@@ -5,7 +5,7 @@ plugins {
 
 group = "me.kiriyaga"
 version = "0.1"
-archivesBaseName = "2bEssentials"
+archivesBaseName = "essentials"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17

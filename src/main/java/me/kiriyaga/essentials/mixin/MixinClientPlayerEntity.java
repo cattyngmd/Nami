@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static me.kiriyaga.essentials.Essentials.EVENT_MANAGER;
+
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity {
 
@@ -16,6 +18,6 @@ public class MixinClientPlayerEntity {
         var mc = net.minecraft.client.MinecraftClient.getInstance();
 
         float partialTicks = mc.getTickDelta();
-        Essentials.EVENT_MANAGER.post(new UpdateEvent(partialTicks));
+        EVENT_MANAGER.post(new UpdateEvent(partialTicks));
     }
 }

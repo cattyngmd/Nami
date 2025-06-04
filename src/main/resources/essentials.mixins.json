@@ -3,7 +3,8 @@
   "package": "me.kiriyaga.essentials.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "MixinClientPlayerEntity"
+    "MixinClientPlayerEntity",
+    "MixinInGameHud"
   ],
   "injectors": {
     "defaultRequire": 1

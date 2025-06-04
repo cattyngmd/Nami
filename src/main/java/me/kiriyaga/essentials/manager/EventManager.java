@@ -1,6 +1,9 @@
 package me.kiriyaga.essentials.manager;
 
-import me.kiriyaga.essentials.event.*;
+import me.kiriyaga.essentials.Essentials;
+import me.kiriyaga.essentials.event.Event;
+import me.kiriyaga.essentials.event.SubscribeEvent;
+import me.kiriyaga.essentials.event.EventPriority;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -9,7 +12,33 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventManager {
 
-    private final Map<Class<? extends Event>, List<MethodEventListener<? extends Event>>> listeners = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Event>, List<ListenerMethod>> listeners = new ConcurrentHashMap<>();
+
+    private static class ListenerMethod implements Comparable<ListenerMethod> {
+        private final Object target;
+        private final Method method;
+        private final EventPriority priority;
+
+        public ListenerMethod(Object target, Method method, EventPriority priority) {
+            this.target = target;
+            this.method = method;
+            this.priority = priority;
+            this.method.setAccessible(true);
+        }
+
+        public void invoke(Event event) throws Exception {
+            method.invoke(target, event);
+        }
+
+        public EventPriority getPriority() {
+            return priority;
+        }
+
+        @Override
+        public int compareTo(ListenerMethod o) {
+            return o.priority.ordinal() - this.priority.ordinal();
+        }
+    }
 
     public void register(Object listenerObject) {
         for (Method method : listenerObject.getClass().getDeclaredMethods()) {
@@ -25,33 +54,38 @@ public class EventManager {
             SubscribeEvent annotation = method.getAnnotation(SubscribeEvent.class);
             EventPriority priority = annotation.priority();
 
-            method.setAccessible(true);
-            MethodEventListener<? extends Event> methodListener = new MethodEventListener<>(listenerObject, method, priority);
+            ListenerMethod listenerMethod = new ListenerMethod(listenerObject, method, priority);
 
-            List<MethodEventListener<? extends Event>> lst = listeners.computeIfAbsent(eventClass, k -> new CopyOnWriteArrayList<>());
-            lst.add(methodListener);
-            lst.sort(Comparator.comparing((MethodEventListener<? extends Event> listener) -> listener.getPriority()).reversed()); // im fucking in love with java lmao
+            listeners.computeIfAbsent(eventClass, k -> new CopyOnWriteArrayList<>()).add(listenerMethod);
+            listeners.get(eventClass).sort(Comparator.naturalOrder());
+
+            Essentials.LOGGER.error("registered " +listeners);
         }
     }
 
     public void unregister(Object listenerObject) {
-        for (List<MethodEventListener<? extends Event>> lst : listeners.values()) {
-            lst.removeIf(listener -> listener.getTarget() == listenerObject);
+        for (List<ListenerMethod> list : listeners.values()) {
+            list.removeIf(listener -> listener.target == listenerObject);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Event> void post(T event) {
-        List<MethodEventListener<? extends Event>> lst = listeners.get(event.getClass());
-        if (lst == null) return;
+    public void post(Event event) {
+        Class<?> clazz = event.getClass();
 
-        for (MethodEventListener<? extends Event> listener : lst) {
-            try {
-                ((MethodEventListener<T>) listener).onEvent(event);
-                if (event.isCancelled()) break;
-            } catch (Exception e) {
-                e.printStackTrace();
+        while (clazz != null && Event.class.isAssignableFrom(clazz)) {
+            List<ListenerMethod> lst = listeners.get(clazz);
+            if (lst != null) {
+                for (ListenerMethod listener : lst) {
+                    try {
+                        Essentials.LOGGER.error("posted to " +listener);
+                        listener.invoke(event);
+                        if (event.isCancelled()) return;
+                    } catch (Exception e) {
+                        Essentials.LOGGER.error("Error invoking event listener: ", e);
+                    }
+                }
             }
+            clazz = clazz.getSuperclass();
         }
     }
 }
