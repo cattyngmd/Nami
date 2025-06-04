@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static me.kiriyaga.essentials.Essentials.LOGGER;
 public class EventManager {
 
     private final Map<Class<? extends Event>, List<ListenerMethod>> listeners = new ConcurrentHashMap<>();
@@ -58,8 +59,6 @@ public class EventManager {
 
             listeners.computeIfAbsent(eventClass, k -> new CopyOnWriteArrayList<>()).add(listenerMethod);
             listeners.get(eventClass).sort(Comparator.naturalOrder());
-
-            Essentials.LOGGER.error("registered " +listeners);
         }
     }
 
@@ -77,11 +76,10 @@ public class EventManager {
             if (lst != null) {
                 for (ListenerMethod listener : lst) {
                     try {
-                        Essentials.LOGGER.error("posted to " +listener);
                         listener.invoke(event);
                         if (event.isCancelled()) return;
                     } catch (Exception e) {
-                        Essentials.LOGGER.error("Error invoking event listener: ", e);
+                        LOGGER.error("Error invoking event listener: ", e);
                     }
                 }
             }
