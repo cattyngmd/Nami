@@ -1,17 +1,16 @@
 package me.kiriyaga.essentials.feature.command.commands;
 
-import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.feature.command.Command;
-import me.kiriyaga.essentials.manager.CommandManager;
 
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.COMMAND_MANAGER;
+import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super("help","Displays list of available commands. Usage: .help command?.", "h", "?", "hlp", "halp", "hilp", "heil");
+        super("help","Displays list of available commands. Usage: .help <Command>.", "h", "?", "hlp", "halp", "hilp", "heil");
     }
 
     @Override
@@ -25,18 +24,20 @@ public class HelpCommand extends Command {
                     builder.append(", ");
                 }
             }
-            sendMessage(builder.toString());
+            CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), builder.toString());
         } else if (args.length == 1) {
             String search = args[0].toLowerCase();
             for (Command cmd : COMMAND_MANAGER.getCommands()) {
                 if (cmd.getName().equalsIgnoreCase(search) || cmd.matches(search)) {
-                    sendMessage(cmd.getName() + " usage: " + cmd.getDescription());
+                    CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), cmd.getName() + " usage: " + cmd.getDescription());
+
                     return;
                 }
             }
-            sendMessage("Command not found: " + search);
+            CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), "Command not found: " + search);
         } else {
-            sendMessage("Type .help");
+            CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), "Type .help");
+
         }
     }
 

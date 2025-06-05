@@ -17,12 +17,6 @@ public abstract class Command {
         this.aliases = aliases;
     }
 
-
-    public void sendMessage(String message) {
-        if (MINECRAFT.player == null) return;
-        MINECRAFT.inGameHud.getChatHud().addMessage(Text.literal("§7[§b" + NAME + "§7]: §r" + message));
-    }
-
     public boolean matches(String input) {
         String lower = input.toLowerCase();
         if (lower.equals(name)) return true;

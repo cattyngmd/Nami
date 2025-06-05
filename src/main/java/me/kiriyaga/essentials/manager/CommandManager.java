@@ -1,7 +1,6 @@
 package me.kiriyaga.essentials.manager;
 
 import me.kiriyaga.essentials.feature.command.Command;
-import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.events.ChatMessageEvent;
 import me.kiriyaga.essentials.feature.command.commands.HelpCommand;
@@ -66,7 +65,6 @@ public class CommandManager {
                     cmd.execute(args);
                 } catch (Exception e) {
                     LOGGER.error("Error executing command " + cmdName, e);
-                    cmd.sendMessage("Error executing command.");
                 }
                 return;
             }
