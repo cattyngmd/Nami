@@ -4,12 +4,12 @@ import me.kiriyaga.essentials.feature.command.Command;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.events.ChatMessageEvent;
 import me.kiriyaga.essentials.feature.command.commands.HelpCommand;
+import me.kiriyaga.essentials.feature.command.commands.NameCommand;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.kiriyaga.essentials.Essentials.LOGGER;
-import static me.kiriyaga.essentials.Essentials.EVENT_MANAGER;
+import static me.kiriyaga.essentials.Essentials.*;
 
 public class CommandManager {
 
@@ -20,6 +20,7 @@ public class CommandManager {
         EVENT_MANAGER.register(this);
 
         registerCommand(new HelpCommand());
+        registerCommand(new NameCommand());
 
         LOGGER.info("Registered " + commands.size() + " commands");
     }

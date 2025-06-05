@@ -6,19 +6,16 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
 
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 import static me.kiriyaga.essentials.Essentials.NAME;
 
 public class ChatManager {
-    private static final String PREFIX = "§7[§b" + NAME + "§7]";
-
-
-    private final Map<String, MessageSignatureData> persistentMessages = new HashMap<>();
-    private MessageSignatureData transientSignature = null;
-
     /**
      * Usage:
      * .sendRaw() just sends raw message without tracking, with prefix
@@ -34,8 +31,21 @@ public class ChatManager {
      * .clear() clears all messages (contained by us btw)
      *
      */
+
+    private final Map<String, MessageSignatureData> persistentMessages = new HashMap<>();
+    private MessageSignatureData transientSignature = null;
+
+    private MessageSignatureData generateSignature() {
+        byte[] data = new byte[256];
+        new SecureRandom().nextBytes(data);
+        return new MessageSignatureData(data);
+    }
+
+
+
     public void sendRaw(String message) {
         if (MINECRAFT.inGameHud == null) return;
+        String PREFIX = "§7[§b" + NAME + "§7]";
         getChatHud().addMessage(Text.literal(PREFIX + message));
     }
 
@@ -46,8 +56,10 @@ public class ChatManager {
             chatHud.removeMessage(persistentMessages.get(key));
         }
 
+        String PREFIX = "§7[§b" + NAME + "§7]";
+
         Text text = Text.literal(PREFIX + message);
-        MessageSignatureData signature = null;
+        MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = MessageIndicator.system();
 
         chatHud.addMessage(text, signature, indicator);
@@ -62,8 +74,10 @@ public class ChatManager {
             transientSignature = null;
         }
 
+        String PREFIX = "§7[§b" + NAME + "§7]";
+
         Text text = Text.literal(PREFIX + message);
-        MessageSignatureData signature = null;
+        MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = MessageIndicator.system();
 
         chatHud.addMessage(text, signature, indicator);
