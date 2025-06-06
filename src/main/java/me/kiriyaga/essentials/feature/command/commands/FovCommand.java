@@ -1,8 +1,7 @@
 package me.kiriyaga.essentials.feature.command.commands;
 
 import me.kiriyaga.essentials.feature.command.Command;
-import me.kiriyaga.essentials.mixin.GameOptionsAccessor;
-import net.minecraft.client.option.SimpleOption;
+import me.kiriyaga.essentials.mixininterface.ISimpleOption;
 
 import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
@@ -10,7 +9,7 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 public class FovCommand extends Command {
 
     public FovCommand() {
-        super("fov", "Changes your FOV. Usage: .fov <Value>");
+        super("fov", "Changes your FOV. Usage: .fov <Value>", "fav", "ащм", " fv");
     }
 
     @Override
@@ -22,13 +21,11 @@ public class FovCommand extends Command {
 
         try {
             int newFov = Integer.parseInt(args[0].trim());
-            if (newFov < 0 || newFov > 420) {
-                CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "FOV must be between 0 and 420.");
+            if (newFov < 0 || newFov > 162) {
+                CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "FOV must be between 0 and 162.");
                 return;
             }
-
-            SimpleOption<Integer> fovOption = ((GameOptionsAccessor) MINECRAFT.options).getFov();
-            fovOption.setValue(newFov);
+            ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(newFov);
 
 
         } catch (NumberFormatException e) {

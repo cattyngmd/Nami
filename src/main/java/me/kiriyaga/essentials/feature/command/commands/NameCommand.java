@@ -12,7 +12,7 @@ import static me.kiriyaga.essentials.Essentials.NAME;
 public class NameCommand extends Command {
 
     public NameCommand() {
-        super("name","Changes the name of client. Usage: .name <Name>.", "n", "nam", "mne", "nome", "brand", "changename");
+        super("name","Changes the name of client. Usage: .name <Name>.", "n", "nam", "mne", "nome", "brand", "changename", "тфьу");
     }
 
     @Override

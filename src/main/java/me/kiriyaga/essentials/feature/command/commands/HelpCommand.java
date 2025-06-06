@@ -10,7 +10,7 @@ import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super("help","Displays list of available commands. Usage: .help <Command>.", "h", "?", "hlp", "halp", "hilp", "heil");
+        super("help","Displays list of available commands. Usage: .help <Command>.", "h", "?", "hlp", "halp", "hilp", "heil", "рудз", "commands", "command");
     }
 
     @Override

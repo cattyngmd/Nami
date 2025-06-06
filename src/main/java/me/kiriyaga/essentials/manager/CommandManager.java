@@ -4,6 +4,7 @@ import me.kiriyaga.essentials.feature.command.Command;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.events.ChatMessageEvent;
 import me.kiriyaga.essentials.feature.command.commands.FovCommand;
+import me.kiriyaga.essentials.feature.command.commands.GammaCommand;
 import me.kiriyaga.essentials.feature.command.commands.HelpCommand;
 import me.kiriyaga.essentials.feature.command.commands.NameCommand;
 
@@ -23,6 +24,7 @@ public class CommandManager {
         registerCommand(new HelpCommand());
         registerCommand(new NameCommand());
         registerCommand(new FovCommand());
+        registerCommand(new GammaCommand());
 
         LOGGER.info("Registered " + commands.size() + " commands");
     }
