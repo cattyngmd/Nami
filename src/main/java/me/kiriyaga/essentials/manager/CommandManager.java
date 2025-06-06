@@ -23,6 +23,7 @@ public class CommandManager {
         registerCommand(new FovCommand());
         registerCommand(new GammaCommand());
         registerCommand(new DisconnectCommand());
+        registerCommand(new ToggleCommand());
 
         LOGGER.info("Registered " + commands.size() + " commands");
     }

@@ -5,6 +5,7 @@ import me.kiriyaga.essentials.event.events.Render2DEvent;
 import me.kiriyaga.essentials.manager.ChatManager;
 import me.kiriyaga.essentials.manager.CommandManager;
 import me.kiriyaga.essentials.manager.EventManager;
+import me.kiriyaga.essentials.manager.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,7 @@ public class Essentials implements ClientModInitializer {
     public static final EventManager EVENT_MANAGER = new EventManager();
     public static final CommandManager COMMAND_MANAGER = new CommandManager();
     public static final ChatManager CHAT_MANAGER = new ChatManager();
+    public static final ModuleManager MODULE_MANAGER = new ModuleManager();
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 
 
@@ -27,15 +29,7 @@ public class Essentials implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         COMMAND_MANAGER.init();
-        EVENT_MANAGER.register(this);
+        MODULE_MANAGER.init();
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
-    }
-
-
-    // for test only for now btw
-    @SubscribeEvent
-    public void onRender2D(Render2DEvent event) {
-
-        event.getDrawContext().drawText(MINECRAFT.textRenderer, NAME, 5, 5, 0x55FFFF, true);
     }
 }
