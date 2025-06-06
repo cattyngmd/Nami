@@ -1,8 +1,8 @@
-package me.kiriyaga.essentials.feature.setting.settings;
+package me.kiriyaga.essentials.setting.settings;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import me.kiriyaga.essentials.feature.setting.Setting;
+import me.kiriyaga.essentials.setting.Setting;
 
 public class EnumSetting<T extends Enum<T>> extends Setting<T> {
 

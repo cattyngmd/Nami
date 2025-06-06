@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.feature.setting;
+package me.kiriyaga.essentials.setting;
 
 import com.google.gson.JsonElement;
 

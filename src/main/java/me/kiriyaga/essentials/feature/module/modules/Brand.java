@@ -4,9 +4,9 @@ import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.events.Render2DEvent;
 import me.kiriyaga.essentials.event.events.UpdateEvent;
 import me.kiriyaga.essentials.feature.module.Module;
-import me.kiriyaga.essentials.feature.setting.settings.BoolSetting;
-import me.kiriyaga.essentials.feature.setting.settings.DoubleSetting;
-import me.kiriyaga.essentials.feature.setting.settings.EnumSetting;
+import me.kiriyaga.essentials.setting.settings.BoolSetting;
+import me.kiriyaga.essentials.setting.settings.DoubleSetting;
+import me.kiriyaga.essentials.setting.settings.EnumSetting;
 
 import static me.kiriyaga.essentials.Essentials.*;
 

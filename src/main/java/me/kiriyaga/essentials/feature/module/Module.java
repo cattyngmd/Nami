@@ -1,6 +1,8 @@
 package me.kiriyaga.essentials.feature.module;
 
-import me.kiriyaga.essentials.feature.setting.Setting;
+import me.kiriyaga.essentials.setting.Setting;
+import me.kiriyaga.essentials.setting.settings.KeyBindSetting;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,11 +19,15 @@ public abstract class Module {
     private String displayInfo = "";
 
     protected final List<Setting<?>> settings = new ArrayList<>();
+    protected final KeyBindSetting keyBind;
 
     public Module(String name, String description, String... aliases) {
         this.name = name;
         this.description = description;
         this.aliases = aliases;
+
+        this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
+        this.settings.add(keyBind);
     }
 
     public void toggle() {
@@ -42,6 +48,10 @@ public abstract class Module {
             CHAT_MANAGER.sendTransient(name + " toggled §coff");
             onDisable();
         }
+    }
+
+    public KeyBindSetting getKeyBind() {
+        return keyBind;
     }
 
     public boolean isEnabled() {

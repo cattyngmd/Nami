@@ -24,6 +24,8 @@ public class CommandManager {
         registerCommand(new GammaCommand());
         registerCommand(new DisconnectCommand());
         registerCommand(new ToggleCommand());
+        registerCommand(new BindCommand());
+
 
         LOGGER.info("Registered " + commands.size() + " commands");
     }

@@ -1,30 +1,32 @@
-package me.kiriyaga.essentials.feature.setting.settings;
+package me.kiriyaga.essentials.setting.settings;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import me.kiriyaga.essentials.feature.setting.Setting;
+import me.kiriyaga.essentials.setting.Setting;
 
-public class DoubleSetting extends Setting<Double> {
+public class IntSetting extends Setting<Integer> {
 
-    private final double min, max;
+    private final int min, max;
 
-    public DoubleSetting(String name, double defaultValue, double min, double max) {
+    public IntSetting(String name, int defaultValue, int min, int max) {
         super(name, defaultValue);
         this.min = min;
         this.max = max;
     }
 
     @Override
-    public void set(Double value) {
+    public void set(Integer value) {
         this.value = Math.max(min, Math.min(max, value));
     }
 
+    @Override
     public void fromJson(JsonElement json) {
         if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
-            set(json.getAsDouble());
+            this.value = json.getAsInt();
         }
     }
 
+    @Override
     public JsonElement toJson() {
         return new JsonPrimitive(value);
     }

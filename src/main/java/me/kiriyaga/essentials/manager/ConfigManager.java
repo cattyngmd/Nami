@@ -1,8 +1,7 @@
 package me.kiriyaga.essentials.manager;
 
 import com.google.gson.*;
-import me.kiriyaga.essentials.feature.setting.Setting;
-import me.kiriyaga.essentials.feature.setting.settings.EnumSetting;
+import me.kiriyaga.essentials.setting.Setting;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
