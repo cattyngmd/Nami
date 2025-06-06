@@ -17,7 +17,6 @@ public class MixinClientPlayerEntity {
     private void tickHook(CallbackInfo ci) {
         var mc = net.minecraft.client.MinecraftClient.getInstance();
 
-        float partialTicks = mc.getTickDelta();
-        EVENT_MANAGER.post(new UpdateEvent(partialTicks));
+        EVENT_MANAGER.post(new UpdateEvent());
     }
 }
