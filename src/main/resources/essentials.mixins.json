@@ -6,8 +6,7 @@
     "MixinClientPlayerEntity",
     "MixinInGameHud",
     "MixinClientPlayNetworkHandler",
-    "ChatHudAccessor",
-    "ChatHudLineAccessor"
+    "ChatHudAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
