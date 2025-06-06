@@ -37,6 +37,6 @@ public class NameCommand extends Command {
         NAME = newName;
         CONFIG_MANAGER.save();
 
-        CHAT_MANAGER.sendPersistent(NameCommand.class.getName(), "Name set to: §8" + newName + "§f");
+        CHAT_MANAGER.sendPersistent(NameCommand.class.getName(), "Name set to: §7" + newName + "§f");
     }
 }

@@ -30,7 +30,7 @@ public class ToggleCommand extends Command {
         }
 
         if (found == null) {
-            CHAT_MANAGER.sendTransient("Module '§8" + input + "§f' not found.");
+            CHAT_MANAGER.sendTransient("Module '§7" + input + "§f' not found.");
             return;
         }
 
