@@ -19,7 +19,7 @@ public class HelpCommand extends Command {
             StringBuilder builder = new StringBuilder("Available commands: ");
             List<Command> cmds = COMMAND_MANAGER.getCommands();
             for (int i = 0; i < cmds.size(); i++) {
-                builder.append(cmds.get(i).getName());
+                builder.append("§8").append(cmds.get(i).getName()).append("§f");
                 if (i < cmds.size() - 1) {
                     builder.append(", ");
                 }
@@ -29,12 +29,12 @@ public class HelpCommand extends Command {
             String search = args[0].toLowerCase();
             for (Command cmd : COMMAND_MANAGER.getCommands()) {
                 if (cmd.getName().equalsIgnoreCase(search) || cmd.matches(search)) {
-                    CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), cmd.getName() + " usage: " + cmd.getDescription());
+                    CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), "§8" + cmd.getName() + "§f usage: " + cmd.getDescription());
 
                     return;
                 }
             }
-            CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), "Command not found: " + search);
+            CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), "Command not found: §8" + search + "§f");
         } else {
             CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), "Type .help");
 

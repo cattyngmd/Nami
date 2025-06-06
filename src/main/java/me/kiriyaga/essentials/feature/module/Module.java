@@ -41,11 +41,11 @@ public abstract class Module {
 
         if (enabled) {
             EVENT_MANAGER.register(this);
-            CHAT_MANAGER.sendTransient(name + " toggled §aon");
+            CHAT_MANAGER.sendTransient("§8" + name + "§f toggled §aon");
             onEnable();
         } else {
             EVENT_MANAGER.unregister(this);
-            CHAT_MANAGER.sendTransient(name + " toggled §coff");
+            CHAT_MANAGER.sendTransient("§8" + name + "§f toggled §coff");
             onDisable();
         }
     }

@@ -18,7 +18,7 @@ public class BindCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 2) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Usage: .bind <module> <key>");
+            CHAT_MANAGER.sendPersistent("§8" + BindCommand.class.getName() + "§f", "Usage: .bind <module> <key>");
             return;
         }
 
@@ -31,7 +31,7 @@ public class BindCommand extends Command {
                 .orElse(null);
 
         if (module == null) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Module '" + moduleName + "' not found.");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Module '§8" + moduleName + "§f' not found.");
             return;
         }
 
@@ -45,24 +45,24 @@ public class BindCommand extends Command {
         }
 
         if (bindSetting == null) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Module '" + moduleName + "' does not have a keybind setting.");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Module '§8" + moduleName + "§f' does not have a keybind setting.");
             return;
         }
 
         int keyCode = KeyUtils.parseKey(keyName);
 
         if (keyCode == -1) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Invalid key name: " + keyName);
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Invalid key name: §8" + keyName + "§f");
             return;
         }
 
         InputUtil.Key key = InputUtil.Type.KEYSYM.createFromCode(keyCode);
         if (key == null) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Invalid key code: " + keyCode);
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Invalid key code: §8" + keyCode + "§f");
             return;
         }
 
         bindSetting.set(keyCode);
-        CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Bound module '" + module.getName() + "' to key '" + keyName + "'.");
+        CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Bound module '§8" + module.getName() + "§f' to key '§8" + keyName + "§f'.");
     }
 }
