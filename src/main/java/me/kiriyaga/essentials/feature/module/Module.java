@@ -1,5 +1,9 @@
 package me.kiriyaga.essentials.feature.module;
 
+import me.kiriyaga.essentials.feature.setting.Setting;
+import java.util.ArrayList;
+import java.util.List;
+
 import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 import static me.kiriyaga.essentials.Essentials.EVENT_MANAGER;
 
@@ -11,6 +15,8 @@ public abstract class Module {
 
     private boolean enabled = false;
     private String displayInfo = "";
+
+    protected final List<Setting<?>> settings = new ArrayList<>();
 
     public Module(String name, String description, String... aliases) {
         this.name = name;
@@ -52,6 +58,15 @@ public abstract class Module {
 
     public String[] getAliases() {
         return aliases;
+    }
+
+    public List<Setting<?>> getSettings() {
+        return settings;
+    }
+
+    public <T extends Setting<?>> T addSetting(T setting) {
+        settings.add(setting);
+        return setting;
     }
 
     public boolean matches(String input) {

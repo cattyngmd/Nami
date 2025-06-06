@@ -48,11 +48,13 @@ public class ChatManager {
     }
 
     public void sendRaw(String message, boolean prefix) {
-        if (MINECRAFT.inGameHud == null) return;
+        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
         getChatHud().addMessage(Text.literal(prefix() + message));
     }
 
     public void sendPersistent(String key, String message) {
+        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+
         ChatHud chatHud = getChatHud();
 
         if (persistentMessages.containsKey(key)) {
@@ -68,6 +70,8 @@ public class ChatManager {
     }
 
     public void sendTransient(String message) {
+        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+
         ChatHud chatHud = getChatHud();
 
         if (transientSignature != null) {
@@ -84,6 +88,8 @@ public class ChatManager {
     }
 
     public void removePersistent(String key) {
+        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+
         ChatHud chatHud = getChatHud();
         if (persistentMessages.containsKey(key)) {
             removeSilently(persistentMessages.get(key));
@@ -92,6 +98,8 @@ public class ChatManager {
     }
 
     public void clear() {
+        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+
         ChatHud chatHud = getChatHud();
         for (MessageSignatureData sig : persistentMessages.values()) {
             chatHud.removeMessage(sig);
@@ -112,7 +120,7 @@ public class ChatManager {
     // btw this is kinda shitcode, but im doin this because of minecraft spaghetti code
 
     private void removeSilently(MessageSignatureData signature) {
-        if (MINECRAFT.inGameHud == null) return;
+        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
 
         ChatHud hud = MINECRAFT.inGameHud.getChatHud();
         ChatHudAccessor accessor = (ChatHudAccessor) hud;

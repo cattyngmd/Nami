@@ -5,7 +5,7 @@ import me.kiriyaga.essentials.feature.command.Command;
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
-import static me.kiriyaga.essentials.Essentials.COMMAND_MANAGER;
+import static me.kiriyaga.essentials.Essentials.CONFIG_MANAGER;
 import static me.kiriyaga.essentials.Essentials.NAME;
 
 
@@ -35,6 +35,7 @@ public class NameCommand extends Command {
         }
 
         NAME = newName;
+        CONFIG_MANAGER.save();
 
         CHAT_MANAGER.sendPersistent(NameCommand.class.getName(), "Name set to: " + newName);
     }
