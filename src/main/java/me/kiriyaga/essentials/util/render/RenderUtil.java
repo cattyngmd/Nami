@@ -236,7 +236,7 @@ public class RenderUtil {
 
         int width = mc.textRenderer.getWidth(text);
         int bgPadding = 2;
-        int bgColor = (int) (mc.options.getTextBackgroundOpacity(0.6f) * 190.0f) << 24;
+        int bgColor = (int) (180.0f) << 24;
         int bgRGB = 0x000000;
         int bgFullColor = bgColor | bgRGB;
 
