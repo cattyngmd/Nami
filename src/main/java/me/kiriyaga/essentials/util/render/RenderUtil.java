@@ -167,12 +167,24 @@ public class RenderUtil {
     }
 
     public static void drawBox(MatrixStack stack, Box box, Color c, double lineWidth) {
-        float minX = (float) (box.minX - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getX());
-        float minY = (float) (box.minY - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getY());
-        float minZ = (float) (box.minZ - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getZ());
-        float maxX = (float) (box.maxX - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getX());
-        float maxY = (float) (box.maxY - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getY());
-        float maxZ = (float) (box.maxZ - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getZ());
+        Camera camera = MINECRAFT.getEntityRenderDispatcher().camera;
+
+        float minX = (float) (box.minX - camera.getPos().getX());
+        float minY = (float) (box.minY - camera.getPos().getY());
+        float minZ = (float) (box.minZ - camera.getPos().getZ());
+        float maxX = (float) (box.maxX - camera.getPos().getX());
+        float maxY = (float) (box.maxY - camera.getPos().getY());
+        float maxZ = (float) (box.maxZ - camera.getPos().getZ());
+
+        Vec3d center = box.getCenter();
+        double distance = camera.getPos().distanceTo(center);
+
+        double minThickness = 0.5;
+        double maxThickness = lineWidth;
+        double scaleFactor = 5.0;
+
+        double scaledLineWidth = maxThickness / (1.0 + (distance / scaleFactor));
+        scaledLineWidth = Math.max(scaledLineWidth, minThickness);
 
         BufferBuilder bufferBuilder = Tessellator.getInstance()
                 .begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL);
@@ -180,8 +192,10 @@ public class RenderUtil {
         VertexRendering.drawBox(stack, bufferBuilder, minX, minY, minZ, maxX, maxY, maxZ,
                 c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
 
-        Layers.getGlobalLines(lineWidth).draw(bufferBuilder.end());
+        Layers.getGlobalLines(scaledLineWidth).draw(bufferBuilder.end());
     }
+
+
 
     public static void drawBox(MatrixStack stack, Vec3d vec, Color c, double lineWidth) {
         drawBox(stack, Box.from(vec), c, lineWidth);
@@ -205,7 +219,7 @@ public class RenderUtil {
         Camera camera = mc.gameRenderer.getCamera();
 
         double distance = camera.getPos().distanceTo(pos);
-        float scale = (float) (baseScale * Math.max(1.5, distance * 0.1));
+        float scale = (float) (baseScale * Math.max(1.5, distance * 0.2));
 
         matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
@@ -216,16 +230,26 @@ public class RenderUtil {
         matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
 
         matrices.translate(0, -0.1, -0.01);
-        matrices.scale(-0.025f * scale, -0.025f * scale, 0);
+        matrices.scale(-0.04f * scale, -0.04f * scale, 1.0f);
 
         int halfWidth = mc.textRenderer.getWidth(text) / 2;
-        VertexConsumerProvider.Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();
 
-        int backgroundColor = 0;
-        if (withBackground) {
-            int opacity = (int) (mc.options.getTextBackgroundOpacity(0.6f) * 255.0f);
-            backgroundColor = (opacity << 24);
-        }
+        int width = mc.textRenderer.getWidth(text);
+        int bgPadding = 2;
+        int bgColor = (int) (mc.options.getTextBackgroundOpacity(0.6f) * 190.0f) << 24;
+        int bgRGB = 0x000000;
+        int bgFullColor = bgColor | bgRGB;
+
+        RenderUtil.rectFilled(
+                matrices,
+                -halfWidth - bgPadding,
+                -bgPadding,
+                width - halfWidth + bgPadding,
+                mc.textRenderer.fontHeight + bgPadding,
+                bgFullColor
+        );
+
+        VertexConsumerProvider.Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();
 
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
 
@@ -237,10 +261,11 @@ public class RenderUtil {
                 matrix4f,
                 immediate,
                 TextRenderer.TextLayerType.SEE_THROUGH,
-                backgroundColor,
+                0,
                 0xf000f0
         );
 
         immediate.draw();
     }
+
 }

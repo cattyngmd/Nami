@@ -23,14 +23,14 @@ import java.awt.*;
 public class ESPModule extends Module {
 
     public final BoolSetting showPlayers = addSetting(new BoolSetting("Players", true));
-    public final BoolSetting showAnimals = addSetting(new BoolSetting("Peacefuls", true));
-    public final BoolSetting showEnemies = addSetting(new BoolSetting("Hostiles", true));
+    public final BoolSetting showPeasefuls = addSetting(new BoolSetting("Peacefuls", true));
+    public final BoolSetting showHostiles = addSetting(new BoolSetting("Hostiles", true));
     public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
-    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line", 1.0,0.5,2.0));
+    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line", 5.0,0.5,2.0));
     public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 
     public ESPModule() {
-        super("ESP", "Draws boxes around entities", "esp", "WH");
+        super("ESP", "Draws boxes around entities", "esp", "WH", "boxes", "уыз");
     }
 
     @SubscribeEvent
@@ -38,39 +38,54 @@ public class ESPModule extends Module {
         if (MINECRAFT == null || MINECRAFT.world == null || MINECRAFT.player == null) return;
 
         MatrixStack matrices = event.getMatrixStack();
-        Vec3d cameraPos = MINECRAFT.gameRenderer.getCamera().getPos();
 
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
                 if (player == MINECRAFT.player || player.isRemoved()) continue;
-                drawBox(player, Color.RED, matrices, cameraPos);
+                drawBox(player, Color.RED, matrices, event.getPartialTicks());
             }
         }
 
-        if (showAnimals.get()) {
+        if (showPeasefuls.get()) {
             for (PassiveEntity animal : EntityUtils.getPassiveMobs()) {
                 if (animal.isRemoved()) continue;
-                drawBox(animal, Color.LIGHT_GRAY, matrices, cameraPos);
+                drawBox(animal, Color.LIGHT_GRAY, matrices, event.getPartialTicks());
             }
         }
 
-        if (showEnemies.get()) {
+        if (showHostiles.get()) {
             for (HostileEntity hostile : EntityUtils.getHostileMobs()) {
                 if (hostile.isRemoved()) continue;
-                drawBox(hostile, Color.RED, matrices, cameraPos);
+                drawBox(hostile, Color.RED, matrices, event.getPartialTicks());
             }
         }
 
         if (showItems.get()) {
             for (ItemEntity item : EntityUtils.getDroppedItems()) {
                 if (item.isRemoved()) continue;
-                drawBox(item, Color.LIGHT_GRAY, matrices, cameraPos);
+                drawBox(item, Color.LIGHT_GRAY, matrices, event.getPartialTicks());
             }
         }
     }
 
-    private void drawBox(Entity entity, Color color, MatrixStack matrices, Vec3d cameraPos) {
-        Box box = entity.getBoundingBox().offset(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        RenderUtil.drawBox(matrices, box, color, lineWidth.get());
+    private void drawBox(Entity entity, Color color, MatrixStack matrices, float partialTicks) {
+
+        double interpX = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * partialTicks;
+        double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
+        double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
+
+
+        Box box = entity.getBoundingBox().offset(
+                interpX - entity.getX(),
+                interpY - entity.getY(),
+                interpZ - entity.getZ()
+        );
+
+        if (filled.get())
+            RenderUtil.drawBoxFilled(matrices, box, color);
+        else
+            RenderUtil.drawBox(matrices, box, color, lineWidth.get());
     }
+
+
 }

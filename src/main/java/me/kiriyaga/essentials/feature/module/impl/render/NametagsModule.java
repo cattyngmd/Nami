@@ -34,40 +34,45 @@ public class NametagsModule extends Module {
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
                 if (player == MINECRAFT.player || player.isRemoved()) continue;
-                drawNameTag(player, 0xFFFF5555);
+                drawNameTag(player, 0xFFFF5555, event.getPartialTicks());
             }
         }
 
         if (showAnimals.get()) {
             for (PassiveEntity animal : EntityUtils.getPassiveMobs()) {
                 if (animal.isRemoved()) continue;
-                drawNameTag(animal, 0xFFAAAAAA);
+                drawNameTag(animal, 0xFFAAAAAA, event.getPartialTicks());
             }
         }
 
         if (showEnemies.get()) {
             for (HostileEntity hostile : EntityUtils.getHostileMobs()) {
                 if (hostile.isRemoved()) continue;
-                drawNameTag(hostile, 0xFFFF5555);
+                drawNameTag(hostile, 0xFFFF5555, event.getPartialTicks());
             }
         }
 
         if (showItems.get()) {
             for (ItemEntity item : EntityUtils.getDroppedItems()) {
                 if (item.isRemoved()) continue;
-                drawNameTag(item, 0xFFAAAAAA);
+                drawNameTag(item, 0xFFAAAAAA, event.getPartialTicks());
             }
         }
     }
-    private void drawNameTag(Entity entity, int color) {
-        Vec3d pos = entity.getPos().add(0, entity.getHeight() + 0.5, 0);
+
+    private void drawNameTag(Entity entity, int color, float tickDelta) {
+        double x = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * tickDelta;
+        double y = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * tickDelta + entity.getHeight() + 0.5;
+        double z = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * tickDelta;
+        Vec3d interpolatedPos = new Vec3d(x, y, z);
+
         Text text = entity.getName();
         float scale = 0.5f;
 
         RenderUtil.drawTextInWorld(
                 MINECRAFT,
                 text,
-                pos,
+                interpolatedPos,
                 scale,
                 color,
                 true

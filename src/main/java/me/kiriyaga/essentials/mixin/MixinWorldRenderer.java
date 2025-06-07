@@ -19,7 +19,7 @@ import static me.kiriyaga.essentials.Essentials.*;
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "render", at = @At("RETURN"))
     private void onRenderTail(
             ObjectAllocator allocator,
             RenderTickCounter tickCounter,
@@ -31,12 +31,15 @@ public class MixinWorldRenderer {
             CallbackInfo ci
     ) {
         MatrixStack matrices = new MatrixStack();
+        matrices.push();
 
-        Vec3d camPos = camera.getPos();
-        matrices.translate(-camPos.x, -camPos.y, -camPos.z);
+        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
 
-        float tickDelta = tickCounter.getTickProgress(false);
+        float tickDelta = tickCounter.getTickProgress(true);
 
         EVENT_MANAGER.post(new Render3DEvent(matrices, tickDelta));
+
+        matrices.pop();
     }
 }

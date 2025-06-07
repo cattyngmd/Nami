@@ -18,7 +18,7 @@ public class BindCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 2) {
-            CHAT_MANAGER.sendPersistent("§7" + BindCommand.class.getName() + "§f", "Usage: .bind <module> <key>");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Usage: .bind <module> <key>");
             return;
         }
 
