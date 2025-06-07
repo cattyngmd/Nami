@@ -1,6 +1,6 @@
 package me.kiriyaga.essentials.mixin;
 
-import me.kiriyaga.essentials.event.events.Render2DEvent;
+import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;

@@ -1,7 +1,7 @@
 package me.kiriyaga.essentials.feature.module;
 
 import me.kiriyaga.essentials.setting.Setting;
-import me.kiriyaga.essentials.setting.settings.KeyBindSetting;
+import me.kiriyaga.essentials.setting.impl.KeyBindSetting;
 
 import java.util.ArrayList;
 import java.util.List;

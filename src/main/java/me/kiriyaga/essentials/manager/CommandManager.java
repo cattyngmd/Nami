@@ -2,8 +2,8 @@ package me.kiriyaga.essentials.manager;
 
 import me.kiriyaga.essentials.feature.command.Command;
 import me.kiriyaga.essentials.event.SubscribeEvent;
-import me.kiriyaga.essentials.event.events.ChatMessageEvent;
-import me.kiriyaga.essentials.feature.command.commands.*;
+import me.kiriyaga.essentials.event.impl.ChatMessageEvent;
+import me.kiriyaga.essentials.feature.command.impl.*;
 
 import java.util.ArrayList;
 import java.util.List;

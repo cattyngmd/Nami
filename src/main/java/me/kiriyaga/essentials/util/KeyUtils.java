@@ -1,5 +1,4 @@
-package me.kiriyaga.essentials.utils;
-import net.minecraft.client.util.InputUtil;
+package me.kiriyaga.essentials.util;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyUtils {

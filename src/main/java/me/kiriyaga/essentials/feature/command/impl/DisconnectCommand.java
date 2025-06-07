@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.feature.command.commands;
+package me.kiriyaga.essentials.feature.command.impl;
 
 import me.kiriyaga.essentials.feature.command.Command;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;

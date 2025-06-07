@@ -1,9 +1,9 @@
-package me.kiriyaga.essentials.feature.command.commands;
+package me.kiriyaga.essentials.feature.command.impl;
 
 import me.kiriyaga.essentials.feature.command.Command;
 import me.kiriyaga.essentials.feature.module.Module;
-import me.kiriyaga.essentials.setting.settings.KeyBindSetting;
-import me.kiriyaga.essentials.utils.KeyUtils;
+import me.kiriyaga.essentials.setting.impl.KeyBindSetting;
+import me.kiriyaga.essentials.util.KeyUtils;
 import net.minecraft.client.util.InputUtil;
 
 import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;

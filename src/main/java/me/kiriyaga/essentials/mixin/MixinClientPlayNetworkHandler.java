@@ -1,8 +1,7 @@
 package me.kiriyaga.essentials.mixin;
 
-import me.kiriyaga.essentials.event.events.ChatMessageEvent;
+import me.kiriyaga.essentials.event.impl.ChatMessageEvent;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

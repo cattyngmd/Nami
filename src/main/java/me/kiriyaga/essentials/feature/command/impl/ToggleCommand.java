@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.feature.command.commands;
+package me.kiriyaga.essentials.feature.command.impl;
 
 import me.kiriyaga.essentials.feature.command.Command;
 import me.kiriyaga.essentials.feature.module.Module;

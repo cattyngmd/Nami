@@ -1,9 +1,8 @@
-package me.kiriyaga.essentials.event.events;
+package me.kiriyaga.essentials.event.impl;
 
 import me.kiriyaga.essentials.event.Event;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class Render2DEvent extends Event {
     private final DrawContext drawContext;

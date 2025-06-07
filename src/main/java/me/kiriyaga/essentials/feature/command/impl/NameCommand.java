@@ -1,8 +1,6 @@
-package me.kiriyaga.essentials.feature.command.commands;
+package me.kiriyaga.essentials.feature.command.impl;
 
 import me.kiriyaga.essentials.feature.command.Command;
-
-import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 import static me.kiriyaga.essentials.Essentials.CONFIG_MANAGER;

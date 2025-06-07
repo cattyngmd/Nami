@@ -10,7 +10,8 @@
     "MixinClientPlayNetworkHandler",
     "MixinInGameHud",
     "MixinMinecraftClient",
-    "MixinSimpleOption"
+    "MixinSimpleOption",
+    "MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

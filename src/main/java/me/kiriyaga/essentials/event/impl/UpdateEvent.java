@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.event.events;
+package me.kiriyaga.essentials.event.impl;
 
 import me.kiriyaga.essentials.event.Event;
 

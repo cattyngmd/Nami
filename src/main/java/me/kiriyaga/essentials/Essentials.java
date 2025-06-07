@@ -1,7 +1,5 @@
 package me.kiriyaga.essentials;
 
-import me.kiriyaga.essentials.event.SubscribeEvent;
-import me.kiriyaga.essentials.event.events.Render2DEvent;
 import me.kiriyaga.essentials.manager.ChatManager;
 import me.kiriyaga.essentials.manager.CommandManager;
 import me.kiriyaga.essentials.manager.EventManager;
