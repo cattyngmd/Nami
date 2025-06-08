@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Essentials implements ClientModInitializer {
     public static String NAME = "2bEssentials";
-    public static final String VERSION = "420.2";
+    public static final String VERSION = "420.4";
 
     public static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 
