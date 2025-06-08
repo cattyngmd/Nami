@@ -14,7 +14,7 @@ import java.util.List;
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
 public class SettingPanel {
-    public static final int HEIGHT = 20;
+    public static final int HEIGHT = 16;
     private static final int PADDING = 6;
     private static final int WIDTH = 110;
 
