@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.feature.module.impl.render;
 
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
+import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
@@ -24,7 +25,7 @@ public class NametagsModule extends Module {
     public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
 
     public NametagsModule() {
-        super("Nametags", "Draws nametags", "nametag");
+        super("Nametags", "Draws nametags", Category.RENDER, "nametag", "nmtags", "names", "тфьуефпы");
     }
 
     @SubscribeEvent

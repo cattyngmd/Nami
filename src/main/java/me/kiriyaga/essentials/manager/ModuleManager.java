@@ -1,6 +1,7 @@
 package me.kiriyaga.essentials.manager;
 
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.feature.module.impl.render.ESPModule;
 import me.kiriyaga.essentials.feature.module.impl.render.NametagsModule;
 
@@ -16,6 +17,7 @@ public class ModuleManager {
     public void init() {
         registerModule(new NametagsModule());
         registerModule(new ESPModule());
+        registerModule(new ColorModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

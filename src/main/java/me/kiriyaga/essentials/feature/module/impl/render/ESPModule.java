@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.feature.module.impl.render;
 
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
+import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
@@ -30,7 +31,7 @@ public class ESPModule extends Module {
     public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 
     public ESPModule() {
-        super("ESP", "Draws boxes around entities", "esp", "WH", "boxes", "уыз");
+        super("ESP", "Draws boxes around entities", Category.RENDER, "esp", "WH", "boxes", "уыз");
     }
 
     @SubscribeEvent

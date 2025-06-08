@@ -14,6 +14,7 @@ public abstract class Module {
     protected final String name;
     protected final String description;
     protected final String[] aliases;
+    protected final Category category;
 
     private boolean enabled = false;
     private String displayInfo = "";
@@ -21,10 +22,11 @@ public abstract class Module {
     protected final List<Setting<?>> settings = new ArrayList<>();
     protected final KeyBindSetting keyBind;
 
-    public Module(String name, String description, String... aliases) {
+    public Module(String name, String description, Category category, String... aliases) {
         this.name = name;
         this.description = description;
         this.aliases = aliases;
+        this.category = category;
 
         this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
         this.settings.add(keyBind);
@@ -48,6 +50,10 @@ public abstract class Module {
             CHAT_MANAGER.sendTransient("§7" + name + "§f toggled §coff");
             onDisable();
         }
+    }
+
+    public Category getCategory() {
+        return category;
     }
 
     public KeyBindSetting getKeyBind() {
