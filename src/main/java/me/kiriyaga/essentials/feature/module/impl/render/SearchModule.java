@@ -121,7 +121,8 @@ public class SearchModule extends Module {
                 if (distSq > 168 * 168) continue;
 
                 BlockState state = MINECRAFT.world.getBlockState(pos);
-                Color blockColor = RenderUtil.getBlockColor(state, MINECRAFT.world, pos);
+                Color blockColor = BlockUtil.getColorByBlockId(state);
+
 
                 RenderUtil.drawBlockShape(
                         matrices,
