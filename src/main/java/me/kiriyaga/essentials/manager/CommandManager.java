@@ -25,6 +25,8 @@ public class CommandManager {
         registerCommand(new DisconnectCommand());
         registerCommand(new ToggleCommand());
         registerCommand(new BindCommand());
+        registerCommand(new SaveCommand());
+        registerCommand(new LoadCommand());
 
 
         LOGGER.info("Registered " + commands.size() + " commands");
