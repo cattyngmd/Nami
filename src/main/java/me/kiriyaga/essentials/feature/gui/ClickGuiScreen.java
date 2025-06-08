@@ -65,7 +65,13 @@ public class ClickGuiScreen extends Screen {
                 List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
                 int curY = startY + CategoryPanel.HEIGHT + CategoryPanel.GAP;
 
-                for (Module module : modules) {
+                for (int i = 0; i < modules.size(); i++) {
+                    Module module = modules.get(i);
+
+                    if (i != 0) {
+                        curY += ModulePanel.PADDING;
+                    }
+
                     if (ModulePanel.isHovered(mouseX, mouseY, curX, curY)) {
                         if (button == 0) {
                             module.toggle();
@@ -93,6 +99,7 @@ public class ClickGuiScreen extends Screen {
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {

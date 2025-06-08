@@ -7,6 +7,7 @@ package me.kiriyaga.essentials.util.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -25,9 +26,16 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockRenderView;
 
 import static me.kiriyaga.essentials.Essentials.*;
 import java.awt.*;
@@ -165,6 +173,36 @@ public class RenderUtil {
     public static void drawBoxFilled(MatrixStack stack, BlockPos bp, Color c) {
         drawBoxFilled(stack, new Box(bp), c);
     }
+
+    public static void drawBlockShape(MatrixStack matrices, World world, BlockPos pos, BlockState state,
+                                      Color fillColor, Color lineColor, double lineWidth, boolean filled) {
+
+        VoxelShape shape = state.getOutlineShape(world, pos);
+
+        shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
+            Box box = new Box(
+                    pos.getX() + minX,
+                    pos.getY() + minY,
+                    pos.getZ() + minZ,
+                    pos.getX() + maxX,
+                    pos.getY() + maxY,
+                    pos.getZ() + maxZ
+            );
+
+            if (filled) {
+                drawBoxFilled(matrices, box, fillColor);
+            }
+            drawBox(matrices, box, lineColor, lineWidth);
+        });
+    }
+
+    public static Color getBlockColor(BlockState state, BlockRenderView world, BlockPos pos) {
+        BlockColors blockColors = MinecraftClient.getInstance().getBlockColors();
+        int colorInt = blockColors.getColor(state, world, pos, 0);
+
+        return new Color(colorInt, true);
+    }
+
 
     public static void drawBox(MatrixStack stack, Box box, Color c, double lineWidth) {
         Camera camera = MINECRAFT.getEntityRenderDispatcher().camera;

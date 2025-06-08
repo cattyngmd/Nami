@@ -14,8 +14,8 @@ import java.util.List;
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
 public class SettingPanel {
-    public static final int HEIGHT = 18;
-    private static final int PADDING = 6;
+    public static final int HEIGHT = 20;
+    private static final int PADDING = 5;
     private static final int WIDTH = 110;
 
     private static ColorModule getColorModule() {
@@ -97,11 +97,9 @@ public class SettingPanel {
                     WIDTH - 2 * PADDING, 4,
                     doubleSetting.get(), doubleSetting.getMin(), doubleSetting.getMax(), primary);
 
-            // Отрисовка значения справа с 1 знаком после запятой
             String valStr = String.format("%.1f", doubleSetting.get());
             context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + 6, textColorInt, false);
 
-            // Подсветка при ховере
             if (hovered) {
                 context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
             }

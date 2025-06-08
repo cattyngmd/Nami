@@ -57,10 +57,17 @@ public class NametagsModule extends Module {
         if (showItems.get()) {
             for (ItemEntity item : EntityUtils.getDroppedItems()) {
                 if (item.isRemoved() || item.getStack().isEmpty()) continue;
-                String name = "x" + item.getStack().getCount();
-                drawNameTag(item, Text.of(name), 0xFFAAAAAA, event.getPartialTicks());
+
+                Text itemName = item.getStack().getName();
+                int count = item.getStack().getCount();
+                Text display = count > 1
+                        ? Text.of(itemName.getString() + " x" + count)
+                        : itemName;
+
+                drawNameTag(item, display, 0xFFAAAAAA, event.getPartialTicks());
             }
         }
+
     }
 
     private void drawNameTag(Entity entity, Text text, int color, float tickDelta) {

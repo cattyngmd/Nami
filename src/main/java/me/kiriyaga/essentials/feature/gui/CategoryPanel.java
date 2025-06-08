@@ -17,7 +17,7 @@ public class CategoryPanel {
     public static final int WIDTH = 110;
     public static final int HEIGHT = 20;
     public static final int GAP = 5;
-    private static final int PADDING = 6;
+    private static final int PADDING = 5;
 
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);

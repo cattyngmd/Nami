@@ -13,8 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Essentials implements ClientModInitializer {
-    public static String NAME = "2bEssentials"; // like that for now, gonna rewrite it while config impl
-    public static final String VERSION = "0.2";
+    public static String NAME = "2bEssentials";
+    public static final String VERSION = "420.2";
 
     public static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 

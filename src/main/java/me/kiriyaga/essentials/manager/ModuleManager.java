@@ -7,6 +7,7 @@ import me.kiriyaga.essentials.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.feature.module.impl.render.ESPModule;
 import me.kiriyaga.essentials.feature.module.impl.render.NametagsModule;
+import me.kiriyaga.essentials.feature.module.impl.render.SearchModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class ModuleManager {
         /// RENDER ///
         registerModule(new NametagsModule());
         registerModule(new ESPModule());
+        registerModule(new SearchModule());
         /// CLIENT ///
         registerModule(new ColorModule());
         registerModule(new ClickGuiModule());
