@@ -64,9 +64,7 @@ public class SettingPanel {
             String text = setting.getName();
             context.drawText(textRenderer, text, x + PADDING, y + 6, textColorInt, false);
 
-            renderHueSlider(context, x + PADDING, y + HEIGHT - 18, WIDTH - 2 * PADDING, 4, hue);
-            renderSaturationSlider(context, x + PADDING, y + HEIGHT - 12, WIDTH - 2 * PADDING, 4, hsb[1]);
-            renderBrightnessSlider(context, x + PADDING, y + HEIGHT - 6, WIDTH - 2 * PADDING, 4, hsb[2]);
+            renderHueSlider(context, x + PADDING, y + HEIGHT - 6, WIDTH - 2 * PADDING, 4, hue);
 
             String hex = String.format("#%02X%02X%02X", colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue());
             context.drawText(textRenderer, hex, x + WIDTH - PADDING - textRenderer.getWidth(hex), y + 6, textColorInt, false);
@@ -101,26 +99,6 @@ public class SettingPanel {
             context.fill(x + i, y, x + i + 1, y + height, toRGBA(color));
         }
         int pos = (int) (hue * width);
-        context.fill(x + pos - 1, y, x + pos + 1, y + height, toRGBA(Color.WHITE));
-    }
-
-    private static void renderSaturationSlider(DrawContext context, int x, int y, int width, int height, float saturation) {
-        for (int i = 0; i < width; i++) {
-            float s = i / (float) width;
-            Color color = Color.getHSBColor(0f, s, 1f);
-            context.fill(x + i, y, x + i + 1, y + height, toRGBA(color));
-        }
-        int pos = (int) (saturation * width);
-        context.fill(x + pos - 1, y, x + pos + 1, y + height, toRGBA(Color.WHITE));
-    }
-
-    private static void renderBrightnessSlider(DrawContext context, int x, int y, int width, int height, float brightness) {
-        for (int i = 0; i < width; i++) {
-            float b = i / (float) width;
-            Color color = Color.getHSBColor(0f, 1f, b);
-            context.fill(x + i, y, x + i + 1, y + height, toRGBA(color));
-        }
-        int pos = (int) (brightness * width);
         context.fill(x + pos - 1, y, x + pos + 1, y + height, toRGBA(Color.WHITE));
     }
 
@@ -196,29 +174,9 @@ public class SettingPanel {
                     enumSetting.cycle();
                     return true;
                 } else if (setting instanceof ColorSetting colorSetting) {
-                    float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
-
-                    int relativeY = (int)(mouseY - curY);
-                    int sliderY = HEIGHT;
-
-                    if (relativeY > sliderY - 18 && relativeY <= sliderY - 14) {
-                        dragComponent = DragComponent.HUE;
-                        startValue = hsb[0];
-                    } else if (relativeY > sliderY - 12 && relativeY <= sliderY - 8) {
-                        dragComponent = DragComponent.SATURATION;
-                        startValue = hsb[1];
-                    } else if (relativeY > sliderY - 6 && relativeY <= sliderY - 2) {
-                        dragComponent = DragComponent.BRIGHTNESS;
-                        startValue = hsb[2];
-                    } else {
-                        dragComponent = DragComponent.HUE;
-                        startValue = hsb[0];
-                    }
-
                     startDragging(setting, mouseX);
                     return true;
                 }
-
             }
             curY += HEIGHT;
         }
@@ -232,30 +190,13 @@ public class SettingPanel {
 
         if (draggedSetting instanceof ColorSetting colorSetting) {
             float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
-            float delta = (float) (deltaX * 0.005);
-
-            switch (dragComponent) {
-                case HUE -> hsb[0] = clampFloat((float) startValue + delta, 0f, 1f);
-                case SATURATION -> hsb[1] = clampFloat((float) startValue + delta, 0f, 1f);
-                case BRIGHTNESS -> hsb[2] = clampFloat((float) startValue + delta, 0f, 1f);
-            }
-
-            Color newColor = Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
+            float newHue = (float) (startValue + deltaX * 0.005);
+            if (newHue < 0) newHue = 0;
+            if (newHue > 1) newHue = 1;
+            Color newColor = Color.getHSBColor(newHue, 1f, 1f);
             colorSetting.setValue(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), colorSetting.getAlpha());
-        } else if (draggedSetting instanceof IntSetting intSetting) {
-            int newValue = slideInt((int) startValue, deltaX);
-            intSetting.set(newValue);
-        } else if (draggedSetting instanceof DoubleSetting doubleSetting) {
-            double newValue = slideDouble(startValue, deltaX);
-            doubleSetting.set(newValue);
         }
     }
-
-
-    private static float clampFloat(float value, float min, float max) {
-        return Math.max(min, Math.min(max, value));
-    }
-
 
     public static void mouseReleased() {
         dragging = false;
@@ -319,9 +260,4 @@ public class SettingPanel {
 
         return newValue;
     }
-    private enum DragComponent {
-        HUE, SATURATION, BRIGHTNESS
-    }
-    private static DragComponent dragComponent = null;
-
 }
