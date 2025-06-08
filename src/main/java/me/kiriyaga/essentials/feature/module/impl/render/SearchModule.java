@@ -32,10 +32,10 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 public class SearchModule extends Module {
 
     private final BoolSetting storages = addSetting(new BoolSetting("Storages", true));
-    private final BoolSetting nonVanilla = addSetting(new BoolSetting("Non-Vanilla", true));
-    private final BoolSetting notifier = addSetting(new BoolSetting("Notifier", true));
+    private final BoolSetting nonVanilla = addSetting(new BoolSetting("Non-Vanilla", false));
+    private final BoolSetting notifier = addSetting(new BoolSetting("Notifier", false));
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line Width", 1.5, 0.5, 2.5));
-    private final BoolSetting filled = addSetting(new BoolSetting("Filled", false));
+    private final BoolSetting filled = addSetting(new BoolSetting("Filled", true));
 
     private ExecutorService workerThread = Executors.newSingleThreadExecutor();
 
@@ -95,7 +95,7 @@ public class SearchModule extends Module {
                 chunkBlocks.put(chunkKey, foundBlocks);
 
                 if (notifier.get()) {
-                    StringBuilder message = new StringBuilder("§cFound: ");
+                    StringBuilder message = new StringBuilder("§8Found: ");
                     foundCounts.forEach((id, count) -> message.append(count).append("x ").append(id.getPath()).append(", "));
                     if (message.length() > 2) message.setLength(message.length() - 2);
 

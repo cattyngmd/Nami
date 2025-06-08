@@ -7,7 +7,11 @@ import net.minecraft.util.Identifier;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class BlockUtil {
+    private static final Block AIR_BLOCK = Registries.BLOCK.get(Identifier.of("minecraft", "air"));
+
+
     private static final Set<String> NON_VANILLA_GENERATED_IDS = Set.of(
             "minecraft:crafting_table",
             "minecraft:enchanting_table",
@@ -34,8 +38,6 @@ public class BlockUtil {
             "minecraft:spawner",
             "minecraft:armor_stand",
             "minecraft:painting",
-            "minecraft:sign",
-            "minecraft:hanging_sign",
             "minecraft:daylight_detector",
             "minecraft:note_block",
             "minecraft:redstone_lamp",
@@ -49,8 +51,31 @@ public class BlockUtil {
             "minecraft:redstone_torch",
             "minecraft:repeater",
             "minecraft:comparator",
-            "minecraft:iron_door",
-            "minecraft:iron_trapdoor",
+            "minecraft:crafter",
+            "minecraft:chiseled_bookshelf",
+            "minecraft:decorated_pot",
+            "minecraft:oak_sign",
+            "minecraft:spruce_sign",
+            "minecraft:birch_sign",
+            "minecraft:jungle_sign",
+            "minecraft:acacia_sign",
+            "minecraft:dark_oak_sign",
+            "minecraft:mangrove_sign",
+            "minecraft:cherry_sign",
+            "minecraft:bamboo_sign",
+            "minecraft:crimson_sign",
+            "minecraft:warped_sign",
+            "minecraft:oak_hanging_sign",
+            "minecraft:spruce_hanging_sign",
+            "minecraft:birch_hanging_sign",
+            "minecraft:jungle_hanging_sign",
+            "minecraft:acacia_hanging_sign",
+            "minecraft:dark_oak_hanging_sign",
+            "minecraft:mangrove_hanging_sign",
+            "minecraft:cherry_hanging_sign",
+            "minecraft:bamboo_hanging_sign",
+            "minecraft:crimson_hanging_sign",
+            "minecraft:warped_hanging_sign",
             "minecraft:sculk_catalyst",
             "minecraft:sculk_sensor",
             "minecraft:calibrated_sculk_sensor",
@@ -79,12 +104,14 @@ public class BlockUtil {
         Set<Block> blocks = new HashSet<>();
         for (Identifier id : NON_VANILLA_GENERATED_IDENTIFIERS) {
             Block block = Registries.BLOCK.get(id);
-            if (block != null) {
+            if (block != null && block != AIR_BLOCK) {
                 blocks.add(block);
             }
         }
         return blocks;
     }
+
+
     private static final Set<String> STORAGE_IDS = Set.of(
             "minecraft:furnace",
             "minecraft:blast_furnace",
@@ -120,10 +147,7 @@ public class BlockUtil {
             "minecraft:black_shulker_box",
             "minecraft:hopper",
             "minecraft:dispenser",
-            "minecraft:dropper",
-            "minecraft:item_frame",
-            "minecraft:glow_item_frame",
-            "minecraft:flower_pot"
+            "minecraft:dropper"
     );
 
 
@@ -148,7 +172,7 @@ public class BlockUtil {
         Set<Block> blocks = new HashSet<>();
         for (Identifier id : STORAGE_IDENTIFIERS) {
             Block block = Registries.BLOCK.get(id);
-            if (block != null) {
+            if (block != null && block != AIR_BLOCK) {
                 blocks.add(block);
             }
         }
