@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials;
 
+import me.kiriyaga.essentials.feature.gui.ClickGuiScreen;
 import me.kiriyaga.essentials.manager.ChatManager;
 import me.kiriyaga.essentials.manager.CommandManager;
 import me.kiriyaga.essentials.manager.EventManager;
@@ -24,6 +25,7 @@ public class Essentials implements ClientModInitializer {
     public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 
+    public static ClickGuiScreen CLICK_GUI = new ClickGuiScreen();
 
 
 

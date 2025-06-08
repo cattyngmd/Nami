@@ -45,4 +45,38 @@ public class KeyUtils {
 
         return -1;
     }
+
+    public static String getKeyName(int keyCode) {
+        switch (keyCode) {
+            case GLFW.GLFW_KEY_LEFT_CONTROL: return "LCTRL";
+            case GLFW.GLFW_KEY_RIGHT_CONTROL: return "RCTRL";
+            case GLFW.GLFW_KEY_LEFT_SHIFT: return "LSHIFT";
+            case GLFW.GLFW_KEY_RIGHT_SHIFT: return "RSHIFT";
+            case GLFW.GLFW_KEY_LEFT_ALT: return "LALT";
+            case GLFW.GLFW_KEY_RIGHT_ALT: return "RALT";
+            case GLFW.GLFW_KEY_SPACE: return "SPACE";
+            case GLFW.GLFW_KEY_ENTER: return "ENTER";
+            case GLFW.GLFW_KEY_TAB: return "TAB";
+            case GLFW.GLFW_KEY_ESCAPE: return "ESC";
+            case GLFW.GLFW_KEY_UP: return "UP";
+            case GLFW.GLFW_KEY_DOWN: return "DOWN";
+            case GLFW.GLFW_KEY_LEFT: return "LEFT";
+            case GLFW.GLFW_KEY_RIGHT: return "RIGHT";
+            case GLFW.GLFW_KEY_BACKSPACE: return "BACKSPACE";
+            case GLFW.GLFW_KEY_DELETE: return "DELETE";
+            case GLFW.GLFW_KEY_INSERT: return "INSERT";
+            case GLFW.GLFW_KEY_HOME: return "HOME";
+            case GLFW.GLFW_KEY_END: return "END";
+            case GLFW.GLFW_KEY_PAGE_UP: return "PAGEUP";
+            case GLFW.GLFW_KEY_PAGE_DOWN: return "PAGEDOWN";
+        }
+        if (keyCode >= GLFW.GLFW_KEY_A && keyCode <= GLFW.GLFW_KEY_Z) {
+            return String.valueOf((char)('A' + (keyCode - GLFW.GLFW_KEY_A)));
+        }
+        if (keyCode >= GLFW.GLFW_KEY_0 && keyCode <= GLFW.GLFW_KEY_9) {
+            return String.valueOf((char)('0' + (keyCode - GLFW.GLFW_KEY_0)));
+        }
+        return "KEY_" + keyCode;
+    }
+
 }

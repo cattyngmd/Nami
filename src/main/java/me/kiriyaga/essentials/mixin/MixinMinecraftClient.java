@@ -16,7 +16,7 @@ public class MixinMinecraftClient {
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents(CallbackInfo ci) {
 
-        if (MINECRAFT.currentScreen != null) return;
+        if (MINECRAFT == null || MINECRAFT.mouse == null) return;
 
         for (Module module : MODULE_MANAGER.getModules()) {
             KeyBindSetting bind = module.getKeyBind();
