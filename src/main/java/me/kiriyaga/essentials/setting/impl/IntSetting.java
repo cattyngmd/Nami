@@ -14,6 +14,14 @@ public class IntSetting extends Setting<Integer> {
         this.max = max;
     }
 
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
     @Override
     public void set(Integer value) {
         this.value = Math.max(min, Math.min(max, value));

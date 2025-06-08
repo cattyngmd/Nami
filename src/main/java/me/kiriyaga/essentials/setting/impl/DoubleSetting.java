@@ -14,6 +14,14 @@ public class DoubleSetting extends Setting<Double> {
         this.max = max;
     }
 
+    public double getMin() {
+        return min;
+    }
+
+    public double getMax() {
+        return max;
+    }
+
     @Override
     public void set(Double value) {
         this.value = Math.max(min, Math.min(max, value));
