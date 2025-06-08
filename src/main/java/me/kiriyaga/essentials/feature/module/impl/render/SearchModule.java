@@ -34,6 +34,7 @@ public class SearchModule extends Module {
     private final BoolSetting storages = addSetting(new BoolSetting("Storages", true));
     private final BoolSetting nonVanilla = addSetting(new BoolSetting("Non-Vanilla", false));
     private final BoolSetting notifier = addSetting(new BoolSetting("Notifier", false));
+    private final BoolSetting notAtSpawn = addSetting(new BoolSetting("Not At Spawn", false));
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line Width", 1.5, 0.5, 2.5));
     private final BoolSetting filled = addSetting(new BoolSetting("Filled", true));
 
@@ -62,7 +63,14 @@ public class SearchModule extends Module {
 
     @SubscribeEvent
     public void onChunkLoad(ChunkDataEvent event) {
-        if (MINECRAFT.world == null) return;
+        if (MINECRAFT.world == null
+                || MINECRAFT.player == null) return;
+
+        if (notAtSpawn.get()) {
+            BlockPos pos = MINECRAFT.player.getBlockPos();
+            if (Math.abs(pos.getX()) + Math.abs(pos.getZ()) < 5000)
+                return;
+        }
 
         updateCandidateBlocks();
 
