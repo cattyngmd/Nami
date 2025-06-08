@@ -95,7 +95,7 @@ public class SearchModule extends Module {
                 chunkBlocks.put(chunkKey, foundBlocks);
 
                 if (notifier.get()) {
-                    StringBuilder message = new StringBuilder("§8Found: ");
+                    StringBuilder message = new StringBuilder("§cFound: ");
                     foundCounts.forEach((id, count) -> message.append(count).append("x ").append(id.getPath()).append(", "));
                     if (message.length() > 2) message.setLength(message.length() - 2);
 

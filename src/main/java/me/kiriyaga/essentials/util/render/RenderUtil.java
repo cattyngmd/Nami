@@ -259,36 +259,34 @@ public class RenderUtil {
         double distance = camera.getPos().distanceTo(pos);
         float scale = (float) (baseScale * Math.max(1.5, distance * 0.2));
 
-        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
-
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
         matrices.translate(pos.x - camera.getPos().x, pos.y - camera.getPos().y, pos.z - camera.getPos().z);
-
-        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
-        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
 
         matrices.translate(0, -0.1, -0.01);
         matrices.scale(-0.04f * scale, -0.04f * scale, 1.0f);
 
-        int halfWidth = mc.textRenderer.getWidth(text) / 2;
+        int textWidth = mc.textRenderer.getWidth(text);
+        int halfWidth = textWidth / 2;
+        int textHeight = mc.textRenderer.fontHeight;
 
-        int width = mc.textRenderer.getWidth(text);
         int bgPadding = 2;
-        int bgColor = (int) (180.0f) << 24;
-        int bgRGB = 0x000000;
-        int bgFullColor = bgColor | bgRGB;
+        int bgColor = (180 << 24) | 0x000000;
 
-        RenderUtil.rectFilled(
-                matrices,
-                -halfWidth - bgPadding,
-                -bgPadding,
-                width - halfWidth + bgPadding,
-                mc.textRenderer.fontHeight + bgPadding,
-                bgFullColor
-        );
+        int x0 = -halfWidth - bgPadding;
+        int y0 = -bgPadding;
+        int x1 = halfWidth + bgPadding;
+        int y1 = textHeight + bgPadding;
+
+        if (withBackground) {
+            RenderUtil.rectFilled(matrices, x0, y0, x1, y1, bgColor);
+
+            RenderUtil.rect(matrices, x0, y0, x1, y1, color, 0.5f);
+        }
 
         VertexConsumerProvider.Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();
-
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
 
         mc.textRenderer.draw(
@@ -305,5 +303,4 @@ public class RenderUtil {
 
         immediate.draw();
     }
-
 }
