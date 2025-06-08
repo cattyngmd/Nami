@@ -1,7 +1,11 @@
 package me.kiriyaga.essentials.mixin;
 
+import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.event.impl.ChatMessageEvent;
+import me.kiriyaga.essentials.event.impl.ChunkDataEvent;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
+import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,5 +24,13 @@ public class MixinClientPlayNetworkHandler {
         if (event.isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "onChunkData", at = @At("TAIL"))
+    private void onChunkData(ChunkDataS2CPacket packet, CallbackInfo info) {
+        if (Essentials.MINECRAFT == null || Essentials.MINECRAFT.world == null) return;
+
+        WorldChunk chunk = Essentials.MINECRAFT.world.getChunk(packet.getChunkX(), packet.getChunkZ());
+        EVENT_MANAGER.post(new ChunkDataEvent(chunk));
     }
 }
