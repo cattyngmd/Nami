@@ -27,7 +27,7 @@ public class ESPModule extends Module {
     public final BoolSetting showPeasefuls = addSetting(new BoolSetting("Peacefuls", true));
     public final BoolSetting showHostiles = addSetting(new BoolSetting("Hostiles", true));
     public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
-    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line", 5.0,0.5,2.0));
+    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line", 1.5,0.5,2.5));
     public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 
     public ESPModule() {

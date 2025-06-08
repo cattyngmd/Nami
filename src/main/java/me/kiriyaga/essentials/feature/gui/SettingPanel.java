@@ -4,10 +4,7 @@ import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.setting.Setting;
-import me.kiriyaga.essentials.setting.impl.BoolSetting;
-import me.kiriyaga.essentials.setting.impl.DoubleSetting;
-import me.kiriyaga.essentials.setting.impl.EnumSetting;
-import me.kiriyaga.essentials.setting.impl.IntSetting;
+import me.kiriyaga.essentials.setting.impl.*;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -41,9 +38,7 @@ public class SettingPanel {
 
     public static void render(DrawContext context, TextRenderer textRenderer, Setting<?> setting, int x, int y, int mouseX, int mouseY) {
         ColorModule colorModule = getColorModule();
-
-        if (colorModule == null)
-            return;
+        if (colorModule == null) return;
 
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = colorModule.primaryColor.get();
@@ -53,14 +48,28 @@ public class SettingPanel {
         Color bgColor;
 
         if (setting instanceof BoolSetting boolSetting) {
-            if (boolSetting.get()) {
-                bgColor = primary;
-            } else {
-                bgColor = secondary;
-            }
-            if (hovered) {
-                bgColor = brighten(bgColor, 0.3f);
-            }
+            bgColor = boolSetting.get() ? primary : secondary;
+            if (hovered) bgColor = brighten(bgColor, 0.3f);
+        } else if (setting instanceof ColorSetting colorSetting) {
+            float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
+            float hue = hsb[0];
+
+            bgColor = hovered ? brighten(secondary, 0.3f) : secondary;
+
+            int bgColorInt = toRGBA(bgColor);
+            int textColorInt = toRGBA(textCol);
+
+            context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
+
+            String text = setting.getName();
+            context.drawText(textRenderer, text, x + PADDING, y + 6, textColorInt, false);
+
+            renderHueSlider(context, x + PADDING, y + HEIGHT - 6, WIDTH - 2 * PADDING, 4, hue);
+
+            String hex = String.format("#%02X%02X%02X", colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue());
+            context.drawText(textRenderer, hex, x + WIDTH - PADDING - textRenderer.getWidth(hex), y + 6, textColorInt, false);
+
+            return;
         } else {
             bgColor = hovered ? brighten(secondary, 0.3f) : secondary;
         }
@@ -69,59 +78,39 @@ public class SettingPanel {
         int textColorInt = toRGBA(textCol);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
+        context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, textColorInt, false);
 
-        String text = setting.getName() + ": " + setting.get();
-        context.drawText(textRenderer, text, x + PADDING, y + 6, textColorInt, false);
-    }
-
-    public static boolean mouseClicked(Module module, double mouseX, double mouseY, int button, int x, int y) {
-        if (button != 0 && button != 1) return false; // реагируем на ЛКМ(0) и ПКМ(1)
-
-        List<Setting<?>> settings = module.getSettings();
-        int curY = y;
-
-        for (Setting<?> setting : settings) {
-            if (isHovered(mouseX, mouseY, x, curY)) {
-                if (setting instanceof BoolSetting boolSetting) {
-                    boolSetting.toggle();
-                    return true;
-                }
-                else if (setting instanceof IntSetting intSetting) {
-                    int step = 1;
-                    int current = intSetting.get();
-                    int min = intSetting.getMin();
-                    int max = intSetting.getMax();
-
-                    if (button == 0 && current < max) {
-                        intSetting.set(current + step);
-                    } else if (button == 1 && current > min) {
-                        intSetting.set(current - step);
-                    }
-                    return true;
-                }
-                else if (setting instanceof DoubleSetting doubleSetting) {
-                    double step = 0.1;
-                    double current = doubleSetting.get();
-                    double min = doubleSetting.getMin();
-                    double max = doubleSetting.getMax();
-
-                    if (button == 0 && current < max) {
-                        doubleSetting.set(Math.min(current + step, max));
-                    } else if (button == 1 && current > min) {
-                        doubleSetting.set(Math.max(current - step, min));
-                    }
-                    return true;
-                }
-                else if (setting instanceof EnumSetting<?> enumSetting) {
-                    enumSetting.cycle();
-                    return true;
-                }
-            }
-            curY += HEIGHT;
+        if (setting instanceof IntSetting intSetting) {
+            renderSlider(context, x + PADDING, y + HEIGHT - 6,
+                    WIDTH - 2 * PADDING, 4,
+                    intSetting.get(), intSetting.getMin(), intSetting.getMax(), primary);
+        } else if (setting instanceof DoubleSetting doubleSetting) {
+            renderSlider(context, x + PADDING, y + HEIGHT - 6,
+                    WIDTH - 2 * PADDING, 4,
+                    doubleSetting.get(), doubleSetting.getMin(), doubleSetting.getMax(), primary);
         }
-        return false;
     }
 
+
+    private static void renderHueSlider(DrawContext context, int x, int y, int width, int height, float hue) {
+        for (int i = 0; i < width; i++) {
+            float h = i / (float) width;
+            Color color = Color.getHSBColor(h, 1f, 1f);
+            context.fill(x + i, y, x + i + 1, y + height, toRGBA(color));
+        }
+        int pos = (int) (hue * width);
+        context.fill(x + pos - 1, y, x + pos + 1, y + height, toRGBA(Color.WHITE));
+    }
+
+
+    private static void renderSlider(DrawContext context, int x, int y, int width, int height,
+                                     double value, double min, double max, Color color) {
+
+        context.fill(x, y, x + width, y + height, toRGBA(new Color(60, 60, 60, 150)));
+        double percent = (value - min) / (max - min);
+        int filledWidth = (int) (width * percent);
+        context.fill(x, y, x + filledWidth, y + height, toRGBA(color));
+    }
 
     private static boolean isHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEIGHT;
@@ -139,5 +128,136 @@ public class SettingPanel {
         int g = Math.min(255, (int)(color.getGreen() + 255 * amount));
         int b = Math.min(255, (int)(color.getBlue() + 255 * amount));
         return new Color(r, g, b, color.getAlpha());
+    }
+
+    private static boolean dragging = false;
+    private static Setting<?> draggedSetting = null;
+    private static int dragStartX = 0;
+    private static double startValue = 0;
+
+    public static boolean mouseClicked(Module module, double mouseX, double mouseY, int button, int x, int y) {
+        if (button != 0 && button != 1) return false;
+
+        List<Setting<?>> settings = module.getSettings();
+        int curY = y;
+
+        for (Setting<?> setting : settings) {
+            if (isHovered(mouseX, mouseY, x, curY)) {
+                if (setting instanceof BoolSetting boolSetting) {
+                    boolSetting.toggle();
+                    return true;
+                } else if (setting instanceof IntSetting intSetting) {
+                    int step = 1;
+                    int current = intSetting.get();
+                    int min = intSetting.getMin();
+                    int max = intSetting.getMax();
+
+                    if (button == 0 && current < max) {
+                        intSetting.set(current + step);
+                    } else if (button == 1 && current > min) {
+                        intSetting.set(current - step);
+                    }
+                    return true;
+                } else if (setting instanceof DoubleSetting doubleSetting) {
+                    double step = 0.1;
+                    double current = doubleSetting.get();
+                    double min = doubleSetting.getMin();
+                    double max = doubleSetting.getMax();
+
+                    if (button == 0 && current < max) {
+                        doubleSetting.set(Math.min(current + step, max));
+                    } else if (button == 1 && current > min) {
+                        doubleSetting.set(Math.max(current - step, min));
+                    }
+                    return true;
+                } else if (setting instanceof EnumSetting<?> enumSetting) {
+                    enumSetting.cycle();
+                    return true;
+                } else if (setting instanceof ColorSetting colorSetting) {
+                    startDragging(setting, mouseX);
+                    return true;
+                }
+            }
+            curY += HEIGHT;
+        }
+        return false;
+    }
+
+    public static void mouseDragged(double mouseX) {
+        if (!dragging || draggedSetting == null) return;
+
+        double deltaX = mouseX - dragStartX;
+
+        if (draggedSetting instanceof ColorSetting colorSetting) {
+            float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
+            float newHue = (float) (startValue + deltaX * 0.005);
+            if (newHue < 0) newHue = 0;
+            if (newHue > 1) newHue = 1;
+            Color newColor = Color.getHSBColor(newHue, 1f, 1f);
+            colorSetting.setValue(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), colorSetting.getAlpha());
+        }
+    }
+
+    public static void mouseReleased() {
+        dragging = false;
+        draggedSetting = null;
+    }
+
+    private static void startDragging(Setting<?> setting, double mouseX) {
+        dragging = true;
+        draggedSetting = setting;
+        dragStartX = (int) mouseX;
+        if (setting instanceof IntSetting intSetting) {
+            startValue = intSetting.get();
+        } else if (setting instanceof DoubleSetting doubleSetting) {
+            startValue = doubleSetting.get();
+        } else if (setting instanceof ColorSetting colorSetting) {
+            float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
+            startValue = hsb[0];
+        }
+    }
+
+    private static int slideInt(int start, double deltaX) {
+        int step = 1;
+        int min = Integer.MIN_VALUE;
+        int max = Integer.MAX_VALUE;
+
+        if (draggedSetting instanceof IntSetting intSetting) {
+            min = intSetting.getMin();
+            max = intSetting.getMax();
+        }
+
+        double sensitivity = 0.2;
+        int delta = (int) Math.round(deltaX * sensitivity);
+
+        int newValue = start + delta * step;
+
+        if (newValue < min) newValue = min;
+        if (newValue > max) newValue = max;
+
+        return newValue;
+    }
+
+    private static double slideDouble(double start, double deltaX) {
+        double step = 0.1;
+        double min = Double.NEGATIVE_INFINITY;
+        double max = Double.POSITIVE_INFINITY;
+
+        if (draggedSetting instanceof DoubleSetting doubleSetting) {
+            min = doubleSetting.getMin();
+            max = doubleSetting.getMax();
+        }
+
+        double sensitivity = 0.02;
+        double delta = deltaX * sensitivity;
+
+        double newValue = start + delta;
+
+        newValue = Math.round(newValue / step) * step;
+
+        if (newValue < min) newValue = min;
+        if (newValue > max) newValue = max;
+
+        return newValue;
     }
 }

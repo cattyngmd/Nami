@@ -97,6 +97,19 @@ public class ClickGuiScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        SettingPanel.mouseDragged(mouseX);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        SettingPanel.mouseReleased();
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+
 
     @Override
     public boolean shouldPause() {
