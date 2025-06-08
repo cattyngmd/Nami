@@ -155,7 +155,7 @@ public class SearchModule extends Module {
     @Override
     public void onEnable() {
         if (workerThread.isShutdown() || workerThread.isTerminated()) {
-            CHAT_MANAGER.sendRaw("Restarting worker thread");
+            CHAT_MANAGER.sendPersistent(SearchModule.class.getName(),"Restarting worker thread");
             workerThread = Executors.newSingleThreadExecutor();
         }
     }
