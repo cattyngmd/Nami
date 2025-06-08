@@ -20,7 +20,9 @@ public class ClickGuiScreen extends Screen {
 
     private final Set<Category> expandedCategories = new HashSet<>();
     private final Set<Module> expandedModules = new HashSet<>();
-    private final ClickGuiModule clickGuiModule = MODULE_MANAGER.getModule(ClickGuiModule.class);
+    private ClickGuiModule getClickGuiModule() {
+        return MODULE_MANAGER.getModule(ClickGuiModule.class);
+    }
 
     public ClickGuiScreen() {
         super(Text.literal("ClickGUI"));
@@ -28,7 +30,7 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (clickGuiModule != null &&clickGuiModule.background.get())
+        if (getClickGuiModule() != null && getClickGuiModule().background.get())
             context.fill(0, 0, this.width, this.height, 0xC0101010);
 
         int startX = 20;

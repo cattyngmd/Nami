@@ -14,12 +14,16 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.Color;
 import java.util.List;
 
+import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+
 public class SettingPanel {
     public static final int HEIGHT = 20;
     private static final int PADDING = 6;
     private static final int WIDTH = 110;
 
-    private static final ColorModule colorModule = (ColorModule) Essentials.MODULE_MANAGER.getModule(ColorModule.class);
+    private static ColorModule getColorModule() {
+        return MODULE_MANAGER.getModule(ColorModule.class);
+    }
 
     public static int getSettingsHeight(Module module) {
         return module.getSettings().size() * HEIGHT;
@@ -36,6 +40,11 @@ public class SettingPanel {
     }
 
     public static void render(DrawContext context, TextRenderer textRenderer, Setting<?> setting, int x, int y, int mouseX, int mouseY) {
+        ColorModule colorModule = getColorModule();
+
+        if (colorModule == null)
+            return;
+
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = colorModule.primaryColor.get();
         Color secondary = colorModule.secondaryColor.get();

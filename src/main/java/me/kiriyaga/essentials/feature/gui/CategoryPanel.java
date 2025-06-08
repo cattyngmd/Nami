@@ -19,7 +19,9 @@ public class CategoryPanel {
     public static final int GAP = 5;
     private static final int PADDING = 6;
 
-    private static final ColorModule colorModule = (ColorModule) Essentials.MODULE_MANAGER.getModule(ColorModule.class);
+    private ColorModule getColorModule() {
+        return MODULE_MANAGER.getModule(ColorModule.class);
+    }
 
     private final Category category;
     private final Set<Category> expandedCategories;
@@ -34,9 +36,9 @@ public class CategoryPanel {
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
 
-        Color primary = colorModule.primaryColor.get();
-        Color secondary = colorModule.secondaryColor.get();
-        Color textCol = colorModule.textColor.get();
+        Color primary = getColorModule().primaryColor.get();
+        Color secondary = getColorModule().secondaryColor.get();
+        Color textCol = getColorModule().textColor.get();
 
         Color bgColor;
         Color textColor;

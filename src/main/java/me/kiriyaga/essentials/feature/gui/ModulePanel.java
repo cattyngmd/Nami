@@ -17,8 +17,9 @@ public class ModulePanel {
     private final Module module;
     private final Set<Module> expandedModules;
 
-    private final ColorModule colorModule = (ColorModule) Essentials.MODULE_MANAGER.getModule(ColorModule.class);
-
+    private ColorModule getColorModule() {
+        return Essentials.MODULE_MANAGER.getModule(ColorModule.class);
+    }
     public ModulePanel(Module module, Set<Module> expandedModules) {
         this.module = module;
         this.expandedModules = expandedModules;
@@ -29,9 +30,9 @@ public class ModulePanel {
         boolean expanded = expandedModules.contains(module);
         boolean enabled = module.isEnabled();
 
-        Color primary = colorModule.primaryColor.get();
-        Color secondary = colorModule.secondaryColor.get();
-        Color textCol = colorModule.textColor.get();
+        Color primary = getColorModule().primaryColor.get();
+        Color secondary = getColorModule().secondaryColor.get();
+        Color textCol = getColorModule().textColor.get();
 
         Color bgColor;
 
