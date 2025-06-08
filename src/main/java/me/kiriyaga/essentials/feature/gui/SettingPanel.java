@@ -41,9 +41,10 @@ public class SettingPanel {
         if (colorModule == null) return;
 
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color primary = colorModule.primaryColor.get();
-        Color secondary = colorModule.secondaryColor.get();
-        Color textCol = colorModule.textColor.get();
+        Color primary = colorModule.getStyledPrimaryColor();
+        Color secondary = colorModule.getStyledSecondaryColor();
+        Color textCol = colorModule.getStyledTextColor();
+
 
         Color bgColor;
 
@@ -84,12 +85,29 @@ public class SettingPanel {
             renderSlider(context, x + PADDING, y + HEIGHT - 6,
                     WIDTH - 2 * PADDING, 4,
                     intSetting.get(), intSetting.getMin(), intSetting.getMax(), primary);
+
+            String valStr = String.valueOf(intSetting.get());
+            context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + 6, textColorInt, false);
+
+            if (hovered) {
+                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
+            }
         } else if (setting instanceof DoubleSetting doubleSetting) {
             renderSlider(context, x + PADDING, y + HEIGHT - 6,
                     WIDTH - 2 * PADDING, 4,
                     doubleSetting.get(), doubleSetting.getMin(), doubleSetting.getMax(), primary);
+
+            // Отрисовка значения справа с 1 знаком после запятой
+            String valStr = String.format("%.1f", doubleSetting.get());
+            context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + 6, textColorInt, false);
+
+            // Подсветка при ховере
+            if (hovered) {
+                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
+            }
         }
     }
+
 
 
     private static void renderHueSlider(DrawContext context, int x, int y, int width, int height, float hue) {
@@ -147,28 +165,10 @@ public class SettingPanel {
                     boolSetting.toggle();
                     return true;
                 } else if (setting instanceof IntSetting intSetting) {
-                    int step = 1;
-                    int current = intSetting.get();
-                    int min = intSetting.getMin();
-                    int max = intSetting.getMax();
-
-                    if (button == 0 && current < max) {
-                        intSetting.set(current + step);
-                    } else if (button == 1 && current > min) {
-                        intSetting.set(current - step);
-                    }
+                    startDragging(setting, mouseX);
                     return true;
                 } else if (setting instanceof DoubleSetting doubleSetting) {
-                    double step = 0.1;
-                    double current = doubleSetting.get();
-                    double min = doubleSetting.getMin();
-                    double max = doubleSetting.getMax();
-
-                    if (button == 0 && current < max) {
-                        doubleSetting.set(Math.min(current + step, max));
-                    } else if (button == 1 && current > min) {
-                        doubleSetting.set(Math.max(current - step, min));
-                    }
+                    startDragging(setting, mouseX);
                     return true;
                 } else if (setting instanceof EnumSetting<?> enumSetting) {
                     enumSetting.cycle();
@@ -191,12 +191,18 @@ public class SettingPanel {
         if (draggedSetting instanceof ColorSetting colorSetting) {
             float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
             float newHue = (float) (startValue + deltaX * 0.005);
-            if (newHue < 0) newHue = 0;
-            if (newHue > 1) newHue = 1;
+            newHue = Math.min(1f, Math.max(0f, newHue));
             Color newColor = Color.getHSBColor(newHue, 1f, 1f);
             colorSetting.setValue(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), colorSetting.getAlpha());
+        } else if (draggedSetting instanceof IntSetting intSetting) {
+            int newValue = slideInt((int) startValue, deltaX);
+            intSetting.set(newValue);
+        } else if (draggedSetting instanceof DoubleSetting doubleSetting) {
+            double newValue = slideDouble(startValue, deltaX);
+            doubleSetting.set(newValue);
         }
     }
+
 
     public static void mouseReleased() {
         dragging = false;

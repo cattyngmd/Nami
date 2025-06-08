@@ -30,9 +30,10 @@ public class ModulePanel {
         boolean expanded = expandedModules.contains(module);
         boolean enabled = module.isEnabled();
 
-        Color primary = getColorModule().primaryColor.get();
-        Color secondary = getColorModule().secondaryColor.get();
-        Color textCol = getColorModule().textColor.get();
+        Color primary = getColorModule().getStyledPrimaryColor();
+        Color secondary = getColorModule().getStyledSecondaryColor();
+        Color textCol = getColorModule().getStyledTextColor();
+
 
         Color bgColor;
 

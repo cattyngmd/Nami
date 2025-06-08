@@ -36,9 +36,12 @@ public class CategoryPanel {
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
 
-        Color primary = getColorModule().primaryColor.get();
-        Color secondary = getColorModule().secondaryColor.get();
-        Color textCol = getColorModule().textColor.get();
+        ColorModule colorModule = getColorModule();
+
+        Color primary = colorModule.getStyledPrimaryColor();
+        Color secondary = colorModule.getStyledSecondaryColor();
+        Color textCol = colorModule.getStyledTextColor();
+
 
         Color bgColor;
         Color textColor;
