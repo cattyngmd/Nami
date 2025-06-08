@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class ModulePanel {
     public static final int WIDTH = 110;
-    public static final int HEIGHT = 16;
+    public static final int HEIGHT = 20;
     public static final int PADDING = 5;
 
     private final Module module;
