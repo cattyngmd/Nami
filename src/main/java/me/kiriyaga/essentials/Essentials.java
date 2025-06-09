@@ -32,7 +32,7 @@ public class Essentials implements ClientModInitializer {
         MODULE_MANAGER.init();
         CONFIG_MANAGER.load();
         PING_MANAGER.init();
-        
+
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
