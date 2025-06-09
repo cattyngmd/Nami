@@ -5,6 +5,7 @@ import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.setting.Setting;
 import me.kiriyaga.essentials.setting.impl.*;
+import me.kiriyaga.essentials.util.KeyUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -92,7 +93,25 @@ public class SettingPanel {
             if (hovered) {
                 context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
             }
-        } else if (setting instanceof DoubleSetting doubleSetting) {
+        }
+        else if (setting instanceof EnumSetting<?> enumSetting) {
+            String valueStr = enumSetting.get().toString();
+            context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + 6, textColorInt, false);
+
+            if (hovered) {
+                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
+            }
+        }
+        else if (setting instanceof KeyBindSetting bindSetting) {
+            String valueStr = KeyUtils.getKeyName(bindSetting.get());
+            context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + 6, textColorInt, false);
+
+            if (hovered) {
+                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
+            }
+        }
+
+        else if (setting instanceof DoubleSetting doubleSetting) {
             renderSlider(context, x + PADDING, y + HEIGHT - 6,
                     WIDTH - 2 * PADDING, 4,
                     doubleSetting.get(), doubleSetting.getMin(), doubleSetting.getMax(), primary);
