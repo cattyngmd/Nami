@@ -17,6 +17,7 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "EntityVelocityUpdateS2CPacketAccessor",
     "MixinClientConnection"
   ]
 }
