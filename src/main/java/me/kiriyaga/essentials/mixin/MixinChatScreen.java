@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.mixin;
 
+import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.DrawContext;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,6 +24,7 @@ public abstract class MixinChatScreen {
     private void onInit(CallbackInfo ci) {
         animationOffset = 20f;
         lastUpdateTime = System.currentTimeMillis();
+        ChatAnimationHelper.setAnimationOffset(animationOffset);
     }
 
     @Inject(method = "render", at = @At("HEAD"))
@@ -32,9 +34,10 @@ public abstract class MixinChatScreen {
         lastUpdateTime = now;
 
         if (animationOffset > 0f) {
-            animationOffset -= elapsed * 60f; // скорость анимации
+            animationOffset -= elapsed * 60f;
             if (animationOffset < 0f) animationOffset = 0f;
         }
+        ChatAnimationHelper.setAnimationOffset(animationOffset);
     }
 
     @Inject(method = "render", at = @At(

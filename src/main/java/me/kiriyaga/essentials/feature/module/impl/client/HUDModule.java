@@ -8,6 +8,7 @@ import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
+import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
@@ -18,21 +19,18 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class HUDModule extends Module {
 
-    private ColorModule getColorModule() {
-        return MODULE_MANAGER.getModule(ColorModule.class);
-    }
-
-    public final BoolSetting watermark = addSetting(new BoolSetting("Watermark", true));
-    public final BoolSetting cords = addSetting(new BoolSetting("Coordinates", false));
-    public final BoolSetting facing = addSetting(new BoolSetting("Facing", true));
-    public final BoolSetting FPS = addSetting(new BoolSetting("FPS", true));
     public final IntSetting updateInterval = addSetting(new IntSetting("Update Interval", 5, 1, 20));
+
+    public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("Watermark", true));
+    public final BoolSetting coordsEnabled = addSetting(new BoolSetting("Coordinates", false));
+    public final BoolSetting facingEnabled = addSetting(new BoolSetting("Facing", true));
+    public final BoolSetting fpsEnabled = addSetting(new BoolSetting("FPS", true));
+    public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", true));
 
     private static final int PADDING = 5;
 
     private int tickCounter = 0;
 
-    // since updating each tick (or even each render tick) means updating 20/60 times per second, we better timeout theese interactions
     private String watermarkText = "";
     private String coordsText = "";
     private String facingText = "";
@@ -40,7 +38,7 @@ public class HUDModule extends Module {
     private String pingText = "";
 
     public HUDModule() {
-        super("HUD", "Displays in game hud.", Category.CLIENT, "ргв");
+        super("HUD","Displays in game hud.", Category.CLIENT, "ргв");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -48,77 +46,94 @@ public class HUDModule extends Module {
         tickCounter++;
         if (tickCounter % updateInterval.get() != 0) return;
 
-        if (MINECRAFT.world == null || MINECRAFT.player == null)
-            return;
+        updateAllData();
+    }
 
-        if (watermark.get()) {
+    private void updateAllData() {
+        MinecraftClient mc = MINECRAFT;
+        if (mc.world == null || mc.player == null) return;
+
+        if (watermarkEnabled.get()) {
             watermarkText = NAME + " " + VERSION;
-        } else {
-            watermarkText = null;
         }
 
-        if (cords.get()) {
-            coordsText = "XYZ " + Formatting.WHITE +
-                    formatCoord(MINECRAFT.player.getX()) + Formatting.GRAY + ", " + Formatting.WHITE +
-                    formatCoord(MINECRAFT.player.getY()) + Formatting.GRAY + ", " + Formatting.WHITE +
-                    formatCoord(MINECRAFT.player.getZ());
-        } else {
-            coordsText = null;
+        if (coordsEnabled.get()) {
+            coordsText = String.format("XYZ %s, %s, %s",
+                    formatCoord(mc.player.getX()),
+                    formatCoord(mc.player.getY()),
+                    formatCoord(mc.player.getZ()));
         }
 
-        if (facing.get()) {
-            facingText = getFacing(MINECRAFT);
-        } else {
-            facingText = null;
+        if (facingEnabled.get()) {
+            facingText = getFacing(mc);
         }
 
-        if (FPS.get()) {
-            fpsText = "FPS: " + Formatting.WHITE + MINECRAFT.getCurrentFps();
-        } else {
-            fpsText = null;
+        if (fpsEnabled.get()) {
+            fpsText = "FPS: " + Formatting.WHITE + mc.getCurrentFps();
         }
 
-        int ping = PING_MANAGER.getPing();
-        pingText = "Ping: " + Formatting.WHITE + ping;
+        if (pingEnabled.get()) {
+            int ping = PING_MANAGER.getPing();
+            pingText = "Ping: " + Formatting.WHITE + (ping < 0 ? "N/A" : ping);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender2D(Render2DEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null)
-            return;
+        MinecraftClient mc = MINECRAFT;
+        if (mc.world == null || mc.player == null) return;
 
         Color styled = getColorModule().getStyledPrimaryColor();
         Color opaque = new Color(styled.getRed(), styled.getGreen(), styled.getBlue(), 255);
         int colorInt = opaque.getRGB();
 
-        int screenWidth = MINECRAFT.getWindow().getScaledWidth();
-        int screenHeight = MINECRAFT.getWindow().getScaledHeight();
+        int screenWidth = mc.getWindow().getScaledWidth();
+        int screenHeight = mc.getWindow().getScaledHeight();
 
-        int yOffset = PADDING;
+        float animationOffset = ChatAnimationHelper.getAnimationOffset();
 
-        if (watermarkText != null) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, PADDING, yOffset, colorInt, false);
-            yOffset += MINECRAFT.textRenderer.fontHeight + 2;
+        renderTopLeft(event, colorInt);
+
+        renderBottomLeft(event, colorInt, screenHeight, animationOffset);
+
+        renderBottomRight(event, colorInt, screenWidth, screenHeight, animationOffset);
+    }
+
+    private void renderTopLeft(Render2DEvent event, int color) {
+        if (watermarkEnabled.get() && !watermarkText.isEmpty()) {
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, PADDING, PADDING, color, false);
+        }
+    }
+
+    private void renderBottomLeft(Render2DEvent event, int color, int screenHeight, float animationOffset) {
+        int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
+        y -= (int) animationOffset;
+
+        if (coordsEnabled.get() && !coordsText.isEmpty()) {
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, PADDING, y, color, false);
+            y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
-        if (facingText != null) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, PADDING, screenHeight - MINECRAFT.textRenderer.fontHeight * 2 - PADDING - 2, colorInt, false);
+        if (facingEnabled.get() && !facingText.isEmpty()) {
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, PADDING, y, color, false);
+            y -= MINECRAFT.textRenderer.fontHeight + 2;
+        }
+    }
+
+    private void renderBottomRight(Render2DEvent event, int color, int screenWidth, int screenHeight, float animationOffset) {
+        int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
+        y -= (int) animationOffset;
+
+        if (fpsEnabled.get() && !fpsText.isEmpty()) {
+            int width = MINECRAFT.textRenderer.getWidth(fpsText);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width - PADDING, y, color, false);
+            y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
-        if (coordsText != null) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, PADDING, screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING, colorInt, false);
-        }
-
-        if (pingText != null) {
-            int pingX = screenWidth - MINECRAFT.textRenderer.getWidth(pingText) - PADDING;
-            int pingY = screenHeight - MINECRAFT.textRenderer.fontHeight * 2 - PADDING - 2;
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, pingX, pingY, colorInt, false);
-        }
-
-        if (fpsText != null) {
-            int fpsX = screenWidth - MINECRAFT.textRenderer.getWidth(fpsText) - PADDING;
-            int fpsY = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, fpsX, fpsY, colorInt, false);
+        if (pingEnabled.get() && !pingText.isEmpty()) {
+            int width = MINECRAFT.textRenderer.getWidth(pingText);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width - PADDING, y, color, false);
+            y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
 
@@ -127,7 +142,7 @@ public class HUDModule extends Module {
     }
 
     private String getFacing(MinecraftClient mc) {
-        if (mc.player == null) return "Unknown";
+        if (mc.player == null) return "Invalid";
         int facingIndex = MathHelper.floor(mc.player.getYaw() * 4.0F / 360.0F + 0.5D) & 3;
         return switch (facingIndex) {
             case 0 -> "South";
@@ -136,5 +151,9 @@ public class HUDModule extends Module {
             case 3 -> "East";
             default -> "Invalid";
         };
+    }
+
+    private ColorModule getColorModule() {
+        return MODULE_MANAGER.getModule(ColorModule.class);
     }
 }
