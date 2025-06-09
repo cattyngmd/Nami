@@ -27,6 +27,12 @@ public abstract class MixinChatScreen {
         ChatAnimationHelper.setAnimationOffset(animationOffset);
     }
 
+    @Inject(method = "removed", at = @At("HEAD"))
+    private void onRemoved(CallbackInfo ci) {
+        animationOffset = 20f;
+        ChatAnimationHelper.setAnimationOffset(0f);
+    }
+
     @Inject(method = "render", at = @At("HEAD"))
     private void onRenderStart(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         long now = System.currentTimeMillis();
