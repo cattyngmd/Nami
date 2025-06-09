@@ -43,11 +43,13 @@ public class NoRenderModule extends Module {
 
     @Override
     public void onEnable() {
-        MINECRAFT.worldRenderer.reload();
+        if (MINECRAFT.world != null)
+            MINECRAFT.worldRenderer.reload();
     }
     @Override
     public void onDisable() {
-        MINECRAFT.worldRenderer.reload();
+        if (MINECRAFT.world != null)
+            MINECRAFT.worldRenderer.reload();
     }
 
     public boolean isNoFire() {

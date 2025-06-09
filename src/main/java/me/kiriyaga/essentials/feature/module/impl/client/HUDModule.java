@@ -26,6 +26,7 @@ public class HUDModule extends Module {
     public final BoolSetting facingEnabled = addSetting(new BoolSetting("Facing", true));
     public final BoolSetting fpsEnabled = addSetting(new BoolSetting("FPS", true));
     public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", true));
+    public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("Lag Warning", true));
 
     private static final int PADDING = 5;
 
@@ -36,6 +37,8 @@ public class HUDModule extends Module {
     private String facingText = "";
     private String fpsText = "";
     private String pingText = "";
+    private boolean serverLagging = false;
+
 
     public HUDModule() {
         super("HUD","Displays in game hud.", Category.CLIENT, "ргв");
@@ -76,6 +79,10 @@ public class HUDModule extends Module {
             int ping = PING_MANAGER.getPing();
             pingText = "Ping: " + Formatting.WHITE + (ping < 0 ? "N/A" : ping);
         }
+
+        if (lagWarningEnabled.get()){
+            serverLagging = PING_MANAGER.isConnectionUnstable();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -99,6 +106,11 @@ public class HUDModule extends Module {
         renderBottomLeft(event, colorInt, screenHeight, animationOffset);
 
         renderBottomRight(event, colorInt, screenWidth, screenHeight, animationOffset);
+
+        if (lagWarningEnabled.get() && serverLagging) {
+            drawLagWarning(event, screenWidth, screenHeight);
+        }
+
     }
 
     private void renderTopLeft(Render2DEvent event, int color) {
@@ -138,6 +150,22 @@ public class HUDModule extends Module {
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
+
+    private void drawLagWarning(Render2DEvent event, int screenWidth, int screenHeight) {
+        String warningText = "Server is lagging!";
+        int textWidth = MINECRAFT.textRenderer.getWidth(warningText);
+        int textHeight = MINECRAFT.textRenderer.fontHeight;
+
+        int x = (screenWidth - textWidth) / 2;
+        int y = (screenHeight - textHeight) / 2;
+
+        Color styled = getColorModule().getStyledPrimaryColor();
+        Color opaque = new Color(styled.getRed(), styled.getGreen(), styled.getBlue(), 255);
+        int colorInt = opaque.getRGB();
+
+        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, colorInt, false);
+    }
+
 
     private String formatCoord(double coord) {
         return String.format("%.1f", coord).replace(',', '.');
