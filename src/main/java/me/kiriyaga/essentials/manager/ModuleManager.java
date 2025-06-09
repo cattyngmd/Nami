@@ -8,10 +8,7 @@ import me.kiriyaga.essentials.feature.module.impl.client.HUDModule;
 import me.kiriyaga.essentials.feature.module.impl.client.PingManagerModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
-import me.kiriyaga.essentials.feature.module.impl.render.ESPModule;
-import me.kiriyaga.essentials.feature.module.impl.render.NametagsModule;
-import me.kiriyaga.essentials.feature.module.impl.render.NoRenderModule;
-import me.kiriyaga.essentials.feature.module.impl.render.SearchModule;
+import me.kiriyaga.essentials.feature.module.impl.render.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +26,7 @@ public class ModuleManager {
         registerModule(new ESPModule());
         registerModule(new SearchModule());
         registerModule(new NoRenderModule());
+        registerModule(new FreeLookModule());
         /// CLIENT ///
         registerModule(new ColorModule());
         registerModule(new ClickGuiModule());
