@@ -1,6 +1,5 @@
 package me.kiriyaga.essentials.manager;
 
-import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ClickGuiModule;
@@ -9,7 +8,6 @@ import me.kiriyaga.essentials.feature.module.impl.client.HUDModule;
 import me.kiriyaga.essentials.feature.module.impl.client.PingManagerModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
-import me.kiriyaga.essentials.feature.module.impl.movement.VelocityModule;
 import me.kiriyaga.essentials.feature.module.impl.render.ESPModule;
 import me.kiriyaga.essentials.feature.module.impl.render.NametagsModule;
 import me.kiriyaga.essentials.feature.module.impl.render.NoRenderModule;
@@ -39,7 +37,6 @@ public class ModuleManager {
         /// COMBAT ///
         registerModule(new AutoTotemModule());
         /// MOVEMENT ///
-        registerModule(new VelocityModule());
         registerModule(new SprintModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");

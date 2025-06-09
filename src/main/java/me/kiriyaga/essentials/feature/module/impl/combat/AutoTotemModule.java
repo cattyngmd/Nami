@@ -8,6 +8,8 @@ import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityStatuses;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
@@ -19,12 +21,10 @@ import static me.kiriyaga.essentials.Essentials.*;
 public class AutoTotemModule extends Module {
 
     private final BoolSetting antiDesync = addSetting(new BoolSetting("Desync", true));
-    private final BoolSetting packetPlace = addSetting(new BoolSetting("Instant", false));
     private final BoolSetting deathLog = addSetting(new BoolSetting("Log", false));
 
     private boolean pendingTotem = false;
     private long lastAttemptTime = 0;
-    private boolean instantTriggered = false;
     private int totemCount = 0;
 
     public AutoTotemModule() {
@@ -35,26 +35,14 @@ public class AutoTotemModule extends Module {
     public void onUpdate(UpdateEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null) return;
 
-        if (instantTriggered) {
-            instantTriggered = false;
-            return;
-        }
-
         attemptPlaceTotem();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPacketReceive(PacketReceiveEvent event) {
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    private void onReceivePacket(PacketReceiveEvent event) {
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
-            if (packet.getStatus() == 35 && packet.getEntity(MINECRAFT.world) == MINECRAFT.player) {
-                MINECRAFT.execute(() -> attemptPlaceTotem()); // for some reason
-            }
-        }
-
-
-        if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
-            if (packet.getEntity(MINECRAFT.world) == MINECRAFT.player && packet.getStatus() == 3) {
-                logDeathData();
+            if (packet.getEntity(MINECRAFT.world) == MINECRAFT.player && packet.getStatus() == 3 && deathLog.get()) {
+                MINECRAFT.execute(this::logDeathData);
             }
         }
     }
@@ -70,13 +58,16 @@ public class AutoTotemModule extends Module {
             if (totemSlot != -1) {
                 int syncId = player.currentScreenHandler.syncId;
                 int invSlot = convertSlot(totemSlot);
-                MINECRAFT.interactionManager.clickSlot(syncId, invSlot, 40, SlotActionType.SWAP, player);
+
+                MINECRAFT.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
+                MINECRAFT.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
+
                 lastAttemptTime = System.currentTimeMillis();
             }
         }
 
         totemCount = countTotems();
-        setDisplayInfo(""+totemCount);
+        setDisplayInfo("" + totemCount);
 
         if (antiDesync.get() && pendingTotem) {
             long now = System.currentTimeMillis();
@@ -88,7 +79,10 @@ public class AutoTotemModule extends Module {
                 if (totemSlot != -1) {
                     int syncId = player.currentScreenHandler.syncId;
                     int invSlot = convertSlot(totemSlot);
-                    MINECRAFT.interactionManager.clickSlot(syncId, invSlot, 40, SlotActionType.SWAP, player);
+
+                    MINECRAFT.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
+                    MINECRAFT.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
+
                     lastAttemptTime = now;
                 }
             }
@@ -125,7 +119,7 @@ public class AutoTotemModule extends Module {
         if (player == null) return;
 
         int ping = PING_MANAGER.getPing();
-        boolean hasTotem = totemCount == 0;
+        boolean hasTotem = totemCount > 0;
         long timeSinceLastSwap = System.currentTimeMillis() - lastAttemptTime;
 
         StringBuilder reason = new StringBuilder();
@@ -139,14 +133,13 @@ public class AutoTotemModule extends Module {
         }
 
         StringBuilder info = new StringBuilder();
-        info.append("\n=== AutoTotem Death Log ===")
+        info.append("\n§c=== AutoTotem Death Log ===")
                 .append("\nCause: ").append(reason)
                 .append("\nPing: ").append(ping).append(" ms")
-                .append("\nInstant: ").append(instantTriggered)
                 .append("\nTotems Available: ").append(totemCount)
                 .append("\nPending Totem: ").append(pendingTotem)
                 .append("\nLast Swap Attempt: ").append(timeSinceLastSwap).append(" ms ago")
-                .append("\n============================");
+                .append("\n§c============================");
 
         CHAT_MANAGER.sendPersistent(AutoTotemModule.class.getName(), info.toString());
     }

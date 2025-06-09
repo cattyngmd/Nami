@@ -30,6 +30,9 @@ public class ClickGuiScreen extends Screen {
         if (getClickGuiModule() != null && getClickGuiModule().background.get())
             context.fill(0, 0, this.width, this.height, 0xC0101010);
 
+        super.render(context, mouseX, mouseY, delta);
+
+
         int startX = 20;
         int startY = 20;
 
@@ -39,8 +42,6 @@ public class ClickGuiScreen extends Screen {
             panel.render(context, this.textRenderer, curX, startY, mouseX, mouseY);
             curX += CategoryPanel.WIDTH + CategoryPanel.GAP;
         }
-
-        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override

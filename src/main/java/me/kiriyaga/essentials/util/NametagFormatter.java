@@ -26,7 +26,7 @@ public class NametagFormatter {
 
         if (module.showHealth.get()) {
             Text health = getHealthText(player);
-            return Texts.join(Text.literal("").getSiblings(), Text.literal("").append(name).append(" ").append(health));
+            return name.copy().append(" ").append(health);
         }
 
         return name;

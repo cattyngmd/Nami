@@ -14,7 +14,6 @@ public class MixinClientPlayerEntity {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickHook(CallbackInfo ci) {
-        var mc = net.minecraft.client.MinecraftClient.getInstance();
 
         EVENT_MANAGER.post(new UpdateEvent());
     }

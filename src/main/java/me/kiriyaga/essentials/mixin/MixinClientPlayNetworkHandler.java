@@ -1,9 +1,7 @@
 package me.kiriyaga.essentials.mixin;
 
-import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.event.impl.ChatMessageEvent;
 import me.kiriyaga.essentials.event.impl.ChunkDataEvent;
-import me.kiriyaga.essentials.feature.module.impl.movement.VelocityModule;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
