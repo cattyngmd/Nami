@@ -11,10 +11,12 @@ import me.kiriyaga.essentials.util.EntityUtils;
 import me.kiriyaga.essentials.util.NametagFormatter;
 import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
@@ -26,7 +28,8 @@ public class NametagsModule extends Module {
     public final BoolSetting showAnimals = addSetting(new BoolSetting("Peacefuls", false));
     public final BoolSetting showEnemies = addSetting(new BoolSetting("Hostiles", false));
     public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
-    public final BoolSetting showHealth = addSetting(new BoolSetting("Show Health", true));
+    public final BoolSetting showHealth = addSetting(new BoolSetting("Show Health", false));
+    public final BoolSetting showEquipment = addSetting(new BoolSetting("Show Equipment", true));
     public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("Format", TextFormat.None));
     public final BoolSetting showBackground = addSetting(new BoolSetting("Background", true));
 
@@ -78,9 +81,46 @@ public class NametagsModule extends Module {
         float scale = 0.5f;
 
         RenderUtil.drawTextInWorld(MINECRAFT, text, pos, scale, color, showBackground.get());
+        if (entity instanceof PlayerEntity && showEquipment.get()) {
+            drawItemRow(entity, tickDelta);
+        }
     }
 
     public enum TextFormat {
         None, Bold, Italic, Both
     }
+
+    private void drawItemRow(Entity entity, float tickDelta) {
+        if (!(entity instanceof PlayerEntity player)) return;
+
+        Vec3d basePos = new Vec3d(
+                entity.lastRenderX + (entity.getX() - entity.lastRenderX) * tickDelta,
+                entity.lastRenderY + (entity.getY() - entity.lastRenderY) * tickDelta + entity.getHeight() + 0.75, // выше текста
+                entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * tickDelta
+        );
+
+        ItemStack[] items = new ItemStack[] {
+                player.getOffHandStack(),
+                player.getEquippedStack(EquipmentSlot.HEAD),
+                player.getEquippedStack(EquipmentSlot.CHEST),
+                player.getEquippedStack(EquipmentSlot.LEGS),
+                player.getEquippedStack(EquipmentSlot.FEET),
+                player.getMainHandStack()
+        };
+
+        double spacing = 0.3;
+        double totalWidth = (items.length - 1) * spacing;
+        double startX = -totalWidth / 2.0;
+
+        for (int i = 0; i < items.length; i++) {
+            ItemStack stack = items[i];
+            if (stack.isEmpty()) continue;
+
+            double xOffset = startX + i * spacing;
+            Vec3d itemPos = basePos.add(xOffset, 0, 0);
+
+            RenderUtil.drawItemInWorld(stack, itemPos, 0.5f);
+        }
+    }
+
 }

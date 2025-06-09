@@ -11,6 +11,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemDisplayContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -303,4 +305,36 @@ public class RenderUtil {
 
         immediate.draw();
     }
+    public static void drawItemInWorld(ItemStack stack, Vec3d pos, float scale) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        MatrixStack matrices = new MatrixStack();
+
+        Camera camera = mc.gameRenderer.getCamera();
+
+        matrices.translate(
+                pos.x - camera.getPos().x,
+                pos.y - camera.getPos().y,
+                pos.z - camera.getPos().z
+        );
+
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.scale(scale, scale, scale);
+
+        DiffuseLighting.enableGuiDepthLighting();
+
+        mc.getItemRenderer().renderItem(
+                stack,
+                ItemDisplayContext.GROUND,
+                15728880,
+                OverlayTexture.DEFAULT_UV,
+                matrices,
+                mc.getBufferBuilders().getEntityVertexConsumers(),
+                mc.world,
+                0
+        );
+
+        mc.getBufferBuilders().getEntityVertexConsumers().draw();
+    }
+
 }
