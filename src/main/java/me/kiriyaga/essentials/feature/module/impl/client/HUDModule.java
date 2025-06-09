@@ -110,7 +110,6 @@ public class HUDModule extends Module {
         if (lagWarningEnabled.get() && serverLagging) {
             drawLagWarning(event, screenWidth, screenHeight);
         }
-
     }
 
     private void renderTopLeft(Render2DEvent event, int color) {

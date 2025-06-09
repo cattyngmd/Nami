@@ -5,18 +5,19 @@ import me.kiriyaga.essentials.event.impl.PacketSendEvent;
 import me.kiriyaga.essentials.feature.module.impl.client.PingManagerModule;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
 import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
-import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static me.kiriyaga.essentials.Essentials.*;
 
+// since theres is only S2C speaking, and no C2S response for us, all we can do it count between S2C requests
+// The idea is, to calculate the S2C request, and based on that - recieve the ms delay
 public class PingManager {
-    private final Map<Long, Long> pingMap = new ConcurrentHashMap<>();
+    private volatile long lastReceiveTime = -1;
     private volatile int lastPing = -1;
 
     private int[] pingHistory = new int[10];
@@ -24,44 +25,25 @@ public class PingManager {
     private int count = 0;
     private volatile long lastUpdated = -1;
 
-    public void init(){
+    public void init() {
         EVENT_MANAGER.register(this);
         LOGGER.info("Ping Manager loaded");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPacketReceive(PacketReceiveEvent packet) {
-        if (packet.getPacket() instanceof KeepAliveS2CPacket keepAlive) {
-            long id = keepAlive.getId();
-            pingMap.put(id, System.currentTimeMillis());
+        if (packet.getPacket() instanceof KeepAliveS2CPacket) {
+            long now = System.currentTimeMillis();
 
             PingManagerModule config = MODULE_MANAGER.getModule(PingManagerModule.class);
+            int keepAliveInterval = config != null ? config.keepAliveInterval.get() : 15000;
 
-            if(config.debug.get())
-                CHAT_MANAGER.sendRaw("[PingManager] Received KeepAliveS2CPacket id=" + id);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onPacketSend(PacketSendEvent packet) {
-        if (packet.getPacket() instanceof KeepAliveC2SPacket keepAlive) {
-            long id = keepAlive.getId();
-            Long sentTime = pingMap.remove(id);
-            if (sentTime != null) {
-                int ping = (int) (System.currentTimeMillis() - sentTime);
-                ping = Math.max(0, Math.min(10000, ping));
-
-                PingManagerModule config = MODULE_MANAGER.getModule(PingManagerModule.class);
-
-                if (config.debug.get())
-                    CHAT_MANAGER.sendRaw("[PingManager] KeepAliveC2SPacket sent id=" + id + ", ping=" + ping + "ms");
+            if (lastReceiveTime != -1) {
+                long interval = now - lastReceiveTime;
+                int ping = (int) Math.max(0, interval - keepAliveInterval);
 
                 int smoothingStrength = config != null ? config.smoothingStrength.get() : 10;
-
                 if (pingHistory.length != smoothingStrength) {
-                    if (config.debug.get())
-                        CHAT_MANAGER.sendRaw("[PingManager] Adjusting pingHistory size from " + pingHistory.length + " to " + smoothingStrength);
-
                     int[] newHistory = new int[smoothingStrength];
                     for (int i = 0; i < Math.min(count, smoothingStrength); i++) {
                         newHistory[i] = pingHistory[(index - count + i + pingHistory.length) % pingHistory.length];
@@ -75,16 +57,14 @@ public class PingManager {
                 count = Math.min(count + 1, smoothingStrength);
 
                 lastPing = averagePing();
-                lastUpdated = System.currentTimeMillis();
+                lastUpdated = now;
 
-                if (config.debug.get())
-                    CHAT_MANAGER.sendRaw("[PingManager] Updated average ping: " + lastPing + "ms");
-            } else {
-                PingManagerModule config = MODULE_MANAGER.getModule(PingManagerModule.class);
-
-                if (config.debug.get())
-                    CHAT_MANAGER.sendRaw("[PingManager] KeepAliveC2SPacket sent id=" + id + " but no matching KeepAliveS2CPacket found");
+                if (config != null && config.debug.get()) {
+                    CHAT_MANAGER.sendRaw("Interval=" + interval + "ms, Ping=" + ping + "ms, Average=" + lastPing + "ms");
+                }
             }
+
+            lastReceiveTime = now;
         }
     }
 
@@ -107,13 +87,12 @@ public class PingManager {
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
         if (lastUpdated == -1) {
             if (config.debug.get())
-                CHAT_MANAGER.sendRaw("[PingManager] Connection unstable: no ping data yet");
+                CHAT_MANAGER.sendRaw("Connection unstable: no ping data yet");
             return true;
         }
         boolean unstable = (System.currentTimeMillis() - lastUpdated) > timeoutMillis;
-        if (unstable) {
-            if (config.debug.get())
-                CHAT_MANAGER.sendRaw("[PingManager] Connection unstable: last ping updated " + (System.currentTimeMillis() - lastUpdated) + "ms ago");
+        if (unstable && config.debug.get()) {
+            CHAT_MANAGER.sendRaw("Connection unstable: last ping updated " + (System.currentTimeMillis() - lastUpdated) + "ms ago");
         }
         return unstable;
     }
