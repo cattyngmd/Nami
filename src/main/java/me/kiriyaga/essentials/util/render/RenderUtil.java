@@ -305,11 +305,15 @@ public class RenderUtil {
 
         immediate.draw();
     }
-    public static void drawItemInWorld(ItemStack stack, Vec3d pos, float scale) {
+
+    public static void drawItemInWorld(ItemStack stack, Vec3d pos, float baseScale) {
         MinecraftClient mc = MinecraftClient.getInstance();
         MatrixStack matrices = new MatrixStack();
 
         Camera camera = mc.gameRenderer.getCamera();
+
+        double distance = camera.getPos().distanceTo(pos);
+        float scale = (float) (baseScale * Math.max(1.5, distance * 0.2));
 
         matrices.translate(
                 pos.x - camera.getPos().x,
@@ -317,15 +321,18 @@ public class RenderUtil {
                 pos.z - camera.getPos().z
         );
 
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.scale(scale, scale, scale);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
+
+        matrices.translate(0, -0.1, -0.01);
+
+        matrices.scale(-0.04f * scale, -0.04f * scale, 1.0f);
 
         DiffuseLighting.enableGuiDepthLighting();
 
         mc.getItemRenderer().renderItem(
                 stack,
-                ItemDisplayContext.GROUND,
+                ItemDisplayContext.FIXED,
                 15728880,
                 OverlayTexture.DEFAULT_UV,
                 matrices,
@@ -336,5 +343,6 @@ public class RenderUtil {
 
         mc.getBufferBuilders().getEntityVertexConsumers().draw();
     }
+
 
 }
