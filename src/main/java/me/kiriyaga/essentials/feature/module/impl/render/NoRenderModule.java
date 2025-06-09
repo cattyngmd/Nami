@@ -38,7 +38,7 @@ public class NoRenderModule extends Module {
     private final BoolSetting noPowderedSnow = addSetting(new BoolSetting("No Powdered Snow", false));
 
     public NoRenderModule() {
-        super("No Render", "Prevent rendering certain overlays/effects", Category.RENDER);
+        super("No Render", "Prevent rendering certain overlays/effects", Category.RENDER, "norender");
     }
 
     @Override

@@ -28,7 +28,7 @@ public class AutoTotemModule extends Module {
     private int totemCount = 0;
 
     public AutoTotemModule() {
-        super("Auto Totem", "Insane shit.", Category.COMBAT);
+        super("Auto Totem", "Insane shit.", Category.COMBAT, "autototem");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

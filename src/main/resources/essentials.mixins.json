@@ -10,8 +10,11 @@
     "MixinBossBarHud",
     "MixinCamera",
     "MixinChatScreen",
+    "MixinChunkBorderDebugRenderer",
     "MixinClientPlayerEntity",
     "MixinClientPlayNetworkHandler",
+    "MixinCompassState",
+    "MixinEntityRenderer",
     "MixinGameRenderer",
     "MixinHeadFeatureRenderer",
     "MixinInGameHud",
@@ -28,6 +31,7 @@
     "MixinClientConnection",
     "MixinEntity",
     "MixinLivingEntity",
+    "MixinPlayerEntity",
     "PlayerInteractEntityC2SPacketAccessor"
   ]
 }

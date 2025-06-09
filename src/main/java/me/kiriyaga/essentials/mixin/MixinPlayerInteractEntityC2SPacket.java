@@ -23,6 +23,9 @@ public abstract class MixinPlayerInteractEntityC2SPacket implements IPlayerInter
 
     @Override
     public Entity getEntity() {
+        if (MINECRAFT.world == null)
+            return null;
+
         return MINECRAFT.world.getEntityById(entityId);
     }
 }

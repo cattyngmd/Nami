@@ -259,7 +259,8 @@ public class RenderUtil {
         Camera camera = mc.gameRenderer.getCamera();
 
         double distance = camera.getPos().distanceTo(pos);
-        float scale = (float) (baseScale * Math.max(1.5, distance * 0.14));
+        float scale = (float) (baseScale * Math.max(1.5, distance * 0.14
+        ));
 
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
@@ -315,24 +316,22 @@ public class RenderUtil {
         double distance = camera.getPos().distanceTo(pos);
         float scale = (float) (baseScale * Math.max(1.5, distance * 0.14));
 
-        matrices.translate(
-                pos.x - camera.getPos().x,
-                pos.y - camera.getPos().y,
-                pos.z - camera.getPos().z
-        );
-
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
 
-        matrices.translate(0, -0.1, -0.01);
+        matrices.translate(pos.x - camera.getPos().x, pos.y - camera.getPos().y, pos.z - camera.getPos().z);
 
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+
+        matrices.translate(0, -0.1, -0.01);
         matrices.scale(-0.04f * scale, -0.04f * scale, 1.0f);
 
         DiffuseLighting.enableGuiDepthLighting();
 
         mc.getItemRenderer().renderItem(
                 stack,
-                ItemDisplayContext.FIXED,
+                ItemDisplayContext.GROUND,
                 15728880,
                 OverlayTexture.DEFAULT_UV,
                 matrices,
@@ -343,6 +342,5 @@ public class RenderUtil {
 
         mc.getBufferBuilders().getEntityVertexConsumers().draw();
     }
-
 
 }

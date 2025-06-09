@@ -45,7 +45,7 @@ public class NametagsModule extends Module {
 
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
-                if (player == MINECRAFT.player || player.isRemoved()) continue;
+                if ((player == MINECRAFT.player && MINECRAFT.options.getPerspective().isFirstPerson() ) || player.isRemoved()) continue;
                 drawNameTag(player, formatter.formatPlayer(player), 0xFFFF5555, event.getPartialTicks());
             }
         }
@@ -81,7 +81,7 @@ public class NametagsModule extends Module {
         float scale = 0.5f;
 
         RenderUtil.drawTextInWorld(MINECRAFT, text, pos, scale, color, showBackground.get());
-        if (entity instanceof PlayerEntity && showEquipment.get()) {
+          if (entity instanceof PlayerEntity && showEquipment.get()) {
             drawItemRow(entity, tickDelta);
         }
     }

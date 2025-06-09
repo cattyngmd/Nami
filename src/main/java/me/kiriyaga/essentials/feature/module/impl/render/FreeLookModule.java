@@ -20,7 +20,7 @@ public class FreeLookModule extends Module {
 
 
     public FreeLookModule() {
-        super("Free Look", "Allows more rotation options in third person.", Category.RENDER, "freelok", "third", "акуудщщл");
+        super("Free Look", "Allows more rotation options in third person.", Category.RENDER, "freelook", "freelok", "third", "акуудщщл");
     }
 
     @Override
