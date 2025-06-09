@@ -30,8 +30,9 @@ public class Essentials implements ClientModInitializer {
     public void onInitializeClient() {
         COMMAND_MANAGER.init();
         MODULE_MANAGER.init();
-        CONFIG_MANAGER.load();
         PING_MANAGER.init();
+
+        CONFIG_MANAGER.load();
 
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
 

@@ -40,21 +40,4 @@ public class MixinClientPlayNetworkHandler {
 
         EVENT_MANAGER.post(new ChunkDataEvent(chunk));
     }
-
-    private VelocityModule getVelocityModule() {
-        return (VelocityModule) MODULE_MANAGER.getModule(VelocityModule.class);
-    }
-
-    @Inject(method = "onEntityVelocityUpdate", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V",
-            shift = At.Shift.AFTER),
-            cancellable = true)
-    private void onEntityVelocityUpdate(EntityVelocityUpdateS2CPacket packet, CallbackInfo ci) {
-        VelocityModule velocityModule = getVelocityModule();
-        if (velocityModule == null || !velocityModule.isEnabled() || !velocityModule.packetDecline.get()) return;
-
-        if (packet.getEntityId() == MINECRAFT.player.getId()) {
-            ci.cancel();
-        }
-    }
 }

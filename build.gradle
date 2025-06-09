@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "me.kiriyaga"
-version = "0.2"
+version = "420"
 archivesBaseName = "essentials"
 
 java {
