@@ -1,12 +1,12 @@
 package me.kiriyaga.essentials.feature.module.impl.client;
 
+import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
@@ -14,7 +14,6 @@ import net.minecraft.util.math.MathHelper;
 import java.awt.*;
 
 import static me.kiriyaga.essentials.Essentials.*;
-
 
 public class HUDModule extends Module {
 
@@ -27,44 +26,54 @@ public class HUDModule extends Module {
     public final BoolSetting facing = addSetting(new BoolSetting("Facing", true));
     public final BoolSetting FPS = addSetting(new BoolSetting("FPS", true));
 
+    private static final int PADDING = 5;
+
     public HUDModule() {
         super("HUD","Displays in game hud.", Category.CLIENT, "ргв");
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender2D(Render2DEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null)
             return;
 
-        Color c = getColorModule().getStyledPrimaryColor();
+        Color styled = getColorModule().getStyledPrimaryColor();
+        Color opaque = new Color(styled.getRed(), styled.getGreen(), styled.getBlue(), 255);
+        int colorInt = opaque.getRGB();
 
         int screenWidth = MINECRAFT.getWindow().getScaledWidth();
         int screenHeight = MINECRAFT.getWindow().getScaledHeight();
 
-        if (watermark.get()){
+        if (watermark.get()) {
             String watermark = NAME + " " + VERSION;
-            int x = screenWidth / 2 - MINECRAFT.textRenderer.getWidth(watermark) / 2;
-            int y = screenHeight / 2;
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermark, x, y, c.getRGB(), false);
+            int x = PADDING;
+            int y = PADDING;
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermark, x, y, colorInt, false);
         }
 
-        if (cords.get()){
-            String coords = Formatting.GRAY + "XYZ " + Formatting.WHITE +
+        if (FPS.get()) {
+            int fps = MINECRAFT.getCurrentFps();
+            String f = "FPS: " + Formatting.WHITE +fps;
+            int x = screenWidth - MINECRAFT.textRenderer.getWidth(f) - PADDING;
+            int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, f, x, y, colorInt, false);
+        }
+
+        if (cords.get()) {
+            String coords = "XYZ " + Formatting.WHITE +
                     formatCoord(MINECRAFT.player.getX()) + Formatting.GRAY + ", " + Formatting.WHITE +
                     formatCoord(MINECRAFT.player.getY()) + Formatting.GRAY + ", " + Formatting.WHITE +
                     formatCoord(MINECRAFT.player.getZ());
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, coords, 2, screenHeight - MINECRAFT.textRenderer.fontHeight -2 , c.getRGB(), false);
+            int x = PADDING;
+            int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, coords, x, y, colorInt, false);
         }
 
-        if (facing.get()){
+        if (facing.get()) {
             String facing = getFacing(MINECRAFT);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, facing, 2 , screenHeight - MINECRAFT.textRenderer.fontHeight * 2 - 4, c.getRGB(), false);
-        }
-
-        if (FPS.get()){
-            int fps = MINECRAFT.getCurrentFps();
-            String f = "FPS: " + fps;
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, f, 2, screenHeight - MINECRAFT.textRenderer.fontHeight * 3 - 6, c.getRGB(), false);
+            int x = PADDING;
+            int y = screenHeight - MINECRAFT.textRenderer.fontHeight * 2 - PADDING - 2;
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, facing, x, y, colorInt, false);
         }
     }
 

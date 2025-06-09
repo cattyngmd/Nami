@@ -15,6 +15,7 @@ public class ClickGuiModule extends Module {
     public ClickGuiModule() {
         super("ClickGui", "Opens click gui", Category.CLIENT, "click", "gui", "menu", "clckgui", "сдшслпгш");
     }
+
     @Override
     public void onEnable(){
         if (MINECRAFT == null || MINECRAFT.mouse == null)

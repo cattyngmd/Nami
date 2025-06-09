@@ -40,5 +40,4 @@ public class MixinClientPlayNetworkHandler {
 
         EVENT_MANAGER.post(new ChunkDataEvent(chunk));
     }
-
 }

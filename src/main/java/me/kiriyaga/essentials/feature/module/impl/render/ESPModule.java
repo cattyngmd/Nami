@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.feature.module.impl.render;
 
+import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
@@ -34,7 +35,7 @@ public class ESPModule extends Module {
         super("ESP", "Draws boxes around entities", Category.RENDER, "esp", "WH", "boxes", "уыз");
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
         if (MINECRAFT == null || MINECRAFT.world == null || MINECRAFT.player == null) return;
 

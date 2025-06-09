@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.feature.module.impl.render;
 
+import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.ChunkDataEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
@@ -61,7 +62,7 @@ public class SearchModule extends Module {
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkDataEvent event) {
         if (MINECRAFT.world == null
                 || MINECRAFT.player == null) return;
@@ -116,7 +117,7 @@ public class SearchModule extends Module {
 
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender(Render3DEvent event) {
         if (MINECRAFT.player == null || MINECRAFT.world == null) return;
 
