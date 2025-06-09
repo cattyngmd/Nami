@@ -90,7 +90,7 @@ public class HUDModule extends Module {
         int screenWidth = mc.getWindow().getScaledWidth();
         int screenHeight = mc.getWindow().getScaledHeight();
 
-        float animationOffset = ChatAnimationHelper.getAnimationOffset();
+        float animationOffset = 20f - ChatAnimationHelper.getAnimationOffset();
 
         renderTopLeft(event, colorInt);
 
