@@ -30,7 +30,7 @@ public abstract class MixinChatScreen {
     @Inject(method = "removed", at = @At("HEAD"))
     private void onRemoved(CallbackInfo ci) {
         animationOffset = 20f;
-        ChatAnimationHelper.setAnimationOffset(0f);
+        ChatAnimationHelper.setAnimationOffset(animationOffset);
     }
 
     @Inject(method = "render", at = @At("HEAD"))
