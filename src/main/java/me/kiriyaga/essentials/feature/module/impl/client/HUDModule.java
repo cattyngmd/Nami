@@ -51,9 +51,19 @@ public class HUDModule extends Module {
             event.getDrawContext().drawText(MINECRAFT.textRenderer, watermark, x, y, colorInt, false);
         }
 
+            int ping = PING_MANAGER.getPing();
+            //boolean unstable = PING_MANAGER.isConnectionUnstable();
+
+            String pingText = "Ping: " + Formatting.WHITE + ping;
+
+            int pingX = screenWidth - MINECRAFT.textRenderer.getWidth(pingText) - PADDING;
+            int pingY = screenHeight - MINECRAFT.textRenderer.fontHeight * 2 - PADDING - 2;
+
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, pingX, pingY, colorInt, false);
+
         if (FPS.get()) {
             int fps = MINECRAFT.getCurrentFps();
-            String f = "FPS: " + Formatting.WHITE +fps;
+            String f = "FPS: " + Formatting.WHITE + fps;
             int x = screenWidth - MINECRAFT.textRenderer.getWidth(f) - PADDING;
             int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
             event.getDrawContext().drawText(MINECRAFT.textRenderer, f, x, y, colorInt, false);
@@ -76,6 +86,7 @@ public class HUDModule extends Module {
             event.getDrawContext().drawText(MINECRAFT.textRenderer, facing, x, y, colorInt, false);
         }
     }
+
 
     private String formatCoord(double coord) {
         return String.format("%.1f", coord).replace(',', '.');
