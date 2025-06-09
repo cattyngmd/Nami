@@ -25,6 +25,7 @@ public class AutoTotemModule extends Module {
     private boolean pendingTotem = false;
     private long lastAttemptTime = 0;
     private boolean instantTriggered = false;
+    private int totemCount = 0;
 
     public AutoTotemModule() {
         super("AutoTotem", "Insane shit.", Category.COMBAT);
@@ -51,8 +52,10 @@ public class AutoTotemModule extends Module {
             }
         }
 
-        if (deathLog.get() && event.getPacket() instanceof PlayerRespawnS2CPacket) {
-            logDeathData();
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
+            if (packet.getEntity(MINECRAFT.world) == MINECRAFT.player && packet.getStatus() == 3) {
+                logDeathData();
+            }
         }
     }
 
@@ -71,6 +74,9 @@ public class AutoTotemModule extends Module {
                 lastAttemptTime = System.currentTimeMillis();
             }
         }
+
+        totemCount = countTotems();
+        setDisplayInfo(""+totemCount);
 
         if (antiDesync.get() && pendingTotem) {
             long now = System.currentTimeMillis();
@@ -99,6 +105,17 @@ public class AutoTotemModule extends Module {
         return -1;
     }
 
+    private int countTotems() {
+        int count = 0;
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = MINECRAFT.player.getInventory().getStack(i);
+            if (stack != null && stack.getItem() == Items.TOTEM_OF_UNDYING) {
+                count += stack.getCount();
+            }
+        }
+        return count;
+    }
+
     private int convertSlot(int slot) {
         return slot < 9 ? slot + 36 : slot;
     }
@@ -108,18 +125,15 @@ public class AutoTotemModule extends Module {
         if (player == null) return;
 
         int ping = PING_MANAGER.getPing();
-        boolean hasTotem = findTotemSlot() != -1;
-        boolean desyncEnabled = antiDesync.get();
+        boolean hasTotem = totemCount == 0;
         long timeSinceLastSwap = System.currentTimeMillis() - lastAttemptTime;
 
         StringBuilder reason = new StringBuilder();
 
         if (!hasTotem) {
             reason.append("NO_TOTEMS");
-        } else if (ping > 200) {
+        } else if (ping > 125) {
             reason.append("HIGH_PING");
-        } else if (ping > 125 && desyncEnabled) {
-            reason.append("DESYNC_DELAY");
         } else {
             reason.append("UNKNOWN_CAUSE");
         }
@@ -128,8 +142,8 @@ public class AutoTotemModule extends Module {
         info.append("\n=== AutoTotem Death Log ===")
                 .append("\nCause: ").append(reason)
                 .append("\nPing: ").append(ping).append(" ms")
-                .append("\nDesync Enabled: ").append(desyncEnabled)
-                .append("\nTotems Available: ").append(hasTotem)
+                .append("\nInstant: ").append(instantTriggered)
+                .append("\nTotems Available: ").append(totemCount)
                 .append("\nPending Totem: ").append(pendingTotem)
                 .append("\nLast Swap Attempt: ").append(timeSinceLastSwap).append(" ms ago")
                 .append("\n============================");
