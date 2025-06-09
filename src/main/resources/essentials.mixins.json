@@ -5,10 +5,16 @@
   "client": [
     "ChatHudAccessor",
     "GameOptionsAccessor",
+    "MixinArmorFeatureRenderer",
+    "MixinBackgroundRenderer",
+    "MixinBossBarHud",
     "MixinChatScreen",
     "MixinClientPlayerEntity",
     "MixinClientPlayNetworkHandler",
+    "MixinGameRenderer",
+    "MixinHeadFeatureRenderer",
     "MixinInGameHud",
+    "MixinInGameOverlayRenderer",
     "MixinMinecraftClient",
     "MixinSimpleOption",
     "MixinWorldRenderer"
@@ -18,6 +24,8 @@
   },
   "mixins": [
     "EntityVelocityUpdateS2CPacketAccessor",
-    "MixinClientConnection"
+    "MixinClientConnection",
+    "MixinLivingEntity",
+    "PlayerInteractEntityC2SPacketAccessor"
   ]
 }

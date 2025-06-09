@@ -18,6 +18,7 @@
   "mixins": [
     "essentials.mixins.json"
   ],
+  "accessWidener": "META-INF/essentials.accesswidener",
   "depends": {
     "fabricloader": ">=0.15.7",
     "fabric": "*",

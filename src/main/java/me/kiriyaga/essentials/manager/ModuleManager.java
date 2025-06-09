@@ -8,9 +8,11 @@ import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.feature.module.impl.client.HUDModule;
 import me.kiriyaga.essentials.feature.module.impl.client.PingManagerModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
+import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.VelocityModule;
 import me.kiriyaga.essentials.feature.module.impl.render.ESPModule;
 import me.kiriyaga.essentials.feature.module.impl.render.NametagsModule;
+import me.kiriyaga.essentials.feature.module.impl.render.NoRenderModule;
 import me.kiriyaga.essentials.feature.module.impl.render.SearchModule;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class ModuleManager {
         registerModule(new NametagsModule());
         registerModule(new ESPModule());
         registerModule(new SearchModule());
+        registerModule(new NoRenderModule());
         /// CLIENT ///
         registerModule(new ColorModule());
         registerModule(new ClickGuiModule());
@@ -37,6 +40,7 @@ public class ModuleManager {
         registerModule(new AutoTotemModule());
         /// MOVEMENT ///
         registerModule(new VelocityModule());
+        registerModule(new SprintModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

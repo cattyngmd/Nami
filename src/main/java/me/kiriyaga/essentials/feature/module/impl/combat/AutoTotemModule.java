@@ -45,12 +45,12 @@ public class AutoTotemModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (packetPlace.get() && event.getPacket() instanceof EntityStatusS2CPacket packet) {
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
             if (packet.getStatus() == 35 && packet.getEntity(MINECRAFT.world) == MINECRAFT.player) {
-                attemptPlaceTotem();
-                instantTriggered = true;
+                MINECRAFT.execute(() -> attemptPlaceTotem()); // for some reason
             }
         }
+
 
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
             if (packet.getEntity(MINECRAFT.world) == MINECRAFT.player && packet.getStatus() == 3) {
