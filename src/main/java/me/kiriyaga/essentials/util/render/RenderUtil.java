@@ -259,7 +259,7 @@ public class RenderUtil {
         Camera camera = mc.gameRenderer.getCamera();
 
         double distance = camera.getPos().distanceTo(pos);
-        float scale = (float) (baseScale * Math.max(1.5, distance * 0.2));
+        float scale = (float) (baseScale * Math.max(1.5, distance * 0.14));
 
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
@@ -313,7 +313,7 @@ public class RenderUtil {
         Camera camera = mc.gameRenderer.getCamera();
 
         double distance = camera.getPos().distanceTo(pos);
-        float scale = (float) (baseScale * Math.max(1.5, distance * 0.2));
+        float scale = (float) (baseScale * Math.max(1.5, distance * 0.14));
 
         matrices.translate(
                 pos.x - camera.getPos().x,
