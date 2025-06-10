@@ -5,6 +5,7 @@ import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
@@ -40,11 +41,12 @@ public class ESPModule extends Module {
         if (MINECRAFT == null || MINECRAFT.world == null || MINECRAFT.player == null) return;
 
         MatrixStack matrices = event.getMatrices();
+        ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
 
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
                 if (player == MINECRAFT.player || player.isRemoved()) continue;
-                drawBox(player, Color.RED, matrices, event.getTickDelta());
+                drawBox(player, colorModule.getStyledPrimaryColor(), matrices, event.getTickDelta());
             }
         }
 
@@ -84,7 +86,7 @@ public class ESPModule extends Module {
         );
 
         if (filled.get())
-            RenderUtil.drawBoxFilled(matrices, box, color);
+            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 122));
         else
             RenderUtil.drawBox(matrices, box, color, lineWidth.get());
     }
