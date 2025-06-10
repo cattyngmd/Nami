@@ -32,6 +32,10 @@ public class ESPModule extends Module {
     public final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line", 1.5,0.5,2.5));
     public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 
+    private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
+    private static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
+    private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
+
     public ESPModule() {
         super("ESP", "Draws boxes around entities", Category.RENDER, "esp", "WH", "boxes", "уыз");
     }
@@ -53,21 +57,21 @@ public class ESPModule extends Module {
         if (showPeasefuls.get()) {
             for (PassiveEntity animal : EntityUtils.getPassiveMobs()) {
                 if (animal.isRemoved()) continue;
-                drawBox(animal, Color.LIGHT_GRAY, matrices, event.getTickDelta());
+                drawBox(animal, COLOR_PASSIVE, matrices, event.getTickDelta());
             }
         }
 
         if (showHostiles.get()) {
             for (HostileEntity hostile : EntityUtils.getHostileMobs()) {
                 if (hostile.isRemoved()) continue;
-                drawBox(hostile, Color.RED, matrices, event.getTickDelta());
+                drawBox(hostile, COLOR_HOSTILE, matrices, event.getTickDelta());
             }
         }
 
         if (showItems.get()) {
             for (ItemEntity item : EntityUtils.getDroppedItems()) {
                 if (item.isRemoved()) continue;
-                drawBox(item, Color.LIGHT_GRAY, matrices, event.getTickDelta());
+                drawBox(item, COLOR_ITEM, matrices, event.getTickDelta());
             }
         }
     }
@@ -86,7 +90,7 @@ public class ESPModule extends Module {
         );
 
         if (filled.get())
-            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 122));
+            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
         else
             RenderUtil.drawBox(matrices, box, color, lineWidth.get());
     }
