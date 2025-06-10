@@ -1,5 +1,5 @@
 /*
- * Originally taken from https://github.com/mioclient/oyvey-ported since im lazy to write my own renderers
+ * Originally taken from https://github.com/mioclient/ oyvey-ported since im lazy to write my own renderers
  * Please take a note that this code can be sublicensed by its owner
  */
 

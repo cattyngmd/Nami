@@ -36,7 +36,7 @@ public class PingManager {
             long now = System.currentTimeMillis();
 
             PingManagerModule config = MODULE_MANAGER.getModule(PingManagerModule.class);
-            int keepAliveInterval = config != null ? config.keepAliveInterval.get() : 15000;
+            int keepAliveInterval = config != null ? config.keepAliveInterval.get() : 1000;
 
             if (lastReceiveTime != -1) {
                 long interval = now - lastReceiveTime;

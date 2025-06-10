@@ -73,31 +73,18 @@ public abstract class MixinCamera implements ICamera {
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
         FreeLookModule freeLookModule = MODULE_MANAGER.getModule(FreeLookModule.class);
 
-        if (freecamModule.isEnabled()) {
+        if (ROTATION_MANAGER != null && ROTATION_MANAGER.isRotating()) {
+            args.set(0, ROTATION_MANAGER.getRenderYaw());
+            args.set(1, ROTATION_MANAGER.getRenderPitch());
+        } else if (freecamModule.isEnabled()) {
             float yaw = freecamModule.lastYaw + (freecamModule.yaw - freecamModule.lastYaw) * tickDelta;
             float pitch = freecamModule.lastPitch + (freecamModule.pitch - freecamModule.lastPitch) * tickDelta;
 
             args.set(0, yaw);
             args.set(1, pitch);
-        }
-        else if (freeLookModule.isEnabled()) {
+        } else if (freeLookModule.isEnabled()) {
             args.set(0, freeLookModule.cameraYaw);
             args.set(1, freeLookModule.cameraPitch);
-        }
-    }
-
-
-    @Inject(method = "getYaw", at = @At("RETURN"), cancellable = true)
-    private void onGetYaw(CallbackInfoReturnable<Float> cir) {
-        if (ROTATION_MANAGER != null && ROTATION_MANAGER.isRotating()) {
-            cir.setReturnValue(ROTATION_MANAGER.getRenderYaw());
-        }
-    }
-
-    @Inject(method = "getPitch", at = @At("RETURN"), cancellable = true)
-    private void onGetPitch(CallbackInfoReturnable<Float> cir) {
-        if (ROTATION_MANAGER != null && ROTATION_MANAGER.isRotating()) {
-            cir.setReturnValue(ROTATION_MANAGER.getRenderPitch());
         }
     }
 }
