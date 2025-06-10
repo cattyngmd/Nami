@@ -1,8 +1,11 @@
 package me.kiriyaga.essentials.mixin;
 
+import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,7 +15,6 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 @Mixin(MinecraftClient.class)
 public class MixinMinecraftClient {
-
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents(CallbackInfo ci) {
 

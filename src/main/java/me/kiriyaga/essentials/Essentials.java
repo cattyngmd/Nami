@@ -20,6 +20,7 @@ public class Essentials implements ClientModInitializer {
     public static final ModuleManager MODULE_MANAGER = new ModuleManager();
     public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
     public static final PingManager PING_MANAGER = new PingManager();
+    public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 
     public static ClickGuiScreen CLICK_GUI = new ClickGuiScreen();
@@ -31,6 +32,7 @@ public class Essentials implements ClientModInitializer {
         COMMAND_MANAGER.init();
         MODULE_MANAGER.init();
         PING_MANAGER.init();
+        ROTATION_MANAGER.init();
 
         CONFIG_MANAGER.load();
 

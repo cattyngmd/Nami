@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.mixin;
 
 import me.kiriyaga.essentials.feature.module.impl.render.FreeLookModule;
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.mixininterface.ICamera;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
@@ -14,9 +15,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 
 @Mixin(Camera.class)
 public abstract class MixinCamera implements ICamera {
@@ -80,6 +83,21 @@ public abstract class MixinCamera implements ICamera {
         else if (freeLookModule.isEnabled()) {
             args.set(0, freeLookModule.cameraYaw);
             args.set(1, freeLookModule.cameraPitch);
+        }
+    }
+
+
+    @Inject(method = "getYaw", at = @At("RETURN"), cancellable = true)
+    private void onGetYaw(CallbackInfoReturnable<Float> cir) {
+        if (ROTATION_MANAGER != null && ROTATION_MANAGER.isRotating()) {
+            cir.setReturnValue(ROTATION_MANAGER.getRenderYaw());
+        }
+    }
+
+    @Inject(method = "getPitch", at = @At("RETURN"), cancellable = true)
+    private void onGetPitch(CallbackInfoReturnable<Float> cir) {
+        if (ROTATION_MANAGER != null && ROTATION_MANAGER.isRotating()) {
+            cir.setReturnValue(ROTATION_MANAGER.getRenderPitch());
         }
     }
 }

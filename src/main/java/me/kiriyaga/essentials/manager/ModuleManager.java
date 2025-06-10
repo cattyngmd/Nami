@@ -2,10 +2,7 @@ package me.kiriyaga.essentials.manager;
 
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
-import me.kiriyaga.essentials.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
-import me.kiriyaga.essentials.feature.module.impl.client.HUDModule;
-import me.kiriyaga.essentials.feature.module.impl.client.PingManagerModule;
+import me.kiriyaga.essentials.feature.module.impl.client.*;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
@@ -34,6 +31,10 @@ public class ModuleManager {
         registerModule(new ClickGuiModule());
         registerModule(new HUDModule());
         registerModule(new PingManagerModule());
+        registerModule(new RotationManagerModule());
+
+        registerModule(new TestRotationShit2());
+
         /// COMBAT ///
         registerModule(new AutoTotemModule());
         /// MOVEMENT ///
