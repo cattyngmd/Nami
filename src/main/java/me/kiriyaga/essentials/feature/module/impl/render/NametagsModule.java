@@ -6,6 +6,7 @@ import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.EnumSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
@@ -62,13 +63,18 @@ public class NametagsModule extends Module {
         Camera camera = mc.gameRenderer.getCamera();
 
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
+        ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
 
+        int color = colorModule.getStyledPrimaryColor().getRGB();
+
+
+        colorModule.getStyledPrimaryColor();
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
                 if ((player == mc.player && !freecamModule.isEnabled()) || player.isRemoved())
                     continue;
 
-                renderNametag2D(player, formatter.formatPlayer(player), 0xFFFF5555, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
+                renderNametag2D(player, formatter.formatPlayer(player), color, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
 
@@ -89,7 +95,7 @@ public class NametagsModule extends Module {
         if (showItems.get()) {
             for (ItemEntity item : EntityUtils.getDroppedItems()) {
                 if (item.isRemoved() || item.getStack().isEmpty()) continue;
-                renderNametag2D(item, formatter.formatItem(item), 0xFFAAAAAA, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
+                renderNametag2D(item, formatter.formatItem(item), 0xFFFF5555, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
     }
