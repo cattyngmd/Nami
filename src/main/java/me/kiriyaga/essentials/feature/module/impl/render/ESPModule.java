@@ -39,33 +39,33 @@ public class ESPModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (MINECRAFT == null || MINECRAFT.world == null || MINECRAFT.player == null) return;
 
-        MatrixStack matrices = event.getMatrixStack();
+        MatrixStack matrices = event.getMatrices();
 
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
                 if (player == MINECRAFT.player || player.isRemoved()) continue;
-                drawBox(player, Color.RED, matrices, event.getPartialTicks());
+                drawBox(player, Color.RED, matrices, event.getTickDelta());
             }
         }
 
         if (showPeasefuls.get()) {
             for (PassiveEntity animal : EntityUtils.getPassiveMobs()) {
                 if (animal.isRemoved()) continue;
-                drawBox(animal, Color.LIGHT_GRAY, matrices, event.getPartialTicks());
+                drawBox(animal, Color.LIGHT_GRAY, matrices, event.getTickDelta());
             }
         }
 
         if (showHostiles.get()) {
             for (HostileEntity hostile : EntityUtils.getHostileMobs()) {
                 if (hostile.isRemoved()) continue;
-                drawBox(hostile, Color.RED, matrices, event.getPartialTicks());
+                drawBox(hostile, Color.RED, matrices, event.getTickDelta());
             }
         }
 
         if (showItems.get()) {
             for (ItemEntity item : EntityUtils.getDroppedItems()) {
                 if (item.isRemoved()) continue;
-                drawBox(item, Color.LIGHT_GRAY, matrices, event.getPartialTicks());
+                drawBox(item, Color.LIGHT_GRAY, matrices, event.getTickDelta());
             }
         }
     }

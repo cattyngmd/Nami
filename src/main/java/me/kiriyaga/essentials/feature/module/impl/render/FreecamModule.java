@@ -33,7 +33,6 @@ public class FreecamModule extends Module {
     @Override
     public void onEnable() {
         if (MINECRAFT.player == null) {
-            toggle();
             return;
         }
 
@@ -51,14 +50,20 @@ public class FreecamModule extends Module {
 
     @Override
     public void onDisable() {
-        if (MINECRAFT.options.getPerspective() != previousPerspective) {
+        if (MINECRAFT.player == null)
+            return;
+        if (MINECRAFT.options.getPerspective() != previousPerspective && previousPerspective != null) {
             MINECRAFT.options.setPerspective(previousPerspective);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdate(UpdateEvent event) {
-        if (!isEnabled() || MINECRAFT.player == null) return;
+        if (MINECRAFT.player == null) return;
+        if (cameraPos == null) {
+            toggle();
+            return;
+        }
 
         forward = MINECRAFT.options.forwardKey.isPressed();
         back    = MINECRAFT.options.backKey.isPressed();

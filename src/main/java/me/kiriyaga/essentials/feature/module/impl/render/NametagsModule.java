@@ -1,15 +1,18 @@
 package me.kiriyaga.essentials.feature.module.impl.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
-import me.kiriyaga.essentials.event.impl.Render3DEvent;
+import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.EnumSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
+import me.kiriyaga.essentials.util.MatrixCache;
 import me.kiriyaga.essentials.util.NametagFormatter;
-import me.kiriyaga.essentials.util.render.RenderUtil;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
@@ -19,8 +22,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.gui.DrawContext;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
+import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
 public class NametagsModule extends Module {
 
@@ -34,71 +43,91 @@ public class NametagsModule extends Module {
     public final BoolSetting showBackground = addSetting(new BoolSetting("Background", true));
 
     private final NametagFormatter formatter = new NametagFormatter(this);
+    private final MinecraftClient mc = MinecraftClient.getInstance();
+
+    public enum TextFormat {
+        None, Bold, Italic, Both
+    }
 
     public NametagsModule() {
         super("Nametags", "Draws names above entities", Category.RENDER, "nametag", "nmtags", "names", "тфьуефпы");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onRender3D(Render3DEvent event) {
-        if (MINECRAFT == null || MINECRAFT.world == null || MINECRAFT.player == null) return;
+    public void onRender2D(Render2DEvent event) {
+        if (mc == null || mc.world == null || mc.player == null) return;
+
+        DrawContext drawContext = event.getDrawContext();
+        MatrixStack matrices = drawContext.getMatrices();
+        Camera camera = mc.gameRenderer.getCamera();
+
+        FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
 
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
-                if ((player == MINECRAFT.player && MINECRAFT.options.getPerspective().isFirstPerson() ) || player.isRemoved()) continue;
-                drawNameTag(player, formatter.formatPlayer(player), 0xFFFF5555, event.getPartialTicks());
+                if ((player == mc.player && !freecamModule.isEnabled()) || player.isRemoved())
+                    continue;
+
+                renderNametag2D(player, formatter.formatPlayer(player), 0xFFFF5555, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
 
         if (showAnimals.get()) {
             for (PassiveEntity animal : EntityUtils.getPassiveMobs()) {
                 if (animal.isRemoved()) continue;
-                drawNameTag(animal, formatter.formatEntity(animal), 0xFFAAAAAA, event.getPartialTicks());
+                renderNametag2D(animal, formatter.formatEntity(animal), 0xFFAAAAAA, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
 
         if (showEnemies.get()) {
             for (HostileEntity hostile : EntityUtils.getHostileMobs()) {
                 if (hostile.isRemoved()) continue;
-                drawNameTag(hostile, formatter.formatEntity(hostile), 0xFFFF5555, event.getPartialTicks());
+                renderNametag2D(hostile, formatter.formatEntity(hostile), 0xFFFF5555, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
 
         if (showItems.get()) {
             for (ItemEntity item : EntityUtils.getDroppedItems()) {
                 if (item.isRemoved() || item.getStack().isEmpty()) continue;
-                drawNameTag(item, formatter.formatItem(item), 0xFFAAAAAA, event.getPartialTicks());
+                renderNametag2D(item, formatter.formatItem(item), 0xFFAAAAAA, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
     }
 
-    private void drawNameTag(Entity entity, Text text, int color, float tickDelta) {
+    private void renderNametag2D(Entity entity, Text text, int color,
+                                 Camera camera, DrawContext drawContext,
+                                 Matrix4f positionMatrix, Matrix4f projectionMatrix, float tickDelta) {
+
         double x = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * tickDelta;
-        double y = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * tickDelta + entity.getHeight() + 0.5;
+        double y = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * tickDelta + 2.3;
         double z = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * tickDelta;
 
-        Vec3d pos = new Vec3d(x, y, z);
-        float scale = 0.5f;
+        Vec3d interpolated = new Vec3d(x, y, z);
 
-        RenderUtil.drawTextInWorld(MINECRAFT, text, pos, scale, color, showBackground.get());
-          if (entity instanceof PlayerEntity && showEquipment.get()) {
-            drawItemRow(entity, tickDelta);
+        Vec3d projected = worldToScreen(interpolated, camera, positionMatrix, projectionMatrix);
+        if (projected == null) return;
+
+        int xScreen = (int) projected.x;
+        int yScreen = (int) projected.y;
+
+        int textWidth = mc.textRenderer.getWidth(text);
+        int textHeight = mc.textRenderer.fontHeight;
+
+        int bgPadding = 2;
+        if (showBackground.get()) {
+            int bgColor = (180 << 24) | 0x000000;
+            drawContext.fill(xScreen - textWidth / 2 - bgPadding, yScreen - bgPadding, xScreen + textWidth / 2 + bgPadding, yScreen + textHeight + bgPadding, bgColor);
+        }
+
+        drawContext.drawText(mc.textRenderer, text, xScreen - textWidth / 2, yScreen, color, false);
+
+        if (entity instanceof PlayerEntity && showEquipment.get()) {
+            renderItemRow2D((PlayerEntity) entity, drawContext, projected);
         }
     }
 
-    public enum TextFormat {
-        None, Bold, Italic, Both
-    }
 
-    private void drawItemRow(Entity entity, float tickDelta) {
-        if (!(entity instanceof PlayerEntity player)) return;
-
-        Vec3d basePos = new Vec3d(
-                entity.lastRenderX + (entity.getX() - entity.lastRenderX) * tickDelta,
-                entity.lastRenderY + (entity.getY() - entity.lastRenderY) * tickDelta + entity.getHeight() + 0.75, // выше текста
-                entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * tickDelta
-        );
-
+    private void renderItemRow2D(PlayerEntity player, DrawContext drawContext, Vec3d baseScreenPos) {
         ItemStack[] items = new ItemStack[] {
                 player.getOffHandStack(),
                 player.getEquippedStack(EquipmentSlot.HEAD),
@@ -108,19 +137,46 @@ public class NametagsModule extends Module {
                 player.getMainHandStack()
         };
 
-        double spacing = 0.3;
+        double spacing = 16;
         double totalWidth = (items.length - 1) * spacing;
-        double startX = -totalWidth / 2.0;
+        double startX = baseScreenPos.x - totalWidth / 2.0;
+        int y = (int) baseScreenPos.y - 14;
 
         for (int i = 0; i < items.length; i++) {
             ItemStack stack = items[i];
             if (stack.isEmpty()) continue;
+            int x = (int) (startX + i * spacing);
 
-            double xOffset = startX + i * spacing;
-            Vec3d itemPos = basePos.add(xOffset, 0, 0);
-
-            RenderUtil.drawItemInWorld(stack, itemPos, 0.5f);
+            drawContext.drawItem(stack, x - 8, y - 8);
         }
     }
+
+
+    private Vec3d worldToScreen(Vec3d worldPos, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix) {
+        Vec3d camPos = camera.getPos();
+
+        float relX = (float) (worldPos.x - camPos.x);
+        float relY = (float) (worldPos.y - camPos.y);
+        float relZ = (float) (worldPos.z - camPos.z);
+
+        Vector4f vec = new Vector4f(relX, relY, relZ, 1.0f);
+
+        Matrix4f viewProjection = new Matrix4f();
+        projectionMatrix.mul(positionMatrix, viewProjection);
+        vec.mul(viewProjection);
+
+        if (vec.w <= 0.0f) return null;
+
+        vec.div(vec.w);
+
+        int screenWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
+        int screenHeight = MinecraftClient.getInstance().getWindow().getScaledHeight();
+
+        float screenX = (vec.x * 0.5f + 0.5f) * screenWidth;
+        float screenY = (1.0f - (vec.y * 0.5f + 0.5f)) * screenHeight;
+
+        return new Vec3d(screenX, screenY, vec.z);
+    }
+
 
 }

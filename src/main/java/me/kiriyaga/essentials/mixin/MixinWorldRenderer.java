@@ -1,13 +1,16 @@
 package me.kiriyaga.essentials.mixin;
 
+import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.essentials.util.MatrixCache;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static me.kiriyaga.essentials.Essentials.*;
 
 @Mixin(WorldRenderer.class)
+
 public class MixinWorldRenderer {
 
     @Inject(method = "render", at = @At("RETURN"))
@@ -32,18 +36,34 @@ public class MixinWorldRenderer {
             Matrix4f projectionMatrix,
             CallbackInfo ci
     ) {
-        MatrixStack matrices = new MatrixStack();
-        matrices.push();
-
-        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
-
         float tickDelta = tickCounter.getTickProgress(true);
 
-        EVENT_MANAGER.post(new Render3DEvent(matrices, tickDelta));
+        MatrixStack matrices = new MatrixStack();
+        matrices.push();
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
+
+        EVENT_MANAGER.post(new Render3DEvent(matrices, tickDelta, camera, positionMatrix, projectionMatrix));
 
         matrices.pop();
     }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void captureMatrices(
+            ObjectAllocator allocator,
+            RenderTickCounter tickCounter,
+            boolean renderBlockOutline,
+            Camera camera,
+            GameRenderer gameRenderer,
+            Matrix4f positionMatrix,
+            Matrix4f projectionMatrix,
+            CallbackInfo ci
+    ) {
+        MatrixCache.positionMatrix = new Matrix4f(positionMatrix);
+        MatrixCache.projectionMatrix = new Matrix4f(projectionMatrix);
+        MatrixCache.camera = camera;
+    }
+
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;setupTerrain(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;ZZ)V"), index = 3)
     private boolean renderSetupTerrainModifyArg(boolean spectator) {

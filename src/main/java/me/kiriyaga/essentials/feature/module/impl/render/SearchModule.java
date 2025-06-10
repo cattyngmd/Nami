@@ -121,7 +121,7 @@ public class SearchModule extends Module {
     public void onRender(Render3DEvent event) {
         if (MINECRAFT.player == null || MINECRAFT.world == null) return;
 
-        MatrixStack matrices = event.getMatrixStack();
+        MatrixStack matrices = event.getMatrices();
         BlockPos playerPos = MINECRAFT.player.getBlockPos();
 
         for (Set<BlockPos> blockSet : chunkBlocks.values()) {

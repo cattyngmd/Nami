@@ -5,10 +5,12 @@
 
 package me.kiriyaga.essentials.util.render;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
@@ -38,6 +40,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
+import org.lwjgl.opengl.GL11;
 
 import static me.kiriyaga.essentials.Essentials.*;
 import java.awt.*;
@@ -254,93 +257,41 @@ public class RenderUtil {
         return matrices;
     }
 
-    public static void drawTextInWorld(MinecraftClient mc, Text text, Vec3d pos, float baseScale, int color, boolean withBackground) {
-        MatrixStack matrices = new MatrixStack();
-        Camera camera = mc.gameRenderer.getCamera();
-
-        double distance = camera.getPos().distanceTo(pos);
-        float scale = (float) (baseScale * Math.max(1.5, distance * 0.14
-        ));
-
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
-        matrices.translate(pos.x - camera.getPos().x, pos.y - camera.getPos().y, pos.z - camera.getPos().z);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-
-        matrices.translate(0, -0.1, -0.01);
-        matrices.scale(-0.04f * scale, -0.04f * scale, 1.0f);
-
-        int textWidth = mc.textRenderer.getWidth(text);
-        int halfWidth = textWidth / 2;
-        int textHeight = mc.textRenderer.fontHeight;
-
-        int bgPadding = 2;
-        int bgColor = (180 << 24) | 0x000000;
-
-        int x0 = -halfWidth - bgPadding;
-        int y0 = -bgPadding;
-        int x1 = halfWidth + bgPadding;
-        int y1 = textHeight + bgPadding;
-
+    public static void drawText2D(
+            DrawContext drawContext,
+            Text text,
+            int x,
+            int y,
+            int color,
+            boolean withBackground
+    ) {
         if (withBackground) {
-            RenderUtil.rectFilled(matrices, x0, y0, x1, y1, bgColor);
-
-            RenderUtil.rect(matrices, x0, y0, x1, y1, color, 0.5f);
+            int padding = 2;
+            int textWidth = MINECRAFT.textRenderer.getWidth(text);
+            int textHeight = MINECRAFT.textRenderer.fontHeight;
+            int bgColor = (180 << 24) | 0x000000;
+            drawContext.fill(x - padding, y - padding, x + textWidth + padding, y + textHeight + padding, bgColor);
         }
-
-        VertexConsumerProvider.Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-
-        mc.textRenderer.draw(
-                text,
-                -halfWidth, 0,
-                color,
-                false,
-                matrix4f,
-                immediate,
-                TextRenderer.TextLayerType.SEE_THROUGH,
-                0,
-                0xf000f0
-        );
-
-        immediate.draw();
+        drawContext.drawText(MINECRAFT.textRenderer, text, x, y, color, false);
     }
 
-    public static void drawItemInWorld(ItemStack stack, Vec3d pos, float baseScale) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        MatrixStack matrices = new MatrixStack();
+    public static void drawItem2D(
+            DrawContext drawContext,
+            ItemStack stack,
+            int x,
+            int y,
+            float scale
+    ) {
+        MatrixStack matrices = drawContext.getMatrices();
+        matrices.push();
 
-        Camera camera = mc.gameRenderer.getCamera();
+        matrices.translate(x, y, 0);
+        matrices.scale(scale, scale, 1f);
 
-        double distance = camera.getPos().distanceTo(pos);
-        float scale = (float) (baseScale * Math.max(1.5, distance * 0.14));
+        drawContext.drawItem(stack, -8, -8);
 
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
-
-        matrices.translate(pos.x - camera.getPos().x, pos.y - camera.getPos().y, pos.z - camera.getPos().z);
-
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-
-        matrices.translate(0, -0.1, -0.01);
-        matrices.scale(-0.04f * scale, -0.04f * scale, 1.0f);
-
-        DiffuseLighting.enableGuiDepthLighting();
-
-        mc.getItemRenderer().renderItem(
-                stack,
-                ItemDisplayContext.GROUND,
-                15728880,
-                OverlayTexture.DEFAULT_UV,
-                matrices,
-                mc.getBufferBuilders().getEntityVertexConsumers(),
-                mc.world,
-                0
-        );
-
-        mc.getBufferBuilders().getEntityVertexConsumers().draw();
+        matrices.pop();
     }
+
 
 }

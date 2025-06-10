@@ -1,22 +1,44 @@
 package me.kiriyaga.essentials.event.impl;
 
 import me.kiriyaga.essentials.event.Event;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;
+import org.joml.Matrix4f;
 
 public class Render3DEvent extends Event {
-    private final MatrixStack matrixStack;
-    private final float partialTicks;
+    private final MatrixStack matrices;
+    private final float tickDelta;
+    private final Camera camera;
+    private final Matrix4f positionMatrix;
+    private final Matrix4f projectionMatrix;
 
-    public Render3DEvent(MatrixStack matrixStack, float partialTicks) {
-        this.matrixStack = matrixStack;
-        this.partialTicks = partialTicks;
+    public Render3DEvent(MatrixStack matrices, float tickDelta, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix) {
+        this.matrices = matrices;
+        this.tickDelta = tickDelta;
+        this.camera = camera;
+        this.positionMatrix = positionMatrix;
+        this.projectionMatrix = projectionMatrix;
     }
 
-    public MatrixStack getMatrixStack() {
-        return matrixStack;
+    public MatrixStack getMatrices() {
+        return matrices;
     }
 
-    public float getPartialTicks() {
-        return partialTicks;
+    public float getTickDelta() {
+        return tickDelta;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public Matrix4f getPositionMatrix() {
+        return positionMatrix;
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
     }
 }
+
+
