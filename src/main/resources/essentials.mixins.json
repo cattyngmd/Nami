@@ -27,11 +27,11 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "EntityVelocityUpdateS2CPacketAccessor",
     "MixinClientConnection",
     "MixinEntity",
     "MixinLivingEntity",
     "MixinPlayerEntity",
+    "MixinPlayerInteractEntityC2SPacket",
     "PlayerInteractEntityC2SPacketAccessor"
   ]
 }

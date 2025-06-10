@@ -31,7 +31,7 @@ public class HUDModule extends Module {
     public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", true));
     public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("Lag Warning", true));
 
-    private static final int PADDING = 5;
+    private static final int PADDING = 2;
 
     private int tickCounter = 0;
 
@@ -175,7 +175,7 @@ public class HUDModule extends Module {
             ItemStack stack = armor[i];
             if (stack.isEmpty()) continue;
 
-            double armorX = x + i * 15;
+            double armorX = x + i * 18;
             double armorY = y;
 
             event.getDrawContext().drawItem(stack, (int) armorX, (int) armorY);

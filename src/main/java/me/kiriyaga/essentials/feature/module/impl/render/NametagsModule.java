@@ -12,6 +12,7 @@ import me.kiriyaga.essentials.setting.impl.EnumSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
 import me.kiriyaga.essentials.util.MatrixCache;
 import me.kiriyaga.essentials.util.NametagFormatter;
+import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -105,7 +106,7 @@ public class NametagsModule extends Module {
                                  Matrix4f positionMatrix, Matrix4f projectionMatrix, float tickDelta) {
 
         double x = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * tickDelta;
-        double y = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * tickDelta + 2.3;
+        double y = (entity.lastRenderY + (entity.getY() - entity.lastRenderY) * tickDelta) + entity.getHeight() + 0.2;
         double z = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * tickDelta;
 
         Vec3d interpolated = new Vec3d(x, y, z);
@@ -119,11 +120,24 @@ public class NametagsModule extends Module {
         int textWidth = mc.textRenderer.getWidth(text);
         int textHeight = mc.textRenderer.fontHeight;
 
-        int bgPadding = 2;
+        int bgPadding = 1;
         if (showBackground.get()) {
             int bgColor = (180 << 24) | 0x000000;
-            drawContext.fill(xScreen - textWidth / 2 - bgPadding, yScreen - bgPadding, xScreen + textWidth / 2 + bgPadding, yScreen + textHeight + bgPadding, bgColor);
+
+            int x1 = xScreen - textWidth / 2 - bgPadding;
+            int y1 = yScreen - bgPadding;
+            int x2 = xScreen + textWidth / 2 + bgPadding;
+            int y2 = yScreen + textHeight + bgPadding -1;
+
+            drawContext.fill(x1, y1, x2, y2, bgColor);
+
+            MatrixStack matrixStack = drawContext.getMatrices();
+            matrixStack.push();
+            RenderUtil.rect(matrixStack, x1-1, y1-1, x2, y2, color, 1.0f); // thanks mojang
+
+            matrixStack.pop();
         }
+
 
         drawContext.drawText(mc.textRenderer, text, xScreen - textWidth / 2, yScreen, color, false);
 
