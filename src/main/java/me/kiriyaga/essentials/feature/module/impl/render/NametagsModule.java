@@ -154,6 +154,7 @@ public class NametagsModule extends Module {
             int x = (int) (startX + i * spacing);
 
             drawContext.drawItem(stack, x - 8, y - 8);
+            drawContext.drawStackOverlay(MINECRAFT.textRenderer, stack ,x - 8, y-8);
         }
     }
 

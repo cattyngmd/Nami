@@ -10,6 +10,8 @@ import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 
@@ -22,6 +24,7 @@ public class HUDModule extends Module {
     public final IntSetting updateInterval = addSetting(new IntSetting("Update Interval", 5, 1, 20));
 
     public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("Watermark", true));
+    public final BoolSetting armorEnabled = addSetting(new BoolSetting("Armor", true));
     public final BoolSetting coordsEnabled = addSetting(new BoolSetting("Coordinates", false));
     public final BoolSetting facingEnabled = addSetting(new BoolSetting("Facing", true));
     public final BoolSetting fpsEnabled = addSetting(new BoolSetting("FPS", true));
@@ -110,6 +113,10 @@ public class HUDModule extends Module {
         if (lagWarningEnabled.get() && serverLagging) {
             drawLagWarning(event, screenWidth, screenHeight);
         }
+
+        if (armorEnabled.get()) {
+            renderArmorHUD(event);
+        }
     }
 
     private void renderTopLeft(Render2DEvent event, int color) {
@@ -149,6 +156,51 @@ public class HUDModule extends Module {
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
+
+    private void renderArmorHUD(Render2DEvent event) {
+        MinecraftClient mc = MINECRAFT;
+        if (mc.player == null) return;
+
+        double x = mc.getWindow().getScaledWidth() / 2 + 7 * mc.getWindow().getScaleFactor();
+        double y = mc.getWindow().getScaledHeight() - 28 * mc.getWindow().getScaleFactor();
+
+        ItemStack[] armor = new ItemStack[]{
+                mc.player.getEquippedStack(EquipmentSlot.HEAD),
+                mc.player.getEquippedStack(EquipmentSlot.CHEST),
+                mc.player.getEquippedStack(EquipmentSlot.LEGS),
+                mc.player.getEquippedStack(EquipmentSlot.FEET)
+        };
+
+        for (int i = 0; i < armor.length; i++) {
+            ItemStack stack = armor[i];
+            if (stack.isEmpty()) continue;
+
+            double armorX = x + i * 15;
+            double armorY = y;
+
+            event.getDrawContext().drawItem(stack, (int) armorX, (int) armorY);
+            event.getDrawContext().drawStackOverlay(MINECRAFT.textRenderer, stack, (int) armorX, (int) armorY);
+
+            if (stack.isDamageable()) {
+                float durability = (stack.getMaxDamage() - (float) stack.getDamage()) / stack.getMaxDamage();
+                int percent = Math.round(durability * 100);
+                int r = (int) ((1 - durability) * 255);
+                int g = (int) (durability * 255);
+
+                String durabilityText = Integer.toString(percent);
+                event.getDrawContext().drawText(
+                        MINECRAFT.textRenderer,
+                        durabilityText,
+                        (int) (armorX + 1),
+                        (int) (armorY - 10),
+                        new Color(r, g, 0).getRGB(),
+                        true
+                );
+            }
+        }
+    }
+
+
 
     private void drawLagWarning(Render2DEvent event, int screenWidth, int screenHeight) {
         String warningText = "Server is lagging!";
