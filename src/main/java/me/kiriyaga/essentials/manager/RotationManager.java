@@ -2,9 +2,15 @@ package me.kiriyaga.essentials.manager;
 
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
+import me.kiriyaga.essentials.event.impl.PacketSendEvent;
 import me.kiriyaga.essentials.event.impl.UpdateEvent;
 import me.kiriyaga.essentials.feature.module.impl.client.RotationManagerModule;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -24,12 +30,13 @@ public class RotationManager {
     private float rotationEaseFactor;
     private float rotationThreshold;
     private int ticksBeforeRelease;
+    private int holdTicksLimit;
 
-    private boolean returned = false;
-
+    private boolean returning = false;
     private int ticksHolding = 0;
+    private int holdTicks = 0;
 
-    private boolean cursorLocked = false;
+    private boolean spoofing = false;
 
     public void init() {
         EVENT_MANAGER.register(this);
@@ -75,34 +82,7 @@ public class RotationManager {
     }
 
     public boolean isRotating() {
-        if (activeRequest != null) return true;
-
-        for (RotationRequest request : requests) {
-            if (Math.abs(wrapDegrees(request.targetYaw - rotationYaw)) > rotationThreshold ||
-                    Math.abs(request.targetPitch - rotationPitch) > rotationThreshold) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-
-    public float getRenderYaw() {
-        return realYaw;
-    }
-
-    public float getRenderPitch() {
-        return realPitch;
-    }
-
-    public void setRenderYaw(float realYaw) {
-        this.realYaw = realYaw;
-    }
-
-    public void setRenderPitch(float realPitch) {
-        this.realPitch = realPitch;
+        return activeRequest != null;
     }
 
     public float getRotationYaw() {
@@ -113,47 +93,77 @@ public class RotationManager {
         return rotationPitch;
     }
 
-    private void applyRotationToPlayer() {
-        if (MINECRAFT.player != null) {
-            MINECRAFT.player.setYaw(rotationYaw);
-            MINECRAFT.player.setPitch(rotationPitch);
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onUpdate(UpdateEvent event) {
         if (MINECRAFT.player == null) return;
 
-        RotationManagerModule rotationManagerModule = MODULE_MANAGER.getModule(RotationManagerModule.class);
-        rotationSpeed = rotationManagerModule.rotationSpeed.get().floatValue();
-        rotationEaseFactor = rotationManagerModule.rotationEaseFactor.get().floatValue();
-        rotationThreshold = rotationManagerModule.rotationThreshold.get().floatValue();
-        ticksBeforeRelease = rotationManagerModule.ticksBeforeRelease.get();
+        RotationManagerModule rotationModule = MODULE_MANAGER.getModule(RotationManagerModule.class);
+        rotationSpeed = rotationModule.rotationSpeed.get().floatValue();
+        rotationEaseFactor = rotationModule.rotationEaseFactor.get().floatValue();
+        rotationThreshold = rotationModule.rotationThreshold.get().floatValue();
+        ticksBeforeRelease = rotationModule.ticksBeforeRelease.get();
+        holdTicksLimit = rotationModule.ticksBeforeRelease.get();
 
-        boolean hasRequests = !requests.isEmpty();
+        updateRealRotation(MINECRAFT.player.getYaw(), MINECRAFT.player.getPitch());
 
-        if (hasRequests) {
-            returned = true;
-
-            if (!cursorLocked && !MINECRAFT.mouse.isCursorLocked()) {
-                MINECRAFT.mouse.lockCursor();
-                cursorLocked = true;
-            }
-
+        if (!requests.isEmpty()) {
             if (activeRequest == null || !requests.contains(activeRequest)) {
                 activeRequest = requests.get(0);
+                rotationYaw = realYaw;
+                rotationPitch = realPitch;
+                holdTicks = 0;
+                ticksHolding = 0;
                 currentYawSpeed = 0f;
                 currentPitchSpeed = 0f;
-                rotationYaw = MINECRAFT.player.getYaw();
-                rotationPitch = MINECRAFT.player.getPitch();
             }
 
+            boolean updated = false;
             if (activeRequest.shouldUpdate()) {
+                float oldYaw = activeRequest.targetYaw;
+                float oldPitch = activeRequest.targetPitch;
                 activeRequest.updateTarget();
+                if (Math.abs(wrapDegrees(oldYaw - activeRequest.targetYaw)) > 0.001f ||
+                        Math.abs(oldPitch - activeRequest.targetPitch) > 0.001f) {
+                    ticksHolding = 0;
+                    holdTicks = 0;
+                    updated = true;
+                }
             }
 
             float yawDiff = wrapDegrees(activeRequest.targetYaw - rotationYaw);
             float pitchDiff = activeRequest.targetPitch - rotationPitch;
+
+            boolean reached = Math.abs(yawDiff) < rotationThreshold && Math.abs(pitchDiff) < rotationThreshold;
+
+            if (reached && !updated) {
+                ticksHolding++;
+                if (ticksHolding >= ticksBeforeRelease) {
+                    requests.remove(activeRequest);
+                    activeRequest = null;
+                    ticksHolding = 0;
+                    holdTicks = 0;
+                    returning = true;
+                }
+            } else {
+                ticksHolding = 0;
+
+                if (!reached) {
+                    holdTicks = 0;
+                }
+
+                if (holdTicks < holdTicksLimit || !reached) {
+                    currentYawSpeed = lerp(currentYawSpeed, yawDiff, rotationEaseFactor);
+                    currentPitchSpeed = lerp(currentPitchSpeed, pitchDiff, rotationEaseFactor);
+
+                    rotationYaw = wrapDegrees(rotationYaw + MathHelper.clamp(currentYawSpeed, -rotationSpeed, rotationSpeed));
+                    rotationPitch += MathHelper.clamp(currentPitchSpeed, -rotationSpeed, rotationSpeed);
+                } else {
+                    holdTicks++;
+                }
+            }
+        } else if (returning) {
+            float yawDiff = wrapDegrees(realYaw - rotationYaw);
+            float pitchDiff = realPitch - rotationPitch;
 
             currentYawSpeed = lerp(currentYawSpeed, yawDiff, rotationEaseFactor);
             currentPitchSpeed = lerp(currentPitchSpeed, pitchDiff, rotationEaseFactor);
@@ -161,38 +171,94 @@ public class RotationManager {
             rotationYaw = wrapDegrees(rotationYaw + MathHelper.clamp(currentYawSpeed, -rotationSpeed, rotationSpeed));
             rotationPitch += MathHelper.clamp(currentPitchSpeed, -rotationSpeed, rotationSpeed);
 
-            applyRotationToPlayer();
+            boolean backReached = Math.abs(yawDiff) < rotationThreshold && Math.abs(pitchDiff) < rotationThreshold;
 
-            boolean rotationReached = Math.abs(yawDiff) < rotationThreshold && Math.abs(pitchDiff) < rotationThreshold;
-
-            if (rotationReached) {
-                ticksHolding++;
-                if (ticksHolding >= ticksBeforeRelease) {
-                    requests.remove(activeRequest);
-                    activeRequest = null;
-                    ticksHolding = 0;
-                }
-            } else {
-                ticksHolding = 0;
+            if (backReached) {
+                returning = false;
+                rotationYaw = realYaw;
+                rotationPitch = realPitch;
             }
-        } else if (returned){
-            returned = false;
+        } else {
             rotationYaw = realYaw;
             rotationPitch = realPitch;
-            applyRotationToPlayer();
-
-            activeRequest = null;
-            ticksHolding = 0;
-
-            if (cursorLocked && MINECRAFT.mouse.isCursorLocked()) {
-                MINECRAFT.mouse.unlockCursor();
-                cursorLocked = false;
-            }
         }
-        // no interp
+
+        if (activeRequest != null) {
+            CHAT_MANAGER.sendRaw(String.format("yaw=%.2f pitch=%.2f  targetYaw=%.2f targetPitch=%.2f  hold=%d  id=%s",
+                    rotationYaw, rotationPitch,
+                    activeRequest.targetYaw, activeRequest.targetPitch,
+                    holdTicks, activeRequest.id));
+        }
     }
 
+    @SubscribeEvent
+    public void onPacketSend(PacketSendEvent event) {
+        if (spoofing) return;
+        Packet<?> packet = event.getPacket();
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null) return;
 
+        if (isRotating()) return;
+
+        float spoofYaw = getRotationYaw();
+        float spoofPitch = getRotationPitch();
+        Vec3d pos = mc.player.getPos();
+
+        if (!(packet instanceof PlayerMoveC2SPacket)) return;
+
+        spoofing = true;
+
+        try {
+            if (packet instanceof PlayerMoveC2SPacket.Full full) {
+                event.cancel();
+                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
+                        new Vec3d(
+                                full.getX(pos.x),
+                                full.getY(pos.y),
+                                full.getZ(pos.z)
+                        ),
+                        spoofYaw,
+                        spoofPitch,
+                        full.isOnGround(),
+                        full.horizontalCollision()
+                ));
+
+            } else if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround posPacket) {
+                event.cancel();
+                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
+                        new Vec3d(
+                                posPacket.getX(pos.x),
+                                posPacket.getY(pos.y),
+                                posPacket.getZ(pos.z)
+                        ),
+                        spoofYaw,
+                        spoofPitch,
+                        posPacket.isOnGround(),
+                        posPacket.horizontalCollision()
+                ));
+
+            } else if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround look) {
+                event.cancel();
+                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
+                        spoofYaw,
+                        spoofPitch,
+                        look.isOnGround(),
+                        look.horizontalCollision()
+                ));
+
+            } else if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly ground) {
+                event.cancel();
+                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
+                        spoofYaw,
+                        spoofPitch,
+                        ground.isOnGround(),
+                        false
+                ));
+            }
+        } finally {
+            spoofing = false;
+        }
+    }
 
     private float wrapDegrees(float angle) {
         angle %= 360f;
@@ -203,11 +269,6 @@ public class RotationManager {
 
     private float lerp(float from, float to, float factor) {
         return from + (to - from) * factor;
-    }
-
-    private float getWrappedYawDiff(float from, float to) {
-        float diff = wrapDegrees(to - from);
-        return diff;
     }
 
     public static class RotationRequest {
@@ -238,7 +299,6 @@ public class RotationManager {
             this.pitchSupplier = pitchSupplier;
             updateTarget();
         }
-
 
         public boolean shouldUpdate() {
             return dynamic;

@@ -48,39 +48,4 @@ public class MixinMinecraftClient {
             }
         }
     }
-
-    @Inject(method = "handleInputEvents", at = @At("HEAD"))
-    private void onHandleInputEvents_HEAD(CallbackInfo ci) {
-        if (MINECRAFT == null || MINECRAFT.mouse == null) return;
-
-        Mouse mouse = this.mouse;
-        if (mouse == null) return;
-
-        if (!(mouse instanceof IMouseDeltaAccessor)) return;
-
-        double deltaX = ((IMouseDeltaAccessor) mouse).getCursorDeltaX();
-        double deltaY = ((IMouseDeltaAccessor) mouse).getCursorDeltaY();
-
-
-        if (ROTATION_MANAGER != null && ROTATION_MANAGER.isRotating()) {
-            float mouseSensitivity = MINECRAFT.options.getMouseSensitivity().getValue().floatValue();
-            float adjustedSensitivity = (mouseSensitivity * 0.6F + 0.2F) * 0.6F;
-            float cubicSensitivity = adjustedSensitivity * adjustedSensitivity * adjustedSensitivity;
-            float degreesPerPixel = cubicSensitivity * 8.0F;
-
-            float yawDelta = (float) deltaX * degreesPerPixel;
-            float pitchDelta = (float) deltaY * degreesPerPixel;
-
-            float newYaw = ROTATION_MANAGER.getRenderYaw() + yawDelta;
-            float newPitch = ROTATION_MANAGER.getRenderPitch() + pitchDelta;
-
-            newPitch = MathHelper.clamp(newPitch, -90.0F, 90.0F);
-            newYaw = MathHelper.wrapDegrees(newYaw);
-
-            ROTATION_MANAGER.setRenderYaw(newYaw);
-            ROTATION_MANAGER.setRenderPitch(newPitch);
-        }
-    }
-
-
 }
