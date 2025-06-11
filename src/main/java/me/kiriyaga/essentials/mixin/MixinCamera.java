@@ -73,10 +73,7 @@ public abstract class MixinCamera implements ICamera {
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
         FreeLookModule freeLookModule = MODULE_MANAGER.getModule(FreeLookModule.class);
 
-        if (ROTATION_MANAGER != null && ROTATION_MANAGER.isRotating()) {
-            args.set(0, ROTATION_MANAGER.getRenderYaw());
-            args.set(1, ROTATION_MANAGER.getRenderPitch());
-        } else if (freecamModule.isEnabled()) {
+        if (freecamModule.isEnabled()) {
             float yaw = freecamModule.lastYaw + (freecamModule.yaw - freecamModule.lastYaw) * tickDelta;
             float pitch = freecamModule.lastPitch + (freecamModule.pitch - freecamModule.lastPitch) * tickDelta;
 

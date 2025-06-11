@@ -95,7 +95,7 @@ public class AuraModule extends Module {
 
         targets = hostiles.stream()
                 .filter(e -> {
-                    boolean alive = !e.isRemoved();
+                    boolean alive = e.isAlive();
                     double distSq = e.squaredDistanceTo(player);
                     boolean inRange = distSq <= maxRange * maxRange;
                     return alive && inRange;

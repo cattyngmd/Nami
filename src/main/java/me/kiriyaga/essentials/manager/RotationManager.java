@@ -48,10 +48,17 @@ public class RotationManager {
     }
 
     public void submitRequest(RotationRequest request) {
+        boolean wasActive = activeRequest != null && Objects.equals(activeRequest.id, request.id);
+
         requests.removeIf(r -> Objects.equals(r.id, request.id));
         requests.add(request);
         requests.sort(Comparator.comparingInt(r -> -r.priority));
+
+        if (wasActive) {
+            activeRequest = request;
+        }
     }
+
 
     public boolean isRequestCompleted(String id) {
         RotationRequest request = null;
