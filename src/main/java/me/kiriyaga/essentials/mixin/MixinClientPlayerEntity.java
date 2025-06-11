@@ -36,4 +36,18 @@ public class MixinClientPlayerEntity {
 
         EVENT_MANAGER.post(new UpdateEvent());
     }
+
+    @Inject(method = "getYaw", at = @At("HEAD"), cancellable = true)
+    private void onGetYaw(CallbackInfoReturnable<Float> cir) {
+        if (ROTATION_MANAGER.isRotating()) {
+            cir.setReturnValue(ROTATION_MANAGER.getRotationYaw());
+        }
+    }
+
+    @Inject(method = "getPitch", at = @At("HEAD"), cancellable = true)
+    private void onGetPitch(CallbackInfoReturnable<Float> cir) {
+        if (ROTATION_MANAGER.isRotating()) {
+            cir.setReturnValue(ROTATION_MANAGER.getRotationPitch());
+        }
+    }
 }
