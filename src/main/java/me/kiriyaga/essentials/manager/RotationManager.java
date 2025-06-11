@@ -23,13 +23,13 @@ public class RotationManager {
     private float rotationSpeed;
     private float rotationEaseFactor;
     private float rotationThreshold;
+    private int ticksBeforeRelease;
 
     private float smoothYaw, smoothPitch;
 
     private boolean returned = false;
 
     private int ticksHolding = 0;
-    private final int ticksBeforeRelease = 60;
 
     private boolean cursorLocked = false;
 
@@ -106,6 +106,7 @@ public class RotationManager {
         rotationSpeed = rotationManagerModule.rotationSpeed.get().floatValue();
         rotationEaseFactor = rotationManagerModule.rotationEaseFactor.get().floatValue();
         rotationThreshold = rotationManagerModule.rotationThreshold.get().floatValue();
+        ticksBeforeRelease = rotationManagerModule.ticksBeforeRelease.get();
 
         boolean hasRequests = !requests.isEmpty();
 

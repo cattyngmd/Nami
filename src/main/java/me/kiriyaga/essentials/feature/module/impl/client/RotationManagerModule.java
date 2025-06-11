@@ -10,6 +10,7 @@ public class RotationManagerModule extends Module {
     public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("Rotation Speed", 5, 1, 30));
     public final DoubleSetting rotationEaseFactor = addSetting(new DoubleSetting("Rotation Ease Factor", 0, 0.05, 1));
     public final DoubleSetting rotationThreshold = addSetting(new DoubleSetting("Rotation Threshold", 5, 1, 15));
+    public final IntSetting ticksBeforeRelease = addSetting(new IntSetting("Rotation Hold", 40, 10, 80));
 
     public RotationManagerModule() {
         super("Rotation Manager", "Allows you to config rotation manager settings.", Category.CLIENT, "rotate", "rotationmanager", "roate", "toationmanager", "кщефеу");
