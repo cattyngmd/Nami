@@ -183,12 +183,12 @@ public class RotationManager {
             rotationPitch = realPitch;
         }
 
-        if (activeRequest != null) {
-            CHAT_MANAGER.sendRaw(String.format("yaw=%.2f pitch=%.2f  targetYaw=%.2f targetPitch=%.2f  hold=%d  id=%s",
-                    rotationYaw, rotationPitch,
-                    activeRequest.targetYaw, activeRequest.targetPitch,
-                    holdTicks, activeRequest.id));
-        }
+//        if (activeRequest != null) {
+//            CHAT_MANAGER.sendRaw(String.format("yaw=%.2f pitch=%.2f  targetYaw=%.2f targetPitch=%.2f  hold=%d  id=%s",
+//                    rotationYaw, rotationPitch,
+//                    activeRequest.targetYaw, activeRequest.targetPitch,
+//                    holdTicks, activeRequest.id));
+//        }
     }
 
     @SubscribeEvent
