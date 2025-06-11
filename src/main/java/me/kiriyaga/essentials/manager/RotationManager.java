@@ -102,7 +102,7 @@ public class RotationManager {
         rotationEaseFactor = rotationModule.rotationEaseFactor.get().floatValue();
         rotationThreshold = rotationModule.rotationThreshold.get().floatValue();
         ticksBeforeRelease = rotationModule.ticksBeforeRelease.get();
-        holdTicksLimit = rotationModule.ticksBeforeRelease.get();
+        holdTicksLimit = rotationModule.holdTicksLimit.get();
 
         updateRealRotation(MINECRAFT.player.getYaw(), MINECRAFT.player.getPitch());
 
@@ -115,6 +115,7 @@ public class RotationManager {
                 ticksHolding = 0;
                 currentYawSpeed = 0f;
                 currentPitchSpeed = 0f;
+                returning = false;
             }
 
             boolean updated = false;
@@ -133,7 +134,7 @@ public class RotationManager {
             float yawDiff = wrapDegrees(activeRequest.targetYaw - rotationYaw);
             float pitchDiff = activeRequest.targetPitch - rotationPitch;
 
-            boolean reached = Math.abs(yawDiff) < rotationThreshold && Math.abs(pitchDiff) < rotationThreshold;
+            boolean reached = Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
 
             if (reached && !updated) {
                 ticksHolding++;
@@ -146,17 +147,17 @@ public class RotationManager {
                 }
             } else {
                 ticksHolding = 0;
-
-                if (!reached) {
-                    holdTicks = 0;
-                }
+                if (!reached) holdTicks = 0;
 
                 if (holdTicks < holdTicksLimit || !reached) {
                     currentYawSpeed = lerp(currentYawSpeed, yawDiff, rotationEaseFactor);
                     currentPitchSpeed = lerp(currentPitchSpeed, pitchDiff, rotationEaseFactor);
 
-                    rotationYaw = wrapDegrees(rotationYaw + MathHelper.clamp(currentYawSpeed, -rotationSpeed, rotationSpeed));
-                    rotationPitch += MathHelper.clamp(currentPitchSpeed, -rotationSpeed, rotationSpeed);
+                    float clampedYawSpeed = MathHelper.clamp(currentYawSpeed, -rotationSpeed, rotationSpeed);
+                    float clampedPitchSpeed = MathHelper.clamp(currentPitchSpeed, -rotationSpeed, rotationSpeed);
+
+                    rotationYaw = wrapDegrees(rotationYaw + clampedYawSpeed);
+                    rotationPitch = MathHelper.clamp(rotationPitch + clampedPitchSpeed, -90f, 90f);
                 } else {
                     holdTicks++;
                 }
@@ -168,10 +169,13 @@ public class RotationManager {
             currentYawSpeed = lerp(currentYawSpeed, yawDiff, rotationEaseFactor);
             currentPitchSpeed = lerp(currentPitchSpeed, pitchDiff, rotationEaseFactor);
 
-            rotationYaw = wrapDegrees(rotationYaw + MathHelper.clamp(currentYawSpeed, -rotationSpeed, rotationSpeed));
-            rotationPitch += MathHelper.clamp(currentPitchSpeed, -rotationSpeed, rotationSpeed);
+            float clampedYawSpeed = MathHelper.clamp(currentYawSpeed, -rotationSpeed, rotationSpeed);
+            float clampedPitchSpeed = MathHelper.clamp(currentPitchSpeed, -rotationSpeed, rotationSpeed);
 
-            boolean backReached = Math.abs(yawDiff) < rotationThreshold && Math.abs(pitchDiff) < rotationThreshold;
+            rotationYaw = wrapDegrees(rotationYaw + clampedYawSpeed);
+            rotationPitch = MathHelper.clamp(rotationPitch + clampedPitchSpeed, -90f, 90f);
+
+            boolean backReached = Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
 
             if (backReached) {
                 returning = false;
@@ -181,14 +185,9 @@ public class RotationManager {
         } else {
             rotationYaw = realYaw;
             rotationPitch = realPitch;
+            currentYawSpeed = 0f;
+            currentPitchSpeed = 0f;
         }
-
-//        if (activeRequest != null) {
-//            CHAT_MANAGER.sendRaw(String.format("yaw=%.2f pitch=%.2f  targetYaw=%.2f targetPitch=%.2f  hold=%d  id=%s",
-//                    rotationYaw, rotationPitch,
-//                    activeRequest.targetYaw, activeRequest.targetPitch,
-//                    holdTicks, activeRequest.id));
-//        }
     }
 
     @SubscribeEvent
