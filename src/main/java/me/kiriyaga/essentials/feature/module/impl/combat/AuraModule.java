@@ -10,15 +10,11 @@ import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
-import me.kiriyaga.essentials.setting.impl.EnumSetting;
-import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
 import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.entity.MinecartEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 
@@ -32,75 +28,117 @@ public class AuraModule extends Module {
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 4, 1, 6));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
-
-    private List<Entity> targets = new ArrayList<>();
-
     public AuraModule() {
         super("2b2t Aura(wip)", "----", Category.COMBAT, "killaura", "aura", "deathaura", "kilaura", "фгкф");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onUpdate(UpdateEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null)
+        System.out.println("[AuraModule] onUpdate called");
+
+        if (MINECRAFT.player == null || MINECRAFT.world == null) {
+            System.out.println("[AuraModule] player or world is null");
             return;
+        }
 
         Entity player = MINECRAFT.player;
         Entity target = getTarget();
 
-        if (target == null) return;
+        if (target == null) {
+            System.out.println("[AuraModule] No target found");
+            return;
+        } else {
+            System.out.println("[AuraModule] Target found: " + target.getName().getString() + " at distance " + player.squaredDistanceTo(target));
+        }
 
         float cooldownProgress = MINECRAFT.player.getAttackCooldownProgress(0f);
+        System.out.println("[AuraModule] Attack cooldown progress: " + cooldownProgress);
 
-        if (cooldownProgress < 1.0f)
+        if (cooldownProgress < 1.0f) {
+            System.out.println("[AuraModule] Cooldown not ready, skipping attack");
             return;
+        }
 
-        attack(target, getYawToEntity(player, target), getPitchToEntity(player, target));
+        int yaw = getYawToEntity(player, target);
+        int pitch = getPitchToEntity(player, target);
+        System.out.println("[AuraModule] Attacking target with yaw: " + yaw + ", pitch: " + pitch);
+
+        attack(target, yaw, pitch);
     }
-
-
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
-        if (!render.get() || getTarget() == null)
+        if (!render.get()) {
+            System.out.println("[AuraModule] Render disabled");
             return;
+        }
+
+        Entity target = getTarget();
+
+        if (target == null) {
+            System.out.println("[AuraModule] Render: No target to draw box for");
+            return;
+        }
 
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
-
-        drawBox(getTarget(),colorModule.getStyledPrimaryColor(),event.getMatrices(), event.getTickDelta());
+        drawBox(target, colorModule.getStyledPrimaryColor(), event.getMatrices(), event.getTickDelta());
+        System.out.println("[AuraModule] Drawing box around target: " + target.getName().getString());
     }
 
     private void attack(Entity target, int yaw, int pitch) {
         if (ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) {
+            System.out.println("[AuraModule] Rotation completed, attacking entity");
             MINECRAFT.interactionManager.attackEntity(MINECRAFT.player, target);
             MINECRAFT.player.swingHand(Hand.MAIN_HAND);
         } else {
-            RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(),10, yaw, pitch);
+            System.out.println("[AuraModule] Submitting rotation request with yaw: " + yaw + ", pitch: " + pitch);
+            RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), 10, yaw, pitch);
             ROTATION_MANAGER.submitRequest(request);
         }
     }
 
     private Entity getTarget() {
-        targets.clear();
+        List<Entity> targets;
 
         List<Entity> hostiles = EntityUtils.getHostileMobs();
 
         double maxRange = attackRange.get();
         ClientPlayerEntity player = MINECRAFT.player;
 
+        System.out.println("[AuraModule] Filtering targets within range: " + maxRange);
+
         targets = hostiles.stream()
-                .filter(e -> !e.isRemoved() && e.squaredDistanceTo(player) <= maxRange * maxRange)
+                .filter(e -> {
+                    boolean alive = !e.isRemoved();
+                    double distSq = e.squaredDistanceTo(player);
+                    boolean inRange = distSq <= maxRange * maxRange;
+                    if (alive && inRange) {
+                        System.out.println("[AuraModule] Possible target: " + e.getName().getString() + ", distSq: " + distSq);
+                    }
+                    return alive && inRange;
+                })
                 .toList();
 
-        return targets.stream()
+        Entity closest = targets.stream()
                 .min((e1, e2) -> Double.compare(e1.squaredDistanceTo(player), e2.squaredDistanceTo(player)))
                 .orElse(null);
+
+        if (closest != null) {
+            System.out.println("[AuraModule] Closest target selected: " + closest.getName().getString());
+        } else {
+            System.out.println("[AuraModule] No targets found after filtering");
+        }
+
+        return closest;
     }
 
     public static int getYawToEntity(Entity from, Entity to) {
         double dx = to.getX() - from.getX();
         double dz = to.getZ() - from.getZ();
         double yaw = Math.toDegrees(Math.atan2(dz, dx)) - 90.0;
-        return wrapDegrees((int) Math.round(yaw));
+        int wrapped = wrapDegrees((int) Math.round(yaw));
+        System.out.println("[AuraModule] Calculated yaw: " + wrapped);
+        return wrapped;
     }
 
     public static int getPitchToEntity(Entity from, Entity to) {
@@ -109,7 +147,9 @@ public class AuraModule extends Module {
         double dz = to.getZ() - from.getZ();
         double distance = Math.sqrt(dx * dx + dz * dz);
         double pitch = -Math.toDegrees(Math.atan2(dy, distance));
-        return (int) Math.round(pitch);
+        int pitchInt = (int) Math.round(pitch);
+        System.out.println("[AuraModule] Calculated pitch: " + pitchInt);
+        return pitchInt;
     }
 
     private static int wrapDegrees(int angle) {
@@ -119,13 +159,11 @@ public class AuraModule extends Module {
         return angle;
     }
 
-
     private void drawBox(Entity entity, Color color, MatrixStack matrices, float partialTicks) {
 
         double interpX = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * partialTicks;
         double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
         double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
-
 
         Box box = entity.getBoundingBox().offset(
                 interpX - entity.getX(),
@@ -133,6 +171,6 @@ public class AuraModule extends Module {
                 interpZ - entity.getZ()
         );
 
-            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
+        RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
     }
 }
