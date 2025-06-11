@@ -8,6 +8,7 @@
     "MixinArmorFeatureRenderer",
     "MixinBackgroundRenderer",
     "MixinBossBarHud",
+    "MixinCamera",
     "MixinChatScreen",
     "MixinChunkBorderDebugRenderer",
     "MixinClientPlayerEntity",
@@ -19,6 +20,7 @@
     "MixinInGameHud",
     "MixinInGameOverlayRenderer",
     "MixinMinecraftClient",
+    "MixinMouse",
     "MixinSimpleOption",
     "MixinWorldRenderer"
   ],
