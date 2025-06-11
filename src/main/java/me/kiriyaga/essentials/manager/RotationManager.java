@@ -23,11 +23,12 @@ public class RotationManager {
     private float rotationSpeed;
     private float rotationEaseFactor;
     private float rotationThreshold;
-
-    private boolean hasCapturedRealRotation = false;
-
+    private int ticksBeforeRelease;
 
     private boolean returned = false;
+
+    private int ticksHolding = 0;
+
     private boolean cursorLocked = false;
 
     public void init() {
@@ -86,6 +87,8 @@ public class RotationManager {
         return false;
     }
 
+
+
     public float getRenderYaw() {
         return realYaw;
     }
@@ -125,17 +128,12 @@ public class RotationManager {
         rotationSpeed = rotationManagerModule.rotationSpeed.get().floatValue();
         rotationEaseFactor = rotationManagerModule.rotationEaseFactor.get().floatValue();
         rotationThreshold = rotationManagerModule.rotationThreshold.get().floatValue();
+        ticksBeforeRelease = rotationManagerModule.ticksBeforeRelease.get();
 
         boolean hasRequests = !requests.isEmpty();
 
         if (hasRequests) {
             returned = true;
-
-            if (!hasCapturedRealRotation) {
-                realYaw = MINECRAFT.player.getYaw();
-                realPitch = MINECRAFT.player.getPitch();
-                hasCapturedRealRotation = true;
-            }
 
             if (!cursorLocked && !MINECRAFT.mouse.isCursorLocked()) {
                 MINECRAFT.mouse.lockCursor();
@@ -168,26 +166,32 @@ public class RotationManager {
             boolean rotationReached = Math.abs(yawDiff) < rotationThreshold && Math.abs(pitchDiff) < rotationThreshold;
 
             if (rotationReached) {
-                requests.remove(activeRequest);
-                activeRequest = null;
+                ticksHolding++;
+                if (ticksHolding >= ticksBeforeRelease) {
+                    requests.remove(activeRequest);
+                    activeRequest = null;
+                    ticksHolding = 0;
+                }
+            } else {
+                ticksHolding = 0;
             }
-
-        } else if (returned) {
+        } else if (returned){
             returned = false;
-            hasCapturedRealRotation = false;
-
             rotationYaw = realYaw;
             rotationPitch = realPitch;
             applyRotationToPlayer();
 
             activeRequest = null;
+            ticksHolding = 0;
 
             if (cursorLocked && MINECRAFT.mouse.isCursorLocked()) {
                 MINECRAFT.mouse.unlockCursor();
                 cursorLocked = false;
             }
         }
+        // no interp
     }
+
 
 
     private float wrapDegrees(float angle) {
@@ -199,6 +203,11 @@ public class RotationManager {
 
     private float lerp(float from, float to, float factor) {
         return from + (to - from) * factor;
+    }
+
+    private float getWrappedYawDiff(float from, float to) {
+        float diff = wrapDegrees(to - from);
+        return diff;
     }
 
     public static class RotationRequest {
@@ -229,6 +238,7 @@ public class RotationManager {
             this.pitchSupplier = pitchSupplier;
             updateTarget();
         }
+
 
         public boolean shouldUpdate() {
             return dynamic;
