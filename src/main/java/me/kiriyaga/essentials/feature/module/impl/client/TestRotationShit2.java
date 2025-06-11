@@ -12,7 +12,6 @@ import java.util.Random;
 import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 
 public class TestRotationShit2 extends Module {
-    private static final int CHANGE_INTERVAL = 40;
     private int tickCount = 0;
     private final Random random = new Random();
 
@@ -25,12 +24,16 @@ public class TestRotationShit2 extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onUpdate(UpdateEvent event) {
-        tickCount++;
 
-        if (tickCount % CHANGE_INTERVAL == 0) {
-            targetYaw = random.nextFloat() * 360f - 180f;
-            targetPitch = random.nextFloat() * 180f - 90f;
+        if (tickCount <= 20){
+            tickCount++;
+            return;
         }
+
+        tickCount = 0;
+        targetYaw = random.nextFloat() * 360f - 180f;
+            targetPitch = random.nextFloat() * 180f - 90f;
+
 
         ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest("123", 1, targetYaw, targetPitch));
     }
