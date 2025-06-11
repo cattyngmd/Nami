@@ -24,6 +24,8 @@ public class RotationManager {
     private float rotationEaseFactor;
     private float rotationThreshold;
 
+    private float smoothYaw, smoothPitch;
+
     private boolean returned = false;
 
     private int ticksHolding = 0;
@@ -66,11 +68,11 @@ public class RotationManager {
 
 
     public float getRenderYaw() {
-        return realYaw;
+        return smoothYaw;
     }
 
     public float getRenderPitch() {
-        return realPitch;
+        return smoothPitch;
     }
 
     public void setRenderYaw(float realYaw) {
@@ -164,6 +166,9 @@ public class RotationManager {
                 cursorLocked = false;
             }
         }
+        // interp
+        this.smoothYaw += getWrappedYawDiff(this.smoothYaw, realYaw) * 0.35f;
+        this.smoothPitch += (realPitch - this.smoothPitch) * 0.35f;
     }
 
 
@@ -177,6 +182,11 @@ public class RotationManager {
 
     private float lerp(float from, float to, float factor) {
         return from + (to - from) * factor;
+    }
+
+    private float getWrappedYawDiff(float from, float to) {
+        float diff = wrapDegrees(to - from);
+        return diff;
     }
 
     public static class RotationRequest {
@@ -207,6 +217,7 @@ public class RotationManager {
             this.pitchSupplier = pitchSupplier;
             updateTarget();
         }
+
 
         public boolean shouldUpdate() {
             return dynamic;
