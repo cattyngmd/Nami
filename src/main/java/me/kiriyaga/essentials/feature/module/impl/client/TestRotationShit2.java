@@ -35,6 +35,6 @@ public class TestRotationShit2 extends Module {
             targetPitch = random.nextFloat() * 180f - 90f;
 
 
-        ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest("123", 1, targetYaw, targetPitch));
+        ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest("123", 100, targetYaw, targetPitch));
     }
 }
