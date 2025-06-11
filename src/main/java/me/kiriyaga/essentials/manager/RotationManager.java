@@ -198,7 +198,7 @@ public class RotationManager {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null) return;
 
-        if (isRotating()) return;
+        if (!isRotating()) return;
 
         float spoofYaw = getRotationYaw();
         float spoofPitch = getRotationPitch();
@@ -257,6 +257,7 @@ public class RotationManager {
             }
         } finally {
             spoofing = false;
+            CHAT_MANAGER.sendRaw(String.format("Visual Look: yaw=%.2f pitch=%.2f (Spoofing active)", spoofYaw, spoofPitch));
         }
     }
 
