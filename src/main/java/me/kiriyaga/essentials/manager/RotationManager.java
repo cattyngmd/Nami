@@ -25,8 +25,6 @@ public class RotationManager {
     private float rotationThreshold;
     private int ticksBeforeRelease;
 
-    private float smoothYaw, smoothPitch;
-
     private boolean returned = false;
 
     private int ticksHolding = 0;
@@ -68,11 +66,11 @@ public class RotationManager {
 
 
     public float getRenderYaw() {
-        return smoothYaw;
+        return realYaw;
     }
 
     public float getRenderPitch() {
-        return smoothPitch;
+        return realPitch;
     }
 
     public void setRenderYaw(float realYaw) {
@@ -167,9 +165,7 @@ public class RotationManager {
                 cursorLocked = false;
             }
         }
-        // interp
-        this.smoothYaw += getWrappedYawDiff(this.smoothYaw, realYaw) * 0.35f;
-        this.smoothPitch += (realPitch - this.smoothPitch) * 0.35f;
+        // no interp
     }
 
 
