@@ -33,24 +33,21 @@ public class EntityUtils {
         return world != null ? world.getPlayers().stream().collect(Collectors.toList()) : List.of();
     }
 
-    public static List<MobEntity> getMobs() {
+    public static List<Entity> getMobs() {
         return getAllEntities().stream()
                 .filter(e -> e instanceof MobEntity)
-                .map(e -> (MobEntity) e)
                 .collect(Collectors.toList());
     }
 
-    public static List<PassiveEntity> getPassiveMobs() {
+    public static List<Entity> getPassiveMobs() {
         return getAllEntities().stream()
                 .filter(e -> e instanceof PassiveEntity)
-                .map(e -> (PassiveEntity) e)
                 .collect(Collectors.toList());
     }
 
-    public static List<HostileEntity> getHostileMobs() {
+    public static List<Entity> getHostileMobs() {
         return getAllEntities().stream()
                 .filter(e -> e instanceof HostileEntity)
-                .map(e -> (HostileEntity) e)
                 .collect(Collectors.toList());
     }
 
@@ -61,14 +58,13 @@ public class EntityUtils {
                 .collect(Collectors.toList());
     }
 
-    public static List<EndCrystalEntity> getEndCrystals() {
+    public static List<Entity> getEndCrystals() {
         return getAllEntities().stream()
                 .filter(e -> e instanceof EndCrystalEntity)
-                .map(e -> (EndCrystalEntity) e)
                 .collect(Collectors.toList());
     }
 
-    public static List<PlayerEntity> getOtherPlayers() {
+    public static List<Entity> getOtherPlayers() {
         ClientPlayerEntity self = MINECRAFT.player;
         return getPlayers().stream()
                 .filter(p -> !p.isRemoved() && p != self)

@@ -46,6 +46,30 @@ public class RotationManager {
         requests.sort(Comparator.comparingInt(r -> -r.priority));
     }
 
+    public boolean isRequestCompleted(String id) {
+        RotationRequest request = null;
+
+        if (activeRequest != null && activeRequest.id.equals(id)) {
+            request = activeRequest;
+        } else {
+            for (RotationRequest r : requests) {
+                if (r.id.equals(id)) {
+                    request = r;
+                    break;
+                }
+            }
+        }
+
+        if (request == null) {
+            return false;
+        }
+
+        float yawDiff = wrapDegrees(request.targetYaw - rotationYaw);
+        float pitchDiff = request.targetPitch - rotationPitch;
+
+        return Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
+    }
+
     public void cancelRequest(String id) {
         requests.removeIf(r -> Objects.equals(r.id, id));
     }

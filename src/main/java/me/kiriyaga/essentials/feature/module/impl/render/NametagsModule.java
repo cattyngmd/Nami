@@ -80,14 +80,14 @@ public class NametagsModule extends Module {
         }
 
         if (showAnimals.get()) {
-            for (PassiveEntity animal : EntityUtils.getPassiveMobs()) {
+            for (Entity animal : EntityUtils.getPassiveMobs()) {
                 if (animal.isRemoved()) continue;
                 renderNametag2D(animal, formatter.formatEntity(animal), 0xFFAAAAAA, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
 
         if (showEnemies.get()) {
-            for (HostileEntity hostile : EntityUtils.getHostileMobs()) {
+            for (Entity hostile : EntityUtils.getHostileMobs()) {
                 if (hostile.isRemoved()) continue;
                 renderNametag2D(hostile, formatter.formatEntity(hostile), 0xFFFF5555, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }

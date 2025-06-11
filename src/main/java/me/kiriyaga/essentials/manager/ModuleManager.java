@@ -3,6 +3,7 @@ package me.kiriyaga.essentials.manager;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.*;
+import me.kiriyaga.essentials.feature.module.impl.combat.AuraModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
@@ -37,6 +38,7 @@ public class ModuleManager {
 
         /// COMBAT ///
         registerModule(new AutoTotemModule());
+        registerModule(new AuraModule());
         /// MOVEMENT ///
         registerModule(new SprintModule());
 

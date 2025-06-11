@@ -55,14 +55,14 @@ public class ESPModule extends Module {
         }
 
         if (showPeasefuls.get()) {
-            for (PassiveEntity animal : EntityUtils.getPassiveMobs()) {
+            for (Entity animal : EntityUtils.getPassiveMobs()) {
                 if (animal.isRemoved()) continue;
                 drawBox(animal, COLOR_PASSIVE, matrices, event.getTickDelta());
             }
         }
 
         if (showHostiles.get()) {
-            for (HostileEntity hostile : EntityUtils.getHostileMobs()) {
+            for (Entity hostile : EntityUtils.getHostileMobs()) {
                 if (hostile.isRemoved()) continue;
                 drawBox(hostile, COLOR_HOSTILE, matrices, event.getTickDelta());
             }
