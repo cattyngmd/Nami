@@ -27,6 +27,8 @@ public class CommandManager {
         registerCommand(new BindCommand());
         registerCommand(new SaveCommand());
         registerCommand(new LoadCommand());
+        registerCommand(new YawCommand());
+        registerCommand(new PitchCommand());
 
 
         LOGGER.info("Registered " + commands.size() + " commands");

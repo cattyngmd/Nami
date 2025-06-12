@@ -28,6 +28,7 @@ public class GammaCommand extends Command {
             }
 
             ((ISimpleOption) (Object) MINECRAFT.options.getGamma()).setValue(newGamma);
+            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Gamma set to: §7" + newGamma);
 
         } catch (NumberFormatException e) {
             CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Invalid number format.");

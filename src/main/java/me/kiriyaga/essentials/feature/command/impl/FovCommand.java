@@ -26,7 +26,7 @@ public class FovCommand extends Command {
                 return;
             }
             ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(newFov);
-
+            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "FOV set to: §7" + newFov);
 
         } catch (NumberFormatException e) {
             CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "Invalid number format.");
