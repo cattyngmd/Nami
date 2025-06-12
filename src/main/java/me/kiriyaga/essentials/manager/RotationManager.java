@@ -229,36 +229,13 @@ public class RotationManager {
                         full.horizontalCollision()
                 ));
 
-            } else if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround posPacket) {
-                event.cancel();
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
-                        new Vec3d(
-                                posPacket.getX(pos.x),
-                                posPacket.getY(pos.y),
-                                posPacket.getZ(pos.z)
-                        ),
-                        spoofYaw,
-                        spoofPitch,
-                        posPacket.isOnGround(),
-                        posPacket.horizontalCollision()
-                ));
-
-            } else if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround look) {
+            }else if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround look) {
                 event.cancel();
                 mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
                         spoofYaw,
                         spoofPitch,
                         look.isOnGround(),
                         look.horizontalCollision()
-                ));
-
-            } else if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly ground) {
-                event.cancel();
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
-                        spoofYaw,
-                        spoofPitch,
-                        ground.isOnGround(),
-                        false
                 ));
             }
         } finally {
