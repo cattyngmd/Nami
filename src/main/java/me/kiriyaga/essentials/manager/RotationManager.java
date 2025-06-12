@@ -210,81 +210,45 @@ public class RotationManager {
 
         float spoofYaw = getRotationYaw();
         float spoofPitch = getRotationPitch();
-        float realYaw = mc.player.getYaw();
         Vec3d pos = mc.player.getPos();
-        Vec3d velocity = mc.player.getVelocity();
 
         if (!(packet instanceof PlayerMoveC2SPacket)) return;
 
         spoofing = true;
+
         try {
             if (packet instanceof PlayerMoveC2SPacket.Full full) {
                 event.cancel();
-
-                Vec3d adjustedVelocity = adjustMovementForYaw(velocity, realYaw, spoofYaw);
-                Vec3d spoofedPos = pos.add(adjustedVelocity);
-
                 mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
-                        full.getX(spoofedPos.x),
-                        full.getY(spoofedPos.y),
-                        full.getZ(spoofedPos.z),
+                        new Vec3d(
+                                full.getX(pos.x),
+                                full.getY(pos.y),
+                                full.getZ(pos.z)
+                        ),
                         spoofYaw,
                         spoofPitch,
                         full.isOnGround(),
                         full.horizontalCollision()
                 ));
 
-            } else if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround look) {
+            }else if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround look) {
                 event.cancel();
-
                 mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
                         spoofYaw,
                         spoofPitch,
                         look.isOnGround(),
                         look.horizontalCollision()
                 ));
-
-            } else if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround posOnly) {
-                event.cancel();
-
-                Vec3d adjustedVelocity = adjustMovementForYaw(velocity, realYaw, spoofYaw);
-                Vec3d spoofedPos = pos.add(adjustedVelocity);
-
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        spoofedPos.x,
-                        spoofedPos.y,
-                        spoofedPos.z,
-                        posOnly.isOnGround(),
-                        posOnly.horizontalCollision()
-                ));
-
-
-
-            } else if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly onGroundOnly) {
-                event.cancel();
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(onGroundOnly.isOnGround(), false));
             }
         } finally {
             spoofing = false;
+            //CHAT_MANAGER.sendRaw(String.format("Visual Look: yaw=%.2f pitch=%.2f (Spoofing active)", spoofYaw, spoofPitch));
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onKeyboardInput(KeyboardInputEvent event) {
         fixMovement(event.lastPlayerInput, event, getRotationYaw());
-    }
-
-    public Vec3d adjustMovementForYaw(Vec3d movement, float fromYaw, float toYaw) {
-        float yawDifference = toYaw - fromYaw;
-        double rad = Math.toRadians(yawDifference);
-
-        double cos = Math.cos(rad);
-        double sin = Math.sin(rad);
-
-        double newX = movement.x * cos - movement.z * sin;
-        double newZ = movement.x * sin + movement.z * cos;
-
-        return new Vec3d(newX, movement.y, newZ);
     }
 
     private float wrapDegrees(float angle) {
