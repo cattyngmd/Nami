@@ -240,7 +240,7 @@ public class RotationManager {
             }
         } finally {
             spoofing = false;
-            CHAT_MANAGER.sendRaw(String.format("Visual Look: yaw=%.2f pitch=%.2f (Spoofing active)", spoofYaw, spoofPitch));
+            //CHAT_MANAGER.sendRaw(String.format("Visual Look: yaw=%.2f pitch=%.2f (Spoofing active)", spoofYaw, spoofPitch));
         }
     }
 
