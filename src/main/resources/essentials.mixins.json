@@ -20,7 +20,6 @@
     "MixinInGameHud",
     "MixinInGameOverlayRenderer",
     "MixinMinecraftClient",
-    "MixinMouse",
     "MixinSimpleOption",
     "MixinWorldRenderer"
   ],
