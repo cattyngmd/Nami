@@ -15,17 +15,20 @@ import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.AxeItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.*;
 
 public class AuraModule extends Module {
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 4, 1, 6));
+    public final BoolSetting swordOnly = addSetting(new BoolSetting("Sword Only", false));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     public AuraModule() {
@@ -38,19 +41,30 @@ public class AuraModule extends Module {
         if (MINECRAFT.player == null || MINECRAFT.world == null)
             return;
 
-
         Entity player = MINECRAFT.player;
         Entity target = getTarget();
 
         if (target == null)
             return;
 
+        if (swordOnly.get()) {
+            Item item = MINECRAFT.player.getMainHandStack().getItem();
+            boolean isSwordOrAxe = item == Items.WOODEN_SWORD || item == Items.STONE_SWORD ||
+                    item == Items.IRON_SWORD || item == Items.GOLDEN_SWORD ||
+                    item == Items.DIAMOND_SWORD || item == Items.NETHERITE_SWORD ||
+                    item == Items.WOODEN_AXE || item == Items.STONE_AXE ||
+                    item == Items.IRON_AXE || item == Items.GOLDEN_AXE ||
+                    item == Items.DIAMOND_AXE || item == Items.NETHERITE_AXE;
+
+            if (!isSwordOrAxe)
+                return;
+        }
+
 
         float cooldownProgress = MINECRAFT.player.getAttackCooldownProgress(0f);
 
         if (cooldownProgress < 1.0f)
             return;
-
 
         int yaw = getYawToEntity(player, target);
         int pitch = getPitchToEntity(player, target);
