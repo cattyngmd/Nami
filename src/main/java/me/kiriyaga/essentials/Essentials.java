@@ -19,6 +19,7 @@ public class Essentials implements ClientModInitializer {
     public static final ChatManager CHAT_MANAGER = new ChatManager();
     public static final ModuleManager MODULE_MANAGER = new ModuleManager();
     public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
+    public static final FriendManager FRIEND_MANAGER = new FriendManager();
     public static final PingManager PING_MANAGER = new PingManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final Logger LOGGER = LogManager.getLogger(NAME);
@@ -35,6 +36,7 @@ public class Essentials implements ClientModInitializer {
         ROTATION_MANAGER.init();
 
         CONFIG_MANAGER.load();
+        FRIEND_MANAGER.load();
 
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
 
