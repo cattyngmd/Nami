@@ -23,41 +23,39 @@ import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {
 
-    private float originalYaw, originalBodyYaw, originalHeadYaw;
-    private boolean spoofing = false;
+    private boolean isTraveling = false;
+
+
+    @Shadow
+    public abstract void travel(Vec3d movementInput);
+
 
     public MixinLivingEntity(EntityType<?> type, World world) {
         super(type, world);
     }
 
-    @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating()) return;
+        if (isTraveling) return;
+        if ((Object) this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating()) return;
 
-        if (movementInput.x == 0 && movementInput.z == 0) return;
+        if (movementInput.lengthSquared() < 1e-4) return;
 
-        float visualYaw = this.getYaw();
-        float spoofYaw = findClosestValidYaw(visualYaw, movementInput);
+        isTraveling = true;
 
-        spoofing = true;
-        originalYaw = this.getYaw();
-        originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
-        originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
+        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
 
-        this.setYaw(spoofYaw);
-        ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
-        ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
-    }
+        spoofYaw = findClosestValidYaw(spoofYaw);
 
-    @Inject(method = "travel", at = @At("TAIL"))
-    private void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating()) return;
+        Vec3d fixedMovement = clampMovementToYaw(movementInput, spoofYaw);
 
-        spoofing = false;
+        ci.cancel();
+        this.travel(fixedMovement);
 
-        this.setYaw(originalYaw);
-        ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
-        ((LivingEntityAccessor) this).setHeadYaw(originalHeadYaw);
+        float yaw = ((EntityAccessor) this).getYaw();
+        ((EntityAccessor) this).setYaw(spoofYaw);
+
+        isTraveling = false;
     }
 
     @ModifyExpressionValue(
@@ -73,26 +71,36 @@ public abstract class MixinLivingEntity extends Entity {
         return ROTATION_MANAGER.getRotationYaw();
     }
 
-    private float findClosestValidYaw(float visualYaw, Vec3d movementInput) {
-        double angleRad = Math.atan2(-movementInput.x, movementInput.z);
-        float movementYaw = (float) Math.toDegrees(angleRad);
-        movementYaw = (movementYaw + 360f) % 360f;
-
-        float[] allowedYawAngles = new float[] {
-                0, 45, 90, 135, 180, 225, 270, 315
-        };
-
+    private float findClosestValidYaw(float yaw) {
+        float[] allowedYawAngles = new float[]{0, 45, 90, 135, 180, 225, 270, 315};
         float bestYaw = allowedYawAngles[0];
         float minDiff = Float.MAX_VALUE;
-
-        for (float yaw : allowedYawAngles) {
-            float diff = Math.abs(((yaw - visualYaw + 540f) % 360f) - 180f);
+        for (float allowedYaw : allowedYawAngles) {
+            float diff = Math.abs(((allowedYaw - yaw + 540f) % 360f) - 180f);
             if (diff < minDiff) {
                 minDiff = diff;
-                bestYaw = yaw;
+                bestYaw = allowedYaw;
             }
         }
-
         return bestYaw;
     }
+
+    private Vec3d clampMovementToYaw(Vec3d input, float yaw) {
+        // Превращаем движение в локальные координаты игрока:
+        double forward = input.z;
+        double strafe = input.x;
+
+        // Рассчитываем угол в радианах
+        double yawRad = Math.toRadians(yaw);
+
+        // Считаем глобальный вектор движения из локального и yaw
+        double cos = Math.cos(yawRad);
+        double sin = Math.sin(yawRad);
+
+        double motionX = strafe * cos - forward * sin;
+        double motionZ = forward * cos + strafe * sin;
+
+        return new Vec3d(motionX, input.y, motionZ);
+    }
+
 }
