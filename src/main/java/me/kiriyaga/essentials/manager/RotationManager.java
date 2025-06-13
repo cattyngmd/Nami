@@ -88,8 +88,9 @@ public class RotationManager {
     }
 
     public boolean isRotating() {
-        return activeRequest != null;
+        return activeRequest != null || returning;
     }
+
 
     public float getRotationYaw() {
         return rotationYaw;
