@@ -21,6 +21,7 @@ import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {
+    private float originalYaw, originalBodyYaw, originalHeadYaw;
 
     public MixinLivingEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -36,10 +37,22 @@ public abstract class MixinLivingEntity extends Entity {
     private void onTravel(Vec3d movementInput, CallbackInfo ci) {
         if ((Object) this != MinecraftClient.getInstance().player) return;
 
-        float spoofYaw = ROTATION_MANAGER.getRotationYaw(); // we do nood need to .isRotating, since its consistent with player rotations now
+        originalYaw = this.getYaw();
+        originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
+        originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
 
+        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
         this.setYaw(spoofYaw);
         ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
         ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
+    }
+
+    @Inject(method = "travel", at = @At("TAIL"))
+    private void onTravelEnd(Vec3d movementInput, CallbackInfo ci) {
+        if ((Object) this != MinecraftClient.getInstance().player) return;
+
+        this.setYaw(originalYaw);
+        ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
+        ((LivingEntityAccessor) this).setHeadYaw(originalHeadYaw);
     }
 }
