@@ -42,6 +42,8 @@ public class AuraModule extends Module {
     public final BoolSetting targetHostiles = addSetting(new BoolSetting("Hostiles", true));
     public final BoolSetting targetNeutrals = addSetting(new BoolSetting("Neutrals", false));
 
+    private Entity currentTarget = null;
+
     public AuraModule() {
         super("Aura", "Attack entities for you.", Category.COMBAT, "killaura", "ara", "killara", "фгкф");
     }
@@ -52,7 +54,12 @@ public class AuraModule extends Module {
         if (!multiTask.get() && MINECRAFT.player.isUsingItem()) return;
 
         Entity target = getTarget(attackRange.get());
-        if (target == null) return;
+        if (target == null) {
+            currentTarget = null;
+            return;
+        }
+
+        currentTarget = target;
 
         if (swordOnly.get()) {
             ItemStack stack = MINECRAFT.player.getMainHandStack();
@@ -76,7 +83,24 @@ public class AuraModule extends Module {
         int yaw = getYawToEntity(MINECRAFT.player, target);
         int pitch = getPitchToEntity(MINECRAFT.player, target);
 
+        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) {
+            return;
+        }
+
         attack(target, yaw, pitch);
+    }
+
+    @SubscribeEvent
+    public void onPreTickUpdateRotation(PreTickEvent event) {
+        if (currentTarget == null) return;
+
+        int yaw = getYawToEntity(MINECRAFT.player, currentTarget);
+        int pitch = getPitchToEntity(MINECRAFT.player, currentTarget);
+
+        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) {
+            RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), 10, yaw, pitch);
+            ROTATION_MANAGER.submitRequest(request);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -114,9 +138,6 @@ public class AuraModule extends Module {
         if (ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) {
             MINECRAFT.interactionManager.attackEntity(MINECRAFT.player, target);
             MINECRAFT.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
-        } else {
-            RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), 10, yaw, pitch);
-            ROTATION_MANAGER.submitRequest(request);
         }
     }
 
@@ -129,11 +150,6 @@ public class AuraModule extends Module {
         RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
     }
 
-    /**
-     * I think mc server doesnt actually get`s your info, about attacking, since there is no any vec sended, but it checks your actual
-     * rotations, and based on that could allow you attack a bit further ?
-     * not really sure but i made it, why not
-     */
     public static int getYawToEntity(Entity from, Entity to) {
         Vec3d fromPos = from.getPos().add(0, from.getEyeHeight(from.getPose()), 0);
 
