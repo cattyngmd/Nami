@@ -6,6 +6,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -21,10 +22,36 @@ import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {
+
     private float originalYaw, originalBodyYaw, originalHeadYaw;
+    private float originalPitch;
 
     public MixinLivingEntity(EntityType<?> type, World world) {
         super(type, world);
+    }
+
+    private void applySpoofRotation() {
+        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
+        float spoofPitch = ROTATION_MANAGER.getRotationPitch();
+
+        this.setYaw(spoofYaw);
+        this.setPitch(spoofPitch);
+        ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
+        ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
+    }
+
+    private void restoreOriginalRotation() {
+        this.setYaw(originalYaw);
+        this.setPitch(originalPitch);
+        ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
+        ((LivingEntityAccessor) this).setHeadYaw(originalHeadYaw);
+    }
+
+    private void saveOriginalRotation() {
+        originalYaw = this.getYaw();
+        originalPitch = this.getPitch();
+        originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
+        originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
     }
 
     @Inject(method = "spawnItemParticles", at = @At("HEAD"), cancellable = true)
@@ -34,25 +61,41 @@ public abstract class MixinLivingEntity extends Entity {
     }
 
     @Inject(method = "travel", at = @At("HEAD"))
-    private void onTravel(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object) this != MinecraftClient.getInstance().player) return;
-
-        originalYaw = this.getYaw();
-        originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
-        originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
-
-        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
-        this.setYaw(spoofYaw);
-        ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
-        ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
+    private void onTravelPre(Vec3d movementInput, CallbackInfo ci) {
+        if ((Object)this != MinecraftClient.getInstance().player) return;
+        saveOriginalRotation();
+        applySpoofRotation();
     }
 
     @Inject(method = "travel", at = @At("TAIL"))
-    private void onTravelEnd(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object) this != MinecraftClient.getInstance().player) return;
+    private void onTravelPost(Vec3d movementInput, CallbackInfo ci) {
+        if ((Object)this != MinecraftClient.getInstance().player) return;
+        restoreOriginalRotation();
+    }
 
-        this.setYaw(originalYaw);
-        ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
-        ((LivingEntityAccessor) this).setHeadYaw(originalHeadYaw);
+    @Inject(method = "jump", at = @At("HEAD"))
+    private void onJumpPre(CallbackInfo ci) {
+        if ((Object)this != MinecraftClient.getInstance().player) return;
+        saveOriginalRotation();
+        applySpoofRotation();
+    }
+
+    @Inject(method = "jump", at = @At("TAIL"))
+    private void onJumpPost(CallbackInfo ci) {
+        if ((Object)this != MinecraftClient.getInstance().player) return;
+        restoreOriginalRotation();
+    }
+
+    @Inject(method = "tickMovement", at = @At("HEAD"))
+    private void onTickMovementPre(CallbackInfo ci) {
+        if ((Object)this != MinecraftClient.getInstance().player) return;
+        saveOriginalRotation();
+        applySpoofRotation();
+    }
+
+    @Inject(method = "tickMovement", at = @At("TAIL"))
+    private void onTickMovementPost(CallbackInfo ci) {
+        if ((Object)this != MinecraftClient.getInstance().player) return;
+        restoreOriginalRotation();
     }
 }
