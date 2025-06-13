@@ -5,20 +5,18 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.entity.mob.*;
+import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.ItemEntity;
-
-import static me.kiriyaga.essentials.Essentials.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class EntityUtils {
+import static me.kiriyaga.essentials.Essentials.*;
 
+public class EntityUtils {
 
     public static List<Entity> getAllEntities() {
         ClientWorld world = MINECRAFT.world;
@@ -41,13 +39,20 @@ public class EntityUtils {
 
     public static List<Entity> getPassiveMobs() {
         return getAllEntities().stream()
-                .filter(e -> e instanceof PassiveEntity)
+                .filter(e -> e instanceof PassiveEntity
+                        || (e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Entity> getNeutralMobs() {
+        return getAllEntities().stream()
+                .filter(e -> isNeutralMob(e))
                 .collect(Collectors.toList());
     }
 
     public static List<Entity> getHostileMobs() {
         return getAllEntities().stream()
-                .filter(e -> e instanceof HostileEntity)
+                .filter(e -> e instanceof HostileEntity && !isNeutralMob(e))
                 .collect(Collectors.toList());
     }
 
@@ -69,5 +74,24 @@ public class EntityUtils {
         return getPlayers().stream()
                 .filter(p -> !p.isRemoved() && p != self)
                 .collect(Collectors.toList());
+    }
+
+    private static boolean isNeutralMob(Entity e) {
+        return e instanceof BeeEntity
+                || e instanceof CaveSpiderEntity
+                || e instanceof DolphinEntity
+                || e instanceof DrownedEntity
+                || e instanceof EndermanEntity
+                || e instanceof FoxEntity
+                || e instanceof GoatEntity
+                || (e instanceof IronGolemEntity && !((IronGolemEntity)e).isPlayerCreated())
+                || e instanceof LlamaEntity
+                || e instanceof TraderLlamaEntity
+                || e instanceof PandaEntity
+                || e instanceof PiglinEntity
+                || e instanceof PolarBearEntity
+                || e instanceof SpiderEntity
+                || (e instanceof WolfEntity && !((WolfEntity)e).isTamed())
+                || e instanceof ZombifiedPiglinEntity;
     }
 }
