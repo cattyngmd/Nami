@@ -3,17 +3,14 @@ package me.kiriyaga.essentials.feature.module.impl.combat;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityStatuses;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 
 import static me.kiriyaga.essentials.Essentials.*;
@@ -32,7 +29,7 @@ public class AutoTotemModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(PreTickEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null) return;
 
         attemptPlaceTotem();

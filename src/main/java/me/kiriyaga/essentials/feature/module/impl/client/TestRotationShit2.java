@@ -2,7 +2,7 @@ package me.kiriyaga.essentials.feature.module.impl.client;
 
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.manager.RotationManager;
@@ -23,7 +23,7 @@ public class TestRotationShit2 extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    private void onUpdate(UpdateEvent event) {
+    private void onUpdate(PreTickEvent event) {
 
         if (tickCount <= 20){
             tickCount++;

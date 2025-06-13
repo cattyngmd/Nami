@@ -3,7 +3,7 @@ package me.kiriyaga.essentials.feature.module.impl.combat;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
@@ -27,7 +27,7 @@ public class AutoLogModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(PreTickEvent event) {
         if (MINECRAFT.player == null || MINECRAFT.world == null)
             return;
 

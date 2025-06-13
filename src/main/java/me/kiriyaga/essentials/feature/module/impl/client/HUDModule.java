@@ -3,7 +3,7 @@ package me.kiriyaga.essentials.feature.module.impl.client;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render2DEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
@@ -48,7 +48,7 @@ public class HUDModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(PreTickEvent event) {
         tickCounter++;
         if (tickCounter % updateInterval.get() != 0) return;
 

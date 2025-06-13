@@ -1,27 +1,17 @@
 package me.kiriyaga.essentials.mixin;
 
 import me.kiriyaga.essentials.event.impl.KeyboardInputEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
-import net.minecraft.client.input.Input;
+import me.kiriyaga.essentials.event.impl.PostTickEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.MovementType;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import static me.kiriyaga.essentials.Essentials.EVENT_MANAGER;
-import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity {
@@ -30,10 +20,16 @@ public class MixinClientPlayerEntity {
     @Mutable
     private PlayerInput lastPlayerInput;
 
-    @Inject(method = "tick", at = @At("TAIL"))
-    private void tickHook(CallbackInfo ci) {
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void tickHookPre(CallbackInfo ci) {
 
-        EVENT_MANAGER.post(new UpdateEvent());
+        EVENT_MANAGER.post(new PreTickEvent());
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void tickHookPost(CallbackInfo ci) {
+
+        EVENT_MANAGER.post(new PostTickEvent());
     }
 
         @Inject(method = "tick", at = @At("HEAD"))

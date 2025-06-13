@@ -3,7 +3,7 @@ package me.kiriyaga.essentials.feature.module.impl.combat;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
@@ -15,7 +15,6 @@ import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
@@ -36,7 +35,7 @@ public class AuraModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(PreTickEvent event) {
 
         if (MINECRAFT.player == null || MINECRAFT.world == null)
             return;

@@ -3,7 +3,7 @@ package me.kiriyaga.essentials.feature.module.impl.movement;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PacketSendEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.mixin.PlayerInteractEntityC2SPacketAccessor;
@@ -30,7 +30,7 @@ public class SprintModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public void onUpdateEvent(UpdateEvent event) {
+    public void onUpdateEvent(PreTickEvent event) {
         if (!isEnabled()) return;
 
         ClientPlayerEntity player = MINECRAFT.player;

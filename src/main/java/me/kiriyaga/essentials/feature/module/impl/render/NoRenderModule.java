@@ -1,21 +1,9 @@
 package me.kiriyaga.essentials.feature.module.impl.render;
 
-import me.kiriyaga.essentials.event.EventPriority;
-import me.kiriyaga.essentials.event.SubscribeEvent;
-import me.kiriyaga.essentials.event.impl.PacketSendEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
-import me.kiriyaga.essentials.mixin.PlayerInteractEntityC2SPacketAccessor;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
-import me.kiriyaga.essentials.setting.impl.EnumSetting;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 
-import java.util.concurrent.Executors;
-
-import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class NoRenderModule extends Module {

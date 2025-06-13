@@ -2,15 +2,12 @@ package me.kiriyaga.essentials.manager;
 
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
-import me.kiriyaga.essentials.event.impl.KeyboardInputEvent;
 import me.kiriyaga.essentials.event.impl.PacketSendEvent;
-import me.kiriyaga.essentials.event.impl.UpdateEvent;
+import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.impl.client.RotationManagerModule;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -103,7 +100,7 @@ public class RotationManager {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(PreTickEvent event) {
         if (MINECRAFT.player == null) return;
 
         RotationManagerModule rotationModule = MODULE_MANAGER.getModule(RotationManagerModule.class);
