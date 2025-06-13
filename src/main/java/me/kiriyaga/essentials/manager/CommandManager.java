@@ -19,6 +19,7 @@ public class CommandManager {
         EVENT_MANAGER.register(this);
 
         registerCommand(new HelpCommand());
+        registerCommand(new ChangePrefixCommand());
         registerCommand(new NameCommand());
         registerCommand(new FovCommand());
         registerCommand(new GammaCommand());
@@ -49,6 +50,16 @@ public class CommandManager {
     public String getPrefix() {
         return prefix;
     }
+
+    public void setPrefix(String prefix) {
+        if (prefix != null && !prefix.isEmpty()) {
+            this.prefix = prefix;
+            LOGGER.info("Prefix changed to: " + prefix);
+        } else {
+            LOGGER.warn("Attempted to set empty or null prefix.");
+        }
+    }
+
 
     @SubscribeEvent
     public void onChatMessage(ChatMessageEvent event) {
