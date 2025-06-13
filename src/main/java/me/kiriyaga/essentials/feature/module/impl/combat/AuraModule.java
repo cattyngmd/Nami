@@ -31,7 +31,7 @@ public class AuraModule extends Module {
 
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Attack", 3.0, 1.0, 5));
     public final DoubleSetting rotationRange = addSetting(new DoubleSetting("Rotation", 3.6, 2.0, 6.0));
-    public final BoolSetting swordOnly = addSetting(new BoolSetting("Weap only", false));
+    public final BoolSetting swordOnly = addSetting(new BoolSetting("Weap Only", false));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
     public final BoolSetting tpsSync = addSetting(new BoolSetting("TPS", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
