@@ -8,6 +8,7 @@ import me.kiriyaga.essentials.feature.module.impl.combat.AutoLogModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
+import me.kiriyaga.essentials.feature.module.impl.travel.EbounceModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +36,14 @@ public class ModuleManager {
         registerModule(new PingManagerModule());
         registerModule(new RotationManagerModule());
 
-        registerModule(new TestRotationShit2());
-
         /// COMBAT ///
         registerModule(new AutoTotemModule());
         registerModule(new AuraModule());
         registerModule(new AutoLogModule());
         /// MOVEMENT ///
         registerModule(new SprintModule());
+        /// TRAVEL ///
+        registerModule(new EbounceModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
