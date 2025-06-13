@@ -34,13 +34,6 @@ public class EbounceModule extends Module {
     }
 
     @SubscribeEvent
-    public void onPacketReceive(PacketReceiveEvent event) {
-        if (event.getPacket() instanceof PlayerSpawnPositionS2CPacket) {
-            onEnable();
-        }
-    }
-
-    @SubscribeEvent
     public void OnPreTick(PreTickEvent event) {
         if (MINECRAFT.player == null || MINECRAFT.player.getAbilities().allowFlying) return;
 
