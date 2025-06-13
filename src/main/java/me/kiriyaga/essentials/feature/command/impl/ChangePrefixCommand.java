@@ -8,29 +8,29 @@ import static me.kiriyaga.essentials.Essentials.COMMAND_MANAGER;
 public class ChangePrefixCommand extends Command {
 
     public ChangePrefixCommand() {
-        super("changeprefix", "Changes your command prefix. Usage: .changeprefix <char>", "cp", "сз", " cp");
+        super("prefix", "Changes your command prefix. Usage: .prefix <char>", "changeprefix", "сз", "зкуашч");
     }
 
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .changeprefix <char>");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix <char>");
             return;
         }
 
         String input = args[0].trim();
 
         if (input.isEmpty()) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Prefix cannot be empty.");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix <char>");
             return;
         }
 
         if (input.length() > 1) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Prefix must be a single character.");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix <char>");
             return;
         }
 
         COMMAND_MANAGER.setPrefix(input);
-        CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Prefix changed to: §e" + input);
+        CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Prefix changed to: §7" + input);
     }
 }
