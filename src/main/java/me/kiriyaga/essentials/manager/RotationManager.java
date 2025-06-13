@@ -246,53 +246,12 @@ public class RotationManager {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onKeyboardInput(KeyboardInputEvent event) {
-        fixMovement(event.lastPlayerInput, event, getRotationYaw());
-    }
-
     private float wrapDegrees(float angle) {
         angle %= 360f;
         if (angle >= 180f) angle -= 360f;
         if (angle < -180f) angle += 360f;
         return angle;
     }
-
-    // artik is real
-    public void fixMovement(PlayerInput input, KeyboardInputEvent event, float spoofYaw) {
-        float forward = (input.forward() ? 1f : 0f) + (input.backward() ? -1f : 0f);
-        float strafe = (input.right() ? 1f : 0f) + (input.left() ? -1f : 0f);
-
-        if (forward == 0f && strafe == 0f) return;
-
-        double inputAngle = MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(strafe, forward)) + spoofYaw);
-
-        float bestForward = 0f;
-        float bestStrafe = 0f;
-        float smallestDiff = Float.MAX_VALUE;
-
-        for (int f = -1; f <= 1; f++) {
-            for (int s = -1; s <= 1; s++) {
-                if (f == 0 && s == 0) continue;
-
-                double testAngle = MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(s, f)) + spoofYaw);
-                float diff = Math.abs(MathHelper.wrapDegrees((float)(inputAngle - testAngle)));
-
-                if (diff < smallestDiff) {
-                    smallestDiff = diff;
-                    bestForward = f;
-                    bestStrafe = s;
-                }
-            }
-        }
-
-        event.setForward(bestForward > 0);
-        event.setBackward(bestForward < 0);
-        event.setRight(bestStrafe > 0);
-        event.setLeft(bestStrafe < 0);
-    }
-
-
 
     private float lerp(float from, float to, float factor) {
         return from + (to - from) * factor;
