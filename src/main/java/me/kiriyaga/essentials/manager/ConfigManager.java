@@ -36,6 +36,14 @@ public class ConfigManager {
                 NAME = root.get("name").getAsString();
             }
 
+            if (root.has("prefix")) {
+                String prefix = root.get("prefix").getAsString().trim();
+                if (!prefix.isEmpty()) {
+                    COMMAND_MANAGER.setPrefix(prefix);
+                }
+            }
+
+
             if (root.has("modules")) {
                 JsonObject modulesJson = root.getAsJsonObject("modules");
 
@@ -73,8 +81,10 @@ public class ConfigManager {
         try {
             JsonObject root = new JsonObject();
             root.addProperty("name", NAME);
+            root.addProperty("prefix", String.valueOf(COMMAND_MANAGER.getPrefix()));
 
             JsonObject modulesJson = new JsonObject();
+
 
             for (Module module : MODULE_MANAGER.getModules()) {
                 JsonObject moduleJson = new JsonObject();
