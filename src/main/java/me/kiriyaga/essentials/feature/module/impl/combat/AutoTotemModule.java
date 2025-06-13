@@ -3,6 +3,7 @@ package me.kiriyaga.essentials.feature.module.impl.combat;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
+import me.kiriyaga.essentials.event.impl.PostTickEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
@@ -29,7 +30,7 @@ public class AutoTotemModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onUpdate(PreTickEvent event) {
+    public void onPostTick(PostTickEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null) return;
 
         attemptPlaceTotem();
