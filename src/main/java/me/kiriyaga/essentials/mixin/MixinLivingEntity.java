@@ -23,79 +23,101 @@ import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {
 
-    private float originalYaw, originalBodyYaw, originalHeadYaw;
-    private float originalPitch;
+    private float travelOriginalYaw, travelOriginalBodyYaw, travelOriginalHeadYaw;
 
+    private float jumpOriginalYaw, jumpOriginalBodyYaw, jumpOriginalHeadYaw;
+
+    private float tickOriginalYaw, tickOriginalBodyYaw, tickOriginalHeadYaw;
     public MixinLivingEntity(EntityType<?> type, World world) {
         super(type, world);
     }
 
+    private void saveOriginalRotationForTravel() {
+        travelOriginalYaw = this.getYaw();
+        travelOriginalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
+        travelOriginalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
+    }
+
+    private void restoreOriginalRotationForTravel() {
+        this.setYaw(travelOriginalYaw);
+        ((LivingEntityAccessor) this).setBodyYaw(travelOriginalBodyYaw);
+        ((LivingEntityAccessor) this).setHeadYaw(travelOriginalHeadYaw);
+    }
+
+    private void saveOriginalRotationForJump() {
+        jumpOriginalYaw = this.getYaw();
+        jumpOriginalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
+        jumpOriginalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
+    }
+
+    private void restoreOriginalRotationForJump() {
+        this.setYaw(jumpOriginalYaw);
+        ((LivingEntityAccessor) this).setBodyYaw(jumpOriginalBodyYaw);
+        ((LivingEntityAccessor) this).setHeadYaw(jumpOriginalHeadYaw);
+    }
+
+    private void saveOriginalRotationForTick() {
+        tickOriginalYaw = this.getYaw();
+        tickOriginalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
+        tickOriginalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
+    }
+
+    private void restoreOriginalRotationForTick() {
+        this.setYaw(tickOriginalYaw);
+        ((LivingEntityAccessor) this).setBodyYaw(tickOriginalBodyYaw);
+        ((LivingEntityAccessor) this).setHeadYaw(tickOriginalHeadYaw);
+    }
+
     private void applySpoofRotation() {
         float spoofYaw = ROTATION_MANAGER.getRotationYaw();
-        float spoofPitch = ROTATION_MANAGER.getRotationPitch();
 
         this.setYaw(spoofYaw);
-        this.setPitch(spoofPitch);
         ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
         ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
-    }
-
-    private void restoreOriginalRotation() {
-        this.setYaw(originalYaw);
-        this.setPitch(originalPitch);
-        ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
-        ((LivingEntityAccessor) this).setHeadYaw(originalHeadYaw);
-    }
-
-    private void saveOriginalRotation() {
-        originalYaw = this.getYaw();
-        originalPitch = this.getPitch();
-        originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
-        originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
-    }
-
-    @Inject(method = "spawnItemParticles", at = @At("HEAD"), cancellable = true)
-    private void spawnItemParticles(ItemStack stack, int count, CallbackInfo info) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
-        if (noRender.isEnabled() && noRender.isNoEating() && stack.getComponents().contains(DataComponentTypes.FOOD)) info.cancel();
     }
 
     @Inject(method = "travel", at = @At("HEAD"))
     private void onTravelPre(Vec3d movementInput, CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
-        saveOriginalRotation();
+
+        saveOriginalRotationForTravel();
         applySpoofRotation();
     }
 
     @Inject(method = "travel", at = @At("TAIL"))
     private void onTravelPost(Vec3d movementInput, CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
-        restoreOriginalRotation();
+
+        restoreOriginalRotationForTravel();
     }
 
     @Inject(method = "jump", at = @At("HEAD"))
     private void onJumpPre(CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
-        saveOriginalRotation();
+
+        saveOriginalRotationForJump();
         applySpoofRotation();
     }
 
     @Inject(method = "jump", at = @At("TAIL"))
     private void onJumpPost(CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
-        restoreOriginalRotation();
+
+        restoreOriginalRotationForJump();
     }
 
     @Inject(method = "tickMovement", at = @At("HEAD"))
     private void onTickMovementPre(CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
-        saveOriginalRotation();
+
+        saveOriginalRotationForTick();
         applySpoofRotation();
     }
 
     @Inject(method = "tickMovement", at = @At("TAIL"))
     private void onTickMovementPost(CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
-        restoreOriginalRotation();
+
+        restoreOriginalRotationForTick();
     }
 }
