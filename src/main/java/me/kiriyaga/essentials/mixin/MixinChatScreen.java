@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
@@ -135,6 +136,11 @@ public abstract class MixinChatScreen {
             selectedSuggestion = "";
             selectedSuggestionIndex = 0; // Reset to valid state just in case
         }
+        if (cmdName.startsWith(prefix)) {
+            chatField.setEditableColor(Color.WHITE.getRGB());
+        } else {
+            chatField.setEditableColor(14737632); // Reset to default
+        }
 
         if (selectedSuggestion.isEmpty()) {
             return;
@@ -143,7 +149,7 @@ public abstract class MixinChatScreen {
         chatField.setEditableColor(14737632); // Reset to default
 
         // LOGGER.info(drawSuggestions);
-        // LOGGER.info(selectedSuggestion);
+        LOGGER.info(selectedSuggestion);
         // LOGGER.info("X:" + chatField.getX());
         // LOGGER.info("Y:" + chatField.getY());
 
@@ -163,25 +169,50 @@ public abstract class MixinChatScreen {
             return;
         }
         if (drawSuggestions) {
-            int x = chatField.getX();
-            int y = chatField.getY();
             int width = chatField.getWidth();
             int height = chatField.getHeight();
+
+            // Filter out the selected suggestion
+            List<String> suggestionsRest = suggestions.stream()
+                .filter(suggestion -> !suggestion.equals(selectedSuggestion))
+                .collect(Collectors.toList());
+
+
+            // Coordinates for drawing
+            int x = ((width - 200) / 8);
+            int y = chatField.getY();
+
+            // Coordinates for selectedSuggestion
+            int _x = chatField.getX();
+            int _y = chatField.getY();
             int spacing = 6; // Adjust spacing as needed
 
-            // Draw Background 
-            // context.fill(x, y-2, x + width, y + height-2, (Color.DARK_GRAY.getRGB()));
+            // Draw the selected suggestion first
+            int selectedColor = new Color(255, 255, 255, 128).getRGB();
+            context.drawText(MINECRAFT.textRenderer, selectedSuggestion, _x, _y, selectedColor, true);
 
-            for (int i = 0; i < suggestions.size(); i++) {
-                String suggestion = suggestions.get(i);
-                int color = (i == selectedSuggestionIndex) ? Color.WHITE.getRGB() : Color.LIGHT_GRAY.getRGB();
+            for (int i = 0; i < suggestionsRest.size(); i++) {
+                String suggestion = suggestionsRest.get(i);
+                int color = Color.LIGHT_GRAY.getRGB();
+                boolean isSelected = i == selectedSuggestionIndex;
 
-                // Draw the suggestion text
-                context.drawText(MINECRAFT.textRenderer, suggestion, x, y, color, true);
+                if (isSelected) {
+                    color = Color.WHITE.getRGB();
+                    float scale = 1.1f; // Slightly increase size by 10%
 
-                // Update x for the next suggestion
-                int textWidth = MINECRAFT.textRenderer.getWidth(suggestion);
-                x += textWidth + spacing;
+                    context.getMatrices().push();
+                    context.getMatrices().translate(x, y, 0);
+                    context.getMatrices().scale(scale, scale, 1.0f);
+                    context.drawText(MINECRAFT.textRenderer, suggestion, 0, 0, color, true);
+                    context.getMatrices().pop();
+
+                    int textWidth = (int) (MINECRAFT.textRenderer.getWidth(suggestion) * scale);
+                    x += textWidth + spacing;
+                } else {
+                    context.drawText(MINECRAFT.textRenderer, suggestion, x, y, color, true);
+                    int textWidth = MINECRAFT.textRenderer.getWidth(suggestion);
+                    x += textWidth + spacing;
+                }
             }
         } else {
             suggestions = new ArrayList<>();
@@ -207,7 +238,7 @@ public abstract class MixinChatScreen {
             suggestions = new ArrayList<>();
             selectedSuggestionIndex = 0;
             drawSuggestions = false;
-            cir.setReturnValue(false);
+            return;
         } else if (keyCode == GLFW.GLFW_KEY_TAB) {
             if (!suggestions.isEmpty()) {
                 if (suggestions.size() == 1) {
