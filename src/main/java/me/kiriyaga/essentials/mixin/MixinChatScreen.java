@@ -230,10 +230,12 @@ public abstract class MixinChatScreen {
 
         if (keyCode == GLFW.GLFW_KEY_DOWN) {
             selectedSuggestionIndex = (selectedSuggestionIndex + 1) % suggestions.size();
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
+            return;
         } else if (keyCode == GLFW.GLFW_KEY_UP) {
             selectedSuggestionIndex = (selectedSuggestionIndex - 1 + suggestions.size()) % suggestions.size();
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
+            return;
         } else if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             suggestions = new ArrayList<>();
             selectedSuggestionIndex = 0;
