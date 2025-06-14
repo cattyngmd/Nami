@@ -66,6 +66,12 @@ public class AuraModule extends Module {
             if (!(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS))) return;
         }
 
+        int yaw = getYawToEntity(MINECRAFT.player, target);
+        int pitch = getPitchToEntity(MINECRAFT.player, target);
+
+        RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), 10, yaw, pitch);
+        ROTATION_MANAGER.submitRequest(request);
+
         float cooldown = MINECRAFT.player.getAttackCooldownProgress(0f);
         if (tpsSync.get()) {
             float tps = 20f;
@@ -80,28 +86,12 @@ public class AuraModule extends Module {
             if (cooldown < 1.0f) return;
         }
 
-        int yaw = getYawToEntity(MINECRAFT.player, target);
-        int pitch = getPitchToEntity(MINECRAFT.player, target);
+        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) return;
 
-        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) {
-            return;
-        }
-
-        attack(target, yaw, pitch);
+        MINECRAFT.interactionManager.attackEntity(MINECRAFT.player, target);
+        MINECRAFT.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
     }
 
-    @SubscribeEvent
-    public void onPreTickUpdateRotation(PreTickEvent event) {
-        if (currentTarget == null) return;
-
-        int yaw = getYawToEntity(MINECRAFT.player, currentTarget);
-        int pitch = getPitchToEntity(MINECRAFT.player, currentTarget);
-
-        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) {
-            RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), 10, yaw, pitch);
-            ROTATION_MANAGER.submitRequest(request);
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
@@ -134,13 +124,6 @@ public class AuraModule extends Module {
                 .orElse(null);
     }
 
-    private void attack(Entity target, int yaw, int pitch) {
-        if (ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) {
-            MINECRAFT.interactionManager.attackEntity(MINECRAFT.player, target);
-            MINECRAFT.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
-        }
-    }
-
     private void drawBox(Entity entity, Color color, MatrixStack matrices, float partialTicks) {
         double interpX = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * partialTicks;
         double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
@@ -151,55 +134,21 @@ public class AuraModule extends Module {
     }
 
     public static int getYawToEntity(Entity from, Entity to) {
-        Vec3d fromPos = from.getPos().add(0, from.getEyeHeight(from.getPose()), 0);
-
-        Vec3d feet = new Vec3d(to.getX(), to.getY(), to.getZ());
-        Vec3d body = to.getBoundingBox().getCenter();
-        Vec3d head = new Vec3d(to.getX(), to.getY() + to.getEyeHeight(to.getPose()), to.getZ());
-
-        Vec3d[] points = {feet, body, head};
-
-        Vec3d closestPoint = points[0];
-        double minDist = fromPos.distanceTo(points[0]);
-        for (Vec3d point : points) {
-            double dist = fromPos.distanceTo(point);
-            if (dist < minDist) {
-                minDist = dist;
-                closestPoint = point;
-            }
-        }
-
-        double dx = closestPoint.x - fromPos.x;
-        double dz = closestPoint.z - fromPos.z;
+        double dx = to.getX() - from.getX();
+        double dz = to.getZ() - from.getZ();
         double yaw = Math.toDegrees(Math.atan2(dz, dx)) - 90.0;
-        return wrapDegrees((int) Math.round(yaw));
+        int wrapped = wrapDegrees((int) Math.round(yaw));
+        return wrapped;
     }
 
     public static int getPitchToEntity(Entity from, Entity to) {
-        Vec3d fromPos = from.getPos().add(0, from.getEyeHeight(from.getPose()), 0);
-
-        Vec3d feet = new Vec3d(to.getX(), to.getY(), to.getZ());
-        Vec3d body = to.getBoundingBox().getCenter();
-        Vec3d head = new Vec3d(to.getX(), to.getY() + to.getEyeHeight(to.getPose()), to.getZ());
-
-        Vec3d[] points = {feet, body, head};
-
-        Vec3d closestPoint = points[0];
-        double minDist = fromPos.distanceTo(points[0]);
-        for (Vec3d point : points) {
-            double dist = fromPos.distanceTo(point);
-            if (dist < minDist) {
-                minDist = dist;
-                closestPoint = point;
-            }
-        }
-
-        double dx = closestPoint.x - fromPos.x;
-        double dy = closestPoint.y - fromPos.y;
-        double dz = closestPoint.z - fromPos.z;
-        double distXZ = Math.sqrt(dx * dx + dz * dz);
-
-        return (int) Math.round(-Math.toDegrees(Math.atan2(dy, distXZ)));
+        double dx = to.getX() - from.getX();
+        double dy = to.getY() + to.getEyeHeight(to.getPose()) - (from.getY() + from.getEyeHeight(from.getPose()));
+        double dz = to.getZ() - from.getZ();
+        double distance = Math.sqrt(dx * dx + dz * dz);
+        double pitch = -Math.toDegrees(Math.atan2(dy, distance));
+        int pitchInt = (int) Math.round(pitch);
+        return pitchInt;
     }
 
     private static int wrapDegrees(int angle) {
