@@ -179,7 +179,7 @@ public abstract class MixinChatScreen {
 
 
             // Coordinates for drawing
-            int x = ((width - 200) / 8);
+            int x = 10 + (width / 16);
             int y = chatField.getY();
 
             // Coordinates for selectedSuggestion
@@ -265,6 +265,7 @@ public abstract class MixinChatScreen {
                 suggestions = new ArrayList<>();
                 drawSuggestions = false;
                 selectedSuggestionIndex = 0;
+                return;
             } else {
                 // Suggestion is different — apply it as new input and close suggestions
                 chatField.setText(selected);
@@ -274,7 +275,6 @@ public abstract class MixinChatScreen {
                 drawSuggestions = false;
                 selectedSuggestionIndex = 0;
             }
-            cir.setReturnValue(false);
         }
     }
 }
