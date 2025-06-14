@@ -31,7 +31,6 @@
     "MixinClientConnection",
     "MixinEntity",
     "MixinLivingEntity",
-    "MixinPlayerEntity",
     "MixinPlayerInteractEntityC2SPacket",
     "PlayerInteractEntityC2SPacketAccessor"
   ]
