@@ -8,6 +8,8 @@ import me.kiriyaga.essentials.feature.command.impl.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ibm.icu.text.PersonNameFormatter.Length;
+
 import static me.kiriyaga.essentials.Essentials.*;
 
 public class CommandManager {
@@ -60,6 +62,30 @@ public class CommandManager {
         }
     }
 
+    public List<String> getSuggestions(String input) {
+        String[] parts = input.split("\\s+");
+        String cmdName = parts.length > 0 ? parts[0] : "";
+
+        String exactMatch = commands.stream()
+            .filter(cmd -> (prefix + cmd.getName()).equals(cmdName))
+            .map(cmd -> prefix + cmd.getName())
+            .findFirst()
+            .orElse("");
+
+        if (exactMatch == cmdName) {
+            return List.of(exactMatch);
+        } else  if (cmdName.startsWith(prefix) && input.length() == 1) {
+            return commands.stream()
+                .map(cmd -> prefix + cmd.getName())
+                .toList();
+        } else {
+            return commands.stream()
+                .map(cmd -> prefix + cmd.getName())
+                .filter(s -> s.startsWith(cmdName))
+                .toList();
+        }
+    }
+
 
     @SubscribeEvent
     public void onChatMessage(ChatMessageEvent event) {
@@ -69,11 +95,8 @@ public class CommandManager {
 
         event.setCancelled(true);
 
-        String withoutPrefix = message.substring(prefix.length()).trim();
-        if (withoutPrefix.isEmpty()) return;
-
-        String[] parts = withoutPrefix.split("\\s+");
-        String cmdName = parts[0];
+        String[] parts = message.split("\\s+");
+        String cmdName = parts.length > 0 ? parts[0] : "";
         String[] args = new String[0];
         if (parts.length > 1) {
             args = new String[parts.length - 1];
@@ -81,7 +104,10 @@ public class CommandManager {
         }
 
         for (Command cmd : commands) {
-            if (cmd.matches(cmdName)) {
+            if (message != cmdName) {
+                event.setCancelled(false);
+            }
+            if ((prefix + cmd.getName()).matches(cmdName)) {
                 try {
                     cmd.execute(args);
                 } catch (Exception e) {
