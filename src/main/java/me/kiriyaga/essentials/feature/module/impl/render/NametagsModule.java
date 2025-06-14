@@ -39,7 +39,6 @@ public class NametagsModule extends Module {
     public final BoolSetting showAnimals = addSetting(new BoolSetting("Peacefuls", false));
     public final BoolSetting showEnemies = addSetting(new BoolSetting("Hostiles", false));
     public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
-    public final BoolSetting showHealth = addSetting(new BoolSetting("Show Health", false));
     public final BoolSetting showEquipment = addSetting(new BoolSetting("Show Equipment", true));
     public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("Format", TextFormat.None));
     public final BoolSetting showBackground = addSetting(new BoolSetting("Background", true));

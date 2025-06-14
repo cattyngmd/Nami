@@ -24,11 +24,6 @@ public class NametagFormatter {
     public Text formatPlayer(PlayerEntity player) {
         Text name = Text.literal(player.getName().getString()).setStyle(getStyle());
 
-        if (module.showHealth.get()) {
-            Text health = getHealthText(player);
-            return name.copy().append(" ").append(health);
-        }
-
         return name;
     }
 
