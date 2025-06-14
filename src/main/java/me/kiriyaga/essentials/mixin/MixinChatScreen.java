@@ -197,8 +197,8 @@ public abstract class MixinChatScreen {
                 boolean isSelected = i == selectedSuggestionIndex;
 
                 if (isSelected) {
-                    color = Color.WHITE.getRGB();
-                    float scale = 1.1f; // Slightly increase size by 10%
+                    color = Color.LIGHT_GRAY.darker().getRGB();
+                    float scale = 1.01f; // Slightly increase size
 
                     context.getMatrices().push();
                     context.getMatrices().translate(x, y, 0);
@@ -265,6 +265,7 @@ public abstract class MixinChatScreen {
                 suggestions = new ArrayList<>();
                 drawSuggestions = false;
                 selectedSuggestionIndex = 0;
+                return;
             } else {
                 // Suggestion is different — apply it as new input and close suggestions
                 chatField.setText(selected);
@@ -274,7 +275,6 @@ public abstract class MixinChatScreen {
                 drawSuggestions = false;
                 selectedSuggestionIndex = 0;
             }
-            cir.setReturnValue(false);
         }
     }
 }
