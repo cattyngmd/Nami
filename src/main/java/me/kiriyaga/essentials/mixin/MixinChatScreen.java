@@ -149,7 +149,7 @@ public abstract class MixinChatScreen {
         chatField.setEditableColor(14737632); // Reset to default
 
         // LOGGER.info(drawSuggestions);
-        LOGGER.info(selectedSuggestion);
+        // LOGGER.info(selectedSuggestion);
         // LOGGER.info("X:" + chatField.getX());
         // LOGGER.info("Y:" + chatField.getY());
 
