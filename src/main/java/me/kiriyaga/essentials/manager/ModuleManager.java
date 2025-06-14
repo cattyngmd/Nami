@@ -9,6 +9,7 @@ import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
 import me.kiriyaga.essentials.feature.module.impl.travel.EbounceModule;
+import me.kiriyaga.essentials.feature.module.impl.world.JoinAnnounceModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,9 @@ public class ModuleManager {
         /// MOVEMENT ///
         registerModule(new SprintModule());
         /// TRAVEL ///
-        registerModule(new EbounceModule());
+        //registerModule(new EbounceModule());
+        /// TRAVEL ///
+        registerModule(new JoinAnnounceModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

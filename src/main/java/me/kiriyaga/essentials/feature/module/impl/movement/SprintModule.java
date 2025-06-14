@@ -17,12 +17,6 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class SprintModule extends Module {
 
-    public enum Mode {
-        Normal,
-        Rotate
-    }
-
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.Normal));
     private final BoolSetting keepSprint = addSetting(new BoolSetting("Keep Sprint", true));
 
     public SprintModule() {
@@ -36,18 +30,11 @@ public class SprintModule extends Module {
         ClientPlayerEntity player = MINECRAFT.player;
         if (player == null || player.isSubmergedInWater() || player.isTouchingWater()) return;
 
-        switch (mode.get()) {
-            case Normal -> {
                 if (player.forwardSpeed > 0 && !player.hasVehicle()) {
                     player.setSprinting(true);
                 } else {
                     player.setSprinting(false);
                 }
-            }
-            case Rotate -> {
-                // TODO: Implement Rotate mode
-            }
-        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
