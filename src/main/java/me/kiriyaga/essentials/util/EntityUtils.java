@@ -145,7 +145,7 @@ public class EntityUtils {
 
         if (e instanceof EndermanEntity enderman) return enderman.isAngry();
         if (e instanceof ZombifiedPiglinEntity piglin) return piglin.isAttacking();
-        if (e instanceof PiglinEntity piglin) return !isPlayerWearingGold(player);
+        if (e instanceof PiglinEntity piglin) return !isPlayerWearingGold(player) || isPlayerWearingGold(player) && piglin.isAttacking();
         if (e instanceof SpiderEntity spider) return spider.getTarget() != null;
         if (e instanceof CaveSpiderEntity caveSpider) return caveSpider.getTarget() != null;
         if (e instanceof PolarBearEntity bear) return bear.getTarget() != null;
