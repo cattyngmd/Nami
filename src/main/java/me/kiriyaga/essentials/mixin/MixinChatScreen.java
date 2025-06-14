@@ -179,7 +179,7 @@ public abstract class MixinChatScreen {
 
 
             // Coordinates for drawing
-            int x = ((width - 200) / 8);
+            int x = 10 + (width / 16);
             int y = chatField.getY();
 
             // Coordinates for selectedSuggestion
