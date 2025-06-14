@@ -31,8 +31,6 @@ public class HUDModule extends Module {
     public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", true));
     public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("Lag Warning", true));
 
-    private static final int PADDING = 2;
-
     private int tickCounter = 0;
 
     private String watermarkText = "";
@@ -121,38 +119,38 @@ public class HUDModule extends Module {
 
     private void renderTopLeft(Render2DEvent event, int color) {
         if (watermarkEnabled.get() && !watermarkText.isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, PADDING, PADDING, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, 0, 0, color, false);
         }
     }
 
     private void renderBottomLeft(Render2DEvent event, int color, int screenHeight, float animationOffset) {
-        int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
+        int y = screenHeight - MINECRAFT.textRenderer.fontHeight;
         y -= (int) animationOffset;
 
         if (coordsEnabled.get() && !coordsText.isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, PADDING, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, 0, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
         if (facingEnabled.get() && !facingText.isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, PADDING, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, 0, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
 
     private void renderBottomRight(Render2DEvent event, int color, int screenWidth, int screenHeight, float animationOffset) {
-        int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
+        int y = screenHeight - MINECRAFT.textRenderer.fontHeight;
         y -= (int) animationOffset;
 
         if (fpsEnabled.get() && !fpsText.isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(fpsText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width - PADDING, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
         if (pingEnabled.get() && !pingText.isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(pingText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width - PADDING, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
