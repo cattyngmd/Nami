@@ -263,8 +263,8 @@ public class HUDModule extends Module {
 
         String countStr = String.valueOf(totemCount);
 
-        int textX = iconX + iconSize - 6;
-        int textY = iconY + iconSize - 12;
+        int textX = iconX + iconSize - 2;
+        int textY = iconY + iconSize - 8;
 
         event.getDrawContext().drawText(
                 mc.textRenderer,

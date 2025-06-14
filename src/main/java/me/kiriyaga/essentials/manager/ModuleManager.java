@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.manager;
 
+import me.kiriyaga.essentials.feature.command.impl.GammaCommand;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.*;
@@ -9,6 +10,8 @@ import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
 import me.kiriyaga.essentials.feature.module.impl.travel.EbounceModule;
+import me.kiriyaga.essentials.feature.module.impl.world.AutoFovModule;
+import me.kiriyaga.essentials.feature.module.impl.world.AutoGammaModule;
 import me.kiriyaga.essentials.feature.module.impl.world.JoinAnnounceModule;
 
 import java.util.ArrayList;
@@ -47,6 +50,8 @@ public class ModuleManager {
         //registerModule(new EbounceModule());
         /// TRAVEL ///
         registerModule(new JoinAnnounceModule());
+        registerModule(new AutoFovModule());
+        registerModule(new AutoGammaModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
