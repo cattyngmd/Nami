@@ -265,6 +265,7 @@ public abstract class MixinChatScreen {
                 suggestions = new ArrayList<>();
                 drawSuggestions = false;
                 selectedSuggestionIndex = 0;
+                return;
             } else {
                 // Suggestion is different — apply it as new input and close suggestions
                 chatField.setText(selected);
@@ -274,7 +275,6 @@ public abstract class MixinChatScreen {
                 drawSuggestions = false;
                 selectedSuggestionIndex = 0;
             }
-            cir.setReturnValue(false);
         }
     }
 }
