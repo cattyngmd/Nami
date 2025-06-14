@@ -31,6 +31,7 @@ public class HUDModule extends Module {
 
     public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("Watermark", true));
     public final BoolSetting armorEnabled = addSetting(new BoolSetting("Armor", true));
+    public final BoolSetting totemsEnabled = addSetting(new BoolSetting("Totems", true));
     public final BoolSetting coordsEnabled = addSetting(new BoolSetting("Coordinates", true));
     public final BoolSetting freecamCords = addSetting(new BoolSetting("Freecam Cords Spoof ", true));
     public final BoolSetting facingEnabled = addSetting(new BoolSetting("Facing", true));
@@ -141,6 +142,10 @@ public class HUDModule extends Module {
         if (armorEnabled.get()) {
             renderArmorHUD(event);
         }
+
+        if (totemsEnabled.get()) {
+            renderTotems(event, screenWidth, screenHeight);
+        }
     }
 
     private void renderTopLeft(Render2DEvent event, int color) {
@@ -225,6 +230,51 @@ public class HUDModule extends Module {
     }
 
 
+    private void renderTotems(Render2DEvent event, int screenWidth, int screenHeight) {
+        MinecraftClient mc = MINECRAFT;
+        if (mc.player == null) return;
+
+        int totemCount = 0;
+
+        for (ItemStack stack : mc.player.getInventory().getMainStacks()) {
+            if (stack.getItem() == net.minecraft.item.Items.TOTEM_OF_UNDYING) {
+                totemCount += stack.getCount();
+            }
+        }
+
+        ItemStack offHandStack = mc.player.getOffHandStack();
+        if (offHandStack.getItem() == net.minecraft.item.Items.TOTEM_OF_UNDYING) {
+            totemCount += offHandStack.getCount();
+        }
+
+        // if (totemCount == 0) return;
+
+        int y = screenHeight - 52;
+
+        int xCenter = screenWidth / 2;
+
+        int iconSize = 16;
+        int iconX = xCenter - iconSize / 2;
+        int iconY = y;
+
+        ItemStack totemStack = new ItemStack(net.minecraft.item.Items.TOTEM_OF_UNDYING);
+
+        event.getDrawContext().drawItem(totemStack, iconX, iconY);
+
+        String countStr = String.valueOf(totemCount);
+
+        int textX = iconX + iconSize - 6;
+        int textY = iconY + iconSize - 8;
+
+        event.getDrawContext().drawText(
+                mc.textRenderer,
+                Text.literal(countStr).setStyle(Style.EMPTY.withColor(0xFFFFFF)),
+                textX,
+                textY,
+                0xFFFFFF,
+                true
+        );
+    }
 
     private void drawLagWarning(Render2DEvent event, int screenWidth, int screenHeight) {
         String warningText = "Server is lagging!";
@@ -232,7 +282,7 @@ public class HUDModule extends Module {
         int textHeight = MINECRAFT.textRenderer.fontHeight;
 
         int x = (screenWidth - textWidth) / 2;
-        int y = (screenHeight - textHeight) / 2;
+        int y = ((screenHeight - textHeight) / 2) - 60;
 
         Color styled = getColorModule().getStyledPrimaryColor();
         Color opaque = new Color(styled.getRed(), styled.getGreen(), styled.getBlue(), 255);
