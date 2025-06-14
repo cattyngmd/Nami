@@ -197,8 +197,8 @@ public abstract class MixinChatScreen {
                 boolean isSelected = i == selectedSuggestionIndex;
 
                 if (isSelected) {
-                    color = Color.WHITE.getRGB();
-                    float scale = 1.1f; // Slightly increase size by 10%
+                    color = Color.LIGHT_GRAY.darker().getRGB();
+                    float scale = 1.01f; // Slightly increase size
 
                     context.getMatrices().push();
                     context.getMatrices().translate(x, y, 0);
