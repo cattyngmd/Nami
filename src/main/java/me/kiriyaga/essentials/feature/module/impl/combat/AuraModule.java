@@ -96,13 +96,12 @@ public class AuraModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
         if (!render.get()) return;
-
-        Entity target = getTarget(rotationRange.get());
-        if (target == null) return;
+        if (currentTarget == null) return;
 
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
-        drawBox(target, colorModule.getStyledPrimaryColor(), event.getMatrices(), event.getTickDelta());
+        drawBox(currentTarget, colorModule.getStyledPrimaryColor(), event.getMatrices(), event.getTickDelta());
     }
+
 
     private Entity getTarget(double range) {
         ClientPlayerEntity player = MINECRAFT.player;

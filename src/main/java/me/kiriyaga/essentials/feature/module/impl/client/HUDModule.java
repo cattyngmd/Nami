@@ -26,17 +26,18 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class HUDModule extends Module {
 
-    public final IntSetting updateInterval = addSetting(new IntSetting("Update Interval", 5, 1, 20));
+    public final IntSetting updateInterval = addSetting(new IntSetting("Update Interval", 1, 1, 20));
 
     public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("Watermark", true));
     public final BoolSetting armorEnabled = addSetting(new BoolSetting("Armor", true));
-    public final BoolSetting coordsEnabled = addSetting(new BoolSetting("Coordinates", false));
+    public final BoolSetting coordsEnabled = addSetting(new BoolSetting("Coordinates", true));
     public final BoolSetting facingEnabled = addSetting(new BoolSetting("Facing", true));
     public final BoolSetting fpsEnabled = addSetting(new BoolSetting("FPS", true));
-    public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", true));
-    public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("Lag Warning", true));
+    public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", false));
+    public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("Lag Warning", false));
 
     private int tickCounter = 0;
+    private static final int PADDING = 2;
 
     private Text coordsText = Text.empty();
     private Text facingText = Text.empty();
@@ -109,7 +110,7 @@ public class HUDModule extends Module {
 
         float rawOffset = ChatAnimationHelper.getAnimationOffset();
 
-        float animationOffset = 20f - rawOffset;
+        float animationOffset = (float) (14f - (rawOffset/1.428571428571429));
 
         renderTopLeft(event, colorInt);
 
@@ -128,21 +129,21 @@ public class HUDModule extends Module {
 
     private void renderTopLeft(Render2DEvent event, int color) {
         if (watermarkEnabled.get() && !watermarkText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, 0, 0, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, PADDING, PADDING, color, true);
         }
     }
 
     private void renderBottomLeft(Render2DEvent event, int color, int screenHeight, float animationOffset) {
-        int y = screenHeight - MINECRAFT.textRenderer.fontHeight;
+        int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
         y -= (int) animationOffset;
 
         if (coordsEnabled.get() && !coordsText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, 0, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, PADDING, y, color, true);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
         if (facingEnabled.get() && !facingText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, 0, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, PADDING, y, color, true);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
@@ -153,13 +154,13 @@ public class HUDModule extends Module {
 
         if (fpsEnabled.get() && !fpsText.getString().isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(fpsText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width - PADDING, y, color, true);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
         if (pingEnabled.get() && !pingText.getString().isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(pingText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width, y, color, false);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width - PADDING, y, color, true);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
@@ -221,7 +222,7 @@ public class HUDModule extends Module {
         Color opaque = new Color(styled.getRed(), styled.getGreen(), styled.getBlue(), 255);
         int colorInt = opaque.getRGB();
 
-        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, colorInt, false);
+        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, colorInt, true);
     }
 
     private Text formatFancyCoords(double x, double y, double z) {
@@ -236,7 +237,7 @@ public class HUDModule extends Module {
         Color primary = getColorModule().getStyledPrimaryColor();
 
         Style primaryStyle = Style.EMPTY.withColor(primary.getRGB());
-        Style grayStyle = Style.EMPTY.withColor(Formatting.DARK_GRAY);
+        Style grayStyle = Style.EMPTY.withColor(Formatting.GRAY);
         Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
 
         MutableText result = Text.literal("XYZ ").setStyle(primaryStyle);
@@ -251,14 +252,6 @@ public class HUDModule extends Module {
             result.append(formatNumberStyled(xAlt, whiteStyle, grayStyle));
             result.append(Text.literal(", ").setStyle(primaryStyle));
             result.append(formatNumberStyled(zAlt, whiteStyle, grayStyle));
-            result.append(Text.literal("]").setStyle(primaryStyle));
-        }
-
-        if (isOverworld || isNether) {
-            result.append(Text.literal(" [").setStyle(primaryStyle));
-            result.append(Text.literal(formatNumber(xAlt)).setStyle(whiteStyle));
-            result.append(Text.literal(", ").setStyle(primaryStyle));
-            result.append(Text.literal(formatNumber(zAlt)).setStyle(whiteStyle));
             result.append(Text.literal("]").setStyle(primaryStyle));
         }
         return result;
@@ -308,9 +301,9 @@ public class HUDModule extends Module {
         };
 
         MutableText text = Text.literal(dir).formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB()));
-        text.append(Text.literal(" [").formatted(Formatting.DARK_GRAY));
+        text.append(Text.literal(" [").formatted(Formatting.GRAY));
         text.append(Text.literal(axis).formatted(Formatting.WHITE));
-        text.append(Text.literal("]").formatted(Formatting.DARK_GRAY));
+        text.append(Text.literal("]").formatted(Formatting.GRAY));
 
         return text;
     }
