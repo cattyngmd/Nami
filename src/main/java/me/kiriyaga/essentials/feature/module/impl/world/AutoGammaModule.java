@@ -6,6 +6,7 @@ import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.mixininterface.ISimpleOption;
+import me.kiriyaga.essentials.setting.impl.DoubleSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket.Action;
@@ -16,7 +17,7 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class AutoGammaModule extends Module {
 
-    public final IntSetting gamma = addSetting(new IntSetting("Gamma", 2, 1, 8));
+    public final DoubleSetting gamma = addSetting(new DoubleSetting("Gamma", 2, 1, 8));
 
     public AutoGammaModule() {
         super("Auto Gamma", "Sets up gamma on join.", Category.WORLD, "autogamma", "gamma", "autogmam", "фгещпфььф");
