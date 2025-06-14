@@ -12,10 +12,15 @@ import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 
 import java.awt.*;
+import java.text.Normalizer;
 
 import static me.kiriyaga.essentials.Essentials.*;
 
@@ -33,11 +38,11 @@ public class HUDModule extends Module {
 
     private int tickCounter = 0;
 
-    private String watermarkText = "";
-    private String coordsText = "";
-    private String facingText = "";
-    private String fpsText = "";
-    private String pingText = "";
+    private Text coordsText = Text.empty();
+    private Text facingText = Text.empty();
+    private Text watermarkText = Text.empty();
+    private Text fpsText = Text.empty();
+    private Text pingText = Text.empty();
     private boolean serverLagging = false;
 
 
@@ -58,30 +63,34 @@ public class HUDModule extends Module {
         if (mc.world == null || mc.player == null) return;
 
         if (watermarkEnabled.get()) {
-            watermarkText = NAME + " " + VERSION;
+            watermarkText = Text.of(NAME + " " + VERSION);
         }
 
         if (coordsEnabled.get()) {
-            coordsText = String.format("XYZ %s, %s, %s",
-                    formatCoord(mc.player.getX()),
-                    formatCoord(mc.player.getY()),
-                    formatCoord(mc.player.getZ()));
+            double x = mc.player.getX();
+            double y = mc.player.getY();
+            double z = mc.player.getZ();
+
+
+            coordsText = formatFancyCoords(x, y, z);
+
         }
 
         if (facingEnabled.get()) {
-            facingText = getFacing(mc);
+            facingText = getFacingText(mc);
         }
 
         if (fpsEnabled.get()) {
-            fpsText = "FPS: " + Formatting.WHITE + mc.getCurrentFps();
+            fpsText = Text.literal("FPS: ").setStyle(Style.EMPTY.withColor(getColorModule().getStyledPrimaryColor().getRGB()))
+                    .append(Text.literal(Integer.toString(mc.getCurrentFps())).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
         }
 
         if (pingEnabled.get()) {
             int ping = PING_MANAGER.getPing();
-            pingText = "Ping: " + Formatting.WHITE + (ping < 0 ? "N/A" : ping);
-        }
+            pingText = Text.literal("Ping: ").setStyle(Style.EMPTY.withColor(getColorModule().getStyledPrimaryColor().getRGB()))
+                    .append(Text.literal(ping < 0 ? "N/A" : Integer.toString(ping)).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));        }
 
-        if (lagWarningEnabled.get()){
+        if (lagWarningEnabled.get()) {
             serverLagging = PING_MANAGER.isConnectionUnstable();
         }
     }
@@ -118,7 +127,7 @@ public class HUDModule extends Module {
     }
 
     private void renderTopLeft(Render2DEvent event, int color) {
-        if (watermarkEnabled.get() && !watermarkText.isEmpty()) {
+        if (watermarkEnabled.get() && !watermarkText.getString().isEmpty()) {
             event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, 0, 0, color, false);
         }
     }
@@ -127,12 +136,12 @@ public class HUDModule extends Module {
         int y = screenHeight - MINECRAFT.textRenderer.fontHeight;
         y -= (int) animationOffset;
 
-        if (coordsEnabled.get() && !coordsText.isEmpty()) {
+        if (coordsEnabled.get() && !coordsText.getString().isEmpty()) {
             event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, 0, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
-        if (facingEnabled.get() && !facingText.isEmpty()) {
+        if (facingEnabled.get() && !facingText.getString().isEmpty()) {
             event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, 0, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
@@ -142,13 +151,13 @@ public class HUDModule extends Module {
         int y = screenHeight - MINECRAFT.textRenderer.fontHeight;
         y -= (int) animationOffset;
 
-        if (fpsEnabled.get() && !fpsText.isEmpty()) {
+        if (fpsEnabled.get() && !fpsText.getString().isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(fpsText);
             event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
-        if (pingEnabled.get() && !pingText.isEmpty()) {
+        if (pingEnabled.get() && !pingText.getString().isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(pingText);
             event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width, y, color, false);
             y -= MINECRAFT.textRenderer.fontHeight + 2;
@@ -215,22 +224,97 @@ public class HUDModule extends Module {
         event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, colorInt, false);
     }
 
+    private Text formatFancyCoords(double x, double y, double z) {
+        MinecraftClient mc = MinecraftClient.getInstance();
 
-    private String formatCoord(double coord) {
-        return String.format("%.1f", coord).replace(',', '.');
+        boolean isNether = mc.world != null && mc.world.getRegistryKey() == World.NETHER;
+        boolean isOverworld = mc.world != null && mc.world.getRegistryKey() == World.OVERWORLD;
+
+        double xAlt = isNether ? x * 8 : x / 8;
+        double zAlt = isNether ? z * 8 : z / 8;
+
+        Color primary = getColorModule().getStyledPrimaryColor();
+
+        Style primaryStyle = Style.EMPTY.withColor(primary.getRGB());
+        Style grayStyle = Style.EMPTY.withColor(Formatting.DARK_GRAY);
+        Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
+
+        MutableText result = Text.literal("XYZ ").setStyle(primaryStyle);
+        result.append(formatNumberStyled(x, whiteStyle, grayStyle));
+        result.append(Text.literal(" ").setStyle(primaryStyle));
+        result.append(formatNumberStyled(y, whiteStyle, grayStyle));
+        result.append(Text.literal(" ").setStyle(primaryStyle));
+        result.append(formatNumberStyled(z, whiteStyle, grayStyle));
+
+        if (isOverworld || isNether) {
+            result.append(Text.literal(" [").setStyle(primaryStyle));
+            result.append(formatNumberStyled(xAlt, whiteStyle, grayStyle));
+            result.append(Text.literal(", ").setStyle(primaryStyle));
+            result.append(formatNumberStyled(zAlt, whiteStyle, grayStyle));
+            result.append(Text.literal("]").setStyle(primaryStyle));
+        }
+
+        if (isOverworld || isNether) {
+            result.append(Text.literal(" [").setStyle(primaryStyle));
+            result.append(Text.literal(formatNumber(xAlt)).setStyle(whiteStyle));
+            result.append(Text.literal(", ").setStyle(primaryStyle));
+            result.append(Text.literal(formatNumber(zAlt)).setStyle(whiteStyle));
+            result.append(Text.literal("]").setStyle(primaryStyle));
+        }
+        return result;
     }
 
-    private String getFacing(MinecraftClient mc) {
-        if (mc.player == null) return "Invalid";
+    private MutableText formatNumberStyled(double val, Style digitStyle, Style separatorStyle) {
+        String formatted = formatNumber(val); // "123.0"
+        int dotIndex = formatted.indexOf('.');
+
+        if (dotIndex == -1) {
+            return Text.literal(formatted).setStyle(digitStyle);
+        }
+
+        MutableText text = Text.literal(formatted.substring(0, dotIndex)).setStyle(digitStyle);
+        text.append(Text.literal(".").setStyle(separatorStyle));
+        text.append(Text.literal(formatted.substring(dotIndex + 1)).setStyle(digitStyle));
+
+        return text;
+    }
+
+
+    private String formatNumber(double val) {
+        double rounded = Math.round(val * 10.0) / 10.0;
+        return String.format("%.1f", rounded).replace(',', '.');
+    }
+
+
+    private Text getFacingText(MinecraftClient mc) {
+        if (mc.player == null) return Text.literal("Invalid").formatted(Formatting.RED);
+
         int facingIndex = MathHelper.floor(mc.player.getYaw() * 4.0F / 360.0F + 0.5D) & 3;
-        return switch (facingIndex) {
+
+        String dir = switch (facingIndex) {
             case 0 -> "South";
             case 1 -> "West";
             case 2 -> "North";
             case 3 -> "East";
             default -> "Invalid";
         };
+
+        String axis = switch (facingIndex) {
+            case 0 -> "+Z";
+            case 1 -> "-X";
+            case 2 -> "-Z";
+            case 3 -> "+X";
+            default -> "?";
+        };
+
+        MutableText text = Text.literal(dir).formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB()));
+        text.append(Text.literal(" [").formatted(Formatting.DARK_GRAY));
+        text.append(Text.literal(axis).formatted(Formatting.WHITE));
+        text.append(Text.literal("]").formatted(Formatting.DARK_GRAY));
+
+        return text;
     }
+
 
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
