@@ -35,6 +35,10 @@ public class RotationManager {
     private int ticksHolding = 0;
     private int holdTicks = 0;
 
+    public float lastSentSpoofYaw;
+    public float lastSentSpoofPitch;
+
+
     private boolean spoofing = false;
 
     public void init() {
@@ -77,11 +81,12 @@ public class RotationManager {
             return false;
         }
 
-        float yawDiff = wrapDegrees(request.targetYaw - rotationYaw);
-        float pitchDiff = request.targetPitch - rotationPitch;
+        float yawDiff = wrapDegrees(request.targetYaw - lastSentSpoofYaw);
+        float pitchDiff = request.targetPitch - lastSentSpoofPitch;
 
         return Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
     }
+
 
     public void cancelRequest(String id) {
         requests.removeIf(r -> Objects.equals(r.id, id));
@@ -208,6 +213,10 @@ public class RotationManager {
 
         float spoofYaw = getRotationYaw();
         float spoofPitch = getRotationPitch();
+
+        lastSentSpoofYaw = spoofYaw;
+        lastSentSpoofPitch = spoofPitch;
+
         Vec3d pos = mc.player.getPos();
 
         if (!(packet instanceof PlayerMoveC2SPacket)) return;
