@@ -54,22 +54,22 @@ public class ESPModule extends Module {
         }
 
         if (showPeacefuls.get()) {
-            for (Entity entity : EntityUtils.getPassiveMobs()) {
-                if (entity.isRemoved()) continue;
+            for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE)) {
+                if (!entity.isAlive()) continue;
                 drawBox(entity, COLOR_PASSIVE, matrices, event.getTickDelta());
             }
         }
 
         if (showNeutrals.get()) {
-            for (Entity entity : EntityUtils.getNeutralMobs()) {
-                if (entity.isRemoved()) continue;
+            for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL)) {
+                if (!entity.isAlive()) continue;
                 drawBox(entity, COLOR_NEUTRAL, matrices, event.getTickDelta());
             }
         }
 
         if (showHostiles.get()) {
-            for (Entity entity : EntityUtils.getHostileMobs()) {
-                if (entity.isRemoved()) continue;
+            for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE)) {
+                if (!entity.isAlive()) continue;
                 drawBox(entity, COLOR_HOSTILE, matrices, event.getTickDelta());
             }
         }

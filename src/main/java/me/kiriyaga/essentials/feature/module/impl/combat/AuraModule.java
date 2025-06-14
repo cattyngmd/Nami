@@ -108,9 +108,9 @@ public class AuraModule extends Module {
         List<Entity> candidates = new ArrayList<>();
 
         if (targetPlayers.get()) candidates.addAll(EntityUtils.getPlayers());
-        if (targetPeacefuls.get()) candidates.addAll(EntityUtils.getPassiveMobs());
-        if (targetHostiles.get()) candidates.addAll(EntityUtils.getHostileMobs());
-        if (targetNeutrals.get()) candidates.addAll(EntityUtils.getNeutralMobs());
+        if (targetPeacefuls.get()) candidates.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE));
+        if (targetHostiles.get()) candidates.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE));
+        if (targetNeutrals.get()) candidates.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL));
 
         candidates.removeIf(e -> e == player
                 || e.isRemoved()
