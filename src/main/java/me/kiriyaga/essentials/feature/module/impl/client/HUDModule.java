@@ -6,6 +6,7 @@ import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
@@ -31,6 +32,7 @@ public class HUDModule extends Module {
     public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("Watermark", true));
     public final BoolSetting armorEnabled = addSetting(new BoolSetting("Armor", true));
     public final BoolSetting coordsEnabled = addSetting(new BoolSetting("Coordinates", true));
+    public final BoolSetting freecamCords = addSetting(new BoolSetting("Freecam Cords Spoof ", true));
     public final BoolSetting facingEnabled = addSetting(new BoolSetting("Facing", true));
     public final BoolSetting fpsEnabled = addSetting(new BoolSetting("FPS", true));
     public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", false));
@@ -68,9 +70,23 @@ public class HUDModule extends Module {
         }
 
         if (coordsEnabled.get()) {
-            double x = mc.player.getX();
-            double y = mc.player.getY();
-            double z = mc.player.getZ();
+
+            double x;
+            double y;
+            double z;
+
+            FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
+
+
+            if (freecamCords.get() && freecamModule.isEnabled()){
+                x = freecamModule.getX();
+                y = freecamModule.getY();
+                z = freecamModule.getZ();
+            } else {
+                x = mc.player.getX();
+                y = mc.player.getY();
+                z = mc.player.getZ();
+            }
 
 
             coordsText = formatFancyCoords(x, y, z);

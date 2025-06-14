@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.feature.module.impl.render;
 
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
+import me.kiriyaga.essentials.event.impl.KeyboardInputEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
@@ -110,6 +111,19 @@ public class FreecamModule extends Module {
         camX = cameraPos.x;
         camY = cameraPos.y;
         camZ = cameraPos.z;
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onKeyboard(KeyboardInputEvent event) {
+        event.setForward(false);
+        event.setBackward(false);
+        event.setLeft(false);
+        event.setRight(false);
+        event.setJump(false);
+        event.setSneak(false);
+        event.setSprint(false);
+
+        event.setCancelled(true);
     }
 
 
