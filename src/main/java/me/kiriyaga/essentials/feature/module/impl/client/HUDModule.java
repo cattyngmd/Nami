@@ -301,9 +301,9 @@ public class HUDModule extends Module {
         };
 
         MutableText text = Text.literal(dir).formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB()));
-        text.append(Text.literal(" [").formatted(Formatting.GRAY));
+        text.append(Text.literal(" [").formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB())));
         text.append(Text.literal(axis).formatted(Formatting.WHITE));
-        text.append(Text.literal("]").formatted(Formatting.GRAY));
+        text.append(Text.literal("]").formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB())));
 
         return text;
     }
