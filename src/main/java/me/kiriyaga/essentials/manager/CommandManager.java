@@ -104,9 +104,6 @@ public class CommandManager {
         }
 
         for (Command cmd : commands) {
-            if (message != cmdName) {
-                event.setCancelled(false);
-            }
             if ((prefix + cmd.getName()).matches(cmdName)) {
                 try {
                     cmd.execute(args);

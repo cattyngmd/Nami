@@ -140,14 +140,7 @@ public abstract class MixinChatScreen {
             return;
         }
 
-
-        if (cmdName.startsWith(prefix)) {
-            chatField.setEditableColor(textCol.getRGB());
-            chatField.setDrawsBackground(true);
-        } else {
-            chatField.setDrawsBackground(false);
-            chatField.setEditableColor(14737632); // Reset to default
-        }
+        chatField.setEditableColor(14737632); // Reset to default
 
         // LOGGER.info(drawSuggestions);
         // LOGGER.info(selectedSuggestion);
@@ -171,24 +164,24 @@ public abstract class MixinChatScreen {
         }
         if (drawSuggestions) {
             int x = chatField.getX();
-            int y = chatField.getY() - chatField.getHeight() - 2;
+            int y = chatField.getY();
             int width = chatField.getWidth();
             int height = chatField.getHeight();
             int spacing = 6; // Adjust spacing as needed
-            int currentX = x;
 
-            context.fill(x, y, x + width, y + height, secondary.getRGB());
+            // Draw Background 
+            // context.fill(x, y-2, x + width, y + height-2, (Color.DARK_GRAY.getRGB()));
 
             for (int i = 0; i < suggestions.size(); i++) {
                 String suggestion = suggestions.get(i);
-                int color = (i == selectedSuggestionIndex) ? textColInverted.getRGB() : textCol.getRGB();
+                int color = (i == selectedSuggestionIndex) ? Color.WHITE.getRGB() : Color.LIGHT_GRAY.getRGB();
 
                 // Draw the suggestion text
-                context.drawText(MINECRAFT.textRenderer, suggestion, currentX, y, color, true);
+                context.drawText(MINECRAFT.textRenderer, suggestion, x, y, color, true);
 
-                // Update currentX for the next suggestion
+                // Update x for the next suggestion
                 int textWidth = MINECRAFT.textRenderer.getWidth(suggestion);
-                currentX += textWidth + spacing;
+                x += textWidth + spacing;
             }
         } else {
             suggestions = new ArrayList<>();
@@ -214,7 +207,7 @@ public abstract class MixinChatScreen {
             suggestions = new ArrayList<>();
             selectedSuggestionIndex = 0;
             drawSuggestions = false;
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
         } else if (keyCode == GLFW.GLFW_KEY_TAB) {
             if (!suggestions.isEmpty()) {
                 if (suggestions.size() == 1) {
@@ -232,10 +225,12 @@ public abstract class MixinChatScreen {
                 cir.setReturnValue(true);
             }
         } else if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
-            String input = chatField.getText();
+            String text = chatField.getText();
+            String[] parts = text.split("\\s+");
+            String cmdName = parts.length > 0 ? parts[0] : "";
             String selected = suggestions.get(selectedSuggestionIndex);
 
-            if (input.equals(selected)) {
+            if (cmdName.equals(selected)) {
                 suggestions = new ArrayList<>();
                 drawSuggestions = false;
                 selectedSuggestionIndex = 0;
