@@ -41,9 +41,7 @@ public class BlockESPModule extends Module {
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("Not At Spawn", false));
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line Width", 1.5, 0.5, 2.5));
     private final BoolSetting filled = addSetting(new BoolSetting("Filled", true));
-
-    private static final int MAX_CHUNKS_PER_TICK = 2;
-
+     
     private final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
 
