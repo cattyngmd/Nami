@@ -11,7 +11,7 @@ public class ColorModule extends Module {
 
     public final ColorSetting primaryColor = addSetting(new ColorSetting("primary", new Color(23, 0, 255, 170), true));
     public final ColorSetting secondaryColor = addSetting(new ColorSetting("secondary", new Color(23, 0, 255, 170), true));
-    public final ColorSetting textColor = addSetting(new ColorSetting("test", new Color(200, 200, 200), true));
+    public final ColorSetting textColor = addSetting(new ColorSetting("text", new Color(200, 200, 200), true));
 
     public final DoubleSetting primarySaturation = addSetting(new DoubleSetting("primary sat", 0.7, 0.0, 1.0));
     public final DoubleSetting primaryDarkness = addSetting(new DoubleSetting("primary dark", 0.4, 0.0, 1.0));

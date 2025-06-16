@@ -34,7 +34,7 @@ public class AuraModule extends Module {
     public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
     public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", true));
-    public final BoolSetting multiTask = addSetting(new BoolSetting("multiTask", false));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
     public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("age", 12, 0.0, 20.0));
 
     public final BoolSetting targetPlayers = addSetting(new BoolSetting("players", true));
