@@ -48,6 +48,7 @@ public class HUDModule extends Module {
     private Text fpsText = Text.empty();
     private Text pingText = Text.empty();
     private boolean serverLagging = false;
+    private int primaryRGB;
 
 
     public HUDModule() {
@@ -65,6 +66,10 @@ public class HUDModule extends Module {
     private void updateAllData() {
         MinecraftClient mc = MINECRAFT;
         if (mc.world == null || mc.player == null) return;
+
+        Color styled = getColorModule().getStyledPrimaryColor();
+        primaryRGB = styled.getRGB() & 0x00FFFFFF;
+
 
         if (watermarkEnabled.get()) {
             watermarkText = Text.of(NAME + " " + VERSION);
@@ -99,13 +104,13 @@ public class HUDModule extends Module {
         }
 
         if (fpsEnabled.get()) {
-            fpsText = Text.literal("FPS: ").setStyle(Style.EMPTY.withColor(getColorModule().getStyledPrimaryColor().getRGB()))
+            fpsText = Text.literal("FPS: ").setStyle(Style.EMPTY.withColor(primaryRGB))
                     .append(Text.literal(Integer.toString(mc.getCurrentFps())).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
         }
 
         if (pingEnabled.get()) {
             int ping = PING_MANAGER.getPing();
-            pingText = Text.literal("Ping: ").setStyle(Style.EMPTY.withColor(getColorModule().getStyledPrimaryColor().getRGB()))
+            pingText = Text.literal("Ping: ").setStyle(Style.EMPTY.withColor(primaryRGB))
                     .append(Text.literal(ping < 0 ? "N/A" : Integer.toString(ping)).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));        }
 
         if (lagWarningEnabled.get()) {
@@ -118,10 +123,6 @@ public class HUDModule extends Module {
         MinecraftClient mc = MINECRAFT;
         if (mc.world == null || mc.player == null) return;
 
-        Color styled = getColorModule().getStyledPrimaryColor();
-        Color opaque = new Color(styled.getRed(), styled.getGreen(), styled.getBlue(), 255);
-        int colorInt = opaque.getRGB();
-
         int screenWidth = mc.getWindow().getScaledWidth();
         int screenHeight = mc.getWindow().getScaledHeight();
 
@@ -129,11 +130,11 @@ public class HUDModule extends Module {
 
         float animationOffset = (float) (14f - (rawOffset/1.428571428571429));
 
-        renderTopLeft(event, colorInt);
+        renderTopLeft(event, primaryRGB);
 
-        renderBottomLeft(event, colorInt, screenHeight, animationOffset);
+        renderBottomLeft(event, primaryRGB, screenHeight, animationOffset);
 
-        renderBottomRight(event, colorInt, screenWidth, screenHeight, animationOffset);
+        renderBottomRight(event, primaryRGB, screenWidth, screenHeight, animationOffset);
 
         if (lagWarningEnabled.get() && serverLagging) {
             drawLagWarning(event, screenWidth, screenHeight);
@@ -284,11 +285,7 @@ public class HUDModule extends Module {
         int x = (screenWidth - textWidth) / 2;
         int y = ((screenHeight - textHeight) / 2) - 60;
 
-        Color styled = getColorModule().getStyledPrimaryColor();
-        Color opaque = new Color(styled.getRed(), styled.getGreen(), styled.getBlue(), 255);
-        int colorInt = opaque.getRGB();
-
-        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, colorInt, true);
+        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, primaryRGB, true);
     }
 
     private Text formatFancyCoords(double x, double y, double z) {
@@ -300,9 +297,7 @@ public class HUDModule extends Module {
         double xAlt = isNether ? x * 8 : x / 8;
         double zAlt = isNether ? z * 8 : z / 8;
 
-        Color primary = getColorModule().getStyledPrimaryColor();
-
-        Style primaryStyle = Style.EMPTY.withColor(primary.getRGB());
+        Style primaryStyle = Style.EMPTY.withColor(primaryRGB);
         Style grayStyle = Style.EMPTY.withColor(Formatting.GRAY);
         Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
 
@@ -366,10 +361,10 @@ public class HUDModule extends Module {
             default -> "?";
         };
 
-        MutableText text = Text.literal(dir).formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB()));
-        text.append(Text.literal(" [").formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB())));
+        MutableText text = Text.literal(dir).formatted(Formatting.byColorIndex(primaryRGB));
+        text.append(Text.literal(" [").formatted(Formatting.byColorIndex(primaryRGB)));
         text.append(Text.literal(axis).formatted(Formatting.WHITE));
-        text.append(Text.literal("]").formatted(Formatting.byColorIndex(getColorModule().getStyledPrimaryColor().getRGB())));
+        text.append(Text.literal("]").formatted(Formatting.byColorIndex(primaryRGB)));
 
         return text;
     }

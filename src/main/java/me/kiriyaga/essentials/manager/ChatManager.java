@@ -1,10 +1,12 @@
 package me.kiriyaga.essentials.manager;
 
+import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.mixin.ChatHudAccessor;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import java.security.SecureRandom;
@@ -12,8 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static me.kiriyaga.essentials.Essentials.MINECRAFT;
-import static me.kiriyaga.essentials.Essentials.NAME;
+import static me.kiriyaga.essentials.Essentials.*;
 
 public class ChatManager {
     /**
@@ -138,7 +139,14 @@ public class ChatManager {
         accessor.callRefresh();
     }
 
-    private String prefix(){
-        return "§7[§b" + NAME + "§7] §f";
+    private Text prefix() {
+        int rgb = MODULE_MANAGER.getModule(ColorModule.class).getStyledPrimaryColor().getRGB() & 0x00FFFFFF;
+
+        Text left = Text.literal("[").setStyle(Style.EMPTY.withColor(0xAAAAAA));
+        Text name = Text.literal(NAME).setStyle(Style.EMPTY.withColor(rgb));
+        Text right = Text.literal("] ").setStyle(Style.EMPTY.withColor(0xAAAAAA));
+        Text space = Text.literal("").setStyle(Style.EMPTY.withColor(0xFFFFFF));
+
+        return Text.empty().append(left).append(name).append(right).append(space);
     }
 }
