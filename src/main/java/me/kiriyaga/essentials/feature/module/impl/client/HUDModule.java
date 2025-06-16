@@ -361,7 +361,7 @@ public class HUDModule extends Module {
             default -> "?";
         };
 
-        Style primaryStyle = Style.EMPTY.withColor(primaryRGB);
+        Style primar b  yStyle = Style.EMPTY.withColor(primaryRGB);
         Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
 
         MutableText text = Text.literal(dir).setStyle(primaryStyle);
