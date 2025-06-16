@@ -341,7 +341,7 @@ public class HUDModule extends Module {
 
 
     private Text getFacingText(MinecraftClient mc) {
-        if (mc.player == null) return Text.literal("Invalid").formatted(Formatting.RED);
+        if (mc.player == null) return Text.literal("Invalid").setStyle(Style.EMPTY.withColor(Formatting.RED));
 
         int facingIndex = MathHelper.floor(mc.player.getYaw() * 4.0F / 360.0F + 0.5D) & 3;
 
@@ -361,15 +361,16 @@ public class HUDModule extends Module {
             default -> "?";
         };
 
-        MutableText text = Text.literal(dir).formatted(Formatting.byColorIndex(primaryRGB));
-        text.append(Text.literal(" [").formatted(Formatting.byColorIndex(primaryRGB)));
-        text.append(Text.literal(axis).formatted(Formatting.WHITE));
-        text.append(Text.literal("]").formatted(Formatting.byColorIndex(primaryRGB)));
+        Style primaryStyle = Style.EMPTY.withColor(primaryRGB);
+        Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
+
+        MutableText text = Text.literal(dir).setStyle(primaryStyle);
+        text.append(Text.literal(" [").setStyle(primaryStyle));
+        text.append(Text.literal(axis).setStyle(whiteStyle));
+        text.append(Text.literal("]").setStyle(primaryStyle));
 
         return text;
     }
-
-
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
     }
