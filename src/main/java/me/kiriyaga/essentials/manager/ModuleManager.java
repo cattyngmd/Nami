@@ -1,6 +1,5 @@
 package me.kiriyaga.essentials.manager;
 
-import me.kiriyaga.essentials.feature.command.impl.GammaCommand;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.*;
@@ -9,7 +8,6 @@ import me.kiriyaga.essentials.feature.module.impl.combat.AutoLogModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
-import me.kiriyaga.essentials.feature.module.impl.travel.EbounceModule;
 import me.kiriyaga.essentials.feature.module.impl.world.AutoFovModule;
 import me.kiriyaga.essentials.feature.module.impl.world.AutoGammaModule;
 import me.kiriyaga.essentials.feature.module.impl.world.EChestFarmerModule;
@@ -29,7 +27,7 @@ public class ModuleManager {
         /// RENDER ///
         registerModule(new NametagsModule());
         registerModule(new ESPModule());
-        registerModule(new SearchModule());
+        registerModule(new BlockESPModule());
         registerModule(new NoRenderModule());
         registerModule(new FreeLookModule());
         registerModule(new FreecamModule());

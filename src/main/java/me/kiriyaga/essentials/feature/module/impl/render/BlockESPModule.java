@@ -3,6 +3,7 @@ package me.kiriyaga.essentials.feature.module.impl.render;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.ChunkDataEvent;
+import me.kiriyaga.essentials.event.impl.PostTickEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
@@ -21,8 +22,6 @@ import net.minecraft.world.chunk.Chunk;
 
 import java.awt.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
-public class SearchModule extends Module {
+public class BlockESPModule extends Module {
 
     private final BoolSetting storages = addSetting(new BoolSetting("Storages", true));
     private final BoolSetting nonVanilla = addSetting(new BoolSetting("Non-Vanilla", false));
@@ -39,14 +38,15 @@ public class SearchModule extends Module {
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line Width", 1.5, 0.5, 2.5));
     private final BoolSetting filled = addSetting(new BoolSetting("Filled", true));
 
-    private ExecutorService workerThread = Executors.newSingleThreadExecutor();
+    private static final int MAX_CHUNKS_PER_TICK = 2;
 
     private final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
+    private final Queue<Chunk> pendingChunks = new LinkedList<>();
 
     private Set<Identifier> candidateBlockIds = new HashSet<>();
 
-    public SearchModule() {
-        super("Search", "Search certain blocks on loaded chunks.", Category.RENDER, "srcj", "blockesp", "serch", "ыуфкср");
+    public BlockESPModule() {
+        super("BlockESP", "Search certain blocks on loaded chunks.", Category.RENDER, "srcj", "blockesp", "serch", "ыуфкср");
     }
 
     private void updateCandidateBlocks() {
@@ -58,63 +58,77 @@ public class SearchModule extends Module {
                 .map(Registries.BLOCK::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-
     }
-
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkDataEvent event) {
-        if (MINECRAFT.world == null
-                || MINECRAFT.player == null) return;
+        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
 
         if (notAtSpawn.get()) {
             BlockPos pos = MINECRAFT.player.getBlockPos();
-            if (Math.abs(pos.getX()) + Math.abs(pos.getZ()) < 5000)
-                return;
+            if (Math.abs(pos.getX()) + Math.abs(pos.getZ()) < 5000) return;
         }
 
         updateCandidateBlocks();
 
-        Chunk chunk = event.getChunk();
+        synchronized (pendingChunks) {
+            pendingChunks.offer(event.getChunk());
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onPostTick(PostTickEvent event) {
+        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+
+        for (int i = 0; i < MAX_CHUNKS_PER_TICK; i++) {
+            Chunk chunk;
+            synchronized (pendingChunks) {
+                chunk = pendingChunks.poll();
+            }
+            if (chunk == null) break;
+
+            processChunk(chunk);
+        }
+    }
+
+    private void processChunk(Chunk chunk) {
         BlockPos chunkStart = chunk.getPos().getStartPos();
         long chunkKey = ChunkPos.toLong(chunk.getPos().x, chunk.getPos().z);
 
-        workerThread.submit(() -> {
-            Set<BlockPos> foundBlocks = new HashSet<>();
-            Map<Identifier, Integer> foundCounts = new HashMap<>();
+        Set<BlockPos> foundBlocks = new HashSet<>();
+        Map<Identifier, Integer> foundCounts = new HashMap<>();
 
-            int worldHeight = Math.min(MINECRAFT.world.getHeight(), 256);
-            for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < worldHeight; y++) {
-                    for (int z = 0; z < 16; z++) {
-                        BlockPos pos = chunkStart.add(x, y, z);
-                        BlockState state = MINECRAFT.world.getBlockState(pos);
-                        Block block = state.getBlock();
+        int worldHeight = Math.min(MINECRAFT.world.getHeight(), 256);
 
-                        Identifier id = Registries.BLOCK.getId(block);
-                        if (id != null && candidateBlockIds.contains(id)) {
-                            foundBlocks.add(pos.toImmutable());
-                            foundCounts.put(id, foundCounts.getOrDefault(id, 0) + 1);
-                        }
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < worldHeight; y++) {
+                for (int z = 0; z < 16; z++) {
+                    BlockPos pos = chunkStart.add(x, y, z);
+                    BlockState state = MINECRAFT.world.getBlockState(pos);
+                    Block block = state.getBlock();
+
+                    Identifier id = Registries.BLOCK.getId(block);
+                    if (id != null && candidateBlockIds.contains(id)) {
+                        foundBlocks.add(pos.toImmutable());
+                        foundCounts.put(id, foundCounts.getOrDefault(id, 0) + 1);
                     }
                 }
             }
+        }
 
-            if (!foundBlocks.isEmpty()) {
-                chunkBlocks.put(chunkKey, foundBlocks);
+        if (!foundBlocks.isEmpty()) {
+            chunkBlocks.put(chunkKey, foundBlocks);
 
-                if (notifier.get()) {
-                    StringBuilder message = new StringBuilder("§cFound: ");
-                    foundCounts.forEach((id, count) -> message.append(count).append("x ").append(id.getPath()).append(", "));
-                    if (message.length() > 2) message.setLength(message.length() - 2);
+            if (notifier.get()) {
+                StringBuilder message = new StringBuilder("§cFound: ");
+                foundCounts.forEach((id, count) -> message.append(count).append("x ").append(id.getPath()).append(", "));
+                if (message.length() > 2) message.setLength(message.length() - 2);
 
-                    MINECRAFT.execute(() -> CHAT_MANAGER.sendRaw(message.toString()));
-                }
-            } else {
-                chunkBlocks.remove(chunkKey);
+                MINECRAFT.execute(() -> CHAT_MANAGER.sendRaw(message.toString()));
             }
-        });
-
+        } else {
+            chunkBlocks.remove(chunkKey);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -126,20 +140,18 @@ public class SearchModule extends Module {
 
         for (Set<BlockPos> blockSet : chunkBlocks.values()) {
             for (BlockPos pos : blockSet) {
-                double distSq = playerPos.getSquaredDistance(pos);
-                if (distSq > 168 * 168) continue;
+                if (playerPos.getSquaredDistance(pos) > 168 * 168) continue;
 
                 BlockState state = MINECRAFT.world.getBlockState(pos);
-                Color blockColor = BlockUtil.getColorByBlockId(state);
-
+                Color color = BlockUtil.getColorByBlockId(state);
 
                 RenderUtil.drawBlockShape(
                         matrices,
                         MINECRAFT.world,
                         pos,
                         state,
-                        new Color(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue(), 60),
-                        blockColor,
+                        new Color(color.getRed(), color.getGreen(), color.getBlue(), 60),
+                        color,
                         lineWidth.get(),
                         filled.get()
                 );
@@ -150,14 +162,8 @@ public class SearchModule extends Module {
     @Override
     public void onDisable() {
         chunkBlocks.clear();
-        workerThread.shutdownNow();
-    }
-
-    @Override
-    public void onEnable() {
-        if (workerThread.isShutdown() || workerThread.isTerminated()) {
-            CHAT_MANAGER.sendPersistent(SearchModule.class.getName(),"Restarting worker thread");
-            workerThread = Executors.newSingleThreadExecutor();
+        synchronized (pendingChunks) {
+            pendingChunks.clear();
         }
     }
 }
