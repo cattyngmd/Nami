@@ -62,6 +62,11 @@ public class FreecamModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
+        if (cameraPos == null){
+            this.toggle();
+            return;
+        }
+
         double dx = 0, dy = 0, dz = 0;
         Vec3d forwardVec = Vec3d.fromPolar(0, yaw);
         Vec3d rightVec = Vec3d.fromPolar(0, yaw + 90);

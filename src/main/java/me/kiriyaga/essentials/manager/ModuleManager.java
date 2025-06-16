@@ -6,6 +6,7 @@ import me.kiriyaga.essentials.feature.module.impl.client.*;
 import me.kiriyaga.essentials.feature.module.impl.combat.AuraModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoLogModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
+import me.kiriyaga.essentials.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
 import me.kiriyaga.essentials.feature.module.impl.world.AutoFovModule;
@@ -45,6 +46,7 @@ public class ModuleManager {
         registerModule(new AutoLogModule());
         /// MOVEMENT ///
         registerModule(new SprintModule());
+        registerModule(new GuiMoveModule());
         /// TRAVEL ///
         //registerModule(new EbounceModule());
         /// WORLD ///
