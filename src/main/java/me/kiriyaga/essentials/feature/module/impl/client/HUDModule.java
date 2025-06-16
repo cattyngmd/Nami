@@ -27,17 +27,17 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class HUDModule extends Module {
 
-    public final IntSetting updateInterval = addSetting(new IntSetting("Update Interval", 1, 1, 20));
+    public final IntSetting updateInterval = addSetting(new IntSetting("interval", 1, 1, 20));
 
-    public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("Watermark", true));
-    public final BoolSetting armorEnabled = addSetting(new BoolSetting("Armor", true));
-    public final BoolSetting totemsEnabled = addSetting(new BoolSetting("Totems", true));
-    public final BoolSetting coordsEnabled = addSetting(new BoolSetting("Coordinates", true));
-    public final BoolSetting freecamCords = addSetting(new BoolSetting("Freecam Cords Spoof ", true));
-    public final BoolSetting facingEnabled = addSetting(new BoolSetting("Facing", true));
-    public final BoolSetting fpsEnabled = addSetting(new BoolSetting("FPS", true));
-    public final BoolSetting pingEnabled = addSetting(new BoolSetting("Ping", false));
-    public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("Lag Warning", false));
+    public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("watermark", true));
+    public final BoolSetting armorEnabled = addSetting(new BoolSetting("armor", true));
+    public final BoolSetting totemsEnabled = addSetting(new BoolSetting("totems", true));
+    public final BoolSetting coordsEnabled = addSetting(new BoolSetting("coordinates", true));
+    public final BoolSetting freecamCords = addSetting(new BoolSetting("freecam spoof ", true));
+    public final BoolSetting facingEnabled = addSetting(new BoolSetting("facing", true));
+    public final BoolSetting fpsEnabled = addSetting(new BoolSetting("fps", true));
+    public final BoolSetting pingEnabled = addSetting(new BoolSetting("ping", false));
+    public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("lag warning", false));
 
     private int tickCounter = 0;
     private static final int PADDING = 2;
@@ -51,7 +51,7 @@ public class HUDModule extends Module {
 
 
     public HUDModule() {
-        super("HUD","Displays in game hud.", Category.CLIENT, "ргв");
+        super("hud","Displays in game hud.", Category.CLIENT, "ргв");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

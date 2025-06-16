@@ -22,13 +22,13 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class ESPModule extends Module {
 
-    public final BoolSetting showPlayers = addSetting(new BoolSetting("Players", true));
-    public final BoolSetting showPeacefuls = addSetting(new BoolSetting("Peacefuls", true));
-    public final BoolSetting showNeutrals = addSetting(new BoolSetting("Neutrals", true));
-    public final BoolSetting showHostiles = addSetting(new BoolSetting("Hostiles", true));
-    public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
-    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line", 1.5, 0.5, 2.5));
-    public final BoolSetting filled = addSetting(new BoolSetting("Filled", false));
+    public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));
+    public final BoolSetting showPeacefuls = addSetting(new BoolSetting("peacefuls", true));
+    public final BoolSetting showNeutrals = addSetting(new BoolSetting("neutrals", true));
+    public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", true));
+    public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
+    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("line", 1.5, 0.5, 2.5));
+    public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 
     private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
     private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
@@ -36,7 +36,7 @@ public class ESPModule extends Module {
     private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public ESPModule() {
-        super("ESP", "Draws boxes around entities", Category.RENDER, "esp", "WH", "boxes", "уыз");
+        super("esp", "Draws boxes around entities", Category.RENDER, "esp", "WH", "boxes", "уыз");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

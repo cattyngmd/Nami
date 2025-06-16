@@ -18,10 +18,10 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class AutoGammaModule extends Module {
 
-    public final DoubleSetting gamma = addSetting(new DoubleSetting("Gamma", 2, 1, 8));
+    public final DoubleSetting gamma = addSetting(new DoubleSetting("gamma", 2, 1, 8));
 
     public AutoGammaModule() {
-        super("Auto Gamma", "Sets up gamma on join.", Category.WORLD, "autogamma", "gamma", "autogmam", "фгещпфььф");
+        super("auto gamma", "Sets up gamma on join.", Category.WORLD, "autogamma", "gamma", "autogmam", "фгещпфььф");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

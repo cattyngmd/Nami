@@ -1,3 +1,4 @@
+// ClickGuiScreen.java
 package me.kiriyaga.essentials.feature.gui;
 
 import me.kiriyaga.essentials.feature.module.Category;
@@ -7,22 +8,31 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
 public class ClickGuiScreen extends Screen {
-
     private final Set<Category> expandedCategories = new HashSet<>();
     private final Set<Module> expandedModules = new HashSet<>();
+    private final Map<Category, Integer> categoryPositions = new HashMap<>();
+    private int scrollOffset = 0;
+    private boolean draggingCategory = false;
+    private Category draggedCategory = null;
+    private int dragStartX = 0;
+    public static final int GUI_ALPHA = 122;
+
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getModule(ClickGuiModule.class);
     }
 
     public ClickGuiScreen() {
         super(Text.literal("ClickGUI"));
+        int x = 20;
+        for (Category category : Category.values()) {
+            categoryPositions.put(category, x);
+            x += CategoryPanel.WIDTH + CategoryPanel.GAP;
+        }
     }
 
     @Override
@@ -32,101 +42,101 @@ public class ClickGuiScreen extends Screen {
 
         super.render(context, mouseX, mouseY, delta);
 
-
-        int startX = 20;
-        int startY = 20;
-
-        int curX = startX;
         for (Category category : Category.values()) {
+            int x = categoryPositions.get(category);
             CategoryPanel panel = new CategoryPanel(category, expandedCategories, expandedModules);
-            panel.render(context, this.textRenderer, curX, startY, mouseX, mouseY);
-            curX += CategoryPanel.WIDTH + CategoryPanel.GAP;
+            panel.render(context, this.textRenderer, x, 20 + scrollOffset, mouseX, mouseY, this.height);
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int startX = 20;
-        int startY = 20;
-
-        int curX = startX;
         for (Category category : Category.values()) {
-            if (CategoryPanel.isHovered(mouseX, mouseY, curX, startY)) {
-                if (button == 0 || button == 1) {
+            int x = categoryPositions.get(category);
+            if (CategoryPanel.isHeaderHovered(mouseX, mouseY, x, 20 + scrollOffset)) {
+                if (button == 0) {
+                    draggingCategory = true;
+                    draggedCategory = category;
+                    dragStartX = (int) mouseX;
+                    return true;
+                } else if (button == 1) {
                     if (expandedCategories.contains(category)) {
                         expandedCategories.remove(category);
                     } else {
                         expandedCategories.add(category);
                     }
+                    return true;
                 }
-                return true;
             }
+        }
 
-            if (expandedCategories.contains(category)) {
-                List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
-                int curY = startY + CategoryPanel.HEIGHT + CategoryPanel.GAP;
+        if (!draggingCategory) {
+            for (Category category : Category.values()) {
+                if (expandedCategories.contains(category)) {
+                    int x = categoryPositions.get(category);
+                    List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
+                    int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING; // Add initial spacing
 
-                for (int i = 0; i < modules.size(); i++) {
-                    Module module = modules.get(i);
-
-                    if (i != 0) {
-                        curY += ModulePanel.PADDING;
-                    }
-
-                    if (ModulePanel.isHovered(mouseX, mouseY, curX, curY)) {
-                        if (button == 0) {
-                            module.toggle();
-                        } else if (button == 1 || button == 0) {
-                            if (expandedModules.contains(module)) {
-                                expandedModules.remove(module);
-                            } else {
-                                expandedModules.add(module);
+                    for (Module module : modules) {
+                        if (ModulePanel.isHovered(mouseX, mouseY, x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING, curY)) {
+                            if (button == 0) {
+                                module.toggle();
+                            } else if (button == 1) {
+                                if (expandedModules.contains(module)) {
+                                    expandedModules.remove(module);
+                                } else {
+                                    expandedModules.add(module);
+                                }
                             }
-                        }
-                        return true;
-                    }
-                    curY += ModulePanel.HEIGHT;
-
-                    if (expandedModules.contains(module)) {
-                        if (SettingPanel.mouseClicked(module, mouseX, mouseY, button, curX, curY)) {
                             return true;
                         }
-                        curY += SettingPanel.getSettingsHeight(module);
+                        curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING; // Add spacing after each module
+
+                        if (expandedModules.contains(module)) {
+                            if (SettingPanel.mouseClicked(module, mouseX, mouseY, button,
+                                    x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING,
+                                    curY)) {
+                                return true;
+                            }
+                            curY += SettingPanel.getSettingsHeight(module);
+                        }
                     }
                 }
             }
-            curX += CategoryPanel.WIDTH + CategoryPanel.GAP;
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (draggingCategory && draggedCategory != null) {
+            int newX = categoryPositions.get(draggedCategory) + (int) deltaX;
+            categoryPositions.put(draggedCategory, newX);
+            return true;
+        }
+
         SettingPanel.mouseDragged(mouseX);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        draggingCategory = false;
+        draggedCategory = null;
         SettingPanel.mouseReleased();
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        scrollOffset += verticalAmount * 10;
+        scrollOffset = Math.min(scrollOffset, 0);
+        return true;
+    }
 
     @Override
     public boolean shouldPause() {
         return false;
     }
-
-    private int getColorOrFallback(java.awt.Color awtColor, int fallback) {
-        if (awtColor == null) return fallback;
-        return ((awtColor.getAlpha() & 0xFF) << 24) |
-                ((awtColor.getRed() & 0xFF) << 16) |
-                ((awtColor.getGreen() & 0xFF) << 8) |
-                (awtColor.getBlue() & 0xFF);
-    }
-
 }

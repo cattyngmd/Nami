@@ -10,23 +10,23 @@ public class NoRenderModule extends Module {
 
 
 
-    private final BoolSetting noFire = addSetting(new BoolSetting("No Fire", true));
-    private final BoolSetting noLiguid = addSetting(new BoolSetting("No Liquid", false));
-    private final BoolSetting noWall = addSetting(new BoolSetting("No Wall", false));
-    private final BoolSetting noVignette = addSetting(new BoolSetting("No Vignette", true));
-    private final BoolSetting noTotem = addSetting(new BoolSetting("No Totem", true));
-    private final BoolSetting noEating = addSetting(new BoolSetting("No Eating", true));
-    private final BoolSetting noBossBar = addSetting(new BoolSetting("No Boss Bar", true));
-    private final BoolSetting noPortal = addSetting(new BoolSetting("No Portal", true));
-    private final BoolSetting noPotIcon = addSetting(new BoolSetting("No Pot Icon", true));
-    private final BoolSetting noFog = addSetting(new BoolSetting("No Fog", true));
-    private final BoolSetting noArmor = addSetting(new BoolSetting("No Armor", true));
-    private final BoolSetting noNausea = addSetting(new BoolSetting("No Nausea", true));
-    private final BoolSetting noPumpkin = addSetting(new BoolSetting("No Pumpkin", false));
-    private final BoolSetting noPowderedSnow = addSetting(new BoolSetting("No Powdered Snow", false));
+    private final BoolSetting noFire = addSetting(new BoolSetting("fire", true));
+    private final BoolSetting noLiguid = addSetting(new BoolSetting("liquid", false));
+    private final BoolSetting noWall = addSetting(new BoolSetting("wall", false));
+    private final BoolSetting noVignette = addSetting(new BoolSetting("vignette", true));
+    private final BoolSetting noTotem = addSetting(new BoolSetting("totem", true));
+    private final BoolSetting noEating = addSetting(new BoolSetting("eat", true));
+    private final BoolSetting noBossBar = addSetting(new BoolSetting("boss", true));
+    private final BoolSetting noPortal = addSetting(new BoolSetting("portal", true));
+    private final BoolSetting noPotIcon = addSetting(new BoolSetting("pot", true));
+    private final BoolSetting noFog = addSetting(new BoolSetting("fog", true));
+    private final BoolSetting noArmor = addSetting(new BoolSetting("armor", true));
+    private final BoolSetting noNausea = addSetting(new BoolSetting("nausea", true));
+    private final BoolSetting noPumpkin = addSetting(new BoolSetting("pumpkin", false));
+    private final BoolSetting noPowderedSnow = addSetting(new BoolSetting("powdered snow", false));
 
     public NoRenderModule() {
-        super("No Render", "Prevent rendering certain overlays/effects", Category.RENDER, "norender");
+        super("no render", "Prevent rendering certain overlays/effects", Category.RENDER, "norender");
     }
 
     @Override

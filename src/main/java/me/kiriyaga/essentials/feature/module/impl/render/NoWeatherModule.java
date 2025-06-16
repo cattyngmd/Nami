@@ -12,6 +12,6 @@ public class NoWeatherModule extends Module {
     private Perspective previousPerspective;
 
     public NoWeatherModule() {
-        super("No Weather", "Disables weather.", Category.RENDER, "noweather", "nowether", "nowather", "тщцуферук");
+        super("no weather", "Disables weather.", Category.RENDER, "noweather", "nowether", "nowather", "тщцуферук");
     }
 }

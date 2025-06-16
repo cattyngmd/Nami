@@ -1,31 +1,33 @@
 package me.kiriyaga.essentials.feature.gui;
 
-import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 import java.util.Set;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
 
 public class CategoryPanel {
-    public static final int WIDTH = 110;
-    public static final int HEIGHT = 20;
+    public static final int WIDTH = 130;
+    public static final int HEADER_HEIGHT = 20;
     public static final int GAP = 5;
     private static final int PADDING = 5;
-
-    private ColorModule getColorModule() {
-        return MODULE_MANAGER.getModule(ColorModule.class);
-    }
+    public static final int BORDER_WIDTH = 2;
+    public static final int BOTTOM_MARGIN = 4;
 
     private final Category category;
     private final Set<Category> expandedCategories;
     private final Set<Module> expandedModules;
+
+    private ColorModule getColorModule() {
+        return MODULE_MANAGER.getModule(ColorModule.class);
+    }
 
     public CategoryPanel(Category category, Set<Category> expandedCategories, Set<Module> expandedModules) {
         this.category = category;
@@ -33,58 +35,58 @@ public class CategoryPanel {
         this.expandedModules = expandedModules;
     }
 
-    public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
-        boolean hovered = isHovered(mouseX, mouseY, x, y);
+    public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
+        boolean hovered = isHeaderHovered(mouseX, mouseY, x, y);
+        boolean expanded = expandedCategories.contains(category);
 
         ColorModule colorModule = getColorModule();
-
         Color primary = colorModule.getStyledPrimaryColor();
         Color secondary = colorModule.getStyledSecondaryColor();
         Color textCol = colorModule.getStyledTextColor();
 
+        Color headerBgColor = expanded ? primary : (hovered ? brighten(secondary, 0.3f) : secondary);
+        context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, headerBgColor.getRGB());
+        context.drawText(textRenderer, category.name(), x + PADDING, y + 6, toRGBA(textCol), false);
 
-        Color bgColor;
-        Color textColor;
-
-        if (expandedCategories.contains(category)) {
-            bgColor = primary;
-            textColor = textCol;
-        } else if (hovered) {
-            bgColor = brighten(secondary, 0.3f);
-            textColor = textCol;
-        } else {
-            bgColor = secondary;
-            textColor = textCol;
-        }
-
-        context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
-        context.drawText(textRenderer, category.name(), x + PADDING, y + 6, toRGBA(textColor), false);
-
-        if (expandedCategories.contains(category)) {
-            int moduleY = y + HEIGHT + GAP;
+        if (expanded) {
+            int totalHeight = HEADER_HEIGHT;
             List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
 
-            for (int i = 0; i < modules.size(); i++) {
-                Module module = modules.get(i);
-
-                if (i != 0) {
-                    moduleY += ModulePanel.PADDING;
-                }
-
-                ModulePanel modulePanel = new ModulePanel(module, expandedModules);
-                modulePanel.render(context, textRenderer, x, moduleY, mouseX, mouseY);
-                moduleY += ModulePanel.HEIGHT;
-
+            for (Module module : modules) {
+                totalHeight += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
                 if (expandedModules.contains(module)) {
-                    moduleY += SettingPanel.renderSettings(context, textRenderer, module, x, moduleY, mouseX, mouseY);
+                    totalHeight += SettingPanel.getSettingsHeight(module);
                 }
             }
+
+            totalHeight += BOTTOM_MARGIN;
+
+            int borderColor = toRGBA(primary);
+            int bgColor = toRGBA(new Color(30, 30, 30, GUI_ALPHA));
+
+            context.fill(x, y + HEADER_HEIGHT, x + BORDER_WIDTH, y + totalHeight, borderColor);
+            context.fill(x + WIDTH - BORDER_WIDTH, y + HEADER_HEIGHT, x + WIDTH, y + totalHeight, borderColor);
+            context.fill(x, y + totalHeight - BORDER_WIDTH, x + WIDTH, y + totalHeight, borderColor);
+            context.fill(x + BORDER_WIDTH, y + HEADER_HEIGHT, x + WIDTH - BORDER_WIDTH, y + totalHeight - BORDER_WIDTH, bgColor);
+
+            int moduleY = y + HEADER_HEIGHT + ModulePanel.MODULE_SPACING;
+            for (Module module : modules) {
+                ModulePanel modulePanel = new ModulePanel(module, expandedModules);
+                modulePanel.render(context, textRenderer, x + BORDER_WIDTH + SettingPanel.INNER_PADDING, moduleY, mouseX, mouseY);
+                moduleY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
+
+                if (expandedModules.contains(module)) {
+                    moduleY += SettingPanel.renderSettings(context, textRenderer, module,
+                            x + BORDER_WIDTH + SettingPanel.INNER_PADDING,
+                            moduleY, mouseX, mouseY);
+                }
+            }
+
         }
     }
 
-
-    public static boolean isHovered(double mouseX, double mouseY, int x, int y) {
-        return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEIGHT;
+    public static boolean isHeaderHovered(double mouseX, double mouseY, int x, int y) {
+        return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEADER_HEIGHT;
     }
 
     private static int toRGBA(Color color) {
@@ -98,6 +100,13 @@ public class CategoryPanel {
         int r = Math.min(255, (int)(color.getRed() + 255 * amount));
         int g = Math.min(255, (int)(color.getGreen() + 255 * amount));
         int b = Math.min(255, (int)(color.getBlue() + 255 * amount));
+        return new Color(r, g, b, color.getAlpha());
+    }
+
+    private static Color darken(Color color, float amount) {
+        int r = Math.max(0, (int)(color.getRed() - 255 * amount));
+        int g = Math.max(0, (int)(color.getGreen() - 255 * amount));
+        int b = Math.max(0, (int)(color.getBlue() - 255 * amount));
         return new Color(r, g, b, color.getAlpha());
     }
 }

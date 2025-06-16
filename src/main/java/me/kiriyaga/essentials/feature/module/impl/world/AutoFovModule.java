@@ -12,10 +12,10 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class AutoFovModule extends Module {
 
-    public final IntSetting fov = addSetting(new IntSetting("Gamma", 110, 1, 162));
+    public final IntSetting fov = addSetting(new IntSetting("fov", 110, 1, 162));
 
     public AutoFovModule() {
-        super("Auto Fov", "Sets up fov on join.", Category.WORLD, "autofov", "fov", "atofov", "фгещащч");
+        super("auto fov", "Sets up fov on join.", Category.WORLD, "autofov", "fov", "atofov", "фгещащч");
     }
 
     @Override

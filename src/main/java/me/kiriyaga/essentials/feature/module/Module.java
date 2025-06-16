@@ -28,7 +28,7 @@ public abstract class Module {
         this.aliases = aliases;
         this.category = category;
 
-        this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
+        this.keyBind = new KeyBindSetting("bind", KeyBindSetting.KEY_NONE);
         this.settings.add(keyBind);
     }
 

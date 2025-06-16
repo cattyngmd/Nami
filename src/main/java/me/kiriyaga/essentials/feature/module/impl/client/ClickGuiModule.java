@@ -13,7 +13,7 @@ public class ClickGuiModule extends Module {
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
 
     public ClickGuiModule() {
-        super("ClickGui", "Opens click gui", Category.CLIENT, "click", "gui", "menu", "clckgui", "сдшслпгш");
+        super("click gui", "Opens click gui", Category.CLIENT, "clickgui","click", "gui", "menu", "clckgui", "сдшслпгш");
     }
 
     @Override

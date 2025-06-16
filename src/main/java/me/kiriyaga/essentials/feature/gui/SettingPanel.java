@@ -9,32 +9,41 @@ import me.kiriyaga.essentials.util.KeyUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
+import static net.minecraft.util.math.ColorHelper.withAlpha;
 
 public class SettingPanel {
-    public static final int HEIGHT = 20;
-    private static final int PADDING = 5;
-    private static final int WIDTH = 110;
+    public static final int HEIGHT = 15;
+    private static final int PADDING = 3;
+    public static final int INNER_PADDING = 2;
+    private static final int WIDTH = 130 - CategoryPanel.BORDER_WIDTH * 2 - INNER_PADDING * 2;
+    private static final int SLIDER_HEIGHT = 2;
+    private static final int MODULE_SPACING = 2;
 
     private static ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
     }
 
     public static int getSettingsHeight(Module module) {
-        return module.getSettings().size() * HEIGHT;
+        return module.getSettings().size() * (HEIGHT + MODULE_SPACING) + MODULE_SPACING;
     }
 
     public static int renderSettings(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY) {
         List<Setting<?>> settings = module.getSettings();
-        int curY = y;
+        int curY = y + MODULE_SPACING;
+
+        Color bgColor = new Color(20, 20, 20, GUI_ALPHA);
+        context.fill(x - INNER_PADDING, y, x + WIDTH + INNER_PADDING, y + getSettingsHeight(module), toRGBA(bgColor));
+
         for (Setting<?> setting : settings) {
             render(context, textRenderer, setting, x, curY, mouseX, mouseY);
-            curY += HEIGHT;
+            curY += HEIGHT + MODULE_SPACING;
         }
-        return settings.size() * HEIGHT;
+        return getSettingsHeight(module);
     }
 
     public static void render(DrawContext context, TextRenderer textRenderer, Setting<?> setting, int x, int y, int mouseX, int mouseY) {
@@ -46,86 +55,84 @@ public class SettingPanel {
         Color secondary = colorModule.getStyledSecondaryColor();
         Color textCol = colorModule.getStyledTextColor();
 
-
         Color bgColor;
 
         if (setting instanceof BoolSetting boolSetting) {
             bgColor = boolSetting.get() ? primary : secondary;
             if (hovered) bgColor = brighten(bgColor, 0.3f);
+
+            int bgColorInt = bgColor.getRGB();
+            int textColorInt = toRGBA(textCol);
+
+            context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
+            context.drawText(textRenderer, setting.getName(), x + PADDING, y + (HEIGHT - 8) / 2, textColorInt, false);
+
+            int checkboxSize = 8;
+            int checkboxX = x + WIDTH - PADDING - checkboxSize;
+            int checkboxY = y + (HEIGHT - checkboxSize) / 2;
+
+            context.fill(checkboxX, checkboxY, checkboxX + checkboxSize, checkboxY + checkboxSize, toRGBA(new Color(60, 60, 60)));
+            if (boolSetting.get()) {
+                context.fill(checkboxX + 1, checkboxY + 1, checkboxX + checkboxSize - 1, checkboxY + checkboxSize - 1, toRGBA(primary));
+            }
+
+            return;
         } else if (setting instanceof ColorSetting colorSetting) {
             float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
             float hue = hsb[0];
 
             bgColor = hovered ? brighten(secondary, 0.3f) : secondary;
 
-            int bgColorInt = toRGBA(bgColor);
+            int bgColorInt = bgColor.getRGB();
             int textColorInt = toRGBA(textCol);
 
             context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
             String text = setting.getName();
-            context.drawText(textRenderer, text, x + PADDING, y + 6, textColorInt, false);
+            context.drawText(textRenderer, text, x + PADDING, y + (HEIGHT - 8) / 2, textColorInt, false);
 
-            renderHueSlider(context, x + PADDING, y + HEIGHT - 6, WIDTH - 2 * PADDING, 4, hue);
+            renderHueSlider(context, x + PADDING, y + HEIGHT - 4, WIDTH - 2 * PADDING, SLIDER_HEIGHT, hue);
 
             String hex = String.format("#%02X%02X%02X", colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue());
-            context.drawText(textRenderer, hex, x + WIDTH - PADDING - textRenderer.getWidth(hex), y + 6, textColorInt, false);
+            context.drawText(textRenderer, hex, x + WIDTH - PADDING - textRenderer.getWidth(hex), y + (HEIGHT - 8) / 2, textColorInt, false);
 
             return;
         } else {
             bgColor = hovered ? brighten(secondary, 0.3f) : secondary;
         }
 
-        int bgColorInt = toRGBA(bgColor);
+        int bgColorInt = bgColor.getRGB();
         int textColorInt = toRGBA(textCol);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
-        context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, textColorInt, false);
+        context.drawText(textRenderer, setting.getName(), x + PADDING, y + (HEIGHT - 8) / 2, textColorInt, false);
 
         if (setting instanceof IntSetting intSetting) {
-            renderSlider(context, x + PADDING, y + HEIGHT - 6,
-                    WIDTH - 2 * PADDING, 4,
+            renderSlider(context, x + PADDING, y + HEIGHT - 4,
+                    WIDTH - 2 * PADDING, SLIDER_HEIGHT,
                     intSetting.get(), intSetting.getMin(), intSetting.getMax(), primary);
 
             String valStr = String.valueOf(intSetting.get());
-            context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + 6, textColorInt, false);
-
-            if (hovered) {
-                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
-            }
-        }
-        else if (setting instanceof EnumSetting<?> enumSetting) {
+            context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + (HEIGHT - 8) / 2, textColorInt, false);
+        } else if (setting instanceof EnumSetting<?> enumSetting) {
             String valueStr = enumSetting.get().toString();
-            context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + 6, textColorInt, false);
-
-            if (hovered) {
-                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
-            }
-        }
-        else if (setting instanceof KeyBindSetting bindSetting) {
+            context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + (HEIGHT - 8) / 2, textColorInt, false);
+        } else if (setting instanceof KeyBindSetting bindSetting) {
             String valueStr = KeyUtils.getKeyName(bindSetting.get());
-            context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + 6, textColorInt, false);
-
-            if (hovered) {
-                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
-            }
-        }
-
-        else if (setting instanceof DoubleSetting doubleSetting) {
-            renderSlider(context, x + PADDING, y + HEIGHT - 6,
-                    WIDTH - 2 * PADDING, 4,
+            context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + (HEIGHT - 8) / 2, textColorInt, false);
+        } else if (setting instanceof DoubleSetting doubleSetting) {
+            renderSlider(context, x + PADDING, y + HEIGHT - 4,
+                    WIDTH - 2 * PADDING, SLIDER_HEIGHT,
                     doubleSetting.get(), doubleSetting.getMin(), doubleSetting.getMax(), primary);
 
             String valStr = String.format("%.1f", doubleSetting.get());
-            context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + 6, textColorInt, false);
+            context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + (HEIGHT - 8) / 2, textColorInt, false);
+        }
 
-            if (hovered) {
-                context.drawText(textRenderer, setting.getName(), x + PADDING, y + 6, toRGBA(brighten(textCol, 0.5f)), false);
-            }
+        if (hovered) {
+            context.drawText(textRenderer, setting.getName(), x + PADDING, y + (HEIGHT - 8) / 2, toRGBA(brighten(textCol, 0.5f)), false);
         }
     }
-
-
 
     private static void renderHueSlider(DrawContext context, int x, int y, int width, int height, float hue) {
         for (int i = 0; i < width; i++) {
@@ -137,10 +144,8 @@ public class SettingPanel {
         context.fill(x + pos - 1, y, x + pos + 1, y + height, toRGBA(Color.WHITE));
     }
 
-
     private static void renderSlider(DrawContext context, int x, int y, int width, int height,
                                      double value, double min, double max, Color color) {
-
         context.fill(x, y, x + width, y + height, toRGBA(new Color(60, 60, 60, 150)));
         double percent = (value - min) / (max - min);
         int filledWidth = (int) (width * percent);
@@ -174,7 +179,7 @@ public class SettingPanel {
         if (button != 0 && button != 1) return false;
 
         List<Setting<?>> settings = module.getSettings();
-        int curY = y;
+        int curY = y + MODULE_SPACING; // Add initial spacing
 
         for (Setting<?> setting : settings) {
             if (isHovered(mouseX, mouseY, x, curY)) {
@@ -193,9 +198,12 @@ public class SettingPanel {
                 } else if (setting instanceof ColorSetting colorSetting) {
                     startDragging(setting, mouseX);
                     return true;
+                } else if (setting instanceof KeyBindSetting) {
+                    // KeyBind handling would go here
+                    return true;
                 }
             }
-            curY += HEIGHT;
+            curY += HEIGHT + MODULE_SPACING;
         }
         return false;
     }
@@ -219,7 +227,6 @@ public class SettingPanel {
             doubleSetting.set(newValue);
         }
     }
-
 
     public static void mouseReleased() {
         dragging = false;

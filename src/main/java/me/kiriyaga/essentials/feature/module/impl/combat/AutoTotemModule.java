@@ -18,15 +18,15 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class AutoTotemModule extends Module {
 
-    private final BoolSetting antiDesync = addSetting(new BoolSetting("Desync", true));
-    private final BoolSetting deathLog = addSetting(new BoolSetting("Log", false));
+    private final BoolSetting antiDesync = addSetting(new BoolSetting("desync", true));
+    private final BoolSetting deathLog = addSetting(new BoolSetting("log", false));
 
     private boolean pendingTotem = false;
     private long lastAttemptTime = 0;
     private int totemCount = 0;
 
     public AutoTotemModule() {
-        super("Auto Totem", "Insane shit.", Category.COMBAT, "autototem");
+        super("auto totem", "Insane shit.", Category.COMBAT, "autototem");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

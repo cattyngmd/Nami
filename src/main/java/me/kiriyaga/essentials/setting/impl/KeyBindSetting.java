@@ -23,7 +23,7 @@ public class KeyBindSetting extends Setting<Integer> {
     }
 
     public String getKeyName() {
-        if (value == KEY_NONE) return "None";
+        if (value == KEY_NONE) return "none";
         return GLFW.glfwGetKeyName(value, 0);
     }
 

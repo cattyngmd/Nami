@@ -18,12 +18,12 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class AutoLogModule extends Module {
 
-    private final IntSetting health = addSetting(new IntSetting("On Health", 12, 1, 26));
-    private final BoolSetting onRender = addSetting(new BoolSetting("On Render", false));
-    private final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
+    private final IntSetting health = addSetting(new IntSetting("on health", 12, 1, 26));
+    private final BoolSetting onRender = addSetting(new BoolSetting("on render", false));
+    private final BoolSetting packet = addSetting(new BoolSetting("packet", false));
 
     public AutoLogModule() {
-        super("AutoLog", "Logs out when danger is near.", Category.COMBAT, "autolog", "panic", "logout", "фгещдщп");
+        super("auto log", "Logs out when danger is near.", Category.COMBAT, "autolog", "panic", "logout", "фгещдщп");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -17,10 +17,10 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class SprintModule extends Module {
 
-    private final BoolSetting keepSprint = addSetting(new BoolSetting("Keep Sprint", true));
+    private final BoolSetting keepSprint = addSetting(new BoolSetting("keep sprint", true));
 
     public SprintModule() {
-        super("Sprint", "Automatically makes you sprint while moving forward.", Category.MOVEMENT);
+        super("sprint", "Automatically makes you sprint while moving forward.", Category.MOVEMENT);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

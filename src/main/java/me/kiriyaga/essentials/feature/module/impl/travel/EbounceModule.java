@@ -15,7 +15,7 @@ public class EbounceModule extends Module {
     private boolean startSprinting;
 
     public EbounceModule() {
-        super("Ebounce", "Simple ebounce (actually very simple)", Category.TRAVEL, "ebnce", "уищгтсу");
+        super("ebounce", "Simple ebounce (actually very simple)", Category.TRAVEL, "ebnce", "уищгтсу");
     }
 
     @Override

@@ -9,29 +9,34 @@ import java.awt.*;
 
 public class ColorModule extends Module {
 
-    public final ColorSetting primaryColor = addSetting(new ColorSetting("Primary", new Color(100, 149, 237, 170), true));
-    public final ColorSetting secondaryColor = addSetting(new ColorSetting("Secondary", new Color(30, 30, 30, 170), true));
-    public final ColorSetting textColor = addSetting(new ColorSetting("Text", new Color(170, 170, 170, 170), true));
+    public final ColorSetting primaryColor = addSetting(new ColorSetting("primary", new Color(23, 0, 255, 170), true));
+    public final ColorSetting secondaryColor = addSetting(new ColorSetting("secondary", new Color(23, 0, 255, 170), true));
+    public final ColorSetting textColor = addSetting(new ColorSetting("test", new Color(200, 200, 200), true));
 
-    public final DoubleSetting primarySaturation = addSetting(new DoubleSetting("Primary Saturation", 0.7, 0.0, 1.0));
-    public final DoubleSetting primaryDarkness = addSetting(new DoubleSetting("Primary Darkness", 0.0, 0.0, 1.0));
+    public final DoubleSetting primarySaturation = addSetting(new DoubleSetting("primary sat", 0.7, 0.0, 1.0));
+    public final DoubleSetting primaryDarkness = addSetting(new DoubleSetting("primary dark", 0.4, 0.0, 1.0));
 
-    public final DoubleSetting secondarySaturation = addSetting(new DoubleSetting("Secondary Saturation", 1.0, 0.0, 1.0));
-    public final DoubleSetting secondaryDarkness = addSetting(new DoubleSetting("Secondary Darkness", 0.2, 0.0, 1.0));
+    public final DoubleSetting secondarySaturation = addSetting(new DoubleSetting("secondary sat", 0.7, 0.0, 1.0));
+    public final DoubleSetting secondaryDarkness = addSetting(new DoubleSetting("secondary dark", 0.8, 0.0, 1.0));
 
-    public final DoubleSetting textSaturation = addSetting(new DoubleSetting("Text Saturation", 1.0, 0.0, 1.0));
-    public final DoubleSetting textDarkness = addSetting(new DoubleSetting("Text Darkness", 0.0, 0.0, 1.0));
+    public final DoubleSetting textSaturation = addSetting(new DoubleSetting("text sat", 0.0, 0.0, 1.0));
+    public final DoubleSetting textDarkness = addSetting(new DoubleSetting("text dark", 0.0, 0.0, 1.0));
+
+    public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.5, 0.0, 1.0));
 
     public ColorModule() {
-        super("Color", "Customizes color scheme", Category.CLIENT, "colr", "c", "colors", "clitor", "сщдщк");
+        super("color", "Customizes color scheme", Category.CLIENT, "colr", "c", "colors", "clitor", "сщдщк");
+    }
+
+    private int getAlpha255() {
+        return (int) (Math.max(0.0, Math.min(1.0, alpha.get())) * 255);
     }
 
     public Color applySaturation(Color base, double saturationFactor) {
         float[] hsb = Color.RGBtoHSB(base.getRed(), base.getGreen(), base.getBlue(), null);
         float saturation = (float) (hsb[1] * saturationFactor);
         saturation = Math.max(0f, Math.min(1f, saturation));
-        Color adjusted = Color.getHSBColor(hsb[0], saturation, hsb[2]);
-        return new Color(adjusted.getRed(), adjusted.getGreen(), adjusted.getBlue(), base.getAlpha());
+        return Color.getHSBColor(hsb[0], saturation, hsb[2]);
     }
 
     public Color applyDarkness(Color base, double darknessFactor) {
@@ -39,11 +44,12 @@ public class ColorModule extends Module {
         int r = Math.max(0, (int) (base.getRed() * factor));
         int g = Math.max(0, (int) (base.getGreen() * factor));
         int b = Math.max(0, (int) (base.getBlue() * factor));
-        return new Color(r, g, b, base.getAlpha());
+        return new Color(r, g, b);
     }
 
     public Color getStyledColor(Color base, double saturation, double darkness) {
-        return applyDarkness(applySaturation(base, saturation), darkness);
+        Color adjusted = applyDarkness(applySaturation(base, saturation), darkness);
+        return new Color(adjusted.getRed(), adjusted.getGreen(), adjusted.getBlue(), getAlpha255());
     }
 
     public Color getStyledPrimaryColor() {

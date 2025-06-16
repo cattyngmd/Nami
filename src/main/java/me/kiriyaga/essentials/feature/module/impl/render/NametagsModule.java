@@ -35,13 +35,13 @@ import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
 public class NametagsModule extends Module {
 
-    public final BoolSetting showPlayers = addSetting(new BoolSetting("Players", true));
-    public final BoolSetting showAnimals = addSetting(new BoolSetting("Peacefuls", false));
-    public final BoolSetting showEnemies = addSetting(new BoolSetting("Hostiles", false));
-    public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
-    public final BoolSetting showEquipment = addSetting(new BoolSetting("Show Equipment", true));
-    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("Format", TextFormat.None));
-    public final BoolSetting showBackground = addSetting(new BoolSetting("Background", true));
+    public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));
+    public final BoolSetting showAnimals = addSetting(new BoolSetting("peacefuls", false));
+    public final BoolSetting showEnemies = addSetting(new BoolSetting("hostiles", false));
+    public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
+    public final BoolSetting showEquipment = addSetting(new BoolSetting("show equipment", true));
+    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.None));
+    public final BoolSetting showBackground = addSetting(new BoolSetting("background", true));
 
     private final NametagFormatter formatter = new NametagFormatter(this);
     private final MinecraftClient mc = MinecraftClient.getInstance();
@@ -51,7 +51,7 @@ public class NametagsModule extends Module {
     }
 
     public NametagsModule() {
-        super("Nametags", "Draws names above entities", Category.RENDER, "nametag", "nmtags", "names", "тфьуефпы");
+        super("nametags", "Draws names above entities", Category.RENDER, "nametag", "nmtags", "names", "тфьуефпы");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

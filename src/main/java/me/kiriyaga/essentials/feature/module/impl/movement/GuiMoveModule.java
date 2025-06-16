@@ -15,7 +15,7 @@ public class GuiMoveModule extends Module {
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public GuiMoveModule() {
-        super("Gui Move", "Allows movement and camera control in most GUIs.", Category.MOVEMENT);
+        super("gui move", "Allows movement and camera control in most GUIs.", Category.MOVEMENT);
     }
 
     @Override

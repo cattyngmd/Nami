@@ -30,17 +30,17 @@ import java.util.stream.Collectors;
 import static me.kiriyaga.essentials.Essentials.CHAT_MANAGER;
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
-public class BlockESPModule extends Module {
+public class SearchModule extends Module {
 
-    private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("Lazy Load", true));
-    private final IntSetting chunksPerTick = addSetting(new IntSetting("Count", 1, 1, 5));
-    private final IntSetting cooldownTicks = addSetting(new IntSetting("Delay", 2, 0, 20));
-    private final BoolSetting storages = addSetting(new BoolSetting("Storages", true));
-    private final BoolSetting nonVanilla = addSetting(new BoolSetting("Non-Vanilla", false));
-    private final BoolSetting notifier = addSetting(new BoolSetting("Notifier", false));
-    private final BoolSetting notAtSpawn = addSetting(new BoolSetting("Not At Spawn", false));
-    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line Width", 1.5, 0.5, 2.5));
-    private final BoolSetting filled = addSetting(new BoolSetting("Filled", true));
+    private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));
+    private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 1, 1, 5));
+    private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 2, 0, 20));
+    private final BoolSetting storages = addSetting(new BoolSetting("storages", true));
+    private final BoolSetting nonVanilla = addSetting(new BoolSetting("non-vanilla", false));
+    private final BoolSetting notifier = addSetting(new BoolSetting("notifier", false));
+    private final BoolSetting notAtSpawn = addSetting(new BoolSetting("not at spawn", false));
+    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 2.5));
+    private final BoolSetting filled = addSetting(new BoolSetting("filled", true));
      
     private final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
@@ -49,8 +49,8 @@ public class BlockESPModule extends Module {
 
     private int tickCounter = 0;
 
-    public BlockESPModule() {
-        super("BlockESP", "Search certain blocks on loaded chunks.", Category.RENDER, "srcj", "blockesp", "serch", "ыуфкср");
+    public SearchModule() {
+        super("search", "Search certain blocks on loaded chunks.", Category.RENDER, "srcj", "blockesp", "serch", "ыуфкср");
     }
 
     private void updateCandidateBlocks() {

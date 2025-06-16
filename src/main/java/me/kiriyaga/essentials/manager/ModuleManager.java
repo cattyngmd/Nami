@@ -28,7 +28,7 @@ public class ModuleManager {
         /// RENDER ///
         registerModule(new NametagsModule());
         registerModule(new ESPModule());
-        registerModule(new BlockESPModule());
+        registerModule(new SearchModule());
         registerModule(new NoRenderModule());
         registerModule(new FreeLookModule());
         registerModule(new FreecamModule());

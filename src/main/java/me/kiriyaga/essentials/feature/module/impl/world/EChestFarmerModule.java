@@ -29,15 +29,15 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class EChestFarmerModule extends Module {
 
-    private final BoolSetting moveToggle = addSetting(new BoolSetting("Move Toggle", true));
-    private final BoolSetting render = addSetting(new BoolSetting("Render", true));
-    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line Width", 1.5, 0.5, 2.5));
-    private final BoolSetting filled = addSetting(new BoolSetting("Filled", true));
+    private final BoolSetting moveToggle = addSetting(new BoolSetting("move toggle", true));
+    private final BoolSetting render = addSetting(new BoolSetting("render", true));
+    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 2.5));
+    private final BoolSetting filled = addSetting(new BoolSetting("filled", true));
 
     public BlockPos targetPos = null;
 
     public EChestFarmerModule() {
-        super("Echest Farmer", "Places and breaks ender chests in front of you.", Category.WORLD, "echestfarmer");
+        super("echest farmer", "Places and breaks ender chests in front of you.", Category.WORLD, "echestfarmer");
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

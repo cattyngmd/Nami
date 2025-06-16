@@ -29,23 +29,23 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class AuraModule extends Module {
 
-    public final DoubleSetting attackRange = addSetting(new DoubleSetting("Attack", 3.0, 1.0, 5));
-    public final DoubleSetting rotationRange = addSetting(new DoubleSetting("Rotation", 3.6, 2.0, 6.0));
-    public final BoolSetting swordOnly = addSetting(new BoolSetting("Weap Only", false));
-    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
-    public final BoolSetting tpsSync = addSetting(new BoolSetting("TPS", true));
-    public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
-    public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("Age", 12, 0.0, 20.0));
+    public final DoubleSetting attackRange = addSetting(new DoubleSetting("attack", 3.0, 1.0, 5));
+    public final DoubleSetting rotationRange = addSetting(new DoubleSetting("rotation", 3.6, 2.0, 6.0));
+    public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
+    public final BoolSetting render = addSetting(new BoolSetting("render", true));
+    public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", true));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("multiTask", false));
+    public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("age", 12, 0.0, 20.0));
 
-    public final BoolSetting targetPlayers = addSetting(new BoolSetting("Players", true));
-    public final BoolSetting targetPeacefuls = addSetting(new BoolSetting("Peacefuls", false));
-    public final BoolSetting targetHostiles = addSetting(new BoolSetting("Hostiles", true));
-    public final BoolSetting targetNeutrals = addSetting(new BoolSetting("Neutrals", false));
+    public final BoolSetting targetPlayers = addSetting(new BoolSetting("players", true));
+    public final BoolSetting targetPeacefuls = addSetting(new BoolSetting("peacefuls", false));
+    public final BoolSetting targetHostiles = addSetting(new BoolSetting("hostiles", true));
+    public final BoolSetting targetNeutrals = addSetting(new BoolSetting("neutrals", false));
 
     private Entity currentTarget = null;
 
     public AuraModule() {
-        super("Aura", "Attack entities for you.", Category.COMBAT, "killaura", "ara", "killara", "фгкф");
+        super("aura", "Attack entities for you.", Category.COMBAT, "killaura", "ara", "killara", "фгкф");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

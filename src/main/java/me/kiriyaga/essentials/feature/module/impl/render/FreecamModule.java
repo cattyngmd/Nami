@@ -16,7 +16,7 @@ import org.lwjgl.glfw.GLFW;
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class FreecamModule extends Module {
-    private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.0, 0.1, 15.0));
+    private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 15.0));
 
     private Perspective previousPerspective;
     private Vec3d cameraPos;
@@ -30,7 +30,7 @@ public class FreecamModule extends Module {
     private boolean forward, back, left, right, up, down;
 
     public FreecamModule() {
-        super("Freecam", "Fly around freely without moving your player.", Category.RENDER, "freecum", "акуусгь");
+        super("freecam", "Fly around freely without moving your player.", Category.RENDER, "freecum", "акуусгь");
     }
 
     @Override
