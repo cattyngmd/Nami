@@ -17,7 +17,7 @@ public class ColorModule extends Module {
     public final DoubleSetting primaryDarkness = addSetting(new DoubleSetting("primary dark", 0.4, 0.0, 1.0));
 
     public final DoubleSetting secondarySaturation = addSetting(new DoubleSetting("secondary sat", 0.7, 0.0, 1.0));
-    public final DoubleSetting secondaryDarkness = addSetting(new DoubleSetting("secondary dark", 0.8, 0.0, 1.0));
+    public final DoubleSetting secondaryDarkness = addSetting(new DoubleSetting("secondary dark", 0.65, 0.0, 1.0));
 
     public final DoubleSetting textSaturation = addSetting(new DoubleSetting("text sat", 0.0, 0.0, 1.0));
     public final DoubleSetting textDarkness = addSetting(new DoubleSetting("text dark", 0.0, 0.0, 1.0));
