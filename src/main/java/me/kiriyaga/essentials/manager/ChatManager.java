@@ -17,6 +17,7 @@ import java.util.Map;
 import static me.kiriyaga.essentials.Essentials.*;
 
 public class ChatManager {
+
     /**
      * Usage:
      * .sendRaw() just sends raw message without tracking
@@ -42,15 +43,14 @@ public class ChatManager {
         return new MessageSignatureData(data);
     }
 
-
-
     public void sendRaw(String message) {
         sendRaw(message, true);
     }
 
     public void sendRaw(String message, boolean prefix) {
         if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
-        getChatHud().addMessage(Text.literal(prefix() + message));
+        Text text = prefix ? prefix().copy().append(Text.literal(message)) : Text.literal(message);
+        getChatHud().addMessage(text);
     }
 
     public void sendPersistent(String key, String message) {
@@ -62,7 +62,7 @@ public class ChatManager {
             removeSilently(persistentMessages.get(key));
         }
 
-        Text text = Text.literal(prefix() + message);
+        Text text = prefix().copy().append(Text.literal(message));
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = MessageIndicator.system();
 
@@ -80,7 +80,7 @@ public class ChatManager {
             transientSignature = null;
         }
 
-        Text text = Text.literal(prefix() + message);
+        Text text = prefix().copy().append(Text.literal(message));
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = MessageIndicator.system();
 
@@ -91,7 +91,6 @@ public class ChatManager {
     public void removePersistent(String key) {
         if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
 
-        ChatHud chatHud = getChatHud();
         if (persistentMessages.containsKey(key)) {
             removeSilently(persistentMessages.get(key));
             persistentMessages.remove(key);
@@ -118,8 +117,6 @@ public class ChatManager {
         return MINECRAFT.inGameHud.getChatHud();
     }
 
-    // btw this is kinda shitcode, but im doin this because of minecraft spaghetti code
-
     private void removeSilently(MessageSignatureData signature) {
         if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
 
@@ -145,8 +142,7 @@ public class ChatManager {
         Text left = Text.literal("[").setStyle(Style.EMPTY.withColor(0xAAAAAA));
         Text name = Text.literal(NAME).setStyle(Style.EMPTY.withColor(rgb));
         Text right = Text.literal("] ").setStyle(Style.EMPTY.withColor(0xAAAAAA));
-        Text space = Text.literal("").setStyle(Style.EMPTY.withColor(0xFFFFFF));
 
-        return Text.empty().append(left).append(name).append(right).append(space);
+        return Text.empty().append(left).append(name).append(right);
     }
 }
