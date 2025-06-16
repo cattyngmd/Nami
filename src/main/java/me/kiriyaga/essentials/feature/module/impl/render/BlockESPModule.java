@@ -9,6 +9,7 @@ import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
+import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.BlockUtil;
 import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.block.Block;
@@ -31,6 +32,9 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class BlockESPModule extends Module {
 
+    private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("Lazy Load", true));
+    private final IntSetting chunksPerTick = addSetting(new IntSetting("Count", 1, 1, 5));
+    private final IntSetting cooldownTicks = addSetting(new IntSetting("Delay", 2, 0, 20));
     private final BoolSetting storages = addSetting(new BoolSetting("Storages", true));
     private final BoolSetting nonVanilla = addSetting(new BoolSetting("Non-Vanilla", false));
     private final BoolSetting notifier = addSetting(new BoolSetting("Notifier", false));
@@ -44,6 +48,8 @@ public class BlockESPModule extends Module {
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
 
     private Set<Identifier> candidateBlockIds = new HashSet<>();
+
+    private int tickCounter = 0;
 
     public BlockESPModule() {
         super("BlockESP", "Search certain blocks on loaded chunks.", Category.RENDER, "srcj", "blockesp", "serch", "ыуфкср");
@@ -76,11 +82,26 @@ public class BlockESPModule extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onPostTick(PostTickEvent event) {
+    @SubscribeEvent
+    public void onPosttick(PostTickEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null) return;
 
-        for (int i = 0; i < MAX_CHUNKS_PER_TICK; i++) {
+        if (!lazyLoadEnabled.get()) {
+            Chunk chunk;
+            synchronized (pendingChunks) {
+                while ((chunk = pendingChunks.poll()) != null) {
+                    processChunk(chunk);
+                }
+            }
+            return;
+        }
+
+        tickCounter++;
+        if (tickCounter < cooldownTicks.get()) return;
+        tickCounter = 0;
+
+        int count = 0;
+        while (count < chunksPerTick.get()) {
             Chunk chunk;
             synchronized (pendingChunks) {
                 chunk = pendingChunks.poll();
@@ -88,6 +109,7 @@ public class BlockESPModule extends Module {
             if (chunk == null) break;
 
             processChunk(chunk);
+            count++;
         }
     }
 
