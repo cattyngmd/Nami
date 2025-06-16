@@ -3,6 +3,7 @@ package me.kiriyaga.essentials.mixin;
 import me.kiriyaga.essentials.event.impl.PostTickEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.PlayerInput;
 import org.spongepowered.asm.mixin.*;
@@ -17,7 +18,7 @@ import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity {
 
-    @Shadow public PlayerInput input;
+    @Shadow public Input input;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void tickHookPre(CallbackInfo ci) {
@@ -35,7 +36,7 @@ public class MixinClientPlayerEntity {
     private void onTickMovementInput(CallbackInfo ci) {
         FreecamModule module = MODULE_MANAGER.getModule(FreecamModule.class);
         if (module.isEnabled()) {
-            this.input = new PlayerInput(false, false, false, false, false, false, false);
+            this.input.playerInput = new PlayerInput(false, false, false, false, false, false, false);
         }
     }
 }

@@ -6,6 +6,7 @@ import me.kiriyaga.essentials.event.impl.PostTickEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
 import me.kiriyaga.essentials.util.BlockUtil;
@@ -28,6 +29,7 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class EChestFarmerModule extends Module {
 
+    private final BoolSetting moveToggle = addSetting(new BoolSetting("Move Toggle", true));
     private final BoolSetting render = addSetting(new BoolSetting("Render", true));
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("Line Width", 1.5, 0.5, 2.5));
     private final BoolSetting filled = addSetting(new BoolSetting("Filled", true));
@@ -44,34 +46,58 @@ public class EChestFarmerModule extends Module {
 
         ClientPlayerEntity player = MINECRAFT.player;
 
+        if (moveToggle.get() && !player.getVelocity().equals(Vec3d.ZERO)) {
+            CHAT_MANAGER.sendPersistent(EChestFarmerModule.class.getName(), "Disabling due to player move.");
+            this.toggle();
+            return;
+        }
+
+
         int echestSlot = findInHotbar(item -> item == Items.ENDER_CHEST);
         int pickaxeSlot = findInHotbar(item -> item == Items.DIAMOND_PICKAXE || item == Items.NETHERITE_PICKAXE);
 
         if (echestSlot == -1 || pickaxeSlot == -1) {
-            CHAT_MANAGER.sendPersistent(EChestFarmerModule.class.getName(), "§cMissing ender chest or pickaxe. Disabling module.");
+            CHAT_MANAGER.sendPersistent(EChestFarmerModule.class.getName(), "Disabling due to missing echest/pickaxe.");
             this.toggle();
             return;
         }
 
         targetPos = player.getBlockPos().offset(player.getHorizontalFacing());
+        BlockState state = MINECRAFT.world.getBlockState(targetPos);
 
-        Block currentBlock = MINECRAFT.world.getBlockState(targetPos).getBlock();
+        Vec3d playerEyes = player.getCameraPosVec(1.0F);
+        Vec3d targetVec = Vec3d.ofCenter(targetPos);
+        Vec3d dir = targetVec.subtract(playerEyes);
 
-        if (currentBlock == Blocks.ENDER_CHEST) {
-            player.getInventory().setSelectedSlot(pickaxeSlot);
-            MINECRAFT.interactionManager.attackBlock(targetPos, Direction.UP);
-            player.swingHand(Hand.MAIN_HAND);
+        double dx = dir.x;
+        double dy = dir.y;
+        double dz = dir.z;
 
-        } else {
+        double distanceXZ = Math.sqrt(dx * dx + dz * dz);
+        float yaw = (float) Math.toDegrees(Math.atan2(dz, dx)) - 90F;
+        float pitch = (float) -Math.toDegrees(Math.atan2(dy, distanceXZ));
+
+        String requestId = EChestFarmerModule.class.getName();
+        RotationManager.RotationRequest req = new RotationManager.RotationRequest(requestId, 2, yaw, pitch);
+        ROTATION_MANAGER.submitRequest(req);
+
+        if (!ROTATION_MANAGER.isRequestCompleted(requestId)) return;
+
+        if (state.isAir()) {
             player.getInventory().setSelectedSlot(echestSlot);
-
             Vec3d hitPos = Vec3d.ofCenter(targetPos);
             BlockHitResult hitResult = new BlockHitResult(hitPos, Direction.UP, targetPos, false);
-
             MINECRAFT.interactionManager.interactBlock(player, Hand.MAIN_HAND, hitResult);
+            player.swingHand(Hand.MAIN_HAND);
 
+        } else if (state.getBlock() == Blocks.ENDER_CHEST) {
+            player.getInventory().setSelectedSlot(pickaxeSlot);
+            MINECRAFT.interactionManager.attackBlock(targetPos, Direction.UP);
+            MINECRAFT.interactionManager.updateBlockBreakingProgress(targetPos, Direction.UP);
+            player.swingHand(Hand.MAIN_HAND);
         }
     }
+
 
     private int findInHotbar(java.util.function.Predicate<Item> predicate) {
         for (int i = 0; i < 9; i++) {

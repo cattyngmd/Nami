@@ -179,6 +179,15 @@ public class RenderUtil {
         drawBoxFilled(stack, new Box(bp), c);
     }
 
+    public static void drawBox(MatrixStack stack, Box box, Color fillColor, Color lineColor, double lineWidth, boolean filled, boolean outline) {
+        if (filled) {
+            drawBoxFilled(stack, box, fillColor);
+        }
+        if (outline) {
+            drawBox(stack, box, lineColor, lineWidth);
+        }
+    }
+
     public static void drawBlockShape(MatrixStack matrices, World world, BlockPos pos, BlockState state,
                                       Color fillColor, Color lineColor, double lineWidth, boolean filled) {
 

@@ -12,6 +12,7 @@
     "MixinChatScreen",
     "MixinChunkBorderDebugRenderer",
     "MixinClientPlayerEntity",
+    "MixinClientPlayerInteractionManager",
     "MixinClientPlayNetworkHandler",
     "MixinCompassState",
     "MixinEntityRenderer",
