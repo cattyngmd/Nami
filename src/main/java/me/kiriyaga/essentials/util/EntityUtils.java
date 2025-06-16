@@ -141,19 +141,25 @@ public class EntityUtils {
 
     public static boolean isAggressiveNow(Entity e) {
         ClientPlayerEntity player = MINECRAFT.player;
-        if (player == null) return false;
+        if (player == null || MINECRAFT.world == null) return false;
+
+        long timeOfDay = MINECRAFT.world.getTimeOfDay() % 24000;
+        boolean isNight = timeOfDay >= 13000 && timeOfDay <= 23000;
 
         if (e instanceof EndermanEntity enderman) return enderman.isAngry();
         if (e instanceof ZombifiedPiglinEntity piglin) return piglin.isAttacking();
-        if (e instanceof PiglinEntity piglin) return !isPlayerWearingGold(player) || isPlayerWearingGold(player) && piglin.isAttacking();
-        if (e instanceof SpiderEntity spider) return spider.getTarget() != null;
-        if (e instanceof CaveSpiderEntity caveSpider) return caveSpider.getTarget() != null;
-        if (e instanceof PolarBearEntity bear) return bear.getTarget() != null;
+        if (e instanceof PiglinEntity piglin) {
+            return !isPlayerWearingGold(player) || (isPlayerWearingGold(player) && piglin.isAttacking());
+        }
+        if (e instanceof SpiderEntity spider) return spider.isAttacking() || isNight;
+        if (e instanceof CaveSpiderEntity) return true;
+        if (e instanceof PolarBearEntity bear) return bear.isAttacking();
         if (e instanceof WolfEntity wolf) return wolf.isAttacking();
         if (e instanceof BeeEntity bee) return bee.hasAngerTime();
 
         return false;
     }
+
 
     private static boolean isPlayerWearingGold(ClientPlayerEntity player) {
         return isGoldArmor(player.getEquippedStack(EquipmentSlot.HEAD)) ||

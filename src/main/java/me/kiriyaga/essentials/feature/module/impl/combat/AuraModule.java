@@ -10,6 +10,7 @@ import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
+import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
 import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -36,7 +37,7 @@ public class AuraModule extends Module {
     public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
     public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("age", 12, 0.0, 20.0));
-
+    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 30));
     public final BoolSetting targetPlayers = addSetting(new BoolSetting("players", true));
     public final BoolSetting targetPeacefuls = addSetting(new BoolSetting("peacefuls", false));
     public final BoolSetting targetHostiles = addSetting(new BoolSetting("hostiles", true));
@@ -69,7 +70,7 @@ public class AuraModule extends Module {
         int yaw = getYawToEntity(MINECRAFT.player, target);
         int pitch = getPitchToEntity(MINECRAFT.player, target);
 
-        RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), 10, yaw, pitch);
+        RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), rotationPriority.get(), yaw, pitch);
         ROTATION_MANAGER.submitRequest(request);
 
         double distanceToTarget = MINECRAFT.player.squaredDistanceTo(target);
