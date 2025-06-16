@@ -30,6 +30,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.awt.*;
+
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
@@ -65,10 +67,7 @@ public class NametagsModule extends Module {
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
 
-        int color = colorModule.getStyledPrimaryColor().getRGB();
-
-
-        colorModule.getStyledPrimaryColor();
+        int color = new Color(colorModule.getStyledPrimaryColor().getRed(), colorModule.getStyledPrimaryColor().getGreen(), colorModule.getStyledPrimaryColor().getBlue(), 255).getRGB();
         if (showPlayers.get()) {
             for (PlayerEntity player : EntityUtils.getPlayers()) {
                 if ((player == mc.player && !freecamModule.isEnabled()) || player.isRemoved())
