@@ -2,13 +2,16 @@ package me.kiriyaga.essentials.feature.module.impl.render;
 
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
+import me.kiriyaga.essentials.event.impl.KeyInputEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
 import net.minecraft.client.option.Perspective;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
@@ -57,21 +60,8 @@ public class FreecamModule extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void onUpdate(PreTickEvent event) {
-        if (MINECRAFT.player == null) return;
-        if (cameraPos == null) {
-            toggle();
-            return;
-        }
-
-        forward = MINECRAFT.options.forwardKey.isPressed();
-        back    = MINECRAFT.options.backKey.isPressed();
-        left    = MINECRAFT.options.leftKey.isPressed();
-        right   = MINECRAFT.options.rightKey.isPressed();
-        up      = MINECRAFT.options.jumpKey.isPressed();
-        down    = MINECRAFT.options.sneakKey.isPressed();
-
+    @SubscribeEvent
+    public void onPreTick(PreTickEvent event) {
         double dx = 0, dy = 0, dz = 0;
         Vec3d forwardVec = Vec3d.fromPolar(0, yaw);
         Vec3d rightVec = Vec3d.fromPolar(0, yaw + 90);
@@ -104,13 +94,38 @@ public class FreecamModule extends Module {
 
         prevPos = pos;
         pos = cameraPos;
-
         cameraPos = cameraPos.add(dx, dy, dz);
 
         camX = cameraPos.x;
         camY = cameraPos.y;
         camZ = cameraPos.z;
     }
+
+    @SubscribeEvent
+    public void onKeyInput(KeyInputEvent event) {
+
+        int forwardKey = InputUtil.fromTranslationKey(MINECRAFT.options.forwardKey.getBoundKeyTranslationKey()).getCode();
+        int backKey    = InputUtil.fromTranslationKey(MINECRAFT.options.backKey.getBoundKeyTranslationKey()).getCode();
+        int leftKey    = InputUtil.fromTranslationKey(MINECRAFT.options.leftKey.getBoundKeyTranslationKey()).getCode();
+        int rightKey   = InputUtil.fromTranslationKey(MINECRAFT.options.rightKey.getBoundKeyTranslationKey()).getCode();
+        int jumpKey    = InputUtil.fromTranslationKey(MINECRAFT.options.jumpKey.getBoundKeyTranslationKey()).getCode();
+        int sneakKey   = InputUtil.fromTranslationKey(MINECRAFT.options.sneakKey.getBoundKeyTranslationKey()).getCode();
+
+
+        boolean pressed = event.action != GLFW.GLFW_RELEASE;
+
+        if (event.key == forwardKey) forward = pressed;
+        else if (event.key == backKey) back = pressed;
+        else if (event.key == leftKey) left = pressed;
+        else if (event.key == rightKey) right = pressed;
+        else if (event.key == jumpKey) up = pressed;
+        else if (event.key == sneakKey) down = pressed;
+
+        if (forward || back || left || right || up || down) {
+            event.cancel();
+        }
+    }
+
 
 
     public double getX() { return camX; }

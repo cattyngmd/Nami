@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.mixin;
 
+import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
 import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.mixininterface.IMouseDeltaAccessor;
 import me.kiriyaga.essentials.setting.impl.KeyBindSetting;

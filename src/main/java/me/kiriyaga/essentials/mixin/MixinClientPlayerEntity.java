@@ -31,12 +31,4 @@ public class MixinClientPlayerEntity {
 
         EVENT_MANAGER.post(new PostTickEvent());
     }
-
-    @Inject(method = "tickMovementInput", at = @At("HEAD"))
-    private void onTickMovementInput(CallbackInfo ci) {
-        FreecamModule module = MODULE_MANAGER.getModule(FreecamModule.class);
-        if (module.isEnabled()) {
-            this.input.playerInput = new PlayerInput(false, false, false, false, false, false, false);
-        }
-    }
 }
