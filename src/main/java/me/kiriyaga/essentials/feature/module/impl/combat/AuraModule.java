@@ -53,7 +53,12 @@ public class AuraModule extends Module {
         if (MINECRAFT.player == null || MINECRAFT.world == null) return;
         if (!multiTask.get() && MINECRAFT.player.isUsingItem()) return;
 
-        Entity target = getTarget(attackRange.get());
+        if (swordOnly.get()) {
+            ItemStack stack = MINECRAFT.player.getMainHandStack();
+            if (!(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS))) return;
+        }
+
+        Entity target = getTarget(rotationRange.get());
         if (target == null) {
             currentTarget = null;
             return;
@@ -61,16 +66,16 @@ public class AuraModule extends Module {
 
         currentTarget = target;
 
-        if (swordOnly.get()) {
-            ItemStack stack = MINECRAFT.player.getMainHandStack();
-            if (!(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS))) return;
-        }
-
         int yaw = getYawToEntity(MINECRAFT.player, target);
         int pitch = getPitchToEntity(MINECRAFT.player, target);
 
         RotationManager.RotationRequest request = new RotationManager.RotationRequest(AuraModule.class.getName(), 10, yaw, pitch);
         ROTATION_MANAGER.submitRequest(request);
+
+        double distanceToTarget = MINECRAFT.player.squaredDistanceTo(target);
+        if (distanceToTarget > attackRange.get() * attackRange.get()) {
+            return;
+        }
 
         float cooldown = MINECRAFT.player.getAttackCooldownProgress(0f);
         if (tpsSync.get()) {
@@ -91,6 +96,7 @@ public class AuraModule extends Module {
         MINECRAFT.interactionManager.attackEntity(MINECRAFT.player, target);
         MINECRAFT.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
     }
+
 
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
