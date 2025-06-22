@@ -220,64 +220,53 @@ public abstract class MixinChatScreen {
             return;
         }
     }
-    
+
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-        if (suggestions.isEmpty()) {
-            drawSuggestions = false;
+        if (!drawSuggestions || suggestions.isEmpty()) {
             return;
         }
 
         if (keyCode == GLFW.GLFW_KEY_DOWN) {
             selectedSuggestionIndex = (selectedSuggestionIndex + 1) % suggestions.size();
-            cir.setReturnValue(false);
-            return;
+            cir.setReturnValue(true);
         } else if (keyCode == GLFW.GLFW_KEY_UP) {
             selectedSuggestionIndex = (selectedSuggestionIndex - 1 + suggestions.size()) % suggestions.size();
-            cir.setReturnValue(false);
-            return;
+            cir.setReturnValue(true);
         } else if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            suggestions = new ArrayList<>();
+            suggestions.clear();
             selectedSuggestionIndex = 0;
             drawSuggestions = false;
-            return;
+            cir.setReturnValue(true);
         } else if (keyCode == GLFW.GLFW_KEY_TAB) {
-            if (!suggestions.isEmpty()) {
-                if (suggestions.size() == 1) {
-                    // Autocomplete if only one suggestion
-                    String selected = suggestions.get(0);
-                    chatField.setText(selected);
-                    chatField.setCursor(selected.length(), false);
-                    selectedSuggestionIndex = 0;
-                    drawSuggestions = false;
-                } else {
-                    // Cycle through multiple suggestions
-                    selectedSuggestionIndex = (selectedSuggestionIndex + 1) % suggestions.size();
-                }
-
-                cir.setReturnValue(true);
+            if (suggestions.size() == 1) {
+                String selected = suggestions.get(0);
+                chatField.setText(selected);
+                chatField.setCursor(selected.length(), false);
+                selectedSuggestionIndex = 0;
+                drawSuggestions = false;
+            } else {
+                selectedSuggestionIndex = (selectedSuggestionIndex + 1) % suggestions.size();
             }
+            cir.setReturnValue(true);
         } else if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
             String text = chatField.getText();
             String[] parts = text.split("\\s+");
             String cmdName = parts.length > 0 ? parts[0] : "";
             String selected = suggestions.get(selectedSuggestionIndex);
 
-            if (cmdName.equals(selected)) {
-                suggestions = new ArrayList<>();
-                drawSuggestions = false;
-                selectedSuggestionIndex = 0;
-                return;
-            } else {
-                // Suggestion is different — apply it as new input and close suggestions
+            if (!cmdName.equals(selected)) {
                 chatField.setText(selected);
                 chatField.setCursor(selected.length(), false);
-
-                suggestions = new ArrayList<>();
-                drawSuggestions = false;
-                selectedSuggestionIndex = 0;
             }
+
+            suggestions.clear();
+            drawSuggestions = false;
+            selectedSuggestionIndex = 0;
+
+            cir.setReturnValue(true);
         }
     }
+
 }
 
