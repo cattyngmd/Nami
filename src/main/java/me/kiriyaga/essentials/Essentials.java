@@ -14,6 +14,8 @@ public class Essentials implements ClientModInitializer {
 
     public static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 
+    public static final Logger LOGGER = LogManager.getLogger(NAME);
+
     public static final EventManager EVENT_MANAGER = new EventManager();
     public static final CommandManager COMMAND_MANAGER = new CommandManager();
     public static final ChatManager CHAT_MANAGER = new ChatManager();
@@ -22,7 +24,6 @@ public class Essentials implements ClientModInitializer {
     public static final FriendManager FRIEND_MANAGER = new FriendManager();
     public static final PingManager PING_MANAGER = new PingManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
-    public static final Logger LOGGER = LogManager.getLogger(NAME);
 
     public static ClickGuiScreen CLICK_GUI = new ClickGuiScreen();
 
