@@ -5,12 +5,19 @@ import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.impl.client.EntityManagerModule;
+import me.kiriyaga.essentials.setting.impl.BoolSetting;
+import me.kiriyaga.essentials.setting.impl.DoubleSetting;
+import me.kiriyaga.essentials.setting.impl.EnumSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
@@ -29,8 +36,41 @@ public class EntityManager {
     private List<ItemEntity> droppedItems = List.of();
     private List<Entity> endCrystals = List.of();
 
-    public void init(){
+    private EntityManagerModule entityManagerModule = MODULE_MANAGER.getModule(EntityManagerModule.class);
+
+    public void init() {
         Essentials.EVENT_MANAGER.register(this);
+    }
+
+    public void markRequested() {
+        idleTicksCounter = 0;
+    }
+
+    public Entity getTarget() {
+        markRequested();
+
+        List<Entity> candidates = allEntities.stream()
+                .filter(e -> e != MINECRAFT.player)
+                .filter(e -> e instanceof LivingEntity)
+                .filter(e -> {
+                    if (e.age < entityManagerModule.minTicksExisted.get().intValue()) return false;
+                    double distSq = e.squaredDistanceTo(MINECRAFT.player);
+                    return distSq <= entityManagerModule.targetRange.get() * entityManagerModule.targetRange.get();
+                })
+                .filter(e ->
+                        (entityManagerModule.targetPlayers.get() && e instanceof PlayerEntity)
+                                || (entityManagerModule.targetHostiles.get() && EntityUtils.isHostile(e))
+                                || (entityManagerModule.targetNeutrals.get() && EntityUtils.isNeutral(e))
+                                || (entityManagerModule.targetPassives.get() && EntityUtils.isPassive(e)))
+                .collect(Collectors.toList());
+
+        Comparator<Entity> comparator = switch (entityManagerModule.priority.get()) {
+            case HEALTH -> Comparator.comparingDouble(e -> ((LivingEntity) e).getHealth());
+            case DISTANCE -> Comparator.comparingDouble(e -> e.squaredDistanceTo(MINECRAFT.player));
+        };
+
+        Optional<Entity> result = candidates.stream().min(comparator);
+        return result.orElse(null);
     }
 
     public List<Entity> getAllEntities() {
@@ -73,7 +113,7 @@ public class EntityManager {
         return endCrystals;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTick(PreTickEvent event) {
         if (MINECRAFT.world == null) {
             clearData();
@@ -103,7 +143,9 @@ public class EntityManager {
                 .filter(e -> e instanceof ItemEntity)
                 .map(e -> (ItemEntity) e)
                 .toList();
-        endCrystals = allEntities.stream().filter(e -> e instanceof net.minecraft.entity.decoration.EndCrystalEntity).toList();
+        endCrystals = allEntities.stream()
+                .filter(e -> e instanceof net.minecraft.entity.decoration.EndCrystalEntity)
+                .toList();
     }
 
     private void clearData() {
@@ -115,9 +157,5 @@ public class EntityManager {
         passive = List.of();
         droppedItems = List.of();
         endCrystals = List.of();
-    }
-
-    public void markRequested() {
-        idleTicksCounter = 0;
     }
 }
