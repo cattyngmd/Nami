@@ -123,9 +123,26 @@ public class EntityUtils {
             return true;
         }
 
-        if (isNeutral(e) && isAggressiveNow(e)) {
+        boolean isNeutralType = e instanceof EndermanEntity ||
+                e instanceof PiglinEntity ||
+                e instanceof ZombifiedPiglinEntity ||
+                e instanceof SpiderEntity ||
+                e instanceof CaveSpiderEntity ||
+                e instanceof PolarBearEntity ||
+                (e instanceof WolfEntity && !((WolfEntity) e).isTamed()) ||
+                e instanceof BeeEntity ||
+                e instanceof GoatEntity ||
+                (e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated());
+
+        if (isNeutralType && isAggressiveNow(e)) {
             return true;
         }
+
+
+        if (isNeutralType && isAggressiveNow(e)) {
+            return true;
+        }
+
 
         if ((e instanceof SpiderEntity || e instanceof CaveSpiderEntity) && isAggressiveNow(e)) {
             return true;
@@ -133,6 +150,7 @@ public class EntityUtils {
 
         return false;
     }
+
 
     public static boolean isNeutral(Entity e) {
         boolean isNeutralType = e instanceof EndermanEntity ||
