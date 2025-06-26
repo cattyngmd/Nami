@@ -131,7 +131,9 @@ public class NametagsModule extends Module {
 
             MatrixStack matrixStack = drawContext.getMatrices();
             matrixStack.push();
-            RenderUtil.rect(matrixStack, x1-1, y1-1, x2, y2, color, 1.0f); // thanks mojang
+            RenderUtil.rect(matrixStack, x1-0.25f, y1-0.25f, x2+0.25f, y2+0.25f, color, 0.25f); // thanks mojang
+
+            // x1-0.25 y1-0.25 here since layers is kinda buggy and for some reason, the x+ z- sides of rest is under the bg
 
             matrixStack.pop();
         }
@@ -180,11 +182,12 @@ public class NametagsModule extends Module {
 
         Vector4f vec = new Vector4f(relX, relY, relZ, 1.0f);
 
-        Matrix4f viewProjection = new Matrix4f();
-        projectionMatrix.mul(positionMatrix, viewProjection);
+        Matrix4f viewProjection = new Matrix4f(projectionMatrix);
+        viewProjection.mul(positionMatrix); // projection * view
+
         vec.mul(viewProjection);
 
-        if (vec.w <= 0.0f) return null;
+        if (vec.w < 0.001f) return null;
 
         vec.div(vec.w);
 
@@ -192,10 +195,8 @@ public class NametagsModule extends Module {
         int screenHeight = MinecraftClient.getInstance().getWindow().getScaledHeight();
 
         float screenX = (vec.x * 0.5f + 0.5f) * screenWidth;
-        float screenY = (1.0f - (vec.y * 0.5f + 0.5f)) * screenHeight;
+        float screenY = (0.5f - vec.y * 0.5f) * screenHeight;
 
         return new Vec3d(screenX, screenY, vec.z);
     }
-
-
 }
