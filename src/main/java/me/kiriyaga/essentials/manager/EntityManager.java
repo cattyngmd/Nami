@@ -36,7 +36,7 @@ public class EntityManager {
     private List<ItemEntity> droppedItems = List.of();
     private List<Entity> endCrystals = List.of();
 
-    private EntityManagerModule entityManagerModule = MODULE_MANAGER.getModule(EntityManagerModule.class);
+    private EntityManagerModule entityManagerModule = null;
 
     public void init() {
         Essentials.EVENT_MANAGER.register(this);
@@ -120,6 +120,8 @@ public class EntityManager {
             idleTicksCounter = 0;
             return;
         }
+
+        entityManagerModule = MODULE_MANAGER.getModule(EntityManagerModule.class);
 
         maxIdleTicks = MODULE_MANAGER.getModule(EntityManagerModule.class).maxIdleTicks.get();
 
