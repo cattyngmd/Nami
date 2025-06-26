@@ -32,21 +32,26 @@ import org.joml.Vector4f;
 
 import java.awt.*;
 
-import static me.kiriyaga.essentials.Essentials.MINECRAFT;
-import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+import static me.kiriyaga.essentials.Essentials.*;
 
 public class NametagsModule extends Module {
 
     public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));
     public final BoolSetting showAnimals = addSetting(new BoolSetting("peacefuls", false));
     public final BoolSetting showEnemies = addSetting(new BoolSetting("hostiles", false));
+    public final BoolSetting showNeutrals = addSetting(new BoolSetting("neutrals", false));
     public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
     public final BoolSetting showEquipment = addSetting(new BoolSetting("show equipment", true));
     public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.None));
     public final BoolSetting showBackground = addSetting(new BoolSetting("background", true));
 
     private final NametagFormatter formatter = new NametagFormatter(this);
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+
+    private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
+    private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
+    private static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
+    private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
+
 
     public enum TextFormat {
         None, Bold, Italic, Both
@@ -58,19 +63,18 @@ public class NametagsModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender2D(Render2DEvent event) {
-        if (mc == null || mc.world == null || mc.player == null) return;
+        if (MINECRAFT == null || MINECRAFT.world == null || MINECRAFT.player == null) return;
 
         DrawContext drawContext = event.getDrawContext();
-        MatrixStack matrices = drawContext.getMatrices();
-        Camera camera = mc.gameRenderer.getCamera();
+        Camera camera = MINECRAFT.gameRenderer.getCamera();
 
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
 
         int color = new Color(colorModule.getStyledPrimaryColor().getRed(), colorModule.getStyledPrimaryColor().getGreen(), colorModule.getStyledPrimaryColor().getBlue(), 255).getRGB();
         if (showPlayers.get()) {
-            for (PlayerEntity player : EntityUtils.getPlayers()) {
-                if ((player == mc.player && !freecamModule.isEnabled()) || player.isRemoved())
+            for (PlayerEntity player : ENTITY_MANAGER.getPlayers()) {
+                if ((player == MINECRAFT.player && !freecamModule.isEnabled()) || player.isRemoved())
                     continue;
 
                 renderNametag2D(player, formatter.formatPlayer(player), color, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
@@ -78,23 +82,30 @@ public class NametagsModule extends Module {
         }
 
         if (showAnimals.get()) {
-            for (Entity animal : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE)) {
-                if (animal.isRemoved()) continue;
-                renderNametag2D(animal, formatter.formatEntity(animal), 0xFFAAAAAA, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
+            for (Entity animal : ENTITY_MANAGER.getPassive()) {
+                if (!animal.isAlive()) continue;
+                renderNametag2D(animal, formatter.formatEntity(animal), COLOR_PASSIVE.getRGB(), camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
 
         if (showEnemies.get()) {
-            for (Entity hostile : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE)) {
-                if (hostile.isRemoved()) continue;
-                renderNametag2D(hostile, formatter.formatEntity(hostile), 0xFFFF5555, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
+            for (Entity hostile : ENTITY_MANAGER.getHostile()) {
+                if (!hostile.isAlive()) continue;
+                renderNametag2D(hostile, formatter.formatEntity(hostile), COLOR_HOSTILE.getRGB(), camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
+            }
+        }
+
+        if (showNeutrals.get()) {
+            for (Entity neutral : ENTITY_MANAGER.getNeutral()) {
+                if (!neutral.isAlive()) continue;
+                renderNametag2D(neutral, formatter.formatEntity(neutral), COLOR_NEUTRAL.getRGB(), camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
 
         if (showItems.get()) {
-            for (ItemEntity item : EntityUtils.getDroppedItems()) {
+            for (ItemEntity item : ENTITY_MANAGER.getDroppedItems()) {
                 if (item.isRemoved() || item.getStack().isEmpty()) continue;
-                renderNametag2D(item, formatter.formatItem(item), 0xFFFF5555, camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
+                renderNametag2D(item, formatter.formatItem(item), COLOR_ITEM.getRGB(), camera, drawContext, MatrixCache.positionMatrix, MatrixCache.projectionMatrix, event.getRenderTickCounter().getDynamicDeltaTicks());
             }
         }
     }
@@ -115,8 +126,8 @@ public class NametagsModule extends Module {
         int xScreen = (int) projected.x;
         int yScreen = (int) projected.y;
 
-        int textWidth = mc.textRenderer.getWidth(text);
-        int textHeight = mc.textRenderer.fontHeight;
+        int textWidth = MINECRAFT.textRenderer.getWidth(text);
+        int textHeight = MINECRAFT.textRenderer.fontHeight;
 
         int bgPadding = 1;
         if (showBackground.get()) {
@@ -139,7 +150,7 @@ public class NametagsModule extends Module {
         }
 
 
-        drawContext.drawText(mc.textRenderer, text, xScreen - textWidth / 2, yScreen, color, false);
+        drawContext.drawText(MINECRAFT.textRenderer, text, xScreen - textWidth / 2, yScreen, color, false);
 
         if (entity instanceof PlayerEntity && showEquipment.get()) {
             renderItemRow2D((PlayerEntity) entity, drawContext, projected);
