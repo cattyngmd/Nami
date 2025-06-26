@@ -184,6 +184,7 @@ public class NametagsModule extends Module {
 
         Matrix4f viewProjection = new Matrix4f(projectionMatrix);
         viewProjection.mul(positionMatrix); // projection * view
+        // well after tests, i figured out that issue is not in the interp, but in 2d renderers lol, TODO: rewrite that
 
         vec.mul(viewProjection);
 
