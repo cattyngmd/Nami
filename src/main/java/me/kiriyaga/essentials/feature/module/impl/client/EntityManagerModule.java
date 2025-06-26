@@ -11,14 +11,13 @@ import me.kiriyaga.essentials.setting.impl.IntSetting;
 public class EntityManagerModule extends Module {
 
     public final IntSetting maxIdleTicks = addSetting(new IntSetting("max idle ticks", 500, 250, 750));
-    public final DoubleSetting targetRange = new DoubleSetting("target range", 3.0, 1.0, 6.0);
-    public final DoubleSetting minTicksExisted = new DoubleSetting("target age", 12, 0.0, 20.0);
-    public final BoolSetting targetPlayers = new BoolSetting("target players", true);
-    public final BoolSetting targetHostiles = new BoolSetting("target hostiles", true);
-    public final BoolSetting targetNeutrals = new BoolSetting("target neutrals", false);
-    public final BoolSetting targetPassives = new BoolSetting("target passives", false);
-    public final EnumSetting<TargetPriority> priority = new EnumSetting<>("priority", TargetPriority.DISTANCE);
-
+    public final DoubleSetting targetRange = addSetting(new DoubleSetting("target range", 3.0, 1.0, 6.0));
+    public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("target age", 12, 0.0, 20.0));
+    public final BoolSetting targetPlayers = addSetting(new BoolSetting("target players", true));
+    public final BoolSetting targetHostiles = addSetting(new BoolSetting("target hostiles", true));
+    public final BoolSetting targetNeutrals = addSetting(new BoolSetting("target neutrals", false));
+    public final BoolSetting targetPassives = addSetting(new BoolSetting("target passives", false));
+    public final EnumSetting<TargetPriority> priority = addSetting(new EnumSetting<>("priority", TargetPriority.DISTANCE));
 
     public enum TargetPriority {
         DISTANCE, HEALTH
