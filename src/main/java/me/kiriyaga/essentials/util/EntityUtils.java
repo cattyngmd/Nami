@@ -94,12 +94,11 @@ public class EntityUtils {
     TODO: someday write some logic from mc core, and track all mobs and actions with them, so we can 100% accurate track agro
      */
     public static boolean isHostile(Entity e) {
-        // Явные хостайл сущности
         if (e instanceof CreeperEntity ||
                 e instanceof SkeletonEntity ||
                 e instanceof StrayEntity ||
                 e instanceof WitherSkeletonEntity ||
-                e instanceof ZombieEntity ||
+                (e.getClass() == ZombieEntity.class) ||
                 e instanceof HuskEntity ||
                 e instanceof DrownedEntity ||
                 e instanceof VindicatorEntity ||
