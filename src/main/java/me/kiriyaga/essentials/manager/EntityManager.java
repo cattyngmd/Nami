@@ -4,8 +4,8 @@ import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
+import me.kiriyaga.essentials.feature.module.impl.client.EntityManagerModule;
 import me.kiriyaga.essentials.util.EntityUtils;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
+import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
 public class EntityManager {
 
@@ -79,6 +80,8 @@ public class EntityManager {
             idleTicksCounter = 0;
             return;
         }
+
+        maxIdleTicks = MODULE_MANAGER.getModule(EntityManagerModule.class).maxIdleTicks.get();
 
         if (idleTicksCounter < maxIdleTicks) {
             updateAll();
