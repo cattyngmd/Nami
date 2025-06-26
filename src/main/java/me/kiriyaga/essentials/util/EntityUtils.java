@@ -93,8 +93,8 @@ public class EntityUtils {
 
     TODO: someday write some logic from mc core, and track all mobs and actions with them, so we can 100% accurate track agro
      */
-
     public static boolean isHostile(Entity e) {
+        // Явные хостайл сущности
         if (e instanceof CreeperEntity ||
                 e instanceof SkeletonEntity ||
                 e instanceof StrayEntity ||
@@ -123,37 +123,19 @@ public class EntityUtils {
             return true;
         }
 
-        boolean isNeutralType = e instanceof EndermanEntity ||
-                e instanceof PiglinEntity ||
-                e instanceof ZombifiedPiglinEntity ||
-                e instanceof SpiderEntity ||
-                e instanceof CaveSpiderEntity ||
-                e instanceof PolarBearEntity ||
-                (e instanceof WolfEntity && !((WolfEntity) e).isTamed()) ||
-                e instanceof BeeEntity ||
-                e instanceof GoatEntity ||
-                (e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated());
-
-        if (isNeutralType && isAggressiveNow(e)) {
-            return true;
-        }
-
-
-        if (isNeutralType && isAggressiveNow(e)) {
-            return true;
-        }
-
-
-        if ((e instanceof SpiderEntity || e instanceof CaveSpiderEntity) && isAggressiveNow(e)) {
+        if (isNeutralEntityType(e) && isAggressiveNow(e)) {
             return true;
         }
 
         return false;
     }
 
-
     public static boolean isNeutral(Entity e) {
-        boolean isNeutralType = e instanceof EndermanEntity ||
+        return isNeutralEntityType(e) && !isAggressiveNow(e);
+    }
+
+    private static boolean isNeutralEntityType(Entity e) {
+        return e instanceof EndermanEntity ||
                 e instanceof PiglinEntity ||
                 e instanceof ZombifiedPiglinEntity ||
                 e instanceof SpiderEntity ||
@@ -163,8 +145,6 @@ public class EntityUtils {
                 e instanceof BeeEntity ||
                 e instanceof GoatEntity ||
                 (e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated());
-
-        return isNeutralType && !isAggressiveNow(e);
     }
 
     public static boolean isPassive(Entity e) {
