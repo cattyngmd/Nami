@@ -135,7 +135,7 @@ public class EntityUtils {
     }
 
     public static boolean isNeutral(Entity e) {
-        return e instanceof EndermanEntity ||
+        boolean isNeutralType = e instanceof EndermanEntity ||
                 e instanceof PiglinEntity ||
                 e instanceof ZombifiedPiglinEntity ||
                 e instanceof SpiderEntity ||
@@ -145,6 +145,8 @@ public class EntityUtils {
                 e instanceof BeeEntity ||
                 e instanceof GoatEntity ||
                 (e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated());
+
+        return isNeutralType && !isAggressiveNow(e);
     }
 
     public static boolean isPassive(Entity e) {
