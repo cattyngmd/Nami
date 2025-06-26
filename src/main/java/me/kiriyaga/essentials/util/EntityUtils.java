@@ -86,17 +86,22 @@ public class EntityUtils {
                 .collect(Collectors.toList());
     }
 
+    /*
+    Since 1.21.5 data about mod target`s is not accessible (also it wasnt accessible on some engine forrks)
+    so its the easiest way to select them
+    but its still bad, since its bases on agro, not on target
+
+    TODO: someday write some logic from mc core, and track all mobs and actions with them, so we can 100% accurate track agro
+     */
+
     public static boolean isHostile(Entity e) {
         if (e instanceof CreeperEntity ||
                 e instanceof SkeletonEntity ||
                 e instanceof StrayEntity ||
                 e instanceof WitherSkeletonEntity ||
-                e instanceof SpiderEntity && isAggressiveNow(e) ||
-                e instanceof CaveSpiderEntity && isAggressiveNow(e) ||
                 e instanceof ZombieEntity ||
                 e instanceof HuskEntity ||
                 e instanceof DrownedEntity ||
-                e instanceof ZoglinEntity ||
                 e instanceof VindicatorEntity ||
                 e instanceof EvokerEntity ||
                 e instanceof PillagerEntity ||
@@ -118,7 +123,15 @@ public class EntityUtils {
             return true;
         }
 
-        return isNeutral(e) && isAggressiveNow(e);
+        if (isNeutral(e) && isAggressiveNow(e)) {
+            return true;
+        }
+
+        if ((e instanceof SpiderEntity || e instanceof CaveSpiderEntity) && isAggressiveNow(e)) {
+            return true;
+        }
+
+        return false;
     }
 
     public static boolean isNeutral(Entity e) {
@@ -128,15 +141,15 @@ public class EntityUtils {
                 e instanceof SpiderEntity ||
                 e instanceof CaveSpiderEntity ||
                 e instanceof PolarBearEntity ||
-                e instanceof WolfEntity && !((WolfEntity) e).isTamed() ||
+                (e instanceof WolfEntity && !((WolfEntity) e).isTamed()) ||
                 e instanceof BeeEntity ||
                 e instanceof GoatEntity ||
-                e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated();
+                (e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated());
     }
 
     public static boolean isPassive(Entity e) {
         return e instanceof PassiveEntity ||
-                e instanceof IronGolemEntity && ((IronGolemEntity) e).isPlayerCreated();
+                (e instanceof IronGolemEntity && ((IronGolemEntity) e).isPlayerCreated());
     }
 
     public static boolean isAggressiveNow(Entity e) {
@@ -159,7 +172,6 @@ public class EntityUtils {
 
         return false;
     }
-
 
     private static boolean isPlayerWearingGold(ClientPlayerEntity player) {
         return isGoldArmor(player.getEquippedStack(EquipmentSlot.HEAD)) ||
