@@ -51,7 +51,7 @@ public class EntityManager {
 
         List<Entity> candidates = allEntities.stream()
                 .filter(e -> e != MINECRAFT.player)
-                .filter(e -> e instanceof LivingEntity)
+                .filter(e -> e instanceof LivingEntity && e.isAlive())
                 .filter(e -> {
                     if (e.age < entityManagerModule.minTicksExisted.get().intValue()) return false;
                     double distSq = e.squaredDistanceTo(MINECRAFT.player);

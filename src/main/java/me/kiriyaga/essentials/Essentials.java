@@ -12,7 +12,7 @@ import javax.swing.text.html.parser.Entity;
 
 public class Essentials implements ClientModInitializer {
     public static String NAME = "2bEssentials";
-    public static final String VERSION = "420.19";
+    public static final String VERSION = "420.20";
 
     public static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 
