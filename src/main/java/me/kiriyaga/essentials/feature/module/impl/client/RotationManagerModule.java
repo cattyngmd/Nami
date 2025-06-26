@@ -12,6 +12,7 @@ public class RotationManagerModule extends Module {
     public final DoubleSetting rotationThreshold = addSetting(new DoubleSetting("threshold", 0, 0, 15));
     public final IntSetting ticksBeforeRelease = addSetting(new IntSetting("hold", 30, 00, 120));
     public final IntSetting holdTicksLimit = addSetting(new IntSetting("limit", 15, 0, 120));
+    public final BoolSetting moveFix = addSetting(new BoolSetting("move fix", true));
 
     public RotationManagerModule() {
         super("rotation manager", "Allows you to config rotation manager settings.", Category.CLIENT, "rotate", "rotationmanager", "roate", "toationmanager", "кщефеу");
