@@ -15,7 +15,7 @@ public class YawCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Usage: .yaw <Value>");
+            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Usage: .yaw §7<Value>");
             return;
         }
 
@@ -23,10 +23,10 @@ public class YawCommand extends Command {
             float yaw = Float.parseFloat(args[0]);
 
             MINECRAFT.player.setYaw(yaw);
-            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Yaw set to: " + yaw);
+            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Yaw set to: §7" + yaw);
 
         } catch (NumberFormatException e) {
-            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Invalid number: " + args[0]);
+            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Invalid number: §7" + args[0]);
         }
     }
 }

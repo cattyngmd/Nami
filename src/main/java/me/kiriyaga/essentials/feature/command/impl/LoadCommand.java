@@ -17,7 +17,7 @@ public class LoadCommand extends Command {
             CONFIG_MANAGER.load();
             CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(), "Config has been loaded.");
         } catch (Exception e){
-            CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(), "Config has not been loaded: " + e);
+            CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(), "Config has not been loaded: §7" + e);
         }
     }
 }

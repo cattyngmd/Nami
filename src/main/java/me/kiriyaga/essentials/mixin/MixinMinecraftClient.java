@@ -1,13 +1,17 @@
 package me.kiriyaga.essentials.mixin;
 
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.essentials.feature.module.impl.world.AutoRespawnModule;
 import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.mixininterface.IMouseDeltaAccessor;
 import me.kiriyaga.essentials.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,6 +51,23 @@ public class MixinMinecraftClient {
                 }
                 bind.setWasPressedLastTick(currentlyPressed);
             }
+        }
+    }
+
+    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    private void setScreen(Screen screen, CallbackInfo info) {
+        if (screen instanceof DeathScreen && MINECRAFT.player != null && MODULE_MANAGER.getModule(AutoRespawnModule.class).isEnabled()) {
+
+            if (MODULE_MANAGER.getModule(AutoRespawnModule.class).sendCords.get()){
+                Vec3d pos = MINECRAFT.player.getPos();
+                String coords = String.format("Death coordinates: X: %d Y: %d Z: %d",
+                        Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
+
+                CHAT_MANAGER.sendPersistent(AutoRespawnModule.class.getName(), "Death coordinates: §7" + coords);
+            }
+
+            MINECRAFT.player.requestRespawn();
+            info.cancel();
         }
     }
 }

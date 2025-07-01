@@ -15,7 +15,7 @@ public class FovCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "Usage: .fov <value>");
+            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "Usage: .fov §7<value>");
             return;
         }
 

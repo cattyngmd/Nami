@@ -16,7 +16,7 @@ public class NameCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(NameCommand.class.getName(), "Usage: .name <Name>.");
+            CHAT_MANAGER.sendPersistent(NameCommand.class.getName(), "Usage: .name §7<Name>");
             return;
         }
 

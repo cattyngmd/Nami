@@ -53,6 +53,7 @@ public class ModuleManager {
         registerModule(new AutoGammaModule());
         registerModule(new AntiPacketKickModule());
         registerModule(new AutoReconnectModule());
+        registerModule(new AutoRespawnModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

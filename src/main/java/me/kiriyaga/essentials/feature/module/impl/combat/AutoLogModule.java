@@ -51,7 +51,7 @@ public class AutoLogModule extends Module {
                 triggeredLevel = true;
             }
         }
-        
+
         if (player.getHealth() <= health.get()) {
             logOut("Low health: §7" + player.getHealth() + "§f HP");
             return;

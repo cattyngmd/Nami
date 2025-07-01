@@ -15,7 +15,7 @@ public class ToggleCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length == 0) {
-            CHAT_MANAGER.sendPersistent(ToggleCommand.class.getName(),"Usage: .toggle <moduleName>");
+            CHAT_MANAGER.sendPersistent(ToggleCommand.class.getName(),"Usage: .toggle §7<moduleName>");
             return;
         }
 

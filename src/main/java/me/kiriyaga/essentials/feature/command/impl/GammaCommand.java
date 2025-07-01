@@ -15,7 +15,7 @@ public class GammaCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Usage: .gamma <Value>");
+            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Usage: .gamma §7<Value>");
             return;
         }
 

@@ -14,7 +14,7 @@ public class FriendCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 2) {
-            CHAT_MANAGER.sendPersistent(FriendCommand.class.getName(), "Usage: .friend <add|del> <name>");
+            CHAT_MANAGER.sendPersistent(FriendCommand.class.getName(), "Usage: .friend §7<add|del> <name>");
             return;
         }
 

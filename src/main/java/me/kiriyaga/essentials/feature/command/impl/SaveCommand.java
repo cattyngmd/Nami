@@ -18,7 +18,7 @@ public class SaveCommand extends Command {
             CONFIG_MANAGER.save();
             CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(), "Config has been saved.");
         } catch (Exception e){
-            CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(), "Config has not been saved: " + e);
+            CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(), "Config has not been saved: §7" + e);
         }
     }
 }

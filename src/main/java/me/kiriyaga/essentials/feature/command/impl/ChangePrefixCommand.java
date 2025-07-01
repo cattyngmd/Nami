@@ -14,19 +14,19 @@ public class ChangePrefixCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix <char>");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix §7<char>");
             return;
         }
 
         String input = args[0].trim();
 
         if (input.isEmpty()) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix <char>");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix §7<char>");
             return;
         }
 
         if (input.length() > 1) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix <char>");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix v<char>");
             return;
         }
 

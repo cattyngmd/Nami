@@ -14,7 +14,7 @@ public class PitchCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Usage: .pitch <Value>");
+            CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Usage: .pitch §7<Value>");
             return;
         }
 
@@ -23,12 +23,12 @@ public class PitchCommand extends Command {
 
             if (MINECRAFT.player != null) {
                 MINECRAFT.player.setPitch(pitch);
-                CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Pitch set to: " + pitch);
+                CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Pitch set to: §7" + pitch);
             } else {
                 CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Player is null.");
             }
         } catch (NumberFormatException e) {
-            CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Invalid number: " + args[0]);
+            CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Invalid number: §7" + args[0]);
         }
     }
 }
