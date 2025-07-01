@@ -19,7 +19,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Color;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
@@ -104,8 +103,8 @@ public abstract class MixinChatScreen {
     @Inject(method = "render", at = @At("TAIL"))
     private void onRenderSuggestions(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
-        Color primary = colorModule.getStyledPrimaryColor();
-        Color secondary = colorModule.getStyledSecondaryColor();
+        Color primary = colorModule.getStyledGlobalColor();
+        Color secondary = colorModule.getStyledSecondColor();
         Color textCol = colorModule.getStyledTextColor();
         Color textColInverted = new Color(
                 255 - textCol.getRed(),

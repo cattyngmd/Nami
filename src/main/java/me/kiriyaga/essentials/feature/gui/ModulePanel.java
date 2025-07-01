@@ -9,9 +9,6 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.Set;
 
-import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
-import static net.minecraft.util.math.ColorHelper.withAlpha;
-
 public class ModulePanel {
     public static final int WIDTH = 130 - CategoryPanel.BORDER_WIDTH * 2 - SettingPanel.INNER_PADDING * 2;
     public static final int HEIGHT = 15;
@@ -35,8 +32,8 @@ public class ModulePanel {
         boolean expanded = expandedModules.contains(module);
         boolean enabled = module.isEnabled();
 
-        Color primary = getColorModule().getStyledPrimaryColor();
-        Color secondary = getColorModule().getStyledSecondaryColor();
+        Color primary = getColorModule().getStyledGlobalColor();
+        Color secondary = getColorModule().getStyledSecondColor();
         Color textCol = getColorModule().getStyledTextColor();
 
         Color bgColor = hovered ? brighten(secondary, 0.4f) : (enabled ? primary : secondary);

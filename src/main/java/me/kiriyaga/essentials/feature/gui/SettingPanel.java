@@ -1,6 +1,5 @@
 package me.kiriyaga.essentials.feature.gui;
 
-import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.setting.Setting;
@@ -13,8 +12,6 @@ import java.awt.*;
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
-import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
-import static net.minecraft.util.math.ColorHelper.withAlpha;
 
 public class SettingPanel {
     public static final int HEIGHT = 15;
@@ -48,8 +45,8 @@ public class SettingPanel {
         if (colorModule == null) return;
 
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color primary = colorModule.getStyledPrimaryColor();
-        Color secondary = colorModule.getStyledSecondaryColor();
+        Color primary = colorModule.getStyledGlobalColor();
+        Color secondary = colorModule.getStyledSecondColor();
         Color textCol = colorModule.getStyledTextColor();
 
         Color bgColor;

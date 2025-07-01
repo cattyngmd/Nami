@@ -66,7 +66,7 @@ public class NametagsModule extends Module {
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
 
-        int color = new Color(colorModule.getStyledPrimaryColor().getRed(), colorModule.getStyledPrimaryColor().getGreen(), colorModule.getStyledPrimaryColor().getBlue(), 255).getRGB();
+        int color = new Color(colorModule.getStyledGlobalColor().getRed(), colorModule.getStyledGlobalColor().getGreen(), colorModule.getStyledGlobalColor().getBlue(), 255).getRGB();
         if (showPlayers.get()) {
             for (PlayerEntity player : ENTITY_MANAGER.getPlayers()) {
                 if ((player == MINECRAFT.player && !freecamModule.isEnabled()) || player.isRemoved())

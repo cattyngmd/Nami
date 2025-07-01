@@ -11,7 +11,6 @@ import net.minecraft.text.Text;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static me.kiriyaga.essentials.Essentials.*;
@@ -137,7 +136,7 @@ public class ChatManager {
     }
 
     private Text prefix() {
-        int rgb = MODULE_MANAGER.getModule(ColorModule.class).getStyledPrimaryColor().getRGB() & 0x00FFFFFF;
+        int rgb = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
 
         Text left = Text.literal("[").setStyle(Style.EMPTY.withColor(0xAAAAAA));
         Text name = Text.literal(NAME).setStyle(Style.EMPTY.withColor(rgb));

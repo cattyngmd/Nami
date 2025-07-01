@@ -111,7 +111,7 @@ public class AuraModule extends Module {
         if (eyeDistance > rotateRange.get()) return;
 
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
-        drawBox(currentTarget, colorModule.getStyledPrimaryColor(), event.getMatrices(), event.getTickDelta());
+        drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
     }
 
     private void drawBox(Entity entity, Color color, MatrixStack matrices, float partialTicks) {

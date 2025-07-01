@@ -10,7 +10,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.Set;
 
-import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
 
@@ -41,8 +40,8 @@ public class CategoryPanel {
         boolean expanded = expandedCategories.contains(category);
 
         ColorModule colorModule = getColorModule();
-        Color primary = colorModule.getStyledPrimaryColor();
-        Color secondary = colorModule.getStyledSecondaryColor();
+        Color primary = colorModule.getStyledGlobalColor();
+        Color secondary = colorModule.getStyledSecondColor();
         Color textCol = colorModule.getStyledTextColor();
 
         Color headerBgColor = expanded ? primary : (hovered ? brighten(secondary, 0.3f) : secondary);

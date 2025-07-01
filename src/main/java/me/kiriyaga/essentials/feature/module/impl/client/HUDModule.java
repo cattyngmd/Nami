@@ -75,7 +75,7 @@ public class HUDModule extends Module {
         MinecraftClient mc = MINECRAFT;
         if (mc.world == null || mc.player == null) return;
 
-        Color styled = getColorModule().getStyledPrimaryColor();
+        Color styled = getColorModule().getStyledGlobalColor();
         primaryRGB = styled.getRGB() & 0x00FFFFFF;
 
         if (watermarkEnabled.get()) {

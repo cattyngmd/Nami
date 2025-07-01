@@ -9,18 +9,11 @@ import java.awt.*;
 
 public class ColorModule extends Module {
 
-    public final ColorSetting primaryColor = addSetting(new ColorSetting("primary", new Color(23, 0, 255, 170), true));
-    public final ColorSetting secondaryColor = addSetting(new ColorSetting("secondary", new Color(23, 0, 255, 170), true));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(23, 0, 255, 170), true));
     public final ColorSetting textColor = addSetting(new ColorSetting("text", new Color(200, 200, 200), true));
 
-    public final DoubleSetting primarySaturation = addSetting(new DoubleSetting("primary sat", 0.7, 0.0, 1.0));
-    public final DoubleSetting primaryDarkness = addSetting(new DoubleSetting("primary dark", 0.4, 0.0, 1.0));
-
-    public final DoubleSetting secondarySaturation = addSetting(new DoubleSetting("secondary sat", 0.7, 0.0, 1.0));
-    public final DoubleSetting secondaryDarkness = addSetting(new DoubleSetting("secondary dark", 0.65, 0.0, 1.0));
-
-    public final DoubleSetting textSaturation = addSetting(new DoubleSetting("text sat", 0.0, 0.0, 1.0));
-    public final DoubleSetting textDarkness = addSetting(new DoubleSetting("text dark", 0.0, 0.0, 1.0));
+    public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.7, 0.0, 1.0));
+    public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.4, 0.0, 1.0));
 
     public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.5, 0.0, 1.0));
 
@@ -52,15 +45,15 @@ public class ColorModule extends Module {
         return new Color(adjusted.getRed(), adjusted.getGreen(), adjusted.getBlue(), getAlpha255());
     }
 
-    public Color getStyledPrimaryColor() {
-        return getStyledColor(primaryColor.get(), primarySaturation.get(), primaryDarkness.get());
+    public Color getStyledGlobalColor() {
+        return getStyledColor(globalColor.get(), globalSaturation.get(), globalDarskness.get());
     }
 
-    public Color getStyledSecondaryColor() {
-        return getStyledColor(secondaryColor.get(), secondarySaturation.get(), secondaryDarkness.get());
+    public Color getStyledSecondColor() {
+        return applyDarkness(getStyledGlobalColor(), 0.5);
     }
 
     public Color getStyledTextColor() {
-        return getStyledColor(textColor.get(), textSaturation.get(), textDarkness.get());
+        return getStyledColor(textColor.get(), globalSaturation.get(), globalDarskness.get());
     }
 }
