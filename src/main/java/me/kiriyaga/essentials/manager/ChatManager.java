@@ -136,11 +136,12 @@ public class ChatManager {
     }
 
     private Text prefix() {
-        int rgb = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
+        int global = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
+        int brac = MODULE_MANAGER.getModule(ColorModule.class).getStyledSecondColor().getRGB() & 0x00FFFFFF;
 
-        Text left = Text.literal("[").setStyle(Style.EMPTY.withColor(0xAAAAAA));
-        Text name = Text.literal(NAME).setStyle(Style.EMPTY.withColor(rgb));
-        Text right = Text.literal("] ").setStyle(Style.EMPTY.withColor(0xAAAAAA));
+        Text left = Text.literal("[").setStyle(Style.EMPTY.withColor(brac));
+        Text name = Text.literal(NAME).setStyle(Style.EMPTY.withColor(global));
+        Text right = Text.literal("] ").setStyle(Style.EMPTY.withColor(brac));
 
         return Text.empty().append(left).append(name).append(right);
     }
