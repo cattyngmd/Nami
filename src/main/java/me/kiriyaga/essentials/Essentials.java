@@ -5,8 +5,11 @@ import me.kiriyaga.essentials.manager.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import net.minecraft.util.Pair;
 
 import javax.swing.text.html.parser.Entity;
 
@@ -27,6 +30,7 @@ public class Essentials implements ClientModInitializer {
     public static final FriendManager FRIEND_MANAGER = new FriendManager();
     public static final PingManager PING_MANAGER = new PingManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
+    public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
 
     public static ClickGuiScreen CLICK_GUI = new ClickGuiScreen();
 

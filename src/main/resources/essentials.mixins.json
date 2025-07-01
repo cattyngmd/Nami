@@ -17,6 +17,8 @@
     "MixinClientPlayerInteractionManager",
     "MixinClientPlayNetworkHandler",
     "MixinCompassState",
+    "MixinConnectScreen",
+    "MixinDisconnectedScreen",
     "MixinEntityRenderer",
     "MixinGameRenderer",
     "MixinHeadFeatureRenderer",
