@@ -26,6 +26,7 @@
     "MixinInGameOverlayRenderer",
     "MixinKeyboard",
     "MixinMinecraftClient",
+    "MixinPlayerListHud",
     "MixinSimpleOption",
     "MixinWorldRenderer"
   ],

@@ -54,6 +54,7 @@ public class ModuleManager {
         registerModule(new AntiPacketKickModule());
         registerModule(new AutoReconnectModule());
         registerModule(new AutoRespawnModule());
+        registerModule(new BetterTabModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

@@ -25,9 +25,6 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 @Mixin(MinecraftClient.class)
 public class MixinMinecraftClient {
-    @Shadow @Final public Mouse mouse;
-    private double lastMouseX = -1;
-    private double lastMouseY = -1;
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
