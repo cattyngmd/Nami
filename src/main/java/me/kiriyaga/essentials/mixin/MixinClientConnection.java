@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
 import me.kiriyaga.essentials.event.impl.PacketSendEvent;
+import me.kiriyaga.essentials.feature.module.impl.world.AntiPacketKickModule;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.PacketCallbacks;
@@ -17,8 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static me.kiriyaga.essentials.Essentials.EVENT_MANAGER;
-import static me.kiriyaga.essentials.Essentials.LOGGER;
+import static me.kiriyaga.essentials.Essentials.*;
 
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
@@ -48,4 +48,11 @@ public class MixinClientConnection {
         }
     }
 
+    @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
+    private void exceptionCaught(ChannelHandlerContext context, Throwable exception, CallbackInfo call) {
+        if (MODULE_MANAGER.getModule(AntiPacketKickModule.class).isEnabled()) {
+            LOGGER.error("Packet ex: \n", exception);
+            call.cancel();
+        }
+    }
 }
