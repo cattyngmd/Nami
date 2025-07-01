@@ -39,6 +39,7 @@
     "MixinEntity",
     "MixinLivingEntity",
     "MixinPlayerInteractEntityC2SPacket",
+    "MixinTextVisitFactory",
     "PlayerInteractEntityC2SPacketAccessor"
   ]
 }

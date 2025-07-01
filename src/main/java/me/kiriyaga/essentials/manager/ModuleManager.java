@@ -55,6 +55,7 @@ public class ModuleManager {
         registerModule(new AutoReconnectModule());
         registerModule(new AutoRespawnModule());
         registerModule(new BetterTabModule());
+        registerModule(new NameProtectModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
