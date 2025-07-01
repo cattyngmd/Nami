@@ -39,7 +39,7 @@ public class NoSoundLagModule extends Module {
     );
 
     public NoSoundLagModule() {
-        super("NoSoundLag", "Prevents lag caused by armor and wither sounds.", Category.misc, "nosoundlag");
+        super("no sound lag", "Prevents lag caused by stacked sounds.", Category.misc, "nosoundlag");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

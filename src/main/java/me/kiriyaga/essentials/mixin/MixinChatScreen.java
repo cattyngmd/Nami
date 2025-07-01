@@ -25,6 +25,7 @@ import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 
 import static me.kiriyaga.essentials.Essentials.*;
+import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
 
 @Mixin(ChatScreen.class)
 public abstract class MixinChatScreen {
@@ -105,7 +106,7 @@ public abstract class MixinChatScreen {
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = colorModule.getStyledTextColor();
+        Color textCol = new Color(255, 255, 255, GUI_ALPHA);
         Color textColInverted = new Color(
                 255 - textCol.getRed(),
                 255 - textCol.getGreen(),

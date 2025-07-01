@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
 
 public class SettingPanel {
     public static final int HEIGHT = 15;
@@ -47,7 +48,7 @@ public class SettingPanel {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = colorModule.getStyledTextColor();
+        Color textCol = new Color(255, 255, 255, GUI_ALPHA);
 
         Color bgColor;
 

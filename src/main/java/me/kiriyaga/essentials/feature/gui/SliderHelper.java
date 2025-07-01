@@ -9,8 +9,9 @@ public class SliderHelper {
      * @param step step allowed change
      * @param min minimum allowed value
      * @param max maximum allowed value
-     * @return новое значение, ограниченное min и max
      */
+
+    // TODO value scoped steps
     public static double slideDouble(double oldValue, double deltaX, double step, double min, double max) {
         double sensitivity = 0.05;
         double change = deltaX * step * sensitivity;

@@ -15,7 +15,7 @@ import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
 
 public class CategoryPanel {
     public static final int WIDTH = 130;
-    public static final int HEADER_HEIGHT = 20;
+    public static final int HEADER_HEIGHT = 15;
     public static final int GAP = 5;
     private static final int PADDING = 5;
     public static final int BORDER_WIDTH = 2;
@@ -42,11 +42,12 @@ public class CategoryPanel {
         ColorModule colorModule = getColorModule();
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = colorModule.getStyledTextColor();
+        Color textCol = new Color(255, 255, 255, GUI_ALPHA);
 
         Color headerBgColor = expanded ? primary : (hovered ? brighten(secondary, 0.3f) : secondary);
         context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, headerBgColor.getRGB());
-        context.drawText(textRenderer, category.name(), x + PADDING, y + 6, toRGBA(textCol), false);
+        int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
+        context.drawText(textRenderer, category.name(), x + PADDING, textY, toRGBA(textCol), false);
 
         if (expanded) {
             int totalHeight = HEADER_HEIGHT;
@@ -65,11 +66,11 @@ public class CategoryPanel {
             int bgColor = toRGBA(new Color(30, 30, 30, GUI_ALPHA));
 
             context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + totalHeight, bgColor);
-
             context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, borderColor);
             context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, borderColor);
-            context.fill(x, y + HEADER_HEIGHT, x + 1, y + totalHeight, borderColor);
-            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT, x + WIDTH, y + totalHeight, borderColor);
+            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, borderColor);
+            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, borderColor);
+
 
             int moduleY = y + HEADER_HEIGHT + ModulePanel.MODULE_SPACING;
             for (Module module : modules) {
