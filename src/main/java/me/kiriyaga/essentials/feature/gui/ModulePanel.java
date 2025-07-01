@@ -30,9 +30,13 @@ public class ModulePanel {
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
+        module.updateAnimation();
+
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         boolean expanded = expandedModules.contains(module);
         boolean enabled = module.isEnabled();
+
+        float expandProgress = module.getExpandProgress();
 
         Color primary = getColorModule().getStyledGlobalColor();
         Color secondary = getColorModule().getStyledSecondColor();

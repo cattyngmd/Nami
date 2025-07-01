@@ -7,7 +7,9 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
@@ -25,6 +27,11 @@ public class CategoryPanel {
     private final Set<Category> expandedCategories;
     private final Set<Module> expandedModules;
 
+    private final Map<Module, ModulePanel> modulePanels = new HashMap<>();
+
+    private float expandProgress = 0f;
+    private long lastUpdateTime = 0;
+
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
     }
@@ -39,6 +46,19 @@ public class CategoryPanel {
         boolean hovered = isHeaderHovered(mouseX, mouseY, x, y);
         boolean expanded = expandedCategories.contains(category);
 
+        long currentTime = System.currentTimeMillis();
+        if (lastUpdateTime == 0) {
+            lastUpdateTime = currentTime;
+        }
+        float delta = (currentTime - lastUpdateTime) / 200f;
+        lastUpdateTime = currentTime;
+
+        if (expanded) {
+            expandProgress = Math.min(1f, expandProgress + delta);
+        } else {
+            expandProgress = Math.max(0f, expandProgress - delta);
+        }
+
         ColorModule colorModule = getColorModule();
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
@@ -49,42 +69,45 @@ public class CategoryPanel {
         int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
         context.drawText(textRenderer, category.name(), x + PADDING, textY, toRGBA(textCol), false);
 
-        if (expanded) {
-            int totalHeight = HEADER_HEIGHT;
+        if (expandProgress > 0) {
+            int totalHeightWithoutMargin = HEADER_HEIGHT;
             List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
 
             for (Module module : modules) {
-                totalHeight += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
+                totalHeightWithoutMargin += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
                 if (expandedModules.contains(module)) {
-                    totalHeight += SettingPanel.getSettingsHeight(module);
+                    totalHeightWithoutMargin += SettingPanel.getSettingsHeight(module);
                 }
             }
 
-            totalHeight += BOTTOM_MARGIN;
+            int animatedHeight = Math.round(totalHeightWithoutMargin * expandProgress);
+            int bgHeight = animatedHeight + (expandProgress == 1f ? BOTTOM_MARGIN : 0);
 
             int borderColor = toRGBA(primary);
             int bgColor = toRGBA(new Color(30, 30, 30, GUI_ALPHA));
 
-            context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + totalHeight, bgColor);
+            context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + bgHeight, bgColor);
+
             context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, borderColor);
-            context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, borderColor);
-            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, borderColor);
-            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, borderColor);
+            context.fill(x, y + HEADER_HEIGHT + bgHeight - 1, x + WIDTH, y + HEADER_HEIGHT + bgHeight, borderColor);
+            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + HEADER_HEIGHT + bgHeight - 1, borderColor);
+            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + HEADER_HEIGHT + bgHeight - 1, borderColor);
 
+            if (expandProgress == 1f) {
+                int moduleY = y + HEADER_HEIGHT + ModulePanel.MODULE_SPACING;
+                for (Module module : modules) {
+                    ModulePanel modulePanel = modulePanels.computeIfAbsent(module, m -> new ModulePanel(m, expandedModules));
+                    modulePanel.render(context, textRenderer, x + BORDER_WIDTH + SettingPanel.INNER_PADDING, moduleY, mouseX, mouseY);
 
-            int moduleY = y + HEADER_HEIGHT + ModulePanel.MODULE_SPACING;
-            for (Module module : modules) {
-                ModulePanel modulePanel = new ModulePanel(module, expandedModules);
-                modulePanel.render(context, textRenderer, x + BORDER_WIDTH + SettingPanel.INNER_PADDING, moduleY, mouseX, mouseY);
-                moduleY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
+                    moduleY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
 
-                if (expandedModules.contains(module)) {
-                    moduleY += SettingPanel.renderSettings(context, textRenderer, module,
-                            x + BORDER_WIDTH + SettingPanel.INNER_PADDING,
-                            moduleY, mouseX, mouseY);
+                    if (expandedModules.contains(module)) {
+                        moduleY += SettingPanel.renderSettings(context, textRenderer, module,
+                                x + BORDER_WIDTH + SettingPanel.INNER_PADDING,
+                                moduleY, mouseX, mouseY);
+                    }
                 }
             }
-
         }
     }
 

@@ -7,6 +7,7 @@ import me.kiriyaga.essentials.setting.impl.*;
 import me.kiriyaga.essentials.util.KeyUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.InputUtil;
 
 import java.awt.*;
 import java.util.List;
@@ -22,6 +23,9 @@ public class SettingPanel {
     private static final int SLIDER_HEIGHT = 2;
     private static final int MODULE_SPACING = 2;
 
+    private static boolean isListeningForBind = false;
+    private static KeyBindSetting currentListeningBind = null;
+
     private static ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
     }
@@ -30,15 +34,48 @@ public class SettingPanel {
         return module.getSettings().size() * (HEIGHT + MODULE_SPACING) + MODULE_SPACING;
     }
 
-    public static int renderSettings(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY) {
+    public static int renderSettingsPartial(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY, int maxHeight) {
+        module.updateAnimation();
+        float progress = module.getExpandProgress();
+
         List<Setting<?>> settings = module.getSettings();
+        int fullHeight = getSettingsHeight(module);
+        int visibleHeight = Math.min(maxHeight, fullHeight);
+
         int curY = y + MODULE_SPACING;
+        int renderedHeight = 0;
 
         for (Setting<?> setting : settings) {
+            if (renderedHeight + HEIGHT + MODULE_SPACING > visibleHeight) break;
+
             render(context, textRenderer, setting, x, curY, mouseX, mouseY);
             curY += HEIGHT + MODULE_SPACING;
+            renderedHeight += HEIGHT + MODULE_SPACING;
         }
-        return getSettingsHeight(module);
+
+        return visibleHeight;
+    }
+
+    public static int renderSettings(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY) {
+        module.updateAnimation();
+        float progress = module.getExpandProgress();
+
+        List<Setting<?>> settings = module.getSettings();
+        int fullHeight = getSettingsHeight(module);
+        int visibleHeight = (int)(fullHeight * progress);
+
+        int curY = y + MODULE_SPACING;
+        int renderedHeight = 0;
+
+        for (Setting<?> setting : settings) {
+            if (renderedHeight + HEIGHT + MODULE_SPACING > visibleHeight) break;
+
+            render(context, textRenderer, setting, x, curY, mouseX, mouseY);
+            curY += HEIGHT + MODULE_SPACING;
+            renderedHeight += HEIGHT + MODULE_SPACING;
+        }
+
+        return visibleHeight;
     }
 
     public static void render(DrawContext context, TextRenderer textRenderer, Setting<?> setting, int x, int y, int mouseX, int mouseY) {
@@ -77,9 +114,6 @@ public class SettingPanel {
 
                 context.drawText(textRenderer, symbol, centerX, centerY, toRGBA(textCol), false);
             }
-
-
-
             return;
         } else if (setting instanceof ColorSetting colorSetting) {
             float[] hsb = Color.RGBtoHSB(colorSetting.getRed(), colorSetting.getGreen(), colorSetting.getBlue(), null);
@@ -122,7 +156,12 @@ public class SettingPanel {
             String valueStr = enumSetting.get().toString();
             context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + (HEIGHT - 8) / 2, textColorInt, false);
         } else if (setting instanceof KeyBindSetting bindSetting) {
-            String valueStr = KeyUtils.getKeyName(bindSetting.get());
+            String valueStr;
+            if (isListeningForBind && bindSetting == currentListeningBind) {
+                valueStr = "Press a key...";
+            } else {
+                valueStr = KeyUtils.getKeyName(bindSetting.get());
+            }
             context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + (HEIGHT - 8) / 2, textColorInt, false);
         } else if (setting instanceof DoubleSetting doubleSetting) {
             renderSlider(context, x + PADDING, y + HEIGHT - 4,
@@ -183,7 +222,7 @@ public class SettingPanel {
         if (button != 0 && button != 1) return false;
 
         List<Setting<?>> settings = module.getSettings();
-        int curY = y + MODULE_SPACING; // Add initial spacing
+        int curY = y + MODULE_SPACING;
 
         for (Setting<?> setting : settings) {
             if (isHovered(mouseX, mouseY, x, curY)) {
@@ -202,9 +241,15 @@ public class SettingPanel {
                 } else if (setting instanceof ColorSetting colorSetting) {
                     startDragging(setting, mouseX);
                     return true;
-                } else if (setting instanceof KeyBindSetting) {
-                    // KeyBind handling would go here
-                    return true;
+                } else if (setting instanceof KeyBindSetting bindSetting) {
+                    if (button == 0) {
+                        isListeningForBind = true;
+                        currentListeningBind = bindSetting;
+                        return true;
+                    } else if (button == 1) {
+                        bindSetting.set(-1);
+                        return true;
+                    }
                 }
             }
             curY += HEIGHT + MODULE_SPACING;
@@ -293,5 +338,19 @@ public class SettingPanel {
         if (newValue > max) newValue = max;
 
         return newValue;
+    }
+
+    public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (isListeningForBind && currentListeningBind != null) {
+            if (keyCode == InputUtil.GLFW_KEY_ESCAPE) {
+                currentListeningBind.set(-1);
+            } else {
+                currentListeningBind.set(keyCode);
+            }
+            isListeningForBind = false;
+            currentListeningBind = null;
+            return true;
+        }
+        return false;
     }
 }

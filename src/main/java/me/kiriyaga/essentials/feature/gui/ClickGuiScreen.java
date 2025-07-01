@@ -1,4 +1,3 @@
-// ClickGuiScreen.java
 package me.kiriyaga.essentials.feature.gui;
 
 import me.kiriyaga.essentials.feature.module.Category;
@@ -21,6 +20,8 @@ public class ClickGuiScreen extends Screen {
     private Category draggedCategory = null;
     private int dragStartX = 0;
     public static final int GUI_ALPHA = 122;
+    private final Map<Category, CategoryPanel> categoryPanels = new HashMap<>();
+
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getModule(ClickGuiModule.class);
@@ -31,6 +32,7 @@ public class ClickGuiScreen extends Screen {
         int x = 20;
         for (Category category : Category.values()) {
             categoryPositions.put(category, x);
+            categoryPanels.put(category, new CategoryPanel(category, expandedCategories, expandedModules));
             x += CategoryPanel.WIDTH + CategoryPanel.GAP;
         }
     }
@@ -44,7 +46,7 @@ public class ClickGuiScreen extends Screen {
 
         for (Category category : Category.values()) {
             int x = categoryPositions.get(category);
-            CategoryPanel panel = new CategoryPanel(category, expandedCategories, expandedModules);
+            CategoryPanel panel = categoryPanels.get(category);
             panel.render(context, this.textRenderer, x, 20 + scrollOffset, mouseX, mouseY, this.height);
         }
     }
@@ -74,25 +76,27 @@ public class ClickGuiScreen extends Screen {
             for (Category category : Category.values()) {
                 if (expandedCategories.contains(category)) {
                     int x = categoryPositions.get(category);
-                    List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
-                    int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING; // Add initial spacing
+                    int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING;
 
-                    for (Module module : modules) {
+                    for (Module module : MODULE_MANAGER.getModulesByCategory(category)) {
                         if (ModulePanel.isHovered(mouseX, mouseY, x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING, curY)) {
                             if (button == 0) {
                                 module.toggle();
                             } else if (button == 1) {
-                                if (expandedModules.contains(module)) {
-                                    expandedModules.remove(module);
-                                } else {
+                                boolean newExpanded = !module.isExpanded();
+                                module.setExpanded(newExpanded);
+
+                                if (newExpanded) {
                                     expandedModules.add(module);
+                                } else {
+                                    expandedModules.remove(module);
                                 }
                             }
                             return true;
                         }
-                        curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING; // Add spacing after each module
+                        curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
 
-                        if (expandedModules.contains(module)) {
+                        if (module.getExpandProgress() > 0) {
                             if (SettingPanel.mouseClicked(module, mouseX, mouseY, button,
                                     x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING,
                                     curY)) {
@@ -107,7 +111,6 @@ public class ClickGuiScreen extends Screen {
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (draggingCategory && draggedCategory != null) {
