@@ -19,7 +19,7 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class AutoLogModule extends Module {
 
-    private final IntSetting health = addSetting(new IntSetting("on health", 12, 1, 26));
+    private final IntSetting health = addSetting(new IntSetting("on health", 12, 0, 36));
     private final BoolSetting onRender = addSetting(new BoolSetting("on render", false));
     private final BoolSetting packet = addSetting(new BoolSetting("packet", false));
     private final IntSetting onLevel = addSetting(new IntSetting("on level", 0, 0, 15000));
@@ -52,7 +52,7 @@ public class AutoLogModule extends Module {
             }
         }
 
-        if (player.getHealth() <= health.get()) {
+        if (player.getHealth() <= health.get() && health.get() != 0) {
             logOut("Low health: §7" + player.getHealth() + "§f HP");
             return;
         }

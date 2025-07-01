@@ -12,6 +12,7 @@ import me.kiriyaga.essentials.feature.module.impl.movement.NoJumpDelayModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
 import me.kiriyaga.essentials.feature.module.impl.world.NoBreakDelayModule;
+import me.kiriyaga.essentials.feature.module.impl.world.NoHitDelayModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,7 @@ public class ModuleManager {
         registerModule(new NoSoundLagModule());
         /// WORLD ///
         registerModule(new NoBreakDelayModule());
+        registerModule(new NoHitDelayModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
