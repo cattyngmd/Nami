@@ -11,6 +11,7 @@ public class NoRenderModule extends Module {
 
 
     private final BoolSetting noFire = addSetting(new BoolSetting("fire", true));
+    private final BoolSetting noBackground = addSetting(new BoolSetting("background", true));
     private final BoolSetting noLiguid = addSetting(new BoolSetting("liquid", false));
     private final BoolSetting noWall = addSetting(new BoolSetting("wall", false));
     private final BoolSetting noVignette = addSetting(new BoolSetting("vignette", true));
@@ -42,6 +43,10 @@ public class NoRenderModule extends Module {
 
     public boolean isNoFire() {
         return noFire.get();
+    }
+
+    public boolean isNoBackground() {
+        return noBackground.get();
     }
 
     public boolean isNoLiguid() {

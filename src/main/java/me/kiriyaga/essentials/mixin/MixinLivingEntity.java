@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.essentials.feature.module.impl.client.RotationManagerModule;
+import me.kiriyaga.essentials.feature.module.impl.movement.NoJumpDelayModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -9,6 +10,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -22,6 +24,8 @@ import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
 public abstract class MixinLivingEntity extends Entity {
 
     private float originalYaw, originalBodyYaw, originalHeadYaw;
+    @Shadow
+    private int jumpingCooldown;
 
     public MixinLivingEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -114,5 +118,12 @@ public abstract class MixinLivingEntity extends Entity {
     private float jumpFix(float originalYaw) {
         if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
         return ROTATION_MANAGER.getRotationYaw();
+    }
+
+    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
+    private void doItemUse(CallbackInfo info) {
+        if (MODULE_MANAGER.getModule(NoJumpDelayModule.class).isEnabled() && jumpingCooldown == 10) {
+            jumpingCooldown = 0;
+        }
     }
 }
