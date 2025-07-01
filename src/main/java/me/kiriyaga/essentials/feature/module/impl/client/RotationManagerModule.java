@@ -16,6 +16,6 @@ public class RotationManagerModule extends Module {
     public final DoubleSetting jitterSpeed = addSetting(new DoubleSetting("jitter speed", 0.3, 0.015, 1));
 
     public RotationManagerModule() {
-        super("rotation manager", "Allows you to config rotation manager settings.", Category.CLIENT, "rotate", "rotationmanager", "roate", "toationmanager", "кщефеу");
+        super("rotation manager", "Allows you to config rotation manager settings.", Category.client, "rotate", "rotationmanager", "roate", "toationmanager", "кщефеу");
     }
 }

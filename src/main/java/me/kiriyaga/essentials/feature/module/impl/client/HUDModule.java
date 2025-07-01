@@ -21,7 +21,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.awt.*;
-import java.text.Normalizer;
 
 import static me.kiriyaga.essentials.Essentials.*;
 
@@ -61,7 +60,7 @@ public class HUDModule extends Module {
 
 
     public HUDModule() {
-        super("hud","Displays in game hud.", Category.CLIENT, "ргв");
+        super("hud","Displays in game hud.", Category.client, "ргв");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

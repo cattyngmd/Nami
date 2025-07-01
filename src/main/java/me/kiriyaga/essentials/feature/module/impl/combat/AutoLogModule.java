@@ -6,7 +6,7 @@ import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
-import me.kiriyaga.essentials.feature.module.impl.world.AutoReconnectModule;
+import me.kiriyaga.essentials.feature.module.impl.misc.AutoReconnectModule;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
@@ -29,7 +29,7 @@ public class AutoLogModule extends Module {
     private boolean triggeredLevel = false;
 
     public AutoLogModule() {
-        super("auto log", "Logs out when danger is near.", Category.COMBAT, "autolog", "panic", "logout", "фгещдщп");
+        super("auto log", "Logs out when danger is near.", Category.combat, "autolog", "panic", "logout", "фгещдщп");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

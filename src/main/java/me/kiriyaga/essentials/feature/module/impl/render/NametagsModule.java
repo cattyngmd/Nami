@@ -1,6 +1,5 @@
 package me.kiriyaga.essentials.feature.module.impl.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.Render2DEvent;
@@ -9,7 +8,6 @@ import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.EnumSetting;
-import me.kiriyaga.essentials.util.EntityUtils;
 import me.kiriyaga.essentials.util.MatrixCache;
 import me.kiriyaga.essentials.util.NametagFormatter;
 import me.kiriyaga.essentials.util.render.RenderUtil;
@@ -18,8 +16,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -27,7 +23,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.gui.DrawContext;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.awt.*;
@@ -58,7 +53,7 @@ public class NametagsModule extends Module {
     }
 
     public NametagsModule() {
-        super("nametags", "Draws names above entities", Category.RENDER, "nametag", "nmtags", "names", "тфьуефпы");
+        super("nametags", "Draws names above entities", Category.visuals, "nametag", "nmtags", "names", "тфьуефпы");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

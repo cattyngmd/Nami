@@ -4,7 +4,6 @@ import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
 import me.kiriyaga.essentials.event.impl.PostTickEvent;
-import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
@@ -26,7 +25,7 @@ public class AutoTotemModule extends Module {
     private int totemCount = 0;
 
     public AutoTotemModule() {
-        super("auto totem", "Insane shit.", Category.COMBAT, "autototem");
+        super("auto totem", "Insane shit.", Category.combat, "autototem");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

@@ -1,6 +1,6 @@
 package me.kiriyaga.essentials.mixin;
 
-import me.kiriyaga.essentials.feature.module.impl.world.BetterTabModule;
+import me.kiriyaga.essentials.feature.module.impl.misc.BetterTabModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.network.PlayerListEntry;

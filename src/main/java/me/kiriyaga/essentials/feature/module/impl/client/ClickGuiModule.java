@@ -1,6 +1,5 @@
 package me.kiriyaga.essentials.feature.module.impl.client;
 
-import me.kiriyaga.essentials.feature.gui.ClickGuiScreen;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
@@ -13,7 +12,7 @@ public class ClickGuiModule extends Module {
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
 
     public ClickGuiModule() {
-        super("click gui", "Opens click gui", Category.CLIENT, "clickgui","click", "gui", "menu", "clckgui", "сдшслпгш");
+        super("click gui", "Opens click gui", Category.client, "clickgui","click", "gui", "menu", "clckgui", "сдшслпгш");
     }
 
     @Override

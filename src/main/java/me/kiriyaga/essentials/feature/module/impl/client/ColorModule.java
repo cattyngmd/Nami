@@ -25,7 +25,7 @@ public class ColorModule extends Module {
     public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.5, 0.0, 1.0));
 
     public ColorModule() {
-        super("color", "Customizes color scheme", Category.CLIENT, "colr", "c", "colors", "clitor", "сщдщк");
+        super("color", "Customizes color scheme", Category.client, "colr", "c", "colors", "clitor", "сщдщк");
     }
 
     private int getAlpha255() {

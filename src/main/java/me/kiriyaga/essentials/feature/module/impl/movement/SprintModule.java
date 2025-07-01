@@ -8,7 +8,6 @@ import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.mixin.PlayerInteractEntityC2SPacketAccessor;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
-import me.kiriyaga.essentials.setting.impl.EnumSetting;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
@@ -21,7 +20,7 @@ public class SprintModule extends Module {
     private final BoolSetting inLiquid = addSetting(new BoolSetting("in liquid", true));
 
     public SprintModule() {
-        super("sprint", "Automatically makes you sprint while moving forward.", Category.MOVEMENT);
+        super("sprint", "Automatically makes you sprint while moving forward.", Category.movement);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

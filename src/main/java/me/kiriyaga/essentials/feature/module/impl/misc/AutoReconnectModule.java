@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.feature.module.impl.world;
+package me.kiriyaga.essentials.feature.module.impl.misc;
 
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
@@ -11,6 +11,6 @@ public class AutoReconnectModule extends Module {
     public final IntSetting delay = addSetting(new IntSetting("delay", 5, 0, 25));
 
     public AutoReconnectModule() {
-        super("auto reconnect", "Automatically reconnects to the specified server.", Category.WORLD, "autoreconnect");
+        super("auto reconnect", "Automatically reconnects to the specified server.", Category.misc, "autoreconnect");
     }
 }

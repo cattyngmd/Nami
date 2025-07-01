@@ -4,7 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import me.kiriyaga.essentials.event.impl.PacketReceiveEvent;
 import me.kiriyaga.essentials.event.impl.PacketSendEvent;
-import me.kiriyaga.essentials.feature.module.impl.world.AntiPacketKickModule;
+import me.kiriyaga.essentials.feature.module.impl.misc.AntiPacketKickModule;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.PacketCallbacks;

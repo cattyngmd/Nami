@@ -1,6 +1,5 @@
 package me.kiriyaga.essentials.feature.module.impl.render;
 
-import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.KeyInputEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
@@ -30,7 +29,7 @@ public class FreecamModule extends Module {
     private boolean forward, back, left, right, up, down;
 
     public FreecamModule() {
-        super("freecam", "Fly around freely without moving your player.", Category.RENDER, "freecum", "акуусгь");
+        super("freecam", "Fly around freely without moving your player.", Category.visuals, "freecum", "акуусгь");
     }
 
     @Override

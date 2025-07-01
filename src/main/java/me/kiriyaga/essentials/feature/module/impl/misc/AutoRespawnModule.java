@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.feature.module.impl.world;
+package me.kiriyaga.essentials.feature.module.impl.misc;
 
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
@@ -9,6 +9,6 @@ public class AutoRespawnModule extends Module {
     public final BoolSetting sendCords = addSetting(new BoolSetting("send cords", true));
 
     public AutoRespawnModule() {
-        super("auto respawn", "Automatically respawns after death.", Category.WORLD, "autorespawn");
+        super("auto respawn", "Automatically respawns after death.", Category.misc, "autorespawn");
     }
 }

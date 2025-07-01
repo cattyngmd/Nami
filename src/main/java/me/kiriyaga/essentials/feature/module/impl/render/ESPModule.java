@@ -8,12 +8,10 @@ import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
-import me.kiriyaga.essentials.util.EntityUtils;
 import me.kiriyaga.essentials.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
 
 import java.awt.*;
@@ -36,7 +34,7 @@ public class ESPModule extends Module {
     private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public ESPModule() {
-        super("esp", "Draws boxes around entities", Category.RENDER, "esp", "WH", "boxes", "уыз");
+        super("esp", "Draws boxes around entities", Category.visuals, "esp", "WH", "boxes", "уыз");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -12,6 +12,6 @@ public class PingManagerModule extends Module {
     public final BoolSetting debug = addSetting(new BoolSetting("debug", false));
 
     public PingManagerModule() {
-        super("ping manager", "Allows you to config ping manager settings.", Category.CLIENT, "ping", "manager", "managr", "png", "зштп");
+        super("ping manager", "Allows you to config ping manager settings.", Category.client, "ping", "manager", "managr", "png", "зштп");
     }
 }

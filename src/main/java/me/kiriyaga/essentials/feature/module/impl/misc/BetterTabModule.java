@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.feature.module.impl.world;
+package me.kiriyaga.essentials.feature.module.impl.misc;
 
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
@@ -12,6 +12,6 @@ public class BetterTabModule extends Module {
     public final BoolSetting highlighFriends = addSetting(new BoolSetting("highlight friends", true));
 
     public BetterTabModule() {
-        super("better tab", "Extends tab limits and tweaks.", Category.WORLD, "bettertab");
+        super("better tab", "Extends tab limits and tweaks.", Category.misc, "bettertab");
     }
 }

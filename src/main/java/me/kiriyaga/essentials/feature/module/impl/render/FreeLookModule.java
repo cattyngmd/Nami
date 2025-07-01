@@ -4,7 +4,6 @@ import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
-import me.kiriyaga.essentials.setting.impl.KeyBindSetting;
 import net.minecraft.client.option.Perspective;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
@@ -20,7 +19,7 @@ public class FreeLookModule extends Module {
 
 
     public FreeLookModule() {
-        super("free look", "Allows more rotation options in third person.", Category.RENDER, "freelook", "freelok", "third", "акуудщщл");
+        super("free look", "Allows more rotation options in third person.", Category.visuals, "freelook", "freelok", "third", "акуудщщл");
     }
 
     @Override

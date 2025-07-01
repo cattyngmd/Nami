@@ -1,4 +1,4 @@
-package me.kiriyaga.essentials.feature.module.impl.world;
+package me.kiriyaga.essentials.feature.module.impl.misc;
 
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
@@ -8,11 +8,7 @@ import me.kiriyaga.essentials.feature.module.Module;
 
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket.Action;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket.Entry;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import static me.kiriyaga.essentials.Essentials.*;
 
@@ -22,7 +18,7 @@ public class JoinAnnounceModule extends Module {
     public final BoolSetting friends = addSetting(new BoolSetting("friends", true));
 
     public JoinAnnounceModule() {
-        super("join announce", "Announces in chat when a player joins the server.", Category.WORLD, "joinannounce", "joins", "announce", "ощштфттщгтсу");
+        super("join announce", "Announces in chat when a player joins the server.", Category.misc, "joinannounce", "joins", "announce", "ощштфттщгтсу");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

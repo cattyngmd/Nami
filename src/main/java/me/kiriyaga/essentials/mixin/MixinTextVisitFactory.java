@@ -1,13 +1,7 @@
 package me.kiriyaga.essentials.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import me.kiriyaga.essentials.feature.module.Module;
-import me.kiriyaga.essentials.feature.module.impl.world.NameProtectModule;
+import me.kiriyaga.essentials.feature.module.impl.misc.NameProtectModule;
 import me.kiriyaga.essentials.mixininterface.IMinecraft;
-import net.minecraft.text.Style;
 import net.minecraft.text.TextVisitFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

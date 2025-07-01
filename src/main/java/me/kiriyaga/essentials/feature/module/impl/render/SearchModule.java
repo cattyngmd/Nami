@@ -50,7 +50,7 @@ public class SearchModule extends Module {
     private int tickCounter = 0;
 
     public SearchModule() {
-        super("search", "Search certain blocks on loaded chunks.", Category.RENDER, "srcj", "blockesp", "serch", "ыуфкср");
+        super("search", "Search certain blocks on loaded chunks.", Category.visuals, "srcj", "blockesp", "serch", "ыуфкср");
     }
 
     private void updateCandidateBlocks() {

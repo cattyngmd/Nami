@@ -9,7 +9,6 @@ import me.kiriyaga.essentials.mixin.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
@@ -26,7 +25,7 @@ public class GuiMoveModule extends Module {
     private boolean sprintHeld = false;
 
     public GuiMoveModule() {
-        super("gui move", "Allows movement and camera control in most GUIs.", Category.MOVEMENT);
+        super("gui move", "Allows movement and camera control in most GUIs.", Category.movement);
     }
 
     @Override

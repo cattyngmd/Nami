@@ -6,10 +6,10 @@ import me.kiriyaga.essentials.feature.module.impl.client.*;
 import me.kiriyaga.essentials.feature.module.impl.combat.AuraModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoLogModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
+import me.kiriyaga.essentials.feature.module.impl.misc.*;
 import me.kiriyaga.essentials.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
-import me.kiriyaga.essentials.feature.module.impl.world.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class ModuleManager {
         registerModule(new GuiMoveModule());
         /// TRAVEL ///
         //registerModule(new EbounceModule());
-        /// WORLD ///
+        /// MISC ///
         registerModule(new JoinAnnounceModule());
         registerModule(new AutoFovModule());
         registerModule(new AutoGammaModule());
@@ -56,6 +56,7 @@ public class ModuleManager {
         registerModule(new AutoRespawnModule());
         registerModule(new BetterTabModule());
         registerModule(new NameProtectModule());
+        registerModule(new NoSoundLagModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

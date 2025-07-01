@@ -1,6 +1,6 @@
 package me.kiriyaga.essentials.mixin;
 
-import me.kiriyaga.essentials.feature.module.impl.world.AutoReconnectModule;
+import me.kiriyaga.essentials.feature.module.impl.misc.AutoReconnectModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
