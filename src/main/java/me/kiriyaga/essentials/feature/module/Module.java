@@ -16,10 +16,6 @@ public abstract class Module {
     protected final String[] aliases;
     protected final Category category;
 
-    private boolean expanded = false;
-    private float expandProgress = 0f;
-    private long lastAnimationTime = System.currentTimeMillis();
-
     private boolean enabled = false;
     private String displayInfo = "";
 
@@ -116,35 +112,4 @@ public abstract class Module {
     protected void onEnable() {}
 
     protected void onDisable() {}
-
-    public float getExpandProgress() {
-        return expandProgress;
-    }
-
-    public void setExpandProgress(float expandProgress) {
-        this.expandProgress = expandProgress;
-    }
-
-    public boolean isExpanded() {
-        return expanded;
-    }
-
-    public void setExpanded(boolean expanded) {
-        this.expanded = expanded;
-    }
-
-    public void updateAnimation() {
-        long currentTime = System.currentTimeMillis();
-        float delta = (currentTime - lastAnimationTime) / 1000f;
-        lastAnimationTime = currentTime;
-
-        float target = expanded ? 1f : 0f;
-        float speed = 2f;
-
-        if (expandProgress < target) {
-            expandProgress = Math.min(target, expandProgress + speed * delta);
-        } else if (expandProgress > target) {
-            expandProgress = Math.max(target, expandProgress - speed * delta);
-        }
-    }
 }
