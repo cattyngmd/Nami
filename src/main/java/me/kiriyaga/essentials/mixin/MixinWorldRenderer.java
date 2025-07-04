@@ -1,6 +1,7 @@
 package me.kiriyaga.essentials.mixin;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,17 +32,17 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class MixinWorldRenderer {
 
-    @Shadow @Final private Set<BlockEntity> noCullingBlockEntities;
-
     @Inject(method = "render", at = @At("RETURN"))
     private void onRenderTail(
             ObjectAllocator allocator,
             RenderTickCounter tickCounter,
             boolean renderBlockOutline,
             Camera camera,
-            GameRenderer gameRenderer,
             Matrix4f positionMatrix,
             Matrix4f projectionMatrix,
+            GpuBufferSlice fog,
+            Vector4f fogColor,
+            boolean shouldRenderSky,
             CallbackInfo ci
     ) {
         float tickDelta = tickCounter.getTickProgress(true);
@@ -61,9 +63,11 @@ public class MixinWorldRenderer {
             RenderTickCounter tickCounter,
             boolean renderBlockOutline,
             Camera camera,
-            GameRenderer gameRenderer,
             Matrix4f positionMatrix,
             Matrix4f projectionMatrix,
+            GpuBufferSlice fog,
+            Vector4f fogColor,
+            boolean shouldRenderSky,
             CallbackInfo ci
     ) {
         MatrixCache.positionMatrix = new Matrix4f(positionMatrix);

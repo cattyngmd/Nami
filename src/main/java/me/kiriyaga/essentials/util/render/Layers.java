@@ -49,7 +49,7 @@ public class Layers {
 
     private static RenderLayer.MultiPhaseParameters withTexture() {
         return builder()
-                .texture(new RenderPhase.Texture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, TriState.FALSE, false))
+                .texture(new RenderPhase.Texture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, false))
                 .build(false);
     }
 

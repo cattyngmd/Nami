@@ -36,16 +36,15 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.*;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import org.lwjgl.opengl.GL11;
+
+import java.lang.Math;
 import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.*;
@@ -298,15 +297,15 @@ public class RenderUtil {
             int y,
             float scale
     ) {
-        MatrixStack matrices = drawContext.getMatrices();
-        matrices.push();
+        Matrix3x2fStack matrices = drawContext.getMatrices();
+        matrices.pushMatrix();
 
-        matrices.translate(x, y, 0);
-        matrices.scale(scale, scale, 1f);
+        matrices.translate(x, y);
+        matrices.scale(scale, scale);
 
         drawContext.drawItem(stack, -8, -8);
 
-        matrices.pop();
+        matrices.popMatrix();
     }
 
     public static void drawText3D(MatrixStack matrices, Text text, Vec3d pos, float scale, boolean background, boolean border, float borderWidth) {

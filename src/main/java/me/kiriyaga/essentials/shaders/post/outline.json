@@ -1,0 +1,16 @@
+{
+  "input": "minecraft:main",
+  "program": "essentials:program/outline",
+  "samplers": ["DiffuseSampler"],
+  "uniforms": [
+    { "name": "InSize", "values": [1,1] },
+    { "name": "RenderMode", "values": [1] },
+    { "name": "FillOpacity", "values": [1.0] }
+  ],
+  "outputs": ["minecraft:final"],
+  "blend": {
+    "func": "add",
+    "srcrgb": "srcalpha",
+    "dstrgb": "1-srcalpha"
+  }
+}

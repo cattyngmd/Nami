@@ -16,6 +16,17 @@ import static net.minecraft.client.gl.RenderPipelines.POSITION_COLOR_SNIPPET;
 import static net.minecraft.client.gl.RenderPipelines.RENDERTYPE_LINES_SNIPPET;
 
 class Pipelines {
+
+    RenderPipeline SHADER_OUTLINE_PIPELINE = RenderPipeline.builder(POSITION_TEX_COLOR_SNIPPET)
+            .withLocation("shaders/post/outline.json") // путь к шейдеру в ресурсах
+            .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withDepthWrite(false)
+            .withCull(false)
+            .build();
+
+
     static final RenderPipeline GLOBAL_QUADS_PIPELINE = RenderPipeline.builder(POSITION_COLOR_SNIPPET)
             .withLocation("pipeline/global_fill_pipeline")
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)

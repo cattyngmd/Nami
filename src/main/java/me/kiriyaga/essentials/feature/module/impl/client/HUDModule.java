@@ -76,7 +76,9 @@ public class HUDModule extends Module {
         if (mc.world == null || mc.player == null) return;
 
         Color styled = getColorModule().getStyledGlobalColor();
-        primaryRGB = styled.getRGB() & 0x00FFFFFF;
+        int rawColor = styled.getRGB();
+        int rgb = rawColor & 0x00FFFFFF;
+        primaryRGB = 0xFF000000 | rgb;
 
         if (watermarkEnabled.get()) {
             watermarkText = Text.of(NAME + " " + VERSION);
