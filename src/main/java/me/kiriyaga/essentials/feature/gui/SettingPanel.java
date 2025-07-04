@@ -297,10 +297,10 @@ public class SettingPanel {
         double max = doubleSetting.getMax();
         double range = max - min;
 
-        double sensitivity = 0.002 * Math.pow(range, 0.25); // адаптивная чувствительность
+        double sensitivity = 0.002 * Math.pow(range, 0.25); //TODO: rewrite this shit it wont work properly on weird values
         double delta = deltaX * sensitivity;
 
-        double stepBase = Math.pow(10, Math.floor(Math.log10(range)) - 2); // например, 10000 => stepBase = 100
+        double stepBase = Math.pow(10, Math.floor(Math.log10(range)) - 2);
         double step = stepBase;
 
         if (Math.abs(deltaX) < 2) step /= 10;
