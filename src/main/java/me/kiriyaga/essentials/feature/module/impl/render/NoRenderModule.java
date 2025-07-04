@@ -16,7 +16,6 @@ public class NoRenderModule extends Module {
     private final BoolSetting noWall = addSetting(new BoolSetting("wall", false));
     private final BoolSetting noVignette = addSetting(new BoolSetting("vignette", true));
     private final BoolSetting noTotem = addSetting(new BoolSetting("totem", true));
-    private final BoolSetting noEating = addSetting(new BoolSetting("eat", true));
     private final BoolSetting noBossBar = addSetting(new BoolSetting("boss", true));
     private final BoolSetting noPortal = addSetting(new BoolSetting("portal", true));
     private final BoolSetting noPotIcon = addSetting(new BoolSetting("pot", true));
@@ -46,6 +45,9 @@ public class NoRenderModule extends Module {
     }
 
     public boolean isNoBackground() {
+        if (MINECRAFT.world == null)
+            return false;
+
         return noBackground.get();
     }
 
@@ -63,10 +65,6 @@ public class NoRenderModule extends Module {
 
     public boolean isNoTotem() {
         return noTotem.get();
-    }
-
-    public boolean isNoEating() {
-        return noEating.get();
     }
 
     public boolean isNoBossBar() {

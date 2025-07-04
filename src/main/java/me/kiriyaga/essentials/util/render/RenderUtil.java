@@ -8,18 +8,22 @@ package me.kiriyaga.essentials.util.render;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.*;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.font.TextRenderer;
@@ -32,6 +36,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -41,6 +46,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import org.lwjgl.opengl.GL11;
+import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.*;
 import java.awt.*;
@@ -284,6 +290,7 @@ public class RenderUtil {
         drawContext.drawText(MINECRAFT.textRenderer, text, x, y, color, false);
     }
 
+
     public static void drawItem2D(
             DrawContext drawContext,
             ItemStack stack,
@@ -302,5 +309,118 @@ public class RenderUtil {
         matrices.pop();
     }
 
+    public static void drawText3D(MatrixStack matrices, Text text, Vec3d pos, float scale, boolean background, boolean border, float borderWidth) {
+        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
 
+        matrices.push();
+        matrices.translate(
+                pos.x - camera.getPos().x,
+                pos.y - camera.getPos().y,
+                pos.z - camera.getPos().z
+        );
+
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+
+        matrices.scale(-scale, -scale, scale);
+
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        float textWidth = textRenderer.getWidth(text) / 2f;
+
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        VertexConsumerProvider.Immediate provider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+
+        if (background) {
+            float bgPadding = 1f;
+            float height = textRenderer.fontHeight;
+
+            float left = -textWidth - bgPadding;
+            float right = textWidth + bgPadding;
+            float top = -bgPadding;
+            float bottom = height + bgPadding;
+
+            int backgroundColor = 0x90000000;
+            int borderColor = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor().getRGB();
+
+            RenderUtil.rectFilled(matrices, left, top, right, bottom, backgroundColor);
+
+            if (border){
+                RenderUtil.rectFilled(matrices, left - borderWidth, top, left, bottom, borderColor);
+                RenderUtil.rectFilled(matrices, right, top, right + borderWidth, bottom, borderColor);
+                RenderUtil.rectFilled(matrices, left - borderWidth, top - borderWidth, right + borderWidth, top, borderColor);
+                RenderUtil.rectFilled(matrices, left - borderWidth, bottom, right + borderWidth, bottom + borderWidth, borderColor);
+            }
+        }
+
+        textRenderer.draw(
+                text, -textWidth, 0, -1, true, matrix, provider, TextRenderer.TextLayerType.SEE_THROUGH, 0, 15728880
+        );
+
+        provider.draw();
+
+        matrices.pop();
+    }
+
+    public static void renderItem3D(ItemStack stack, MatrixStack matrices, Vec3d pos, RenderLayer customLayer, float scale) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        ItemRenderer itemRenderer = client.getItemRenderer();
+
+        matrices.push();
+
+        Vec3d camPos = client.gameRenderer.getCamera().getPos();
+        matrices.translate(pos.x - camPos.x, pos.y - camPos.y, pos.z - camPos.z);
+
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-client.gameRenderer.getCamera().getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(client.gameRenderer.getCamera().getPitch()));
+
+        float s = scale * 13f;
+        matrices.scale(s, s, s);
+
+        VertexConsumerProvider.Immediate base = client.getBufferBuilders().getEntityVertexConsumers();
+
+        VertexConsumerProvider redirectingProvider = requestedLayer -> {
+            String name = requestedLayer.getName().toLowerCase();
+            if (name.contains("item") || name.contains("cutout") || name.contains("entity")) {
+                return base.getBuffer(customLayer);
+            }
+            return base.getBuffer(requestedLayer);
+        };
+
+        itemRenderer.renderItem(
+                stack,
+                ItemDisplayContext.GUI,
+                LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                OverlayTexture.DEFAULT_UV,
+                matrices,
+                redirectingProvider,
+                client.world,
+                0
+        );
+
+        // since we are using our own pipeline and layer, we need to shade ourselfs, but i dont wanna so we just use second layer for glint
+        if (stack.hasGlint()) {
+            VertexConsumerProvider glintProvider = requestedLayer -> {
+                String name = requestedLayer.getName().toLowerCase();
+                if (name.contains("glint")) {
+                    return base.getBuffer(RenderLayer.getGlint());
+                }
+                return base.getBuffer(requestedLayer);
+            };
+
+            itemRenderer.renderItem(
+                    stack,
+                    ItemDisplayContext.GUI,
+                    LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                    OverlayTexture.DEFAULT_UV,
+                    matrices,
+                    glintProvider,
+                    client.world,
+                    0
+            );
+        }
+
+        base.draw();
+
+        matrices.pop();
+    }
 }

@@ -10,6 +10,7 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
+import static net.minecraft.client.gl.RenderPipelines.POSITION_TEX_COLOR_SNIPPET;
 
 import static net.minecraft.client.gl.RenderPipelines.POSITION_COLOR_SNIPPET;
 import static net.minecraft.client.gl.RenderPipelines.RENDERTYPE_LINES_SNIPPET;
@@ -31,4 +32,23 @@ class Pipelines {
             .withDepthWrite(false)
             .withCull(false)
             .build();
+
+    static final RenderPipeline GLOBAL_TEXT_PIPELINE = RenderPipeline.builder(POSITION_COLOR_SNIPPET)
+            .withLocation("pipeline/global_text_pipeline")
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withDepthWrite(false)
+            .withCull(false)
+            .build();
+
+    static final RenderPipeline GLOBAL_ITEM_PIPELINE = RenderPipeline.builder(POSITION_TEX_COLOR_SNIPPET)
+            .withLocation("pipeline/global_item_pipeline")
+            .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withDepthWrite(false)
+            .withCull(false)
+            .build();
+
 }

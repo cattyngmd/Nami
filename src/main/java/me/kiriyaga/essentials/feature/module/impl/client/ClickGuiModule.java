@@ -20,6 +20,7 @@ public class ClickGuiModule extends Module {
         if (MINECRAFT == null || MINECRAFT.mouse == null)
             return;
 
+        System.out.println("tried to toggle gui");
         MINECRAFT.setScreen(CLICK_GUI);
         this.toggle();
     }

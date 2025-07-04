@@ -11,6 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.List;
 
+import static java.lang.Math.clamp;
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
 
@@ -129,7 +130,20 @@ public class SettingPanel {
                     WIDTH - 2 * PADDING, SLIDER_HEIGHT,
                     doubleSetting.get(), doubleSetting.getMin(), doubleSetting.getMax(), primary);
 
-            String valStr = String.format("%.1f", doubleSetting.get());
+            double val = doubleSetting.get();
+            double range = doubleSetting.getMax() - doubleSetting.getMin();
+            String valStr;
+
+            if (range <= 0.1) { // insane ifelse statement
+                valStr = String.format("%.3f", val);
+            } else if (range <= 10) {
+                valStr = String.format("%.2f", val);
+            } else if (range <= 1000) {
+                valStr = String.format("%.1f", val);
+            } else {
+                valStr = String.format("%.0f", val);
+            }
+
             context.drawText(textRenderer, valStr, x + WIDTH - PADDING - textRenderer.getWidth(valStr), y + (HEIGHT - 8) / 2, textColorInt, false);
         }
 
@@ -151,8 +165,12 @@ public class SettingPanel {
     private static void renderSlider(DrawContext context, int x, int y, int width, int height,
                                      double value, double min, double max, Color color) {
         context.fill(x, y, x + width, y + height, toRGBA(new Color(60, 60, 60, 150)));
+
+        value = Math.max(min, Math.min(max, value));
+
         double percent = (value - min) / (max - min);
         int filledWidth = (int) (width * percent);
+
         context.fill(x, y, x + filledWidth, y + height, toRGBA(color));
     }
 
@@ -273,25 +291,36 @@ public class SettingPanel {
     }
 
     private static double slideDouble(double start, double deltaX) {
-        double step = 0.1;
-        double min = Double.NEGATIVE_INFINITY;
-        double max = Double.POSITIVE_INFINITY;
+        if (!(draggedSetting instanceof DoubleSetting doubleSetting)) return start;
 
-        if (draggedSetting instanceof DoubleSetting doubleSetting) {
-            min = doubleSetting.getMin();
-            max = doubleSetting.getMax();
-        }
+        double min = doubleSetting.getMin();
+        double max = doubleSetting.getMax();
+        double range = max - min;
 
-        double sensitivity = 0.02;
+        double sensitivity = 0.002 * Math.pow(range, 0.25); // адаптивная чувствительность
         double delta = deltaX * sensitivity;
 
-        double newValue = start + delta;
+        double stepBase = Math.pow(10, Math.floor(Math.log10(range)) - 2); // например, 10000 => stepBase = 100
+        double step = stepBase;
 
+        if (Math.abs(deltaX) < 2) step /= 10;
+        else if (Math.abs(deltaX) < 5) step /= 5;
+        else if (Math.abs(deltaX) > 50) step *= 5;
+
+        double newValue = start + delta;
         newValue = Math.round(newValue / step) * step;
 
-        if (newValue < min) newValue = min;
-        if (newValue > max) newValue = max;
-
+        newValue = Math.max(min, Math.min(max, newValue));
         return newValue;
+    }
+
+    private static double calculateDynamicStep(double min, double max) {
+        double range = Math.abs(max - min);
+        if (range == 0) return 0.0001;
+
+        double exponent = Math.floor(Math.log10(range)) - 2;
+        exponent = Math.max(-6, Math.min(2, exponent));
+
+        return Math.pow(10, exponent);
     }
 }

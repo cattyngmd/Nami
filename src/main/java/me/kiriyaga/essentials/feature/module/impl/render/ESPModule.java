@@ -25,6 +25,7 @@ public class ESPModule extends Module {
     public final BoolSetting showNeutrals = addSetting(new BoolSetting("neutrals", true));
     public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", true));
     public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
+    public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth appearance", true));
     public final DoubleSetting lineWidth = addSetting(new DoubleSetting("line", 1.5, 0.5, 2.5));
     public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 
@@ -91,10 +92,16 @@ public class ESPModule extends Module {
                 interpZ - entity.getZ()
         );
 
+        int cof = smoothAppear.get() ? entity.age : 99;
+
+        int alpha = Math.min(cof * 10, 255);
+
         if (filled.get()) {
-            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
+            int filledAlpha = Math.min(alpha, 75);
+            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), filledAlpha));
         } else {
-            RenderUtil.drawBox(matrices, box, color, lineWidth.get());
+            RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lineWidth.get());
         }
     }
+
 }

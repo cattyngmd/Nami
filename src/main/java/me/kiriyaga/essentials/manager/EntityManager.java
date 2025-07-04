@@ -3,11 +3,8 @@ package me.kiriyaga.essentials.manager;
 import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
-import me.kiriyaga.essentials.event.impl.PreTickEvent;
+import me.kiriyaga.essentials.event.impl.Render2DEvent;
 import me.kiriyaga.essentials.feature.module.impl.client.EntityManagerModule;
-import me.kiriyaga.essentials.setting.impl.BoolSetting;
-import me.kiriyaga.essentials.setting.impl.DoubleSetting;
-import me.kiriyaga.essentials.setting.impl.EnumSetting;
 import me.kiriyaga.essentials.util.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -114,7 +111,7 @@ public class EntityManager {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPreTick(PreTickEvent event) {
+    public void onFrame(Render2DEvent event) {
         if (MINECRAFT.world == null) {
             clearData();
             idleTicksCounter = 0;

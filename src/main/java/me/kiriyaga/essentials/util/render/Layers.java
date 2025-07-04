@@ -7,6 +7,8 @@ package me.kiriyaga.essentials.util.render;
 
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.util.TriState;
 import net.minecraft.util.Util;
 
 import java.util.OptionalDouble;
@@ -17,6 +19,8 @@ import static me.kiriyaga.essentials.util.render.Pipelines.*;
 public class Layers {
     private static final RenderLayer GLOBAL_QUADS;
     private static final Function<Double, RenderLayer> GLOBAL_LINES;
+    private static final RenderLayer GLOBAL_TEXT;
+    private static final RenderLayer GLOBAL_ITEM;
 
     public static RenderLayer getGlobalLines(double width) {
         return GLOBAL_LINES.apply(width);
@@ -26,6 +30,15 @@ public class Layers {
         return GLOBAL_QUADS;
     }
 
+    public static RenderLayer getGlobalText() {
+        return GLOBAL_TEXT;
+    }
+
+    public static RenderLayer getGlobalItem() {
+        return GLOBAL_ITEM;
+    }
+
+
     private static RenderLayer.MultiPhaseParameters.Builder builder() {
         return RenderLayer.MultiPhaseParameters.builder();
     }
@@ -34,8 +47,17 @@ public class Layers {
         return builder().build(false);
     }
 
+    private static RenderLayer.MultiPhaseParameters withTexture() {
+        return builder()
+                .texture(new RenderPhase.Texture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, TriState.FALSE, false))
+                .build(false);
+    }
+
     static {
         GLOBAL_QUADS = RenderLayer.of("global_fill", 156, GLOBAL_QUADS_PIPELINE, empty());
+
+        GLOBAL_TEXT = RenderLayer.of("global_text", 156, Pipelines.GLOBAL_TEXT_PIPELINE, empty());
+        GLOBAL_ITEM = RenderLayer.of("global_item", 156, GLOBAL_ITEM_PIPELINE, withTexture());
 
         GLOBAL_LINES = Util.memoize(l -> {
             RenderPhase.LineWidth width = new RenderPhase.LineWidth(OptionalDouble.of(l));
