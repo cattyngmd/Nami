@@ -19,15 +19,20 @@ public class AutoFovModule extends Module {
     }
 
     @Override
-    public void onEnable(){
-        ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(fov.get());
+    public void onEnable() {
+        if (MINECRAFT != null && MINECRAFT.options != null && MINECRAFT.options.getFov() != null) {
+            ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(fov.get());
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    private void onTick(PostTickEvent ev){
+    private void onTick(PostTickEvent ev) {
+        if (MINECRAFT == null || MINECRAFT.options == null || MINECRAFT.options.getFov() == null) return;
+
         int d = MINECRAFT.options.getFov().getValue();
 
-        if (d != fov.get())
+        if (d != fov.get()) {
             ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(fov.get());
+        }
     }
 }

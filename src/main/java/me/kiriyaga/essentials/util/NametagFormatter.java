@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.util;
 
+import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import me.kiriyaga.essentials.feature.module.impl.render.NametagsModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -116,14 +117,16 @@ public class NametagFormatter {
         Color color = forcedColor;
 
         if (color == null && entity != null) {
-            if (entity instanceof PlayerEntity && FRIEND_MANAGER.isFriend(entity.getName().getString())) {
-                color = MODULE_MANAGER.getModule(me.kiriyaga.essentials.feature.module.impl.client.ColorModule.class).getStyledGlobalColor();
-            } else if (entity instanceof  PlayerEntity && entity.isSneaking()) {
-                color = new Color(255, 215, 0); // gold (?)
-            } else if (entity instanceof  PlayerEntity) {
-                color = Color.WHITE;
-            } else if (entity.getClass().getSimpleName().equals("ItemEntity")) {
-                color = MODULE_MANAGER.getModule(me.kiriyaga.essentials.feature.module.impl.client.ColorModule.class).getStyledGlobalColor();
+            if (entity instanceof PlayerEntity player) {
+                if (player.isSneaking()) {
+                    color = new Color(255, 165, 0);
+                } else if (FRIEND_MANAGER.isFriend(player.getName().getString())) {
+                    color = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor();
+                } else {
+                    color = Color.WHITE;
+                }
+            } else if (entity instanceof ItemEntity) {
+                color = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor();
             } else if (EntityUtils.isHostile(entity)) {
                 color = COLOR_HOSTILE;
             } else if (EntityUtils.isNeutral(entity)) {

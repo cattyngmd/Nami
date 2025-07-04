@@ -28,6 +28,7 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class NametagsModule extends Module {
 
+    public final BoolSetting self = addSetting(new BoolSetting("self", false));
     public final BoolSetting players = addSetting(new BoolSetting("players", true));
     public final BoolSetting hostiles = addSetting(new BoolSetting("hostiles", false));
     public final BoolSetting neutrals = addSetting(new BoolSetting("neutrals", false));
@@ -60,11 +61,14 @@ public class NametagsModule extends Module {
         MatrixStack matrices = event.getMatrices();
 
         if (players.get()) {
-            Color playerColor = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor();
             for (PlayerEntity player : ENTITY_MANAGER.getPlayers()) {
-                if (player == MINECRAFT.player && MINECRAFT.options.getPerspective().isFirstPerson()) continue;
-                renderEntityNametag(player, event.getTickDelta(), matrices, 30, playerColor);
+                if (player == MINECRAFT.player) continue;
+                renderEntityNametag(player, event.getTickDelta(), matrices, 30, null);
             }
+        }
+
+        if (self.get() && !MINECRAFT.options.getPerspective().isFirstPerson()){
+            renderEntityNametag(MINECRAFT.player, event.getTickDelta(), matrices, 30, null);
         }
 
         if (hostiles.get()) {
