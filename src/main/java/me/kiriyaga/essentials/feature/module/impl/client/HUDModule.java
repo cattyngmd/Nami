@@ -11,6 +11,7 @@ import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
@@ -19,8 +20,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.joml.Matrix3x2fStack;
 
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static me.kiriyaga.essentials.Essentials.*;
 
@@ -31,6 +35,7 @@ public class HUDModule extends Module {
     public final BoolSetting chatAnimation = addSetting(new BoolSetting("chat animation", true));
     public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("watermark", true));
     public final BoolSetting armorEnabled = addSetting(new BoolSetting("armor", true));
+    public final BoolSetting armorDurability = addSetting(new BoolSetting("armor durability", true));
     public final BoolSetting speedEnabled = addSetting(new BoolSetting("speed", true));
     public final BoolSetting totemsEnabled = addSetting(new BoolSetting("totems", true));
     public final BoolSetting coordsEnabled = addSetting(new BoolSetting("coordinates", true));
@@ -39,6 +44,8 @@ public class HUDModule extends Module {
     public final BoolSetting fpsEnabled = addSetting(new BoolSetting("fps", true));
     public final BoolSetting pingEnabled = addSetting(new BoolSetting("ping", false));
     public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("lag warning", false));
+    public final BoolSetting time = addSetting(new BoolSetting("time", false));
+    public final BoolSetting shadow = addSetting(new BoolSetting("shadow", true));
 
     private int tickCounter = 0;
     private static final int PADDING = 1;
@@ -49,6 +56,7 @@ public class HUDModule extends Module {
     private Text fpsText = Text.empty();
     private Text pingText = Text.empty();
     private Text speedText = Text.empty();
+    private Text timeText = Text.empty();
     private boolean serverLagging = false;
     private int primaryRGB;
 
@@ -146,6 +154,17 @@ public class HUDModule extends Module {
             lastY = mc.player.getY();
             lastZ = mc.player.getZ();
         }
+
+        if (time.get()) {
+            LocalDateTime now = LocalDateTime.now();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
+            String formattedTime = now.format(formatter);
+
+            int darkGrayColor = 0xFF666666;
+
+            timeText = Text.literal(formattedTime).setStyle(Style.EMPTY.withColor(darkGrayColor));
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -181,7 +200,29 @@ public class HUDModule extends Module {
 
     private void renderTopLeft(Render2DEvent event, int color) {
         if (watermarkEnabled.get() && !watermarkText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, watermarkText, PADDING, PADDING, color, true);
+            event.getDrawContext().drawText(
+                    MINECRAFT.textRenderer,
+                    watermarkText,
+                    PADDING,
+                    PADDING,
+                    color,
+                    shadow.get()
+            );
+
+            int watermarkWidth = MINECRAFT.textRenderer.getWidth(watermarkText);
+
+            int gap = 5;
+
+            if (time.get() && timeText != null) {
+                event.getDrawContext().drawText(
+                        MINECRAFT.textRenderer,
+                        timeText,
+                        PADDING + watermarkWidth + gap,
+                        PADDING,
+                        0xFF333333,
+                        shadow.get()
+                );
+            }
         }
     }
 
@@ -190,12 +231,12 @@ public class HUDModule extends Module {
         y -= (int) animationOffset;
 
         if (coordsEnabled.get() && !coordsText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, PADDING, y, color, true);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, PADDING, y, color, shadow.get());
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
         if (facingEnabled.get() && !facingText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, PADDING, y, color, true);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, PADDING, y, color, shadow.get());
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
@@ -206,19 +247,19 @@ public class HUDModule extends Module {
 
         if (speedEnabled.get() && !speedText.getString().isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(speedText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, speedText, screenWidth - width - PADDING, y, color, true);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, speedText, screenWidth - width - PADDING, y, color, shadow.get());
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
         if (pingEnabled.get() && !pingText.getString().isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(pingText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width - PADDING, y, color, true);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width - PADDING, y, color, shadow.get());
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
 
         if (fpsEnabled.get() && !fpsText.getString().isEmpty()) {
             int width = MINECRAFT.textRenderer.getWidth(fpsText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width - PADDING, y, color, true);
+            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width - PADDING, y, color, shadow.get());
             y -= MINECRAFT.textRenderer.fontHeight + 2;
         }
     }
@@ -247,21 +288,34 @@ public class HUDModule extends Module {
             event.getDrawContext().drawItem(stack, (int) armorX, (int) armorY);
             event.getDrawContext().drawStackOverlay(MINECRAFT.textRenderer, stack, (int) armorX, (int) armorY);
 
-            if (stack.isDamageable()) {
+            if (stack.isDamageable() && armorDurability.get()) {
                 float durability = (stack.getMaxDamage() - (float) stack.getDamage()) / stack.getMaxDamage();
                 int percent = Math.round(durability * 100);
                 int r = (int) ((1 - durability) * 255);
                 int g = (int) (durability * 255);
 
-                String durabilityText = Integer.toString(percent);
+                String durabilityText = percent+"%";
+
+                Matrix3x2fStack matrices = event.getDrawContext().getMatrices();
+
+                matrices.pushMatrix();
+
+                float scale = 0.7f;
+                matrices.scale(scale, scale);
+
+                float scaledX = (float) ((armorX + 1) / scale);
+                float scaledY = (float) ((armorY - 10) / scale);
+
                 event.getDrawContext().drawText(
                         MINECRAFT.textRenderer,
                         durabilityText,
-                        (int) (armorX + 1),
-                        (int) (armorY - 10),
+                        (int) scaledX,
+                        (int) scaledY,
                         new Color(r, g, 0).getRGB(),
-                        true
+                        shadow.get()
                 );
+
+                matrices.popMatrix();
             }
         }
     }
@@ -305,23 +359,23 @@ public class HUDModule extends Module {
 
         event.getDrawContext().drawText(
                 mc.textRenderer,
-                Text.literal(countStr).setStyle(Style.EMPTY.withColor(0xFFFFFF)),
+                Text.literal(countStr).setStyle(Style.EMPTY.withColor(0xFFFFFFFF)),
                 textX,
                 textY,
-                0xFFFFFF,
+                0xFFFFFFFF,
                 true
         );
     }
 
     private void drawLagWarning(Render2DEvent event, int screenWidth, int screenHeight) {
-        String warningText = "Server is lagging!";
+        String warningText = "Server is not responding in " + PING_MANAGER.getConnectionUnstableTimeSeconds() + "s";
         int textWidth = MINECRAFT.textRenderer.getWidth(warningText);
         int textHeight = MINECRAFT.textRenderer.fontHeight;
 
         int x = (screenWidth - textWidth) / 2;
         int y = ((screenHeight - textHeight) / 2) - 60;
 
-        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, primaryRGB, true);
+        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, primaryRGB, shadow.get());
     }
 
     private Text formatFancyCoords(double x, double y, double z) {
@@ -384,13 +438,24 @@ public class HUDModule extends Module {
         return String.format("%.1f", rounded).replace(',', '.');
     }
 
-
     private Text getFacingText(MinecraftClient mc) {
         if (mc.player == null) return Text.literal("Invalid").setStyle(Style.EMPTY.withColor(Formatting.RED));
 
-        int facingIndex = MathHelper.floor(mc.player.getYaw() * 4.0F / 360.0F + 0.5D) & 3;
+        float yaw = mc.player.getYaw() % 360;
+        if (yaw < 0) yaw += 360;
 
-        String dir = switch (facingIndex) {
+        double rad = Math.toRadians(yaw);
+
+        double dx = -Math.sin(rad);
+        double dz = Math.cos(rad);
+
+        double absDx = Math.abs(dx);
+        double absDz = Math.abs(dz);
+
+        Style primaryStyle = Style.EMPTY.withColor(primaryRGB);
+        Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
+
+        String dir = switch ((int) Math.floor((yaw + 45) / 90) % 4) {
             case 0 -> "South";
             case 1 -> "West";
             case 2 -> "North";
@@ -398,24 +463,31 @@ public class HUDModule extends Module {
             default -> "Invalid";
         };
 
-        String axis = switch (facingIndex) {
-            case 0 -> "+Z";
-            case 1 -> "-X";
-            case 2 -> "-Z";
-            case 3 -> "+X";
-            default -> "?";
-        };
-
-        Style primaryStyle = Style.EMPTY.withColor(primaryRGB);
-        Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
-
         MutableText text = Text.literal(dir).setStyle(primaryStyle);
         text.append(Text.literal(" [").setStyle(primaryStyle));
-        text.append(Text.literal(axis).setStyle(whiteStyle));
+
+        if (absDx > 0.2 && absDz > 0.2 && Math.abs(absDx - absDz) < 0.4) {
+            String axis1 = dz > 0 ? "+Z" : "-Z";
+            String axis2 = dx > 0 ? "+X" : "-X";
+
+            text.append(Text.literal(axis1).setStyle(whiteStyle));
+            text.append(Text.literal(",").setStyle(primaryStyle));
+            text.append(Text.literal(" " + axis2).setStyle(whiteStyle));
+        } else {
+            if (absDz > absDx) {
+                String axis = dz > 0 ? "+Z" : "-Z";
+                text.append(Text.literal(axis).setStyle(whiteStyle));
+            } else {
+                String axis = dx > 0 ? "+X" : "-X";
+                text.append(Text.literal(axis).setStyle(whiteStyle));
+            }
+        }
+
         text.append(Text.literal("]").setStyle(primaryStyle));
 
         return text;
     }
+
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
     }

@@ -5,6 +5,7 @@ import me.kiriyaga.essentials.event.impl.KeyInputEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
 import me.kiriyaga.essentials.mixin.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
@@ -13,6 +14,7 @@ import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
+import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
 public class GuiMoveModule extends Module {
 
@@ -62,7 +64,13 @@ public class GuiMoveModule extends Module {
 
     @SubscribeEvent
     public void onRender3D(Render3DEvent event) {
-        if (!isEnabled() || !canMove()) return;
+        if (!isEnabled() || !canMove() || MODULE_MANAGER.getModule(FreecamModule.class).isEnabled()) return;
+
+        if (MINECRAFT.currentScreen == null) {
+            forwardHeld = backHeld = leftHeld = rightHeld = jumpHeld = sneakHeld = sprintHeld = false;
+            setKeysPressed(false);
+            return;
+        }
 
         updateKeyWithHold(MINECRAFT.options.forwardKey, forwardHeld);
         updateKeyWithHold(MINECRAFT.options.backKey, backHeld);

@@ -46,6 +46,7 @@ public class SearchModule extends Module {
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
 
     private Set<Identifier> candidateBlockIds = new HashSet<>();
+    private final Queue<String> pendingMessages = new LinkedList<>();
 
     private int tickCounter = 0;
 
@@ -144,7 +145,9 @@ public class SearchModule extends Module {
                 foundCounts.forEach((id, count) -> message.append(count).append("x ").append(id.getPath()).append(", "));
                 if (message.length() > 2) message.setLength(message.length() - 2);
 
-                MINECRAFT.execute(() -> CHAT_MANAGER.sendRaw(message.toString()));
+                synchronized (pendingMessages) {
+                    pendingMessages.offer(message.toString());
+                }
             }
         } else {
             chunkBlocks.remove(chunkKey);
@@ -154,6 +157,12 @@ public class SearchModule extends Module {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender(Render3DEvent event) {
         if (MINECRAFT.player == null || MINECRAFT.world == null) return;
+
+        synchronized (pendingMessages) {
+            while (!pendingMessages.isEmpty()) {
+                CHAT_MANAGER.sendRaw(pendingMessages.poll());
+            }
+        }
 
         MatrixStack matrices = event.getMatrices();
         BlockPos playerPos = MINECRAFT.player.getBlockPos();

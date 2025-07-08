@@ -25,8 +25,6 @@ public class SprintModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdateEvent(PreTickEvent event) {
-        if (!isEnabled()) return;
-
         ClientPlayerEntity player = MINECRAFT.player;
         if (player == null) return;
 

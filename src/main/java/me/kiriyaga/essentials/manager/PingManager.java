@@ -96,4 +96,10 @@ public class PingManager {
         }
         return unstable;
     }
+    public float getConnectionUnstableTimeSeconds() {
+        if (lastUpdated == -1) return Float.POSITIVE_INFINITY;
+        long deltaMillis = System.currentTimeMillis() - lastUpdated;
+        return deltaMillis / 1000.0f;
+    }
+
 }
