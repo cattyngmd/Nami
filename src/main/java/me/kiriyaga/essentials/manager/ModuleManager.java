@@ -7,10 +7,7 @@ import me.kiriyaga.essentials.feature.module.impl.combat.AuraModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoLogModule;
 import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.misc.*;
-import me.kiriyaga.essentials.feature.module.impl.movement.GuiMoveModule;
-import me.kiriyaga.essentials.feature.module.impl.movement.NoJumpDelayModule;
-import me.kiriyaga.essentials.feature.module.impl.movement.SneakModule;
-import me.kiriyaga.essentials.feature.module.impl.movement.SprintModule;
+import me.kiriyaga.essentials.feature.module.impl.movement.*;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
 import me.kiriyaga.essentials.feature.module.impl.world.NoBreakDelayModule;
 import me.kiriyaga.essentials.feature.module.impl.world.NoHitDelayModule;
@@ -51,6 +48,7 @@ public class ModuleManager {
         registerModule(new GuiMoveModule());
         registerModule(new NoJumpDelayModule());
         registerModule(new SneakModule());
+        registerModule(new AutoWalkModule());
         /// TRAVEL ///
         //registerModule(new EbounceModule());
         /// MISC ///

@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.feature.module.impl.movement;
 
+import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.event.impl.Render3DEvent;
@@ -51,10 +52,8 @@ public class SneakModule extends Module {
         setSneakHeld(false);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdateEvent(PreTickEvent event) {
-        if (!isEnabled()) return;
-
         ClientPlayerEntity player = MINECRAFT.player;
         if (player == null) return;
 
