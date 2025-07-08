@@ -199,30 +199,32 @@ public class HUDModule extends Module {
     }
 
     private void renderTopLeft(Render2DEvent event, int color) {
+        int x = PADDING;
+
         if (watermarkEnabled.get() && !watermarkText.getString().isEmpty()) {
             event.getDrawContext().drawText(
                     MINECRAFT.textRenderer,
                     watermarkText,
-                    PADDING,
+                    x,
                     PADDING,
                     color,
                     shadow.get()
             );
 
             int watermarkWidth = MINECRAFT.textRenderer.getWidth(watermarkText);
-
             int gap = 5;
+            x += watermarkWidth + gap;
+        }
 
-            if (time.get() && timeText != null) {
-                event.getDrawContext().drawText(
-                        MINECRAFT.textRenderer,
-                        timeText,
-                        PADDING + watermarkWidth + gap,
-                        PADDING,
-                        0xFF333333,
-                        shadow.get()
-                );
-            }
+        if (time.get() && timeText != null) {
+            event.getDrawContext().drawText(
+                    MINECRAFT.textRenderer,
+                    timeText,
+                    x,
+                    PADDING,
+                    0xFF333333,
+                    shadow.get()
+            );
         }
     }
 
