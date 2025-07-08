@@ -37,7 +37,7 @@ public class SneakModule extends Module {
     private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.Always));
     private final BoolSetting render = addSetting(new BoolSetting("render", false));
 
-    private static final double EDGE_THRESHOLD = 0.25;
+    private static final double EDGE_THRESHOLD = 0.2;
     private static final int CHECK_RADIUS = 1;
 
     public SneakModule() {
@@ -65,12 +65,56 @@ public class SneakModule extends Module {
         setSneakHeld(shouldSneak);
     }
 
+    private boolean isOnBlockEdgeWithSupport(ClientPlayerEntity player) {
+        Vec3d pos = player.getPos();
+        int blockY = (int) Math.floor(player.getY() - 0.001);
+
+        double relX = pos.x - Math.floor(pos.x);
+        double relZ = pos.z - Math.floor(pos.z);
+
+        int baseX = (int) Math.floor(pos.x);
+        int baseZ = (int) Math.floor(pos.z);
+
+        boolean nearEdgeX = relX < EDGE_THRESHOLD || relX > 1.0 - EDGE_THRESHOLD;
+        boolean nearEdgeZ = relZ < EDGE_THRESHOLD || relZ > 1.0 - EDGE_THRESHOLD;
+
+        if (!nearEdgeX && !nearEdgeZ) return false;
+
+        int[] xOffsets = {0};
+        int[] zOffsets = {0};
+
+        if (relX < EDGE_THRESHOLD) xOffsets = new int[]{0, -1};
+        else if (relX > 1.0 - EDGE_THRESHOLD) xOffsets = new int[]{0, 1};
+
+        if (relZ < EDGE_THRESHOLD) zOffsets = new int[]{0, -1};
+        else if (relZ > 1.0 - EDGE_THRESHOLD) zOffsets = new int[]{0, 1};
+
+        for (int dx : xOffsets) {
+            for (int dz : zOffsets) {
+                BlockPos posToCheck = new BlockPos(baseX + dx, blockY, baseZ + dz);
+                if (MINECRAFT.world.getBlockState(posToCheck).isAir()) {
+                    return false;
+                } else {
+                    checkedBlocks.putIfAbsent(posToCheck, new Color(255, 255, 0, 60));
+                }
+            }
+        }
+
+        return true;
+    }
+
+
     private boolean shouldSneakAtEdges(ClientPlayerEntity player) {
         Vec3d pos = player.getPos();
         int blockY = (int) Math.floor(player.getY() - 0.001);
 
         checkedBlocks.clear();
 
+        if (isOnBlockEdgeWithSupport(player)) {
+            return false;
+        }
+
+        Map<BlockPos, Color> yellowBlocks = new HashMap<>();
 
         for (int dx = -CHECK_RADIUS; dx <= CHECK_RADIUS; dx++) {
             for (int dz = -CHECK_RADIUS; dz <= CHECK_RADIUS; dz++) {
@@ -80,7 +124,41 @@ public class SneakModule extends Module {
                         (int) Math.floor(pos.z) + dz
                 );
 
-                checkedBlocks.put(checkPos, new Color(0, 255, 0, 60));
+                if (dx == 0 && dz == 0) continue;
+
+                BlockState state = MINECRAFT.world.getBlockState(checkPos);
+                if (state.isAir()) continue;
+
+                for (int ndx = -1; ndx <= 1; ndx++) {
+                    for (int ndz = -1; ndz <= 1; ndz++) {
+                        if (ndx == 0 && ndz == 0) continue;
+                        BlockPos neighborPos = checkPos.add(ndx, 0, ndz);
+                        BlockState neighborState = MINECRAFT.world.getBlockState(neighborPos);
+                        if (neighborState.isAir()) continue;
+
+                        double neighborCenterX = neighborPos.getX() + 0.5;
+                        double neighborCenterZ = neighborPos.getZ() + 0.5;
+
+                        double distX = Math.abs(pos.x - neighborCenterX);
+                        double distZ = Math.abs(pos.z - neighborCenterZ);
+
+                        if (distX < EDGE_THRESHOLD && distZ < EDGE_THRESHOLD) {
+                            yellowBlocks.put(neighborPos, new Color(255, 255, 0, 60));
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int dx = -CHECK_RADIUS; dx <= CHECK_RADIUS; dx++) {
+            for (int dz = -CHECK_RADIUS; dz <= CHECK_RADIUS; dz++) {
+                BlockPos checkPos = new BlockPos(
+                        (int) Math.floor(pos.x) + dx,
+                        blockY,
+                        (int) Math.floor(pos.z) + dz
+                );
+
+                if (dx == 0 && dz == 0) continue;
 
                 BlockState state = MINECRAFT.world.getBlockState(checkPos);
                 if (state.isAir()) continue;
@@ -92,41 +170,31 @@ public class SneakModule extends Module {
                 double distZ = Math.abs(pos.z - centerZ);
 
                 if (distX > EDGE_THRESHOLD || distZ > EDGE_THRESHOLD) {
-                    if (!isInternalIntersection(pos, checkPos)) {
-                            return true;
+                    boolean hasYellowNeighbor = false;
+                    for (int ndx = -1; ndx <= 1; ndx++) {
+                        for (int ndz = -1; ndz <= 1; ndz++) {
+                            if (ndx == 0 && ndz == 0) continue;
+                            BlockPos neighborPos = checkPos.add(ndx, 0, ndz);
+                            if (yellowBlocks.containsKey(neighborPos)) {
+                                hasYellowNeighbor = true;
+                                break;
+                            }
+                        }
+                        if (hasYellowNeighbor) break;
+                    }
+                    checkedBlocks.put(checkPos, hasYellowNeighbor ? new Color(255, 255, 0, 60) : new Color(0, 255, 0, 60));
+                    if (!hasYellowNeighbor) {
+                        return true;
                     }
                 }
             }
         }
 
+        checkedBlocks.putAll(yellowBlocks);
+
         return false;
     }
 
-    private boolean isInternalIntersection(Vec3d pos, BlockPos blockPos) {
-
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                if (dx == 0 && dz == 0) continue;
-
-                BlockPos neighborPos = blockPos.add(dx, 0, dz);
-                BlockState neighborState = MINECRAFT.world.getBlockState(neighborPos);
-                if (neighborState.isAir()) continue;
-
-                checkedBlocks.put(neighborPos, new Color(255, 255, 0, 60));
-
-                double neighborCenterX = neighborPos.getX() + 0.5;
-                double neighborCenterZ = neighborPos.getZ() + 0.5;
-
-                double distX = Math.abs(pos.x - neighborCenterX);
-                double distZ = Math.abs(pos.z - neighborCenterZ);
-
-                if (distX < EDGE_THRESHOLD && distZ < EDGE_THRESHOLD) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
