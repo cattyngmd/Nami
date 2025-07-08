@@ -20,7 +20,9 @@ import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
@@ -202,11 +204,19 @@ public class SneakModule extends Module {
 
         MatrixStack matrices = event.getMatrices();
 
-        for (Map.Entry<BlockPos, Color> entry : checkedBlocks.entrySet()) {
-            BlockPos pos = entry.getKey();
-            Color color = entry.getValue();
+        Set<BlockPos> renderedPositions = new HashSet<>();
+        int maxRenderCount = 25;
 
-            RenderUtil.drawBox(matrices, new Box(pos), color, color, 1.5, true, true);
+        for (Map.Entry<BlockPos, Color> entry : checkedBlocks.entrySet()) {
+            if (renderedPositions.size() >= maxRenderCount) break;
+
+            BlockPos pos = entry.getKey();
+            BlockPos normalizedPos = new BlockPos(pos.getX(), pos.getY(), pos.getZ());
+
+            if (renderedPositions.add(normalizedPos)) {
+                Color color = entry.getValue();
+                RenderUtil.drawBox(matrices, new Box(normalizedPos), color, color, 1.5, true, true);
+            }
         }
     }
 
