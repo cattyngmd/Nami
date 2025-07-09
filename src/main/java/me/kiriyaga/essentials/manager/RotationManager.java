@@ -220,7 +220,7 @@ public class RotationManager {
             currentPitchSpeed = 0f;
         }
 
-        if (isRotating()) {
+        if (isRotating() && !returning) {
             float jitterYawOffset = jitterAmount * (float) Math.sin(tickCount * jitterSpeed);
             float jitterPitchOffset = jitterYawOffset / 5f;
 
@@ -279,10 +279,11 @@ public class RotationManager {
             if (isRotating()){
                 mc.player.setBodyYaw(spoofYaw);
                 mc.player.setHeadYaw(spoofYaw);
+                //mc.player.setYaw(spoofYaw);
             }
 
             spoofing = false; //  ebal rot rekursii
-            // CHAT_MANAGER.sendRaw(String.format("Visual Look: yaw=%.2f pitch=%.2f (Spoofing active)", spoofYaw, spoofPitch));
+            //CHAT_MANAGER.sendRaw(String.format("Visual Look: yaw=%.2f pitch=%.2f (Spoofing active)", spoofYaw, spoofPitch));
         }
     }
 

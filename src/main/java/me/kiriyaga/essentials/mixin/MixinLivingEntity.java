@@ -16,8 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
-import static me.kiriyaga.essentials.Essentials.ROTATION_MANAGER;
+import static me.kiriyaga.essentials.Essentials.*;
 
 
 @Mixin(LivingEntity.class)
@@ -41,6 +40,8 @@ public abstract class MixinLivingEntity extends Entity {
 
         float spoofYaw = ROTATION_MANAGER.lastSentSpoofYaw;
 
+        //CHAT_MANAGER.sendRaw("travelPreHook Rotating: " +ROTATION_MANAGER.isRotating() + "\n spoof yaw: " + spoofYaw + "\nrealyaw: " + originalYaw);
+
         this.setYaw(spoofYaw);
         ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
         ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
@@ -49,6 +50,8 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(method = "travel", at = @At("TAIL"))
     private void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get()) return;
+
+        //CHAT_MANAGER.sendRaw("travelPostHook Rotating: " +ROTATION_MANAGER.isRotating() + "\nrealyaw: " + originalYaw);
 
         this.setYaw(originalYaw);
         ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
@@ -68,6 +71,8 @@ public abstract class MixinLivingEntity extends Entity {
         Vec3d globalMovement = localToGlobal(movementInput, realYaw);
 
         Vec3d clampedLocalMovement = globalToLocal(globalMovement, clampedSpoofYaw);
+
+        //CHAT_MANAGER.sendRaw("modifyMovementInput Rotating: " +ROTATION_MANAGER.isRotating() + "\n spoof yaw: " + spoofYaw + "\nrealyaw: " + originalYaw + "\ninput: "+clampedLocalMovement);
 
         return clampedLocalMovement;
     }
@@ -122,7 +127,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
-        if (MODULE_MANAGER.getModule(NoJumpDelayModule.class).isEnabled() && jumpingCooldown == 10) {
+        if (MODULE_MANAGER.getModule(NoJumpDelayModule.class).isEnabled()) {
             jumpingCooldown = 0;
         }
     }
