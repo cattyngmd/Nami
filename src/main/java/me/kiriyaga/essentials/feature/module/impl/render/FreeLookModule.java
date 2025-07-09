@@ -19,7 +19,7 @@ public class FreeLookModule extends Module {
 
 
     public FreeLookModule() {
-        super("free look", "Allows more rotation options in third person.", Category.visuals, "freelook", "freelok", "third", "акуудщщл");
+        super("free look", "Look around freely without moving your real yaw/pitch.", Category.visuals, "freelook", "freelok", "third", "акуудщщл");
     }
 
     @Override

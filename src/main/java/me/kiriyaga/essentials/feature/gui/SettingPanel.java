@@ -50,6 +50,7 @@ public class SettingPanel {
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
         Color textCol = new Color(255, 255, 255, GUI_ALPHA);
+        Color textColActivated = new Color(255, 255, 255, 255);
 
         Color bgColor;
 
@@ -58,7 +59,7 @@ public class SettingPanel {
             if (hovered) bgColor = brighten(bgColor, 0.3f);
 
             int bgColorInt = bgColor.getRGB();
-            int textColorInt = toRGBA(textCol);
+            int textColorInt = boolSetting.get() ? toRGBA(textColActivated) : toRGBA(textCol);
 
             context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
             context.drawText(textRenderer, setting.getName(), x + PADDING, y + (HEIGHT - 8) / 2, textColorInt, false);

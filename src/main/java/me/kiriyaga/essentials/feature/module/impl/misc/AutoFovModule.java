@@ -15,7 +15,7 @@ public class AutoFovModule extends Module {
     public final IntSetting fov = addSetting(new IntSetting("fov", 110, 1, 162));
 
     public AutoFovModule() {
-        super("auto fov", "Sets up fov on join.", Category.misc, "autofov", "fov", "atofov", "фгещащч");
+        super("auto fov", "Set up your custom fov.", Category.misc, "autofov", "fov", "atofov", "фгещащч");
     }
 
     @Override

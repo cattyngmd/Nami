@@ -35,7 +35,7 @@ public class ESPModule extends Module {
     private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public ESPModule() {
-        super("esp", "Draws boxes around entities", Category.visuals, "esp", "WH", "boxes", "уыз");
+        super("esp", "Draws boxes around certain entities.", Category.visuals, "esp", "WH", "boxes", "уыз");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

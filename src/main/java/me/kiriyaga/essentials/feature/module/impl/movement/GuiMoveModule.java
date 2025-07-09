@@ -27,7 +27,7 @@ public class GuiMoveModule extends Module {
     private boolean sprintHeld = false;
 
     public GuiMoveModule() {
-        super("gui move", "Allows movement and camera control in most GUIs.", Category.movement);
+        super("gui move", "Allows movement in most GUIs.", Category.movement);
     }
 
     @Override

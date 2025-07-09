@@ -51,7 +51,7 @@ public class NametagsModule extends Module {
     }
 
     public NametagsModule() {
-        super("nametags", "Draws nametags above entities", Category.visuals);
+        super("nametags", "Draws nametags above certain entities.", Category.visuals);
     }
 
     @SubscribeEvent

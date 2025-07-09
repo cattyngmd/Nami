@@ -42,7 +42,7 @@ public class CategoryPanel {
         ColorModule colorModule = getColorModule();
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = new Color(255, 255, 255, GUI_ALPHA);
+        Color textCol = new Color(255, 255, 255, 255);
 
         Color headerBgColor = expanded ? primary : (hovered ? brighten(secondary, 0.3f) : secondary);
         context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, headerBgColor.getRGB());

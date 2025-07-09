@@ -29,7 +29,7 @@ public class AutoLogModule extends Module {
     private boolean triggeredLevel = false;
 
     public AutoLogModule() {
-        super("auto log", "Logs out when danger is near.", Category.combat, "autolog", "panic", "logout", "фгещдщп");
+        super("auto log", "Automatically logs out in certain conditions.", Category.combat, "autolog", "panic", "logout", "фгещдщп");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.feature.gui;
 
 import me.kiriyaga.essentials.Essentials;
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.essentials.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.Set;
 
+import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 import static me.kiriyaga.essentials.feature.gui.ClickGuiScreen.GUI_ALPHA;
 
 public class ModulePanel {
@@ -21,7 +23,7 @@ public class ModulePanel {
     private final Set<Module> expandedModules;
 
     private ColorModule getColorModule() {
-        return Essentials.MODULE_MANAGER.getModule(ColorModule.class);
+        return MODULE_MANAGER.getModule(ColorModule.class);
     }
 
     public ModulePanel(Module module, Set<Module> expandedModules) {
@@ -37,17 +39,23 @@ public class ModulePanel {
         Color primary = getColorModule().getStyledGlobalColor();
         Color secondary = getColorModule().getStyledSecondColor();
         Color textCol = new Color(255, 255, 255, GUI_ALPHA);
+        Color textColActivated = new Color(255, 255, 255, 255);
 
         Color bgColor = hovered ? brighten(secondary, 0.4f) : (enabled ? primary : secondary);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColor.getRGB());
-        context.drawText(textRenderer, module.getName(), x + PADDING, y + (HEIGHT - 8) / 2, toRGBA(textCol), false);
+
+        if (module.isEnabled())
+            context.drawText(textRenderer, module.getName(), x + PADDING, y + (HEIGHT - 8) / 2, toRGBA(textColActivated), false);
+        else
+            context.drawText(textRenderer, module.getName(), x + PADDING, y + (HEIGHT - 8) / 2, toRGBA(textCol), false);
 
         String indicator = expanded ? "-" : "+";
-        context.drawText(textRenderer, indicator,
-                x + WIDTH - PADDING - textRenderer.getWidth(indicator),
-                y + (HEIGHT - 8) / 2,
-                toRGBA(textCol), false);
+
+        if (module.isEnabled())
+            context.drawText(textRenderer, indicator, x + WIDTH - PADDING - textRenderer.getWidth(indicator), y + (HEIGHT - 8) / 2, toRGBA(textColActivated), false);
+        else
+            context.drawText(textRenderer, indicator, x + WIDTH - PADDING - textRenderer.getWidth(indicator), y + (HEIGHT - 8) / 2, toRGBA(textCol), false);
     }
 
     public static boolean isHovered(double mouseX, double mouseY, int x, int y) {

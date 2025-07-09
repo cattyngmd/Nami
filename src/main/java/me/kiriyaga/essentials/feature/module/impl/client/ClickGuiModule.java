@@ -9,10 +9,11 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class ClickGuiModule extends Module {
 
-    public final BoolSetting background = addSetting(new BoolSetting("Background", true));
+    public final BoolSetting background = addSetting(new BoolSetting("background", false));
+    public final BoolSetting descriptions = addSetting(new BoolSetting("descriptions", true));
 
     public ClickGuiModule() {
-        super("click gui", "Opens click gui", Category.client, "clickgui","click", "gui", "menu", "clckgui", "сдшслпгш");
+        super("click gui", "Opens client UI.", Category.client, "clickgui","click", "gui", "menu", "clckgui", "сдшслпгш");
     }
 
     @Override

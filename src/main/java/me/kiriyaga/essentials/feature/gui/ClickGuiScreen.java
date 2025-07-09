@@ -8,7 +8,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
 
@@ -47,6 +49,46 @@ public class ClickGuiScreen extends Screen {
             CategoryPanel panel = new CategoryPanel(category, expandedCategories, expandedModules);
             panel.render(context, this.textRenderer, x, 20 + scrollOffset, mouseX, mouseY, this.height);
         }
+
+        if (getClickGuiModule().descriptions.get()) {
+            for (Category category : Category.values()) {
+                if (!expandedCategories.contains(category)) continue;
+
+                int x = categoryPositions.get(category);
+                List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
+                int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING;
+
+                for (Module module : modules) {
+                    int modX = x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
+                    int modY = curY;
+
+                    if (ModulePanel.isHovered(mouseX, mouseY, modX, modY)) {
+                        String description = module.getDescription();
+                        if (description != null && !description.isEmpty()) {
+
+                            int descX = mouseX + 5;
+                            int descY = mouseY;
+                            int textWidth = textRenderer.getWidth(description);
+                            int textHeight = 8;
+
+                            context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2,
+                                    new Color(30, 30, 30, GUI_ALPHA).getRGB());
+
+                            context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, false);
+
+                        }
+                        return;
+                    }
+
+                    curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
+
+                    if (expandedModules.contains(module)) {
+                        curY += SettingPanel.getSettingsHeight(module);
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
