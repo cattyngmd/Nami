@@ -44,6 +44,9 @@ public class EntityManager {
     }
 
     public Entity getTarget() {
+        if (MINECRAFT.player == null || MINECRAFT.world == null)
+            return null;
+
         markRequested();
 
         List<Entity> candidates = allEntities.stream()

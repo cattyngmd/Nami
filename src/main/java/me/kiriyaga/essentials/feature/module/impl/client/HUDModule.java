@@ -7,6 +7,7 @@ import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.essentials.mixin.DebugHudAccessor;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
@@ -25,6 +26,7 @@ import org.joml.Matrix3x2fStack;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.function.BiFunction;
 
 import static me.kiriyaga.essentials.Essentials.*;
 
@@ -39,16 +41,22 @@ public class HUDModule extends Module {
     public final BoolSetting speedEnabled = addSetting(new BoolSetting("speed", true));
     public final BoolSetting totemsEnabled = addSetting(new BoolSetting("totems", true));
     public final BoolSetting coordsEnabled = addSetting(new BoolSetting("coordinates", true));
-    public final BoolSetting freecamCords = addSetting(new BoolSetting("freecam spoof ", true));
     public final BoolSetting facingEnabled = addSetting(new BoolSetting("facing", true));
     public final BoolSetting fpsEnabled = addSetting(new BoolSetting("fps", true));
     public final BoolSetting pingEnabled = addSetting(new BoolSetting("ping", false));
     public final BoolSetting lagWarningEnabled = addSetting(new BoolSetting("lag warning", false));
     public final BoolSetting time = addSetting(new BoolSetting("time", false));
+    public final BoolSetting greetingEnabled = addSetting(new BoolSetting("greeting", true));
+    public final IntSetting greetingDelay = addSetting(new IntSetting("greeting delay", 30, 5, 120));
     public final BoolSetting shadow = addSetting(new BoolSetting("shadow", true));
+    public final BoolSetting bounce = addSetting(new BoolSetting("bounce", false));
+    public final IntSetting bounceSpeed = addSetting(new IntSetting("bounce speed", 5, 1, 20));
+    public final IntSetting bounceIntensity = addSetting(new IntSetting("bounce intensity", 30, 10, 70));
 
     private int tickCounter = 0;
     private static final int PADDING = 1;
+    private float bounceProgress = 0f;
+    private boolean increasing = true;
 
     private Text coordsText = Text.empty();
     private Text facingText = Text.empty();
@@ -66,6 +74,30 @@ public class HUDModule extends Module {
     private boolean speedBufferFilled = false;
     private double lastX = 0, lastY = 0, lastZ = 0;
 
+    private String fullGreeting = "";
+    private int greetingCharIndex = 0;
+    private int dotAnimationTimer = 0;
+    private boolean dotVisible = true;
+    private long lastWorldJoinTime = 0;
+    private String currentGreeting = "";
+    private boolean isFadingOut = false;
+    private long greetingShownTime = 0;
+    private final long greetingDisplayDuration = 5000;
+    private static final String[] GREETINGS = {
+            "Greetings %s :^)",
+            "Looking great today %s :>",
+            "Are ya winning son?",
+            "Im like a pedo, but a good one :<",
+            "Good evening %s :^)",
+            "1.12.2 is just bad",
+            "can we argue with the fact that future is a pedo client?",
+            "dr donut buy mio client (c)",
+            "Skidtrap has fallen to it's poetic end (c)",
+            "Do not forget to drink %s :^)",
+            "phobot is not real",
+            "Do not forget to sleep %s!"
+    };
+
 
     public HUDModule() {
         super("hud","Displays in game hud.", Category.client, "ргв");
@@ -73,11 +105,31 @@ public class HUDModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdate(PreTickEvent event) {
+        if (bounce.get()) {
+            float step = bounceSpeed.get() / 100f;
+            if (increasing) {
+                bounceProgress += step;
+                if (bounceProgress >= 1f) {
+                    bounceProgress = 1f;
+                    increasing = false;
+                }
+            } else {
+                bounceProgress -= step;
+                if (bounceProgress <= 0f) {
+                    bounceProgress = 0f;
+                    increasing = true;
+                }
+            }
+        } else {
+            bounceProgress = 0f;
+        }
+
         tickCounter++;
         if (tickCounter % updateInterval.get() != 0) return;
 
         updateAllData();
     }
+
 
     private void updateAllData() {
         MinecraftClient mc = MINECRAFT;
@@ -88,23 +140,19 @@ public class HUDModule extends Module {
         int rgb = rawColor & 0x00FFFFFF;
         primaryRGB = 0xFF000000 | rgb;
 
+        int pulsingPrimary = getPulsingColor(primaryRGB);
+        int pulsingWhite = getPulsingColor(0xFFFFFFFF);
+
         if (watermarkEnabled.get()) {
             watermarkText = Text.of(NAME + " " + VERSION);
         }
 
         if (coordsEnabled.get()) {
-            double x, y, z;
-            FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
+            DebugHudAccessor accessor = (DebugHudAccessor) mc.getDebugHud();
 
-            if (freecamCords.get() && freecamModule.isEnabled()) {
-                x = freecamModule.getX();
-                y = freecamModule.getY();
-                z = freecamModule.getZ();
-            } else {
-                x = mc.player.getX();
-                y = mc.player.getY();
-                z = mc.player.getZ();
-            }
+            double x = accessor.getX();
+            double y = accessor.getY();
+            double z = accessor.getZ();
 
             coordsText = formatFancyCoords(x, y, z);
         }
@@ -114,14 +162,14 @@ public class HUDModule extends Module {
         }
 
         if (fpsEnabled.get()) {
-            fpsText = Text.literal("FPS: ").setStyle(Style.EMPTY.withColor(primaryRGB))
-                    .append(Text.literal(Integer.toString(mc.getCurrentFps())).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
+            fpsText = Text.literal("FPS: ").setStyle(Style.EMPTY.withColor(pulsingPrimary))
+                    .append(Text.literal(Integer.toString(mc.getCurrentFps())).setStyle(Style.EMPTY.withColor(pulsingWhite)));
         }
 
         if (pingEnabled.get()) {
             int ping = PING_MANAGER.getPing();
-            pingText = Text.literal("Ping: ").setStyle(Style.EMPTY.withColor(primaryRGB))
-                    .append(Text.literal(ping < 0 ? "N/A" : Integer.toString(ping)).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
+            pingText = Text.literal("Ping: ").setStyle(Style.EMPTY.withColor(pulsingPrimary))
+                    .append(Text.literal(ping < 0 ? "N/A" : Integer.toString(ping)).setStyle(Style.EMPTY.withColor(pulsingWhite)));
         }
 
         if (lagWarningEnabled.get()) {
@@ -147,8 +195,8 @@ public class HUDModule extends Module {
             double averageSpeed = count > 0 ? sum / count : 0;
 
             String speedStr = formatNumber(averageSpeed);
-            speedText = Text.literal("Speed: ").setStyle(Style.EMPTY.withColor(primaryRGB))
-                    .append(Text.literal(speedStr).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
+            speedText = Text.literal("Speed: ").setStyle(Style.EMPTY.withColor(pulsingPrimary))
+                    .append(Text.literal(speedStr).setStyle(Style.EMPTY.withColor(pulsingWhite)));
 
             lastX = mc.player.getX();
             lastY = mc.player.getY();
@@ -161,29 +209,81 @@ public class HUDModule extends Module {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
             String formattedTime = now.format(formatter);
 
-            int darkGrayColor = 0xFF666666;
+            timeText = Text.literal(formattedTime);
+        }
 
-            timeText = Text.literal(formattedTime).setStyle(Style.EMPTY.withColor(darkGrayColor));
+        if (greetingEnabled.get()) {
+            if (lastWorldJoinTime == 0) {
+                lastWorldJoinTime = System.currentTimeMillis();
+            } else {
+                long elapsedSeconds = (System.currentTimeMillis() - lastWorldJoinTime) / 1000;
+                if (elapsedSeconds >= greetingDelay.get() && fullGreeting.isEmpty()) {
+                    String greetingTemplate = GREETINGS[(int)(Math.random() * GREETINGS.length)];
+                    fullGreeting = String.format(greetingTemplate, MINECRAFT.player.getName().getString());
+                    greetingCharIndex = 0;
+                    greetingShownTime = 0;
+                }
+            }
+
+            if (!fullGreeting.isEmpty()) {
+                if (greetingCharIndex < fullGreeting.length() && !isFadingOut) {
+                    greetingCharIndex++;
+                    currentGreeting = fullGreeting.substring(0, greetingCharIndex);
+                } else if (greetingCharIndex == fullGreeting.length() && !isFadingOut) {
+                    if (greetingShownTime == 0) {
+                        greetingShownTime = System.currentTimeMillis();
+                    } else if (System.currentTimeMillis() - greetingShownTime >= greetingDisplayDuration) {
+                        isFadingOut = true;
+                        greetingShownTime = 0;
+                    }
+                } else if (isFadingOut) {
+                    if (greetingCharIndex > 0) {
+                        greetingCharIndex--;
+                        currentGreeting = fullGreeting.substring(0, greetingCharIndex);
+                    } else {
+                        fullGreeting = "";
+                        currentGreeting = "";
+                        isFadingOut = false;
+                        greetingShownTime = 0;
+                        lastWorldJoinTime = System.currentTimeMillis();
+                    }
+                }
+            }
+
+            dotAnimationTimer++;
+            if (dotAnimationTimer >= 20) {
+                dotAnimationTimer = 0;
+                dotVisible = !dotVisible;
+            }
+
+        } else {
+            lastWorldJoinTime = 0;
+            fullGreeting = "";
+            greetingCharIndex = 0;
+            currentGreeting = "";
+            greetingShownTime = 0;
+            isFadingOut = false;
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender2D(Render2DEvent event) {
         MinecraftClient mc = MINECRAFT;
-        if (mc.world == null || mc.player == null) return;
+        if (mc.world == null || mc.player == null || mc.getDebugHud().shouldShowDebugHud()) return;
 
         int screenWidth = mc.getWindow().getScaledWidth();
         int screenHeight = mc.getWindow().getScaledHeight();
 
         float rawOffset = ChatAnimationHelper.getAnimationOffset();
+        float animationOffset = (float) (14f - (rawOffset / 1.428571428571429));
 
-        float animationOffset = (float) (14f - (rawOffset/1.428571428571429));
+        int pulsingPrimary = getPulsingColor(primaryRGB);
 
-        renderTopLeft(event, primaryRGB);
+        renderTopLeft(event, pulsingPrimary);
 
-        renderBottomLeft(event, primaryRGB, screenHeight, animationOffset);
+        renderBottomLeft(event, pulsingPrimary, screenHeight, animationOffset);
 
-        renderBottomRight(event, primaryRGB, screenWidth, screenHeight, animationOffset);
+        renderBottomRight(event, pulsingPrimary, screenWidth, screenHeight, animationOffset);
 
         if (lagWarningEnabled.get() && serverLagging) {
             drawLagWarning(event, screenWidth, screenHeight);
@@ -195,6 +295,10 @@ public class HUDModule extends Module {
 
         if (totemsEnabled.get()) {
             renderTotems(event, screenWidth, screenHeight);
+        }
+
+        if (greetingEnabled.get()){
+            renderGreeting(event, screenWidth);
         }
     }
 
@@ -217,12 +321,13 @@ public class HUDModule extends Module {
         }
 
         if (time.get() && timeText != null) {
+            int pulsingColor = getPulsingColor(0xFF333333);
             event.getDrawContext().drawText(
                     MINECRAFT.textRenderer,
                     timeText,
                     x,
                     PADDING,
-                    0xFF333333,
+                    pulsingColor,
                     shadow.get()
             );
         }
@@ -296,7 +401,7 @@ public class HUDModule extends Module {
                 int r = (int) ((1 - durability) * 255);
                 int g = (int) (durability * 255);
 
-                String durabilityText = percent+"%";
+                String durabilityText = percent + "%";
 
                 Matrix3x2fStack matrices = event.getDrawContext().getMatrices();
 
@@ -308,12 +413,15 @@ public class HUDModule extends Module {
                 float scaledX = (float) ((armorX + 1) / scale);
                 float scaledY = (float) ((armorY - 10) / scale);
 
+                int baseColor = new Color(r, g, 0).getRGB();
+                int pulsingColor = getPulsingColor(baseColor);
+
                 event.getDrawContext().drawText(
                         MINECRAFT.textRenderer,
                         durabilityText,
                         (int) scaledX,
                         (int) scaledY,
-                        new Color(r, g, 0).getRGB(),
+                        pulsingColor,
                         shadow.get()
                 );
 
@@ -359,12 +467,15 @@ public class HUDModule extends Module {
         int textX = iconX + iconSize - 4;
         int textY = iconY + iconSize - 6;
 
+        int baseColor = 0xFFFFFFFF;
+        int pulsingColor = getPulsingColor(baseColor);
+
         event.getDrawContext().drawText(
                 mc.textRenderer,
-                Text.literal(countStr).setStyle(Style.EMPTY.withColor(0xFFFFFFFF)),
+                Text.literal(countStr).setStyle(Style.EMPTY.withColor(pulsingColor)),
                 textX,
                 textY,
-                0xFFFFFFFF,
+                pulsingColor,
                 true
         );
     }
@@ -377,7 +488,8 @@ public class HUDModule extends Module {
         int x = (screenWidth - textWidth) / 2;
         int y = ((screenHeight - textHeight) / 2) - 60;
 
-        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, primaryRGB, shadow.get());
+        int pulsingColor = getPulsingColor(primaryRGB);
+        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, pulsingColor, shadow.get());
     }
 
     private Text formatFancyCoords(double x, double y, double z) {
@@ -389,9 +501,11 @@ public class HUDModule extends Module {
         double xAlt = isNether ? x * 8 : x / 8;
         double zAlt = isNether ? z * 8 : z / 8;
 
-        Style primaryStyle = Style.EMPTY.withColor(primaryRGB);
-        Style grayStyle = Style.EMPTY.withColor(Formatting.GRAY);
-        Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
+        int pulsingPrimaryColor = getPulsingColor(primaryRGB);
+        Style primaryStyle = Style.EMPTY.withColor(pulsingPrimaryColor);
+        Style grayStyle = Style.EMPTY.withColor(getPulsingColor(0xFFB2BAAB));
+        Style whiteStyle = Style.EMPTY.withColor(getPulsingColor(0xFFFFFFFF));
+
 
         MutableText result = Text.literal("XYZ ").setStyle(primaryStyle);
         result.append(formatNumberStyled(x, whiteStyle, grayStyle));
@@ -416,6 +530,8 @@ public class HUDModule extends Module {
 
         MutableText text = Text.literal("");
 
+        Style pulsingDigitStyle = Style.EMPTY.withColor(getPulsingColor(0xFFFFFFFF));
+
         if (formatted.startsWith("-")) {
             text.append(Text.literal("-").setStyle(separatorStyle));
             formatted = formatted.substring(1);
@@ -423,17 +539,15 @@ public class HUDModule extends Module {
         }
 
         if (dotIndex == -1) {
-            return text.append(Text.literal(formatted).setStyle(digitStyle));
+            return text.append(Text.literal(formatted).setStyle(pulsingDigitStyle));
         }
 
-        text.append(Text.literal(formatted.substring(0, dotIndex)).setStyle(digitStyle));
+        text.append(Text.literal(formatted.substring(0, dotIndex)).setStyle(pulsingDigitStyle));
         text.append(Text.literal(".").setStyle(separatorStyle));
-        text.append(Text.literal(formatted.substring(dotIndex + 1)).setStyle(digitStyle));
+        text.append(Text.literal(formatted.substring(dotIndex + 1)).setStyle(pulsingDigitStyle));
 
         return text;
     }
-
-
 
     private String formatNumber(double val) {
         double rounded = Math.round(val * 10.0) / 10.0;
@@ -454,8 +568,11 @@ public class HUDModule extends Module {
         double absDx = Math.abs(dx);
         double absDz = Math.abs(dz);
 
-        Style primaryStyle = Style.EMPTY.withColor(primaryRGB);
-        Style whiteStyle = Style.EMPTY.withColor(Formatting.WHITE);
+        int pulsingColor = getPulsingColor(primaryRGB);
+        Style primaryStyle = Style.EMPTY.withColor(pulsingColor);
+
+        Style whiteStyle = Style.EMPTY.withColor(getPulsingColor(0xFFFFFFFF));
+        Style grayStyle = Style.EMPTY.withColor(getPulsingColor(0xFFB2BAAB));
 
         String dir = switch ((int) Math.floor((yaw + 45) / 90) % 4) {
             case 0 -> "South";
@@ -468,26 +585,73 @@ public class HUDModule extends Module {
         MutableText text = Text.literal(dir).setStyle(primaryStyle);
         text.append(Text.literal(" [").setStyle(primaryStyle));
 
+        BiFunction<String, Style, MutableText> formatAxis = (axis, color) -> {
+            MutableText t = Text.literal("");
+            if (axis.startsWith("+") || axis.startsWith("-")) {
+                t.append(Text.literal(axis.substring(0, 1)).setStyle(grayStyle));
+                t.append(Text.literal(axis.substring(1)).setStyle(color));
+            } else {
+                t.append(Text.literal(axis).setStyle(color));
+            }
+            return t;
+        };
+
         if (absDx > 0.2 && absDz > 0.2 && Math.abs(absDx - absDz) < 0.4) {
             String axis1 = dz > 0 ? "+Z" : "-Z";
             String axis2 = dx > 0 ? "+X" : "-X";
 
-            text.append(Text.literal(axis1).setStyle(whiteStyle));
+            text.append(formatAxis.apply(axis1, whiteStyle));
             text.append(Text.literal(",").setStyle(primaryStyle));
-            text.append(Text.literal(" " + axis2).setStyle(whiteStyle));
+            text.append(Text.literal(" "));
+            text.append(formatAxis.apply(axis2, whiteStyle));
         } else {
             if (absDz > absDx) {
                 String axis = dz > 0 ? "+Z" : "-Z";
-                text.append(Text.literal(axis).setStyle(whiteStyle));
+                text.append(formatAxis.apply(axis, whiteStyle));
             } else {
                 String axis = dx > 0 ? "+X" : "-X";
-                text.append(Text.literal(axis).setStyle(whiteStyle));
+                text.append(formatAxis.apply(axis, whiteStyle));
             }
         }
 
         text.append(Text.literal("]").setStyle(primaryStyle));
 
         return text;
+    }
+
+    private void renderGreeting(Render2DEvent event, int screenWidth) {
+        if (!greetingEnabled.get() || currentGreeting.isEmpty()) return;
+
+        String textToRender = currentGreeting + (dotVisible ? "." : "");
+        int textWidth = MINECRAFT.textRenderer.getWidth(textToRender);
+        int x = (screenWidth - textWidth) / 2;
+        int y = PADDING;
+
+        int pulsingColor = getPulsingColor(primaryRGB);
+        event.getDrawContext().drawText(
+                MINECRAFT.textRenderer,
+                textToRender,
+                x,
+                y,
+                pulsingColor,
+                shadow.get()
+        );
+    }
+
+    private int getPulsingColor(int originalColor) {
+        if (!bounce.get()) return originalColor;
+
+        float intensity = bounceIntensity.get() / 100f;
+        float pulseFactor = (float) Math.sin(bounceProgress * Math.PI);
+        int a = (originalColor >> 24) & 0xFF;
+        int r = (originalColor >> 16) & 0xFF;
+        int g = (originalColor >> 8) & 0xFF;
+        int b = originalColor & 0xFF;
+
+        int minAlpha = (int)(a * (1 - intensity));
+        int pulsingAlpha = minAlpha + (int)((a - minAlpha) * pulseFactor);
+
+        return (pulsingAlpha << 24) | (r << 16) | (g << 8) | b;
     }
 
     private ColorModule getColorModule() {

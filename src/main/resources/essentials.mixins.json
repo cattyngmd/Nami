@@ -16,6 +16,7 @@
     "MixinClientPlayNetworkHandler",
     "MixinCompassState",
     "MixinConnectScreen",
+    "MixinDebugHud",
     "MixinDisconnectedScreen",
     "MixinEntityRenderer",
     "MixinFogRenderer",

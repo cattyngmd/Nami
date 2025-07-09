@@ -5,6 +5,7 @@ import me.kiriyaga.essentials.event.impl.KeyInputEvent;
 import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
+import me.kiriyaga.essentials.mixin.DebugHudAccessor;
 import me.kiriyaga.essentials.setting.impl.DoubleSetting;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.util.InputUtil;
@@ -103,6 +104,9 @@ public class FreecamModule extends Module {
         camX = cameraPos.x;
         camY = cameraPos.y;
         camZ = cameraPos.z;
+
+        DebugHudAccessor accessor = (DebugHudAccessor) MINECRAFT.getDebugHud();
+        accessor.setCoords(camX, camY, camZ);
     }
 
     @SubscribeEvent
