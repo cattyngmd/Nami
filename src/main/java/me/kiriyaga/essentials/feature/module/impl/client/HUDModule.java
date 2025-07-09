@@ -88,13 +88,20 @@ public class HUDModule extends Module {
             "Are ya winning son?",
             "Im like a pedo, but a good one :<",
             "Good evening %s :^)",
+            "kids do not rename your obby",
+            "OldLadyNorth did nothing wrong ^_^",
+            "0x22 sounds so fucking weird and his build is crazy asf",
+            "bro why are all these devs shooting estrogen into their morning monsters?",
+            "kiriyaga was here",
             "1.12.2 is just bad",
             "can we argue with the fact that future is a pedo client?",
+            "Verify you are human...",
+            "Script to win :^)",
             "dr donut buy mio client (c)",
             "Skidtrap has fallen to it's poetic end (c)",
-            "Do not forget to drink %s :^)",
+            "Do not forget to drink water %s :^)",
             "phobot is not real",
-            "Do not forget to sleep %s!"
+            "Do not forget to get some sleep, %s!"
     };
 
 
@@ -318,7 +325,7 @@ public class HUDModule extends Module {
         }
 
         if (time.get() && timeText != null) {
-            int pulsingColor = getPulsingColor(0xFF333333);
+            int pulsingColor = getPulsingColor(0xFFB2BAAB);
             event.getDrawContext().drawText(
                     MINECRAFT.textRenderer,
                     timeText,
