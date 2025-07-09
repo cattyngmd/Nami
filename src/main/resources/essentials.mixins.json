@@ -21,6 +21,7 @@
     "MixinFogRenderer",
     "MixinGameRenderer",
     "MixinHeadFeatureRenderer",
+    "MixinInactivityFpsLimiter",
     "MixinInGameHud",
     "MixinInGameOverlayRenderer",
     "MixinKeyboard",
@@ -40,6 +41,7 @@
     "MixinLivingEntity",
     "MixinPlayerInteractEntityC2SPacket",
     "MixinTextVisitFactory",
-    "PlayerInteractEntityC2SPacketAccessor"
+    "PlayerInteractEntityC2SPacketAccessor",
+    "PlayerPositionAccessor"
   ]
 }

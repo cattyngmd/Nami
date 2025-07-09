@@ -9,6 +9,7 @@ import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.misc.*;
 import me.kiriyaga.essentials.feature.module.impl.movement.*;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
+import me.kiriyaga.essentials.feature.module.impl.world.AntiInteractModule;
 import me.kiriyaga.essentials.feature.module.impl.world.NoBreakDelayModule;
 import me.kiriyaga.essentials.feature.module.impl.world.NoHitDelayModule;
 
@@ -49,6 +50,7 @@ public class ModuleManager {
         registerModule(new NoJumpDelayModule());
         registerModule(new SneakModule());
         registerModule(new AutoWalkModule());
+        registerModule(new NoRotateModule());
         /// TRAVEL ///
         //registerModule(new EbounceModule());
         /// MISC ///
@@ -61,8 +63,10 @@ public class ModuleManager {
         registerModule(new BetterTabModule());
         registerModule(new NameProtectModule());
         registerModule(new NoSoundLagModule());
+        registerModule(new UnfocusedCpuModule());
         /// WORLD ///
         registerModule(new NoBreakDelayModule());
+        registerModule(new AntiInteractModule());
         registerModule(new NoHitDelayModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
