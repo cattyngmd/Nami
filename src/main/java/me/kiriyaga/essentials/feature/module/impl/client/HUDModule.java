@@ -7,7 +7,6 @@ import me.kiriyaga.essentials.event.impl.PreTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
-import me.kiriyaga.essentials.mixin.DebugHudAccessor;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
 import me.kiriyaga.essentials.setting.impl.IntSetting;
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
@@ -148,11 +147,9 @@ public class HUDModule extends Module {
         }
 
         if (coordsEnabled.get()) {
-            DebugHudAccessor accessor = (DebugHudAccessor) mc.getDebugHud();
-
-            double x = accessor.getX();
-            double y = accessor.getY();
-            double z = accessor.getZ();
+            double x = mc.player.getX();
+            double y = mc.player.getY();
+            double z = mc.player.getZ();
 
             coordsText = formatFancyCoords(x, y, z);
         }
