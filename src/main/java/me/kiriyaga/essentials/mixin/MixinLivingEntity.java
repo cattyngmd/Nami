@@ -32,7 +32,8 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get()) return;
+        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get())
+            return;
 
         originalYaw = this.getYaw();
         originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();

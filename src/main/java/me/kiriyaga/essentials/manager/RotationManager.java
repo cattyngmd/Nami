@@ -124,6 +124,8 @@ public class RotationManager {
     public void onPreTick(PreTickEvent event) {
         if (MINECRAFT.player == null) return;
 
+        //CHAT_MANAGER.sendRaw("active req: "+ activeRequest);
+
         RotationManagerModule rotationModule = MODULE_MANAGER.getModule(RotationManagerModule.class);
         rotationSpeed = rotationModule.rotationSpeed.get().floatValue();
         rotationEaseFactor = rotationModule.rotationEaseFactor.get().floatValue();
@@ -307,6 +309,19 @@ public class RotationManager {
 
         public float targetYaw;
         public float targetPitch;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof RotationRequest)) return false;
+            RotationRequest other = (RotationRequest) o;
+            return this.id.equals(other.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
 
         public RotationRequest(String id, int priority, float yaw, float pitch) {
             this.id = id;

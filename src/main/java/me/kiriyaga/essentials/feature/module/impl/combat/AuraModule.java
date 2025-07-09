@@ -61,7 +61,6 @@ public class AuraModule extends Module {
 
         if (target == null) {
             currentTarget = null;
-            ROTATION_MANAGER.cancelRequest(AuraModule.class.getName());
             return;
         }
         double eyeDistance = getClosestEyeDistance(MINECRAFT.player.getEyePos(), target.getBoundingBox());
@@ -71,7 +70,6 @@ public class AuraModule extends Module {
 
         if (!inRotateRange) {
             currentTarget = null;
-            ROTATION_MANAGER.cancelRequest(AuraModule.class.getName());
             return;
         }
 

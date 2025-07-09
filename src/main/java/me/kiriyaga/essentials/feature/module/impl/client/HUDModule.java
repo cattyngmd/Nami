@@ -278,8 +278,7 @@ public class HUDModule extends Module {
         int screenWidth = mc.getWindow().getScaledWidth();
         int screenHeight = mc.getWindow().getScaledHeight();
 
-        float rawOffset = ChatAnimationHelper.getAnimationOffset();
-        float animationOffset = (float) (14f - (rawOffset / 1.428571428571429));
+        float animationOffset = ChatAnimationHelper.getAnimationOffset();
 
         int pulsingPrimary = getPulsingColor(primaryRGB);
 

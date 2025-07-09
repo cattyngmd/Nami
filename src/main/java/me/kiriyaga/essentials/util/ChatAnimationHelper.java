@@ -1,7 +1,7 @@
 package me.kiriyaga.essentials.util;
 
 public class ChatAnimationHelper {
-    private static volatile float animationOffset = 20f;
+    private static volatile float animationOffset = 0f;
 
     public static void setAnimationOffset(float offset) {
         animationOffset = offset;

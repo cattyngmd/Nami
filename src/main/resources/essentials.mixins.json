@@ -10,6 +10,7 @@
     "MixinArmorFeatureRenderer",
     "MixinBossBarHud",
     "MixinCamera",
+    "MixinChatScreen",
     "MixinChunkBorderDebugRenderer",
     "MixinClientPlayerEntity",
     "MixinClientPlayerInteractionManager",
