@@ -32,6 +32,7 @@ public class ModuleManager {
         registerModule(new FreeLookModule());
         registerModule(new FreecamModule());
         registerModule(new NoWeatherModule());
+        registerModule(new ViewClipModule());
         /// CLIENT ///
         registerModule(new ColorModule());
         registerModule(new ClickGuiModule());

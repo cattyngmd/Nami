@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.mixin;
 
 import me.kiriyaga.essentials.feature.module.impl.render.FreeLookModule;
 import me.kiriyaga.essentials.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.essentials.feature.module.impl.render.ViewClipModule;
 import me.kiriyaga.essentials.manager.RotationManager;
 import me.kiriyaga.essentials.mixininterface.ICamera;
 import net.minecraft.client.render.Camera;
@@ -82,6 +83,20 @@ public abstract class MixinCamera implements ICamera {
         } else if (freeLookModule.isEnabled()) {
             args.set(0, freeLookModule.cameraYaw);
             args.set(1, freeLookModule.cameraPitch);
+        }
+    }
+
+    @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
+    private void allowClip(float f, CallbackInfoReturnable<Float> i) {
+        if (MODULE_MANAGER.getModule(ViewClipModule.class).isEnabled()) {
+            i.setReturnValue(f);
+        }
+    }
+
+    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;clipToSpace(F)F"))
+    private void extendDistance(Args args) {
+        if (MODULE_MANAGER.getModule(ViewClipModule.class).isEnabled()) {
+            args.set(0, MODULE_MANAGER.getModule(ViewClipModule.class).distance.get().floatValue());
         }
     }
 }
