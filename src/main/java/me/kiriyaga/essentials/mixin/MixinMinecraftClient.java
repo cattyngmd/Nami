@@ -25,7 +25,6 @@ public class MixinMinecraftClient {
     @Shadow private int itemUseCooldown;
 
     private int holdTicks = 0;
-    private boolean usedThisTick = false;
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
@@ -54,30 +53,22 @@ public class MixinMinecraftClient {
 
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
-        usedThisTick = true;
-        CHAT_MANAGER.sendRaw("not pressend " + holdTicks);
-
         FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
-        if (fastPlace.isEnabled()) {
-            if (MINECRAFT.options.useKey.isPressed()) {
-                CHAT_MANAGER.sendRaw("pressed " + holdTicks);
-                holdTicks++;
 
-                if (holdTicks >= fastPlace.startDelay.get()) {
-                    itemUseCooldown = fastPlace.delay.get();
-                }
-            } else {
-                holdTicks = 0;
-            }
+        if (holdTicks >= fastPlace.startDelay.get() && fastPlace.isEnabled()) {
+            itemUseCooldown = fastPlace.delay.get();
         }
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
-    private void restoreHold(CallbackInfo info) {
-        if (!usedThisTick) {
+    private void onTick(CallbackInfo info) {
+        FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
+
+        if (fastPlace.isEnabled() && MINECRAFT.options.useKey.isPressed()) {
+            holdTicks++;
+        } else {
             holdTicks = 0;
         }
-        usedThisTick = false;
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
