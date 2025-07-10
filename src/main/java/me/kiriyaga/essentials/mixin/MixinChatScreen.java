@@ -1,5 +1,6 @@
 package me.kiriyaga.essentials.mixin;
 
+import me.kiriyaga.essentials.feature.module.impl.client.HUDModule;
 import me.kiriyaga.essentials.util.ChatAnimationHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -10,12 +11,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+
 @Mixin(ChatScreen.class)
 public abstract class MixinChatScreen extends Screen {
 
     private float animatedHeight = 0f;
     private long lastTime = System.currentTimeMillis();
-    private static final int MAX_HEIGHT = 12;
+    private static final int MAX_HEIGHT = 14;
 
     protected MixinChatScreen(Text title) {
         super(title);
@@ -30,6 +33,9 @@ public abstract class MixinChatScreen extends Screen {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
     private void redirectFill(DrawContext context, int x1, int y1, int x2, int y2, int color) {
+        if (!MODULE_MANAGER.getModule(HUDModule.class).chatAnimation.get())
+            return;
+
         long now = System.currentTimeMillis();
         float delta = (now - lastTime) / 1000f;
         lastTime = now;
