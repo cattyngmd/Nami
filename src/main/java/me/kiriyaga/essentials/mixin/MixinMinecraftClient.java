@@ -1,6 +1,7 @@
 package me.kiriyaga.essentials.mixin;
 
 import me.kiriyaga.essentials.feature.module.impl.misc.AutoRespawnModule;
+import me.kiriyaga.essentials.feature.module.impl.world.FastPlaceModule;
 import me.kiriyaga.essentials.feature.module.impl.world.NoHitDelayModule;
 import me.kiriyaga.essentials.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
@@ -21,6 +22,10 @@ import static me.kiriyaga.essentials.Essentials.*;
 public class MixinMinecraftClient {
     @Shadow
     public int attackCooldown;
+    @Shadow private int itemUseCooldown;
+
+    private int holdTicks = 0;
+    private boolean usedThisTick = false;
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
@@ -45,6 +50,30 @@ public class MixinMinecraftClient {
                 bind.setWasPressedLastTick(currentlyPressed);
             }
         }
+    }
+
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
+    private void doItemUse(CallbackInfo info) {
+        usedThisTick = true;
+
+        FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
+        if (fastPlace.isEnabled()) {
+            holdTicks++;
+
+            if (holdTicks > fastPlace.startDelay.get().intValue()) {
+                itemUseCooldown = fastPlace.delay.get().intValue();
+            } else {
+                itemUseCooldown = 0;
+            }
+        }
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void restoreHold(CallbackInfo info) {
+        if (!usedThisTick) {
+            holdTicks = 0;
+        }
+        usedThisTick = false;
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)

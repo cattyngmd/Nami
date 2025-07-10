@@ -10,6 +10,7 @@ import me.kiriyaga.essentials.feature.module.impl.misc.*;
 import me.kiriyaga.essentials.feature.module.impl.movement.*;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
 import me.kiriyaga.essentials.feature.module.impl.world.AntiInteractModule;
+import me.kiriyaga.essentials.feature.module.impl.world.FastPlaceModule;
 import me.kiriyaga.essentials.feature.module.impl.world.NoBreakDelayModule;
 import me.kiriyaga.essentials.feature.module.impl.world.NoHitDelayModule;
 
@@ -69,6 +70,7 @@ public class ModuleManager {
         registerModule(new NoBreakDelayModule());
         registerModule(new AntiInteractModule());
         registerModule(new NoHitDelayModule());
+        registerModule(new FastPlaceModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
