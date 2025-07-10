@@ -55,15 +55,19 @@ public class MixinMinecraftClient {
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
         usedThisTick = true;
+        CHAT_MANAGER.sendRaw("not pressend " + holdTicks);
 
         FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
         if (fastPlace.isEnabled()) {
-            holdTicks++;
+            if (MINECRAFT.options.useKey.isPressed()) {
+                CHAT_MANAGER.sendRaw("pressed " + holdTicks);
+                holdTicks++;
 
-            if (holdTicks > fastPlace.startDelay.get().intValue()) {
-                itemUseCooldown = fastPlace.delay.get().intValue();
+                if (holdTicks >= fastPlace.startDelay.get()) {
+                    itemUseCooldown = fastPlace.delay.get();
+                }
             } else {
-                itemUseCooldown = 0;
+                holdTicks = 0;
             }
         }
     }
