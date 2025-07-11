@@ -9,10 +9,7 @@ import me.kiriyaga.essentials.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.essentials.feature.module.impl.misc.*;
 import me.kiriyaga.essentials.feature.module.impl.movement.*;
 import me.kiriyaga.essentials.feature.module.impl.render.*;
-import me.kiriyaga.essentials.feature.module.impl.world.AntiInteractModule;
-import me.kiriyaga.essentials.feature.module.impl.world.FastPlaceModule;
-import me.kiriyaga.essentials.feature.module.impl.world.NoBreakDelayModule;
-import me.kiriyaga.essentials.feature.module.impl.world.NoHitDelayModule;
+import me.kiriyaga.essentials.feature.module.impl.world.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +68,8 @@ public class ModuleManager {
         registerModule(new AntiInteractModule());
         registerModule(new NoHitDelayModule());
         registerModule(new FastPlaceModule());
+        registerModule(new ElytraSwapModule());
+        registerModule(new AutoElytraModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

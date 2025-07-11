@@ -44,6 +44,9 @@ public class AutoTotemModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onReceivePacket(PacketReceiveEvent event) {
+        if (MINECRAFT.world == null || MINECRAFT.player == null)
+            return;
+
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
             if (packet.getEntity(MINECRAFT.world) == MINECRAFT.player && packet.getStatus() == 3 && deathLog.get()) {
                 MINECRAFT.execute(this::logDeathData);

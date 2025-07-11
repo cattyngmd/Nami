@@ -13,7 +13,7 @@ import net.minecraft.util.Pair;
 
 public class Essentials implements ClientModInitializer {
     public static String NAME = "2bEssentials";
-    public static final String VERSION = "420.26 ";
+    public static final String VERSION = "420.27 ";
 
     public static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 
