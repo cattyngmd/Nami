@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static me.kiriyaga.essentials.Essentials.MINECRAFT;
-import static me.kiriyaga.essentials.Essentials.MODULE_MANAGER;
+import static me.kiriyaga.essentials.Essentials.*;
 
 public class EntityManager {
 
@@ -58,7 +57,7 @@ public class EntityManager {
                     return distSq <= entityManagerModule.targetRange.get() * entityManagerModule.targetRange.get();
                 })
                 .filter(e ->
-                        (entityManagerModule.targetPlayers.get() && e instanceof PlayerEntity)
+                        (entityManagerModule.targetPlayers.get() && e instanceof PlayerEntity && !FRIEND_MANAGER.isFriend(e.getName().getString()))
                                 || (entityManagerModule.targetHostiles.get() && EntityUtils.isHostile(e))
                                 || (entityManagerModule.targetNeutrals.get() && EntityUtils.isNeutral(e))
                                 || (entityManagerModule.targetPassives.get() && EntityUtils.isPassive(e)))
