@@ -1,6 +1,6 @@
-# 2bEssentials
+# Nami Client
 
-**2bEssentials** is a modular and lightweight anarchy client base built build for PVE and automatization.
+**Nami** is a modular and lightweight anarchy client base built build for PVE and automatization.
 
 ## Why
 
@@ -19,7 +19,7 @@ This project was started as a clean, open-source alternative. It aims to be tran
 
 ```bash
 git clone https://github.com/Kiriyaga7615/2bEssentials.git
-cd 2bEssentials
+cd nami
 
 ```
 
@@ -32,7 +32,7 @@ On Windows:
 gradlew.bat build
 
 The compiled JAR will be located in:
-build/libs/2bEssentials-<version>.jar
+build/libs/nami-<version>.jar
 ```
 
 ## License
