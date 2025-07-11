@@ -44,7 +44,7 @@ public class EntityManager {
     }
 
     public Entity getTarget() {
-        if (MINECRAFT.player == null || MINECRAFT.world == null)
+        if (MINECRAFT.player == null || MINECRAFT.world == null || entityManagerModule == null)
             return null;
 
         markRequested();

@@ -7,6 +7,7 @@ import me.kiriyaga.essentials.feature.command.impl.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.ibm.icu.text.PersonNameFormatter.Length;
 
@@ -63,31 +64,6 @@ public class CommandManager {
         }
     }
 
-    public List<String> getSuggestions(String input) {
-        String[] parts = input.split("\\s+");
-        String cmdName = parts.length > 0 ? parts[0] : "";
-
-        String exactMatch = commands.stream()
-            .filter(cmd -> (prefix + cmd.getName()).equals(cmdName))
-            .map(cmd -> prefix + cmd.getName())
-            .findFirst()
-            .orElse("");
-
-        if (exactMatch == cmdName) {
-            return List.of(exactMatch);
-        } else  if (cmdName.startsWith(prefix) && input.length() == 1) {
-            return commands.stream()
-                .map(cmd -> prefix + cmd.getName())
-                .toList();
-        } else {
-            return commands.stream()
-                .map(cmd -> prefix + cmd.getName())
-                .filter(s -> s.startsWith(cmdName))
-                .toList();
-        }
-    }
-
-
     @SubscribeEvent
     public void onChatMessage(ChatMessageEvent event) {
         String message = event.getMessage();
@@ -105,13 +81,24 @@ public class CommandManager {
         }
 
         for (Command cmd : commands) {
-            if ((prefix + cmd.getName()).matches(cmdName)) {
+            if ((prefix + cmd.getName()).matches(Pattern.quote(cmdName))) {
                 try {
                     cmd.execute(args);
                 } catch (Exception e) {
                     LOGGER.error("Error executing command " + cmdName, e);
                 }
                 return;
+            }
+
+            for (String alias : cmd.getAliases()) {
+                if ((prefix + alias).matches(Pattern.quote(cmdName))) {
+                    try {
+                        cmd.execute(args);
+                    } catch (Exception e) {
+                        LOGGER.error("Error executing command " + cmdName, e);
+                    }
+                    return;
+                }
             }
         }
     }
