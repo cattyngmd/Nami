@@ -44,7 +44,8 @@ public class GuiMoveModule extends Module {
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
-        if (!isEnabled() || !canMove()) return;
+        if (!canMove()) return;
+
 
         updateHeld(MINECRAFT.options.forwardKey, event.key, event.action, false, v -> forwardHeld = v);
         updateHeld(MINECRAFT.options.backKey, event.key, event.action, false, v -> backHeld = v);
@@ -64,7 +65,7 @@ public class GuiMoveModule extends Module {
 
     @SubscribeEvent
     public void onRender3D(Render3DEvent event) {
-        if (!isEnabled() || !canMove() || MODULE_MANAGER.getModule(FreecamModule.class).isEnabled()) return;
+        if (!canMove() || MODULE_MANAGER.getModule(FreecamModule.class).isEnabled()) return;
 
         if (MINECRAFT.currentScreen == null) {
             forwardHeld = backHeld = leftHeld = rightHeld = jumpHeld = sneakHeld = sprintHeld = false;

@@ -2,6 +2,7 @@ package me.kiriyaga.essentials.feature.module.impl.world;
 
 import me.kiriyaga.essentials.event.EventPriority;
 import me.kiriyaga.essentials.event.SubscribeEvent;
+import me.kiriyaga.essentials.event.impl.KeyInputEvent;
 import me.kiriyaga.essentials.event.impl.PostTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
@@ -19,11 +20,8 @@ import static me.kiriyaga.essentials.Essentials.MINECRAFT;
 
 public class AutoElytraModule extends Module {
 
+    private boolean wasOnGroundLastTick = true;
     private static final int ARMOR_CHEST_SLOT = 6;
-    private boolean hasJumpPressedOnce = false;
-    private boolean needJumpToggle = false;
-    private boolean jumpKeyPrevState = false;
-
     private static final Map<Item, Integer> CHESTPLATE_PRIORITY = Map.of(
             Items.LEATHER_CHESTPLATE, 1,
             Items.GOLDEN_CHESTPLATE, 2,
@@ -33,14 +31,8 @@ public class AutoElytraModule extends Module {
             Items.NETHERITE_CHESTPLATE, 6
     );
 
-    private boolean lastJumping = false;
-
     private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
     private final IntSetting swapSlotSetting = addSetting(new IntSetting("swap slot", 8, 1, 9));
-
-    public AutoElytraModule() {
-        super("auto elytra", "Automatically swaps elytra and chestplate based on flight/jump state.", Category.world, "autoelytra");
-    }
 
     private enum ElytraState {
         CHESTPLATE,
@@ -48,88 +40,111 @@ public class AutoElytraModule extends Module {
     }
 
     private ElytraState currentState = ElytraState.CHESTPLATE;
+    private boolean swapRequested = false;
+    private boolean needJumpImitate = false;
+    private int jumpToggleStep = 0;
+
+    public AutoElytraModule() {
+        super("auto elytra", "Swaps elytra/chestplate on key press", Category.world, "autoelytra");
+    }
+
+    @SubscribeEvent
+    public void onKeyInput(KeyInputEvent event) {
+        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+
+        if (event.key == MINECRAFT.options.jumpKey.getDefaultKey().getCode() && event.action == 1) {
+            ClientPlayerEntity player = MINECRAFT.player;
+            boolean onGround = player.isOnGround();
+
+            if (!onGround && !wasOnGroundLastTick) {
+                swapRequested = true;
+            }
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPostTick(PostTickEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+
         ClientPlayerEntity player = MINECRAFT.player;
-        int syncId = player.currentScreenHandler.syncId;
-
-        boolean jumpKeyPressed = MINECRAFT.options.jumpKey.isPressed();
-
-        // --- Логика имитации нажатия пробела после свапа элитры ---
-        if (needJumpToggle) {
-            if (!jumpKeyPrevState) {
-                // Если пробел НЕ зажат — нажимаем и сразу отпускаем
-                MINECRAFT.options.jumpKey.setPressed(true);
-                MINECRAFT.options.jumpKey.setPressed(false);
-                needJumpToggle = false;
-            } else {
-                // Если пробел зажат — отжать -> нажать -> отжать по тикам
-                handleJumpToggleSteps();
-                return; // пропускаем остальной код в этом тике
-            }
-        }
-
-        jumpKeyPrevState = jumpKeyPressed;
-
-        ItemStack chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
-        Item chestItemType = chestItem.getItem();
 
         boolean onGround = player.isOnGround();
-        boolean jumping = jumpKeyPressed;
 
-        if (onGround) {
-            currentState = ElytraState.CHESTPLATE;
-            hasJumpPressedOnce = false;
-
+        wasOnGroundLastTick = onGround;
+        if (player.isOnGround()) {
+            ItemStack chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
             Item bestChestplate = getBestChestplate();
-            if (bestChestplate != null && chestItemType != bestChestplate) {
-                int slot = findChestplateSlot(bestChestplate);
-                if (slot != -1) {
-                    if (fastSwap.get()) {
-                        fastSwapItem(slot, syncId, bestChestplate);
-                    } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
-                        swapWithArmor(slot, syncId);
-                    }
-                }
-            }
-        } else {
-            if (jumping && !lastJumping) {
-                if (!hasJumpPressedOnce) {
-                    hasJumpPressedOnce = true;
-                } else {
-                    if (currentState == ElytraState.CHESTPLATE) {
-                        int elytraSlot = findElytraSlot();
-                        if (elytraSlot != -1) {
-                            if (fastSwap.get()) {
-                                fastSwapItem(elytraSlot, syncId, Items.ELYTRA);
-                            } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
-                                swapWithArmor(elytraSlot, syncId);
-                            }
-                            currentState = ElytraState.ELYTRA;
 
-                            // после свапа элитры ставим флаг имитации прыжка
-                            needJumpToggle = true;
-                        }
-                    } else if (currentState == ElytraState.ELYTRA) {
-                        Item best = getBestChestplate();
-                        int slot = findChestplateSlot(best);
-                        if (slot != -1) {
-                            if (fastSwap.get()) {
-                                fastSwapItem(slot, syncId, best);
-                            } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
-                                swapWithArmor(slot, syncId);
-                            }
-                            currentState = ElytraState.CHESTPLATE;
-                        }
+            if (bestChestplate != null &&
+                    (chestItem.isEmpty() || chestItem.getItem() == Items.ELYTRA)) {
+
+                int chestSlot = findChestplateSlot(bestChestplate);
+                if (chestSlot != -1) {
+                    int syncId = player.currentScreenHandler.syncId;
+                    if (fastSwap.get()) {
+                        fastSwapItem(chestSlot, syncId, bestChestplate);
+                    } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+                        swapWithArmor(chestSlot, syncId);
                     }
-                    hasJumpPressedOnce = false;
+                    currentState = ElytraState.CHESTPLATE;
                 }
             }
+            return;
         }
 
-        lastJumping = jumping;
+        if (needJumpImitate) {
+            handleJumpToggleSteps();
+            return;
+        }
+
+        if (!swapRequested) return;
+        swapRequested = false;
+
+        int syncId = player.currentScreenHandler.syncId;
+
+        if (currentState == ElytraState.CHESTPLATE) {
+            int elytraSlot = findElytraSlot();
+            if (elytraSlot != -1) {
+                if (fastSwap.get()) {
+                    fastSwapItem(elytraSlot, syncId, Items.ELYTRA);
+                } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+                    swapWithArmor(elytraSlot, syncId);
+                }
+                currentState = ElytraState.ELYTRA;
+
+                needJumpImitate = true;
+                jumpToggleStep = 0;
+            }
+        } else {
+            Item best = getBestChestplate();
+            int chestSlot = findChestplateSlot(best);
+            if (chestSlot != -1) {
+                if (fastSwap.get()) {
+                    fastSwapItem(chestSlot, syncId, best);
+                } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+                    swapWithArmor(chestSlot, syncId);
+                }
+                currentState = ElytraState.CHESTPLATE;
+            }
+        }
+    }
+
+    private void handleJumpToggleSteps() {
+        switch (jumpToggleStep) {
+            case 0:
+                MINECRAFT.options.jumpKey.setPressed(false);
+                jumpToggleStep++;
+                break;
+            case 1:
+                MINECRAFT.options.jumpKey.setPressed(true);
+                jumpToggleStep++;
+                break;
+            case 2:
+                MINECRAFT.options.jumpKey.setPressed(false);
+                jumpToggleStep = 0;
+                needJumpImitate = false;
+                break;
+        }
     }
 
     private void swapWithArmor(int slot, int syncId) {
@@ -192,24 +207,5 @@ public class AutoElytraModule extends Module {
 
     private int convertSlot(int slot) {
         return slot < 9 ? slot + 36 : slot;
-    }
-
-    private int jumpToggleStep = 0;
-    private void handleJumpToggleSteps() {
-        switch (jumpToggleStep) {
-            case 0:
-                MINECRAFT.options.jumpKey.setPressed(false); // отжать
-                jumpToggleStep++;
-                break;
-            case 1:
-                MINECRAFT.options.jumpKey.setPressed(true); // нажать
-                jumpToggleStep++;
-                break;
-            case 2:
-                MINECRAFT.options.jumpKey.setPressed(false); // отжать
-                jumpToggleStep = 0;
-                needJumpToggle = false;
-                break;
-        }
     }
 }
