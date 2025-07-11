@@ -7,6 +7,8 @@ import me.kiriyaga.essentials.event.impl.PostTickEvent;
 import me.kiriyaga.essentials.feature.module.Category;
 import me.kiriyaga.essentials.feature.module.Module;
 import me.kiriyaga.essentials.setting.impl.BoolSetting;
+import me.kiriyaga.essentials.setting.impl.IntSetting;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -17,9 +19,10 @@ import static me.kiriyaga.essentials.Essentials.*;
 
 public class AutoTotemModule extends Module {
 
-    private final BoolSetting antiDesync = addSetting(new BoolSetting("desync", true));
+    private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
+    private final IntSetting totemSlotSetting = addSetting(new IntSetting("totem slot", 9, 1, 9));
+    private final BoolSetting antiDesync = addSetting(new BoolSetting("desync check", false));
     private final BoolSetting deathLog = addSetting(new BoolSetting("log", false));
-
     private boolean pendingTotem = false;
     private long lastAttemptTime = 0;
     private int totemCount = 0;
@@ -32,7 +35,11 @@ public class AutoTotemModule extends Module {
     public void onPostTick(PostTickEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null) return;
 
-        attemptPlaceTotem();
+        if (fastSwap.get()) {
+            attemptFastSwap();
+        } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+            attemptPlaceTotem();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -43,6 +50,31 @@ public class AutoTotemModule extends Module {
             }
         }
     }
+
+    private void attemptFastSwap() {
+        ClientPlayerEntity player = MINECRAFT.player;
+        if (player == null) return;
+
+        int hotbarSlot = totemSlotSetting.get() - 1;
+        int syncId = player.currentScreenHandler.syncId;
+
+        ItemStack hotbarStack = player.getInventory().getStack(hotbarSlot);
+        ItemStack offhand = player.getOffHandStack();
+
+        if (hotbarStack.getItem() != Items.TOTEM_OF_UNDYING) {
+            int totemSlot = findTotemSlot();
+            if (totemSlot == -1) return;
+
+            int inventorySlot = convertSlot(totemSlot);
+            MINECRAFT.interactionManager.clickSlot(syncId, inventorySlot, hotbarSlot, SlotActionType.SWAP, player);
+            return; // we do not want to one-tick swap methods
+        }
+
+        if (offhand.getItem() != Items.TOTEM_OF_UNDYING) {
+            MINECRAFT.interactionManager.clickSlot(syncId, 45, hotbarSlot, SlotActionType.SWAP, player);
+        }
+    }
+
 
     private void attemptPlaceTotem() {
         ClientPlayerEntity player = MINECRAFT.player;
@@ -130,7 +162,7 @@ public class AutoTotemModule extends Module {
         }
 
         StringBuilder info = new StringBuilder();
-        info.append("\n§c=== AutoTotem Death Log ===")
+        info.append("\n§c=== AutoTotem ===")
                 .append("\nCause: ").append(reason)
                 .append("\nPing: ").append(ping).append(" ms")
                 .append("\nTotems Available: ").append(totemCount)
@@ -140,5 +172,4 @@ public class AutoTotemModule extends Module {
 
         CHAT_MANAGER.sendPersistent(AutoTotemModule.class.getName(), info.toString());
     }
-
 }
