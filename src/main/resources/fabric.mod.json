@@ -12,13 +12,13 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "me.kiriyaga.essentials.Essentials"
+      "me.kiriyaga.nami.Nami"
     ]
   },
   "mixins": [
-    "essentials.mixins.json"
+    "nami.mixins.json"
   ],
-  "accessWidener": "META-INF/essentials.accesswidener",
+  "accessWidener": "META-INF/nami.accesswidener",
   "depends": {
     "fabricloader": ">=0.16.14",
     "fabric": "*",

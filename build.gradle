@@ -5,7 +5,7 @@ plugins {
 
 group = "me.kiriyaga"
 version = "420"
-archivesBaseName = "essentials"
+archivesBaseName = "nami"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -32,7 +32,7 @@ dependencies {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/META-INF/essentials.accesswidener")
+    accessWidenerPath = file("src/main/resources/META-INF/nami.accesswidener")
 }
 
 tasks.processResources {
