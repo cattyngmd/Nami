@@ -36,7 +36,8 @@ public class ColorModule extends Module {
         int r = Math.max(0, (int) (base.getRed() * factor));
         int g = Math.max(0, (int) (base.getGreen() * factor));
         int b = Math.max(0, (int) (base.getBlue() * factor));
-        return new Color(r, g, b);
+        int a = base.getAlpha();
+        return new Color(r, g, b, a);
     }
 
     public Color getStyledColor(Color base, double saturation, double darkness) {
