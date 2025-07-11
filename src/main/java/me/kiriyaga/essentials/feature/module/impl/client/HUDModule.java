@@ -93,6 +93,7 @@ public class HUDModule extends Module {
             "bro why are all these devs shooting estrogen into their morning monsters?",
             "Kiriyaga was here",
             "1.12.2 is just bad",
+            "killaua pls dont kill my friends",
             "can we argue with the fact that future is a pedo client?",
             "Verify you are human...",
             "Script to win :^)",
