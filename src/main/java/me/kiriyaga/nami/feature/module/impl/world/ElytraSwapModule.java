@@ -62,11 +62,13 @@ public class ElytraSwapModule extends Module {
             if (CHESTPLATE_PRIORITY.containsKey(swapStack.getItem())) {
                 MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
                 this.setEnabled(false);
+                CHAT_MANAGER.sendTransient("Elytra swapped.");
             }
         } else {
             if (swapStack.getItem() == Items.ELYTRA) {
                 MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
                 this.setEnabled(false);
+                CHAT_MANAGER.sendTransient("Elytra swapped.");
             }
         }
     }
@@ -87,6 +89,7 @@ public class ElytraSwapModule extends Module {
                     MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
                     MINECRAFT.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
                     this.setEnabled(false);
+                    CHAT_MANAGER.sendTransient("Elytra swapped.");
                 }
             }
         } else {
@@ -96,6 +99,7 @@ public class ElytraSwapModule extends Module {
                 MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
                 MINECRAFT.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
                 this.setEnabled(false);
+                CHAT_MANAGER.sendTransient("Elytra swapped.");
             }
         }
     }

@@ -7,6 +7,7 @@ import me.kiriyaga.nami.setting.impl.*;
 import me.kiriyaga.nami.util.KeyUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.List;
@@ -338,7 +339,11 @@ public class SettingPanel {
 
     public static boolean keyPressed(int keyCode) {
         if (waitingForKeyBind != null) {
-            waitingForKeyBind.set(keyCode);
+            if (keyCode == GLFW.GLFW_KEY_DELETE) {
+                waitingForKeyBind.set(-1);
+            } else {
+                waitingForKeyBind.set(keyCode);
+            }
             waitingForKeyBind = null;
             return true;
         }

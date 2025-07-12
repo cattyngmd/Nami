@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "name",
+  "id": "nami",
   "version": "${version}",
   "name": "Nami Client",
   "description": "A high-performance, modular client base for anarchy servers.",
