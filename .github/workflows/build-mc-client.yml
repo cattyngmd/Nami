@@ -30,14 +30,14 @@ jobs:
       - name: Build client
         run: ./gradlew clean build remapJar --stacktrace
 
+      - name: List files in build/libs
+        run: ls -l build/libs/
+
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
         with:
           name: nami-client
           path: build/libs/*.jar
-
-      - name: List files in build/libs
-        run: ls -l build/libs/
 
   release:
     needs: build
@@ -45,12 +45,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: artifact
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: nami-client
+          path: ./artifact
 
-      - name: release
+      - name: List downloaded files
+        run: ls -l ./artifact
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: 420.28
@@ -62,6 +66,7 @@ jobs:
 
       - name: Upload JAR to Release
         run: |
+          cd ./artifact
           JAR_FILE=$(ls *.jar | head -n 1)
           echo "Uploading $JAR_FILE to release tag 420.28"
           gh release upload 420.28 "$JAR_FILE" --clobber
