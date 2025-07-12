@@ -2,6 +2,11 @@
 
 **Nami** is a modular and lightweight anarchy client base built build for PVE and automatization.
 
+##Config/feedback
+it may be a little difficult to configurate nami, since i left many development only settings for now, please lead to 
+https://discord.gg/TfknuhEP
+for stable config, also you can ask me about any settings there
+
 ## Why
 
 Most commonly used Minecraft clients are paid, closed-source, and obfuscated. This makes them difficult to audit or trust and in some cases, they may include backdoors or malicious code.
