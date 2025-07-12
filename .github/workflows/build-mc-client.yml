@@ -33,5 +33,34 @@ jobs:
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
         with:
-          name: minecraft-client
+          name: nami-client
           path: build/libs/*-remapped.jar
+
+  release:
+    needs: build
+    if: github.actor == 'Kiriyaga7615'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nami-client
+
+      - name: release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: 420.28
+          name: Nami 420.28
+          body: |
+            First release!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload JAR to Release
+        run: |
+          JAR_FILE=$(ls *.jar | head -n 1)
+         echo "Uploading $JAR_FILE to release tag 420.28"
+          gh release upload 420.28 "$JAR_FILE" --clobber
+        env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
