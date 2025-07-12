@@ -34,7 +34,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nami-client
-          path: build/libs/*-remapped.jar
+          path: build/libs/*.jar
+
+      - name: List files in build/libs
+        run: ls -l build/libs/
 
   release:
     needs: build
