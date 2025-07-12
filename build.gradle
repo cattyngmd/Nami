@@ -4,8 +4,20 @@ plugins {
 }
 
 group = "me.kiriyaga"
-version = "420"
 archivesBaseName = "nami"
+
+def getGitHash() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+        ignoreExitValue true
+    }
+    return stdout.toString().trim()
+}
+
+version = "29.${getGitHash()}"
+
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21

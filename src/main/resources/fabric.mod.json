@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "essentials",
+  "id": "name",
   "version": "${version}",
-  "name": "essentials",
+  "name": "Nami Client",
   "description": "A high-performance, modular client base for anarchy servers.",
   "authors": ["Kiriyaga"],
   "contact": {
-    "sources": "github someday"
+    "sources": "https://github.com/Kiriyaga7615/NamiClient"
   },
   "license": "MIT",
   "environment": "*",

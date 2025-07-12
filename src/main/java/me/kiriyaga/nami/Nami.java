@@ -4,6 +4,8 @@ import me.kiriyaga.nami.feature.gui.ClickGuiScreen;
 import me.kiriyaga.nami.manager.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
@@ -14,7 +16,15 @@ import net.minecraft.util.Pair;
 public class Nami implements ClientModInitializer {
     public static String NAME = "Nami 波";
     public static String DISPLAY_NAME = "Nami 波";
-    public static final String VERSION = "420.28 ";
+    public static final String VERSION;
+    static {
+        ModContainer mod = FabricLoader.getInstance().getModContainer("nami").orElse(null);
+        if (mod != null) {
+            VERSION = mod.getMetadata().getVersion().getFriendlyString();
+        } else {
+            VERSION = "dev-environment";
+        }
+    }
 
     public static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 

@@ -57,11 +57,14 @@ jobs:
       - name: List downloaded files
         run: ls -l ./artifact
 
+      - name: Set version from short commit SHA
+        run: echo "VERSION=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_ENV
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: 420.28
-          name: Nami 420.28
+          tag_name: ${{ env.VERSION }}
+          name: Nami ${{ env.VERSION }}
           body: |
             First release!
         env:
@@ -70,7 +73,7 @@ jobs:
       - name: Upload JAR to Release
         run: |
           JAR_FILE=$(ls ./artifact/*.jar | head -n 1)
-          echo "Uploading $JAR_FILE to release tag 420.28"
-          gh release upload 420.28 "$JAR_FILE" --clobber
+          echo "Uploading $JAR_FILE to release tag ${{ env.VERSION }}"
+          gh release upload ${{ env.VERSION }} "$JAR_FILE" --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
