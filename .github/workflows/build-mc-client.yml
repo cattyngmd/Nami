@@ -45,6 +45,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -66,8 +69,7 @@ jobs:
 
       - name: Upload JAR to Release
         run: |
-          cp ./artifact/*.jar .
-          JAR_FILE=$(ls *.jar | head -n 1)
+          JAR_FILE=$(ls ./artifact/*.jar | head -n 1)
           echo "Uploading $JAR_FILE to release tag 420.28"
           gh release upload 420.28 "$JAR_FILE" --clobber
         env:
