@@ -10,7 +10,7 @@ This project was started as a clean, open-source alternative. It aims to be tran
 
 ## Requirements
 
-- Java 17 (because of Minecraft 1.21.4 and Fabric)
+- Java 21 (because of Minecraft 1.21.4 and Fabric)
 - Gradle 8+ (wrapper included)
 
 ## How to Build
