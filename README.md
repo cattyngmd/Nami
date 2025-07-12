@@ -1,6 +1,11 @@
-# 2bEssentials
+# Nami Client
 
-**2bEssentials** is a modular and lightweight anarchy client base built build for PVE and automatization.
+**Nami** is a modular and lightweight anarchy client base built build for PVE and automatization.
+
+##Config/feedback
+it may be a little difficult to configurate nami, since i left many development only settings for now, please lead to 
+https://discord.gg/TfknuhEP
+for stable config, also you can ask me about any settings there
 
 ## Why
 
@@ -10,7 +15,7 @@ This project was started as a clean, open-source alternative. It aims to be tran
 
 ## Requirements
 
-- Java 17 (because of Minecraft 1.21.4 and Fabric)
+- Java 21 (because of Minecraft 1.21.4 and Fabric)
 - Gradle 8+ (wrapper included)
 
 ## How to Build
@@ -19,7 +24,7 @@ This project was started as a clean, open-source alternative. It aims to be tran
 
 ```bash
 git clone https://github.com/Kiriyaga7615/2bEssentials.git
-cd 2bEssentials
+cd nami
 
 ```
 
@@ -32,7 +37,7 @@ On Windows:
 gradlew.bat build
 
 The compiled JAR will be located in:
-build/libs/2bEssentials-<version>.jar
+build/libs/nami-<version>.jar
 ```
 
 ## License
