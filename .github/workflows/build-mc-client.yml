@@ -62,7 +62,7 @@ jobs:
           body: |
             First release!
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Upload JAR to Release
         run: |
@@ -71,4 +71,4 @@ jobs:
           echo "Uploading $JAR_FILE to release tag 420.28"
           gh release upload 420.28 "$JAR_FILE" --clobber
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
