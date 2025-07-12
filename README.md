@@ -2,7 +2,7 @@
 
 **Nami** is a modular and lightweight anarchy client base built build for PVE and automatization.
 
-##Config/feedback
+## Config/feedback
 it may be a little difficult to configurate nami, since i left many development only settings for now, please lead to 
 https://discord.gg/TfknuhEP
 for stable config, also you can ask me about any settings there
@@ -42,3 +42,7 @@ build/libs/nami-<version>.jar
 
 ## License
 This project is licensed under the MIT License. You are free to contribute, distribute, fork or skid anything you will.
+
+## Additional thanks
+[cattyngmd](https://github.com/cattyngmd) for helping with rotations.
+
