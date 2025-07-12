@@ -1,4 +1,8 @@
-# Nami Client
+# Nami Client 1.21.7
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b691e0f0-b739-45fc-b655-57fcba551052" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/977df04a-0a57-4b3e-a2db-5c249dd8f874" />
+
+1.21.4 branch is outdated!
 
 **Nami** is a modular and lightweight anarchy client base built build for PVE and automatization.
 
