@@ -60,7 +60,7 @@ jobs:
       - name: Upload JAR to Release
         run: |
           JAR_FILE=$(ls *.jar | head -n 1)
-         echo "Uploading $JAR_FILE to release tag 420.28"
+          echo "Uploading $JAR_FILE to release tag 420.28"
           gh release upload 420.28 "$JAR_FILE" --clobber
         env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
