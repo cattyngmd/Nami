@@ -23,6 +23,8 @@ public class SettingPanel {
     private static final int SLIDER_HEIGHT = 2;
     private static final int MODULE_SPACING = 2;
 
+    private static KeyBindSetting waitingForKeyBind = null;
+
     private static ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
     }
@@ -124,7 +126,12 @@ public class SettingPanel {
             String valueStr = enumSetting.get().toString();
             context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + (HEIGHT - 8) / 2, textColorInt, false);
         } else if (setting instanceof KeyBindSetting bindSetting) {
-            String valueStr = KeyUtils.getKeyName(bindSetting.get());
+            String valueStr;
+            if (waitingForKeyBind == bindSetting) {
+                valueStr = "Press a key...";
+            } else {
+                valueStr = KeyUtils.getKeyName(bindSetting.get());
+            }
             context.drawText(textRenderer, valueStr, x + WIDTH - PADDING - textRenderer.getWidth(valueStr), y + (HEIGHT - 8) / 2, textColorInt, false);
         } else if (setting instanceof DoubleSetting doubleSetting) {
             renderSlider(context, x + PADDING, y + HEIGHT - 4,
@@ -202,7 +209,7 @@ public class SettingPanel {
         if (button != 0 && button != 1) return false;
 
         List<Setting<?>> settings = module.getSettings();
-        int curY = y + MODULE_SPACING; // Add initial spacing
+        int curY = y + MODULE_SPACING;
 
         for (Setting<?> setting : settings) {
             if (isHovered(mouseX, mouseY, x, curY)) {
@@ -221,8 +228,12 @@ public class SettingPanel {
                 } else if (setting instanceof ColorSetting colorSetting) {
                     startDragging(setting, mouseX);
                     return true;
-                } else if (setting instanceof KeyBindSetting) {
-                    // KeyBind handling would go here
+                } else if (setting instanceof KeyBindSetting keyBindSetting) {
+                    if (waitingForKeyBind == null) {
+                        waitingForKeyBind = keyBindSetting;
+                    } else if (waitingForKeyBind == keyBindSetting) {
+                        waitingForKeyBind = null;
+                    }
                     return true;
                 }
             }
@@ -323,5 +334,14 @@ public class SettingPanel {
         exponent = Math.max(-6, Math.min(2, exponent));
 
         return Math.pow(10, exponent);
+    }
+
+    public static boolean keyPressed(int keyCode) {
+        if (waitingForKeyBind != null) {
+            waitingForKeyBind.set(keyCode);
+            waitingForKeyBind = null;
+            return true;
+        }
+        return false;
     }
 }

@@ -151,6 +151,15 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (SettingPanel.keyPressed(keyCode)) {
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+
+    @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (draggingCategory && draggedCategory != null) {
             int newX = categoryPositions.get(draggedCategory) + (int) deltaX;
