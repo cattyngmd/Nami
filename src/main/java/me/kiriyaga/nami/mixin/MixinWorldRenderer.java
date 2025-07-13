@@ -3,6 +3,7 @@ package me.kiriyaga.nami.mixin;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
+import me.kiriyaga.nami.feature.module.impl.render.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.render.NoWeatherModule;
 import me.kiriyaga.nami.util.MatrixCache;
@@ -79,6 +80,7 @@ public class MixinWorldRenderer {
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;setupTerrain(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;ZZ)V"), index = 3)
     private boolean renderSetupTerrainModifyArg(boolean spectator) {
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
-        return freecamModule.isEnabled() || spectator;
+        FreeLookModule freeLookModule = MODULE_MANAGER.getModule(FreeLookModule.class);
+        return freecamModule.isEnabled() || spectator || freeLookModule.isEnabled();
     }
 }
