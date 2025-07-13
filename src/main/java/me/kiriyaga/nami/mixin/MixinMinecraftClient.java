@@ -7,6 +7,10 @@ import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,11 +58,21 @@ public class MixinMinecraftClient {
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
         FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
+        if (!fastPlace.isEnabled()) return;
 
-        if (holdTicks >= fastPlace.startDelay.get() && fastPlace.isEnabled()) {
+        ItemStack heldStack = MinecraftClient.getInstance().player.getMainHandStack();
+        Item heldItem = heldStack.getItem();
+        Identifier heldId = Registries.ITEM.getId(heldItem);
+
+        if (fastPlace.whitelist.get() && !fastPlace.whitelist.isWhitelisted(heldId)) return;
+
+        if (fastPlace.blacklist.get() && fastPlace.blacklist.isWhitelisted(heldId)) return;
+
+        if (holdTicks >= fastPlace.startDelay.get()) {
             itemUseCooldown = fastPlace.delay.get();
         }
     }
+
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo info) {
