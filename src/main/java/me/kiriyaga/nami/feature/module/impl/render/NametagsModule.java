@@ -103,7 +103,7 @@ public class NametagsModule extends Module {
         Vec3d pos = new Vec3d(
                 MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
                 MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY())
-                        + (entity.isSneaking() ? 0.0 : entity.getBoundingBox().getLengthY() + 0.3),
+                        + (entity.isSneaking() ? entity.getBoundingBox().getLengthY() + 0.0 : entity.getBoundingBox().getLengthY() + 0.3),
                 MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ())
         );
 
