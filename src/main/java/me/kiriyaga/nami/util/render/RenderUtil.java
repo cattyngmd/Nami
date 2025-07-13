@@ -329,12 +329,10 @@ public class RenderUtil {
             RenderUtil.rectFilled(matrices, left, top, right, bottom, backgroundColor);
 
             if (border){
-                float scaledBorderWidth = Math.max(0.5f, borderWidth / scale);
-
-                RenderUtil.rectFilled(matrices, left - scaledBorderWidth, top, left, bottom, borderColor);
-                RenderUtil.rectFilled(matrices, right, top, right + scaledBorderWidth, bottom, borderColor);
-                RenderUtil.rectFilled(matrices, left - scaledBorderWidth, top - scaledBorderWidth, right + scaledBorderWidth, top, borderColor);
-                RenderUtil.rectFilled(matrices, left - scaledBorderWidth, bottom, right + scaledBorderWidth, bottom + scaledBorderWidth, borderColor);
+                RenderUtil.rectFilled(matrices, left - borderWidth, top, left, bottom, borderColor);
+                RenderUtil.rectFilled(matrices, right, top, right + borderWidth, bottom, borderColor);
+                RenderUtil.rectFilled(matrices, left - borderWidth, top - borderWidth, right + borderWidth, top, borderColor);
+                RenderUtil.rectFilled(matrices, left - borderWidth, bottom, right + borderWidth, bottom + borderWidth, borderColor);
             }
         }
 
