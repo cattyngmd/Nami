@@ -40,6 +40,7 @@
     "MixinClientConnection",
     "MixinEntity",
     "MixinLivingEntity",
+    "MixinPlayerEntity",
     "MixinPlayerInteractEntityC2SPacket",
     "MixinSodiumWorldRenderer",
     "MixinTextVisitFactory",
