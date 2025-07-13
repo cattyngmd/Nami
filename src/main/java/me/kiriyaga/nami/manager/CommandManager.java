@@ -14,7 +14,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class CommandManager {
 
     private final List<Command> commands = new ArrayList<>();
-    private String prefix = ".";
+    private String prefix = "-";
 
     public void init() {
         EVENT_MANAGER.register(this);

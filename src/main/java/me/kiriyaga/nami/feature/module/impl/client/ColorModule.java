@@ -1,5 +1,8 @@
 package me.kiriyaga.nami.feature.module.impl.client;
 
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.feature.module.Category;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
@@ -10,15 +13,16 @@ import java.awt.*;
 
 public class ColorModule extends Module {
 
-    public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 248, 170), true));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 0, 170), true));
 
-    public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.45, 0.0, 1.0));
-    public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.05, 0.0, 1.0));
-
+    public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.35, 0.0, 1.0));
+    public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.00, 0.0, 1.0));
     public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.7, 0.0, 1.0));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
-    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbowSpeed", 0.5, 0.01, 5.0));
+    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbowSpeed", 1.0, 0.01, 5.0));
+
+    private int phase = 0;
 
     public ColorModule() {
         super("color", "Customizes color scheme.", Category.client, "colr", "c", "colors", "clitor", "сщдщк");
@@ -27,7 +31,7 @@ public class ColorModule extends Module {
     }
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         if (!this.isEnabled())
             this.toggle();
     }
@@ -57,17 +61,40 @@ public class ColorModule extends Module {
         return new Color(adjusted.getRed(), adjusted.getGreen(), adjusted.getBlue(), getAlpha255());
     }
 
-    private Color getRainbowColor() {
-        long time = System.currentTimeMillis();
-        float hue = (time * 0.001f * rainbowSpeed.get().floatValue()) % 1.0f;
-        Color rainbow = Color.getHSBColor(hue, 1f, 1f);
-        return new Color(rainbow.getRed(), rainbow.getGreen(), rainbow.getBlue(), getAlpha255());
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    private void onRender(Render2DEvent ev){
+        updateGlobalColor();
+    }
+
+    public void updateGlobalColor() {
+        if (!rainbowEnabled.get()) return;
+
+        Color current = globalColor.get();
+        int r = current.getRed();
+        int g = current.getGreen();
+        int b = current.getBlue();
+        int a = getAlpha255();
+
+        int step = (int) Math.max(1, rainbowSpeed.get() * 4);
+
+        switch (phase) {
+            case 0: g += step; if (g >= 255) { g = 255; phase = 1; } break;
+            case 1: r -= step; if (r <= 0)   { r = 0;   phase = 2; } break;
+            case 2: b += step; if (b >= 255) { b = 255; phase = 3; } break;
+            case 3: g -= step; if (g <= 0)   { g = 0;   phase = 4; } break;
+            case 4: r += step; if (r >= 255) { r = 255; phase = 5; } break;
+            case 5: b -= step; if (b <= 0)   { b = 0;   phase = 0; } break;
+        }
+
+        r = clamp(r); g = clamp(g); b = clamp(b);
+        globalColor.set(new Color(r, g, b, a));
+    }
+
+    private int clamp(int val) {
+        return Math.max(0, Math.min(255, val));
     }
 
     public Color getEffectiveGlobalColor() {
-        if (rainbowEnabled.get()) {
-            return getRainbowColor();
-        }
         return globalColor.get();
     }
 
