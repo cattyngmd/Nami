@@ -119,12 +119,13 @@ public class SearchModule extends Module {
         Set<BlockPos> foundBlocks = new HashSet<>();
         Map<Identifier, Integer> foundCounts = new HashMap<>();
 
-        int worldHeight = Math.min(MINECRAFT.world.getHeight(), 256);
+        int minY = -64;
+        int maxY = 320;
 
         for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < worldHeight; y++) {
+            for (int y = minY; y < maxY; y++) {
                 for (int z = 0; z < 16; z++) {
-                    BlockPos pos = chunkStart.add(x, y, z);
+                    BlockPos pos = new BlockPos(chunkStart.getX() + x, y, chunkStart.getZ() + z);
                     BlockState state = MINECRAFT.world.getBlockState(pos);
                     Block block = state.getBlock();
 
@@ -169,7 +170,7 @@ public class SearchModule extends Module {
 
         for (Set<BlockPos> blockSet : chunkBlocks.values()) {
             for (BlockPos pos : blockSet) {
-                if (playerPos.getSquaredDistance(pos) > 168 * 168) continue;
+                if (playerPos.getSquaredDistance(pos) > 300 * 300) continue;
 
                 BlockState state = MINECRAFT.world.getBlockState(pos);
                 Color color = BlockUtil.getColorByBlockId(state);
