@@ -25,13 +25,14 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class AuraModule extends Module {
 
-    public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 4.6, 1.0, 10.0));
-    public final DoubleSetting attackRange = addSetting(new DoubleSetting("attack", 4.0, 1.0, 6.0));
+    public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.20, 1.0, 7.0));
+    public final DoubleSetting attackRange = addSetting(new DoubleSetting("attack", 3.00, 1.0, 6.0));
     public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
-    public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", true));
+    public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", false));
     public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 30));
+    public final BoolSetting grim = addSetting(new BoolSetting("grim", true));
+    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 10));
     public final DoubleSetting preRotate = addSetting(new DoubleSetting("pre rotate", 0.2, 0.0, 1.0));
 
     private Entity currentTarget = null;
@@ -63,7 +64,13 @@ public class AuraModule extends Module {
             currentTarget = null;
             return;
         }
-        double eyeDistance = getClosestEyeDistance(MINECRAFT.player.getEyePos(), target.getBoundingBox());
+
+        double eyeDistance;
+        if (grim.get()) {
+            eyeDistance = getClosestEyeDistance(MINECRAFT.player.getEyePos(), target.getBoundingBox());
+        } else {
+            eyeDistance = MINECRAFT.player.getPos().distanceTo(getEntityCenter(target));
+        }
 
         boolean inRotateRange = eyeDistance <= rotateRange.get();
         boolean inAttackRange = eyeDistance <= attackRange.get();
@@ -84,14 +91,15 @@ public class AuraModule extends Module {
 
         float ticksUntilReady = (1.0f - cooldown) * tps;
         if (ticksUntilReady <= preRotate.get() * tps) {
-                ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
-                        AuraModule.class.getName(),
-                        rotationPriority.get(),
-                        (float) getYawToVec(MINECRAFT.player, getClosestPointToEye(MINECRAFT.player.getEyePos(), target.getBoundingBox())),
-                        (float) getPitchToVec(MINECRAFT.player, getClosestPointToEye(MINECRAFT.player.getEyePos(), target.getBoundingBox()))
-                ));
-        }
+            Vec3d targetCenter = getEntityCenter(target);
 
+            ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
+                    AuraModule.class.getName(),
+                    rotationPriority.get(),
+                    (float) getYawToVec(MINECRAFT.player, targetCenter),
+                    (float) getPitchToVec(MINECRAFT.player, targetCenter)
+            ));
+        }
 
         if (!inAttackRange) return;
         if (cooldown < (tpsSync.get() ? 1.0f * (20f / tps) : 1.0f)) return;
@@ -105,7 +113,13 @@ public class AuraModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (!render.get() || currentTarget == null) return;
 
-        double eyeDistance = getClosestEyeDistance(MINECRAFT.player.getEyePos(), currentTarget.getBoundingBox());
+        double eyeDistance;
+        if (grim.get()) {
+            eyeDistance = getClosestEyeDistance(MINECRAFT.player.getEyePos(), currentTarget.getBoundingBox());
+        } else {
+            eyeDistance = MINECRAFT.player.getPos().distanceTo(getEntityCenter(currentTarget));
+        }
+
         if (eyeDistance > rotateRange.get()) return;
 
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
@@ -141,15 +155,23 @@ public class AuraModule extends Module {
         return angle;
     }
 
-    private static Vec3d getClosestPointToEye(Vec3d eyePos, Box box) {
-        double x = MathHelper.clamp(eyePos.x, box.minX, box.maxX);
-        double y = MathHelper.clamp(eyePos.y, box.minY, box.maxY);
-        double z = MathHelper.clamp(eyePos.z, box.minZ, box.maxZ);
-        return new Vec3d(x, y, z);
+    private static Vec3d getEntityCenter(Entity entity) {
+        Box box = entity.getBoundingBox();
+        double centerX = box.minX + (box.getLengthX() / 2);
+        double centerY = box.minY + (box.getLengthY() / 2);
+        double centerZ = box.minZ + (box.getLengthZ() / 2);
+        return new Vec3d(centerX, centerY, centerZ);
     }
 
     private static double getClosestEyeDistance(Vec3d eyePos, Box box) {
         Vec3d closest = getClosestPointToEye(eyePos, box);
         return eyePos.distanceTo(closest);
+    }
+
+    private static Vec3d getClosestPointToEye(Vec3d eyePos, Box box) {
+        double x = MathHelper.clamp(eyePos.x, box.minX, box.maxX);
+        double y = MathHelper.clamp(eyePos.y, box.minY, box.maxY);
+        double z = MathHelper.clamp(eyePos.z, box.minZ, box.maxZ);
+        return new Vec3d(x, y, z);
     }
 }
