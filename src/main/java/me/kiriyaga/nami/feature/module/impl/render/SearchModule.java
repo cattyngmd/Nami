@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.BlockUtil;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
@@ -35,13 +36,14 @@ public class SearchModule extends Module {
     private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));
     private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 1, 1, 5));
     private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 2, 0, 20));
+    private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, "search"));
     private final BoolSetting storages = addSetting(new BoolSetting("storages", true));
     private final BoolSetting nonVanilla = addSetting(new BoolSetting("non-vanilla", false));
     private final BoolSetting notifier = addSetting(new BoolSetting("notifier", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("not at spawn", false));
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 2.5));
     private final BoolSetting filled = addSetting(new BoolSetting("filled", true));
-     
+
     private final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
 
@@ -52,6 +54,16 @@ public class SearchModule extends Module {
 
     public SearchModule() {
         super("search", "Search certain blocks on loaded chunks.", Category.visuals, "srcj", "blockesp", "serch", "ыуфкср");
+        whitelist.setOnChanged(this::reloadChunksAroundPlayer);
+        storages.setOnChanged(this::reloadChunksAroundPlayer);
+        nonVanilla.setOnChanged(this::reloadChunksAroundPlayer);
+        notAtSpawn.setOnChanged(this::reloadChunksAroundPlayer);
+        notifier.setOnChanged(this::reloadChunksAroundPlayer); // i just want it dont blame me
+    }
+
+    @Override
+    public void onEnable() {
+        reloadChunksAroundPlayer();
     }
 
     private void updateCandidateBlocks() {
@@ -63,6 +75,8 @@ public class SearchModule extends Module {
                 .map(Registries.BLOCK::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
+
+        candidateBlockIds.addAll(whitelist.getWhitelist());
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -188,6 +202,26 @@ public class SearchModule extends Module {
             }
         }
     }
+
+    private void reloadChunksAroundPlayer() {
+        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+
+        synchronized (pendingChunks) {
+            pendingChunks.clear();
+
+            int radius = MINECRAFT.options.getViewDistance().getValue();
+            BlockPos playerPos = MINECRAFT.player.getBlockPos();
+            ChunkPos playerChunk = new ChunkPos(playerPos);
+
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    Chunk chunk = MINECRAFT.world.getChunk(playerChunk.x + dx, playerChunk.z + dz);
+                    pendingChunks.offer(chunk);
+                }
+            }
+        }
+    }
+
 
     @Override
     public void onDisable() {

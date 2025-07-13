@@ -27,17 +27,30 @@ public class NoRenderModule extends Module {
 
     public NoRenderModule() {
         super("no render", "Prevent rendering certain overlays/effects.", Category.visuals, "norender");
+        noFire.setOnChanged(this::reloadRenderer);
+        noBackground.setOnChanged(this::reloadRenderer);
+        noLiguid.setOnChanged(this::reloadRenderer);
+        noVignette.setOnChanged(this::reloadRenderer);
+        noPortal.setOnChanged(this::reloadRenderer);
+        noFog.setOnChanged(this::reloadRenderer);
+        noPumpkin.setOnChanged(this::reloadRenderer);
+        noPowderedSnow.setOnChanged(this::reloadRenderer);
+    }
+
+    private void reloadRenderer() {
+        if (MINECRAFT.world != null) {
+            MINECRAFT.worldRenderer.reload();
+        }
     }
 
     @Override
     public void onEnable() {
-        if (MINECRAFT.world != null)
-            MINECRAFT.worldRenderer.reload();
+        reloadRenderer();
     }
+
     @Override
     public void onDisable() {
-        if (MINECRAFT.world != null)
-            MINECRAFT.worldRenderer.reload();
+        reloadRenderer();
     }
 
     public boolean isNoFire() {

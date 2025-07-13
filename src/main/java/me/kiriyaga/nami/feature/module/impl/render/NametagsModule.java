@@ -102,7 +102,8 @@ public class NametagsModule extends Module {
     private void renderEntityNametag(net.minecraft.entity.Entity entity, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
         Vec3d pos = new Vec3d(
                 MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
-                MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY()) + (entity.isSneaking() ? 2 : 2.3),
+                MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY())
+                        + (entity.isSneaking() ? 0.0 : entity.getBoundingBox().getLengthY() + 0.3),
                 MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ())
         );
 
