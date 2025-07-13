@@ -1,6 +1,7 @@
 # Nami Client 1.21.7
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b691e0f0-b739-45fc-b655-57fcba551052" />
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/977df04a-0a57-4b3e-a2db-5c249dd8f874" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4a7403a7-d303-4abf-baf3-4928f6acb026" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f56b8766-5d83-45e0-b6ad-d97a5e46f1ab" />
+
 
 1.21.4 branch is outdated!
 
@@ -12,7 +13,6 @@ it may be a little difficult to configurate nami, since i left many development 
 https://discord.gg/TfknuhEP
 for stable config, also you can ask me about any settings there
 
-CLICKGUI IS NOT BOUND BY DEFAULT, USE .bind clickgui RSHIFT for binding
 ## Why
 
 Most commonly used Minecraft clients are paid, closed-source, and obfuscated. This makes them difficult to audit or trust and in some cases, they may include backdoors or malicious code.
