@@ -100,4 +100,19 @@ public class CommandManager {
             }
         }
     }
+
+    public Command getCommand(String name) {
+        String lowerName = name.toLowerCase();
+        for (Command cmd : commands) {
+            if (cmd.getName().equalsIgnoreCase(lowerName)) {
+                return cmd;
+            }
+            for (String alias : cmd.getAliases()) {
+                if (alias.equalsIgnoreCase(lowerName)) {
+                    return cmd;
+                }
+            }
+        }
+        return null;
+    }
 }

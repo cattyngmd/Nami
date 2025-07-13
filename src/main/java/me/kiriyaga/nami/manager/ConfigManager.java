@@ -1,7 +1,9 @@
 package me.kiriyaga.nami.manager;
 
 import com.google.gson.*;
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.setting.Setting;
+import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
@@ -26,6 +28,14 @@ public class ConfigManager {
     public void load() {
         if (!configFile.exists()) {
             LOGGER.info("Config not found, using defaults.");
+
+            Module clickGuiModule = MODULE_MANAGER.getModule(ClickGuiModule.class);
+            if (clickGuiModule != null) {
+                KeyBindSetting bindSetting = clickGuiModule.getKeyBind();
+                bindSetting.set(79);
+            }
+
+            save();
             return;
         }
 

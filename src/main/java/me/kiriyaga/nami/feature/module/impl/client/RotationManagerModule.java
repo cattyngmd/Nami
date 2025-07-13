@@ -20,4 +20,9 @@ public class RotationManagerModule extends Module {
         if (!this.isEnabled())
             this.toggle();
     }
+    @Override
+    public void onDisable(){
+        if (!this.isEnabled())
+            this.toggle();
+    }
 }

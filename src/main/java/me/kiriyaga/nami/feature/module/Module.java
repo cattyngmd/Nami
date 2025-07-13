@@ -101,6 +101,16 @@ public abstract class Module {
         return name;
     }
 
+    public Setting<?> getSettingByName(String name) {
+        String lower = name.toLowerCase();
+        for (Setting<?> setting : settings) {
+            if (setting.getName().toLowerCase().equals(lower)) {
+                return setting;
+            }
+        }
+        return null;
+    }
+
     public void setDisplayInfo(String info) {
         this.displayInfo = info;
     }

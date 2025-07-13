@@ -8,8 +8,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -51,6 +53,13 @@ public abstract class MixinClientPlayerInteractionManager{
                 Block block = player.getWorld().getBlockState(hitResult.getBlockPos()).getBlock();
                 String dimension = player.getWorld().getDimension().toString();
 
+                Identifier blockId = Registries.BLOCK.getId(block);
+
+                if (antiInteract.whitelist.get() && antiInteract.whitelist.isWhitelisted(blockId)) {
+                    info.setReturnValue(ActionResult.FAIL);
+                    return;
+                }
+
                 if (player.getWorld().getDimension().bedWorks() && antiInteract.isBed(block)) {
                     info.setReturnValue(ActionResult.FAIL);
                     return;
@@ -62,4 +71,5 @@ public abstract class MixinClientPlayerInteractionManager{
             }
         }
     }
+
 }

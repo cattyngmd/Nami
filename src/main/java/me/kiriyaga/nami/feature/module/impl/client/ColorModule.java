@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.client;
 
 import me.kiriyaga.nami.feature.module.Category;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.ColorSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 
@@ -16,8 +17,17 @@ public class ColorModule extends Module {
 
     public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.7, 0.0, 1.0));
 
+    public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
+    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbowSpeed", 0.5, 0.01, 5.0));
+
     public ColorModule() {
         super("color", "Customizes color scheme.", Category.client, "colr", "c", "colors", "clitor", "сщдщк");
+        if (!this.isEnabled())
+            this.toggle();
+    }
+
+    @Override
+    public void onDisable(){
         if (!this.isEnabled())
             this.toggle();
     }
@@ -47,8 +57,22 @@ public class ColorModule extends Module {
         return new Color(adjusted.getRed(), adjusted.getGreen(), adjusted.getBlue(), getAlpha255());
     }
 
+    private Color getRainbowColor() {
+        long time = System.currentTimeMillis();
+        float hue = (time * 0.001f * rainbowSpeed.get().floatValue()) % 1.0f;
+        Color rainbow = Color.getHSBColor(hue, 1f, 1f);
+        return new Color(rainbow.getRed(), rainbow.getGreen(), rainbow.getBlue(), getAlpha255());
+    }
+
+    public Color getEffectiveGlobalColor() {
+        if (rainbowEnabled.get()) {
+            return getRainbowColor();
+        }
+        return globalColor.get();
+    }
+
     public Color getStyledGlobalColor() {
-        return getStyledColor(globalColor.get(), globalSaturation.get(), globalDarskness.get());
+        return getStyledColor(getEffectiveGlobalColor(), globalSaturation.get(), globalDarskness.get());
     }
 
     public Color getStyledSecondColor() {
