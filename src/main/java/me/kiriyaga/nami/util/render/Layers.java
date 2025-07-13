@@ -7,6 +7,7 @@ package me.kiriyaga.nami.util.render;
 
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Util;
 
@@ -20,6 +21,9 @@ public class Layers {
     private static final Function<Double, RenderLayer> GLOBAL_LINES;
     private static final RenderLayer GLOBAL_TEXT;
     private static final RenderLayer GLOBAL_ITEM;
+    private static final RenderLayer GLOBAL_GLINT;
+
+    public static RenderLayer getGlobalGlint() {return GLOBAL_GLINT;}
 
     public static RenderLayer getGlobalLines(double width) {
         return GLOBAL_LINES.apply(width);
@@ -62,5 +66,11 @@ public class Layers {
             RenderPhase.LineWidth width = new RenderPhase.LineWidth(OptionalDouble.of(l));
             return RenderLayer.of("global_lines", 156, GLOBAL_LINES_PIPELINE, builder().lineWidth(width).build(false));
         });
+
+        GLOBAL_GLINT = RenderLayer.of("global_glint", 156, Pipelines.GLOBAL_GLINT_PIPELINE,
+                RenderLayer.MultiPhaseParameters.builder()
+                        .texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, false))
+                        .texturing(RenderPhase.ENTITY_GLINT_TEXTURING)
+                        .build(false));
     }
 }

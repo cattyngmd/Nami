@@ -175,9 +175,17 @@ public class NametagsModule extends Module {
         int itemCount = nonEmptyItems.size();
         if (itemCount == 0) return;
 
-        double baseX = MathHelper.lerp(tickDelta, player.lastRenderX, player.getX());
-        double baseY = MathHelper.lerp(tickDelta, player.lastRenderY, player.getY()) + (player.isSneaking() ? 2.0f : 2.3f);
-        double baseZ = MathHelper.lerp(tickDelta, player.lastRenderZ, player.getZ());
+        double interpMinX = MathHelper.lerp(tickDelta, player.lastRenderX, player.getX()) - player.getWidth() / 2.0;
+        double interpMinY = MathHelper.lerp(tickDelta, player.lastRenderY, player.getY());
+        double interpMinZ = MathHelper.lerp(tickDelta, player.lastRenderZ, player.getZ()) - player.getWidth() / 2.0;
+
+        double interpMaxX = interpMinX + player.getWidth();
+        double interpMaxY = interpMinY + player.getHeight();
+        double interpMaxZ = interpMinZ + player.getWidth();
+
+        double baseX = (interpMinX + interpMaxX) / 2.0;
+        double baseY = interpMaxY + (player.isSneaking() ? 0.0 : 0.3);
+        double baseZ = (interpMinZ + interpMaxZ) / 2.0;
 
         Vec3d camPos = MINECRAFT.getEntityRenderDispatcher().camera.getPos();
         float yaw = MINECRAFT.gameRenderer.getCamera().getYaw();
