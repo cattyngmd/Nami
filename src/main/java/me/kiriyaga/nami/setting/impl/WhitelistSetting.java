@@ -82,41 +82,70 @@ public class WhitelistSetting extends BoolSetting {
 
         @Override
         public void execute(String[] args) {
-            if (args.length < 3) {
-                CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " whitelist <add/del> <item>");
+            if (args.length == 0) {
+                CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " whitelist <add/del/list> [item]");
                 return;
             }
 
             if (!args[0].equalsIgnoreCase("whitelist")) {
-                CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " whitelist <add/del> <item>");
+                CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " whitelist <add/del/list> [item]");
                 return;
             }
 
-            String action = args[1];
-            String itemName = args[2].toLowerCase().replace("minecraft:", "");
-            boolean result = false;
+            if (args.length == 1) {
+                CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " [listName] <add/del/list> [item]");
+                return;
+            }
 
-            switch (action.toLowerCase()) {
+            String action = args[1].toLowerCase();
+
+            switch (action) {
                 case "add":
-                    result = addToWhitelist(itemName);
-                    if (result) {
-                        CHAT_MANAGER.sendPersistent(moduleName, "Added: §7minecraft:" + itemName);
+                    if (args.length < 3) {
+                        CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " <listName> add <item>");
+                        return;
+                    }
+                    String addItem = args[2].toLowerCase().replace("minecraft:", "");
+                    if (addToWhitelist(addItem)) {
+                        CHAT_MANAGER.sendPersistent(moduleName, "Added: §7minecraft:" + addItem);
                     } else {
-                        CHAT_MANAGER.sendPersistent(moduleName, "Invalid item id: §7minecraft:" + itemName);
+                        CHAT_MANAGER.sendPersistent(moduleName, "Invalid item id or already added: §7minecraft:" + addItem);
                     }
                     break;
+
                 case "del":
-                    result = removeFromWhitelist(itemName);
-                    if (result) {
-                        CHAT_MANAGER.sendPersistent(moduleName, "Removed: §7minecraft:" + itemName);
+                    if (args.length < 3) {
+                        CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " <listName> del <item>");
+                        return;
+                    }
+                    String delItem = args[2].toLowerCase().replace("minecraft:", "");
+                    if (removeFromWhitelist(delItem)) {
+                        CHAT_MANAGER.sendPersistent(moduleName, "Removed: §7minecraft:" + delItem);
                     } else {
-                        CHAT_MANAGER.sendPersistent(moduleName, "Invalid or not in list: §7minecraft:" + itemName);
+                        CHAT_MANAGER.sendPersistent(moduleName, "Invalid or not in list: §7minecraft:" + delItem);
                     }
                     break;
+
+                case "list":
+                    if (whitelist.isEmpty()) {
+                        CHAT_MANAGER.sendPersistent(moduleName, "List is empty.");
+                        return;
+                    }
+                    StringBuilder builder = new StringBuilder("List items: ");
+                    int i = 0;
+                    for (Identifier id : whitelist) {
+                        builder.append("§7").append(id.toString()).append("§f");
+                        if (i < whitelist.size() - 1) {
+                            builder.append(", ");
+                        }
+                        i++;
+                    }
+                    CHAT_MANAGER.sendPersistent(moduleName, builder.toString());
+                    break;
+
                 default:
-                    CHAT_MANAGER.sendPersistent(moduleName, "Unknown action: §7" + action + ".§f Use §7add/del");
+                    CHAT_MANAGER.sendPersistent(moduleName, "Unknown action: §7" + action + ". Use §7add/del/list");
             }
         }
-
     }
 }
