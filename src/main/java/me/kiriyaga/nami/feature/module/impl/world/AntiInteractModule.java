@@ -21,7 +21,7 @@ import static me.kiriyaga.nami.Nami.MINECRAFT;
 
 public class AntiInteractModule extends Module {
 
-    public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, "antiinteract"));
+    public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name));
     public final BoolSetting spawnPoint = addSetting(new BoolSetting("spawn point", true));
     public final BoolSetting packet = addSetting(new BoolSetting("packet", false));
 

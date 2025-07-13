@@ -23,7 +23,7 @@ public class WhitelistSetting extends BoolSetting {
         this.moduleName = moduleName.toLowerCase();
         this.settingName = name.toLowerCase();
 
-        if (COMMAND_MANAGER.getCommand(this.moduleName) == null) {
+        if (COMMAND_MANAGER.getCommand(this.moduleName.replace(" ", "")) == null) {
             COMMAND_MANAGER.registerCommand(new WhitelistCommand(this.moduleName));
         }
     }
@@ -84,10 +84,9 @@ public class WhitelistSetting extends BoolSetting {
         private final String moduleName;
 
         public WhitelistCommand(String moduleName) {
-            super(moduleName, "Manage list settings for module " + moduleName);
+            super(moduleName.replace(" ", ""), "Manage list settings for module " + moduleName);
             this.moduleName = moduleName;
         }
-
         @Override
         public void execute(String[] args) {
             if (args.length < 1) {
