@@ -17,7 +17,6 @@ import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 
 import net.minecraft.util.math.BlockPos;
@@ -31,12 +30,12 @@ import static me.kiriyaga.nami.Nami.MINECRAFT;
 public class VelocityModule extends Module {
 
     private enum Mode {
-        NORMAL,
-        GRIM,
-        WALLS
+        normal,
+        grim,
+        walls
     }
 
-    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.GRIM));
+    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.grim));
     private final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("horizontal", 100.0, 0.0, 100.0));
     private final DoubleSetting verticalPercent = addSetting(new DoubleSetting("vertical", 100.0, 0.0, 100.0));
     private final BoolSetting handleKnockback = addSetting(new BoolSetting("knockback", true));
@@ -81,36 +80,36 @@ public class VelocityModule extends Module {
                 return;
             }
 
-            if (modeSetting.get() == Mode.WALLS && (!isPlayerPhased() || (requireGround.get() && !player.isOnGround()))) {
+            if (modeSetting.get() == Mode.walls && (!isPlayerPhased() || (requireGround.get() && !player.isOnGround()))) {
                 return;
             }
 
             switch (modeSetting.get()) {
-                case NORMAL, WALLS -> {
+                case normal, walls -> {
                     if (isNoVelocityConfigured()) {
                         event.cancel();
                     } else {
                         scaleVelocityPacket(velocityPacket);
                     }
                 }
-                case GRIM -> {
+                case grim -> {
                     if (isPlayerPhased()) event.cancel();
                 }
             }
         }
 
         else if (packet instanceof ExplosionS2CPacket explosionPacket && handleExplosions.get()) {
-            if (modeSetting.get() == Mode.WALLS && !isPlayerPhased()) return;
+            if (modeSetting.get() == Mode.walls && !isPlayerPhased()) return;
 
             switch (modeSetting.get()) {
-                case NORMAL, WALLS -> {
+                case normal, walls -> {
                     if (isNoVelocityConfigured()) {
                         event.cancel();
                     } else {
                         scaleExplosionPacket(explosionPacket);
                     }
                 }
-                case GRIM -> {
+                case grim -> {
                     if (isPlayerPhased()) event.cancel();
                 }
             }
@@ -162,9 +161,9 @@ public class VelocityModule extends Module {
 
         for (Packet<?> p : bundle.getPackets()) {
             if (p instanceof ExplosionS2CPacket explosion && handleExplosions.get()) {
-                if (modeSetting.get() == Mode.GRIM && isPlayerPhased()) continue;
+                if (modeSetting.get() == Mode.grim && isPlayerPhased()) continue;
 
-                if (modeSetting.get() == Mode.WALLS && !isPlayerPhased()) {
+                if (modeSetting.get() == Mode.walls && !isPlayerPhased()) {
                     filteredPackets.add(p);
                     continue;
                 }
@@ -179,9 +178,9 @@ public class VelocityModule extends Module {
                     continue;
                 }
 
-                if (modeSetting.get() == Mode.GRIM && isPlayerPhased()) continue;
+                if (modeSetting.get() == Mode.grim && isPlayerPhased()) continue;
 
-                if (modeSetting.get() == Mode.WALLS) {
+                if (modeSetting.get() == Mode.walls) {
                     if (!isPlayerPhased() || (requireGround.get() && !MINECRAFT.player.isOnGround())) {
                         filteredPackets.add(p);
                         continue;
