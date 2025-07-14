@@ -36,12 +36,6 @@ public class RotationManager {
     private boolean returning = false;
     private int ticksHolding = 0;
 
-    public float lastSentSpoofYaw;
-    public float lastSentSpoofPitch;
-
-
-    private boolean spoofing = false;
-
     public void init() {
         EVENT_MANAGER.register(this);
     }
@@ -96,8 +90,8 @@ public class RotationManager {
             return false;
         }
 
-        float yawDiff = wrapDegrees(request.targetYaw - lastSentSpoofYaw);
-        float pitchDiff = request.targetPitch - lastSentSpoofPitch;
+        float yawDiff = wrapDegrees(request.targetYaw - rotationYaw);
+        float pitchDiff = request.targetPitch - rotationPitch;
 
         return Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
     }
@@ -228,64 +222,6 @@ public class RotationManager {
 
             rotationYaw = wrapDegrees(rotationYaw + jitterYawOffset);
             rotationPitch = MathHelper.clamp(rotationPitch + jitterPitchOffset, -90f, 90f);
-        }
-    }
-
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPacketSend(PacketSendEvent event) {
-        if (spoofing) return;
-        Packet<?> packet = event.getPacket();
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null) return;
-
-        if (!isRotating()) return;
-
-        float spoofYaw = getRotationYaw();
-        float spoofPitch = getRotationPitch();
-
-        lastSentSpoofYaw = spoofYaw;
-        lastSentSpoofPitch = spoofPitch;
-
-        Vec3d pos = mc.player.getPos();
-
-        if (!(packet instanceof PlayerMoveC2SPacket)) return;
-
-        spoofing = true;
-
-        try {
-            if (packet instanceof PlayerMoveC2SPacket.Full full) {
-                event.cancel();
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
-                        new Vec3d(
-                                full.getX(pos.x),
-                                full.getY(pos.y),
-                                full.getZ(pos.z)
-                        ),
-                        spoofYaw,
-                        spoofPitch,
-                        full.isOnGround(),
-                        full.horizontalCollision()
-                ));
-
-            }else if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround look) {
-                event.cancel();
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
-                        spoofYaw,
-                        spoofPitch,
-                        look.isOnGround(),
-                        look.horizontalCollision()
-                ));
-            }
-        } finally {
-            if (isRotating()){
-                mc.player.setBodyYaw(spoofYaw);
-                mc.player.setHeadYaw(spoofYaw);
-                //mc.player.setYaw(spoofYaw);
-            }
-
-            spoofing = false; //  ebal rot rekursii
-            //CHAT_MANAGER.sendRaw(String.format("Visual Look: yaw=%.2f pitch=%.2f (Spoofing active)", spoofYaw, spoofPitch));
         }
     }
 

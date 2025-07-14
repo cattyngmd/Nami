@@ -2,6 +2,8 @@ package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
@@ -16,6 +18,11 @@ public class MixinClientPlayerEntity {
 
     @Shadow private float lastYawClient;
     @Shadow private float lastPitchClient;
+
+    @Shadow
+    protected MinecraftClient client;
+
+    private float originalYaw, originalPitch;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void tickHookPre(CallbackInfo ci) {
@@ -35,5 +42,29 @@ public class MixinClientPlayerEntity {
             this.lastYawClient += (float)(Math.random() * 10 + 10);
             this.lastPitchClient += (float)(Math.random() * 10 + 10);
         }
+    }
+
+    @Inject(method = "sendMovementPackets", at = @At("HEAD"))
+    private void preSendMovementPackets(CallbackInfo ci) {
+        if (!ROTATION_MANAGER.isRotating())
+            return;
+
+        originalYaw = MINECRAFT.player.getYaw();
+        originalPitch = MINECRAFT.player.getPitch();
+
+        MINECRAFT.player.setYaw(ROTATION_MANAGER.getRotationYaw());
+        MINECRAFT.player.setPitch(ROTATION_MANAGER.getRotationPitch());
+
+        MINECRAFT.player.setBodyYaw(ROTATION_MANAGER.getRotationYaw());
+        MINECRAFT.player.setHeadYaw(ROTATION_MANAGER.getRotationYaw());
+    }
+
+    @Inject(method = "sendMovementPackets", at = @At("TAIL"))
+    private void postSendMovementPackets(CallbackInfo ci) {
+        if (!ROTATION_MANAGER.isRotating())
+            return;
+
+        MINECRAFT.player.setYaw(originalYaw);
+        MINECRAFT.player.setPitch(originalPitch);
     }
 }

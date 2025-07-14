@@ -39,7 +39,7 @@ public abstract class MixinLivingEntity extends Entity {
         originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
         originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
 
-        float spoofYaw = ROTATION_MANAGER.lastSentSpoofYaw;
+        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
 
         //CHAT_MANAGER.sendRaw("travelPreHook Rotating: " +ROTATION_MANAGER.isRotating() + "\n spoof yaw: " + spoofYaw + "\nrealyaw: " + originalYaw);
 
@@ -65,7 +65,7 @@ public abstract class MixinLivingEntity extends Entity {
         if (movementInput.lengthSquared() < 1e-4) return movementInput;
 
         float realYaw = originalYaw;
-        float spoofYaw = ROTATION_MANAGER.lastSentSpoofYaw;
+        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
 
         float clampedSpoofYaw = findClosestValidYaw(spoofYaw);
 
