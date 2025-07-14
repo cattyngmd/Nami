@@ -1,0 +1,251 @@
+package me.kiriyaga.nami.feature.module.impl.movement;
+
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.*;
+
+import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.Module;
+
+import me.kiriyaga.nami.mixin.*;
+
+import me.kiriyaga.nami.setting.impl.*;
+
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityStatuses;
+import net.minecraft.entity.projectile.FishingBobberEntity;
+
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.play.*;
+
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+
+import java.util.*;
+
+import static me.kiriyaga.nami.Nami.MINECRAFT;
+
+public class VelocityModule extends Module {
+
+    private enum Mode {
+        NORMAL,
+        GRIM,
+        WALLS
+    }
+
+    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.GRIM));
+    private final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("horizontal", 100.0, 0.0, 100.0));
+    private final DoubleSetting verticalPercent = addSetting(new DoubleSetting("vertical", 100.0, 0.0, 100.0));
+    private final BoolSetting handleKnockback = addSetting(new BoolSetting("knockback", true));
+    private final BoolSetting handleExplosions = addSetting(new BoolSetting("explosion", true));
+    private final BoolSetting concealMotion = addSetting(new BoolSetting("conceal", false));
+    private final BoolSetting requireGround = addSetting(new BoolSetting("ground only", false));
+    private final BoolSetting cancelEntityPush = addSetting(new BoolSetting("entity push", true));
+    private final BoolSetting cancelBlockPush = addSetting(new BoolSetting("block push", true));
+    private final BoolSetting cancelLiquidPush = addSetting(new BoolSetting("liquid push", true));
+    private final BoolSetting cancelFishHook = addSetting(new BoolSetting("rod push", false));
+
+    private boolean shouldCancelVelocity = false;
+    private boolean pendingConcealment = false;
+
+    public VelocityModule() {
+        super("velocity", "Reduces or modifies incoming velocity effects.", Category.movement,
+                "antiknockback", "мудщсшен");
+    }
+
+    @Override
+    public void onDisable() {
+        shouldCancelVelocity = false;
+        pendingConcealment = false;
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onPacketReceive(PacketReceiveEvent event) {
+        ClientPlayerEntity player = MINECRAFT.player;
+        if (player == null || MINECRAFT.world == null) return;
+
+        Packet<?> packet = event.getPacket();
+
+        if (packet instanceof PlayerPositionLookS2CPacket && concealMotion.get()) {
+            pendingConcealment = true;
+        }
+
+        if (packet instanceof EntityVelocityUpdateS2CPacket velocityPacket && handleKnockback.get()) {
+            if (velocityPacket.getEntityId() != player.getId()) return;
+
+            if (pendingConcealment && isZeroVelocity(velocityPacket)) {
+                pendingConcealment = false;
+                return;
+            }
+
+            if (modeSetting.get() == Mode.WALLS && (!isPlayerPhased() || (requireGround.get() && !player.isOnGround()))) {
+                return;
+            }
+
+            switch (modeSetting.get()) {
+                case NORMAL, WALLS -> {
+                    if (isNoVelocityConfigured()) {
+                        event.cancel();
+                    } else {
+                        scaleVelocityPacket(velocityPacket);
+                    }
+                }
+                case GRIM -> {
+                    if (isPlayerPhased()) event.cancel();
+                }
+            }
+        }
+
+        else if (packet instanceof ExplosionS2CPacket explosionPacket && handleExplosions.get()) {
+            if (modeSetting.get() == Mode.WALLS && !isPlayerPhased()) return;
+
+            switch (modeSetting.get()) {
+                case NORMAL, WALLS -> {
+                    if (isNoVelocityConfigured()) {
+                        event.cancel();
+                    } else {
+                        scaleExplosionPacket(explosionPacket);
+                    }
+                }
+                case GRIM -> {
+                    if (isPlayerPhased()) event.cancel();
+                }
+            }
+        }
+
+        else if (packet instanceof BundleS2CPacket bundlePacket) {
+            handleBundlePacket(event, bundlePacket);
+        }
+
+        else if (packet instanceof EntityStatusS2CPacket statusPacket
+                && statusPacket.getStatus() == EntityStatuses.PULL_HOOKED_ENTITY
+                && cancelFishHook.get()) {
+            Entity entity = statusPacket.getEntity(MINECRAFT.world);
+            if (entity instanceof FishingBobberEntity hook && hook.getHookedEntity() == player) {
+                event.cancel();
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onPreTick(PreTickEvent event) {
+        pendingConcealment = false;
+        shouldCancelVelocity = false;
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onEntityPush(EntityPushEvent event) {
+        if (cancelEntityPush.get() && event.getTarget().equals(MINECRAFT.player)) {
+            event.cancel();
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onBlockPush(BlockPushEvent event) {
+        if (cancelBlockPush.get()) {
+            event.cancel();
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onFluidPush(LiquidPushEvent event) {
+        if (cancelLiquidPush.get()) {
+            event.cancel();
+        }
+    }
+
+    private void handleBundlePacket(PacketReceiveEvent event, BundleS2CPacket bundle) {
+        List<Packet<?>> filteredPackets = new ArrayList<>();
+
+        for (Packet<?> p : bundle.getPackets()) {
+            if (p instanceof ExplosionS2CPacket explosion && handleExplosions.get()) {
+                if (modeSetting.get() == Mode.GRIM && isPlayerPhased()) continue;
+
+                if (modeSetting.get() == Mode.WALLS && !isPlayerPhased()) {
+                    filteredPackets.add(p);
+                    continue;
+                }
+
+                if (isNoVelocityConfigured()) continue;
+                scaleExplosionPacket(explosion);
+            }
+
+            else if (p instanceof EntityVelocityUpdateS2CPacket velocity && handleKnockback.get()) {
+                if (velocity.getEntityId() != MINECRAFT.player.getId()) {
+                    filteredPackets.add(p);
+                    continue;
+                }
+
+                if (modeSetting.get() == Mode.GRIM && isPlayerPhased()) continue;
+
+                if (modeSetting.get() == Mode.WALLS) {
+                    if (!isPlayerPhased() || (requireGround.get() && !MINECRAFT.player.isOnGround())) {
+                        filteredPackets.add(p);
+                        continue;
+                    }
+                }
+
+                if (isNoVelocityConfigured()) continue;
+                scaleVelocityPacket(velocity);
+            }
+
+            filteredPackets.add(p);
+        }
+
+        ((BundlePacketAccessor) bundle).setIterable(filteredPackets);
+    }
+
+    private boolean isZeroVelocity(EntityVelocityUpdateS2CPacket packet) {
+        return packet.getVelocityX() == 0 && packet.getVelocityY() == 0 && packet.getVelocityZ() == 0;
+    }
+
+    private boolean isNoVelocityConfigured() {
+        return horizontalPercent.get() == 0 && verticalPercent.get() == 0;
+    }
+
+    private boolean isPlayerPhased() {
+        ClientPlayerEntity player = MINECRAFT.player;
+        if (player == null) return false;
+
+        Box expandedBox = player.getBoundingBox().expand(0.1);
+
+        for (int x = (int) Math.floor(expandedBox.minX); x <= (int) Math.floor(expandedBox.maxX); x++) {
+            for (int y = (int) Math.floor(expandedBox.minY); y <= (int) Math.floor(expandedBox.maxY); y++) {
+                for (int z = (int) Math.floor(expandedBox.minZ); z <= (int) Math.floor(expandedBox.maxZ); z++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    if (!MINECRAFT.world.getBlockState(pos).isReplaceable()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void scaleVelocityPacket(EntityVelocityUpdateS2CPacket packet) {
+        int scaledX = (int) (packet.getVelocityX() * (horizontalPercent.get() / 100.0));
+        int scaledY = (int) (packet.getVelocityY() * (verticalPercent.get() / 100.0));
+        int scaledZ = (int) (packet.getVelocityZ() * (horizontalPercent.get() / 100.0));
+
+        ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityX(scaledX);
+        ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityY(scaledY);
+        ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityZ(scaledZ);
+    }
+
+    private void scaleExplosionPacket(ExplosionS2CPacket packet) {
+        ExplosionS2CPacketAccessor accessor = (ExplosionS2CPacketAccessor) (Object) packet;
+
+        accessor.getPlayerKnockback().ifPresent(original -> {
+            Vec3d scaled = new Vec3d(
+                    original.x * (horizontalPercent.get() / 100.0),
+                    original.y * (verticalPercent.get() / 100.0),
+                    original.z * (horizontalPercent.get() / 100.0)
+            );
+            accessor.setPlayerKnockback(Optional.of(scaled));
+        });
+    }
+}

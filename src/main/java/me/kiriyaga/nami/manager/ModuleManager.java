@@ -50,6 +50,7 @@ public class ModuleManager {
         registerModule(new SneakModule());
         registerModule(new AutoWalkModule());
         registerModule(new NoRotateModule());
+        registerModule(new VelocityModule());
         /// TRAVEL ///
         //registerModule(new EbounceModule());
         /// MISC ///

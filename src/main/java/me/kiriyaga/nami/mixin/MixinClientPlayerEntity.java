@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
+import me.kiriyaga.nami.event.impl.BlockPushEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import net.minecraft.client.MinecraftClient;
@@ -34,6 +35,16 @@ public class MixinClientPlayerEntity {
     private void tickHookPost(CallbackInfo ci) {
 
         EVENT_MANAGER.post(new PostTickEvent());
+    }
+
+    @Inject(method = "pushOutOfBlocks", at = @At(value = "HEAD"),
+            cancellable = true)
+    private void pushOutOfBlocks(double x, double z, CallbackInfo ci) {
+        BlockPushEvent pushOutOfBlocksEvent = new BlockPushEvent();
+        EVENT_MANAGER.post(pushOutOfBlocksEvent);
+
+        if (pushOutOfBlocksEvent.isCancelled())
+            ci.cancel();
     }
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))

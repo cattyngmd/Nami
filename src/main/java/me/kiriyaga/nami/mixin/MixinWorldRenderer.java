@@ -6,6 +6,7 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.impl.render.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.render.NoWeatherModule;
+import me.kiriyaga.nami.feature.module.impl.render.ViewClipModule;
 import me.kiriyaga.nami.util.MatrixCache;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.ObjectAllocator;
@@ -81,6 +82,7 @@ public class MixinWorldRenderer {
     private boolean renderSetupTerrainModifyArg(boolean spectator) {
         FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
         FreeLookModule freeLookModule = MODULE_MANAGER.getModule(FreeLookModule.class);
-        return freecamModule.isEnabled() || spectator || freeLookModule.isEnabled();
+        ViewClipModule viewClipModule = MODULE_MANAGER.getModule(ViewClipModule.class);
+        return (freecamModule.isEnabled() || spectator || freeLookModule.isEnabled() || viewClipModule.isEnabled());
     }
 }

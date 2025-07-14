@@ -36,6 +36,9 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "BundlePacketAccessor",
+    "EntityVelocityUpdateS2CPacketAccessor",
+    "ExplosionS2CPacketAccessor",
     "LivingEntityAccessor",
     "MixinClientConnection",
     "MixinEntity",
