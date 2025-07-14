@@ -283,23 +283,22 @@ public class SettingPanel {
     }
 
     private static int slideInt(int start, double deltaX) {
-        int step = 1;
-        int min = Integer.MIN_VALUE;
-        int max = Integer.MAX_VALUE;
+        if (!(draggedSetting instanceof IntSetting intSetting)) return start;
 
-        if (draggedSetting instanceof IntSetting intSetting) {
-            min = intSetting.getMin();
-            max = intSetting.getMax();
-        }
+        int min = intSetting.getMin();
+        int max = intSetting.getMax();
+        int range = max - min;
 
-        double sensitivity = 0.2;
-        int delta = (int) Math.round(deltaX * sensitivity);
+        int step = Math.max(1, range / 15);
 
-        int newValue = start + delta * step;
+        double sensitivity = 0.01;
+        int delta = (int) Math.round(deltaX * sensitivity * range);
 
-        if (newValue < min) newValue = min;
-        if (newValue > max) newValue = max;
+        int newValue = start + delta;
 
+        newValue = Math.round((float)newValue / step) * step;
+
+        newValue = Math.max(min, Math.min(max, newValue));
         return newValue;
     }
 
@@ -310,31 +309,18 @@ public class SettingPanel {
         double max = doubleSetting.getMax();
         double range = max - min;
 
-        double sensitivity = 0.002 * Math.pow(range, 0.25); //TODO: rewrite this shit it wont work properly on weird values
-        double delta = deltaX * sensitivity;
+        double step = range / 15.0;
 
-        double stepBase = Math.pow(10, Math.floor(Math.log10(range)) - 2);
-        double step = stepBase;
+        double sensitivity = 0.01;
 
-        if (Math.abs(deltaX) < 2) step /= 10;
-        else if (Math.abs(deltaX) < 5) step /= 5;
-        else if (Math.abs(deltaX) > 50) step *= 5;
+        double delta = deltaX * sensitivity * range;
 
         double newValue = start + delta;
+
         newValue = Math.round(newValue / step) * step;
 
         newValue = Math.max(min, Math.min(max, newValue));
         return newValue;
-    }
-
-    private static double calculateDynamicStep(double min, double max) {
-        double range = Math.abs(max - min);
-        if (range == 0) return 0.0001;
-
-        double exponent = Math.floor(Math.log10(range)) - 2;
-        exponent = Math.max(-6, Math.min(2, exponent));
-
-        return Math.pow(10, exponent);
     }
 
     public static boolean keyPressed(int keyCode) {

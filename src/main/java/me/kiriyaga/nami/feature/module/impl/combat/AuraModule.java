@@ -33,7 +33,7 @@ public class AuraModule extends Module {
     public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
     public final BoolSetting grim = addSetting(new BoolSetting("grim", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 10));
-    public final DoubleSetting preRotate = addSetting(new DoubleSetting("pre rotate", 0.2, 0.0, 1.0));
+    public final DoubleSetting preRotate = addSetting(new DoubleSetting("pre rotate", 0.1, 0.0, 1.0));
 
     private Entity currentTarget = null;
 
