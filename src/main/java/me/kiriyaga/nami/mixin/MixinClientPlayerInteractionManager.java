@@ -1,6 +1,8 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.Nami;
+import me.kiriyaga.nami.event.impl.BreakBlockEvent;
+import me.kiriyaga.nami.event.impl.PlaceBlockEvent;
 import me.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
 import me.kiriyaga.nami.feature.module.impl.world.AntiInteractModule;
 import me.kiriyaga.nami.feature.module.impl.world.NoBreakDelayModule;
@@ -37,6 +39,27 @@ public abstract class MixinClientPlayerInteractionManager{
 
         if (ev.isCancelled())
             call.cancel();
+    }
+
+    @Inject(method = "interactBlock", at = @At(value = "HEAD"), cancellable = true)
+    private void interactBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
+        PlaceBlockEvent interactBlockEvent = new PlaceBlockEvent(player, hand, hitResult);
+        EVENT_MANAGER.post(interactBlockEvent);
+
+        if (interactBlockEvent.isCancelled()) {
+            cir.setReturnValue(ActionResult.SUCCESS);
+            cir.cancel();
+        }
+    }
+
+    @Inject(method = "breakBlock", at = @At(value = "HEAD"), cancellable = true)
+    private void breakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        BreakBlockEvent breakBlockEvent = new BreakBlockEvent(pos);
+        EVENT_MANAGER.post(breakBlockEvent);
+        if (breakBlockEvent.isCancelled()) {
+            cir.setReturnValue(false);
+            cir.cancel();
+        }
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"))

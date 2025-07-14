@@ -74,6 +74,7 @@ public class ModuleManager {
         registerModule(new FastPlaceModule());
         registerModule(new ElytraSwapModule());
         registerModule(new AutoElytraModule());
+        registerModule(new NoGlitchBlocksModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
