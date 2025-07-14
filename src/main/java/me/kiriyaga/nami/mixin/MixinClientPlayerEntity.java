@@ -37,14 +37,6 @@ public class MixinClientPlayerEntity {
     }
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
-    private void spoofLastYawPitch(CallbackInfo ci) {
-        if (ROTATION_MANAGER.isRotating()) {
-            this.lastYawClient += (float)(Math.random() * 10 + 10);
-            this.lastPitchClient += (float)(Math.random() * 10 + 10);
-        }
-    }
-
-    @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
         if (!ROTATION_MANAGER.isRotating())
             return;
