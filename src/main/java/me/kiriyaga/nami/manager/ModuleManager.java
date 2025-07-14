@@ -52,6 +52,8 @@ public class ModuleManager {
         registerModule(new NoRotateModule());
         registerModule(new VelocityModule());
         registerModule(new SprintResetModule());
+        registerModule(new ParkourModule());
+        registerModule(new SpinnerModule());
         /// TRAVEL ///
         //registerModule(new EbounceModule());
         /// MISC ///
