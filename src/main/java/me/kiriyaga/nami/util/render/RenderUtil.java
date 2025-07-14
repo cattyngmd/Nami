@@ -386,7 +386,7 @@ public class RenderUtil {
             VertexConsumerProvider glintProvider = requestedLayer -> {
                 String name = requestedLayer.getName().toLowerCase();
                 if (name.contains("glint")) {
-                    return base.getBuffer(Layers.getGlobalGlint());
+                    return base.getBuffer(customLayer);
                 }
                 return base.getBuffer(requestedLayer);
             };
