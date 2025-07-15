@@ -21,10 +21,13 @@ import net.minecraft.network.packet.s2c.play.*;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 
 import java.util.*;
 
+import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MINECRAFT;
 
 public class VelocityModule extends Module {
@@ -47,7 +50,6 @@ public class VelocityModule extends Module {
     private final BoolSetting cancelLiquidPush = addSetting(new BoolSetting("liquid push", true));
     private final BoolSetting cancelFishHook = addSetting(new BoolSetting("rod push", false));
 
-    private boolean shouldCancelVelocity = false;
     private boolean pendingConcealment = false;
 
     public VelocityModule() {
@@ -57,7 +59,6 @@ public class VelocityModule extends Module {
 
     @Override
     public void onDisable() {
-        shouldCancelVelocity = false;
         pendingConcealment = false;
     }
 
@@ -132,7 +133,6 @@ public class VelocityModule extends Module {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onPreTick(PreTickEvent event) {
         pendingConcealment = false;
-        shouldCancelVelocity = false;
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -207,15 +207,25 @@ public class VelocityModule extends Module {
 
     private boolean isPlayerPhased() {
         ClientPlayerEntity player = MINECRAFT.player;
-        if (player == null) return false;
+        if (player == null || MINECRAFT.world == null) return false;
 
-        Box expandedBox = player.getBoundingBox().expand(0.1);
+        Box boundingBox = player.getBoundingBox();
 
-        for (int x = (int) Math.floor(expandedBox.minX); x <= (int) Math.floor(expandedBox.maxX); x++) {
-            for (int y = (int) Math.floor(expandedBox.minY); y <= (int) Math.floor(expandedBox.maxY); y++) {
-                for (int z = (int) Math.floor(expandedBox.minZ); z <= (int) Math.floor(expandedBox.maxZ); z++) {
+        int minX = MathHelper.floor(boundingBox.minX);
+        int maxX = MathHelper.ceil(boundingBox.maxX);
+        int minY = MathHelper.floor(boundingBox.minY);
+        int maxY = MathHelper.ceil(boundingBox.maxY);
+        int minZ = MathHelper.floor(boundingBox.minZ);
+        int maxZ = MathHelper.ceil(boundingBox.maxZ);
+
+        for (int x = minX; x < maxX; x++) {
+            for (int y = minY; y < maxY; y++) {
+                for (int z = minZ; z < maxZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    if (!MINECRAFT.world.getBlockState(pos).isReplaceable()) {
+                    VoxelShape shape = MINECRAFT.world.getBlockState(pos).getCollisionShape(MINECRAFT.world, pos);
+
+                    if (!shape.isEmpty() && shape.getBoundingBox().offset(pos).intersects(boundingBox)) {
+                        //CHAT_MANAGER.sendRaw("phased");
                         return true;
                     }
                 }
@@ -224,6 +234,7 @@ public class VelocityModule extends Module {
 
         return false;
     }
+
 
     private void scaleVelocityPacket(EntityVelocityUpdateS2CPacket packet) {
         int scaledX = (int) (packet.getVelocityX() * (horizontalPercent.get() / 100.0));

@@ -38,7 +38,6 @@ public class AutoEatModule extends Module {
     @Override
     public void onDisable() {
         setUseHeld(false);
-        // Убрали возврат в предыдущий слот
     }
 
     @SubscribeEvent
@@ -53,7 +52,7 @@ public class AutoEatModule extends Module {
         if (eating && !MINECRAFT.player.isUsingItem()) {
             setUseHeld(false);
             eating = false;
-            swapCooldown = (int) swapDelayTicksSetting.get();
+            swapCooldown = swapDelayTicksSetting.get();
             return;
         }
 
