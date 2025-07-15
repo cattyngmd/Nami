@@ -69,6 +69,7 @@ public class HUDModule extends Module {
     private int speedSampleIndex = 0;
     private boolean speedBufferFilled = false;
     private double lastX = 0, lastY = 0, lastZ = 0;
+    public double speed;
 
     private String fullGreeting = "";
     private int greetingCharIndex = 0;
@@ -196,6 +197,7 @@ public class HUDModule extends Module {
                 sum += speedSamples[i];
             }
             double averageSpeed = count > 0 ? sum / count : 0;
+            speed = averageSpeed;
 
             String speedStr = formatNumber(averageSpeed);
             speedText = Text.literal("Speed: ").setStyle(Style.EMPTY.withColor(pulsingPrimary))

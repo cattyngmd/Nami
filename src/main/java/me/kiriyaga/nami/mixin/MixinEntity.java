@@ -1,18 +1,24 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.EntityPushEvent;
+import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.render.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity {
+
+    @Shadow public abstract boolean isPlayer();
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
     private void updateChangeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
@@ -40,5 +46,12 @@ public abstract class MixinEntity {
         EVENT_MANAGER.post(pushEntityEvent);
         if (pushEntityEvent.isCancelled())
             ci.cancel();
+    }
+
+    @Inject(at = @At("HEAD"), method = "Lnet/minecraft/entity/Entity;getPose()Lnet/minecraft/entity/EntityPose;", cancellable = true)
+    private void entityPose(CallbackInfoReturnable<EntityPose> cir) {
+        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getModule(ElytraFlyModule.class);
+        if (elytraFlyModule.isEnabled() && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && this.isPlayer())
+            cir.setReturnValue(EntityPose.STANDING);
     }
 }

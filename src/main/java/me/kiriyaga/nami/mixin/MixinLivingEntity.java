@@ -2,11 +2,13 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
+import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoJumpDelayModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -25,6 +28,9 @@ public abstract class MixinLivingEntity extends Entity {
     private float originalYaw, originalBodyYaw, originalHeadYaw;
     @Shadow
     private int jumpingCooldown;
+    private float originalPitch;
+
+    @Shadow public abstract Brain<?> getBrain();
 
     public MixinLivingEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -36,25 +42,26 @@ public abstract class MixinLivingEntity extends Entity {
             return;
 
         originalYaw = this.getYaw();
+        originalPitch = this.getPitch();
         originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
         originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
 
         float spoofYaw = ROTATION_MANAGER.getRotationYaw();
-
-        //CHAT_MANAGER.sendRaw("travelPreHook Rotating: " +ROTATION_MANAGER.isRotating() + "\n spoof yaw: " + spoofYaw + "\nrealyaw: " + originalYaw);
+        float spoofPitch = ROTATION_MANAGER.getRotationPitch();
 
         this.setYaw(spoofYaw);
+        this.setPitch(spoofPitch);
         ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
         ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
     }
 
     @Inject(method = "travel", at = @At("TAIL"))
     private void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get()) return;
-
-        //CHAT_MANAGER.sendRaw("travelPostHook Rotating: " +ROTATION_MANAGER.isRotating() + "\nrealyaw: " + originalYaw);
+        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get())
+            return;
 
         this.setYaw(originalYaw);
+        this.setPitch(originalPitch);
         ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
         ((LivingEntityAccessor) this).setHeadYaw(originalHeadYaw);
     }
@@ -131,5 +138,12 @@ public abstract class MixinLivingEntity extends Entity {
         if (MODULE_MANAGER.getModule(NoJumpDelayModule.class).isEnabled()) {
             jumpingCooldown = 0;
         }
+    }
+
+    @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
+    private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
+        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getModule(ElytraFlyModule.class);
+        if (MINECRAFT.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && this.isPlayer() && elytraFlyModule.isEnabled())
+            cir.setReturnValue(true);
     }
 }
