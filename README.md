@@ -1,6 +1,7 @@
 # Nami Client 1.21.7
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4a7403a7-d303-4abf-baf3-4928f6acb026" />
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f56b8766-5d83-45e0-b6ad-d97a5e46f1ab" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8bbe39b3-0ef0-4f38-94d2-f81df402f005" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/71a79d90-b439-490c-8f92-969cd7f2adeb" />
+
 
 
 1.21.4 branch is outdated!
