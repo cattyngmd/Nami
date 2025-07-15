@@ -60,11 +60,11 @@ public class ElytraFlyModule extends Module {
 
             //75 magic value = its just the best value
             ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(this.getName(), rotationPriority.get(), MINECRAFT.player.getYaw(), 75.00f));
-        }
 
-        MINECRAFT.player.networkHandler.sendPacket(
-                new ClientCommandC2SPacket(MINECRAFT.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
-        );
+            MINECRAFT.player.networkHandler.sendPacket(
+                    new ClientCommandC2SPacket(MINECRAFT.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
+            );
+        }
     }
 
     private void setJumpHeld(boolean held) {
