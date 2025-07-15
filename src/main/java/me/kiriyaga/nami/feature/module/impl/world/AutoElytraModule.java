@@ -6,6 +6,7 @@ import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.feature.module.Category;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -17,6 +18,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class AutoElytraModule extends Module {
 
@@ -33,6 +35,7 @@ public class AutoElytraModule extends Module {
 
     private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
     private final IntSetting swapSlotSetting = addSetting(new IntSetting("swap slot", 8, 1, 9));
+    private final BoolSetting pauseEfly = addSetting(new BoolSetting("pause on efly", true));
 
     private enum ElytraState {
         CHESTPLATE,
@@ -50,7 +53,7 @@ public class AutoElytraModule extends Module {
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MINECRAFT.world == null || MINECRAFT.player == null || (pauseEfly.get() && MODULE_MANAGER.getModule(ElytraFlyModule.class).isEnabled())) return;
 
         if (event.key == MINECRAFT.options.jumpKey.getDefaultKey().getCode() && event.action == 1) {
             ClientPlayerEntity player = MINECRAFT.player;
