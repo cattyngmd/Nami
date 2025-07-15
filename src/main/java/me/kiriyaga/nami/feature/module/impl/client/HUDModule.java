@@ -173,7 +173,7 @@ public class HUDModule extends Module {
         if (pingEnabled.get()) {
             int ping = PING_MANAGER.getPing();
             pingText = Text.literal("Ping: ").setStyle(Style.EMPTY.withColor(pulsingPrimary))
-                    .append(Text.literal(ping < 0 ? "N/A" : Integer.toString(ping)).setStyle(Style.EMPTY.withColor(pulsingWhite)));
+                    .append(Text.literal(ping < 0 ? "N/A" : ping + "ms").setStyle(Style.EMPTY.withColor(pulsingWhite)));
         }
 
         if (lagWarningEnabled.get()) {
@@ -199,7 +199,7 @@ public class HUDModule extends Module {
             double averageSpeed = count > 0 ? sum / count : 0;
             speed = averageSpeed;
 
-            String speedStr = formatNumber(averageSpeed);
+            String speedStr = formatSpeedNumber(averageSpeed) + "bp/s";
             speedText = Text.literal("Speed: ").setStyle(Style.EMPTY.withColor(pulsingPrimary))
                     .append(Text.literal(speedStr).setStyle(Style.EMPTY.withColor(pulsingWhite)));
 
@@ -556,6 +556,11 @@ public class HUDModule extends Module {
     private String formatNumber(double val) {
         double rounded = Math.round(val * 10.0) / 10.0;
         return String.format("%.1f", rounded).replace(',', '.');
+    }
+
+    private String formatSpeedNumber(double val) {
+        double rounded = Math.round(val * 10.0) / 10.0;
+        return String.format("%.2f", rounded).replace(',', '.');
     }
 
     private Text getFacingText(MinecraftClient mc) {
