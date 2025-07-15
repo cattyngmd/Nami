@@ -43,16 +43,36 @@ public class ChatManager {
     }
 
     public void sendRaw(String message) {
-        sendRaw(message, true);
+        sendRaw(Text.literal(message), true);
     }
 
     public void sendRaw(String message, boolean prefix) {
+        sendRaw(Text.literal(message), prefix);
+    }
+
+    public void sendRaw(Text message) {
+        sendRaw(message, true);
+    }
+
+    public void sendRaw(Text message, boolean prefix) {
         if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
-        Text text = prefix ? prefix().copy().append(Text.literal(message)) : Text.literal(message);
+        Text text = prefix ? prefix().copy().append(message) : message;
         getChatHud().addMessage(text);
     }
 
     public void sendPersistent(String key, String message) {
+        sendPersistent(key, Text.literal(message), true);
+    }
+
+    public void sendPersistent(String key, String message, boolean prefix) {
+        sendPersistent(key, Text.literal(message), prefix);
+    }
+
+    public void sendPersistent(String key, Text message) {
+        sendPersistent(key, message, true);
+    }
+
+    public void sendPersistent(String key, Text message, boolean prefix) {
         if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
 
         ChatHud chatHud = getChatHud();
@@ -61,7 +81,7 @@ public class ChatManager {
             removeSilently(persistentMessages.get(key));
         }
 
-        Text text = prefix().copy().append(Text.literal(message));
+        Text text = prefix ? prefix().copy().append(message) : message;
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = MessageIndicator.system();
 
@@ -70,6 +90,18 @@ public class ChatManager {
     }
 
     public void sendTransient(String message) {
+        sendTransient(Text.literal(message), true);
+    }
+
+    public void sendTransient(String message, boolean prefix) {
+        sendTransient(Text.literal(message), prefix);
+    }
+
+    public void sendTransient(Text message) {
+        sendTransient(message, true);
+    }
+
+    public void sendTransient(Text message, boolean prefix) {
         if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
 
         ChatHud chatHud = getChatHud();
@@ -79,7 +111,7 @@ public class ChatManager {
             transientSignature = null;
         }
 
-        Text text = prefix().copy().append(Text.literal(message));
+        Text text = prefix ? prefix().copy().append(message) : message;
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = MessageIndicator.system();
 
@@ -140,7 +172,7 @@ public class ChatManager {
         int brac = MODULE_MANAGER.getModule(ColorModule.class).getStyledSecondColor().getRGB() & 0x00FFFFFF;
 
         Text left = Text.literal("[").setStyle(Style.EMPTY.withColor(brac));
-        Text name = Text.literal(DISPLAY_NAME).setStyle(Style.EMPTY.withColor(global));
+        Text name = Text.literal(NAME).setStyle(Style.EMPTY.withColor(global));
         Text right = Text.literal("] ").setStyle(Style.EMPTY.withColor(brac));
 
         return Text.empty().append(left).append(name).append(right);

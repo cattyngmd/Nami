@@ -1,13 +1,16 @@
 package me.kiriyaga.nami.feature.module;
 
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.setting.Setting;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public abstract class Module {
 
@@ -41,16 +44,49 @@ public abstract class Module {
 
         this.enabled = state;
 
+        ColorModule cm = MODULE_MANAGER.getModule(ColorModule.class);
+
         if (enabled) {
             EVENT_MANAGER.register(this);
-            CHAT_MANAGER.sendTransient("§7" + name + "§f toggled §aon");
             onEnable();
+
+            if (cm != null) {
+                Color bracketColor = cm.getStyledSecondColor();
+                Color plusColor = cm.getStyledGlobalColor();
+
+                Style bracketStyle = Style.EMPTY.withColor(bracketColor.getRGB());
+                Style plusStyle = Style.EMPTY.withColor(plusColor.getRGB());
+
+                Text message = Text.empty()
+                        .append(Text.literal("[").setStyle(bracketStyle))
+                        .append(Text.literal("+").setStyle(plusStyle))
+                        .append(Text.literal("] ").setStyle(bracketStyle))
+                        .append(Text.literal(name));
+
+                CHAT_MANAGER.sendTransient(message, false);
+            }
         } else {
             EVENT_MANAGER.unregister(this);
-            CHAT_MANAGER.sendTransient("§7" + name + "§f toggled §coff");
             onDisable();
+
+            if (cm != null) {
+                Color baseRed = new Color(220, 0, 0);
+                Color bracketRed = cm.applyDarkness(baseRed, 0.5);
+
+                Style bracketStyle = Style.EMPTY.withColor(bracketRed.getRGB());
+                Style minusStyle = Style.EMPTY.withColor(baseRed.getRGB());
+
+                Text message = Text.empty()
+                        .append(Text.literal("[").setStyle(bracketStyle))
+                        .append(Text.literal("-").setStyle(minusStyle))
+                        .append(Text.literal("] ").setStyle(bracketStyle))
+                        .append(Text.literal(name));
+
+                CHAT_MANAGER.sendTransient(message, false);
+            }
         }
     }
+
 
     public Category getCategory() {
         return category;
