@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.util.Pair;
 
 public class Nami implements ClientModInitializer {
-    public static String NAME = "Nami 波";
+    public static String NAME = "nami";
     public static String DISPLAY_NAME = "Nami 波";
     public static final String VERSION;
     static {
