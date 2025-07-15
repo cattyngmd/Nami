@@ -54,6 +54,7 @@ public class ModuleManager {
         registerModule(new SprintResetModule());
         registerModule(new ParkourModule());
         registerModule(new SpinnerModule());
+        registerModule(new YawModule());
         /// TRAVEL ///
         //registerModule(new EbounceModule());
         /// MISC ///
@@ -75,6 +76,7 @@ public class ModuleManager {
         registerModule(new ElytraSwapModule());
         registerModule(new AutoElytraModule());
         registerModule(new NoGlitchBlocksModule());
+        registerModule(new AutoEatModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
