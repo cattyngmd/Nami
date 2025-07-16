@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Category;
 import me.kiriyaga.nami.feature.module.Module;
@@ -12,12 +13,14 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -30,6 +33,7 @@ public class ElytraFlyModule extends Module {
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.bounce));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
     private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
+    private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
     private final DoubleSetting targetSpeed = addSetting(new DoubleSetting("boost speed", 100.00, 40.00, 135.00));
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
@@ -73,6 +77,19 @@ public class ElytraFlyModule extends Module {
             MINECRAFT.player.networkHandler.sendPacket(
                     new ClientCommandC2SPacket(MINECRAFT.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
             );
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    private void onMove(MoveEvent event) {
+        ClientPlayerEntity player = MINECRAFT.player;
+        if (player == null) return;
+
+        if (!player.isOnGround()) return;
+
+        if (player.isSprinting() && MODULE_MANAGER.getModule(HUDModule.class).speed < targetSpeed.get() && newBoost.get()) {
+            Vec3d velocity = player.getVelocity();
+            player.setVelocity(velocity.x, 0.0, velocity.z);
         }
     }
 

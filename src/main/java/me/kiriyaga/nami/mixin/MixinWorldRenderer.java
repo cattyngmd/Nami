@@ -54,18 +54,7 @@ public class MixinWorldRenderer {
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void captureMatrices(
-            ObjectAllocator allocator,
-            RenderTickCounter tickCounter,
-            boolean renderBlockOutline,
-            Camera camera,
-            Matrix4f positionMatrix,
-            Matrix4f projectionMatrix,
-            GpuBufferSlice fog,
-            Vector4f fogColor,
-            boolean shouldRenderSky,
-            CallbackInfo ci
-    ) {
+    private void captureMatrices(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
         MatrixCache.positionMatrix = new Matrix4f(positionMatrix);
         MatrixCache.projectionMatrix = new Matrix4f(projectionMatrix);
         MatrixCache.camera = camera;
