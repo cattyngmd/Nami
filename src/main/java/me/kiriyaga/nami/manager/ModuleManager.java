@@ -79,6 +79,7 @@ public class ModuleManager {
         registerModule(new AutoEatModule());
         registerModule(new MultiTaskModule());
         registerModule(new NoGlitchItemsModule());
+        registerModule(new NoGlitchItemsModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

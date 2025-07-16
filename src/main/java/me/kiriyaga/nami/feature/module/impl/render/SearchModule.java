@@ -41,7 +41,7 @@ public class SearchModule extends Module {
     private final BoolSetting nonVanilla = addSetting(new BoolSetting("non-vanilla", false));
     private final BoolSetting notifier = addSetting(new BoolSetting("notifier", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("not at spawn", false));
-    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 2.5));
+    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 3));
     private final BoolSetting filled = addSetting(new BoolSetting("filled", true));
 
     private final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
@@ -221,7 +221,6 @@ public class SearchModule extends Module {
             }
         }
     }
-
 
     @Override
     public void onDisable() {

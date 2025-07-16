@@ -2,6 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.feature.module.impl.misc.AutoRespawnModule;
+import me.kiriyaga.nami.feature.module.impl.world.AirPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.FastPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.NoHitDelayModule;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
@@ -61,6 +62,12 @@ public class MixinMinecraftClient {
 
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
+
+        if (MODULE_MANAGER.getModule(AirPlaceModule.class).isEnabled() && MODULE_MANAGER.getModule(AirPlaceModule.class).cooldown <= 0){
+            itemUseCooldown = MODULE_MANAGER.getModule(AirPlaceModule.class).delay.get();
+            return;
+        }
+
         FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
         if (!fastPlace.isEnabled()) return;
 
