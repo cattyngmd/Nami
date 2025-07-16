@@ -56,6 +56,7 @@ public class ModuleManager {
         registerModule(new SpinnerModule());
         registerModule(new YawModule());
         registerModule(new ElytraFlyModule());
+        registerModule(new HighJumpModule());
         /// MISC ///
         registerModule(new JoinAnnounceModule());
         registerModule(new AutoFovModule());

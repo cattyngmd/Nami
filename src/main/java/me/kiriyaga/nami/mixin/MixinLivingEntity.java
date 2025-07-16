@@ -3,12 +3,14 @@ package me.kiriyaga.nami.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
+import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoJumpDelayModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -121,13 +123,7 @@ public abstract class MixinLivingEntity extends Entity {
         return new Vec3d(x, globalVec.y, z);
     }
 
-    @ModifyExpressionValue(
-            method = "jump",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"
-            )
-    )
+    @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float jumpFix(float originalYaw) {
         if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
         return ROTATION_MANAGER.getRotationYaw();
@@ -143,7 +139,29 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
         ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getModule(ElytraFlyModule.class);
-        if (MINECRAFT.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && this.isPlayer() && elytraFlyModule.isEnabled())
+        if (MINECRAFT.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled())
             cir.setReturnValue(true);
+    }
+
+    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
+    private void onJumpInject(CallbackInfo ci) {
+        HighJumpModule mod = MODULE_MANAGER.getModule(HighJumpModule.class);
+
+        if (!mod.isEnabled())
+            return;
+
+        float jumpBoost = mod.height.get().floatValue();
+
+        Vec3d vel = this.getVelocity();
+        this.setVelocity(vel.x, Math.max(jumpBoost, vel.y), vel.z);
+
+        if (this.isSprinting()) {
+            float yawRad = this.getYaw() * 0.017453292F;
+            this.addVelocityInternal(new Vec3d(-MathHelper.sin(yawRad) * 0.2, 0.0, MathHelper.cos(yawRad) * 0.2));
+        }
+
+        this.velocityDirty = true;
+
+        ci.cancel();
     }
 }
