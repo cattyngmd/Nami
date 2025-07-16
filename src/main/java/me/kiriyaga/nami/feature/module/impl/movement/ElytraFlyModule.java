@@ -57,7 +57,7 @@ public class ElytraFlyModule extends Module {
     private void onPreTick(PreTickEvent event) {
         if (MINECRAFT.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
-        
+
         if (mode.get() == FlyMode.bounce) {
 
             if (boost.get() && MINECRAFT.player.getVelocity().y > 0 && MODULE_MANAGER.getModule(HUDModule.class).speed < targetSpeed.get()) {

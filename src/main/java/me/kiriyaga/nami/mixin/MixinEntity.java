@@ -7,6 +7,8 @@ import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -52,7 +54,7 @@ public abstract class MixinEntity {
     @Inject(at = @At("HEAD"), method = "Lnet/minecraft/entity/Entity;getPose()Lnet/minecraft/entity/EntityPose;", cancellable = true)
     private void entityPose(CallbackInfoReturnable<EntityPose> cir) {
         ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getModule(ElytraFlyModule.class);
-        if (elytraFlyModule.isEnabled() && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player)
+        if (elytraFlyModule.isEnabled() && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player && MINECRAFT.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA)
             cir.setReturnValue(EntityPose.STANDING);
     }
 }
