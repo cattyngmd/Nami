@@ -70,7 +70,6 @@ public class AirPlaceModule extends Module {
             return;
         }
         if (!MINECRAFT.options.useKey.isPressed()){
-            renderPos = null;
             return;
         }
 
