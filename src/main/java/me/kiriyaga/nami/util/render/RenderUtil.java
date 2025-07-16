@@ -8,12 +8,14 @@ package me.kiriyaga.nami.util.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.util.MatrixCache;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -35,6 +37,9 @@ import java.lang.Math;
 
 import static me.kiriyaga.nami.Nami.*;
 import java.awt.*;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class RenderUtil {
 
@@ -77,6 +82,24 @@ public class RenderUtil {
         }
 
         rectFilled(matrices, x1, y, x2 + width, y + width, color);
+    }
+
+    private static void drawLineRect(DrawContext drawContext, Vec2f start, Vec2f end, int color, float width) {
+        float dx = end.x - start.x;
+        float dy = end.y - start.y;
+        float length = (float) Math.sqrt(dx * dx + dy * dy);
+        int segments = (int) (length / width);
+
+        float stepX = dx / segments;
+        float stepY = dy / segments;
+
+        for (int i = 0; i < segments; i++) {
+            float x1 = start.x + stepX * i;
+            float y1 = start.y + stepY * i;
+            float x2 = x1 + width;
+            float y2 = y1 + width;
+            rectFilled(drawContext, x1, y1, x2, y2, color);
+        }
     }
 
     protected static void drawVerticalLine(DrawContext matrices, float x, float y1, float y2, int color, float width) {
@@ -417,5 +440,58 @@ public class RenderUtil {
         base.draw();
 
         matrices.pop();
+    }
+
+    public static void drawThickLine(MatrixStack matrix, Vec3d start, Vec3d end, float thickness, int color) {
+        Matrix4f mat = matrix.peek().getPositionMatrix();
+        Vec3d camPos = MatrixCache.camera.getPos();
+
+        float r = (color >> 16 & 0xFF) / 255.0f;
+        float g = (color >> 8 & 0xFF) / 255.0f;
+        float b = (color & 0xFF) / 255.0f;
+        float a = (color >> 24 & 0xFF) / 255.0f;
+
+        Vector3f from = new Vector3f((float)(start.x - end.x), (float)(start.y - end.y), (float)(start.z - end.z));
+        Vector3f dir = new Vector3f((float)(end.x - start.x), (float)(end.y - start.y), (float)(end.z - start.z));
+        dir.normalize();
+
+        Vector3f up = new Vector3f(0, 1, 0);
+        if (Math.abs(dir.dot(up)) > 0.99f) up = new Vector3f(1, 0, 0);
+        Vector3f side1 = dir.cross(up, new Vector3f());
+        Vector3f side2 = dir.cross(side1, new Vector3f());
+
+        side1.normalize().mul(thickness / 2f);
+        side2.normalize().mul(thickness / 2f);
+
+        Vector3f[] verts = new Vector3f[8];
+        verts[0] = new Vector3f((float)(start.x - camPos.x), (float)(start.y - camPos.y), (float)(start.z - camPos.z)).add(side1).add(side2);
+        verts[1] = new Vector3f(verts[0]).sub(side1.mul(2f));
+        verts[2] = new Vector3f(verts[1]).sub(side2.mul(2f));
+        verts[3] = new Vector3f(verts[0]).sub(side2.mul(2f));
+
+        verts[4] = new Vector3f((float)(end.x - camPos.x), (float)(end.y - camPos.y), (float)(end.z - camPos.z)).add(side1).add(side2);
+        verts[5] = new Vector3f(verts[4]).sub(side1.mul(2f));
+        verts[6] = new Vector3f(verts[5]).sub(side2.mul(2f));
+        verts[7] = new Vector3f(verts[4]).sub(side2.mul(2f));
+
+        BufferBuilder builder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        int[][] quads = {
+                {0, 1, 5, 4}, // side
+                {1, 2, 6, 5}, // side
+                {2, 3, 7, 6}, // side
+                {3, 0, 4, 7}, // side
+                {0, 1, 2, 3}, // start cap
+                {4, 5, 6, 7}  // end cap
+        };
+
+        for (int[] quad : quads) {
+            for (int idx : quad) {
+                Vector3f v = verts[idx];
+                builder.vertex(mat, v.x, v.y, v.z).color(r, g, b, a);
+            }
+        }
+
+        Layers.getGlobalQuads().draw(builder.end());
     }
 }
