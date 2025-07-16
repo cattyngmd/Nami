@@ -14,6 +14,9 @@ import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -52,7 +55,11 @@ public class ElytraFlyModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onPreTick(PreTickEvent event) {
+        if (MINECRAFT.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
+            return;
+        
         if (mode.get() == FlyMode.bounce) {
+
             if (boost.get() && MINECRAFT.player.getVelocity().y > 0 && MODULE_MANAGER.getModule(HUDModule.class).speed < targetSpeed.get()) {
                 MINECRAFT.player.setVelocity(MINECRAFT.player.getVelocity().x, 0.0, MINECRAFT.player.getVelocity().z);
             }
