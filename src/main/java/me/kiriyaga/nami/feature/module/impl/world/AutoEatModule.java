@@ -16,10 +16,8 @@ import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 public class AutoEatModule extends Module {
 
     private final IntSetting swapDelayTicksSetting = addSetting(new IntSetting("delay", 5, 1, 20));
@@ -42,22 +40,22 @@ public class AutoEatModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        if (MINECRAFT.player == null) return;
+        if (MC.player == null) return;
 
         if (swapCooldown > 0) {
             swapCooldown--;
             return;
         }
 
-        if (eating && !MINECRAFT.player.isUsingItem()) {
+        if (eating && !MC.player.isUsingItem()) {
             setUseHeld(false);
             eating = false;
             swapCooldown = swapDelayTicksSetting.get();
             return;
         }
 
-        double hunger = MINECRAFT.player.getHungerManager().getFoodLevel();
-        double health = MINECRAFT.player.getHealth();
+        double hunger = MC.player.getHungerManager().getFoodLevel();
+        double health = MC.player.getHealth();
 
         if (hunger >= minHunger.get() && health >= minHealth.get()) {
             if (eating) {
@@ -78,7 +76,7 @@ public class AutoEatModule extends Module {
             return;
         }
 
-        int currentSlot = MINECRAFT.player.getInventory().getSelectedSlot();
+        int currentSlot = MC.player.getInventory().getSelectedSlot();
 
         if (!eating) {
             if (currentSlot != bestSlot) {
@@ -95,7 +93,7 @@ public class AutoEatModule extends Module {
         float bestScore = -1;
 
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MINECRAFT.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getStack(i);
             float score = getFoodScore(stack);
             if (score > bestScore) {
                 bestScore = score;
@@ -149,10 +147,10 @@ public class AutoEatModule extends Module {
     }
 
     private void setUseHeld(boolean held) {
-        KeyBinding useKey = MINECRAFT.options.useKey;
+        KeyBinding useKey = MC.options.useKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) useKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MINECRAFT.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
         useKey.setPressed(physicallyPressed || held);
     }
 
@@ -160,8 +158,8 @@ public class AutoEatModule extends Module {
         if (slot == 45) return true;
         if (slot < 0 || slot > 8) return false;
 
-        MINECRAFT.player.getInventory().setSelectedSlot(slot);
-        ((ClientPlayerInteractionManagerAccessor) MINECRAFT.interactionManager).callSyncSelectedSlot();
+        MC.player.getInventory().setSelectedSlot(slot);
+        ((ClientPlayerInteractionManagerAccessor) MC.interactionManager).callSyncSelectedSlot();
         return true;
     }
 }

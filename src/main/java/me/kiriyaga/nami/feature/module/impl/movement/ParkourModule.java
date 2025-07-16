@@ -8,9 +8,8 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.math.Box;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class ParkourModule extends Module {
 
@@ -25,13 +24,13 @@ public class ParkourModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null) return;
+        if (MC.player == null || MC.world == null) return;
 
         boolean shouldJump =
-                MINECRAFT.player.isOnGround()
-                        && !MINECRAFT.player.isSneaking()
-                        && MINECRAFT.world.isSpaceEmpty(MINECRAFT.player,
-                        MINECRAFT.player.getBoundingBox()
+                MC.player.isOnGround()
+                        && !MC.player.isSneaking()
+                        && MC.world.isSpaceEmpty(MC.player,
+                        MC.player.getBoundingBox()
                                 .offset(0.0, -0.5, 0.0)
                                 .expand(-0.001, 0.0, -0.001));
 
@@ -39,10 +38,10 @@ public class ParkourModule extends Module {
     }
 
     private void setJumpHeld(boolean held) {
-        KeyBinding jumpKey = MINECRAFT.options.jumpKey;
+        KeyBinding jumpKey = MC.options.jumpKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) jumpKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MINECRAFT.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
         jumpKey.setPressed(physicallyPressed || held);
     }
 }

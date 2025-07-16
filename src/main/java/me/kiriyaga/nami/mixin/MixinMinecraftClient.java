@@ -37,7 +37,7 @@ public class MixinMinecraftClient {
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
-        if (MINECRAFT == null || MINECRAFT.mouse == null) return;
+        if (MC == null || MC.mouse == null) return;
 
         for (Module module : MODULE_MANAGER.getModules()) {
             KeyBindSetting bind = module.getKeyBind();
@@ -89,7 +89,7 @@ public class MixinMinecraftClient {
     private void onTick(CallbackInfo info) {
         FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
 
-        if (fastPlace.isEnabled() && MINECRAFT.options.useKey.isPressed()) {
+        if (fastPlace.isEnabled() && MC.options.useKey.isPressed()) {
             holdTicks++;
         } else {
             holdTicks = 0;
@@ -98,17 +98,17 @@ public class MixinMinecraftClient {
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void setScreen(Screen screen, CallbackInfo info) {
-        if (screen instanceof DeathScreen && MINECRAFT.player != null && MODULE_MANAGER.getModule(AutoRespawnModule.class).isEnabled()) {
+        if (screen instanceof DeathScreen && MC.player != null && MODULE_MANAGER.getModule(AutoRespawnModule.class).isEnabled()) {
 
             if (MODULE_MANAGER.getModule(AutoRespawnModule.class).sendCords.get()) {
-                Vec3d pos = MINECRAFT.player.getPos();
+                Vec3d pos = MC.player.getPos();
                 String coords = String.format("X: %d Y: %d Z: %d",
                         Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
 
                 CHAT_MANAGER.sendPersistent(AutoRespawnModule.class.getName(), "Death coordinates: §7" + coords);
             }
 
-            MINECRAFT.player.requestRespawn();
+            MC.player.requestRespawn();
             info.cancel();
         }
     }

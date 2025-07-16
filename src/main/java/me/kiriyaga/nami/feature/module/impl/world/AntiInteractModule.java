@@ -15,9 +15,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionTypes;
 
-import java.rmi.registry.Registry;
-
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class AntiInteractModule extends Module {
 
@@ -34,13 +32,13 @@ public class AntiInteractModule extends Module {
         if (!packet.get() || !spawnPoint.get()) return;
 
         if (!(ev.getPacket() instanceof PlayerInteractBlockC2SPacket interactPacket)) return;
-        if (MINECRAFT.world == null) return;
+        if (MC.world == null) return;
 
         BlockPos pos = interactPacket.getBlockHitResult().getBlockPos();
-        Block block = MINECRAFT.world.getBlockState(pos).getBlock();
-        var dimension = MINECRAFT.world.getDimensionEntry().matchesKey(DimensionTypes.OVERWORLD) ? "overworld"
-                : MINECRAFT.world.getDimensionEntry().matchesKey(DimensionTypes.THE_NETHER) ? "nether"
-                : MINECRAFT.world.getDimensionEntry().matchesKey(DimensionTypes.THE_END) ? "end"
+        Block block = MC.world.getBlockState(pos).getBlock();
+        var dimension = MC.world.getDimensionEntry().matchesKey(DimensionTypes.OVERWORLD) ? "overworld"
+                : MC.world.getDimensionEntry().matchesKey(DimensionTypes.THE_NETHER) ? "nether"
+                : MC.world.getDimensionEntry().matchesKey(DimensionTypes.THE_END) ? "end"
                 : "unknown";
 
         Identifier blockId = Registries.BLOCK.getId(block);

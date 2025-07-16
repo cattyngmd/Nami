@@ -38,17 +38,17 @@ public class ElytraSwapModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPostTick(PostTickEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC.world == null || MC.player == null) return;
 
-        if (fastSwap.get() && (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen)) {
+        if (fastSwap.get() && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
             attemptFastSwap();
-        } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+        } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
             attemptSwap();
         }
     }
 
     private void attemptFastSwap() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
         int syncId = player.currentScreenHandler.syncId;
@@ -60,13 +60,13 @@ public class ElytraSwapModule extends Module {
 
         if (chestItem.getItem() == Items.ELYTRA) {
             if (CHESTPLATE_PRIORITY.containsKey(swapStack.getItem())) {
-                MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
+                MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
                 this.setEnabled(false);
                 CHAT_MANAGER.sendTransient("Elytra swapped.");
             }
         } else {
             if (swapStack.getItem() == Items.ELYTRA) {
-                MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
+                MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
                 this.setEnabled(false);
                 CHAT_MANAGER.sendTransient("Elytra swapped.");
             }
@@ -76,7 +76,7 @@ public class ElytraSwapModule extends Module {
 
 
     private void attemptSwap() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         int syncId = player.currentScreenHandler.syncId;
         ItemStack chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
 
@@ -85,9 +85,9 @@ public class ElytraSwapModule extends Module {
             if (bestChestplate != null) {
                 int slot = findChestplateSlot(bestChestplate);
                 if (slot != -1) {
-                    MINECRAFT.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
-                    MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
-                    MINECRAFT.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
+                    MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
+                    MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
+                    MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
                     this.setEnabled(false);
                     CHAT_MANAGER.sendTransient("Elytra swapped.");
                 }
@@ -95,9 +95,9 @@ public class ElytraSwapModule extends Module {
         } else {
             int elytraSlot = findElytraSlot();
             if (elytraSlot != -1) {
-                MINECRAFT.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
-                MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
-                MINECRAFT.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
+                MC.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
+                MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
+                MC.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
                 this.setEnabled(false);
                 CHAT_MANAGER.sendTransient("Elytra swapped.");
             }
@@ -105,7 +105,7 @@ public class ElytraSwapModule extends Module {
     }
 
     private int findElytraSlot() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         for (int i = 0; i < 36; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (stack != null && stack.getItem() == Items.ELYTRA) {
@@ -116,7 +116,7 @@ public class ElytraSwapModule extends Module {
     }
 
     private Item findBestChestplateInInventory() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         Item best = null;
         int bestPriority = 0;
         for (int i = 0; i < 36; i++) {
@@ -133,7 +133,7 @@ public class ElytraSwapModule extends Module {
     }
 
     private int findChestplateSlot(Item chestplate) {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         for (int i = 0; i < 36; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (stack != null && stack.getItem() == chestplate) {

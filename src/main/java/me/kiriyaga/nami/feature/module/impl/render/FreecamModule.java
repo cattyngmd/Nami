@@ -12,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class FreecamModule extends Module {
     private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 15.0));
@@ -34,28 +34,28 @@ public class FreecamModule extends Module {
 
     @Override
     public void onEnable() {
-        if (MINECRAFT.player == null) {
+        if (MC.player == null) {
             return;
         }
 
-        previousPerspective = MINECRAFT.options.getPerspective();
-        MINECRAFT.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+        previousPerspective = MC.options.getPerspective();
+        MC.options.setPerspective(Perspective.THIRD_PERSON_BACK);
 
-        cameraPos = MINECRAFT.player.getCameraPosVec(1.0f);
+        cameraPos = MC.player.getCameraPosVec(1.0f);
         camX = cameraPos.x;
         camY = cameraPos.y;
         camZ = cameraPos.z;
 
-        yaw = MINECRAFT.player.getYaw();
-        pitch = MINECRAFT.player.getPitch();
+        yaw = MC.player.getYaw();
+        pitch = MC.player.getPitch();
     }
 
     @Override
     public void onDisable() {
-        if (MINECRAFT.player == null)
+        if (MC.player == null)
             return;
-        if (MINECRAFT.options.getPerspective() != previousPerspective && previousPerspective != null) {
-            MINECRAFT.options.setPerspective(previousPerspective);
+        if (MC.options.getPerspective() != previousPerspective && previousPerspective != null) {
+            MC.options.setPerspective(previousPerspective);
         }
     }
 
@@ -108,12 +108,12 @@ public class FreecamModule extends Module {
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
 
-        int forwardKey = InputUtil.fromTranslationKey(MINECRAFT.options.forwardKey.getBoundKeyTranslationKey()).getCode();
-        int backKey    = InputUtil.fromTranslationKey(MINECRAFT.options.backKey.getBoundKeyTranslationKey()).getCode();
-        int leftKey    = InputUtil.fromTranslationKey(MINECRAFT.options.leftKey.getBoundKeyTranslationKey()).getCode();
-        int rightKey   = InputUtil.fromTranslationKey(MINECRAFT.options.rightKey.getBoundKeyTranslationKey()).getCode();
-        int jumpKey    = InputUtil.fromTranslationKey(MINECRAFT.options.jumpKey.getBoundKeyTranslationKey()).getCode();
-        int sneakKey   = InputUtil.fromTranslationKey(MINECRAFT.options.sneakKey.getBoundKeyTranslationKey()).getCode();
+        int forwardKey = InputUtil.fromTranslationKey(MC.options.forwardKey.getBoundKeyTranslationKey()).getCode();
+        int backKey    = InputUtil.fromTranslationKey(MC.options.backKey.getBoundKeyTranslationKey()).getCode();
+        int leftKey    = InputUtil.fromTranslationKey(MC.options.leftKey.getBoundKeyTranslationKey()).getCode();
+        int rightKey   = InputUtil.fromTranslationKey(MC.options.rightKey.getBoundKeyTranslationKey()).getCode();
+        int jumpKey    = InputUtil.fromTranslationKey(MC.options.jumpKey.getBoundKeyTranslationKey()).getCode();
+        int sneakKey   = InputUtil.fromTranslationKey(MC.options.sneakKey.getBoundKeyTranslationKey()).getCode();
 
 
         boolean pressed = event.action != GLFW.GLFW_RELEASE;

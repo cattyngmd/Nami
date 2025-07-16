@@ -40,7 +40,7 @@ public class ESPModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
-        if (MINECRAFT == null || MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC == null || MC.world == null || MC.player == null) return;
 
         MatrixStack matrices = event.getMatrices();
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);

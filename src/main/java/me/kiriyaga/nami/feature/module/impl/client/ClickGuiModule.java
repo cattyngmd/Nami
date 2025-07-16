@@ -5,7 +5,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 
 import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class ClickGuiModule extends Module {
 
@@ -18,10 +18,10 @@ public class ClickGuiModule extends Module {
 
     @Override
     public void onEnable(){
-        if (MINECRAFT == null || MINECRAFT.mouse == null)
+        if (MC == null || MC.mouse == null)
             return;
 
-        MINECRAFT.setScreen(CLICK_GUI);
+        MC.setScreen(CLICK_GUI);
         this.toggle();
     }
 }

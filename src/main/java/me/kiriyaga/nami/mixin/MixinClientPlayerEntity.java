@@ -5,7 +5,6 @@ import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
@@ -64,14 +63,14 @@ public class MixinClientPlayerEntity {
         if (!ROTATION_MANAGER.isRotating())
             return;
 
-        originalYaw = MINECRAFT.player.getYaw();
-        originalPitch = MINECRAFT.player.getPitch();
+        originalYaw = MC.player.getYaw();
+        originalPitch = MC.player.getPitch();
 
-        MINECRAFT.player.setYaw(ROTATION_MANAGER.getRotationYaw());
-        MINECRAFT.player.setPitch(ROTATION_MANAGER.getRotationPitch());
+        MC.player.setYaw(ROTATION_MANAGER.getRotationYaw());
+        MC.player.setPitch(ROTATION_MANAGER.getRotationPitch());
 
-        MINECRAFT.player.setBodyYaw(ROTATION_MANAGER.getRotationYaw());
-        MINECRAFT.player.setHeadYaw(ROTATION_MANAGER.getRotationYaw());
+        MC.player.setBodyYaw(ROTATION_MANAGER.getRotationYaw());
+        MC.player.setHeadYaw(ROTATION_MANAGER.getRotationYaw());
     }
 
     @Inject(method = "sendMovementPackets", at = @At("TAIL"))
@@ -79,7 +78,7 @@ public class MixinClientPlayerEntity {
         if (!ROTATION_MANAGER.isRotating())
             return;
 
-        MINECRAFT.player.setYaw(originalYaw);
-        MINECRAFT.player.setPitch(originalPitch);
+        MC.player.setYaw(originalYaw);
+        MC.player.setPitch(originalPitch);
     }
 }

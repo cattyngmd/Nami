@@ -33,29 +33,29 @@ public class AutoTotemModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPostTick(PostTickEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC.world == null || MC.player == null) return;
 
-        if (fastSwap.get() && (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen)) {
+        if (fastSwap.get() && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
             attemptFastSwap();
-        } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+        } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
             attemptPlaceTotem();
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onReceivePacket(PacketReceiveEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null)
+        if (MC.world == null || MC.player == null)
             return;
 
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
-            if (packet.getEntity(MINECRAFT.world) == MINECRAFT.player && packet.getStatus() == 3 && deathLog.get()) {
-                MINECRAFT.execute(this::logDeathData);
+            if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 3 && deathLog.get()) {
+                MC.execute(this::logDeathData);
             }
         }
     }
 
     private void attemptFastSwap() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
         int hotbarSlot = totemSlotSetting.get() - 1;
@@ -69,18 +69,18 @@ public class AutoTotemModule extends Module {
             if (totemSlot == -1) return;
 
             int inventorySlot = convertSlot(totemSlot);
-            MINECRAFT.interactionManager.clickSlot(syncId, inventorySlot, hotbarSlot, SlotActionType.SWAP, player);
+            MC.interactionManager.clickSlot(syncId, inventorySlot, hotbarSlot, SlotActionType.SWAP, player);
             return; // we do not want to one-tick swap methods
         }
 
         if (offhand.getItem() != Items.TOTEM_OF_UNDYING) {
-            MINECRAFT.interactionManager.clickSlot(syncId, 45, hotbarSlot, SlotActionType.SWAP, player);
+            MC.interactionManager.clickSlot(syncId, 45, hotbarSlot, SlotActionType.SWAP, player);
         }
     }
 
 
     private void attemptPlaceTotem() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         ItemStack offhandStack = player.getOffHandStack();
 
         pendingTotem = offhandStack.getItem() != Items.TOTEM_OF_UNDYING;
@@ -91,8 +91,8 @@ public class AutoTotemModule extends Module {
                 int syncId = player.currentScreenHandler.syncId;
                 int invSlot = convertSlot(totemSlot);
 
-                MINECRAFT.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
-                MINECRAFT.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
+                MC.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
+                MC.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
 
                 lastAttemptTime = System.currentTimeMillis();
             }
@@ -112,8 +112,8 @@ public class AutoTotemModule extends Module {
                     int syncId = player.currentScreenHandler.syncId;
                     int invSlot = convertSlot(totemSlot);
 
-                    MINECRAFT.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
-                    MINECRAFT.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
+                    MC.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
+                    MC.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
 
                     lastAttemptTime = now;
                 }
@@ -123,7 +123,7 @@ public class AutoTotemModule extends Module {
 
     private int findTotemSlot() {
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = MINECRAFT.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getStack(i);
             if (stack != null && stack.getItem() == Items.TOTEM_OF_UNDYING) {
                 return i;
             }
@@ -134,7 +134,7 @@ public class AutoTotemModule extends Module {
     private int countTotems() {
         int count = 0;
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = MINECRAFT.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getStack(i);
             if (stack != null && stack.getItem() == Items.TOTEM_OF_UNDYING) {
                 count += stack.getCount();
             }
@@ -147,7 +147,7 @@ public class AutoTotemModule extends Module {
     }
 
     private void logDeathData() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
         int ping = PING_MANAGER.getPing();

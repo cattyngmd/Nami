@@ -17,7 +17,7 @@ import net.minecraft.screen.slot.SlotActionType;
 
 import java.util.Map;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class AutoElytraModule extends Module {
@@ -53,10 +53,10 @@ public class AutoElytraModule extends Module {
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null || (pauseEfly.get() && MODULE_MANAGER.getModule(ElytraFlyModule.class).isEnabled())) return;
+        if (MC.world == null || MC.player == null || (pauseEfly.get() && MODULE_MANAGER.getModule(ElytraFlyModule.class).isEnabled())) return;
 
-        if (event.key == MINECRAFT.options.jumpKey.getDefaultKey().getCode() && event.action == 1) {
-            ClientPlayerEntity player = MINECRAFT.player;
+        if (event.key == MC.options.jumpKey.getDefaultKey().getCode() && event.action == 1) {
+            ClientPlayerEntity player = MC.player;
             boolean onGround = player.isOnGround();
 
             if (!onGround && !wasOnGroundLastTick) {
@@ -67,9 +67,9 @@ public class AutoElytraModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPostTick(PostTickEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC.world == null || MC.player == null) return;
 
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
 
         boolean onGround = player.isOnGround();
 
@@ -84,9 +84,9 @@ public class AutoElytraModule extends Module {
                 int chestSlot = findChestplateSlot(bestChestplate);
                 if (chestSlot != -1) {
                     int syncId = player.currentScreenHandler.syncId;
-                    if (fastSwap.get() && (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen)) {
+                    if (fastSwap.get() && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
                         fastSwapItem(chestSlot, syncId, bestChestplate);
-                    } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+                    } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
                         swapWithArmor(chestSlot, syncId);
                     }
                     currentState = ElytraState.CHESTPLATE;
@@ -110,7 +110,7 @@ public class AutoElytraModule extends Module {
             if (elytraSlot != -1) {
                 if (fastSwap.get()) {
                     fastSwapItem(elytraSlot, syncId, Items.ELYTRA);
-                } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+                } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
                     swapWithArmor(elytraSlot, syncId);
                 }
                 currentState = ElytraState.ELYTRA;
@@ -124,7 +124,7 @@ public class AutoElytraModule extends Module {
             if (chestSlot != -1) {
                 if (fastSwap.get()) {
                     fastSwapItem(chestSlot, syncId, best);
-                } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
+                } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
                     swapWithArmor(chestSlot, syncId);
                 }
                 currentState = ElytraState.CHESTPLATE;
@@ -135,15 +135,15 @@ public class AutoElytraModule extends Module {
     private void handleJumpToggleSteps() {
         switch (jumpToggleStep) {
             case 0:
-                MINECRAFT.options.jumpKey.setPressed(false);
+                MC.options.jumpKey.setPressed(false);
                 jumpToggleStep++;
                 break;
             case 1:
-                MINECRAFT.options.jumpKey.setPressed(true);
+                MC.options.jumpKey.setPressed(true);
                 jumpToggleStep++;
                 break;
             case 2:
-                MINECRAFT.options.jumpKey.setPressed(false);
+                MC.options.jumpKey.setPressed(false);
                 jumpToggleStep = 0;
                 needJumpImitate = false;
                 break;
@@ -151,14 +151,14 @@ public class AutoElytraModule extends Module {
     }
 
     private void swapWithArmor(int slot, int syncId) {
-        ClientPlayerEntity player = MINECRAFT.player;
-        MINECRAFT.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
-        MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
-        MINECRAFT.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
+        ClientPlayerEntity player = MC.player;
+        MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
+        MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
+        MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
     }
 
     private void fastSwapItem(int inventorySlot, int syncId, Item itemToEquip) {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         int hotbarSlot = swapSlotSetting.get() - 1;
 
         ItemStack hotbarStack = player.getInventory().getStack(hotbarSlot);
@@ -166,11 +166,11 @@ public class AutoElytraModule extends Module {
             return;
         }
 
-        MINECRAFT.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlot, SlotActionType.SWAP, player);
+        MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlot, SlotActionType.SWAP, player);
     }
 
     private Item getBestChestplate() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         Item best = null;
         int bestPriority = 0;
         for (int i = 0; i < 36; i++) {
@@ -187,7 +187,7 @@ public class AutoElytraModule extends Module {
     }
 
     private int findChestplateSlot(Item chestplate) {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         for (int i = 0; i < 36; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (stack != null && stack.getItem() == chestplate) {
@@ -198,7 +198,7 @@ public class AutoElytraModule extends Module {
     }
 
     private int findElytraSlot() {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         for (int i = 0; i < 36; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (stack != null && stack.getItem() == Items.ELYTRA) {

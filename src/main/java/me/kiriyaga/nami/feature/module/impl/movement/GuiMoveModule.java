@@ -13,7 +13,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class GuiMoveModule extends Module {
@@ -47,13 +47,13 @@ public class GuiMoveModule extends Module {
         if (!canMove()) return;
 
 
-        updateHeld(MINECRAFT.options.forwardKey, event.key, event.action, false, v -> forwardHeld = v);
-        updateHeld(MINECRAFT.options.backKey, event.key, event.action, false, v -> backHeld = v);
-        updateHeld(MINECRAFT.options.leftKey, event.key, event.action, false, v -> leftHeld = v);
-        updateHeld(MINECRAFT.options.rightKey, event.key, event.action, false, v -> rightHeld = v);
-        updateHeld(MINECRAFT.options.jumpKey, event.key, event.action, false, v -> jumpHeld = v);
-        updateHeld(MINECRAFT.options.sneakKey, event.key, event.action, false, v -> sneakHeld = v);
-        updateHeld(MINECRAFT.options.sprintKey, event.key, event.action, false, v -> sprintHeld = v);
+        updateHeld(MC.options.forwardKey, event.key, event.action, false, v -> forwardHeld = v);
+        updateHeld(MC.options.backKey, event.key, event.action, false, v -> backHeld = v);
+        updateHeld(MC.options.leftKey, event.key, event.action, false, v -> leftHeld = v);
+        updateHeld(MC.options.rightKey, event.key, event.action, false, v -> rightHeld = v);
+        updateHeld(MC.options.jumpKey, event.key, event.action, false, v -> jumpHeld = v);
+        updateHeld(MC.options.sneakKey, event.key, event.action, false, v -> sneakHeld = v);
+        updateHeld(MC.options.sprintKey, event.key, event.action, false, v -> sprintHeld = v);
     }
 
     private void updateHeld(KeyBinding bind, int key, int action, boolean mouse, java.util.function.Consumer<Boolean> setter) {
@@ -67,46 +67,46 @@ public class GuiMoveModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (!canMove() || MODULE_MANAGER.getModule(FreecamModule.class).isEnabled()) return;
 
-        if (MINECRAFT.currentScreen == null) {
+        if (MC.currentScreen == null) {
             forwardHeld = backHeld = leftHeld = rightHeld = jumpHeld = sneakHeld = sprintHeld = false;
             setKeysPressed(false);
             return;
         }
 
-        updateKeyWithHold(MINECRAFT.options.forwardKey, forwardHeld);
-        updateKeyWithHold(MINECRAFT.options.backKey, backHeld);
-        updateKeyWithHold(MINECRAFT.options.leftKey, leftHeld);
-        updateKeyWithHold(MINECRAFT.options.rightKey, rightHeld);
-        updateKeyWithHold(MINECRAFT.options.jumpKey, jumpHeld);
-        updateKeyWithHold(MINECRAFT.options.sneakKey, sneakHeld);
-        updateKeyWithHold(MINECRAFT.options.sprintKey, sprintHeld);
+        updateKeyWithHold(MC.options.forwardKey, forwardHeld);
+        updateKeyWithHold(MC.options.backKey, backHeld);
+        updateKeyWithHold(MC.options.leftKey, leftHeld);
+        updateKeyWithHold(MC.options.rightKey, rightHeld);
+        updateKeyWithHold(MC.options.jumpKey, jumpHeld);
+        updateKeyWithHold(MC.options.sneakKey, sneakHeld);
+        updateKeyWithHold(MC.options.sprintKey, sprintHeld);
     }
 
     private void updateKeyWithHold(KeyBinding bind, boolean held) {
         InputUtil.Key boundKey = ((KeyBindingAccessor) bind).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MINECRAFT.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
         bind.setPressed(physicallyPressed || held);
     }
 
     private boolean canMove() {
-        if (MINECRAFT.currentScreen == null) return false;
-        return !(MINECRAFT.currentScreen instanceof ChatScreen
-                || MINECRAFT.currentScreen instanceof SignEditScreen
-                || MINECRAFT.currentScreen instanceof AnvilScreen
-                || MINECRAFT.currentScreen instanceof AbstractCommandBlockScreen
-                || MINECRAFT.currentScreen instanceof StructureBlockScreen
-                || MINECRAFT.currentScreen instanceof CreativeInventoryScreen
+        if (MC.currentScreen == null) return false;
+        return !(MC.currentScreen instanceof ChatScreen
+                || MC.currentScreen instanceof SignEditScreen
+                || MC.currentScreen instanceof AnvilScreen
+                || MC.currentScreen instanceof AbstractCommandBlockScreen
+                || MC.currentScreen instanceof StructureBlockScreen
+                || MC.currentScreen instanceof CreativeInventoryScreen
         );
     }
 
     private void setKeysPressed(boolean pressed) {
-        MINECRAFT.options.forwardKey.setPressed(pressed);
-        MINECRAFT.options.backKey.setPressed(pressed);
-        MINECRAFT.options.leftKey.setPressed(pressed);
-        MINECRAFT.options.rightKey.setPressed(pressed);
-        MINECRAFT.options.jumpKey.setPressed(pressed);
-        MINECRAFT.options.sneakKey.setPressed(pressed);
-        MINECRAFT.options.sprintKey.setPressed(pressed);
+        MC.options.forwardKey.setPressed(pressed);
+        MC.options.backKey.setPressed(pressed);
+        MC.options.leftKey.setPressed(pressed);
+        MC.options.rightKey.setPressed(pressed);
+        MC.options.jumpKey.setPressed(pressed);
+        MC.options.sneakKey.setPressed(pressed);
+        MC.options.sprintKey.setPressed(pressed);
     }
 }

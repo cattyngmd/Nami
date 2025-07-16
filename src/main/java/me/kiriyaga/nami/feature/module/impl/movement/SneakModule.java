@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class SneakModule extends Module {
 
@@ -55,7 +55,7 @@ public class SneakModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdateEvent(PreTickEvent event) {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
         boolean shouldSneak = switch (mode.get()) {
@@ -71,9 +71,9 @@ public class SneakModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLedgeClip(LedgeClipEvent event) {
         if (mode.get() != Mode.ledge) return;
-        assert MINECRAFT.player != null;
-        if (!MINECRAFT.player.isSneaking()) {
-            MINECRAFT.player.setSneaking(true);
+        assert MC.player != null;
+        if (!MC.player.isSneaking()) {
+            MC.player.setSneaking(true);
             event.cancel();
             event.setClipped(true);
         }
@@ -106,7 +106,7 @@ public class SneakModule extends Module {
         for (int dx : xOffsets) {
             for (int dz : zOffsets) {
                 BlockPos posToCheck = new BlockPos(baseX + dx, blockY, baseZ + dz);
-                if (MINECRAFT.world.getBlockState(posToCheck).isAir()) {
+                if (MC.world.getBlockState(posToCheck).isAir()) {
                     return false;
                 } else {
                     checkedBlocks.putIfAbsent(posToCheck, new Color(255, 255, 0, 60));
@@ -140,14 +140,14 @@ public class SneakModule extends Module {
 
                 if (dx == 0 && dz == 0) continue;
 
-                BlockState state = MINECRAFT.world.getBlockState(checkPos);
+                BlockState state = MC.world.getBlockState(checkPos);
                 if (state.isAir()) continue;
 
                 for (int ndx = -1; ndx <= 1; ndx++) {
                     for (int ndz = -1; ndz <= 1; ndz++) {
                         if (ndx == 0 && ndz == 0) continue;
                         BlockPos neighborPos = checkPos.add(ndx, 0, ndz);
-                        BlockState neighborState = MINECRAFT.world.getBlockState(neighborPos);
+                        BlockState neighborState = MC.world.getBlockState(neighborPos);
                         if (neighborState.isAir()) continue;
 
                         double neighborCenterX = neighborPos.getX() + 0.5;
@@ -174,7 +174,7 @@ public class SneakModule extends Module {
 
                 if (dx == 0 && dz == 0) continue;
 
-                BlockState state = MINECRAFT.world.getBlockState(checkPos);
+                BlockState state = MC.world.getBlockState(checkPos);
                 if (state.isAir()) continue;
 
                 double centerX = checkPos.getX() + 0.5;
@@ -212,7 +212,7 @@ public class SneakModule extends Module {
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null || !render.get()) return;
+        if (MC.player == null || MC.world == null || !render.get()) return;
 
         MatrixStack matrices = event.getMatrices();
 
@@ -233,10 +233,10 @@ public class SneakModule extends Module {
     }
 
     private void setSneakHeld(boolean held) {
-        KeyBinding sneakKey = MINECRAFT.options.sneakKey;
+        KeyBinding sneakKey = MC.options.sneakKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) sneakKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MINECRAFT.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
         sneakKey.setPressed(physicallyPressed || held);
     }
 }

@@ -17,7 +17,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
@@ -59,30 +58,30 @@ public class ElytraFlyModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onPreTick(PreTickEvent event) {
-        if (MINECRAFT.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
+        if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
         if (mode.get() == FlyMode.bounce) {
 
-            if (boost.get() && MINECRAFT.player.getVelocity().y > 0 && MODULE_MANAGER.getModule(HUDModule.class).speed < targetSpeed.get()) {
-                MINECRAFT.player.setVelocity(MINECRAFT.player.getVelocity().x, 0.0, MINECRAFT.player.getVelocity().z);
+            if (boost.get() && MC.player.getVelocity().y > 0 && MODULE_MANAGER.getModule(HUDModule.class).speed < targetSpeed.get()) {
+                MC.player.setVelocity(MC.player.getVelocity().x, 0.0, MC.player.getVelocity().z);
             }
 
             setJumpHeld(true);
 
             //75 magic value = its just the best value
             if (pitch.get())
-                ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(this.getName(), rotationPriority.get(), MINECRAFT.player.getYaw(), 75.00f));
+                ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), 75.00f));
 
-            MINECRAFT.player.networkHandler.sendPacket(
-                    new ClientCommandC2SPacket(MINECRAFT.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
+            MC.player.networkHandler.sendPacket(
+                    new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
             );
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onMove(MoveEvent event) {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
         if (!player.isOnGround()) return;
@@ -94,10 +93,10 @@ public class ElytraFlyModule extends Module {
     }
 
     private void setJumpHeld(boolean held) {
-        KeyBinding jumpKey = MINECRAFT.options.jumpKey;
+        KeyBinding jumpKey = MC.options.jumpKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) jumpKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MINECRAFT.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
         jumpKey.setPressed(physicallyPressed || held);
     }
 }

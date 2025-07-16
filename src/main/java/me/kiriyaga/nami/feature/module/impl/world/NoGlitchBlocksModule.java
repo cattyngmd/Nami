@@ -10,9 +10,8 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.item.BlockItem;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.util.Hand;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class NoGlitchBlocksModule extends Module {
 
@@ -27,8 +26,8 @@ public class NoGlitchBlocksModule extends Module {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onBlockPlace(PlaceBlockEvent event) {
         if (!place.get()) return;
-        if (MINECRAFT.isInSingleplayer()) return;
-        if (!(MINECRAFT.player.getStackInHand(event.getHand()).getItem() instanceof BlockItem)) return;
+        if (MC.isInSingleplayer()) return;
+        if (!(MC.player.getStackInHand(event.getHand()).getItem() instanceof BlockItem)) return;
 
         event.cancel();
 
@@ -37,15 +36,15 @@ public class NoGlitchBlocksModule extends Module {
                 event.getHitResult(),
                 0
         );
-        MINECRAFT.getNetworkHandler().sendPacket(packet);
+        MC.getNetworkHandler().sendPacket(packet);
         if (swing.get())
-            MINECRAFT.getNetworkHandler().sendPacket(new HandSwingC2SPacket(event.getHand()));
+            MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(event.getHand()));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BreakBlockEvent event) {
         if (!destroy.get()) return;
-        if (MINECRAFT.isInSingleplayer()) return;
+        if (MC.isInSingleplayer()) return;
 
         event.cancel();
     }

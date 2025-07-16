@@ -50,11 +50,11 @@ public class AuraModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onTick(PreTickEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null) return;
-        if (!multiTask.get() && MINECRAFT.player.isUsingItem()) return;
+        if (MC.player == null || MC.world == null) return;
+        if (!multiTask.get() && MC.player.isUsingItem()) return;
 
         if (swordOnly.get()) {
-            ItemStack stack = MINECRAFT.player.getMainHandStack();
+            ItemStack stack = MC.player.getMainHandStack();
             if (!(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS))) return;
         }
 
@@ -67,9 +67,9 @@ public class AuraModule extends Module {
 
         double eyeDistance;
         if (grim.get()) {
-            eyeDistance = getClosestEyeDistance(MINECRAFT.player.getEyePos(), target.getBoundingBox());
+            eyeDistance = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
         } else {
-            eyeDistance = MINECRAFT.player.getPos().distanceTo(getEntityCenter(target));
+            eyeDistance = MC.player.getPos().distanceTo(getEntityCenter(target));
         }
 
         boolean inRotateRange = eyeDistance <= rotateRange.get();
@@ -82,10 +82,10 @@ public class AuraModule extends Module {
 
         currentTarget = target;
 
-        float cooldown = MINECRAFT.player.getAttackCooldownProgress(0f);
+        float cooldown = MC.player.getAttackCooldownProgress(0f);
         float tps = 20f;
-        if (tpsSync.get() && MINECRAFT.getServer() != null) {
-            double tickTimeMs = MINECRAFT.getServer().getAverageTickTime() / 1_000_000.0;
+        if (tpsSync.get() && MC.getServer() != null) {
+            double tickTimeMs = MC.getServer().getAverageTickTime() / 1_000_000.0;
             tps = (float) Math.min(20.0, 1000.0 / tickTimeMs);
         }
 
@@ -96,8 +96,8 @@ public class AuraModule extends Module {
             ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
                     AuraModule.class.getName(),
                     rotationPriority.get(),
-                    (float) getYawToVec(MINECRAFT.player, targetCenter),
-                    (float) getPitchToVec(MINECRAFT.player, targetCenter)
+                    (float) getYawToVec(MC.player, targetCenter),
+                    (float) getPitchToVec(MC.player, targetCenter)
             ));
         }
 
@@ -105,8 +105,8 @@ public class AuraModule extends Module {
         if (cooldown < (tpsSync.get() ? 1.0f * (20f / tps) : 1.0f)) return;
         if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) return;
 
-        MINECRAFT.interactionManager.attackEntity(MINECRAFT.player, target);
-        MINECRAFT.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
+        MC.interactionManager.attackEntity(MC.player, target);
+        MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -115,9 +115,9 @@ public class AuraModule extends Module {
 
         double eyeDistance;
         if (grim.get()) {
-            eyeDistance = getClosestEyeDistance(MINECRAFT.player.getEyePos(), currentTarget.getBoundingBox());
+            eyeDistance = getClosestEyeDistance(MC.player.getEyePos(), currentTarget.getBoundingBox());
         } else {
-            eyeDistance = MINECRAFT.player.getPos().distanceTo(getEntityCenter(currentTarget));
+            eyeDistance = MC.player.getPos().distanceTo(getEntityCenter(currentTarget));
         }
 
         if (eyeDistance > rotateRange.get()) return;

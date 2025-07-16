@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.client;
 
+import me.kiriyaga.nami.Nami;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render2DEvent;
@@ -138,7 +139,7 @@ public class HUDModule extends Module {
 
 
     private void updateAllData() {
-        MinecraftClient mc = MINECRAFT;
+        MinecraftClient mc = Nami.MC;
         if (mc.world == null || mc.player == null) return;
 
         Color styled = getColorModule().getStyledGlobalColor();
@@ -224,7 +225,7 @@ public class HUDModule extends Module {
                 long elapsedSeconds = (System.currentTimeMillis() - lastWorldJoinTime) / 1000;
                 if (elapsedSeconds >= greetingDelay.get() && fullGreeting.isEmpty()) {
                     String greetingTemplate = GREETINGS[(int)(Math.random() * GREETINGS.length)];
-                    fullGreeting = String.format(greetingTemplate, MINECRAFT.player.getName().getString());
+                    fullGreeting = String.format(greetingTemplate, Nami.MC.player.getName().getString());
                     greetingCharIndex = 0;
                     greetingShownTime = 0;
                 }
@@ -273,7 +274,7 @@ public class HUDModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender2D(Render2DEvent event) {
-        MinecraftClient mc = MINECRAFT;
+        MinecraftClient mc = Nami.MC;
         if (mc.world == null || mc.player == null || mc.getDebugHud().shouldShowDebugHud()) return;
 
         int screenWidth = mc.getWindow().getScaledWidth();
@@ -311,7 +312,7 @@ public class HUDModule extends Module {
 
         if (watermarkEnabled.get() && !watermarkText.getString().isEmpty()) {
             event.getDrawContext().drawText(
-                    MINECRAFT.textRenderer,
+                    MC.textRenderer,
                     watermarkText,
                     x,
                     PADDING,
@@ -319,7 +320,7 @@ public class HUDModule extends Module {
                     shadow.get()
             );
 
-            int watermarkWidth = MINECRAFT.textRenderer.getWidth(watermarkText);
+            int watermarkWidth = MC.textRenderer.getWidth(watermarkText);
             int gap = 5;
             x += watermarkWidth + gap;
         }
@@ -327,7 +328,7 @@ public class HUDModule extends Module {
         if (time.get() && timeText != null) {
             int pulsingColor = getPulsingColor(0xFFB2BAAB);
             event.getDrawContext().drawText(
-                    MINECRAFT.textRenderer,
+                    MC.textRenderer,
                     timeText,
                     x,
                     PADDING,
@@ -338,45 +339,45 @@ public class HUDModule extends Module {
     }
 
     private void renderBottomLeft(Render2DEvent event, int color, int screenHeight, float animationOffset) {
-        int y = screenHeight - MINECRAFT.textRenderer.fontHeight - PADDING;
+        int y = screenHeight - MC.textRenderer.fontHeight - PADDING;
         y -= (int) animationOffset;
 
         if (coordsEnabled.get() && !coordsText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, coordsText, PADDING, y, color, shadow.get());
-            y -= MINECRAFT.textRenderer.fontHeight + 2;
+            event.getDrawContext().drawText(MC.textRenderer, coordsText, PADDING, y, color, shadow.get());
+            y -= MC.textRenderer.fontHeight + 2;
         }
 
         if (facingEnabled.get() && !facingText.getString().isEmpty()) {
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, facingText, PADDING, y, color, shadow.get());
-            y -= MINECRAFT.textRenderer.fontHeight + 2;
+            event.getDrawContext().drawText(MC.textRenderer, facingText, PADDING, y, color, shadow.get());
+            y -= MC.textRenderer.fontHeight + 2;
         }
     }
 
     private void renderBottomRight(Render2DEvent event, int color, int screenWidth, int screenHeight, float animationOffset) {
-        int y = screenHeight - MINECRAFT.textRenderer.fontHeight;
+        int y = screenHeight - MC.textRenderer.fontHeight;
         y -= (int) animationOffset;
 
         if (speedEnabled.get() && !speedText.getString().isEmpty()) {
-            int width = MINECRAFT.textRenderer.getWidth(speedText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, speedText, screenWidth - width - PADDING, y, color, shadow.get());
-            y -= MINECRAFT.textRenderer.fontHeight + 2;
+            int width = MC.textRenderer.getWidth(speedText);
+            event.getDrawContext().drawText(MC.textRenderer, speedText, screenWidth - width - PADDING, y, color, shadow.get());
+            y -= MC.textRenderer.fontHeight + 2;
         }
 
         if (pingEnabled.get() && !pingText.getString().isEmpty()) {
-            int width = MINECRAFT.textRenderer.getWidth(pingText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, pingText, screenWidth - width - PADDING, y, color, shadow.get());
-            y -= MINECRAFT.textRenderer.fontHeight + 2;
+            int width = MC.textRenderer.getWidth(pingText);
+            event.getDrawContext().drawText(MC.textRenderer, pingText, screenWidth - width - PADDING, y, color, shadow.get());
+            y -= MC.textRenderer.fontHeight + 2;
         }
 
         if (fpsEnabled.get() && !fpsText.getString().isEmpty()) {
-            int width = MINECRAFT.textRenderer.getWidth(fpsText);
-            event.getDrawContext().drawText(MINECRAFT.textRenderer, fpsText, screenWidth - width - PADDING, y, color, shadow.get());
-            y -= MINECRAFT.textRenderer.fontHeight + 2;
+            int width = MC.textRenderer.getWidth(fpsText);
+            event.getDrawContext().drawText(MC.textRenderer, fpsText, screenWidth - width - PADDING, y, color, shadow.get());
+            y -= MC.textRenderer.fontHeight + 2;
         }
     }
 
     private void renderArmorHUD(Render2DEvent event) {
-        MinecraftClient mc = MINECRAFT;
+        MinecraftClient mc = Nami.MC;
         if (mc.player == null) return;
 
         double x = mc.getWindow().getScaledWidth() / 2 + 7 * mc.getWindow().getScaleFactor();
@@ -397,7 +398,7 @@ public class HUDModule extends Module {
             double armorY = y;
 
             event.getDrawContext().drawItem(stack, (int) armorX, (int) armorY);
-            event.getDrawContext().drawStackOverlay(MINECRAFT.textRenderer, stack, (int) armorX, (int) armorY);
+            event.getDrawContext().drawStackOverlay(Nami.MC.textRenderer, stack, (int) armorX, (int) armorY);
 
             if (stack.isDamageable() && armorDurability.get()) {
                 float durability = (stack.getMaxDamage() - (float) stack.getDamage()) / stack.getMaxDamage();
@@ -421,7 +422,7 @@ public class HUDModule extends Module {
                 int pulsingColor = getPulsingColor(baseColor);
 
                 event.getDrawContext().drawText(
-                        MINECRAFT.textRenderer,
+                        Nami.MC.textRenderer,
                         durabilityText,
                         (int) scaledX,
                         (int) scaledY,
@@ -436,7 +437,7 @@ public class HUDModule extends Module {
 
 
     private void renderTotems(Render2DEvent event, int screenWidth, int screenHeight) {
-        MinecraftClient mc = MINECRAFT;
+        MinecraftClient mc = Nami.MC;
         if (mc.player == null) return;
 
         int totemCount = 0;
@@ -486,14 +487,14 @@ public class HUDModule extends Module {
 
     private void drawLagWarning(Render2DEvent event, int screenWidth, int screenHeight) {
         String warningText = "Server is not responding in " + PING_MANAGER.getConnectionUnstableTimeSeconds() + "s";
-        int textWidth = MINECRAFT.textRenderer.getWidth(warningText);
-        int textHeight = MINECRAFT.textRenderer.fontHeight;
+        int textWidth = MC.textRenderer.getWidth(warningText);
+        int textHeight = MC.textRenderer.fontHeight;
 
         int x = (screenWidth - textWidth) / 2;
         int y = ((screenHeight - textHeight) / 2) - 60;
 
         int pulsingColor = getPulsingColor(primaryRGB);
-        event.getDrawContext().drawText(MINECRAFT.textRenderer, warningText, x, y, pulsingColor, shadow.get());
+        event.getDrawContext().drawText(MC.textRenderer, warningText, x, y, pulsingColor, shadow.get());
     }
 
     private Text formatFancyCoords(double x, double y, double z) {
@@ -632,13 +633,13 @@ public class HUDModule extends Module {
         if (!greetingEnabled.get() || currentGreeting.isEmpty()) return;
 
         String textToRender = currentGreeting + (dotVisible ? "." : "");
-        int textWidth = MINECRAFT.textRenderer.getWidth(textToRender);
+        int textWidth = MC.textRenderer.getWidth(textToRender);
         int x = (screenWidth - textWidth) / 2;
         int y = PADDING;
 
         int pulsingColor = getPulsingColor(primaryRGB);
         event.getDrawContext().drawText(
-                MINECRAFT.textRenderer,
+                MC.textRenderer,
                 textToRender,
                 x,
                 y,

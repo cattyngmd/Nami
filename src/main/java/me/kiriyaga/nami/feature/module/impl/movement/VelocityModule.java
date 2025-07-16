@@ -27,8 +27,7 @@ import net.minecraft.util.shape.VoxelShape;
 
 import java.util.*;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class VelocityModule extends Module {
 
@@ -64,8 +63,8 @@ public class VelocityModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onPacketReceive(PacketReceiveEvent event) {
-        ClientPlayerEntity player = MINECRAFT.player;
-        if (player == null || MINECRAFT.world == null) return;
+        ClientPlayerEntity player = MC.player;
+        if (player == null || MC.world == null) return;
 
         Packet<?> packet = event.getPacket();
 
@@ -123,7 +122,7 @@ public class VelocityModule extends Module {
         else if (packet instanceof EntityStatusS2CPacket statusPacket
                 && statusPacket.getStatus() == EntityStatuses.PULL_HOOKED_ENTITY
                 && cancelFishHook.get()) {
-            Entity entity = statusPacket.getEntity(MINECRAFT.world);
+            Entity entity = statusPacket.getEntity(MC.world);
             if (entity instanceof FishingBobberEntity hook && hook.getHookedEntity() == player) {
                 event.cancel();
             }
@@ -137,7 +136,7 @@ public class VelocityModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onEntityPush(EntityPushEvent event) {
-        if (cancelEntityPush.get() && event.getTarget().equals(MINECRAFT.player)) {
+        if (cancelEntityPush.get() && event.getTarget().equals(MC.player)) {
             event.cancel();
         }
     }
@@ -173,7 +172,7 @@ public class VelocityModule extends Module {
             }
 
             else if (p instanceof EntityVelocityUpdateS2CPacket velocity && handleKnockback.get()) {
-                if (velocity.getEntityId() != MINECRAFT.player.getId()) {
+                if (velocity.getEntityId() != MC.player.getId()) {
                     filteredPackets.add(p);
                     continue;
                 }
@@ -181,7 +180,7 @@ public class VelocityModule extends Module {
                 if (modeSetting.get() == Mode.grim && isPlayerPhased()) continue;
 
                 if (modeSetting.get() == Mode.walls) {
-                    if (!isPlayerPhased() || (requireGround.get() && !MINECRAFT.player.isOnGround())) {
+                    if (!isPlayerPhased() || (requireGround.get() && !MC.player.isOnGround())) {
                         filteredPackets.add(p);
                         continue;
                     }
@@ -206,8 +205,8 @@ public class VelocityModule extends Module {
     }
 
     private boolean isPlayerPhased() {
-        ClientPlayerEntity player = MINECRAFT.player;
-        if (player == null || MINECRAFT.world == null) return false;
+        ClientPlayerEntity player = MC.player;
+        if (player == null || MC.world == null) return false;
 
         Box boundingBox = player.getBoundingBox();
 
@@ -222,7 +221,7 @@ public class VelocityModule extends Module {
             for (int y = minY; y < maxY; y++) {
                 for (int z = minZ; z < maxZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    VoxelShape shape = MINECRAFT.world.getBlockState(pos).getCollisionShape(MINECRAFT.world, pos);
+                    VoxelShape shape = MC.world.getBlockState(pos).getCollisionShape(MC.world, pos);
 
                     if (!shape.isEmpty() && shape.getBoundingBox().offset(pos).intersects(boundingBox)) {
                         //CHAT_MANAGER.sendRaw("phased");

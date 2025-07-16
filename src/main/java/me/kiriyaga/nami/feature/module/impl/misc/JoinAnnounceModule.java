@@ -41,7 +41,7 @@ public class JoinAnnounceModule extends Module {
             }
         } else if (event.getPacket() instanceof PlayerRemoveS2CPacket leavePacket) {
             for (var playerInfo : leavePacket.profileIds()) {
-                var info = MINECRAFT.getNetworkHandler().getPlayerListEntry(playerInfo);
+                var info = MC.getNetworkHandler().getPlayerListEntry(playerInfo);
                 if (info == null) continue;
 
                 String playerName = info.getProfile().getName();

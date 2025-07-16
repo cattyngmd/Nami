@@ -55,19 +55,19 @@ public class NametagsModule extends Module {
 
     @SubscribeEvent
     public void onRender3d(Render3DEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC.world == null || MC.player == null) return;
 
         MatrixStack matrices = event.getMatrices();
 
         if (players.get()) {
             for (PlayerEntity player : ENTITY_MANAGER.getPlayers()) {
-                if (player == MINECRAFT.player) continue;
+                if (player == MC.player) continue;
                 renderEntityNametag(player, event.getTickDelta(), matrices, 30, null);
             }
         }
 
-        if (self.get() && !MINECRAFT.options.getPerspective().isFirstPerson()){
-            renderEntityNametag(MINECRAFT.player, event.getTickDelta(), matrices, 30, null);
+        if (self.get() && !MC.options.getPerspective().isFirstPerson()){
+            renderEntityNametag(MC.player, event.getTickDelta(), matrices, 30, null);
         }
 
         if (hostiles.get()) {
@@ -187,8 +187,8 @@ public class NametagsModule extends Module {
         double baseY = interpMaxY + (player.isSneaking() ? 0.0 : 0.3);
         double baseZ = (interpMinZ + interpMaxZ) / 2.0;
 
-        Vec3d camPos = MINECRAFT.getEntityRenderDispatcher().camera.getPos();
-        float yaw = MINECRAFT.gameRenderer.getCamera().getYaw();
+        Vec3d camPos = MC.getEntityRenderDispatcher().camera.getPos();
+        float yaw = MC.gameRenderer.getCamera().getYaw();
         Vec3d camForward = Vec3d.fromPolar(0, yaw).normalize();
         Vec3d camRight = camForward.crossProduct(new Vec3d(0, 1, 0)).normalize();
 

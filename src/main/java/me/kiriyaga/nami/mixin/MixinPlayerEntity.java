@@ -13,11 +13,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity extends LivingEntity {
@@ -40,7 +39,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             SprintResetEvent sprintResetEvent = new SprintResetEvent();
             EVENT_MANAGER.post(sprintResetEvent);
             if (!sprintResetEvent.isCancelled())
-                MINECRAFT.player.setVelocity(MINECRAFT.player.getVelocity().multiply(0.6, 1.0, 0.6));
+                MC.player.setVelocity(MC.player.getVelocity().multiply(0.6, 1.0, 0.6));
         }
     }
 
@@ -50,7 +49,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             SprintResetEvent sprintResetEvent = new SprintResetEvent();
             EVENT_MANAGER.post(sprintResetEvent);
             if (!sprintResetEvent.isCancelled())
-                MINECRAFT.player.setSprinting(false);
+                MC.player.setSprinting(false);
 
         }
     }
@@ -59,7 +58,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
     @Inject(method = "isPushedByFluids", at = @At(value = "HEAD"),
             cancellable = true)
     private void isPushedByFluids(CallbackInfoReturnable<Boolean> cir) {
-        if ((Object) this != MINECRAFT.player)
+        if ((Object) this != MC.player)
             return;
 
         LiquidPushEvent pushFluidsEvent = new LiquidPushEvent();

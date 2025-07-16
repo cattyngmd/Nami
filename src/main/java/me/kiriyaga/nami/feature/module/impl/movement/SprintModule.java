@@ -12,7 +12,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class SprintModule extends Module {
 
@@ -25,7 +25,7 @@ public class SprintModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdateEvent(PreTickEvent event) {
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
         if (!inLiquid.get() && (player.isSubmergedInWater() || player.isTouchingWater()))
@@ -51,8 +51,8 @@ public class SprintModule extends Module {
 
 
         if (!keepSprint.get()) {
-            MINECRAFT.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(MINECRAFT.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-            MINECRAFT.player.setSprinting(false);
+            MC.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+            MC.player.setSprinting(false);
         }
     }
 }

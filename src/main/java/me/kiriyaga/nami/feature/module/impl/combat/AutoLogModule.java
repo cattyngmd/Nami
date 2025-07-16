@@ -34,10 +34,10 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdate(PreTickEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null)
+        if (MC.player == null || MC.world == null)
             return;
 
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
 
         if (onLevel.get() != 0) {
 
@@ -76,10 +76,10 @@ public class AutoLogModule extends Module {
             double y = packet.getY();
             double z = packet.getZ();
 
-            MINECRAFT.execute(() -> {
-                Entity entity = MINECRAFT.world.getEntityById(id);
+            MC.execute(() -> {
+                Entity entity = MC.world.getEntityById(id);
                 if (entity instanceof PlayerEntity player && !FRIEND_MANAGER.isFriend(player.getName().getString())) {
-                    double distance = MINECRAFT.player.distanceTo(player);
+                    double distance = MC.player.distanceTo(player);
                         logOut("Untrusted player in range: " + player.getName().toString() + " (" + String.format("%.1f", distance) + " blocks)");
                 }
             });
@@ -88,8 +88,8 @@ public class AutoLogModule extends Module {
 
 
     private void logOut(String reason) {
-        if (MINECRAFT.getNetworkHandler() != null) {
-            MINECRAFT.getNetworkHandler().onDisconnect(new net.minecraft.network.packet.s2c.common.DisconnectS2CPacket(
+        if (MC.getNetworkHandler() != null) {
+            MC.getNetworkHandler().onDisconnect(new net.minecraft.network.packet.s2c.common.DisconnectS2CPacket(
                     net.minecraft.text.Text.of("AutoLog: §7" + reason)
             ));
 

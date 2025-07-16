@@ -4,7 +4,7 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class GammaCommand extends Command {
 
@@ -27,7 +27,7 @@ public class GammaCommand extends Command {
                 return;
             }
 
-            ((ISimpleOption) (Object) MINECRAFT.options.getGamma()).setValue(newGamma);
+            ((ISimpleOption) (Object) MC.options.getGamma()).setValue(newGamma);
             CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Gamma set to: §7" + newGamma);
 
         } catch (NumberFormatException e) {

@@ -5,7 +5,6 @@
 
 package me.kiriyaga.nami.util.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.MatrixCache;
@@ -15,7 +14,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -37,9 +35,6 @@ import java.lang.Math;
 
 import static me.kiriyaga.nami.Nami.*;
 import java.awt.*;
-import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class RenderUtil {
 
@@ -153,12 +148,12 @@ public class RenderUtil {
 
     // 3d
     public static void drawBoxFilled(MatrixStack stack, Box box, Color c) {
-        float minX = (float) (box.minX - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getX());
-        float minY = (float) (box.minY - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getY());
-        float minZ = (float) (box.minZ - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getZ());
-        float maxX = (float) (box.maxX - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getX());
-        float maxY = (float) (box.maxY - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getY());
-        float maxZ = (float) (box.maxZ - MINECRAFT.getEntityRenderDispatcher().camera.getPos().getZ());
+        float minX = (float) (box.minX - MC.getEntityRenderDispatcher().camera.getPos().getX());
+        float minY = (float) (box.minY - MC.getEntityRenderDispatcher().camera.getPos().getY());
+        float minZ = (float) (box.minZ - MC.getEntityRenderDispatcher().camera.getPos().getZ());
+        float maxX = (float) (box.maxX - MC.getEntityRenderDispatcher().camera.getPos().getX());
+        float maxY = (float) (box.maxY - MC.getEntityRenderDispatcher().camera.getPos().getY());
+        float maxZ = (float) (box.maxZ - MC.getEntityRenderDispatcher().camera.getPos().getZ());
 
         BufferBuilder bufferBuilder = Tessellator.getInstance()
                 .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -243,7 +238,7 @@ public class RenderUtil {
 
 
     public static void drawBox(MatrixStack stack, Box box, Color c, double lineWidth) {
-        Camera camera = MINECRAFT.getEntityRenderDispatcher().camera;
+        Camera camera = MC.getEntityRenderDispatcher().camera;
 
         float minX = (float) (box.minX - camera.getPos().getX());
         float minY = (float) (box.minY - camera.getPos().getY());
@@ -283,7 +278,7 @@ public class RenderUtil {
 
     public static MatrixStack matrixFrom(Vec3d pos) {
         MatrixStack matrices = new MatrixStack();
-        Camera camera = MINECRAFT.gameRenderer.getCamera();
+        Camera camera = MC.gameRenderer.getCamera();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
         matrices.translate(pos.getX() - camera.getPos().x, pos.getY() - camera.getPos().y, pos.getZ() - camera.getPos().z);
@@ -300,12 +295,12 @@ public class RenderUtil {
     ) {
         if (withBackground) {
             int padding = 2;
-            int textWidth = MINECRAFT.textRenderer.getWidth(text);
-            int textHeight = MINECRAFT.textRenderer.fontHeight;
+            int textWidth = MC.textRenderer.getWidth(text);
+            int textHeight = MC.textRenderer.fontHeight;
             int bgColor = (180 << 24) | 0x000000;
             drawContext.fill(x - padding, y - padding, x + textWidth + padding, y + textHeight + padding, bgColor);
         }
-        drawContext.drawText(MINECRAFT.textRenderer, text, x, y, color, false);
+        drawContext.drawText(MC.textRenderer, text, x, y, color, false);
     }
 
 

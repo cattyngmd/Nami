@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.network.ClientPlayerEntity;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class YawModule extends Module {
 
@@ -20,9 +20,9 @@ public class YawModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null) return;
+        if (MC.player == null || MC.world == null) return;
 
-        ClientPlayerEntity player = MINECRAFT.player;
+        ClientPlayerEntity player = MC.player;
 
         float currentYaw = normalizeYaw(player.getYaw());
         int dirCount = directions.get();

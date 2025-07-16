@@ -55,7 +55,7 @@ public class ChatManager {
     }
 
     public void sendRaw(Text message, boolean prefix) {
-        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
         Text text = prefix ? prefix().copy().append(message) : message;
         getChatHud().addMessage(text);
     }
@@ -73,7 +73,7 @@ public class ChatManager {
     }
 
     public void sendPersistent(String key, Text message, boolean prefix) {
-        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
         ChatHud chatHud = getChatHud();
 
@@ -102,7 +102,7 @@ public class ChatManager {
     }
 
     public void sendTransient(Text message, boolean prefix) {
-        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
         ChatHud chatHud = getChatHud();
 
@@ -120,7 +120,7 @@ public class ChatManager {
     }
 
     public void removePersistent(String key) {
-        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
         if (persistentMessages.containsKey(key)) {
             removeSilently(persistentMessages.get(key));
@@ -129,7 +129,7 @@ public class ChatManager {
     }
 
     public void clear() {
-        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
         ChatHud chatHud = getChatHud();
         for (MessageSignatureData sig : persistentMessages.values()) {
@@ -145,13 +145,13 @@ public class ChatManager {
     }
 
     private ChatHud getChatHud() {
-        return MINECRAFT.inGameHud.getChatHud();
+        return MC.inGameHud.getChatHud();
     }
 
     private void removeSilently(MessageSignatureData signature) {
-        if (MINECRAFT == null || MINECRAFT.inGameHud == null || getChatHud() == null) return;
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
-        ChatHud hud = MINECRAFT.inGameHud.getChatHud();
+        ChatHud hud = MC.inGameHud.getChatHud();
         ChatHudAccessor accessor = (ChatHudAccessor) hud;
 
         accessor.getMessages().removeIf(line -> signature.equals(line.signature()));

@@ -8,9 +8,8 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.manager.RotationManager;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
-import net.minecraft.util.math.Vec3d;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
 public class SpinnerModule extends Module {
@@ -27,12 +26,12 @@ public class SpinnerModule extends Module {
 
     @Override
     public void onEnable() {
-        currentYaw = MINECRAFT.player != null ? MINECRAFT.player.getYaw() : 0.0f;
+        currentYaw = MC.player != null ? MC.player.getYaw() : 0.0f;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
-        if (MINECRAFT.player == null) return;
+        if (MC.player == null) return;
 
         currentYaw += rotationSpeed.get().floatValue();
         if (currentYaw > 360.0f) {

@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.command.impl;
 import me.kiriyaga.nami.feature.command.Command;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class YawCommand extends Command {
 
@@ -21,7 +21,7 @@ public class YawCommand extends Command {
         try {
             float yaw = Float.parseFloat(args[0]);
 
-            MINECRAFT.player.setYaw(yaw);
+            MC.player.setYaw(yaw);
             CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Yaw set to: §7" + yaw);
 
         } catch (NumberFormatException e) {

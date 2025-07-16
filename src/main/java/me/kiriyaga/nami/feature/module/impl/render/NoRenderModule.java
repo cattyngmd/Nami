@@ -4,7 +4,7 @@ import me.kiriyaga.nami.feature.module.Category;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class NoRenderModule extends Module {
 
@@ -38,8 +38,8 @@ public class NoRenderModule extends Module {
     }
 
     private void reloadRenderer() {
-        if (MINECRAFT.world != null) {
-            MINECRAFT.worldRenderer.reload();
+        if (MC.world != null) {
+            MC.worldRenderer.reload();
         }
     }
 
@@ -58,7 +58,7 @@ public class NoRenderModule extends Module {
     }
 
     public boolean isNoBackground() {
-        if (MINECRAFT.world == null)
+        if (MC.world == null)
             return false;
 
         return noBackground.get();

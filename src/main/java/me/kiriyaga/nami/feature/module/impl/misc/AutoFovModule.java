@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class AutoFovModule extends Module {
 
@@ -20,19 +20,19 @@ public class AutoFovModule extends Module {
 
     @Override
     public void onEnable() {
-        if (MINECRAFT != null && MINECRAFT.options != null && MINECRAFT.options.getFov() != null) {
-            ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(fov.get());
+        if (MC != null && MC.options != null && MC.options.getFov() != null) {
+            ((ISimpleOption) (Object) MC.options.getFov()).setValue(fov.get());
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     private void onTick(PostTickEvent ev) {
-        if (MINECRAFT == null || MINECRAFT.options == null || MINECRAFT.options.getFov() == null) return;
+        if (MC == null || MC.options == null || MC.options.getFov() == null) return;
 
-        int d = MINECRAFT.options.getFov().getValue();
+        int d = MC.options.getFov().getValue();
 
         if (d != fov.get()) {
-            ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(fov.get());
+            ((ISimpleOption) (Object) MC.options.getFov()).setValue(fov.get());
         }
     }
 }

@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class SearchModule extends Module {
 
@@ -81,10 +81,10 @@ public class SearchModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkDataEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC.world == null || MC.player == null) return;
 
         if (notAtSpawn.get()) {
-            BlockPos pos = MINECRAFT.player.getBlockPos();
+            BlockPos pos = MC.player.getBlockPos();
             if (Math.abs(pos.getX()) + Math.abs(pos.getZ()) < 5000) return;
         }
 
@@ -97,7 +97,7 @@ public class SearchModule extends Module {
 
     @SubscribeEvent
     public void onPosttick(PostTickEvent event) {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC.world == null || MC.player == null) return;
 
         if (!lazyLoadEnabled.get()) {
             Chunk chunk;
@@ -140,7 +140,7 @@ public class SearchModule extends Module {
             for (int y = minY; y < maxY; y++) {
                 for (int z = 0; z < 16; z++) {
                     BlockPos pos = new BlockPos(chunkStart.getX() + x, y, chunkStart.getZ() + z);
-                    BlockState state = MINECRAFT.world.getBlockState(pos);
+                    BlockState state = MC.world.getBlockState(pos);
                     Block block = state.getBlock();
 
                     Identifier id = Registries.BLOCK.getId(block);
@@ -171,7 +171,7 @@ public class SearchModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender(Render3DEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null) return;
+        if (MC.player == null || MC.world == null) return;
 
         synchronized (pendingMessages) {
             while (!pendingMessages.isEmpty()) {
@@ -180,18 +180,18 @@ public class SearchModule extends Module {
         }
 
         MatrixStack matrices = event.getMatrices();
-        BlockPos playerPos = MINECRAFT.player.getBlockPos();
+        BlockPos playerPos = MC.player.getBlockPos();
 
         for (Set<BlockPos> blockSet : chunkBlocks.values()) {
             for (BlockPos pos : blockSet) {
                 if (playerPos.getSquaredDistance(pos) > 300 * 300) continue;
 
-                BlockState state = MINECRAFT.world.getBlockState(pos);
+                BlockState state = MC.world.getBlockState(pos);
                 Color color = BlockUtil.getColorByBlockId(state);
 
                 RenderUtil.drawBlockShape(
                         matrices,
-                        MINECRAFT.world,
+                        MC.world,
                         pos,
                         state,
                         new Color(color.getRed(), color.getGreen(), color.getBlue(), 60),
@@ -204,18 +204,18 @@ public class SearchModule extends Module {
     }
 
     private void reloadChunksAroundPlayer() {
-        if (MINECRAFT.world == null || MINECRAFT.player == null) return;
+        if (MC.world == null || MC.player == null) return;
 
         synchronized (pendingChunks) {
             pendingChunks.clear();
 
-            int radius = MINECRAFT.options.getViewDistance().getValue();
-            BlockPos playerPos = MINECRAFT.player.getBlockPos();
+            int radius = MC.options.getViewDistance().getValue();
+            BlockPos playerPos = MC.player.getBlockPos();
             ChunkPos playerChunk = new ChunkPos(playerPos);
 
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
-                    Chunk chunk = MINECRAFT.world.getChunk(playerChunk.x + dx, playerChunk.z + dz);
+                    Chunk chunk = MC.world.getChunk(playerChunk.x + dx, playerChunk.z + dz);
                     pendingChunks.offer(chunk);
                 }
             }

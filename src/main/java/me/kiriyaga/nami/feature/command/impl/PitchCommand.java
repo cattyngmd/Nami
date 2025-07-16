@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.command.impl;
 import me.kiriyaga.nami.feature.command.Command;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class PitchCommand extends Command {
 
@@ -21,8 +21,8 @@ public class PitchCommand extends Command {
         try {
             float pitch = Float.parseFloat(args[0]);
 
-            if (MINECRAFT.player != null) {
-                MINECRAFT.player.setPitch(pitch);
+            if (MC.player != null) {
+                MC.player.setPitch(pitch);
                 CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Pitch set to: §7" + pitch);
             } else {
                 CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(), "Player is null.");

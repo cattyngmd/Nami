@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class EntityUtils {
 
@@ -63,14 +63,14 @@ public class EntityUtils {
 
 
     public static List<Entity> getAllEntities() {
-        ClientWorld world = MINECRAFT.world;
+        ClientWorld world = MC.world;
         return world != null
                 ? StreamSupport.stream(world.getEntities().spliterator(), false).collect(Collectors.toList())
                 : List.of();
     }
 
     public static List<PlayerEntity> getPlayers() {
-        ClientWorld world = MINECRAFT.world;
+        ClientWorld world = MC.world;
         if (world == null) return List.of();
 
         return StreamSupport.stream(world.getEntities().spliterator(), false)
@@ -80,7 +80,7 @@ public class EntityUtils {
     }
 
     public static List<PlayerEntity> getOtherPlayers() {
-        ClientPlayerEntity self = MINECRAFT.player;
+        ClientPlayerEntity self = MC.player;
         return getPlayers().stream()
                 .filter(p -> !p.isRemoved() && p != self)
                 .collect(Collectors.toList());
@@ -152,10 +152,10 @@ public class EntityUtils {
     }
 
     public static boolean isAggressiveNow(Entity e) {
-        ClientPlayerEntity player = MINECRAFT.player;
-        if (player == null || MINECRAFT.world == null) return false;
+        ClientPlayerEntity player = MC.player;
+        if (player == null || MC.world == null) return false;
 
-        long timeOfDay = MINECRAFT.world.getTimeOfDay() % 24000;
+        long timeOfDay = MC.world.getTimeOfDay() % 24000;
         boolean isNight = timeOfDay >= 13000 && timeOfDay <= 23000;
 
         if (e instanceof EndermanEntity enderman) return enderman.isAngry();

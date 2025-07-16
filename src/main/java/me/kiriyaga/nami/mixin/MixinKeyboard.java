@@ -29,14 +29,14 @@ public abstract class MixinKeyboard {
 
     @Inject(method = "onKey", at = @At("HEAD"))
     private void onKeyClickgui(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (MINECRAFT == null) return;
+        if (MC == null) return;
         if (action != GLFW.GLFW_PRESS) return;
 
         ClickGuiModule clickGui = MODULE_MANAGER.getModule(ClickGuiModule.class);
         KeyBindSetting bind = clickGui.getKeyBind();
 
         if (bind.get() == key) {
-            if (MINECRAFT.world == null) {
+            if (MC.world == null) {
                 clickGui.toggle();
             }
         }

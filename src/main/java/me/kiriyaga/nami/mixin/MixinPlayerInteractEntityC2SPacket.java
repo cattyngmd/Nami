@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 
 @Mixin(PlayerInteractEntityC2SPacket.class)
@@ -23,9 +23,9 @@ public abstract class MixinPlayerInteractEntityC2SPacket implements IPlayerInter
 
     @Override
     public Entity getEntity() {
-        if (MINECRAFT.world == null)
+        if (MC.world == null)
             return null;
 
-        return MINECRAFT.world.getEntityById(entityId);
+        return MC.world.getEntityById(entityId);
     }
 }

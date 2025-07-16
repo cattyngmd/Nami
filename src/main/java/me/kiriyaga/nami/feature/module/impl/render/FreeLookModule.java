@@ -6,7 +6,7 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import net.minecraft.client.option.Perspective;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class FreeLookModule extends Module {
     public float cameraYaw;
@@ -26,21 +26,21 @@ public class FreeLookModule extends Module {
     public void onEnable() {
         this.getKeyBind().setHoldMode(holdMode.get());
 
-        if (MINECRAFT.player == null) return;
+        if (MC.player == null) return;
 
-        cameraYaw = MINECRAFT.player.getYaw();
-        cameraPitch = MINECRAFT.player.getPitch();
+        cameraYaw = MC.player.getYaw();
+        cameraPitch = MC.player.getPitch();
 
-        previousPerspective = MINECRAFT.options.getPerspective();
+        previousPerspective = MC.options.getPerspective();
         if (previousPerspective != Perspective.THIRD_PERSON_BACK) {
-            MINECRAFT.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+            MC.options.setPerspective(Perspective.THIRD_PERSON_BACK);
         }
     }
 
     @Override
     public void onDisable() {
-        if (MINECRAFT.options.getPerspective() != previousPerspective) {
-            MINECRAFT.options.setPerspective(previousPerspective);
+        if (MC.options.getPerspective() != previousPerspective) {
+            MC.options.setPerspective(previousPerspective);
         }
     }
 }

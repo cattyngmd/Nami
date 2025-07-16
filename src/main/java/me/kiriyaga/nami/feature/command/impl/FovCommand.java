@@ -4,7 +4,7 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class FovCommand extends Command {
 
@@ -25,7 +25,7 @@ public class FovCommand extends Command {
                 CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "FOV must be between 0 and 162.");
                 return;
             }
-            ((ISimpleOption) (Object) MINECRAFT.options.getFov()).setValue(newFov);
+            ((ISimpleOption) (Object) MC.options.getFov()).setValue(newFov);
             CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "FOV set to: §7" + newFov);
 
         } catch (NumberFormatException e) {

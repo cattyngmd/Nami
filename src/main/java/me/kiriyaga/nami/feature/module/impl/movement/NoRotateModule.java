@@ -9,7 +9,7 @@ import me.kiriyaga.nami.mixin.PlayerPositionAccessor;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class NoRotateModule extends Module {
 
@@ -21,8 +21,8 @@ public class NoRotateModule extends Module {
     private void onPacketRecieve(PacketReceiveEvent ev){
         if (ev.getPacket() instanceof PlayerPositionLookS2CPacket packet) {
 
-            ((PlayerPositionAccessor) (Object) packet.change()).setYaw(MINECRAFT.player.getYaw());
-            ((PlayerPositionAccessor) (Object) packet.change()).setPitch(MINECRAFT.player.getPitch());
+            ((PlayerPositionAccessor) (Object) packet.change()).setYaw(MC.player.getYaw());
+            ((PlayerPositionAccessor) (Object) packet.change()).setPitch(MC.player.getPitch());
 
             packet.relatives().remove(PositionFlag.X_ROT);
             packet.relatives().remove(PositionFlag.Y_ROT);

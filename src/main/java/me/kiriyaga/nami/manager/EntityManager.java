@@ -43,17 +43,17 @@ public class EntityManager {
     }
 
     public Entity getTarget() {
-        if (MINECRAFT.player == null || MINECRAFT.world == null || entityManagerModule == null)
+        if (MC.player == null || MC.world == null || entityManagerModule == null)
             return null;
 
         markRequested();
 
         List<Entity> candidates = allEntities.stream()
-                .filter(e -> e != MINECRAFT.player)
+                .filter(e -> e != MC.player)
                 .filter(e -> e instanceof LivingEntity && e.isAlive())
                 .filter(e -> {
                     if (e.age < entityManagerModule.minTicksExisted.get().intValue()) return false;
-                    double distSq = e.squaredDistanceTo(MINECRAFT.player);
+                    double distSq = e.squaredDistanceTo(MC.player);
                     return distSq <= entityManagerModule.targetRange.get() * entityManagerModule.targetRange.get();
                 })
                 .filter(e ->
@@ -65,7 +65,7 @@ public class EntityManager {
 
         Comparator<Entity> comparator = switch (entityManagerModule.priority.get()) {
             case HEALTH -> Comparator.comparingDouble(e -> ((LivingEntity) e).getHealth());
-            case DISTANCE -> Comparator.comparingDouble(e -> e.squaredDistanceTo(MINECRAFT.player));
+            case DISTANCE -> Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player));
         };
 
         Optional<Entity> result = candidates.stream().min(comparator);
@@ -114,7 +114,7 @@ public class EntityManager {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onFrame(Render2DEvent event) {
-        if (MINECRAFT.world == null) {
+        if (MC.world == null) {
             clearData();
             idleTicksCounter = 0;
             return;

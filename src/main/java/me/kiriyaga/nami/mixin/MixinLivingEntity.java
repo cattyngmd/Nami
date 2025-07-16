@@ -141,7 +141,7 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
         ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getModule(ElytraFlyModule.class);
-        if (MINECRAFT.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled() && MINECRAFT.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA)
+        if (MC.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled() && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA)
             cir.setReturnValue(true);
     }
 

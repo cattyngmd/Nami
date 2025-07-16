@@ -39,7 +39,7 @@ public class TracersModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
-        if (MINECRAFT == null || MINECRAFT.player == null || MINECRAFT.world == null) return;
+        if (MC == null || MC.player == null || MC.world == null) return;
         if (MatrixCache.camera == null) return;
 
         Vec3d cameraPos = MatrixCache.camera.getPos();

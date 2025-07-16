@@ -5,7 +5,7 @@ import com.google.gson.JsonPrimitive;
 import me.kiriyaga.nami.setting.Setting;
 import org.lwjgl.glfw.GLFW;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class KeyBindSetting extends Setting<Integer> {
 
@@ -19,7 +19,7 @@ public class KeyBindSetting extends Setting<Integer> {
 
     public boolean isPressed() {
         if (value == KEY_NONE) return false;
-        return GLFW.glfwGetKey(MINECRAFT.getWindow().getHandle(), value) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetKey(MC.getWindow().getHandle(), value) == GLFW.GLFW_PRESS;
     }
 
     public String getKeyName() {

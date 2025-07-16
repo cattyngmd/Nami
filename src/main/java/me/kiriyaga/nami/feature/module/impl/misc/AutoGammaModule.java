@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 
 public class AutoGammaModule extends Module {
 
@@ -20,9 +20,9 @@ public class AutoGammaModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     private void onTick(PostTickEvent ev){
-        double d = MINECRAFT.options.getGamma().getValue();
+        double d = MC.options.getGamma().getValue();
 
         if (d != gamma.get())
-            ((ISimpleOption) (Object) MINECRAFT.options.getGamma()).setValue(gamma.get());
+            ((ISimpleOption) (Object) MC.options.getGamma()).setValue(gamma.get());
     }
 }

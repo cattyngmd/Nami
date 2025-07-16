@@ -56,7 +56,7 @@ public class NametagFormatter {
     public Text formatGameMode(PlayerEntity player) {
         GameMode gm = GameMode.SURVIVAL;
         try {
-            var entry = MINECRAFT.getNetworkHandler().getPlayerListEntry(player.getUuid());
+            var entry = MC.getNetworkHandler().getPlayerListEntry(player.getUuid());
             if (entry != null) gm = entry.getGameMode();
         } catch (Exception ignored) {}
 
@@ -75,7 +75,7 @@ public class NametagFormatter {
     public Text formatPing(PlayerEntity player) {
         int ping = 0;
         try {
-            var entry =MINECRAFT.getNetworkHandler().getPlayerListEntry(player.getUuid());
+            var entry = MC.getNetworkHandler().getPlayerListEntry(player.getUuid());
             if (entry != null) ping = entry.getLatency();
         } catch (Exception ignored) {}
 

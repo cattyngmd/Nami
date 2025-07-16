@@ -25,7 +25,7 @@ import net.minecraft.util.math.Direction;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.MINECRAFT;
+import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class AirPlaceModule extends Module {
@@ -52,35 +52,35 @@ public class AirPlaceModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.interactionManager == null) return;
+        if (MC.player == null || MC.interactionManager == null) return;
 
         if (cooldown > 0) {
             cooldown--;
             return;
         }
 
-        if (!(MINECRAFT.crosshairTarget instanceof BlockHitResult hit) || !MINECRAFT.world.isAir(hit.getBlockPos())) {
+        if (!(MC.crosshairTarget instanceof BlockHitResult hit) || !MC.world.isAir(hit.getBlockPos())) {
             renderPos = null;
             return;
         }
 
-        ItemStack mainStack = MINECRAFT.player.getMainHandStack();
+        ItemStack mainStack = MC.player.getMainHandStack();
         if (mainStack.isEmpty() || !(mainStack.getItem() instanceof BlockItem)){
             renderPos = null;
             return;
         }
-        if (!MINECRAFT.options.useKey.isPressed()){
+        if (!MC.options.useKey.isPressed()){
             return;
         }
 
-        HitResult ray = MINECRAFT.player.raycast(range.get(), 1.0f, fluids.get());
+        HitResult ray = MC.player.raycast(range.get(), 1.0f, fluids.get());
         if (!(ray instanceof BlockHitResult target)) {
             renderPos = null;
             return;
         }
 
         BlockPos targetPos = BlockPos.ofFloored(target.getPos());
-        if (!MINECRAFT.world.isAir(targetPos) || hasEntity(targetPos)) {
+        if (!MC.world.isAir(targetPos) || hasEntity(targetPos)) {
             renderPos = null;
             return;
         }
@@ -90,27 +90,27 @@ public class AirPlaceModule extends Module {
         cooldown = delay.get();
 
         if (grim.get()) {
-            MINECRAFT.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
+            MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
 
-            MINECRAFT.interactionManager.interactBlock(MINECRAFT.player, Hand.OFF_HAND, target);
-            MINECRAFT.player.swingHand(Hand.MAIN_HAND, false);
+            MC.interactionManager.interactBlock(MC.player, Hand.OFF_HAND, target);
+            MC.player.swingHand(Hand.MAIN_HAND, false);
 
-            MINECRAFT.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
-            MINECRAFT.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
+            MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
+            MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
         } else {
-            MINECRAFT.interactionManager.interactBlock(MINECRAFT.player, Hand.MAIN_HAND, target);
-            MINECRAFT.player.swingHand(Hand.MAIN_HAND);
+            MC.interactionManager.interactBlock(MC.player, Hand.MAIN_HAND, target);
+            MC.player.swingHand(Hand.MAIN_HAND);
         }
     }
 
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MINECRAFT.player == null || MINECRAFT.world == null || renderPos == null) return;
+        if (MC.player == null || MC.world == null || renderPos == null) return;
 
-        if (!MINECRAFT.world.isAir(renderPos)) return;
+        if (!MC.world.isAir(renderPos)) return;
         if (hasEntity(renderPos)) return;
 
         MatrixStack matrices = event.getMatrices();
@@ -125,7 +125,7 @@ public class AirPlaceModule extends Module {
     }
 
     private boolean hasEntity(BlockPos pos) {
-        for (Entity entity : MINECRAFT.world.getEntities()) {
+        for (Entity entity : MC.world.getEntities()) {
             if (entity.getBoundingBox().intersects(new Box(pos))) return true;
         }
         return false;

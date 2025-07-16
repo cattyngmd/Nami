@@ -26,7 +26,7 @@ public class Nami implements ClientModInitializer {
         }
     }
 
-    public static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
+    public static final MinecraftClient MC = MinecraftClient.getInstance();
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 

@@ -2,14 +2,9 @@ package me.kiriyaga.nami.manager;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.PacketSendEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -116,7 +111,7 @@ public class RotationManager {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTick(PreTickEvent event) {
-        if (MINECRAFT.player == null) return;
+        if (MC.player == null) return;
 
         //CHAT_MANAGER.sendRaw("active req: "+ activeRequest);
 
@@ -128,7 +123,7 @@ public class RotationManager {
         jitterAmount = rotationModule.jitterAmount.get().floatValue();
         jitterSpeed = rotationModule.jitterSpeed.get().floatValue();
 
-        updateRealRotation(MINECRAFT.player.getYaw(), MINECRAFT.player.getPitch());
+        updateRealRotation(MC.player.getYaw(), MC.player.getPitch());
 
         if (!requests.isEmpty()) {
             if (activeRequest == null || !requests.contains(activeRequest)) {
