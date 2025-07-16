@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
+import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.feature.module.impl.misc.AutoRespawnModule;
 import me.kiriyaga.nami.feature.module.impl.world.FastPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.NoHitDelayModule;
@@ -7,6 +8,8 @@ import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -16,6 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.kiriyaga.nami.feature.module.Module;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -106,5 +110,21 @@ public class MixinMinecraftClient {
     private void doAttack(CallbackInfoReturnable<Boolean> info) {
         if (MODULE_MANAGER.getModule(NoHitDelayModule.class).isEnabled())
             attackCooldown = 0;
+    }
+
+    @Redirect(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
+    private boolean handleBlockBreaking(ClientPlayerEntity instance) {
+        InteractionEvent ev = new InteractionEvent();
+        EVENT_MANAGER.post(ev);
+        boolean b = !ev.isCancelled() && instance.isUsingItem();
+        return b;
+    }
+
+    @Redirect(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet" + "/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
+    private boolean doItemUse(ClientPlayerInteractionManager instance) {
+        InteractionEvent ev = new InteractionEvent();
+        EVENT_MANAGER.post(ev);
+        boolean b = !ev.isCancelled() && instance.isBreakingBlock();
+        return b;
     }
 }

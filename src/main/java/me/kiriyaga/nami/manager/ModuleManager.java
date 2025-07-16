@@ -77,6 +77,7 @@ public class ModuleManager {
         registerModule(new AutoElytraModule());
         registerModule(new NoGlitchBlocksModule());
         registerModule(new AutoEatModule());
+        registerModule(new MultiTaskModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }
