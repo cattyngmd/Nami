@@ -16,7 +16,7 @@ def getGitHash() {
     return stdout.toString().trim()
 }
 
-version = "2.3.8 - ${getGitHash()}"
+version = "2.3.9 - ${getGitHash()}"
 
 
 java {

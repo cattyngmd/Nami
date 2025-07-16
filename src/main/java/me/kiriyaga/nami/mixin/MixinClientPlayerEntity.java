@@ -17,13 +17,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(ClientPlayerEntity.class)
-public class MixinClientPlayerEntity {
+public abstract class MixinClientPlayerEntity {
 
     @Shadow private float lastYawClient;
     @Shadow private float lastPitchClient;
 
     @Shadow
     protected MinecraftClient client;
+
+    @Shadow public abstract void move(MovementType type, Vec3d movement);
 
     private float originalYaw, originalPitch;
 
@@ -54,9 +56,18 @@ public class MixinClientPlayerEntity {
         EVENT_MANAGER.post(moveEvent);
 
         if (moveEvent.isCancelled()) {
-            ci.cancel(); // lol what
+            ci.cancel();
+            return;
+        }
+
+        Vec3d newMovement = moveEvent.getMovement();
+        if (!newMovement.equals(movement)) {
+            this.move(movementType, newMovement);
+            ci.cancel();
         }
     }
+
+
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
