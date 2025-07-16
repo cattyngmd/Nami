@@ -48,7 +48,10 @@ public class ESPModule extends Module {
         if (showPlayers.get()) {
             for (Entity player : ENTITY_MANAGER.getOtherPlayers()) {
                 if (player.isRemoved()) continue;
-                drawBox(player, colorModule.getStyledGlobalColor(), matrices, event.getTickDelta());
+                if (FRIEND_MANAGER.isFriend(player.getName().getString()))
+                    drawBox(player, colorModule.getStyledGlobalColor(), matrices, event.getTickDelta());
+                else
+                    drawBox(player, COLOR_HOSTILE, matrices, event.getTickDelta());
             }
         }
 

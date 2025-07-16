@@ -5,6 +5,7 @@
 
 package me.kiriyaga.nami.util.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.block.BlockState;
@@ -37,18 +38,18 @@ import java.awt.*;
 
 public class RenderUtil {
 
-    public static void rect(MatrixStack stack, float x1, float y1, float x2, float y2, int color) {
+    public static void rect(DrawContext stack, float x1, float y1, float x2, float y2, int color) {
         rectFilled(stack, x1, y1, x2, y2, color);
     }
 
-    public static void rect(MatrixStack stack, float x1, float y1, float x2, float y2, int color, float width) {
+    public static void rect(DrawContext stack, float x1, float y1, float x2, float y2, int color, float width) {
         drawHorizontalLine(stack, x1, x2, y1, color, width);
         drawVerticalLine(stack, x2, y1, y2, color, width);
         drawHorizontalLine(stack, x1, x2, y2, color, width);
         drawVerticalLine(stack, x1, y1, y2, color, width);
     }
 
-    protected static void drawHorizontalLine(MatrixStack matrices, float x1, float x2, float y, int color) {
+    protected static void drawHorizontalLine(DrawContext matrices, float x1, float x2, float y, int color) {
         if (x2 < x1) {
             float i = x1;
             x1 = x2;
@@ -58,7 +59,7 @@ public class RenderUtil {
         rectFilled(matrices, x1, y, x2 + 1, y + 1, color);
     }
 
-    protected static void drawVerticalLine(MatrixStack matrices, float x, float y1, float y2, int color) {
+    protected static void drawVerticalLine(DrawContext matrices, float x, float y1, float y2, int color) {
         if (y2 < y1) {
             float i = y1;
             y1 = y2;
@@ -68,7 +69,7 @@ public class RenderUtil {
         rectFilled(matrices, x, y1 + 1, x + 1, y2, color);
     }
 
-    protected static void drawHorizontalLine(MatrixStack matrices, float x1, float x2, float y, int color, float width) {
+    protected static void drawHorizontalLine(DrawContext matrices, float x1, float x2, float y, int color, float width) {
         if (x2 < x1) {
             float i = x1;
             x1 = x2;
@@ -78,7 +79,7 @@ public class RenderUtil {
         rectFilled(matrices, x1, y, x2 + width, y + width, color);
     }
 
-    protected static void drawVerticalLine(MatrixStack matrices, float x, float y1, float y2, int color, float width) {
+    protected static void drawVerticalLine(DrawContext matrices, float x, float y1, float y2, int color, float width) {
         if (y2 < y1) {
             float i = y1;
             y1 = y2;
@@ -88,7 +89,16 @@ public class RenderUtil {
         rectFilled(matrices, x, y1 + width, x + width, y2, color);
     }
 
-    public static void rectFilled(MatrixStack matrix, float x1, float y1, float x2, float y2, int color) {
+    public static void rectFilled(DrawContext drawContext, float x1, float y1, float x2, float y2, int color) {
+        int ix1 = (int) Math.min(x1, x2);
+        int iy1 = (int) Math.min(y1, y2);
+        int ix2 = (int) Math.max(x1, x2);
+        int iy2 = (int) Math.max(y1, y2);
+
+        drawContext.fill(ix1, iy1, ix2, iy2, color);
+    }
+
+    public static void rect3d(MatrixStack matrix, float x1, float y1, float x2, float y2, int color) {
         float i;
         if (x1 < x2) {
             i = x1;
@@ -116,6 +126,7 @@ public class RenderUtil {
 
         Layers.getGlobalQuads().draw(bufferBuilder.end());
     }
+
 
     // 3d
     public static void drawBoxFilled(MatrixStack stack, Box box, Color c) {
@@ -326,13 +337,13 @@ public class RenderUtil {
             int backgroundColor = 0x90000000;
             int borderColor = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor().getRGB();
 
-            RenderUtil.rectFilled(matrices, left, top, right, bottom, backgroundColor);
+            RenderUtil.rect3d(matrices, left, top, right, bottom, backgroundColor);
 
             if (border){
-                RenderUtil.rectFilled(matrices, left - borderWidth, top, left, bottom, borderColor);
-                RenderUtil.rectFilled(matrices, right, top, right + borderWidth, bottom, borderColor);
-                RenderUtil.rectFilled(matrices, left - borderWidth, top - borderWidth, right + borderWidth, top, borderColor);
-                RenderUtil.rectFilled(matrices, left - borderWidth, bottom, right + borderWidth, bottom + borderWidth, borderColor);
+                RenderUtil.rect3d(matrices, left - borderWidth, top, left, bottom, borderColor);
+                RenderUtil.rect3d(matrices, right, top, right + borderWidth, bottom, borderColor);
+                RenderUtil.rect3d(matrices, left - borderWidth, top - borderWidth, right + borderWidth, top, borderColor);
+                RenderUtil.rect3d(matrices, left - borderWidth, bottom, right + borderWidth, bottom + borderWidth, borderColor);
             }
         }
 
