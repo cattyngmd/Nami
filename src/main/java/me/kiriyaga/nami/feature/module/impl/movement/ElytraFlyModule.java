@@ -25,8 +25,9 @@ public class ElytraFlyModule extends Module {
     }
 
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.bounce));
+    private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
     private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
-    private final DoubleSetting targetSpeed = addSetting(new DoubleSetting("target speed", 100.00, 40.00, 115.00));
+    private final DoubleSetting targetSpeed = addSetting(new DoubleSetting("boost speed", 100.00, 40.00, 135.00));
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
@@ -59,7 +60,8 @@ public class ElytraFlyModule extends Module {
             setJumpHeld(true);
 
             //75 magic value = its just the best value
-            ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(this.getName(), rotationPriority.get(), MINECRAFT.player.getYaw(), 75.00f));
+            if (pitch.get())
+                ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(this.getName(), rotationPriority.get(), MINECRAFT.player.getYaw(), 75.00f));
 
             MINECRAFT.player.networkHandler.sendPacket(
                     new ClientCommandC2SPacket(MINECRAFT.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
