@@ -48,6 +48,7 @@
     "MixinSodiumWorldRenderer",
     "MixinTextVisitFactory",
     "PlayerInteractEntityC2SPacketAccessor",
-    "PlayerPositionAccessor"
+    "PlayerPositionAccessor",
+    "ScreenHandlerAccessor"
   ]
 }
