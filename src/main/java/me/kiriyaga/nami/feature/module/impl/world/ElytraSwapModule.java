@@ -40,7 +40,7 @@ public class ElytraSwapModule extends Module {
     public void onPostTick(PostTickEvent event) {
         if (MINECRAFT.world == null || MINECRAFT.player == null) return;
 
-        if (fastSwap.get()) {
+        if (fastSwap.get() && (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen)) {
             attemptFastSwap();
         } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
             attemptSwap();

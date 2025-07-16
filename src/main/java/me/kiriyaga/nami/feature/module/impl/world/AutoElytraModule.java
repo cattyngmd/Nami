@@ -84,7 +84,7 @@ public class AutoElytraModule extends Module {
                 int chestSlot = findChestplateSlot(bestChestplate);
                 if (chestSlot != -1) {
                     int syncId = player.currentScreenHandler.syncId;
-                    if (fastSwap.get()) {
+                    if (fastSwap.get() && (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen)) {
                         fastSwapItem(chestSlot, syncId, bestChestplate);
                     } else if (MINECRAFT.currentScreen == null || MINECRAFT.currentScreen instanceof InventoryScreen) {
                         swapWithArmor(chestSlot, syncId);
