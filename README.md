@@ -51,5 +51,5 @@ build/libs/nami-<version>.jar
 This project is licensed under the MIT License. You are free to contribute, distribute, fork or skid anything you will.
 
 ## Additional thanks
-[cattyngmd](https://github.com/cattyngmd) for helping with rotations.
+[cattyngmd](https://github.com/cattyngmd) for helping with rotations and y motion boost method.
 
