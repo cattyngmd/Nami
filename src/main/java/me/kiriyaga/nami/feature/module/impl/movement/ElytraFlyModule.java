@@ -89,7 +89,7 @@ public class ElytraFlyModule extends Module {
         HUDModule hud = MODULE_MANAGER.getModule(HUDModule.class);
         double currentBps = hud.speed;
 
-        if (player.isSprinting() && currentBps < targetSpeed.get() && currentBps > 60.0 && newBoost.get()) {
+        if (player.isSprinting() && currentBps < targetSpeed.get() && currentBps > 39.00 && newBoost.get()) {
 
             Vec3d velocity = player.getVelocity();
             event.setMovement(new Vec3d(velocity.x, 0, velocity.z));
