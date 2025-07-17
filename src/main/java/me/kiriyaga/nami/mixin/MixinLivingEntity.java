@@ -13,6 +13,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -165,5 +166,35 @@ public abstract class MixinLivingEntity extends Entity {
         this.velocityDirty = true;
 
         ci.cancel();
+    }
+
+    @Inject(method = "setSprinting", at = @At("HEAD"), cancellable = true)
+    private void setSprinting(boolean sprinting, CallbackInfo ci) {
+        if ((Object)this != MinecraftClient.getInstance().player) return;
+
+        if (!ROTATION_MANAGER.isRotating() ||
+                !MODULE_MANAGER.getModule(RotationManagerModule.class).sprintFix.get())
+            return;
+
+        if (sprinting && MC.player.input != null) {
+            Vec2f movement = MC.player.input.getMovementInput();
+            float forward = movement.x;
+            float sideways = movement.y;
+
+            if (forward == 0 && sideways == 0) {
+                ci.cancel();
+                super.setSprinting(false);
+                return;
+            }
+
+            double moveAngleRad = Math.atan2(sideways, forward);
+            float moveAngleDeg = (float) Math.toDegrees(moveAngleRad);
+            moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
+
+            if (Math.abs(moveAngleDeg) > 45f) {
+                ci.cancel();
+                super.setSprinting(false);
+            }
+        }
     }
 }
