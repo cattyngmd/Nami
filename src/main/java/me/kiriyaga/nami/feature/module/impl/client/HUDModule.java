@@ -7,7 +7,9 @@ import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Category;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.MinecraftClient;
@@ -29,6 +31,10 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class HUDModule extends Module {
 
+    public enum SpeedMode {
+        kmh, bps
+    }
+
     public final IntSetting updateInterval = addSetting(new IntSetting("interval", 1, 1, 20));
 
     public final BoolSetting chatAnimation = addSetting(new BoolSetting("chat animation", true));
@@ -36,6 +42,7 @@ public class HUDModule extends Module {
     public final BoolSetting armorEnabled = addSetting(new BoolSetting("armor", true));
     public final BoolSetting armorDurability = addSetting(new BoolSetting("armor durability", true));
     public final BoolSetting speedEnabled = addSetting(new BoolSetting("speed", true));
+    public final EnumSetting<SpeedMode> mode = addSetting(new EnumSetting<>("mode", SpeedMode.kmh));
     public final BoolSetting totemsEnabled = addSetting(new BoolSetting("totems", true));
     public final BoolSetting coordsEnabled = addSetting(new BoolSetting("coordinates", true));
     public final BoolSetting facingEnabled = addSetting(new BoolSetting("facing", true));
@@ -200,9 +207,20 @@ public class HUDModule extends Module {
             double averageSpeed = count > 0 ? sum / count : 0;
             speed = averageSpeed;
 
-            String speedStr = formatSpeedNumber(averageSpeed) + "bp/s";
-            speedText = Text.literal("Speed: ").setStyle(Style.EMPTY.withColor(pulsingPrimary))
+            String speedStr;
+            if (mode.get() == SpeedMode.bps) {
+                speedStr = formatSpeedNumber(averageSpeed) + " bp/s";
+            } else if (mode.get() == SpeedMode.kmh) {
+                double kmh = averageSpeed * 3.6;
+                speedStr = formatSpeedNumber(kmh) + " km/h";
+            } else {
+                speedStr = formatSpeedNumber(averageSpeed);
+            }
+
+            speedText = Text.literal("Speed: ")
+                    .setStyle(Style.EMPTY.withColor(pulsingPrimary))
                     .append(Text.literal(speedStr).setStyle(Style.EMPTY.withColor(pulsingWhite)));
+
 
             lastX = mc.player.getX();
             lastY = mc.player.getY();
