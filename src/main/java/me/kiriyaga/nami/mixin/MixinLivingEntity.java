@@ -172,8 +172,7 @@ public abstract class MixinLivingEntity extends Entity {
     private void setSprinting(boolean sprinting, CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
 
-        if (!ROTATION_MANAGER.isRotating() ||
-                !MODULE_MANAGER.getModule(RotationManagerModule.class).sprintFix.get())
+        if (!ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).sprintFix.get())
             return;
 
         if (sprinting && MC.player.input != null) {
@@ -181,19 +180,37 @@ public abstract class MixinLivingEntity extends Entity {
             float forward = movement.x;
             float sideways = movement.y;
 
+            //CHAT_MANAGER.sendRaw("forward " + forward + ", sideways " + sideways);
+
             if (forward == 0 && sideways == 0) {
                 ci.cancel();
                 super.setSprinting(false);
+                //CHAT_MANAGER.sendRaw("сancelled sprint no movement");
                 return;
             }
 
-            double moveAngleRad = Math.atan2(sideways, forward);
+            float spoofYaw = ROTATION_MANAGER.getRotationYaw();
+            float realYaw = MC.player.getYaw();
+
+            Vec3d localMovement = new Vec3d(sideways, 0, forward);
+            Vec3d globalMovement = localToGlobal(localMovement, realYaw);
+
+            //CHAT_MANAGER.sendRaw("global movement: X" + globalMovement.x + " Z" + globalMovement.z);
+
+            Vec3d localRelativeToSpoof = globalToLocal(globalMovement, spoofYaw);
+
+            //CHAT_MANAGER.sendRaw("local relative: X" + localRelativeToSpoof.x + " Z" + localRelativeToSpoof.z);
+
+            double moveAngleRad = Math.atan2(localRelativeToSpoof.z, localRelativeToSpoof.x);
             float moveAngleDeg = (float) Math.toDegrees(moveAngleRad);
             moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
+
+            //CHAT_MANAGER.sendRaw("move angle deg relative to spoof " + moveAngleDeg);
 
             if (Math.abs(moveAngleDeg) > 45f) {
                 ci.cancel();
                 super.setSprinting(false);
+               // CHAT_MANAGER.sendRaw("cancelled sprint because angle more then 45");
             }
         }
     }
