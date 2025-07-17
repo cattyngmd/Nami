@@ -102,6 +102,7 @@ public class EntityUtils {
                 e instanceof HuskEntity ||
                 e instanceof DrownedEntity ||
                 e instanceof VindicatorEntity ||
+                e instanceof BoggedEntity ||
                 e instanceof EvokerEntity ||
                 e instanceof PillagerEntity ||
                 e instanceof RavagerEntity ||
@@ -113,6 +114,7 @@ public class EntityUtils {
                 e instanceof ElderGuardianEntity ||
                 e instanceof GhastEntity ||
                 e instanceof HoglinEntity ||
+                e instanceof ZombieVillagerEntity ||
                 e instanceof MagmaCubeEntity ||
                 e instanceof SilverfishEntity ||
                 e instanceof SlimeEntity ||
