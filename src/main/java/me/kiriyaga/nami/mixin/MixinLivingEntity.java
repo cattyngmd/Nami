@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoJumpDelayModule;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -206,6 +207,7 @@ public abstract class MixinLivingEntity extends Entity {
             moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
 
             //CHAT_MANAGER.sendRaw("move angle deg relative to spoof " + moveAngleDeg);
+
 
             if (Math.abs(moveAngleDeg) > 45f) {
                 ci.cancel();

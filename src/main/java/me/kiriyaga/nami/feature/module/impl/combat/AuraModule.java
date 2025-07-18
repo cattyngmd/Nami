@@ -18,6 +18,8 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.math.*;
+import net.minecraft.util.hit.EntityHitResult;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
@@ -31,7 +33,7 @@ public class AuraModule extends Module {
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
     public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", false));
     public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
-    public final BoolSetting grim = addSetting(new BoolSetting("grim", true));
+    public final BoolSetting raycast = addSetting(new BoolSetting("raycast", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 10));
     public final DoubleSetting preRotate = addSetting(new DoubleSetting("pre rotate", 0.1, 0.0, 1.0));
 
@@ -44,9 +46,8 @@ public class AuraModule extends Module {
     @Override
     public void onDisable() {
         currentTarget = null;
-        ROTATION_MANAGER.cancelRequest(AuraModule.class.getName());
+        //ROTATION_MANAGER.cancelRequest(AuraModule.class.getName()); //no
     }
-
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onTick(PreTickEvent event) {
@@ -59,23 +60,7 @@ public class AuraModule extends Module {
         }
 
         Entity target = ENTITY_MANAGER.getTarget();
-
         if (target == null) {
-            currentTarget = null;
-            return;
-        }
-
-        double eyeDistance;
-        if (grim.get()) {
-            eyeDistance = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
-        } else {
-            eyeDistance = MC.player.getPos().distanceTo(getEntityCenter(target));
-        }
-
-        boolean inRotateRange = eyeDistance <= rotateRange.get();
-        boolean inAttackRange = eyeDistance <= attackRange.get();
-
-        if (!inRotateRange) {
             currentTarget = null;
             return;
         }
@@ -90,20 +75,39 @@ public class AuraModule extends Module {
         }
 
         float ticksUntilReady = (1.0f - cooldown) * tps;
-        if (ticksUntilReady <= preRotate.get() * tps) {
-            Vec3d targetCenter = getEntityCenter(target);
+
+        double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
+
+        if (eyeDist <= rotateRange.get() && ticksUntilReady <= preRotate.get() * tps) {
+            Vec3d rotationTarget;
+            if (raycast.get()) {
+                Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+                rotationTarget = getClosestPointToEye(eyePos, target.getBoundingBox());
+            } else {
+                rotationTarget = getEntityCenter(target);
+            }
 
             ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
                     AuraModule.class.getName(),
                     rotationPriority.get(),
-                    (float) getYawToVec(MC.player, targetCenter),
-                    (float) getPitchToVec(MC.player, targetCenter)
+                    (float) getYawToVec(MC.player, rotationTarget),
+                    (float) getPitchToVec(MC.player, rotationTarget)
             ));
         }
 
-        if (!inAttackRange) return;
+        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName()) && !raycast.get()) return;
+
+        boolean canAttack;
+        if (raycast.get()) {
+            EntityHitResult attackHit = raycastTarget(MC.player, target, attackRange.get());
+            canAttack = attackHit != null && attackHit.getEntity() == target;
+        } else {
+            double dist = MC.player.getPos().distanceTo(getEntityCenter(target));
+            canAttack = dist <= attackRange.get();
+        }
+
+        if (!canAttack) return;
         if (cooldown < (tpsSync.get() ? 1.0f * (20f / tps) : 1.0f)) return;
-        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName())) return;
 
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
@@ -113,14 +117,9 @@ public class AuraModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (!render.get() || currentTarget == null) return;
 
-        double eyeDistance;
-        if (grim.get()) {
-            eyeDistance = getClosestEyeDistance(MC.player.getEyePos(), currentTarget.getBoundingBox());
-        } else {
-            eyeDistance = MC.player.getPos().distanceTo(getEntityCenter(currentTarget));
-        }
+        double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), currentTarget.getBoundingBox());
 
-        if (eyeDistance > rotateRange.get()) return;
+        if (eyeDist > rotateRange.get()) return;
 
         ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
         drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
@@ -174,4 +173,35 @@ public class AuraModule extends Module {
         double z = MathHelper.clamp(eyePos.z, box.minZ, box.maxZ);
         return new Vec3d(x, y, z);
     }
+
+    private static EntityHitResult raycastTarget(Entity player, Entity target, double reach) {
+        float yaw = ROTATION_MANAGER.getRotationYaw();
+        float pitch = ROTATION_MANAGER.getRotationPitch();
+
+        Vec3d eyePos = player.getCameraPosVec(1.0f);
+
+        Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
+
+        Vec3d reachEnd = eyePos.add(look.multiply(reach));
+
+        Box targetBox = target.getBoundingBox();
+
+        if (targetBox.raycast(eyePos, reachEnd).isPresent()) {
+            return new EntityHitResult(target);
+        }
+
+        return null;
+    }
+
+    private static Vec3d getLookVectorFromYawPitch(float yaw, float pitch) {
+        float fYaw = (float) Math.toRadians(yaw);
+        float fPitch = (float) Math.toRadians(pitch);
+
+        double x = -Math.cos(fPitch) * Math.sin(fYaw);
+        double y = -Math.sin(fPitch);
+        double z = Math.cos(fPitch) * Math.cos(fYaw);
+
+        return new Vec3d(x, y, z).normalize();
+    }
+
 }
