@@ -31,7 +31,7 @@ import static me.kiriyaga.nami.Nami.*;
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {
 
-    private float originalYaw, originalBodyYaw, originalHeadYaw;
+    private float originalYaw;
     @Shadow
     private int jumpingCooldown;
     private float originalPitch;
@@ -49,8 +49,6 @@ public abstract class MixinLivingEntity extends Entity {
 
         originalYaw = this.getYaw();
         originalPitch = this.getPitch();
-        originalBodyYaw = ((LivingEntityAccessor) this).getBodyYaw();
-        originalHeadYaw = ((LivingEntityAccessor) this).getHeadYaw();
 
         float spoofYaw = ROTATION_MANAGER.getRotationYaw();
         float spoofPitch = ROTATION_MANAGER.getRotationPitch();
@@ -68,8 +66,6 @@ public abstract class MixinLivingEntity extends Entity {
 
         this.setYaw(originalYaw);
         this.setPitch(originalPitch);
-        ((LivingEntityAccessor) this).setBodyYaw(originalBodyYaw);
-        ((LivingEntityAccessor) this).setHeadYaw(originalHeadYaw);
     }
 
     @ModifyVariable(method = "travel", at = @At("HEAD"), ordinal = 0)
@@ -148,7 +144,7 @@ public abstract class MixinLivingEntity extends Entity {
     }
 
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
-    private void onJumpInject(CallbackInfo ci) {
+    private void onJump(CallbackInfo ci) {
         HighJumpModule mod = MODULE_MANAGER.getModule(HighJumpModule.class);
 
         if (!mod.isEnabled())
