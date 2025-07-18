@@ -14,7 +14,7 @@ public class MixinTextVisitFactory implements IMinecraft {
 
     @ModifyVariable(method = "visitFormatted(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/text/Style;Lnet/minecraft/text/CharacterVisitor;)Z", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private static String replaceText(String value) {
-        if (MODULE_MANAGER.getModule(NameProtectModule.class).isEnabled()) return value.replaceAll(mc.getSession().getUsername(), "Protected"); // TODO unhardcode that. the day im gonna write runtime lists
+        if (MODULE_MANAGER.getModule(NameProtectModule.class).isEnabled()) return value.replaceAll(mc.getSession().getUsername(), "NamiClient"); // TODO unhardcode that. the day im gonna write runtime lists
         return value;
     }
 }
