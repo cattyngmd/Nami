@@ -69,9 +69,6 @@ public class AirPlaceModule extends Module {
             renderPos = null;
             return;
         }
-        if (!MC.options.useKey.isPressed()){
-            return;
-        }
 
         HitResult ray = MC.player.raycast(range.get(), 1.0f, fluids.get());
         if (!(ray instanceof BlockHitResult target)) {
@@ -87,6 +84,9 @@ public class AirPlaceModule extends Module {
 
         renderPos = targetPos;
 
+        if (!MC.options.useKey.isPressed()){
+            return;
+        }
         cooldown = delay.get();
 
         if (grim.get()) {
