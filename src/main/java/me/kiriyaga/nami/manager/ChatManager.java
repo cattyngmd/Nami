@@ -148,7 +148,7 @@ public class ChatManager {
         return MC.inGameHud.getChatHud();
     }
 
-    private void removeSilently(MessageSignatureData signature) {
+    public void removeSilently(MessageSignatureData signature) {
         if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
         ChatHud hud = MC.inGameHud.getChatHud();

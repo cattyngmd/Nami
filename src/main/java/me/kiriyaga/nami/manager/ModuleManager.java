@@ -81,6 +81,7 @@ public class ModuleManager {
         registerModule(new MultiTaskModule());
         registerModule(new NoGlitchItemsModule());
         registerModule(new AirPlaceModule());
+        registerModule(new AntiSpamModule());
 
         LOGGER.info("Registered " + modules.size() + " modules");
     }

@@ -36,8 +36,6 @@ public abstract class MixinLivingEntity extends Entity {
     private int jumpingCooldown;
     private float originalPitch;
 
-    @Shadow public abstract Brain<?> getBrain();
-
     public MixinLivingEntity(EntityType<?> type, World world) {
         super(type, world);
     }
