@@ -1,5 +1,6 @@
 package me.kiriyaga.nami;
 
+import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.feature.gui.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;

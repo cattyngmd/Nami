@@ -49,7 +49,7 @@ public class ConfigManager {
             if (root.has("prefix")) {
                 String prefix = root.get("prefix").getAsString().trim();
                 if (!prefix.isEmpty()) {
-                    COMMAND_MANAGER.setPrefix(prefix);
+                    COMMAND_MANAGER.getExecutor().setPrefix(prefix);
                 }
             }
 
@@ -91,7 +91,7 @@ public class ConfigManager {
         try {
             JsonObject root = new JsonObject();
             root.addProperty("name", DISPLAY_NAME);
-            root.addProperty("prefix", String.valueOf(COMMAND_MANAGER.getPrefix()));
+            root.addProperty("prefix", String.valueOf(COMMAND_MANAGER.getExecutor().getPrefix()));
 
             JsonObject modulesJson = new JsonObject();
 

@@ -32,7 +32,7 @@ public class ChangePrefixCommand extends Command {
             return;
         }
 
-        COMMAND_MANAGER.setPrefix(input);
+        COMMAND_MANAGER.getExecutor().setPrefix(input);
         CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Prefix changed to: §7" + input);
     }
 }
