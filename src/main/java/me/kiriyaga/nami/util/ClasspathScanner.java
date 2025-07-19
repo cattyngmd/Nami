@@ -50,7 +50,10 @@ public class ClasspathScanner {
                 result.addAll(scanDirectory(file, fullPkg + file.getName(), base, annotation));
             } else if (file.getName().endsWith(".class")) {
                 String className = fullPkg + file.getName().replace(".class", "");
-                Class<?> cls = Class.forName(className);
+
+                if (shouldSkipClass(className)) continue;
+
+                Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
 
                 if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
                     result.add((Class<? extends T>) cls);
@@ -69,16 +72,25 @@ public class ClasspathScanner {
             JarEntry entry = entries.nextElement();
             String name = entry.getName();
 
-            if (name.endsWith(".class")) {
-                String className = name.replace('/', '.').replace(".class", "");
-                Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+            if (!name.endsWith(".class")) continue;
+            if (name.startsWith("META-INF/")) continue;
+            if (name.endsWith("module-info.class") || name.endsWith("package-info.class")) continue;
 
-                if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
-                    result.add((Class<? extends T>) cls);
-                }
+            String className = name.replace('/', '.').replace(".class", "");
+
+            if (shouldSkipClass(className)) continue;
+
+            Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+
+            if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
+                result.add((Class<? extends T>) cls);
             }
         }
 
         return result;
+    }
+
+    private static boolean shouldSkipClass(String className) {
+        return className.contains("META-INF") || className.contains("$");
     }
 }
