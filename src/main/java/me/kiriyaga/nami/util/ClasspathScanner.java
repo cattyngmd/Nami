@@ -51,6 +51,10 @@ public class ClasspathScanner {
             } else if (file.getName().endsWith(".class")) {
                 String className = fullPkg + file.getName().replace(".class", "");
 
+                if (file.getName().equals("module-info.class")) {
+                    continue;
+                }
+
                 if (className.startsWith("me.kiriyaga.nami.mixin.")) {
                     continue;
                 }
@@ -75,9 +79,21 @@ public class ClasspathScanner {
             String name = entry.getName();
 
             if (name.endsWith(".class")) {
+                if (name.equals("module-info.class")) {
+                    continue;
+                }
+
+                if (name.startsWith("META-INF/versions/")) {
+                    continue;
+                }
+
+                if (name.startsWith("me/kiriyaga/nami/mixin/")) {
+                    continue;
+                }
+
                 String className = name.replace('/', '.').replace(".class", "");
 
-                if (className.startsWith("me.kiriyaga.nami.mixin.")) {
+                if (!className.startsWith("me.kiriyaga.nami.")) {
                     continue;
                 }
 

@@ -3,7 +3,11 @@ package me.kiriyaga.nami.feature.module;
 import java.util.*;
 
 public class ModuleCategory {
-    private static final Map<String, ModuleCategory> CATEGORIES = new HashMap<>();
+    private static final Map<String, ModuleCategory> CATEGORIES = new LinkedHashMap<>();
+
+    private static final List<String> FIXED_ORDER = List.of(
+            "combat", "movement", "misc", "visuals", "world", "client"
+    );
 
     private final String name;
 
@@ -15,8 +19,26 @@ public class ModuleCategory {
         return CATEGORIES.computeIfAbsent(name.toLowerCase(), ModuleCategory::new);
     }
 
-    public static Collection<ModuleCategory> getAll() {
-        return CATEGORIES.values();
+    public static List<ModuleCategory> getAll() {
+        List<ModuleCategory> sorted = new ArrayList<>();
+
+        Set<String> added = new HashSet<>();
+
+        for (String key : FIXED_ORDER) {
+            ModuleCategory cat = CATEGORIES.get(key);
+            if (cat != null) {
+                sorted.add(cat);
+                added.add(cat.name);
+            }
+        }
+
+        for (ModuleCategory cat : CATEGORIES.values()) {
+            if (!added.contains(cat.name)) {
+                sorted.add(cat);
+            }
+        }
+
+        return sorted;
     }
 
     public String getName() {
