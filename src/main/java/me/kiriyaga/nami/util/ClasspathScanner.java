@@ -64,7 +64,7 @@ public class ClasspathScanner {
         return result;
     }
 
-    private static <T> Set<Class<? extends T>> scanJar(JarFile jar, Class<T> base, Class<?> annotation) throws ClassNotFoundException {
+    private static <T> Set<Class<? extends T>> scanJar(JarFile jar, Class<T> base, Class<?> annotation) {
         Set<Class<? extends T>> result = new HashSet<>();
         Enumeration<JarEntry> entries = jar.entries();
 
@@ -80,10 +80,12 @@ public class ClasspathScanner {
 
             if (shouldSkipClass(className)) continue;
 
-            Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
-
-            if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
-                result.add((Class<? extends T>) cls);
+            try {
+                Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+                if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
+                    result.add((Class<? extends T>) cls);
+                }
+            } catch (NoClassDefFoundError | ClassNotFoundException | ExceptionInInitializerError e) {
             }
         }
 
