@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager;
+package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.event.SubscribeEvent;

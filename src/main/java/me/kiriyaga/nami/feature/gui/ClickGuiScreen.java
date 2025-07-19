@@ -24,7 +24,7 @@ public class ClickGuiScreen extends Screen {
     public static final int GUI_ALPHA = 122;
 
     private ClickGuiModule getClickGuiModule() {
-        return MODULE_MANAGER.getModule(ClickGuiModule.class);
+        return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
     public ClickGuiScreen() {
@@ -70,7 +70,7 @@ public class ClickGuiScreen extends Screen {
                 Integer x = categoryPositions.get(moduleCategory);
                 if (x == null) continue;
 
-                List<Module> modules = MODULE_MANAGER.getModulesByCategory(moduleCategory);
+                List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
                 int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING;
 
                 for (Module module : modules) {
@@ -135,7 +135,7 @@ public class ClickGuiScreen extends Screen {
                     Integer x = categoryPositions.get(moduleCategory);
                     if (x == null) continue;
 
-                    List<Module> modules = MODULE_MANAGER.getModulesByCategory(moduleCategory);
+                    List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
                     int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING;
 
                     for (Module module : modules) {

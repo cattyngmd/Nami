@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
 import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterCommand
 public class DisconnectCommand extends Command {
 
     public DisconnectCommand() {

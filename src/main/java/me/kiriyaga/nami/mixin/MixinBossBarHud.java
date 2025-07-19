@@ -14,7 +14,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public abstract class MixinBossBarHud {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(CallbackInfo info) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender.isEnabled() && noRender.isNoBossBar()) info.cancel();
     }
 }

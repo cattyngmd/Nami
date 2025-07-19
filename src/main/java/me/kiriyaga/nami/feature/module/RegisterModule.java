@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager.module;
+package me.kiriyaga.nami.feature.module;
 
 import java.lang.annotation.*;
 

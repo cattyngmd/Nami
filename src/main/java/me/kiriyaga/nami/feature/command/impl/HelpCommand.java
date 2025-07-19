@@ -1,12 +1,14 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.COMMAND_MANAGER;
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 
+@RegisterCommand
 public class HelpCommand extends Command {
 
     public HelpCommand() {

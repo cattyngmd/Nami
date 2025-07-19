@@ -7,8 +7,8 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.manager.RotationManager;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -122,7 +122,7 @@ public class AuraModule extends Module {
 
         if (eyeDist > rotateRange.get()) return;
 
-        ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
+        ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
     }
 

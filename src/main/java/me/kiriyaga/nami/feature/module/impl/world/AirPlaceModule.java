@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -117,7 +117,7 @@ public class AirPlaceModule extends Module {
 
         MatrixStack matrices = event.getMatrices();
 
-        ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
+        ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
         Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
 

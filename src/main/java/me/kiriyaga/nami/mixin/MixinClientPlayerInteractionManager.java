@@ -64,13 +64,13 @@ public abstract class MixinClientPlayerInteractionManager{
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"))
     private void disableBreakCooldown(CallbackInfoReturnable<Boolean> cir) {
-        if (MODULE_MANAGER.getModule(NoBreakDelayModule.class).isEnabled())
+        if (MODULE_MANAGER.getStorage().getByClass(NoBreakDelayModule.class).isEnabled())
             this.blockBreakingCooldown = 0;
     }
 
     @Inject(method = "interactBlock", at = @At(value = "HEAD"), cancellable = true)
     private void interactBlockHead(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> info) {
-        AntiInteractModule antiInteract = Nami.MODULE_MANAGER.getModule(AntiInteractModule.class);
+        AntiInteractModule antiInteract = Nami.MODULE_MANAGER.getStorage().getByClass(AntiInteractModule.class);
         if (antiInteract != null && antiInteract.isEnabled() && antiInteract.spawnPoint.get()) {
             if (player.getWorld() != null) {
                 Block block = player.getWorld().getBlockState(hitResult.getBlockPos()).getBlock();

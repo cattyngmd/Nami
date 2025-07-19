@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager.module;
+package me.kiriyaga.nami.core.module;
 
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -6,31 +6,24 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static me.kiriyaga.nami.Nami.LOGGER;
-
-public class ModuleManager {
+public class ModuleStorage {
 
     private final List<Module> modules = new ArrayList<>();
 
-    public void init() {
-        ModuleRegistry.registerAnnotatedModules(this);
-        LOGGER.info("Registered " + modules.size() + " modules");
-    }
-
-    public void registerModule(Module module) {
+    public void add(Module module) {
         modules.add(module);
     }
 
-    public void unregisterModule(Module module) {
+    public void remove(Module module) {
         modules.remove(module);
         module.setEnabled(false);
     }
 
-    public List<Module> getModules() {
+    public List<Module> getAll() {
         return modules;
     }
 
-    public <T extends Module> T getModule(Class<T> clazz) {
+    public <T extends Module> T getByClass(Class<T> clazz) {
         return modules.stream()
                 .filter(clazz::isInstance)
                 .map(clazz::cast)
@@ -38,17 +31,21 @@ public class ModuleManager {
                 .orElse(null);
     }
 
-    public Module getModuleByName(String name) {
+    public Module getByName(String name) {
         return modules.stream()
                 .filter(m -> m.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    public List<Module> getModulesByCategory(ModuleCategory category) {
+    public List<Module> getByCategory(ModuleCategory category) {
         return modules.stream()
                 .filter(m -> m.getCategory().equals(category))
                 .sorted(Comparator.comparing(Module::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
+    }
+
+    public int size() {
+        return modules.size();
     }
 }

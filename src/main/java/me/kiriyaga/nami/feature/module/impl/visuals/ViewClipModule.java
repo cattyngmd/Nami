@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.visuals;
 
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 
 @RegisterModule(category = "visuals")

@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterCommand
 public class FovCommand extends Command {
 
     public FovCommand() {

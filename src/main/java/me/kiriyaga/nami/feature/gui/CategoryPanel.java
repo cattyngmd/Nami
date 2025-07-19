@@ -26,7 +26,7 @@ public class CategoryPanel {
     private final Set<Module> expandedModules;
 
     private ColorModule getColorModule() {
-        return MODULE_MANAGER.getModule(ColorModule.class);
+        return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
     }
 
     public CategoryPanel(ModuleCategory moduleCategory, Set<ModuleCategory> expandedCategories, Set<Module> expandedModules) {
@@ -51,7 +51,7 @@ public class CategoryPanel {
 
         if (expanded) {
             int totalHeight = HEADER_HEIGHT;
-            List<Module> modules = MODULE_MANAGER.getModulesByCategory(moduleCategory);
+            List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
 
             for (Module module : modules) {
                 totalHeight += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;

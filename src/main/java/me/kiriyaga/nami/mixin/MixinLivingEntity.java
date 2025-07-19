@@ -42,7 +42,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get())
+        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).moveFix.get())
             return;
 
         originalYaw = this.getYaw();
@@ -59,7 +59,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "travel", at = @At("TAIL"))
     private void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get())
+        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).moveFix.get())
             return;
 
         this.setYaw(originalYaw);
@@ -68,7 +68,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @ModifyVariable(method = "travel", at = @At("HEAD"), ordinal = 0)
     private Vec3d modifyMovementInput(Vec3d movementInput) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).moveFix.get()) return movementInput;
+        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).moveFix.get()) return movementInput;
         if (movementInput.lengthSquared() < 1e-4) return movementInput;
 
         float realYaw = originalYaw;
@@ -129,21 +129,21 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
-        if (MODULE_MANAGER.getModule(NoJumpDelayModule.class).isEnabled()) {
+        if (MODULE_MANAGER.getStorage().getByClass(NoJumpDelayModule.class).isEnabled()) {
             jumpingCooldown = 0;
         }
     }
 
     @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
-        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getModule(ElytraFlyModule.class);
+        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class);
         if (MC.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled() && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA)
             cir.setReturnValue(true);
     }
 
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     private void onJump(CallbackInfo ci) {
-        HighJumpModule mod = MODULE_MANAGER.getModule(HighJumpModule.class);
+        HighJumpModule mod = MODULE_MANAGER.getStorage().getByClass(HighJumpModule.class);
 
         if (!mod.isEnabled())
             return;
@@ -167,7 +167,7 @@ public abstract class MixinLivingEntity extends Entity {
     private void setSprinting(boolean sprinting, CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
 
-        if (!ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getModule(RotationManagerModule.class).sprintFix.get())
+        if (!ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).sprintFix.get())
             return;
 
         if (sprinting && MC.player.input != null) {

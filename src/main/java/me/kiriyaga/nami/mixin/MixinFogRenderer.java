@@ -16,7 +16,7 @@ public abstract class MixinFogRenderer {
             at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/fog/FogRenderer;fogEnabled:Z")
     )
     private boolean modifyFogEnabled(boolean original) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender != null && noRender.isEnabled() && noRender.isNoFog()) {
             return false;
         }

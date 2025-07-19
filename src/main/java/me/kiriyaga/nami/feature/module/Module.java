@@ -45,7 +45,7 @@ public abstract class Module {
 
         this.enabled = state;
 
-        ColorModule cm = MODULE_MANAGER.getModule(ColorModule.class);
+        ColorModule cm = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
 
         if (enabled) {
             EVENT_MANAGER.register(this);

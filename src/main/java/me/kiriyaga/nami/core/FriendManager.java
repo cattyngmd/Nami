@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager;
+package me.kiriyaga.nami.core;
 
 import com.google.gson.*;
 import net.fabricmc.loader.api.FabricLoader;

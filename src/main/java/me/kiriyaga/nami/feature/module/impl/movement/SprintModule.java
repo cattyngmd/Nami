@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.PacketSendEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.PlayerInteractEntityC2SPacketAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.client.network.ClientPlayerEntity;

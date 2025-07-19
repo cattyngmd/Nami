@@ -1,10 +1,12 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterCommand
 public class PitchCommand extends Command {
 
     public PitchCommand() {

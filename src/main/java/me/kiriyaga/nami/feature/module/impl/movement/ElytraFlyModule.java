@@ -7,8 +7,8 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.HUDModule;
-import me.kiriyaga.nami.manager.RotationManager;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
@@ -45,15 +45,15 @@ public class ElytraFlyModule extends Module {
 
     @Override
     public void onEnable() {
-        if (autoWalkEnable.get() && !MODULE_MANAGER.getModule(AutoWalkModule.class).isEnabled()) {
-            MODULE_MANAGER.getModule(AutoWalkModule.class).toggle();
+        if (autoWalkEnable.get() && !MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).isEnabled()) {
+            MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).toggle();
         }
     }
 
     @Override
     public void onDisable() {
-        if (autoWalkEnable.get() && MODULE_MANAGER.getModule(AutoWalkModule.class).isEnabled()) {
-            MODULE_MANAGER.getModule(AutoWalkModule.class).toggle();
+        if (autoWalkEnable.get() && MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).isEnabled()) {
+            MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).toggle();
         }
         setJumpHeld(false);
     }
@@ -65,7 +65,7 @@ public class ElytraFlyModule extends Module {
 
         if (mode.get() == FlyMode.bounce) {
 
-            if (boost.get() && MC.player.getVelocity().y > 0 && MODULE_MANAGER.getModule(HUDModule.class).speed < targetSpeed.get()) {
+            if (boost.get() && MC.player.getVelocity().y > 0 && MODULE_MANAGER.getStorage().getByClass(HUDModule.class).speed < targetSpeed.get()) {
                 MC.player.setVelocity(MC.player.getVelocity().x, 0.0, MC.player.getVelocity().z);
             }
 
@@ -88,7 +88,7 @@ public class ElytraFlyModule extends Module {
 
         if (!player.isOnGround()) return;
 
-        HUDModule hud = MODULE_MANAGER.getModule(HUDModule.class);
+        HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
         double currentBps = hud.speed;
 
         if (player.isSprinting() && currentBps < targetSpeed.get() && currentBps > 39.00 && newBoost.get()) {

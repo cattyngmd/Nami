@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager;
+package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.Nami;
 import me.kiriyaga.nami.event.EventPriority;
@@ -120,9 +120,9 @@ public class EntityManager {
             return;
         }
 
-        entityManagerModule = MODULE_MANAGER.getModule(EntityManagerModule.class);
+        entityManagerModule = MODULE_MANAGER.getStorage().getByClass(EntityManagerModule.class);
 
-        maxIdleTicks = MODULE_MANAGER.getModule(EntityManagerModule.class).maxIdleTicks.get();
+        maxIdleTicks = MODULE_MANAGER.getStorage().getByClass(EntityManagerModule.class).maxIdleTicks.get();
 
         if (idleTicksCounter < maxIdleTicks) {
             updateAll();

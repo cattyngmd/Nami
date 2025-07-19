@@ -7,7 +7,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.misc.AutoReconnectModule;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EntityUtils;
@@ -98,8 +98,8 @@ public class AutoLogModule extends Module {
             if (selfToggle.get())
                 this.toggle();
 
-            if (reconnectToggle.get() && MODULE_MANAGER.getModule(AutoReconnectModule.class).isEnabled())
-                MODULE_MANAGER.getModule(AutoReconnectModule.class).toggle();
+            if (reconnectToggle.get() && MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).isEnabled())
+                MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).toggle();
         }
     }
 }

@@ -19,7 +19,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public abstract class MixinHeadFeatureRenderer<S extends LivingEntityRenderState, M extends EntityModel<S> & ModelWithHead> {
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
     private void onRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, S livingEntityRenderState, float f, float g, CallbackInfo ci) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (livingEntityRenderState instanceof PlayerEntityRenderState && noRender.isEnabled() && noRender.isNoArmor()) ci.cancel();
     }
 }

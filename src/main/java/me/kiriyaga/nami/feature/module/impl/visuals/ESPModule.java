@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
@@ -45,7 +45,7 @@ public class ESPModule extends Module {
         if (MC == null || MC.world == null || MC.player == null) return;
 
         MatrixStack matrices = event.getMatrices();
-        ColorModule colorModule = MODULE_MANAGER.getModule(ColorModule.class);
+        ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
 
         if (showPlayers.get()) {
             for (Entity player : ENTITY_MANAGER.getOtherPlayers()) {

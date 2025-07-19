@@ -96,7 +96,7 @@ public class WhitelistSetting extends BoolSetting {
 
             String settingName = args[0].toLowerCase();
 
-            var module = MODULE_MANAGER.getModuleByName(moduleName);
+            var module = MODULE_MANAGER.getStorage().getByName(moduleName);
             if (module == null) {
                 CHAT_MANAGER.sendPersistent(moduleName, "Module '" + moduleName + "' not found.");
                 return;

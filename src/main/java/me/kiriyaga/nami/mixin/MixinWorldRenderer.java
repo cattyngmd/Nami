@@ -62,16 +62,16 @@ public class MixinWorldRenderer {
 
     @WrapWithCondition(method = "method_62216", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WeatherRendering;renderPrecipitation(Lnet/minecraft/world/World;Lnet/minecraft/client/render/VertexConsumerProvider;IFLnet/minecraft/util/math/Vec3d;)V"))
     private boolean shouldRenderPrecipitation(WeatherRendering instance, World world, VertexConsumerProvider vertexConsumers, int ticks, float tickProgress, Vec3d pos) {
-        NoWeatherModule noWeatherModule = MODULE_MANAGER.getModule(NoWeatherModule.class);
+        NoWeatherModule noWeatherModule = MODULE_MANAGER.getStorage().getByClass(NoWeatherModule.class);
         return !noWeatherModule.isEnabled();
     }
 
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;setupTerrain(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;ZZ)V"), index = 3)
     private boolean renderSetupTerrainModifyArg(boolean spectator) {
-        FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
-        FreeLookModule freeLookModule = MODULE_MANAGER.getModule(FreeLookModule.class);
-        ViewClipModule viewClipModule = MODULE_MANAGER.getModule(ViewClipModule.class);
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        FreeLookModule freeLookModule = MODULE_MANAGER.getStorage().getByClass(FreeLookModule.class);
+        ViewClipModule viewClipModule = MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class);
         return (freecamModule.isEnabled() || spectator || freeLookModule.isEnabled() || viewClipModule.isEnabled());
     }
 }

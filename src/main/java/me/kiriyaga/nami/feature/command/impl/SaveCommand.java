@@ -1,9 +1,11 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterCommand
 public class SaveCommand extends Command {
 
     public SaveCommand() {

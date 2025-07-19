@@ -48,7 +48,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "showFloatingItem", at = @At("HEAD"), cancellable = true)
     private void onShowFloatingItem(ItemStack floatingItem, CallbackInfo info) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (floatingItem.getItem() == Items.TOTEM_OF_UNDYING && noRender.isEnabled() && noRender.isNoTotem()) {
             info.cancel();
         }
@@ -59,7 +59,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "updateCrosshairTarget", at = @At("HEAD"), cancellable = true)
     private void updateTargetedEntityInvoke(float tickDelta, CallbackInfo info) {
-        FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
 
         if (freecamModule.isEnabled() && client.getCameraEntity() != null && !freecamSet) {
             info.cancel();

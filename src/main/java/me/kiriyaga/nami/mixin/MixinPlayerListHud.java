@@ -33,7 +33,7 @@ public abstract class MixinPlayerListHud {
 
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntries(CallbackInfoReturnable<List<PlayerListEntry>> info) {
-        BetterTabModule betterTab = MODULE_MANAGER.getModule(BetterTabModule.class);
+        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
         if (!betterTab.isEnabled()) return;
 
         List<PlayerListEntry> entries = client.player.networkHandler.getListedPlayerListEntries().stream()
@@ -47,7 +47,7 @@ public abstract class MixinPlayerListHud {
 
     @Inject(method = "getPlayerName", at = @At("HEAD"), cancellable = true)
     private void getPlayerName(PlayerListEntry entry, CallbackInfoReturnable<Text> info) {
-        BetterTabModule betterTab = MODULE_MANAGER.getModule(BetterTabModule.class);
+        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
 
         if (!betterTab.isEnabled()) return;
 

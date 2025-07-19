@@ -18,7 +18,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public abstract class MixinArmorFeatureRenderer<S extends BipedEntityRenderState, M extends BipedEntityModel<S>, A extends BipedEntityModel<S>> {
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/state/BipedEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
     private void onRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, S bipedEntityRenderState, float f, float g, CallbackInfo ci) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (bipedEntityRenderState instanceof PlayerEntityRenderState && noRender.isEnabled() && noRender.isNoArmor()) ci.cancel();
     }
 }

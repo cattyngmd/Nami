@@ -119,12 +119,12 @@ public class NametagFormatter {
                 if (player.isSneaking()) {
                     color = new Color(255, 165, 0);
                 } else if (FRIEND_MANAGER.isFriend(player.getName().getString())) {
-                    color = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor();
+                    color = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
                 } else {
                     color = Color.WHITE;
                 }
             } else if (entity instanceof ItemEntity) {
-                color = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor();
+                color = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
             } else if (EntityUtils.isHostile(entity)) {
                 color = COLOR_HOSTILE;
             } else if (EntityUtils.isNeutral(entity)) {

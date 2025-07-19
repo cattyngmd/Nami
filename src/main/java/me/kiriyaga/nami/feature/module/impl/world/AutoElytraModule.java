@@ -7,7 +7,7 @@ import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -55,7 +55,7 @@ public class AutoElytraModule extends Module {
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
-        if (MC.world == null || MC.player == null || (pauseEfly.get() && MODULE_MANAGER.getModule(ElytraFlyModule.class).isEnabled())) return;
+        if (MC.world == null || MC.player == null || (pauseEfly.get() && MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class).isEnabled())) return;
 
         if (event.key == MC.options.jumpKey.getDefaultKey().getCode() && event.action == 1) {
             ClientPlayerEntity player = MC.player;

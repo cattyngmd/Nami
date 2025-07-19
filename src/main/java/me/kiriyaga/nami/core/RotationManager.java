@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager;
+package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
@@ -115,7 +115,7 @@ public class RotationManager {
 
         //CHAT_MANAGER.sendRaw("active req: "+ activeRequest);
 
-        RotationManagerModule rotationModule = MODULE_MANAGER.getModule(RotationManagerModule.class);
+        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
         rotationSpeed = rotationModule.rotationSpeed.get().floatValue();
         rotationEaseFactor = rotationModule.rotationEaseFactor.get().floatValue();
         rotationThreshold = rotationModule.rotationThreshold.get().floatValue();

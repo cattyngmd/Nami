@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
@@ -67,7 +67,7 @@ public class GuiMoveModule extends Module {
 
     @SubscribeEvent
     public void onRender3D(Render3DEvent event) {
-        if (!canMove() || MODULE_MANAGER.getModule(FreecamModule.class).isEnabled()) return;
+        if (!canMove() || MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return;
 
         if (MC.currentScreen == null) {
             forwardHeld = backHeld = leftHeld = rightHeld = jumpHeld = sneakHeld = sprintHeld = false;

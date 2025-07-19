@@ -1,8 +1,8 @@
 package me.kiriyaga.nami;
 
 import me.kiriyaga.nami.feature.gui.ClickGuiScreen;
-import me.kiriyaga.nami.manager.*;
-import me.kiriyaga.nami.manager.module.ModuleManager;
+import me.kiriyaga.nami.core.*;
+import me.kiriyaga.nami.core.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;

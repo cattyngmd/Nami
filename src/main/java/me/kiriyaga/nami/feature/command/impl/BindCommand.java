@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import me.kiriyaga.nami.util.KeyUtils;
@@ -9,6 +10,7 @@ import net.minecraft.client.util.InputUtil;
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
+@RegisterCommand
 public class BindCommand extends Command {
 
     public BindCommand() {
@@ -25,7 +27,7 @@ public class BindCommand extends Command {
         String moduleName = args[0].toLowerCase();
         String keyName = args[1].toUpperCase();
 
-        Module module = MODULE_MANAGER.getModules().stream()
+        Module module = MODULE_MANAGER.getStorage().getAll().stream()
                 .filter(m -> m.getName().equalsIgnoreCase(moduleName) || m.matches(moduleName))
                 .findFirst()
                 .orElse(null);

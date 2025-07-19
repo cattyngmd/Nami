@@ -31,7 +31,7 @@ public abstract class MixinDisconnectedScreen extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo info) {
-        AutoReconnectModule module = MODULE_MANAGER.getModule(AutoReconnectModule.class);
+        AutoReconnectModule module = MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class);
 
         if (LAST_CONNECTION != null || !module.hardHide.get()) {
 
@@ -59,7 +59,7 @@ public abstract class MixinDisconnectedScreen extends Screen {
 
     @Override
     public void tick() {
-        AutoReconnectModule module = MODULE_MANAGER.getModule(AutoReconnectModule.class);
+        AutoReconnectModule module = MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class);
 
         if (!module.isEnabled() || LAST_CONNECTION == null || module.hardHide.get()) return;
 

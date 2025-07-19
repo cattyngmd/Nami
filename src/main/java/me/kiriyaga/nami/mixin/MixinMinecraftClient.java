@@ -39,7 +39,7 @@ public class MixinMinecraftClient {
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
         if (MC == null || MC.mouse == null) return;
 
-        for (Module module : MODULE_MANAGER.getModules()) {
+        for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             KeyBindSetting bind = module.getKeyBind();
             if (bind.get() != KeyBindSetting.KEY_NONE) {
                 boolean currentlyPressed = bind.isPressed();
@@ -63,12 +63,12 @@ public class MixinMinecraftClient {
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
 
-        if (MODULE_MANAGER.getModule(AirPlaceModule.class).isEnabled() && MODULE_MANAGER.getModule(AirPlaceModule.class).cooldown <= 0){
-            itemUseCooldown = MODULE_MANAGER.getModule(AirPlaceModule.class).delay.get();
+        if (MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).cooldown <= 0){
+            itemUseCooldown = MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).delay.get();
             return;
         }
 
-        FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
+        FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
         if (!fastPlace.isEnabled()) return;
 
         ItemStack heldStack = MinecraftClient.getInstance().player.getMainHandStack();
@@ -87,7 +87,7 @@ public class MixinMinecraftClient {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo info) {
-        FastPlaceModule fastPlace = MODULE_MANAGER.getModule(FastPlaceModule.class);
+        FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
 
         if (fastPlace.isEnabled() && MC.options.useKey.isPressed()) {
             holdTicks++;
@@ -98,9 +98,9 @@ public class MixinMinecraftClient {
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void setScreen(Screen screen, CallbackInfo info) {
-        if (screen instanceof DeathScreen && MC.player != null && MODULE_MANAGER.getModule(AutoRespawnModule.class).isEnabled()) {
+        if (screen instanceof DeathScreen && MC.player != null && MODULE_MANAGER.getStorage().getByClass(AutoRespawnModule.class).isEnabled()) {
 
-            if (MODULE_MANAGER.getModule(AutoRespawnModule.class).sendCords.get()) {
+            if (MODULE_MANAGER.getStorage().getByClass(AutoRespawnModule.class).sendCords.get()) {
                 Vec3d pos = MC.player.getPos();
                 String coords = String.format("X: %d Y: %d Z: %d",
                         Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
@@ -115,7 +115,7 @@ public class MixinMinecraftClient {
 
     @Inject(method = "doAttack", at = @At("HEAD"))
     private void doAttack(CallbackInfoReturnable<Boolean> info) {
-        if (MODULE_MANAGER.getModule(NoHitDelayModule.class).isEnabled())
+        if (MODULE_MANAGER.getStorage().getByClass(NoHitDelayModule.class).isEnabled())
             attackCooldown = 0;
     }
 

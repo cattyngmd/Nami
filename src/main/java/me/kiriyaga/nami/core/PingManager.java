@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager;
+package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.feature.module.impl.client.PingManagerModule;
@@ -29,7 +29,7 @@ public class PingManager {
         if (packet.getPacket() instanceof KeepAliveS2CPacket) {
             long now = System.currentTimeMillis();
 
-            PingManagerModule config = MODULE_MANAGER.getModule(PingManagerModule.class);
+            PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
             int keepAliveInterval = config != null ? config.keepAliveInterval.get() : 1000;
 
             if (lastReceiveTime != -1) {
@@ -75,7 +75,7 @@ public class PingManager {
     }
 
     public boolean isConnectionUnstable() {
-        PingManagerModule config = MODULE_MANAGER.getModule(PingManagerModule.class);
+        PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
         if (config == null) return false;
 
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;

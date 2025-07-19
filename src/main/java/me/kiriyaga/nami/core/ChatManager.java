@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager;
+package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.mixin.ChatHudAccessor;
@@ -168,8 +168,8 @@ public class ChatManager {
     }
 
     private Text prefix() {
-        int global = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
-        int brac = MODULE_MANAGER.getModule(ColorModule.class).getStyledSecondColor().getRGB() & 0x00FFFFFF;
+        int global = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
+        int brac = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor().getRGB() & 0x00FFFFFF;
 
         Text left = Text.literal("[").setStyle(Style.EMPTY.withColor(brac));
         Text name = Text.literal(NAME).setStyle(Style.EMPTY.withColor(global));

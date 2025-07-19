@@ -14,7 +14,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public abstract class MixinScreen {
     @Inject(method = "renderBackground(Lnet/minecraft/client/gui/DrawContext;IIF)V", at = @At("HEAD"), cancellable = true)
     public void noBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        NoRenderModule m = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule m = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
 
         if (m.isEnabled() && m.isNoBackground())
             ci.cancel();

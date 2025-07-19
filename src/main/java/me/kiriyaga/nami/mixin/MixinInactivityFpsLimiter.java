@@ -14,8 +14,8 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class MixinInactivityFpsLimiter {
     @Inject(method = "update", at = @At("HEAD"), cancellable = true)
     private void updateHead(CallbackInfoReturnable<Integer> info) {
-        if (MODULE_MANAGER.getModule(UnfocusedCpuModule.class).isEnabled() && !MC.isWindowFocused()) {
-            info.setReturnValue(MODULE_MANAGER.getModule(UnfocusedCpuModule.class).limit.get());
+        if (MODULE_MANAGER.getStorage().getByClass(UnfocusedCpuModule.class).isEnabled() && !MC.isWindowFocused()) {
+            info.setReturnValue(MODULE_MANAGER.getStorage().getByClass(UnfocusedCpuModule.class).limit.get());
         }
     }
 }

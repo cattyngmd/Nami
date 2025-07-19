@@ -27,7 +27,7 @@ public class SettingPanel {
     private static KeyBindSetting waitingForKeyBind = null;
 
     private static ColorModule getColorModule() {
-        return MODULE_MANAGER.getModule(ColorModule.class);
+        return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
     }
 
     public static int getSettingsHeight(Module module) {

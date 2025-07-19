@@ -27,8 +27,8 @@ public abstract class MixinEntity {
     private void updateChangeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
         if ((Object) this != MC.player) return;
 
-        FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
-        FreeLookModule freeLookModule = MODULE_MANAGER.getModule(FreeLookModule.class);
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        FreeLookModule freeLookModule = MODULE_MANAGER.getStorage().getByClass(FreeLookModule.class);
 
         if (freecamModule.isEnabled()) {
             freecamModule.changeLookDirection(cursorDeltaX * 0.15, cursorDeltaY * 0.15);
@@ -53,7 +53,7 @@ public abstract class MixinEntity {
 
     @Inject(at = @At("HEAD"), method = "Lnet/minecraft/entity/Entity;getPose()Lnet/minecraft/entity/EntityPose;", cancellable = true)
     private void entityPose(CallbackInfoReturnable<EntityPose> cir) {
-        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getModule(ElytraFlyModule.class);
+        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class);
         if (elytraFlyModule.isEnabled() && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA)
             cir.setReturnValue(EntityPose.STANDING);
     }

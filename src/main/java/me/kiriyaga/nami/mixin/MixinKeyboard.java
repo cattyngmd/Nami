@@ -32,7 +32,7 @@ public abstract class MixinKeyboard {
         if (MC == null) return;
         if (action != GLFW.GLFW_PRESS) return;
 
-        ClickGuiModule clickGui = MODULE_MANAGER.getModule(ClickGuiModule.class);
+        ClickGuiModule clickGui = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
         KeyBindSetting bind = clickGui.getKeyBind();
 
         if (bind.get() == key) {

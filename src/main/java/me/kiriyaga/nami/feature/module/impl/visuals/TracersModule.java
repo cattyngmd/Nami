@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.util.MatrixCache;
@@ -74,7 +74,7 @@ public class TracersModule extends Module {
         if (showPlayers.get()) {
             for (Entity player : ENTITY_MANAGER.getOtherPlayers()) {
                 Color color = FRIEND_MANAGER.isFriend(player.getName().getString())
-                        ? MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor()
+                        ? MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor()
                         : COLOR_HOSTILE;
                 drawEntityTracer.accept(player, color);
             }

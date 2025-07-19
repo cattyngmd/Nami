@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.manager;
+package me.kiriyaga.nami.core;
 
 import com.google.gson.*;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -29,7 +29,7 @@ public class ConfigManager {
         if (!configFile.exists()) {
             LOGGER.info("Config not found, using defaults.");
 
-            Module clickGuiModule = MODULE_MANAGER.getModule(ClickGuiModule.class);
+            Module clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
             if (clickGuiModule != null) {
                 KeyBindSetting bindSetting = clickGuiModule.getKeyBind();
                 bindSetting.set(79);
@@ -57,7 +57,7 @@ public class ConfigManager {
             if (root.has("modules")) {
                 JsonObject modulesJson = root.getAsJsonObject("modules");
 
-                for (Module module : MODULE_MANAGER.getModules()) {
+                for (Module module : MODULE_MANAGER.getStorage().getAll()) {
                     if (!modulesJson.has(module.getName())) continue;
                     JsonObject moduleJson = modulesJson.getAsJsonObject(module.getName());
 
@@ -96,7 +96,7 @@ public class ConfigManager {
             JsonObject modulesJson = new JsonObject();
 
 
-            for (Module module : MODULE_MANAGER.getModules()) {
+            for (Module module : MODULE_MANAGER.getStorage().getAll()){
                 JsonObject moduleJson = new JsonObject();
 
                 moduleJson.addProperty("enabled", module.isEnabled());

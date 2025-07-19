@@ -13,9 +13,9 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class MixinSodiumWorldRenderer {
     @ModifyVariable(method = "setupTerrain", at = @At("HEAD"), argsOnly = true)
     private FogParameters modifyFogParameters(FogParameters fogParameters) {
-        if (MODULE_MANAGER.getModule(NoRenderModule.class) == null) return fogParameters;
+        if (MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) == null) return fogParameters;
 
-        if (MODULE_MANAGER.getModule(NoRenderModule.class).isNoFog()) return FogParameters.NONE;
+        if (MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isNoFog()) return FogParameters.NONE;
 
         return fogParameters;
     }

@@ -7,7 +7,7 @@ import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -684,6 +684,6 @@ public class HUDModule extends Module {
     }
 
     private ColorModule getColorModule() {
-        return MODULE_MANAGER.getModule(ColorModule.class);
+        return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
     }
 }

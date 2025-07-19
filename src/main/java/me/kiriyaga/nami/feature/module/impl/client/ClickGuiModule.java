@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.client;
 
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 
 import static me.kiriyaga.nami.Nami.CLICK_GUI;

@@ -353,7 +353,7 @@ public class RenderUtil {
             float bottom = height + bgPadding;
 
             int backgroundColor = 0x90000000;
-            int borderColor = MODULE_MANAGER.getModule(ColorModule.class).getStyledGlobalColor().getRGB();
+            int borderColor = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB();
 
             RenderUtil.rect3d(matrices, left, top, right, bottom, backgroundColor);
 

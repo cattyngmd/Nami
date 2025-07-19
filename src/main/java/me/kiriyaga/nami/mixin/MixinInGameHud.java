@@ -25,33 +25,33 @@ public class MixinInGameHud {
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderStatusEffectOverlay(CallbackInfo info) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender.isEnabled() && noRender.isNoPotIcon()) info.cancel();
     }
     @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderPortalOverlay(DrawContext context, float nauseaStrength, CallbackInfo ci) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender.isEnabled() && noRender.isNoPortal()) ci.cancel();
     }
 
     @ModifyArgs(method = "renderMiscOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderOverlay(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;F)V", ordinal = 0))
     private void onRenderPumpkinOverlay(org.spongepowered.asm.mixin.injection.invoke.arg.Args args) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender.isEnabled() && noRender.isNoPumpkin()) args.set(2, 0f);
     }
     @ModifyArgs(method = "renderMiscOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderOverlay(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;F)V", ordinal = 1))
     private void onRenderPowderedSnowOverlay(org.spongepowered.asm.mixin.injection.invoke.arg.Args args) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender.isEnabled() && noRender.isNoPowderedSnow()) args.set(2, 0f);
     }
     @Inject(method = "renderVignetteOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderVignetteOverlay(DrawContext context, Entity entity, CallbackInfo ci) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender.isEnabled() && noRender.isNoVignette()) ci.cancel();
     }
     @Inject(method = "renderNauseaOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderNausea(DrawContext context, float distortionStrength, CallbackInfo ci) {
-        NoRenderModule noRender = MODULE_MANAGER.getModule(NoRenderModule.class);
+        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender.isEnabled() && noRender.isNoNausea()) ci.cancel();
     }
 }

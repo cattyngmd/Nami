@@ -21,7 +21,7 @@ public class ModulePanel {
     private final Set<Module> expandedModules;
 
     private ColorModule getColorModule() {
-        return MODULE_MANAGER.getModule(ColorModule.class);
+        return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
     }
 
     public ModulePanel(Module module, Set<Module> expandedModules) {

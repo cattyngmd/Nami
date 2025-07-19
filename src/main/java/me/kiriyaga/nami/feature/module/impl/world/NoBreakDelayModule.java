@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.world;
 
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 
 @RegisterModule(category = "world")
 public class NoBreakDelayModule extends Module {

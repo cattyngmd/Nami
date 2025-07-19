@@ -1,46 +1,40 @@
-package me.kiriyaga.nami.manager.module;
+package me.kiriyaga.nami.core.command;
 
-import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.ModuleCategory;
-import me.kiriyaga.nami.manager.module.RegisterModule;
+import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.module.ModuleFinder;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class ModuleRegistry {
+public class CommandRegistry {
 
-    private static final String MODULE_PACKAGE = "me.kiriyaga.nami.feature.module.impl";
+    private static final String COMMAND_PACKAGE = "me.kiriyaga.nami.feature.command.impl";
 
-    public static void registerAnnotatedModules(ModuleManager manager) {
-        Set<Class<? extends Module>> classes = findAnnotatedModuleClasses();
+    public static void registerAnnotatedCommands(CommandStorage storage) {
+        Set<Class<? extends Command>> classes = findAnnotatedCommandClasses();
 
-        for (Class<? extends Module> clazz : classes) {
-            RegisterModule annotation = clazz.getAnnotation(RegisterModule.class);
-            if (annotation == null) continue;
-
+        for (Class<? extends Command> clazz : classes) {
             try {
-                ModuleCategory category = ModuleCategory.of(annotation.category());
-                Module module = clazz.getDeclaredConstructor().newInstance();
-                manager.registerModule(module);
+                Command command = clazz.getDeclaredConstructor().newInstance();
+                storage.addCommand(command);
             } catch (Exception e) {
-                System.err.println("Failed to instantiate module: " + clazz.getName());
+                System.err.println("Failed to instantiate command: " + clazz.getName());
                 e.printStackTrace();
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static Set<Class<? extends Module>> findAnnotatedModuleClasses() {
-        Set<Class<? extends Module>> result = new HashSet<>();
+    private static Set<Class<? extends Command>> findAnnotatedCommandClasses() {
+        Set<Class<? extends Command>> result = new HashSet<>();
 
         try {
-            String path = MODULE_PACKAGE.replace('.', '/');
+            String path = COMMAND_PACKAGE.replace('.', '/');
             Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(path);
 
             while (resources.hasMoreElements()) {
@@ -55,7 +49,7 @@ public class ModuleRegistry {
                 } else {
                     File dir = new File(filePath);
                     if (dir.exists() && dir.isDirectory()) {
-                        result.addAll(scanDirectory(dir, MODULE_PACKAGE));
+                        result.addAll(scanDirectory(dir, COMMAND_PACKAGE));
                     }
                 }
             }
@@ -66,8 +60,8 @@ public class ModuleRegistry {
         return result;
     }
 
-    private static Set<Class<? extends Module>> scanDirectory(File dir, String packageName) throws ClassNotFoundException {
-        Set<Class<? extends Module>> result = new HashSet<>();
+    private static Set<Class<? extends Command>> scanDirectory(File dir, String packageName) throws ClassNotFoundException {
+        Set<Class<? extends Command>> result = new HashSet<>();
 
         for (File file : Objects.requireNonNull(dir.listFiles())) {
             if (file.isDirectory()) {
@@ -76,8 +70,8 @@ public class ModuleRegistry {
                 String className = packageName + '.' + file.getName().replace(".class", "");
                 Class<?> cls = Class.forName(className);
 
-                if (Module.class.isAssignableFrom(cls) && cls.isAnnotationPresent(RegisterModule.class)) {
-                    result.add((Class<? extends Module>) cls);
+                if (Command.class.isAssignableFrom(cls) && cls.isAnnotationPresent(RegisterCommand.class)) {
+                    result.add((Class<? extends Command>) cls);
                 }
             }
         }
@@ -85,20 +79,20 @@ public class ModuleRegistry {
         return result;
     }
 
-    private static Set<Class<? extends Module>> scanJar(JarFile jar) throws ClassNotFoundException {
-        Set<Class<? extends Module>> result = new HashSet<>();
+    private static Set<Class<? extends Command>> scanJar(JarFile jar) throws ClassNotFoundException {
+        Set<Class<? extends Command>> result = new HashSet<>();
 
         Enumeration<JarEntry> entries = jar.entries();
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
             String name = entry.getName();
 
-            if (name.endsWith(".class") && name.startsWith(MODULE_PACKAGE.replace('.', '/'))) {
+            if (name.endsWith(".class") && name.startsWith(COMMAND_PACKAGE.replace('.', '/'))) {
                 String className = name.replace('/', '.').replace(".class", "");
                 Class<?> cls = Class.forName(className);
 
-                if (Module.class.isAssignableFrom(cls) && cls.isAnnotationPresent(RegisterModule.class)) {
-                    result.add((Class<? extends Module>) cls);
+                if (Command.class.isAssignableFrom(cls) && cls.isAnnotationPresent(RegisterCommand.class)) {
+                    result.add((Class<? extends Command>) cls);
                 }
             }
         }

@@ -22,7 +22,7 @@ public abstract class MixinChunkBorderDebugRenderer {
 
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getChunkPos()Lnet/minecraft/util/math/ChunkPos;"))
     private ChunkPos render$getChunkPos(ChunkPos chunkPos) {
-        FreecamModule freecamModule = MODULE_MANAGER.getModule(FreecamModule.class);
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
 
         if (!freecamModule.isEnabled()) return chunkPos;
 

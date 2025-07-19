@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.module.Module;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
+@RegisterCommand
 public class ToggleCommand extends Command {
 
     public ToggleCommand() {
@@ -22,7 +24,7 @@ public class ToggleCommand extends Command {
         String input = args[0];
 
         Module found = null;
-        for (Module m : MODULE_MANAGER.getModules()) {
+        for (Module m : MODULE_MANAGER.getStorage().getAll()) {
             if (m.matches(input)) {
                 found = m;
                 break;
