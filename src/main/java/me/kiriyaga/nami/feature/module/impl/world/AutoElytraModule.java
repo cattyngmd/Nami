@@ -4,9 +4,10 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -20,6 +21,7 @@ import java.util.Map;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
+@RegisterModule(category = "world")
 public class AutoElytraModule extends Module {
 
     private boolean wasOnGroundLastTick = true;
@@ -48,7 +50,7 @@ public class AutoElytraModule extends Module {
     private int jumpToggleStep = 0;
 
     public AutoElytraModule() {
-        super("auto elytra", "Controlls elytra fly automatically, based QOL.", Category.world, "autoelytra");
+        super("auto elytra", "Controlls elytra fly automatically, based QOL.", ModuleCategory.of("world"), "autoelytra");
     }
 
     @SubscribeEvent

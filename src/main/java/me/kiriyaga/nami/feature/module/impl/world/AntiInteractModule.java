@@ -3,8 +3,9 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.WhitelistSetting;
 import net.minecraft.block.Block;
@@ -17,6 +18,7 @@ import net.minecraft.world.dimension.DimensionTypes;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "world")
 public class AntiInteractModule extends Module {
 
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name));
@@ -24,7 +26,7 @@ public class AntiInteractModule extends Module {
     public final BoolSetting packet = addSetting(new BoolSetting("packet", false));
 
     public AntiInteractModule() {
-        super("anti interact", "Prevents you from interacting with certain blocks.", Category.world, "antiinteract");
+        super("anti interact", "Prevents you from interacting with certain blocks.", ModuleCategory.of("world"), "antiinteract");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

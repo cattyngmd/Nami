@@ -3,8 +3,9 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.ReceiveMessageEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.ChatHudAccessor;
 
 import net.minecraft.client.MinecraftClient;
@@ -16,6 +17,7 @@ import net.minecraft.network.message.MessageSignatureData;
 
 import java.util.*;
 
+@RegisterModule(category = "world")
 public class AntiSpamModule extends Module {
 
     private static class SpamData {
@@ -34,7 +36,7 @@ public class AntiSpamModule extends Module {
     private final Map<MessageSignatureData, UUID> signatureToSender = new HashMap<>();
 
     public AntiSpamModule() {
-        super("anti spam", "Removes repeated chat messages from the same player.", Category.world, "antispam", "фтешызфь");
+        super("anti spam", "Removes repeated chat messages from the same player.", ModuleCategory.of("world"), "antispam", "фтешызфь");
     }
 
     public void onNewMessageSignature(MessageSignatureData signature, UUID sender) {

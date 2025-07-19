@@ -4,8 +4,9 @@ import com.google.common.collect.Sets;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -14,6 +15,7 @@ import net.minecraft.sound.SoundEvents;
 
 import java.util.Set;
 
+@RegisterModule(category = "misc")
 public class NoSoundLagModule extends Module {
 
     public final BoolSetting armor = addSetting(new BoolSetting("armor", true));
@@ -39,7 +41,7 @@ public class NoSoundLagModule extends Module {
     );
 
     public NoSoundLagModule() {
-        super("no sound lag", "Prevents lag caused by stacked sounds.", Category.misc, "nosoundlag");
+        super("no sound lag", "Prevents lag caused by stacked sounds.", ModuleCategory.of("misc"), "nosoundlag");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

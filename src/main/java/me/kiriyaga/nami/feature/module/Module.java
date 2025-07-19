@@ -17,7 +17,7 @@ public abstract class Module {
     protected final String name;
     protected final String description;
     protected final String[] aliases;
-    protected final Category category;
+    protected final ModuleCategory category;
 
     private boolean enabled = false;
     private String displayInfo = "";
@@ -25,7 +25,7 @@ public abstract class Module {
     protected final List<Setting<?>> settings = new ArrayList<>();
     protected final KeyBindSetting keyBind;
 
-    public Module(String name, String description, Category category, String... aliases) {
+    public Module(String name, String description, ModuleCategory category, String... aliases) {
         this.name = name;
         this.description = description;
         this.aliases = aliases;
@@ -34,6 +34,7 @@ public abstract class Module {
         this.keyBind = new KeyBindSetting("bind", KeyBindSetting.KEY_NONE);
         this.settings.add(keyBind);
     }
+
 
     public void toggle() {
         setEnabled(!enabled);
@@ -88,7 +89,7 @@ public abstract class Module {
     }
 
 
-    public Category getCategory() {
+    public ModuleCategory getCategory() {
         return category;
     }
 

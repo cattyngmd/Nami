@@ -1,12 +1,14 @@
 package me.kiriyaga.nami.feature.module.impl.movement;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 
+@RegisterModule(category = "movement")
 public class NoJumpDelayModule extends Module {
 
     public NoJumpDelayModule() {
-        super("no jump delay", "Removes vanilla jump delay which increases movement speed.", Category.movement, "nojumpdelay");
+        super("no jump delay", "Removes vanilla jump delay which increases movement speed.", ModuleCategory.of("movement"), "nojumpdelay");
     }
 
 }

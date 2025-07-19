@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.debug.ChunkBorderDebugRenderer;
 import net.minecraft.util.math.ChunkPos;

@@ -1,10 +1,12 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.setting.impl.WhitelistSetting;
 
+@RegisterModule(category = "world")
 public class FastPlaceModule extends Module {
 
     public final IntSetting delay = addSetting(new IntSetting("delay", 1, 0, 5));
@@ -13,6 +15,6 @@ public class FastPlaceModule extends Module {
     public final WhitelistSetting blacklist = addSetting(new WhitelistSetting("blacklist", false, this.name));
 
     public FastPlaceModule() {
-        super("fast place", "Decreases cooldown between any type of use.", Category.world, "fastplace");
+        super("fast place", "Decreases cooldown between any type of use.", ModuleCategory.of("world"), "fastplace");
     }
 }

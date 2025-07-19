@@ -1,12 +1,13 @@
-package me.kiriyaga.nami.feature.module.impl.render;
+package me.kiriyaga.nami.feature.module.impl.visuals;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.ChunkDataEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "visuals")
 public class SearchModule extends Module {
 
     private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));
@@ -53,7 +55,7 @@ public class SearchModule extends Module {
     private int tickCounter = 0;
 
     public SearchModule() {
-        super("search", "Search certain blocks on loaded chunks.", Category.visuals, "srcj", "blockesp", "serch", "ыуфкср");
+        super("search", "Search certain blocks on loaded chunks.", ModuleCategory.of("visuals"), "srcj", "blockesp", "serch", "ыуфкср");
         whitelist.setOnChanged(this::reloadChunksAroundPlayer);
         storages.setOnChanged(this::reloadChunksAroundPlayer);
         nonVanilla.setOnChanged(this::reloadChunksAroundPlayer);

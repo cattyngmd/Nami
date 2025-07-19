@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.util;
 
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.feature.module.impl.render.NametagsModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.NametagsModule;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;

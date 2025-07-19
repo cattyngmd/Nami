@@ -1,12 +1,14 @@
 package me.kiriyaga.nami.feature.module.impl.client;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
+@RegisterModule(category = "client")
 public class EntityManagerModule extends Module {
 
     public final IntSetting maxIdleTicks = addSetting(new IntSetting("max idle ticks", 500, 250, 750));
@@ -23,7 +25,7 @@ public class EntityManagerModule extends Module {
     }
 
     public EntityManagerModule() {
-        super("entity manager", "Allows you to config entity manager settings", Category.client, "entity", "entitymanager", "enity", "утешеньфтфпук");
+        super("entity manager", "Allows you to config entity manager settings", ModuleCategory.of("client"), "entity", "entitymanager", "enity", "утешеньфтфпук");
         if (!this.isEnabled())
             this.toggle();
     }

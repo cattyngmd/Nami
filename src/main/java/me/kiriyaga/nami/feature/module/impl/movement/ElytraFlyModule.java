@@ -4,10 +4,11 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.HUDModule;
 import me.kiriyaga.nami.manager.RotationManager;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
@@ -23,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "movement")
 public class ElytraFlyModule extends Module {
 
     public enum FlyMode {
@@ -38,7 +40,7 @@ public class ElytraFlyModule extends Module {
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     public ElytraFlyModule() {
-        super("elytra fly", "Improves elytra flying.", Category.movement, "уднекфадн", "elytrafly");
+        super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "уднекфадн", "elytrafly");
     }
 
     @Override

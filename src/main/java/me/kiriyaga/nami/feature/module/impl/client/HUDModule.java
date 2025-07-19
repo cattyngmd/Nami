@@ -5,9 +5,9 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -29,6 +29,7 @@ import java.util.function.BiFunction;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "client")
 public class HUDModule extends Module {
 
     public enum SpeedMode {
@@ -114,7 +115,7 @@ public class HUDModule extends Module {
 
 
     public HUDModule() {
-        super("hud","Displays in game hud.", Category.client, "ргв");
+        super("hud","Displays in game hud.", ModuleCategory.of("client"), "ргв");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

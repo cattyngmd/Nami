@@ -3,9 +3,10 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -28,6 +29,7 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
+@RegisterModule(category = "world")
 public class AirPlaceModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 3.0, 2.0, 5.0));
@@ -41,7 +43,7 @@ public class AirPlaceModule extends Module {
     private BlockPos renderPos = null;
 
     public AirPlaceModule() {
-        super("air place", "Allows placing blocks mid-air.", Category.world, "airplace", "фшкздфсу");
+        super("air place", "Allows placing blocks mid-air.", ModuleCategory.of("world"), "airplace", "фшкздфсу");
     }
 
     @Override

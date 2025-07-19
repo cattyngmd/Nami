@@ -3,17 +3,19 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.ScreenHandlerAccessor;
 import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "world")
 public class NoGlitchItemsModule extends Module {
     public NoGlitchItemsModule() {
-        super("no glitch items", "Prevents ghost items in inventory.", Category.world);
+        super("no glitch items", "Prevents ghost items in inventory.", ModuleCategory.of("world"));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

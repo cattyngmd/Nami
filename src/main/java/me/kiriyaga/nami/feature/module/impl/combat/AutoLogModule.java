@@ -4,9 +4,10 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.misc.AutoReconnectModule;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EntityUtils;
@@ -17,6 +18,7 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "combat")
 public class AutoLogModule extends Module {
 
     private final IntSetting health = addSetting(new IntSetting("on health", 12, 0, 36));
@@ -29,7 +31,7 @@ public class AutoLogModule extends Module {
     private boolean triggeredLevel = false;
 
     public AutoLogModule() {
-        super("auto log", "Automatically logs out in certain conditions.", Category.combat, "autolog", "panic", "logout", "фгещдщп");
+        super("auto log", "Automatically logs out in certain conditions.", ModuleCategory.of("combat"), "autolog", "panic", "logout", "фгещдщп");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

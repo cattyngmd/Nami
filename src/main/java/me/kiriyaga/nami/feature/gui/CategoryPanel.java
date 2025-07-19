@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.gui;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
@@ -21,23 +21,23 @@ public class CategoryPanel {
     public static final int BORDER_WIDTH = 2;
     public static final int BOTTOM_MARGIN = 4;
 
-    private final Category category;
-    private final Set<Category> expandedCategories;
+    private final ModuleCategory moduleCategory;
+    private final Set<ModuleCategory> expandedCategories;
     private final Set<Module> expandedModules;
 
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getModule(ColorModule.class);
     }
 
-    public CategoryPanel(Category category, Set<Category> expandedCategories, Set<Module> expandedModules) {
-        this.category = category;
+    public CategoryPanel(ModuleCategory moduleCategory, Set<ModuleCategory> expandedCategories, Set<Module> expandedModules) {
+        this.moduleCategory = moduleCategory;
         this.expandedCategories = expandedCategories;
         this.expandedModules = expandedModules;
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
         boolean hovered = isHeaderHovered(mouseX, mouseY, x, y);
-        boolean expanded = expandedCategories.contains(category);
+        boolean expanded = expandedCategories.contains(moduleCategory);
 
         ColorModule colorModule = getColorModule();
         Color primary = colorModule.getStyledGlobalColor();
@@ -47,11 +47,11 @@ public class CategoryPanel {
         Color headerBgColor = expanded ? primary : (hovered ? brighten(secondary, 0.3f) : secondary);
         context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, headerBgColor.getRGB());
         int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
-        context.drawText(textRenderer, category.name(), x + PADDING, textY, toRGBA(textCol), false);
+        context.drawText(textRenderer, moduleCategory.getName(), x + PADDING, textY, toRGBA(textCol), false);
 
         if (expanded) {
             int totalHeight = HEADER_HEIGHT;
-            List<Module> modules = MODULE_MANAGER.getModulesByCategory(category);
+            List<Module> modules = MODULE_MANAGER.getModulesByCategory(moduleCategory);
 
             for (Module module : modules) {
                 totalHeight += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;

@@ -4,8 +4,9 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.PlayerInteractEntityC2SPacketAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -14,13 +15,14 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "movement")
 public class SprintModule extends Module {
 
     private final BoolSetting keepSprint = addSetting(new BoolSetting("keep sprint", true));
     private final BoolSetting inLiquid = addSetting(new BoolSetting("in liquid", true));
 
     public SprintModule() {
-        super("sprint", "Automatically makes you sprint while moving forward.", Category.movement);
+        super("sprint", "Automatically makes you sprint while moving forward.", ModuleCategory.of("movement"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

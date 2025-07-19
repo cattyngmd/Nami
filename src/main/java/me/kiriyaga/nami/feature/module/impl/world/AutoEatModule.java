@@ -2,8 +2,9 @@ package me.kiriyaga.nami.feature.module.impl.world;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
@@ -18,6 +19,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 import static me.kiriyaga.nami.Nami.MC;
+
+@RegisterModule(category = "world")
 public class AutoEatModule extends Module {
 
     private final IntSetting swapDelayTicksSetting = addSetting(new IntSetting("delay", 5, 1, 20));
@@ -30,7 +33,7 @@ public class AutoEatModule extends Module {
     private int swapCooldown = 0;
 
     public AutoEatModule() {
-        super("auto eat", "Automatically eats best food.", Category.world, "фгещуфв", "autoeat");
+        super("auto eat", "Automatically eats best food.", ModuleCategory.of("world"), "фгещуфв", "autoeat");
     }
 
     @Override

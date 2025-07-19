@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.feature.module.impl.client;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
+@RegisterModule(category = "client")
 public class RotationManagerModule extends Module {
     public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 360, 25, 360));
     public final DoubleSetting rotationEaseFactor = addSetting(new DoubleSetting("ease", 1, 0.4, 1));
@@ -17,7 +19,7 @@ public class RotationManagerModule extends Module {
     public final BoolSetting sprintFix = addSetting(new BoolSetting("sprint fix", true));
 
     public RotationManagerModule() {
-        super("rotation manager", "Allows you to config rotation manager settings.", Category.client, "rotate", "rotationmanager", "roate", "toationmanager", "кщефеу");
+        super("rotation manager", "Allows you to config rotation manager settings.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager", "кщефеу");
         if (!this.isEnabled())
             this.toggle();
     }

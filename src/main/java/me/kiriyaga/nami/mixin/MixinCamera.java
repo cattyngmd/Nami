@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.render.FreeLookModule;
-import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
-import me.kiriyaga.nami.feature.module.impl.render.ViewClipModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.ViewClipModule;
 import me.kiriyaga.nami.mixininterface.ICamera;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;

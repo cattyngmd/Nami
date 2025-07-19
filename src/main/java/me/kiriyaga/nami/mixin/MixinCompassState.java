@@ -2,7 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.item.property.numeric.CompassState;
 import net.minecraft.entity.Entity;

@@ -4,10 +4,11 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.manager.RotationManager;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -19,12 +20,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.math.*;
 import net.minecraft.util.hit.EntityHitResult;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "combat")
 public class AuraModule extends Module {
 
     public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.20, 1.0, 7.0));
@@ -40,7 +41,7 @@ public class AuraModule extends Module {
     private Entity currentTarget = null;
 
     public AuraModule() {
-        super("aura", "Attacks certain targets automatically.", Category.combat, "killaura", "ara", "killara", "фгкф");
+        super("aura", "Attacks certain targets automatically.", ModuleCategory.of("combat"), "killaura", "ara", "killara", "фгкф");
     }
 
     @Override

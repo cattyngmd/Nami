@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.render.NoRenderModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.gui.hud.BossBarHud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

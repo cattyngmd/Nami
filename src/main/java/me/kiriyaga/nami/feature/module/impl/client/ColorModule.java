@@ -3,14 +3,16 @@ package me.kiriyaga.nami.feature.module.impl.client;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render2DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.ColorSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 
 import java.awt.*;
 
+@RegisterModule(category = "client")
 public class ColorModule extends Module {
 
     public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 0, 170), true));
@@ -25,7 +27,7 @@ public class ColorModule extends Module {
     private int phase = 0;
 
     public ColorModule() {
-        super("color", "Customizes color scheme.", Category.client, "colr", "c", "colors", "clitor", "сщдщк");
+        super("color", "Customizes color scheme.", ModuleCategory.of("client"), "colr", "c", "colors", "clitor", "сщдщк");
         if (!this.isEnabled())
             this.toggle();
     }

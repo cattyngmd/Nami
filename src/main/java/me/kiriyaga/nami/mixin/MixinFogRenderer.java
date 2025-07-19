@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import me.kiriyaga.nami.feature.module.impl.render.NoRenderModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.render.fog.FogRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

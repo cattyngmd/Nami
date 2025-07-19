@@ -3,9 +3,10 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
@@ -16,6 +17,7 @@ import org.lwjgl.glfw.GLFW;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
+@RegisterModule(category = "movement")
 public class GuiMoveModule extends Module {
 
     private boolean forwardHeld = false;
@@ -27,7 +29,7 @@ public class GuiMoveModule extends Module {
     private boolean sprintHeld = false;
 
     public GuiMoveModule() {
-        super("gui move", "Allows movement in most GUIs.", Category.movement);
+        super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"));
     }
 
     @Override

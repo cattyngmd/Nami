@@ -4,9 +4,10 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.*;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.*;
 
 import me.kiriyaga.nami.setting.impl.*;
@@ -29,6 +30,7 @@ import java.util.*;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "movement")
 public class VelocityModule extends Module {
 
     private enum Mode {
@@ -52,7 +54,7 @@ public class VelocityModule extends Module {
     private boolean pendingConcealment = false;
 
     public VelocityModule() {
-        super("velocity", "Reduces or modifies incoming velocity effects.", Category.movement,
+        super("velocity", "Reduces or modifies incoming velocity effects.", ModuleCategory.of("movement"),
                 "antiknockback", "мудщсшен");
     }
 

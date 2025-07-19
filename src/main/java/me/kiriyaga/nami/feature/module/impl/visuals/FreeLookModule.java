@@ -1,13 +1,15 @@
-package me.kiriyaga.nami.feature.module.impl.render;
+package me.kiriyaga.nami.feature.module.impl.visuals;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import net.minecraft.client.option.Perspective;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "visuals")
 public class FreeLookModule extends Module {
     public float cameraYaw;
     public float cameraPitch;
@@ -19,7 +21,7 @@ public class FreeLookModule extends Module {
 
 
     public FreeLookModule() {
-        super("free look", "Look around freely without moving your real yaw/pitch.", Category.visuals, "freelook", "freelok", "third", "акуудщщл");
+        super("free look", "Look around freely without moving your real yaw/pitch.", ModuleCategory.of("visuals"), "freelook", "freelok", "third", "акуудщщл");
     }
 
     @Override

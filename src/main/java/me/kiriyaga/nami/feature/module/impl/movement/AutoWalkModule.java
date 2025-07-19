@@ -3,18 +3,20 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "movement")
 public class AutoWalkModule extends Module {
 
     public AutoWalkModule() {
-        super("auto walk", "Automatically makes you walk.", Category.movement);
+        super("auto walk", "Automatically makes you walk.", ModuleCategory.of("movement"));
     }
 
     @Override

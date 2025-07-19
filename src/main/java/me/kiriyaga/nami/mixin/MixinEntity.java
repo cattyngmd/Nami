@@ -2,8 +2,8 @@ package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.EntityPushEvent;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
-import me.kiriyaga.nami.feature.module.impl.render.FreeLookModule;
-import me.kiriyaga.nami.feature.module.impl.render.FreecamModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;

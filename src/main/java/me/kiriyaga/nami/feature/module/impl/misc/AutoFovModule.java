@@ -3,19 +3,21 @@ package me.kiriyaga.nami.feature.module.impl.misc;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "misc")
 public class AutoFovModule extends Module {
 
     public final IntSetting fov = addSetting(new IntSetting("fov", 110, 1, 162));
 
     public AutoFovModule() {
-        super("auto fov", "Set up your custom fov.", Category.misc, "autofov", "fov", "atofov", "фгещащч");
+        super("auto fov", "Set up your custom fov.", ModuleCategory.of("misc"), "autofov", "fov", "atofov", "фгещащч");
     }
 
     @Override

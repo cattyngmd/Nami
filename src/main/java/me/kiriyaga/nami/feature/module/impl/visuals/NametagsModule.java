@@ -1,9 +1,10 @@
-package me.kiriyaga.nami.feature.module.impl.render;
+package me.kiriyaga.nami.feature.module.impl.visuals;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "visuals")
 public class NametagsModule extends Module {
 
     public final BoolSetting self = addSetting(new BoolSetting("self", false));
@@ -50,7 +52,7 @@ public class NametagsModule extends Module {
     }
 
     public NametagsModule() {
-        super("nametags", "Draws nametags above certain entities.", Category.visuals);
+        super("nametags", "Draws nametags above certain entities.", ModuleCategory.of("visuals"));
     }
 
     @SubscribeEvent

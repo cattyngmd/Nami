@@ -5,8 +5,9 @@ import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.LedgeClipEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
@@ -28,6 +29,7 @@ import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "movement")
 public class SneakModule extends Module {
 
     public enum Mode {
@@ -45,7 +47,7 @@ public class SneakModule extends Module {
     private static final int CHECK_RADIUS = 1;
 
     public SneakModule() {
-        super("sneak", "Automatically makes you sneak.", Category.movement);
+        super("sneak", "Automatically makes you sneak.", ModuleCategory.of("movement"));
     }
 
     @Override

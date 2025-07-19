@@ -1,11 +1,12 @@
-package me.kiriyaga.nami.feature.module.impl.render;
+package me.kiriyaga.nami.feature.module.impl.visuals;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
@@ -18,6 +19,7 @@ import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "visuals")
 public class ESPModule extends Module {
 
     public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));
@@ -35,7 +37,7 @@ public class ESPModule extends Module {
     private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public ESPModule() {
-        super("esp", "Draws boxes around certain entities.", Category.visuals, "esp", "WH", "boxes", "уыз");
+        super("esp", "Draws boxes around certain entities.", ModuleCategory.of("visuals"), "esp", "WH", "boxes", "уыз");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

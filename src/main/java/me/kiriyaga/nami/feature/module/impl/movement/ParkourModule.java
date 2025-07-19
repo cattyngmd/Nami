@@ -3,18 +3,20 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "movement")
 public class ParkourModule extends Module {
 
     public ParkourModule() {
-        super("parkour", "Automatically jumps at the edge of blocks.", Category.movement, "зфклщгк");
+        super("parkour", "Automatically jumps at the edge of blocks.", ModuleCategory.of("movement"), "зфклщгк");
     }
 
     @Override

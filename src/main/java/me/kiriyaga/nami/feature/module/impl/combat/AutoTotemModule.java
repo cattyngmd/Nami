@@ -4,8 +4,9 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -17,6 +18,7 @@ import net.minecraft.screen.slot.SlotActionType;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "combat")
 public class AutoTotemModule extends Module {
 
     private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
@@ -28,7 +30,7 @@ public class AutoTotemModule extends Module {
     private int totemCount = 0;
 
     public AutoTotemModule() {
-        super("auto totem", "Automatically places totem in your hand.", Category.combat, "autototem");
+        super("auto totem", "Automatically places totem in your hand.", ModuleCategory.of("combat"), "autototem");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

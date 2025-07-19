@@ -3,15 +3,17 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.manager.RotationManager;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
+@RegisterModule(category = "movement")
 public class SpinnerModule extends Module {
 
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 1, 1, 10));
@@ -21,7 +23,7 @@ public class SpinnerModule extends Module {
     private float currentYaw = 0.0f;
 
     public SpinnerModule() {
-        super("spinner", "Make you, spin!.", Category.movement, "ызшттук");
+        super("spinner", "Make you, spin!.", ModuleCategory.of("movement"), "ызшттук");
     }
 
     @Override

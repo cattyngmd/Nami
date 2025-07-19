@@ -1,11 +1,13 @@
-package me.kiriyaga.nami.feature.module.impl.render;
+package me.kiriyaga.nami.feature.module.impl.visuals;
 
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "visuals")
 public class NoRenderModule extends Module {
 
 
@@ -26,7 +28,7 @@ public class NoRenderModule extends Module {
     private final BoolSetting noPowderedSnow = addSetting(new BoolSetting("powdered snow", false));
 
     public NoRenderModule() {
-        super("no render", "Prevent rendering certain overlays/effects.", Category.visuals, "norender");
+        super("no render", "Prevent rendering certain overlays/effects.", ModuleCategory.of("visuals"), "norender");
         noFire.setOnChanged(this::reloadRenderer);
         noBackground.setOnChanged(this::reloadRenderer);
         noLiguid.setOnChanged(this::reloadRenderer);

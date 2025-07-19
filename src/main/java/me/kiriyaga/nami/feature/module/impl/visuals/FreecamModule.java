@@ -1,10 +1,11 @@
-package me.kiriyaga.nami.feature.module.impl.render;
+package me.kiriyaga.nami.feature.module.impl.visuals;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.util.InputUtil;
@@ -14,6 +15,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "visuals")
 public class FreecamModule extends Module {
     private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 15.0));
 
@@ -29,7 +31,7 @@ public class FreecamModule extends Module {
     private boolean forward, back, left, right, up, down;
 
     public FreecamModule() {
-        super("freecam", "Fly around freely without moving your player.", Category.visuals, "freecum", "акуусгь");
+        super("freecam", "Fly around freely without moving your player.", ModuleCategory.of("visuals"), "freecum", "акуусгь");
     }
 
     @Override

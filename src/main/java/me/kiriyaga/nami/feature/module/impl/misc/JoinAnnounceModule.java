@@ -3,22 +3,24 @@ package me.kiriyaga.nami.feature.module.impl.misc;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 
 import static me.kiriyaga.nami.Nami.*;
 
+@RegisterModule(category = "misc")
 public class JoinAnnounceModule extends Module {
 
     public final BoolSetting everyone = addSetting(new BoolSetting("everyone", false));
     public final BoolSetting friends = addSetting(new BoolSetting("friends", true));
 
     public JoinAnnounceModule() {
-        super("join announce", "Announces in chat when a certain player joins the server.", Category.misc, "joinannounce", "joins", "announce", "ощштфттщгтсу");
+        super("join announce", "Announces in chat when a certain player joins the server.", ModuleCategory.of("misc"), "joinannounce", "joins", "announce", "ощштфттщгтсу");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

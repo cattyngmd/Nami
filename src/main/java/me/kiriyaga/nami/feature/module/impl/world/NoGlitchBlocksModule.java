@@ -4,8 +4,9 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.BreakBlockEvent;
 import me.kiriyaga.nami.event.impl.PlaceBlockEvent;
-import me.kiriyaga.nami.feature.module.Category;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.manager.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.item.BlockItem;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -13,6 +14,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 
 import static me.kiriyaga.nami.Nami.MC;
 
+@RegisterModule(category = "world")
 public class NoGlitchBlocksModule extends Module {
 
     private final BoolSetting place = addSetting(new BoolSetting("place", true));
@@ -20,7 +22,7 @@ public class NoGlitchBlocksModule extends Module {
     private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
 
     public NoGlitchBlocksModule() {
-        super("no glitch blocks", "Prevents ghost/place/destroy glitches.", Category.world);
+        super("no glitch blocks", "Prevents ghost/place/destroy glitches.", ModuleCategory.of("world"));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
