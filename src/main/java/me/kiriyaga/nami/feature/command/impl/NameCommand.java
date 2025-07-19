@@ -32,7 +32,7 @@ public class NameCommand extends Command {
         }
 
         DISPLAY_NAME = newName;
-        CONFIG_MANAGER.save();
+        CONFIG_MANAGER.saveName(newName);
 
         CHAT_MANAGER.sendPersistent(NameCommand.class.getName(), "Name set to: §7" + newName + "§f");
     }

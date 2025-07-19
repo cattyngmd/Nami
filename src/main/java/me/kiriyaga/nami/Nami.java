@@ -1,6 +1,7 @@
 package me.kiriyaga.nami;
 
 import me.kiriyaga.nami.core.command.CommandManager;
+import me.kiriyaga.nami.core.config.ConfigManager;
 import me.kiriyaga.nami.feature.gui.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
@@ -38,7 +39,7 @@ public class Nami implements ClientModInitializer {
     public static final EntityManager ENTITY_MANAGER = new EntityManager();
     public static final CommandManager COMMAND_MANAGER = new CommandManager();
     public static final ChatManager CHAT_MANAGER = new ChatManager();
-    public static final FriendManager FRIEND_MANAGER = new FriendManager();
+    public static final FriendManager FRIEND_MANAGER = new FriendManager(CONFIG_MANAGER);
     public static final PingManager PING_MANAGER = new PingManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
@@ -55,13 +56,17 @@ public class Nami implements ClientModInitializer {
         ROTATION_MANAGER.init();
         ENTITY_MANAGER.init();
 
-        CONFIG_MANAGER.load();
+        CONFIG_MANAGER.loadModules();
+        CONFIG_MANAGER.loadFriends();
+        DISPLAY_NAME = CONFIG_MANAGER.loadName();
+        COMMAND_MANAGER.getExecutor().setPrefix(CONFIG_MANAGER.loadPrefix());
+
         FRIEND_MANAGER.load();
 
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
-            CONFIG_MANAGER.save();
+            CONFIG_MANAGER.saveModules();
         });
 
     }

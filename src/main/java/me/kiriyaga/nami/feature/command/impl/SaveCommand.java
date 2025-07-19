@@ -15,7 +15,7 @@ public class SaveCommand extends Command {
     @Override
     public void execute(String[] args) {
         try {
-            CONFIG_MANAGER.save();
+            CONFIG_MANAGER.saveModules();
             CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(), "Config has been saved.");
         } catch (Exception e){
             CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(), "Config has not been saved: §7" + e);

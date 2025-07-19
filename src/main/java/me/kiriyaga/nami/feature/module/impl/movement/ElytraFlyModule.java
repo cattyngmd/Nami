@@ -34,8 +34,8 @@ public class ElytraFlyModule extends Module {
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.bounce));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
     private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
+    private final DoubleSetting targetSpeed = addSetting(new DoubleSetting("boost target speed", 100.00, 40.00, 250.00));
     private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
-    private final DoubleSetting targetSpeed = addSetting(new DoubleSetting("boost speed", 100.00, 40.00, 250.00));
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
@@ -91,7 +91,7 @@ public class ElytraFlyModule extends Module {
         HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
         double currentBps = hud.speed;
 
-        if (player.isSprinting() && currentBps < targetSpeed.get() && currentBps > 39.00 && newBoost.get()) {
+        if (player.isSprinting() && currentBps > 9.00 && newBoost.get()) {
 
             Vec3d velocity = player.getVelocity();
             event.setMovement(new Vec3d(velocity.x, 0, velocity.z));

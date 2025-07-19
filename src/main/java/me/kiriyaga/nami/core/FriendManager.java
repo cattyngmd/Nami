@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.core;
 
 import com.google.gson.*;
+import me.kiriyaga.nami.core.config.ConfigManager;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
@@ -16,75 +17,36 @@ import static me.kiriyaga.nami.Nami.LOGGER;
 
 public class FriendManager {
 
-    private final Set<String> friends = new HashSet<>();
-    private final File file;
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final ConfigManager configManager;
+    private Set<String> friends = new HashSet<>();
 
-    public FriendManager() {
-        File dir = new File(FabricLoader.getInstance().getGameDir().toFile(), "2bEssentials");
-        this.file = new File(dir, "friends.json");
+    public FriendManager(ConfigManager configManager) {
+        this.configManager = configManager;
+        load();
     }
 
     public void load() {
-        friends.clear();
-
-        if (!file.exists()) {
-            LOGGER.info("Friend list not found, starting with empty list.");
-            return;
-        }
-
-        try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
-            JsonElement element = JsonParser.parseReader(reader);
-            if (!element.isJsonArray()) return;
-
-            for (JsonElement friend : element.getAsJsonArray()) {
-                if (friend.isJsonPrimitive() && friend.getAsJsonPrimitive().isString()) {
-                    friends.add(friend.getAsString().toLowerCase());
-                }
-            }
-
-            LOGGER.info("Loaded " + friends.size() + " friends.");
-        } catch (Exception e) {
-            LOGGER.error("Failed to load friends.json", e);
-        }
-    }
-
-    public void save() {
-        try {
-            JsonArray array = new JsonArray();
-            for (String name : friends) {
-                array.add(name);
-            }
-
-            file.getParentFile().mkdirs();
-            try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
-                gson.toJson(array, writer);
-            }
-
-            LOGGER.info("Saved friends.json");
-        } catch (Exception e) {
-            LOGGER.error("Failed to save friends.json", e);
-        }
-    }
-
-    public boolean isFriend(String name) {
-        return name != null && friends.contains(name.toLowerCase());
+        this.friends = new HashSet<>(configManager.loadFriends());
     }
 
     public void addFriend(String name) {
         if (name == null) return;
         if (friends.add(name.toLowerCase())) {
-            CHAT_MANAGER.sendPersistent(FriendManager.class.getName(), "Added friend: §7" + name);
-            save();
+            configManager.saveFriends(friends);
+            CHAT_MANAGER.sendPersistent(getClass().getName(), "Added friend: §7" + name);
         }
     }
 
     public void removeFriend(String name) {
         if (name == null) return;
         if (friends.remove(name.toLowerCase())) {
-            CHAT_MANAGER.sendPersistent(FriendManager.class.getName(), "Removed friend: §7" + name);
-            save();
+            configManager.saveFriends(friends);
+            CHAT_MANAGER.sendPersistent(getClass().getName(), "Removed friend: §7" + name);
         }
+    }
+
+    public boolean isFriend(String name) {
+        return configManager.isFriend(name);
     }
 
     public Set<String> getFriends() {

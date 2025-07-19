@@ -16,7 +16,7 @@ public class LoadCommand extends Command {
     @Override
     public void execute(String[] args) {
         try {
-            CONFIG_MANAGER.load();
+            CONFIG_MANAGER.loadModules();
             CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(), "Config has been loaded.");
         } catch (Exception e){
             CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(), "Config has not been loaded: §7" + e);

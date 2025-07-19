@@ -3,8 +3,7 @@ package me.kiriyaga.nami.feature.command.impl;
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.COMMAND_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class ChangePrefixCommand extends Command {
@@ -33,6 +32,7 @@ public class ChangePrefixCommand extends Command {
         }
 
         COMMAND_MANAGER.getExecutor().setPrefix(input);
+        CONFIG_MANAGER.savePrefix(input);
         CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Prefix changed to: §7" + input);
     }
 }
