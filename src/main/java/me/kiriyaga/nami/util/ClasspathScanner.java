@@ -51,9 +51,11 @@ public class ClasspathScanner {
             } else if (file.getName().endsWith(".class")) {
                 String className = fullPkg + file.getName().replace(".class", "");
 
-                if (shouldSkipClass(className)) continue;
+                if (className.startsWith("me.kiriyaga.nami.mixin.")) {
+                    continue;
+                }
 
-                Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+                Class<?> cls = Class.forName(className);
 
                 if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
                     result.add((Class<? extends T>) cls);
@@ -64,7 +66,7 @@ public class ClasspathScanner {
         return result;
     }
 
-    private static <T> Set<Class<? extends T>> scanJar(JarFile jar, Class<T> base, Class<?> annotation) {
+    private static <T> Set<Class<? extends T>> scanJar(JarFile jar, Class<T> base, Class<?> annotation) throws ClassNotFoundException {
         Set<Class<? extends T>> result = new HashSet<>();
         Enumeration<JarEntry> entries = jar.entries();
 
@@ -72,27 +74,21 @@ public class ClasspathScanner {
             JarEntry entry = entries.nextElement();
             String name = entry.getName();
 
-            if (!name.endsWith(".class")) continue;
-            if (name.startsWith("META-INF/")) continue;
-            if (name.endsWith("module-info.class") || name.endsWith("package-info.class")) continue;
+            if (name.endsWith(".class")) {
+                String className = name.replace('/', '.').replace(".class", "");
 
-            String className = name.replace('/', '.').replace(".class", "");
+                if (className.startsWith("me.kiriyaga.nami.mixin.")) {
+                    continue;
+                }
 
-            if (shouldSkipClass(className)) continue;
-
-            try {
                 Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+
                 if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
                     result.add((Class<? extends T>) cls);
                 }
-            } catch (NoClassDefFoundError | ClassNotFoundException | ExceptionInInitializerError e) {
             }
         }
 
         return result;
-    }
-
-    private static boolean shouldSkipClass(String className) {
-        return className.contains("META-INF") || className.contains("$");
     }
 }
