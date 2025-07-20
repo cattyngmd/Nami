@@ -58,7 +58,12 @@ public class Nami implements ClientModInitializer {
 
         CONFIG_MANAGER.loadModules();
         CONFIG_MANAGER.loadFriends();
-        DISPLAY_NAME = CONFIG_MANAGER.loadName();
+
+        if (CONFIG_MANAGER.loadName() == null)
+            CONFIG_MANAGER.saveName(DISPLAY_NAME);
+        else
+            DISPLAY_NAME = CONFIG_MANAGER.loadName();
+
         COMMAND_MANAGER.getExecutor().setPrefix(CONFIG_MANAGER.loadPrefix());
 
         FRIEND_MANAGER.load();
