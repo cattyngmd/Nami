@@ -32,6 +32,8 @@ public abstract class MixinChatScreen extends Screen {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
     private void redirectFill(DrawContext context, int x1, int y1, int x2, int y2, int color) {
+        if (MODULE_MANAGER.getStorage().getByClass(HUDModule.class) == null)
+            return;
         if (!MODULE_MANAGER.getStorage().getByClass(HUDModule.class).chatAnimation.get())
             return;
 
