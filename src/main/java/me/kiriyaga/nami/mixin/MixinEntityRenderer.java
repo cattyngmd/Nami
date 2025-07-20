@@ -17,7 +17,13 @@ public abstract class MixinEntityRenderer<T extends Entity, S extends EntityRend
 
     @Inject(method = "getDisplayName", at = @At("HEAD"), cancellable = true)
     private void onRenderLabel(T entity, CallbackInfoReturnable<Text> cir) {
-        NametagsModule nametagsModule = MODULE_MANAGER.getStorage().getByClass(NametagsModule.class);
-        if (nametagsModule.isEnabled()) cir.setReturnValue(null);
+        NametagsModule nametagsModule = MODULE_MANAGER.getStorage() != null
+                ? MODULE_MANAGER.getStorage().getByClass(NametagsModule.class)
+                : null;
+
+        if (nametagsModule != null && nametagsModule.isEnabled()) {
+            cir.setReturnValue(null);
+            return;
+        }
     }
 }

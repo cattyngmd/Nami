@@ -64,35 +64,40 @@ public abstract class MixinClientPlayerInteractionManager{
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"))
     private void disableBreakCooldown(CallbackInfoReturnable<Boolean> cir) {
-        if (MODULE_MANAGER.getStorage().getByClass(NoBreakDelayModule.class).isEnabled())
+        if (MODULE_MANAGER.getStorage() == null) return;
+
+        NoBreakDelayModule noBreakDelay = MODULE_MANAGER.getStorage().getByClass(NoBreakDelayModule.class);
+        if (noBreakDelay != null && noBreakDelay.isEnabled()) {
             this.blockBreakingCooldown = 0;
+        }
     }
 
     @Inject(method = "interactBlock", at = @At(value = "HEAD"), cancellable = true)
     private void interactBlockHead(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> info) {
+        if (Nami.MODULE_MANAGER.getStorage() == null) return;
+
         AntiInteractModule antiInteract = Nami.MODULE_MANAGER.getStorage().getByClass(AntiInteractModule.class);
-        if (antiInteract != null && antiInteract.isEnabled() && antiInteract.spawnPoint.get()) {
-            if (player.getWorld() != null) {
-                Block block = player.getWorld().getBlockState(hitResult.getBlockPos()).getBlock();
-                String dimension = player.getWorld().getDimension().toString();
+        if (antiInteract == null || !antiInteract.isEnabled() || !antiInteract.spawnPoint.get()) return;
 
-                Identifier blockId = Registries.BLOCK.getId(block);
+        if (player.getWorld() == null) return;
 
-                if (antiInteract.whitelist.get() && antiInteract.whitelist.isWhitelisted(blockId)) {
-                    info.setReturnValue(ActionResult.FAIL);
-                    return;
-                }
+        Block block = player.getWorld().getBlockState(hitResult.getBlockPos()).getBlock();
+        String dimension = player.getWorld().getDimension().toString();
 
-                if (player.getWorld().getDimension().bedWorks() && antiInteract.isBed(block)) {
-                    info.setReturnValue(ActionResult.FAIL);
-                    return;
-                }
-                if (block == Blocks.RESPAWN_ANCHOR && dimension.contains("nether")) {
-                    info.setReturnValue(ActionResult.FAIL);
-                    return;
-                }
-            }
+        Identifier blockId = Registries.BLOCK.getId(block);
+
+        if (antiInteract.whitelist.get() && antiInteract.whitelist.isWhitelisted(blockId)) {
+            info.setReturnValue(ActionResult.FAIL);
+            return;
+        }
+
+        if (player.getWorld().getDimension().bedWorks() && antiInteract.isBed(block)) {
+            info.setReturnValue(ActionResult.FAIL);
+            return;
+        }
+
+        if (block == Blocks.RESPAWN_ANCHOR && dimension.contains("nether")) {
+            info.setReturnValue(ActionResult.FAIL);
         }
     }
-
 }

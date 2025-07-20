@@ -33,8 +33,10 @@ public abstract class MixinPlayerListHud {
 
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntries(CallbackInfoReturnable<List<PlayerListEntry>> info) {
-        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
-        if (!betterTab.isEnabled()) return;
+        BetterTabModule betterTab = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class) : null;
+        if (betterTab == null || !betterTab.isEnabled()) return;
+
+        if (client == null || client.player == null || client.player.networkHandler == null) return;
 
         List<PlayerListEntry> entries = client.player.networkHandler.getListedPlayerListEntries().stream()
                 .sorted(ENTRY_ORDERING)
@@ -47,9 +49,8 @@ public abstract class MixinPlayerListHud {
 
     @Inject(method = "getPlayerName", at = @At("HEAD"), cancellable = true)
     private void getPlayerName(PlayerListEntry entry, CallbackInfoReturnable<Text> info) {
-        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
-
-        if (!betterTab.isEnabled()) return;
+        BetterTabModule betterTab = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class) : null;
+        if (betterTab == null || !betterTab.isEnabled()) return;
 
         boolean highlightFriends = betterTab.highlighFriends.get();
         String playerName = entry.getProfile().getName();
@@ -61,7 +62,6 @@ public abstract class MixinPlayerListHud {
             if (entry.getDisplayName() != null) {
                 for (Text sibling : entry.getDisplayName().getSiblings()) {
                     String str = sibling.getString();
-
                     if (str.equals(playerName)) {
                         formattedName.append(Text.literal(playerName).formatted(Formatting.AQUA));
                     } else if (str.equals("] " + playerName)) {
@@ -76,8 +76,6 @@ public abstract class MixinPlayerListHud {
             }
 
             info.setReturnValue(applyGameModeFormatting(entry, formattedName));
-            return;
         }
-
     }
 }

@@ -18,19 +18,31 @@ public class MixinInGameOverlayRenderer {
 
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
     private static void onRenderFireOverlay(MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+        if (MODULE_MANAGER.getStorage() == null) return;
+
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender.isEnabled() && noRender.isNoFire()) ci.cancel();
+        if (noRender != null && noRender.isEnabled() && noRender.isNoFire()) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "renderUnderwaterOverlay", at = @At("HEAD"), cancellable = true)
     private static void onRenderUnderwaterOverlay(MinecraftClient client, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+        if (MODULE_MANAGER.getStorage() == null) return;
+
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender.isEnabled() && noRender.isNoLiguid()) ci.cancel();
+        if (noRender != null && noRender.isEnabled() && noRender.isNoLiguid()) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "renderInWallOverlay", at = @At("HEAD"), cancellable = true)
     private static void render(Sprite sprite, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+        if (MODULE_MANAGER.getStorage() == null) return;
+
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender.isEnabled() && noRender.isNoWall()) ci.cancel();
+        if (noRender != null && noRender.isEnabled() && noRender.isNoWall()) {
+            ci.cancel();
+        }
     }
 }

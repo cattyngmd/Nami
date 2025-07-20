@@ -45,18 +45,22 @@ public abstract class MixinCamera implements ICamera {
 
     @ModifyVariable(method = "clipToSpace", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float modifyClipToSpace(float d) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
+                ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
+                : null;
 
-        if (freecamModule.isEnabled()) return 0;
+        if (freecamModule != null && freecamModule.isEnabled()) return 0;
 
         return d;
     }
 
     @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V"))
     private void onUpdateSetPosArgs(Args args) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
+                ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
+                : null;
 
-        if (freecamModule.isEnabled()) {
+        if (freecamModule != null && freecamModule.isEnabled()) {
             double x = freecamModule.prevPos.x + (freecamModule.pos.x - freecamModule.prevPos.x) * tickDelta;
             double y = freecamModule.prevPos.y + (freecamModule.pos.y - freecamModule.prevPos.y) * tickDelta;
             double z = freecamModule.prevPos.z + (freecamModule.pos.z - freecamModule.prevPos.z) * tickDelta;
@@ -69,16 +73,20 @@ public abstract class MixinCamera implements ICamera {
 
     @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V"))
     private void onUpdateSetRotationArgs(Args args) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
-        FreeLookModule freeLookModule = MODULE_MANAGER.getStorage().getByClass(FreeLookModule.class);
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
+                ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
+                : null;
+        FreeLookModule freeLookModule = MODULE_MANAGER.getStorage() != null
+                ? MODULE_MANAGER.getStorage().getByClass(FreeLookModule.class)
+                : null;
 
-        if (freecamModule.isEnabled()) {
+        if (freecamModule != null && freecamModule.isEnabled()) {
             float yaw = freecamModule.lastYaw + (freecamModule.yaw - freecamModule.lastYaw) * tickDelta;
             float pitch = freecamModule.lastPitch + (freecamModule.pitch - freecamModule.lastPitch) * tickDelta;
 
             args.set(0, yaw);
             args.set(1, pitch);
-        } else if (freeLookModule.isEnabled()) {
+        } else if (freeLookModule != null && freeLookModule.isEnabled()) {
             args.set(0, freeLookModule.cameraYaw);
             args.set(1, freeLookModule.cameraPitch);
         }
@@ -86,15 +94,23 @@ public abstract class MixinCamera implements ICamera {
 
     @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
     private void allowClip(float f, CallbackInfoReturnable<Float> i) {
-        if (MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class).isEnabled()) {
+        ViewClipModule viewClipModule = MODULE_MANAGER.getStorage() != null
+                ? MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class)
+                : null;
+
+        if (viewClipModule != null && viewClipModule.isEnabled()) {
             i.setReturnValue(f);
         }
     }
 
     @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;clipToSpace(F)F"))
     private void extendDistance(Args args) {
-        if (MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class).isEnabled()) {
-            args.set(0, MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class).distance.get().floatValue());
+        ViewClipModule viewClipModule = MODULE_MANAGER.getStorage() != null
+                ? MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class)
+                : null;
+
+        if (viewClipModule != null && viewClipModule.isEnabled()) {
+            args.set(0, viewClipModule.distance.get().floatValue());
         }
     }
 }

@@ -48,8 +48,10 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "showFloatingItem", at = @At("HEAD"), cancellable = true)
     private void onShowFloatingItem(ItemStack floatingItem, CallbackInfo info) {
+        if (MODULE_MANAGER.getStorage() == null) return;
+
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (floatingItem.getItem() == Items.TOTEM_OF_UNDYING && noRender.isEnabled() && noRender.isNoTotem()) {
+        if (noRender != null && floatingItem.getItem() == Items.TOTEM_OF_UNDYING && noRender.isEnabled() && noRender.isNoTotem()) {
             info.cancel();
         }
     }
@@ -59,9 +61,14 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "updateCrosshairTarget", at = @At("HEAD"), cancellable = true)
     private void updateTargetedEntityInvoke(float tickDelta, CallbackInfo info) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        if (MODULE_MANAGER.getStorage() == null) return;
 
-        if (freecamModule.isEnabled() && client.getCameraEntity() != null && !freecamSet) {
+        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        if (freecamModule == null || !freecamModule.isEnabled()) return;
+
+        if (client == null) return;
+
+        if (client.getCameraEntity() != null && !freecamSet) {
             info.cancel();
 
             Entity cameraE = client.getCameraEntity();
@@ -102,5 +109,4 @@ public abstract class MixinGameRenderer {
             cameraE.lastPitch = lastPitch;
         }
     }
-
 }

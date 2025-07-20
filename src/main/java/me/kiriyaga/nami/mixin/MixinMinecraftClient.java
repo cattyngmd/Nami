@@ -44,7 +44,10 @@ public abstract class MixinMinecraftClient {
         if (MC == null || MC.mouse == null) return;
 
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
+            if (module == null) continue;
             KeyBindSetting bind = module.getKeyBind();
+            if (bind == null) continue;
+
             if (bind.get() != KeyBindSetting.KEY_NONE) {
                 boolean currentlyPressed = bind.isPressed();
 
@@ -67,20 +70,28 @@ public abstract class MixinMinecraftClient {
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
 
-        if (MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class) == null || MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class) == null)
-            return;
+        AirPlaceModule airPlace = MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class);
+        FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
 
-        if (MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).cooldown <= 0){
-            itemUseCooldown = MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).delay.get();
+        if (airPlace == null || fastPlace == null) return;
+
+        if (airPlace.isEnabled() && airPlace.cooldown <= 0) {
+            itemUseCooldown = airPlace.delay.get();
             return;
         }
 
-        FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
         if (!fastPlace.isEnabled()) return;
 
-        ItemStack heldStack = MinecraftClient.getInstance().player.getMainHandStack();
+        if (MC == null || MC.player == null) return;
+
+        ItemStack heldStack = MC.player.getMainHandStack();
+        if (heldStack == null) return;
+
         Item heldItem = heldStack.getItem();
+        if (heldItem == null) return;
+
         Identifier heldId = Registries.ITEM.getId(heldItem);
+        if (heldId == null) return;
 
         if (fastPlace.whitelist.get() && !fastPlace.whitelist.isWhitelisted(heldId)) return;
 
@@ -91,15 +102,13 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo info) {
         FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
 
-        if (fastPlace == null)
-            return;
+        if (fastPlace == null) return;
 
-        if (fastPlace.isEnabled() && MC.options.useKey.isPressed()) {
+        if (fastPlace.isEnabled() && MC != null && MC.options != null && MC.options.useKey.isPressed()) {
             holdTicks++;
         } else {
             holdTicks = 0;
@@ -108,40 +117,44 @@ public abstract class MixinMinecraftClient {
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void setScreen(Screen screen, CallbackInfo info) {
-        if (screen instanceof DeathScreen && MC.player != null && MODULE_MANAGER.getStorage().getByClass(AutoRespawnModule.class).isEnabled()) {
+        if (!(screen instanceof DeathScreen)) return;
 
-            if (MODULE_MANAGER.getStorage().getByClass(AutoRespawnModule.class).sendCords.get()) {
-                Vec3d pos = MC.player.getPos();
-                String coords = String.format("X: %d Y: %d Z: %d",
-                        Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
+        if (MC == null || MC.player == null) return;
 
-                CHAT_MANAGER.sendPersistent(AutoRespawnModule.class.getName(), "Death coordinates: §7" + coords);
-            }
+        AutoRespawnModule autoRespawn = MODULE_MANAGER.getStorage().getByClass(AutoRespawnModule.class);
+        if (autoRespawn == null || !autoRespawn.isEnabled()) return;
 
-            MC.player.requestRespawn();
-            info.cancel();
+        if (autoRespawn.sendCords.get()) {
+            Vec3d pos = MC.player.getPos();
+            String coords = String.format("X: %d Y: %d Z: %d",
+                    Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
+
+            CHAT_MANAGER.sendPersistent(AutoRespawnModule.class.getName(), "Death coordinates: §7" + coords);
         }
+
+        MC.player.requestRespawn();
+        info.cancel();
     }
 
     @Inject(method = "doAttack", at = @At("HEAD"))
     private void doAttack(CallbackInfoReturnable<Boolean> info) {
-        if (MODULE_MANAGER.getStorage().getByClass(NoHitDelayModule.class).isEnabled())
+        NoHitDelayModule noHitDelay = MODULE_MANAGER.getStorage().getByClass(NoHitDelayModule.class);
+        if (noHitDelay != null && noHitDelay.isEnabled()) {
             attackCooldown = 0;
+        }
     }
 
     @Redirect(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
     private boolean handleBlockBreaking(ClientPlayerEntity instance) {
         InteractionEvent ev = new InteractionEvent();
         EVENT_MANAGER.post(ev);
-        boolean b = !ev.isCancelled() && instance.isUsingItem();
-        return b;
+        return !ev.isCancelled() && instance.isUsingItem();
     }
 
-    @Redirect(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet" + "/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
+    @Redirect(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
     private boolean doItemUse(ClientPlayerInteractionManager instance) {
         InteractionEvent ev = new InteractionEvent();
         EVENT_MANAGER.post(ev);
-        boolean b = !ev.isCancelled() && instance.isBreakingBlock();
-        return b;
+        return !ev.isCancelled() && instance.isBreakingBlock();
     }
 }

@@ -42,8 +42,12 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).moveFix.get())
-            return;
+        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating()) return;
+
+        if (MODULE_MANAGER.getStorage() == null) return;
+        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
+        if (rotationModule == null || !rotationModule.moveFix.get()) return;
 
         originalYaw = this.getYaw();
         originalPitch = this.getPitch();
@@ -59,8 +63,12 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "travel", at = @At("TAIL"))
     private void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).moveFix.get())
-            return;
+        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating()) return;
+
+        if (MODULE_MANAGER.getStorage() == null) return;
+        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
+        if (rotationModule == null || !rotationModule.moveFix.get()) return;
 
         this.setYaw(originalYaw);
         this.setPitch(originalPitch);
@@ -68,7 +76,13 @@ public abstract class MixinLivingEntity extends Entity {
 
     @ModifyVariable(method = "travel", at = @At("HEAD"), ordinal = 0)
     private Vec3d modifyMovementInput(Vec3d movementInput) {
-        if ((Object)this != MinecraftClient.getInstance().player || !ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).moveFix.get()) return movementInput;
+        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return movementInput;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating()) return movementInput;
+
+        if (MODULE_MANAGER.getStorage() == null) return movementInput;
+        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
+        if (rotationModule == null || !rotationModule.moveFix.get()) return movementInput;
+
         if (movementInput.lengthSquared() < 1e-4) return movementInput;
 
         float realYaw = originalYaw;
@@ -79,8 +93,6 @@ public abstract class MixinLivingEntity extends Entity {
         Vec3d globalMovement = localToGlobal(movementInput, realYaw);
 
         Vec3d clampedLocalMovement = globalToLocal(globalMovement, clampedSpoofYaw);
-
-        //CHAT_MANAGER.sendRaw("modifyMovementInput Rotating: " +ROTATION_MANAGER.isRotating() + "\n spoof yaw: " + spoofYaw + "\nrealyaw: " + originalYaw + "\ninput: "+clampedLocalMovement);
 
         return clampedLocalMovement;
     }
@@ -124,29 +136,31 @@ public abstract class MixinLivingEntity extends Entity {
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float jumpFix(float originalYaw) {
         if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
-        return ROTATION_MANAGER.getRotationYaw();
+        return ROTATION_MANAGER != null ? ROTATION_MANAGER.getRotationYaw() : originalYaw;
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
-        if (MODULE_MANAGER.getStorage().getByClass(NoJumpDelayModule.class).isEnabled()) {
+        NoJumpDelayModule module = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(NoJumpDelayModule.class) : null;
+        if (module != null && module.isEnabled()) {
             jumpingCooldown = 0;
         }
     }
 
     @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
-        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class);
-        if (MC.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce && (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled() && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA)
+        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class) : null;
+        if (elytraFlyModule != null && MC.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce &&
+                (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled() &&
+                MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             cir.setReturnValue(true);
+        }
     }
 
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     private void onJump(CallbackInfo ci) {
-        HighJumpModule mod = MODULE_MANAGER.getStorage().getByClass(HighJumpModule.class);
-
-        if (!mod.isEnabled())
-            return;
+        HighJumpModule mod = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(HighJumpModule.class) : null;
+        if (mod == null || !mod.isEnabled()) return;
 
         float jumpBoost = mod.height.get().floatValue();
 
@@ -159,7 +173,6 @@ public abstract class MixinLivingEntity extends Entity {
         }
 
         this.velocityDirty = true;
-
         ci.cancel();
     }
 
@@ -167,7 +180,8 @@ public abstract class MixinLivingEntity extends Entity {
     private void setSprinting(boolean sprinting, CallbackInfo ci) {
         if ((Object)this != MinecraftClient.getInstance().player) return;
 
-        if (!ROTATION_MANAGER.isRotating() || !MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class).sprintFix.get())
+        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class) : null;
+        if (rotationModule == null || ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating() || !rotationModule.sprintFix.get())
             return;
 
         if (sprinting && MC.player.input != null) {
@@ -175,12 +189,9 @@ public abstract class MixinLivingEntity extends Entity {
             float forward = movement.x;
             float sideways = movement.y;
 
-            //CHAT_MANAGER.sendRaw("forward " + forward + ", sideways " + sideways);
-
             if (forward == 0 && sideways == 0) {
                 ci.cancel();
                 super.setSprinting(false);
-                //CHAT_MANAGER.sendRaw("сancelled sprint no movement");
                 return;
             }
 
@@ -190,23 +201,15 @@ public abstract class MixinLivingEntity extends Entity {
             Vec3d localMovement = new Vec3d(sideways, 0, forward);
             Vec3d globalMovement = localToGlobal(localMovement, realYaw);
 
-            //CHAT_MANAGER.sendRaw("global movement: X" + globalMovement.x + " Z" + globalMovement.z);
-
             Vec3d localRelativeToSpoof = globalToLocal(globalMovement, spoofYaw);
-
-            //CHAT_MANAGER.sendRaw("local relative: X" + localRelativeToSpoof.x + " Z" + localRelativeToSpoof.z);
 
             double moveAngleRad = Math.atan2(localRelativeToSpoof.z, localRelativeToSpoof.x);
             float moveAngleDeg = (float) Math.toDegrees(moveAngleRad);
             moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
 
-            //CHAT_MANAGER.sendRaw("move angle deg relative to spoof " + moveAngleDeg);
-
-
             if (Math.abs(moveAngleDeg) > 45f) {
                 ci.cancel();
                 super.setSprinting(false);
-               // CHAT_MANAGER.sendRaw("cancelled sprint because angle more then 45");
             }
         }
     }

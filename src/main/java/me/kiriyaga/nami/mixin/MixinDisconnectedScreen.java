@@ -32,9 +32,9 @@ public abstract class MixinDisconnectedScreen extends Screen {
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo info) {
         AutoReconnectModule module = MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class);
+        if (module == null) return;
 
         if (LAST_CONNECTION != null || !module.hardHide.get()) {
-
             reconnectButton = ButtonWidget.builder(Text.literal(getReconnectText(module)), button -> tryReconnect())
                     .width(200)
                     .build();
@@ -60,6 +60,7 @@ public abstract class MixinDisconnectedScreen extends Screen {
     @Override
     public void tick() {
         AutoReconnectModule module = MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class);
+        if (module == null) return;
 
         if (!module.isEnabled() || LAST_CONNECTION == null || module.hardHide.get()) return;
 
@@ -76,7 +77,7 @@ public abstract class MixinDisconnectedScreen extends Screen {
     @Unique
     private String getReconnectText(AutoReconnectModule module) {
         String text = "Reconnect";
-        if (module.isEnabled()) {
+        if (module != null && module.isEnabled()) {
             text += " " + String.format("(" + Formatting.WHITE + "%.1fs" + Formatting.RESET + ")", time / 20.0);
         }
         return text;
@@ -84,11 +85,13 @@ public abstract class MixinDisconnectedScreen extends Screen {
 
     @Unique
     private String getToggleText(AutoReconnectModule module) {
+        if (module == null) return Formatting.RED + "AutoReconnect";
         return (module.isEnabled() ? Formatting.WHITE : Formatting.RED) + "AutoReconnect";
     }
 
     @Unique
     private void tryReconnect() {
+        if (LAST_CONNECTION == null) return;
         ConnectScreen.connect(
                 new TitleScreen(),
                 MinecraftClient.getInstance(),

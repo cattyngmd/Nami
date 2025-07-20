@@ -20,11 +20,14 @@ public abstract class MixinChunkBorderDebugRenderer {
     @Final
     private MinecraftClient client;
 
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getChunkPos()Lnet/minecraft/util/math/ChunkPos;"))
+    @ModifyExpressionValue(
+            method = "render",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getChunkPos()Lnet/minecraft/util/math/ChunkPos;")
+    )
     private ChunkPos render$getChunkPos(ChunkPos chunkPos) {
         FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
 
-        if (!freecamModule.isEnabled()) return chunkPos;
+        if (freecamModule == null || !freecamModule.isEnabled()) return chunkPos;
 
         float delta = client.getRenderTickCounter().getTickProgress(true);
 

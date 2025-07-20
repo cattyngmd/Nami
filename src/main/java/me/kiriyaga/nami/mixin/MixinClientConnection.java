@@ -50,7 +50,8 @@ public class MixinClientConnection {
 
     @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
     private void exceptionCaught(ChannelHandlerContext context, Throwable exception, CallbackInfo call) {
-        if (MODULE_MANAGER.getStorage().getByClass(AntiPacketKickModule.class).isEnabled()) {
+        AntiPacketKickModule module = MODULE_MANAGER.getStorage().getByClass(AntiPacketKickModule.class);
+        if (module != null && module.isEnabled()) {
             LOGGER.error("Packet ex: \n", exception);
             call.cancel();
         }
