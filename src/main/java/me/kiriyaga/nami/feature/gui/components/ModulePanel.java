@@ -1,12 +1,14 @@
 package me.kiriyaga.nami.feature.gui.components;
 
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.Set;
 
+import static me.kiriyaga.nami.Nami.CLICK_GUI;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
@@ -41,7 +43,12 @@ public class ModulePanel {
         Color secondary = getColorModule().getStyledSecondColor();
         Color textCol = new Color(255, 255, 255, GUI_ALPHA);
         Color textColActivated = new Color(255, 255, 255, 255);
-        Color bgColor = enabled ? primary : secondary;
+
+        Color bgColor;
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get())
+            bgColor = enabled ? primary : secondary;
+        else
+            bgColor = new Color(0,0,0, 0);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
