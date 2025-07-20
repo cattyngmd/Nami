@@ -1,17 +1,6 @@
-package me.kiriyaga.nami.feature.gui;
+package me.kiriyaga.nami.feature.gui.base;
 
 public class SliderHelper {
-
-    /**
-     * Counts value for slider by minmax
-     * @param oldValue current value
-     * @param deltaX delta betwen values
-     * @param step step allowed change
-     * @param min minimum allowed value
-     * @param max maximum allowed value
-     */
-
-    // TODO value scoped steps
     public static double slideDouble(double oldValue, double deltaX, double step, double min, double max) {
         double sensitivity = 0.05;
         double change = deltaX * step * sensitivity;

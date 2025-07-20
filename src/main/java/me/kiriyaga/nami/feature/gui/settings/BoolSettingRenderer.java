@@ -1,0 +1,60 @@
+package me.kiriyaga.nami.feature.gui.settings;
+
+import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import java.awt.*;
+
+import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
+
+public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
+
+    @Override
+    public void render(DrawContext context, TextRenderer textRenderer, BoolSetting setting, int x, int y, int mouseX, int mouseY) {
+        boolean hovered = isHovered(mouseX, mouseY, x, y);
+        ColorModule colorModule = getColorModule();
+        Color primary = colorModule.getStyledGlobalColor();
+        Color secondary = colorModule.getStyledSecondColor();
+        Color textCol = new Color(255, 255, 255, GUI_ALPHA);
+        Color textColActivated = new Color(255, 255, 255, 255);
+        Color bgColor = new Color(30, 30, 30, 0);
+
+        int bgColorInt = toRGBA(bgColor);
+        int textColorInt = setting.get() ? toRGBA(textColActivated) : toRGBA(textCol);
+
+        context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
+
+        int lineOffset = 1;
+
+        context.fill(
+                x - 1,
+                y - lineOffset,
+                x,
+                y + HEIGHT,
+                primary.getRGB()
+        );
+
+        context.drawText(textRenderer, setting.getName(), x + PADDING, y + (HEIGHT - 8) / 2, textColorInt, false);
+    }
+
+    @Override
+    public boolean mouseClicked(BoolSetting setting, double mouseX, double mouseY, int button) {
+        setting.toggle();
+        return true;
+    }
+
+    @Override
+    public void mouseDragged(BoolSetting setting, double mouseX) {
+    }
+
+    private static boolean isHovered(double mouseX, double mouseY, int x, int y) {
+        return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEIGHT;
+    }
+
+    protected ColorModule getColorModule() {
+        return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
+    }
+}

@@ -2,7 +2,7 @@ package me.kiriyaga.nami;
 
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
-import me.kiriyaga.nami.feature.gui.ClickGuiScreen;
+import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;

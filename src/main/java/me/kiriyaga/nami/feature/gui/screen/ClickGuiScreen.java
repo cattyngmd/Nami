@@ -1,5 +1,8 @@
-package me.kiriyaga.nami.feature.gui;
+package me.kiriyaga.nami.feature.gui.screen;
 
+import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
+import me.kiriyaga.nami.feature.gui.components.ModulePanel;
+import me.kiriyaga.nami.feature.gui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -7,9 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
@@ -21,15 +22,15 @@ public class ClickGuiScreen extends Screen {
     private boolean draggingCategory = false;
     private ModuleCategory draggedModuleCategory = null;
     private int dragStartX = 0;
-    public static final int GUI_ALPHA = 122;
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
     public ClickGuiScreen() {
-        super(Text.literal("ClickGUI"));
+        super(Text.literal("NamiGui"));
         syncCategoryPositions();
+        expandedCategories.addAll(ModuleCategory.getAll());
     }
 
     private void syncCategoryPositions() {
@@ -54,7 +55,7 @@ public class ClickGuiScreen extends Screen {
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             try {
                 Integer x = categoryPositions.get(moduleCategory);
-                if (x == null) continue; // пропускаем, если позиции нет
+                if (x == null) continue;
 
                 CategoryPanel panel = new CategoryPanel(moduleCategory, expandedCategories, expandedModules);
                 panel.render(context, this.textRenderer, x, 20 + scrollOffset, mouseX, mouseY, this.height);
@@ -71,7 +72,7 @@ public class ClickGuiScreen extends Screen {
                 if (x == null) continue;
 
                 List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
-                int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING;
+                int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
 
                 for (Module module : modules) {
                     int modX = x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
@@ -80,15 +81,13 @@ public class ClickGuiScreen extends Screen {
                     if (ModulePanel.isHovered(mouseX, mouseY, modX, modY)) {
                         String description = module.getDescription();
                         if (description != null && !description.isEmpty()) {
-
                             int descX = mouseX + 5;
                             int descY = mouseY;
                             int textWidth = textRenderer.getWidth(description);
                             int textHeight = 8;
 
                             context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2,
-                                    new Color(30, 30, 30, GUI_ALPHA).getRGB());
-
+                                    0x7F000000);
                             context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, false);
                         }
                         return;
@@ -136,7 +135,7 @@ public class ClickGuiScreen extends Screen {
                     if (x == null) continue;
 
                     List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
-                    int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING;
+                    int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
 
                     for (Module module : modules) {
                         if (ModulePanel.isHovered(mouseX, mouseY, x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING, curY)) {
@@ -188,7 +187,7 @@ public class ClickGuiScreen extends Screen {
             }
         }
 
-        SettingPanel.mouseDragged(mouseX);
+        SettingPanel.mouseDragged(mouseX, mouseY);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
