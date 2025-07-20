@@ -25,13 +25,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.kiriyaga.nami.feature.module.Module;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.concurrent.CompletableFuture;
+
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(MinecraftClient.class)
-public class MixinMinecraftClient {
+public abstract class MixinMinecraftClient {
     @Shadow
     public int attackCooldown;
     @Shadow private int itemUseCooldown;
+
+    @Shadow public abstract CompletableFuture<Void> reloadResources();
 
     private int holdTicks = 0;
 
@@ -63,6 +67,9 @@ public class MixinMinecraftClient {
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
 
+        if (MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class) == null || MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class) == null)
+            return;
+
         if (MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).cooldown <= 0){
             itemUseCooldown = MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class).delay.get();
             return;
@@ -88,6 +95,9 @@ public class MixinMinecraftClient {
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo info) {
         FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
+
+        if (fastPlace == null)
+            return;
 
         if (fastPlace.isEnabled() && MC.options.useKey.isPressed()) {
             holdTicks++;
