@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.settings;
 
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.setting.impl.ColorSetting;
 import net.minecraft.client.font.TextRenderer;
@@ -18,7 +19,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     public void render(DrawContext context, TextRenderer textRenderer, ColorSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = new Color(255, 255, 255, 255);
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
@@ -32,7 +33,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         String text = setting.getName();
         context.drawText(textRenderer, text, (int)(x + PADDING), y + (HEIGHT - 8) / 2, textColorInt, false);
 
-        renderHueSlider(context, x + PADDING, y + HEIGHT - 4, WIDTH - 2 * PADDING, SLIDER_HEIGHT, hue);
+        renderHueSlider(context, x + PADDING, y + HEIGHT - 2, WIDTH - 2 * PADDING, SLIDER_HEIGHT, hue);
 
         int lineOffset = 1;
 

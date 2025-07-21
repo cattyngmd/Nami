@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.gui.components;
 
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -41,7 +42,7 @@ public class CategoryPanel {
         ColorModule colorModule = getColorModule();
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = new Color(255, 255, 255, 255);
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
         int totalHeight = HEADER_HEIGHT + BOTTOM_MARGIN;
         List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);

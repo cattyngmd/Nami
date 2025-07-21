@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.settings;
 
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import net.minecraft.client.font.TextRenderer;
@@ -16,7 +17,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
     public void render(DrawContext context, TextRenderer textRenderer, EnumSetting<?> setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = new Color(255, 255, 255, 255);
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));

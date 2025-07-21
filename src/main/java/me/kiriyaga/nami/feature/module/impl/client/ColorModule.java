@@ -17,9 +17,9 @@ public class ColorModule extends Module {
 
     public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 0, 170), true));
 
-    public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.35, 0.0, 1.0));
+    public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.33, 0.0, 1.0));
     public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.00, 0.0, 1.0));
-    public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.7, 0.0, 1.0));
+    public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.4, 0.0, 1.0));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
     public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbow speed", 0.4, 0.01, 5.0));

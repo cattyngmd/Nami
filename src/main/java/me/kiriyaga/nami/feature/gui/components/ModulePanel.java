@@ -42,13 +42,13 @@ public class ModulePanel {
         Color primary = getColorModule().getStyledGlobalColor();
         Color secondary = getColorModule().getStyledSecondColor();
         Color textCol = new Color(255, 255, 255, GUI_ALPHA);
-        Color textColActivated = new Color(255, 255, 255, 255);
+        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
         Color bgColor;
         if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get())
             bgColor = enabled ? primary : secondary;
         else
-            bgColor = new Color(0,0,0, 0);
+            bgColor = new Color(30, 30, 30, 0);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 

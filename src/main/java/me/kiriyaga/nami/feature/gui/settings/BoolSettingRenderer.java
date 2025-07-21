@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.gui.settings;
 
 import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.client.font.TextRenderer;
@@ -19,8 +20,8 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
         Color textCol = new Color(255, 255, 255, GUI_ALPHA);
-        Color textColActivated = new Color(255, 255, 255, 255);
         Color bgColor = new Color(30, 30, 30, 0);
+        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
         int bgColorInt = toRGBA(bgColor);
         int textColorInt = setting.get() ? toRGBA(textColActivated) : toRGBA(textCol);
