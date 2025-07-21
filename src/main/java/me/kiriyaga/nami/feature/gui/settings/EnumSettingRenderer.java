@@ -17,21 +17,24 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
     public void render(DrawContext context, TextRenderer textRenderer, EnumSetting<?> setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
+                ? new Color(255, 255, 255, 255)
+                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
-        float targetOffset = hovered ? 0f : -20f;
-
         int lineOffset = 1;
         context.fill(x - 1, y - lineOffset, x, y + HEIGHT, primary.getRGB());
+
+        int textX = x + PADDING + (hovered ? 1 : 0);
+        int textY = y + (HEIGHT - 8) / 2;
 
         context.drawText(
                 textRenderer,
                 setting.getName(),
-                (int)(x + PADDING),
-                y + (HEIGHT - 8) / 2,
+                textX,
+                textY,
                 toRGBA(textCol),
                 false
         );
@@ -41,7 +44,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
                 textRenderer,
                 valueStr,
                 x + WIDTH - PADDING - textRenderer.getWidth(valueStr),
-                y + (HEIGHT - 8) / 2,
+                textY,
                 toRGBA(textCol),
                 false
         );

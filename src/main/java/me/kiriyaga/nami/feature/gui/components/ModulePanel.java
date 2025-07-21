@@ -20,7 +20,6 @@ public class ModulePanel {
 
     private final Module module;
     private final Set<Module> expandedModules;
-    private float textOffsetX = 0f;
 
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
@@ -36,13 +35,12 @@ public class ModulePanel {
         boolean enabled = module.isEnabled();
         boolean expanded = expandedModules.contains(module);
 
-        float targetOffset = hovered ? 0f : -6f;
-        textOffsetX = approach(textOffsetX, targetOffset, 0.1f);
-
         Color primary = getColorModule().getStyledGlobalColor();
         Color secondary = getColorModule().getStyledSecondColor();
         Color textCol = new Color(255, 255, 255, GUI_ALPHA);
-        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
+                ? new Color(255, 255, 255, 255)
+                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
         Color bgColor;
         if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get())
@@ -57,12 +55,12 @@ public class ModulePanel {
         }
 
         int textY = y + (HEIGHT - 8) / 2;
-        int baseTextX = x + PADDING;
+        int baseTextX = x + PADDING + (hovered ? 1 : 0);
 
         context.drawText(
                 textRenderer,
                 module.getName(),
-                (int) (baseTextX + textOffsetX),
+                baseTextX,
                 textY,
                 toRGBA(enabled ? textColActivated : textCol),
                 false

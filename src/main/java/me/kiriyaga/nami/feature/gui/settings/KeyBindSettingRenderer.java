@@ -19,7 +19,9 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
     public void render(DrawContext context, TextRenderer textRenderer, KeyBindSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
+                ? new Color(255, 255, 255, 255)
+                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
@@ -33,16 +35,28 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                 primary.getRGB()
         );
 
-        context.drawText(textRenderer, setting.getName(), (int)(x + PADDING),
-                y + (HEIGHT - 8) / 2, toRGBA(textCol), false);
+        int textX = x + PADDING + (hovered ? 1 : 0);
+        int textY = y + (HEIGHT - 8) / 2;
+
+        context.drawText(
+                textRenderer,
+                setting.getName(),
+                textX,
+                textY,
+                toRGBA(textCol),
+                false
+        );
 
         String valueStr = waitingForKeyBind == setting ? "Press a key..." : KeyUtils.getKeyName(setting.get());
 
-        context.drawText(textRenderer, valueStr,
+        context.drawText(
+                textRenderer,
+                valueStr,
                 x + WIDTH - PADDING - textRenderer.getWidth(valueStr),
-                y + (HEIGHT - 8) / 2,
+                textY,
                 toRGBA(textCol),
-                false);
+                false
+        );
     }
 
     @Override

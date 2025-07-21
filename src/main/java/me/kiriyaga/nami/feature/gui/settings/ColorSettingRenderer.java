@@ -19,7 +19,9 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     public void render(DrawContext context, TextRenderer textRenderer, ColorSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
+                ? new Color(255, 255, 255, 255)
+                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
@@ -31,12 +33,14 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
         String text = setting.getName();
-        context.drawText(textRenderer, text, (int)(x + PADDING), y + (HEIGHT - 8) / 2, textColorInt, false);
+        int textX = x + PADDING + (hovered ? 1 : 0);
+        int textY = y + (HEIGHT - 8) / 2;
+
+        context.drawText(textRenderer, text, textX, textY, textColorInt, false);
 
         renderHueSlider(context, x + PADDING, y + HEIGHT - 2, WIDTH - 2 * PADDING, SLIDER_HEIGHT, hue);
 
         int lineOffset = 1;
-
         context.fill(
                 x - 1,
                 y - lineOffset,
@@ -46,7 +50,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         );
 
         String hex = String.format("#%02X%02X%02X", setting.getRed(), setting.getGreen(), setting.getBlue());
-        context.drawText(textRenderer, hex, x + WIDTH - PADDING - textRenderer.getWidth(hex), y + (HEIGHT - 8) / 2, textColorInt, false);
+        context.drawText(textRenderer, hex, x + WIDTH - PADDING - textRenderer.getWidth(hex), textY, textColorInt, false);
     }
 
     @Override

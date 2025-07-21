@@ -19,26 +19,38 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
     public void render(DrawContext context, TextRenderer textRenderer, DoubleSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
+                ? new Color(255, 255, 255, 255)
+                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
+        int textX = x + PADDING + (hovered ? 1 : 0);
+        int textY = y + (HEIGHT - 8) / 2;
+
         context.drawText(
                 textRenderer,
                 setting.getName(),
-                (int)(x + PADDING),
-                y + (HEIGHT - 8) / 2,
+                textX,
+                textY,
                 toRGBA(textCol),
                 false
         );
 
-        renderSlider(context, x + PADDING, y + HEIGHT - 2,
-                WIDTH - 4 * PADDING, SLIDER_HEIGHT,
-                setting.get(), setting.getMin(), setting.getMax(), primary);
+        renderSlider(
+                context,
+                x + PADDING,
+                y + HEIGHT - 2,
+                WIDTH - 4 * PADDING,
+                SLIDER_HEIGHT,
+                setting.get(),
+                setting.getMin(),
+                setting.getMax(),
+                primary
+        );
 
         int lineOffset = 1;
-
         context.fill(
                 x - 1,
                 y - lineOffset,
@@ -50,11 +62,12 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
         double val = setting.get();
         double range = setting.getMax() - setting.getMin();
         String valStr = formatValue(val, range);
+
         context.drawText(
                 textRenderer,
                 valStr,
                 x + WIDTH - PADDING - textRenderer.getWidth(valStr),
-                y + (HEIGHT - 8) / 2,
+                textY,
                 toRGBA(textCol),
                 false
         );

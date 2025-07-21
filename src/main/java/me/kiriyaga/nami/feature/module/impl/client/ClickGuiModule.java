@@ -11,8 +11,8 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule(category = "client")
 public class ClickGuiModule extends Module {
 
-    public final BoolSetting moduleFill = addSetting(new BoolSetting("module fill", false));
-    public final BoolSetting background = addSetting(new BoolSetting("background", false));
+    public final BoolSetting moduleFill = addSetting(new BoolSetting("module fill", true));
+    public final BoolSetting background = addSetting(new BoolSetting("background", true));
     public final BoolSetting descriptions = addSetting(new BoolSetting("descriptions", true));
 
     public ClickGuiModule() {

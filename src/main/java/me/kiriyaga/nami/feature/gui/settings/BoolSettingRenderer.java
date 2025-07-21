@@ -21,7 +21,9 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         Color secondary = colorModule.getStyledSecondColor();
         Color textCol = new Color(255, 255, 255, GUI_ALPHA);
         Color bgColor = new Color(30, 30, 30, 0);
-        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
+                ? new Color(255, 255, 255, 255)
+                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
         int bgColorInt = toRGBA(bgColor);
         int textColorInt = setting.get() ? toRGBA(textColActivated) : toRGBA(textCol);
@@ -29,7 +31,6 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
         int lineOffset = 1;
-
         context.fill(
                 x - 1,
                 y - lineOffset,
@@ -38,7 +39,10 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
                 primary.getRGB()
         );
 
-        context.drawText(textRenderer, setting.getName(), x + PADDING, y + (HEIGHT - 8) / 2, textColorInt, false);
+        int textX = x + PADDING + (hovered ? 1 : 0);
+        int textY = y + (HEIGHT - 8) / 2;
+
+        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, false);
     }
 
     @Override
