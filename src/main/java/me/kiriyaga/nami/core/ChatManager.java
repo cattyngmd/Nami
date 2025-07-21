@@ -83,7 +83,7 @@ public class ChatManager {
 
         Text text = prefix ? prefix().copy().append(message) : message;
         MessageSignatureData signature = generateSignature();
-        MessageIndicator indicator = MessageIndicator.system();
+        MessageIndicator indicator = indicator();
 
         chatHud.addMessage(text, signature, indicator);
         persistentMessages.put(key, signature);
@@ -113,7 +113,7 @@ public class ChatManager {
 
         Text text = prefix ? prefix().copy().append(message) : message;
         MessageSignatureData signature = generateSignature();
-        MessageIndicator indicator = MessageIndicator.system();
+        MessageIndicator indicator = indicator();
 
         chatHud.addMessage(text, signature, indicator);
         transientSignature = signature;
@@ -165,6 +165,11 @@ public class ChatManager {
             return false;
         });
         accessor.callRefresh();
+    }
+
+    private MessageIndicator indicator() {
+        int global = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
+        return new MessageIndicator(global, null, Text.literal(DISPLAY_NAME), NAME);
     }
 
     private Text prefix() {
