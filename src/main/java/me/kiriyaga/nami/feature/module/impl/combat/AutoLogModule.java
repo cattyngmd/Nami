@@ -2,12 +2,14 @@ package me.kiriyaga.nami.feature.module.impl.combat;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.DissconectEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.misc.AutoReconnectModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.misc.IllegalDisconnectModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EntityUtils;
@@ -90,16 +92,20 @@ public class AutoLogModule extends Module {
 
 
     private void logOut(String reason) {
-        if (MC.getNetworkHandler() != null) {
-            MC.getNetworkHandler().onDisconnect(new net.minecraft.network.packet.s2c.common.DisconnectS2CPacket(
-                    net.minecraft.text.Text.of("AutoLog: §7" + reason)
-            ));
+        if (MODULE_MANAGER.getStorage().getByClass(IllegalDisconnectModule.class).isEnabled())
+            EVENT_MANAGER.post(new DissconectEvent());
+        else {
+            if (MC.getNetworkHandler() != null) {
+                MC.getNetworkHandler().onDisconnect(new net.minecraft.network.packet.s2c.common.DisconnectS2CPacket(
+                        net.minecraft.text.Text.of("AutoLog: §7" + reason)
+                ));
 
-            if (selfToggle.get())
-                this.toggle();
+                if (selfToggle.get())
+                    this.toggle();
 
-            if (reconnectToggle.get() && MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).isEnabled())
-                MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).toggle();
+                if (reconnectToggle.get() && MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).isEnabled())
+                    MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).toggle();
+            }
         }
     }
 }

@@ -21,6 +21,7 @@
     "MixinDisconnectedScreen",
     "MixinEntityRenderer",
     "MixinFogRenderer",
+    "MixinGameMenuScreen",
     "MixinGameRenderer",
     "MixinHeadFeatureRenderer",
     "MixinInactivityFpsLimiter",
