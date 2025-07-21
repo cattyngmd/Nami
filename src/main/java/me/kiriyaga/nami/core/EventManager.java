@@ -3,13 +3,16 @@ package me.kiriyaga.nami.core;
 import me.kiriyaga.nami.event.Event;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import static me.kiriyaga.nami.Nami.LOGGER;
+
 public class EventManager {
 
     private final Map<Class<? extends Event>, List<ListenerMethod>> listeners = new ConcurrentHashMap<>();
@@ -18,16 +21,18 @@ public class EventManager {
         private final Object target;
         private final Method method;
         private final EventPriority priority;
+        private final Consumer<Object> invoker;
 
-        public ListenerMethod(Object target, Method method, EventPriority priority) {
+        public ListenerMethod(Object target, Method method, EventPriority priority) throws Throwable {
             this.target = target;
             this.method = method;
             this.priority = priority;
+            this.invoker = ReflectionUtils.wrapConsumer(target, method);
             this.method.setAccessible(true);
         }
 
         public void invoke(Event event) throws Exception {
-            method.invoke(target, event);
+            invoker.accept(event);
         }
 
         public EventPriority getPriority() {
@@ -54,10 +59,13 @@ public class EventManager {
             SubscribeEvent annotation = method.getAnnotation(SubscribeEvent.class);
             EventPriority priority = annotation.priority();
 
-            ListenerMethod listenerMethod = new ListenerMethod(listenerObject, method, priority);
-
-            listeners.computeIfAbsent(eventClass, k -> new CopyOnWriteArrayList<>()).add(listenerMethod);
-            listeners.get(eventClass).sort(Comparator.naturalOrder());
+            try {
+                ListenerMethod listenerMethod = new ListenerMethod(listenerObject, method, priority);
+                listeners.computeIfAbsent(eventClass, k -> new CopyOnWriteArrayList<>()).add(listenerMethod);
+                listeners.get(eventClass).sort(Comparator.naturalOrder());
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
