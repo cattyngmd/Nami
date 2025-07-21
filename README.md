@@ -1,55 +1,100 @@
 # Nami Client 1.21.7
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8bbe39b3-0ef0-4f38-94d2-f81df402f005" />
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/71a79d90-b439-490c-8f92-969cd7f2adeb" />
 
+<p align="center">
+  <a href="https://github.com/Kiriyaga7615/2bEssentials/releases">
+    <img src="https://img.shields.io/github/v/release/Kiriyaga7615/2bEssentials?color=blue&label=Latest%20Release" alt="Latest Release" />
+  </a>
+  <a href="https://github.com/Kiriyaga7615/2bEssentials/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/Kiriyaga7615/2bEssentials?color=blue" alt="License" />
+  </a>
+  <a href="https://discord.gg/your_discord_invite_here">
+    <img src="https://img.shields.io/discord/your_discord_id_here?color=7289DA&label=Discord" alt="Discord" />
+  </a>
+</p>
 
+**Nami** is a modular and lightweight anarchy client base built for PVE and automation.  
+The 1.21.4 branch is outdated!
 
-1.21.4 branch is outdated!
+Most popular Minecraft clients are closed-source, paid, and obfuscated, making them difficult to audit or trust. Some may include backdoors or malicious code.
 
-**Nami** is a modular and lightweight anarchy client base built build for PVE and automatization.
+This project started as a clean, open-source alternative aiming to be transparent, secure, and easy to extend without relying on unsafe third-party clients.
 
-## Config/feedback
+---
 
-it may be a little difficult to configurate nami, since i left many development only settings for now, please lead to 
-https://discord.gg/TfknuhEP
-for stable config, also you can ask me about any settings there
+## Screenshots
 
-## Why
+<details>
+<summary>View screenshots</summary>
 
-Most commonly used Minecraft clients are paid, closed-source, and obfuscated. This makes them difficult to audit or trust and in some cases, they may include backdoors or malicious code.
+<img width="100%" alt="Nami Client screenshot 1" src="https://github.com/user-attachments/assets/8bbe39b3-0ef0-4f38-94d2-f81df402f005" />  
+<img width="100%" alt="Nami Client screenshot 2" src="https://github.com/user-attachments/assets/71a79d90-b439-490c-8f92-969cd7f2adeb" />
 
-This project was started as a clean, open-source alternative. It aims to be transparent, secure, and easy to extend, without relying on potentially unsafe third-party clients.
+</details>
+
+---
 
 ## Requirements
 
-- Java 21
-- Gradle 8+
+- Java 21  
+- Gradle 8+  
+- Minecraft 1.21.7  
+- Fabric loader, API
+
+---
 
 ## How to Build
 
-### 1. Clone the repository
+1. Clone the repository:
 
-```bash
-git clone https://github.com/Kiriyaga7615/2bEssentials.git
-cd nami
+    git clone https://github.com/Kiriyaga7615/2bEssentials.git  
+    cd nami
 
-```
+2. Build with Gradle:
 
-### 2. Build Gradle
-``` bash
-Using the Gradle wrapper:
-./gradlew build
+    Linux / macOS  
+    ./gradlew build
 
-On Windows:
-gradlew.bat build
+    Windows  
+    gradlew.bat build
 
-The compiled JAR will be located in:
-build/libs/nami-<version>.jar
-```
+The compiled JAR will be located at:  
+`build/libs/nami-<version>.jar`
+
+---
+
+## FAQ
+
+<details>
+<summary>How to open ClickGUI?</summary>
+
+ClickGUI is not bound by default. Use the command:  
+`-bind clickgui KEY`  
+to bind it to your preferred key.
+
+</details>
+
+<details>
+<summary>What is the command prefix?</summary>
+
+The default command prefix is `-`.
+
+</details>
+
+<details>
+<summary>Can I use a custom font?</summary>
+
+Please use the Caxton mod instead of the built-in client font renderers.
+
+</details>
+
+---
 
 ## License
-This project is licensed under the MIT License. You are free to contribute, distribute, fork or skid anything you will.
 
-## Additional thanks
-[cattyngmd](https://github.com/cattyngmd) for helping with rotations and y motion boost method.
+This project is licensed under the MIT License. You are free to contribute, distribute, fork, or reuse any part.
 
+---
+
+## Special Thanks
+
+Thanks to [cattyngmd](https://github.com/cattyngmd) for assistance with rotations and Y motion boost methods.
