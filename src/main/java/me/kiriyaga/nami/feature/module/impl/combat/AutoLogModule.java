@@ -100,20 +100,24 @@ public class AutoLogModule extends Module {
 
 
     private void logOut(String reason) {
-        if (MODULE_MANAGER.getStorage().getByClass(IllegalDisconnectModule.class).isEnabled())
+        if (MODULE_MANAGER.getStorage().getByClass(IllegalDisconnectModule.class).isEnabled()){
+            triggerToggle();
             EVENT_MANAGER.post(new DissconectEvent());
-        else {
+        } else {
             if (MC.getNetworkHandler() != null) {
+                triggerToggle();
                 MC.getNetworkHandler().onDisconnect(new net.minecraft.network.packet.s2c.common.DisconnectS2CPacket(
                         net.minecraft.text.Text.of("AutoLog: §7" + reason)
                 ));
-
-                if (selfToggle.get())
-                    this.toggle();
-
-                if (reconnectToggle.get() && MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).isEnabled())
-                    MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).toggle();
             }
         }
+    }
+
+    private void triggerToggle(){
+        if (selfToggle.get())
+            this.toggle();
+
+        if (reconnectToggle.get() && MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).isEnabled())
+            MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class).toggle();
     }
 }
