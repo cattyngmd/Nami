@@ -74,10 +74,15 @@ public class GuiMoveModule extends Module {
 
         Screen currentScreen = MC.currentScreen;
 
-        if (lastScreen != currentScreen) {
-            resetHeldKeys();
+        if (currentScreen != null) {
+            if (lastScreen != currentScreen) {
+                resetHeldKeys();
+            }
             lastScreen = currentScreen;
+        } else {
+            lastScreen = null;
         }
+
 
         if (!canMove()) {
             setKeysPressed(false);
@@ -112,7 +117,7 @@ public class GuiMoveModule extends Module {
     }
 
     private boolean canMove() {
-        if (MC.currentScreen == null) return false;
+        if (MC.currentScreen == null) return true;
         return !(MC.currentScreen instanceof ChatScreen
                 || MC.currentScreen instanceof SignEditScreen
                 || MC.currentScreen instanceof AnvilScreen
