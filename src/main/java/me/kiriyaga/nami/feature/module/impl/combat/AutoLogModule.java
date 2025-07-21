@@ -92,7 +92,7 @@ public class AutoLogModule extends Module {
         }
 
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
-            if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 3 && onPop.get()) {
+            if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 35 && onPop.get()) {
                 MC.execute(() -> logOut("AutoLog: totem got popped."));
             }
         }
