@@ -93,6 +93,9 @@ public class RotationManager {
 
 
     public void cancelRequest(String id) {
+        if (activeRequest.id == id) // this shit is necessary
+            activeRequest = null;
+
         requests.removeIf(r -> Objects.equals(r.id, id));
     }
 
