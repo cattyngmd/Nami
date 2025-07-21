@@ -17,6 +17,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.MaceItem;
+import net.minecraft.item.TridentItem;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.math.*;
 import net.minecraft.util.hit.EntityHitResult;
@@ -55,16 +57,14 @@ public class AuraModule extends Module {
         if (MC.player == null || MC.world == null) return;
         if (!multiTask.get() && MC.player.isUsingItem()) return;
 
-        if (swordOnly.get()) {
-            ItemStack stack = MC.player.getMainHandStack();
-            if (!(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS))) return;
-        }
+        ItemStack stack = MC.player.getMainHandStack();
 
         Entity target = ENTITY_MANAGER.getTarget();
-        if (target == null) {
+        if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS) || stack.getItem() instanceof TridentItem || stack.getItem() instanceof MaceItem))) {
             currentTarget = null;
             return;
         }
+
 
         currentTarget = target;
 
