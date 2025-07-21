@@ -49,15 +49,4 @@ public class MixinClientPlayNetworkHandler {
 
         EVENT_MANAGER.post(new ChunkDataEvent(chunk));
     }
-
-    @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
-    private void onChatMessage(ChatMessageS2CPacket packet, CallbackInfo ci) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-
-        ReceiveMessageEvent event = new ReceiveMessageEvent();
-        EVENT_MANAGER.post(event);
-
-        if (event.isCancelled())
-            ci.cancel();
-    }
 }

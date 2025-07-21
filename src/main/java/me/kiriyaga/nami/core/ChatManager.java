@@ -177,4 +177,30 @@ public class ChatManager {
 
         return Text.empty().append(left).append(name).append(right);
     }
+
+    public boolean isOurSignature(MessageSignatureData sig) {
+        if (sig == null) return false;
+
+        if (transientSignature != null && equalsSig(transientSignature, sig)) return true;
+
+        for (MessageSignatureData entry : persistentMessages.values()) {
+            if (equalsSig(entry, sig)) return true;
+        }
+
+        return false;
+    }
+
+    private boolean equalsSig(MessageSignatureData a, MessageSignatureData b) {
+        if (a == b) return true;
+        if (a == null || b == null) return false;
+
+        byte[] ad = a.data();
+        byte[] bd = b.data();
+
+        if (ad.length != bd.length) return false;
+        for (int i = 0; i < ad.length; i++) {
+            if (ad[i] != bd[i]) return false;
+        }
+        return true;
+    }
 }
