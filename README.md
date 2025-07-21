@@ -12,6 +12,11 @@
   </a>
 </p>
 
+![# badge](no-stops-no-regrets.svg)
+![# badge](ensuring-code-integrity.svg)
+![# badge](works-on-selfmerging.svg)
+
+
 **Nami** is a modular and lightweight anarchy client base built for PVE and automation.  
 The 1.21.4 branch is outdated!
 
