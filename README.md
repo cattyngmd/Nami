@@ -7,7 +7,7 @@
   <a href="https://github.com/Kiriyaga7615/2bEssentials/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/Kiriyaga7615/2bEssentials?color=blue" alt="License" />
   </a>
-  <a href="https://discord.gg/your_discord_invite_here">
+  <a href="https://discord.gg/qy3eS42beW">
     <img src="https://img.shields.io/discord/your_discord_id_here?color=7289DA&label=Discord" alt="Discord" />
   </a>
 </p>
