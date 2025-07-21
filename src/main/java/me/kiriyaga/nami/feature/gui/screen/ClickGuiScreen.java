@@ -22,6 +22,7 @@ public class ClickGuiScreen extends Screen {
     private boolean draggingCategory = false;
     private ModuleCategory draggedModuleCategory = null;
     private int dragStartX = 0;
+    public float scale = 1;
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
@@ -50,18 +51,19 @@ public class ClickGuiScreen extends Screen {
         if (clickGuiModule != null && clickGuiModule.background.get())
             context.fill(0, 0, this.width, this.height, 0xC0101010);
 
-        super.render(context, mouseX, mouseY, delta);
+        context.getMatrices().pushMatrix();
+
+        context.getMatrices().scale(scale, scale);
+
+        int scaledMouseX = (int) (mouseX / scale);
+        int scaledMouseY = (int) (mouseY / scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
-            try {
-                Integer x = categoryPositions.get(moduleCategory);
-                if (x == null) continue;
+            Integer x = categoryPositions.get(moduleCategory);
+            if (x == null) continue;
 
-                CategoryPanel panel = new CategoryPanel(moduleCategory, expandedCategories, expandedModules);
-                panel.render(context, this.textRenderer, x, 20 + scrollOffset, mouseX, mouseY, this.height);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            CategoryPanel panel = new CategoryPanel(moduleCategory, expandedCategories, expandedModules);
+            panel.render(context, this.textRenderer, x, 20 + scrollOffset, scaledMouseX, scaledMouseY, this.height);
         }
 
         if (clickGuiModule != null && clickGuiModule.descriptions.get()) {
@@ -78,11 +80,11 @@ public class ClickGuiScreen extends Screen {
                     int modX = x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
                     int modY = curY;
 
-                    if (ModulePanel.isHovered(mouseX, mouseY, modX, modY)) {
+                    if (ModulePanel.isHovered(scaledMouseX, scaledMouseY, modX, modY)) {
                         String description = module.getDescription();
                         if (description != null && !description.isEmpty()) {
-                            int descX = mouseX + 5;
-                            int descY = mouseY;
+                            int descX = scaledMouseX + 5;
+                            int descY = scaledMouseY;
                             int textWidth = textRenderer.getWidth(description);
                             int textHeight = 8;
 
@@ -90,6 +92,7 @@ public class ClickGuiScreen extends Screen {
                                     0x7F000000);
                             context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, false);
                         }
+                        context.getMatrices().popMatrix();
                         return;
                     }
 
@@ -101,21 +104,28 @@ public class ClickGuiScreen extends Screen {
                 }
             }
         }
+
+        context.getMatrices().popMatrix();
+
+        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         syncCategoryPositions();
 
+        int scaledMouseX = (int) (mouseX / scale);
+        int scaledMouseY = (int) (mouseY / scale);
+
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             Integer x = categoryPositions.get(moduleCategory);
             if (x == null) continue;
 
-            if (CategoryPanel.isHeaderHovered(mouseX, mouseY, x, 20 + scrollOffset)) {
+            if (CategoryPanel.isHeaderHovered(scaledMouseX, scaledMouseY, x, 20 + scrollOffset)) {
                 if (button == 0) {
                     draggingCategory = true;
                     draggedModuleCategory = moduleCategory;
-                    dragStartX = (int) mouseX;
+                    dragStartX = scaledMouseX;
                     return true;
                 } else if (button == 1) {
                     if (expandedCategories.contains(moduleCategory)) {
@@ -138,7 +148,9 @@ public class ClickGuiScreen extends Screen {
                     int curY = 20 + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
 
                     for (Module module : modules) {
-                        if (ModulePanel.isHovered(mouseX, mouseY, x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING, curY)) {
+                        int modX = x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
+
+                        if (ModulePanel.isHovered(scaledMouseX, scaledMouseY, modX, curY)) {
                             if (button == 0) {
                                 module.toggle();
                             } else if (button == 1) {
@@ -153,9 +165,7 @@ public class ClickGuiScreen extends Screen {
                         curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
 
                         if (expandedModules.contains(module)) {
-                            if (SettingPanel.mouseClicked(module, mouseX, mouseY, button,
-                                    x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING,
-                                    curY)) {
+                            if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) {
                                 return true;
                             }
                             curY += SettingPanel.getSettingsHeight(module);
@@ -178,16 +188,21 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        int scaledMouseX = (int) (mouseX / scale);
+        int scaledMouseY = (int) (mouseY / scale);
+        int scaledDeltaX = (int) (deltaX / scale);
+        int scaledDeltaY = (int) (deltaY / scale);
+
         if (draggingCategory && draggedModuleCategory != null) {
             Integer currentX = categoryPositions.get(draggedModuleCategory);
             if (currentX != null) {
-                int newX = currentX + (int) deltaX;
+                int newX = currentX + scaledDeltaX;
                 categoryPositions.put(draggedModuleCategory, newX);
                 return true;
             }
         }
 
-        SettingPanel.mouseDragged(mouseX, mouseY);
+        SettingPanel.mouseDragged(scaledMouseX, scaledMouseY);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
