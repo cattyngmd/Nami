@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -28,6 +29,8 @@ public class GuiMoveModule extends Module {
     private boolean sneakHeld = false;
     private boolean sprintHeld = false;
 
+    private Screen lastScreen = null;
+
     public GuiMoveModule() {
         super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"));
     }
@@ -42,12 +45,12 @@ public class GuiMoveModule extends Module {
         sneakHeld = false;
         sprintHeld = false;
         setKeysPressed(false);
+        lastScreen = null;
     }
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
         if (!canMove()) return;
-
 
         updateHeld(MC.options.forwardKey, event.key, event.action, false, v -> forwardHeld = v);
         updateHeld(MC.options.backKey, event.key, event.action, false, v -> backHeld = v);
@@ -67,10 +70,16 @@ public class GuiMoveModule extends Module {
 
     @SubscribeEvent
     public void onRender3D(Render3DEvent event) {
-        if (!canMove() || MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return;
+        if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return;
 
-        if (MC.currentScreen == null) {
-            forwardHeld = backHeld = leftHeld = rightHeld = jumpHeld = sneakHeld = sprintHeld = false;
+        Screen currentScreen = MC.currentScreen;
+
+        if (lastScreen != currentScreen) {
+            resetHeldKeys();
+            lastScreen = currentScreen;
+        }
+
+        if (!canMove()) {
             setKeysPressed(false);
             return;
         }
@@ -82,6 +91,17 @@ public class GuiMoveModule extends Module {
         updateKeyWithHold(MC.options.jumpKey, jumpHeld);
         updateKeyWithHold(MC.options.sneakKey, sneakHeld);
         updateKeyWithHold(MC.options.sprintKey, sprintHeld);
+    }
+
+    private void resetHeldKeys() {
+        forwardHeld = false;
+        backHeld = false;
+        leftHeld = false;
+        rightHeld = false;
+        jumpHeld = false;
+        sneakHeld = false;
+        sprintHeld = false;
+        setKeysPressed(false);
     }
 
     private void updateKeyWithHold(KeyBinding bind, boolean held) {
