@@ -32,7 +32,8 @@
     "MixinPlayerListHud",
     "MixinScreen",
     "MixinSimpleOption",
-    "MixinWorldRenderer"
+    "MixinWorldRenderer",
+    "SignEditScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

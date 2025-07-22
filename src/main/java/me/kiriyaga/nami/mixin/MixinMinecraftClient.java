@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.InteractionEvent;
+import me.kiriyaga.nami.event.impl.OpenScreenEvent;
 import me.kiriyaga.nami.feature.module.impl.misc.AutoRespawnModule;
 import me.kiriyaga.nami.feature.module.impl.world.AirPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.FastPlaceModule;
@@ -15,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.kiriyaga.nami.feature.module.Module;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -36,6 +39,8 @@ public abstract class MixinMinecraftClient {
     @Shadow private int itemUseCooldown;
 
     @Shadow public abstract CompletableFuture<Void> reloadResources();
+
+    @Shadow public abstract int saveCrashReport(File runDir, CrashReport crashReport);
 
     private int holdTicks = 0;
 
@@ -116,24 +121,13 @@ public abstract class MixinMinecraftClient {
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
-    private void setScreen(Screen screen, CallbackInfo info) {
-        if (!(screen instanceof DeathScreen)) return;
+    private void onSetScreen(Screen screen, CallbackInfo ci) {
+        OpenScreenEvent event = new OpenScreenEvent(screen);
 
-        if (MC == null || MC.player == null) return;
+        EVENT_MANAGER.post(event);
 
-        AutoRespawnModule autoRespawn = MODULE_MANAGER.getStorage().getByClass(AutoRespawnModule.class);
-        if (autoRespawn == null || !autoRespawn.isEnabled()) return;
-
-        if (autoRespawn.sendCords.get()) {
-            Vec3d pos = MC.player.getPos();
-            String coords = String.format("X: %d Y: %d Z: %d",
-                    Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
-
-            CHAT_MANAGER.sendPersistent(AutoRespawnModule.class.getName(), "Death coordinates: §7" + coords);
-        }
-
-        MC.player.requestRespawn();
-        info.cancel();
+        if (event.isCancelled())
+            ci.cancel();
     }
 
     @Inject(method = "doAttack", at = @At("HEAD"))
