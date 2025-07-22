@@ -11,7 +11,9 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
@@ -45,8 +47,11 @@ public class AutoNametagModule extends Module {
 
         for (Entity entity : MC.world.getEntities()) {
             if (entity == null) continue;
+            if (entity == MC.player) continue;
             if (entity.getCustomName() != null && !nametagged.get()) continue;
             if (entity instanceof VillagerEntity) continue;
+            if (entity instanceof EnderPearlEntity) continue;
+            if (entity instanceof EnderDragonEntity) continue;
 
             double distance = MC.player.squaredDistanceTo(entity);
             if (distance > range.get() * range.get()) continue;

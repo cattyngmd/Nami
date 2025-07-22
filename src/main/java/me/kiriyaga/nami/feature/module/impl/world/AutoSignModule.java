@@ -29,9 +29,6 @@ public class AutoSignModule extends Module {
 
     @SubscribeEvent
     public void onPacketSend(PacketSendEvent event) {
-        if (cachedText != null)
-            return;
-
         if (event.getPacket() instanceof UpdateSignC2SPacket packet)
             cachedText = packet.getText();
     }
