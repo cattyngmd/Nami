@@ -14,7 +14,9 @@ import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.Tameable;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -35,6 +37,8 @@ public class NametagsModule extends Module {
     public final BoolSetting neutrals = addSetting(new BoolSetting("neutrals", false));
     public final BoolSetting passives = addSetting(new BoolSetting("passives", false));
     public final BoolSetting items = addSetting(new BoolSetting("items", false));
+    public final BoolSetting tamed = addSetting(new BoolSetting("tamed", false));
+    public final BoolSetting pearls = addSetting(new BoolSetting("pearls", false));
     public final BoolSetting showItems = addSetting(new BoolSetting("equipment", true));
     public final BoolSetting showHealth = addSetting(new BoolSetting("health", false));
     public final BoolSetting showGameMode = addSetting(new BoolSetting("gamemode", false));
@@ -99,9 +103,33 @@ public class NametagsModule extends Module {
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
+
+        if (tamed.get()) {
+            for (var entity : ENTITY_MANAGER.getAllEntities()) {
+                if (entity instanceof Tameable tameable){
+                    if (tameable.getOwner() == null) continue;
+
+                    renderEntityNametag(entity, tameable.getOwner().getName().getString(), event.getTickDelta(), matrices, 30, null);
+
+                }
+            }
+        }
+
+        if (pearls.get()) {
+            for (var entity : ENTITY_MANAGER.getAllEntities()) {
+                if (!(entity instanceof EnderPearlEntity pearl)) continue;
+                if (pearl.getOwner() == null) continue;
+
+                renderEntityNametag(pearl, pearl.getOwner().getName().getString(), event.getTickDelta(), matrices, 30, null);
+            }
+        }
     }
 
     private void renderEntityNametag(net.minecraft.entity.Entity entity, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
+        renderEntityNametag(entity, entity.getName().getString(), tickDelta, matrices, scale, forcedColor);
+    }
+
+        private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
         Vec3d pos = new Vec3d(
                 MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
                 MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY())

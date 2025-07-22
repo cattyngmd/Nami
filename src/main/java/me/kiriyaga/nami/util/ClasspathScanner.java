@@ -16,7 +16,7 @@ public class ClasspathScanner {
         Set<Class<? extends T>> result = new HashSet<>();
 
         try {
-            Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("");
+            Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("me/kiriyaga/nami");
 
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
