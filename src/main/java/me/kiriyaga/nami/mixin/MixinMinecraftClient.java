@@ -39,9 +39,7 @@ public abstract class MixinMinecraftClient {
     @Shadow private int itemUseCooldown;
 
     @Shadow public abstract CompletableFuture<Void> reloadResources();
-
-    @Shadow public abstract int saveCrashReport(File runDir, CrashReport crashReport);
-
+    
     private int holdTicks = 0;
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
