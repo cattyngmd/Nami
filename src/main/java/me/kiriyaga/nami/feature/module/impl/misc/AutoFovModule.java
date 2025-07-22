@@ -11,7 +11,7 @@ import me.kiriyaga.nami.setting.impl.IntSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class AutoFovModule extends Module {
 
     public final IntSetting fov = addSetting(new IntSetting("fov", 110, 1, 162));

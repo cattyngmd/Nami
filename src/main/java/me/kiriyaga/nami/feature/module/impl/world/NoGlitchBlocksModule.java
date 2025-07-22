@@ -14,7 +14,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class NoGlitchBlocksModule extends Module {
 
     private final BoolSetting place = addSetting(new BoolSetting("place", true));

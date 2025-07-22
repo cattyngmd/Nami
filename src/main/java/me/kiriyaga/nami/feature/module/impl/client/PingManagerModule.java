@@ -6,7 +6,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-@RegisterModule(category = "client")
+@RegisterModule
 public class PingManagerModule extends Module {
     public final IntSetting smoothingStrength = addSetting(new IntSetting("smoothing", 10, 1, 50));
     public final IntSetting unstableConnectionTimeout = addSetting(new IntSetting("unstable", 3, 1, 60));

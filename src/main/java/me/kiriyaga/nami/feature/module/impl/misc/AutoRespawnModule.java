@@ -5,7 +5,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class AutoRespawnModule extends Module {
 
     public final BoolSetting sendCords = addSetting(new BoolSetting("send cords", true));

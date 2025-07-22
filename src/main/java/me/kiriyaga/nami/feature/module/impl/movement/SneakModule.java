@@ -29,7 +29,7 @@ import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class SneakModule extends Module {
 
     public enum Mode {

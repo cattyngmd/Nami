@@ -12,7 +12,7 @@ import net.minecraft.screen.ScreenHandler;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class NoGlitchItemsModule extends Module {
     public NoGlitchItemsModule() {
         super("no glitch items", "Prevents ghost items in inventory.", ModuleCategory.of("world"));

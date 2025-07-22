@@ -9,7 +9,7 @@ import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import static me.kiriyaga.nami.Nami.CLICK_GUI;
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "client")
+@RegisterModule
 public class ClickGuiModule extends Module {
 
     public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1.00, 0.50, 1.50));

@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class MultiTaskModule extends Module {
 
     public MultiTaskModule() {

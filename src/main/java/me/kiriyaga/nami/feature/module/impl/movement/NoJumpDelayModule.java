@@ -4,7 +4,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class NoJumpDelayModule extends Module {
 
     public NoJumpDelayModule() {

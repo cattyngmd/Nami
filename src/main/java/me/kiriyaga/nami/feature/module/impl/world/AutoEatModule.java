@@ -20,7 +20,7 @@ import net.minecraft.item.Items;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class AutoEatModule extends Module {
 
     private final IntSetting swapDelayTicksSetting = addSetting(new IntSetting("delay", 5, 1, 20));

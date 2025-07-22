@@ -8,7 +8,7 @@ import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-@RegisterModule(category = "client")
+@RegisterModule
 public class EntityManagerModule extends Module {
 
     public final IntSetting maxIdleTicks = addSetting(new IntSetting("max idle ticks", 500, 250, 750));

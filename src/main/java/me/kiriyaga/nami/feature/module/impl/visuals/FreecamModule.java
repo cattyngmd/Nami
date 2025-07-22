@@ -15,7 +15,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class FreecamModule extends Module {
     private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 15.0));
 

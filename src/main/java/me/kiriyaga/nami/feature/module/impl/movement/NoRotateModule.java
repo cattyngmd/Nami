@@ -12,7 +12,7 @@ import net.minecraft.network.packet.s2c.play.PositionFlag;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class NoRotateModule extends Module {
 
     public NoRotateModule() {

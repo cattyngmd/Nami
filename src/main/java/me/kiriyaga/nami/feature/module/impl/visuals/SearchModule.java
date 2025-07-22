@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class SearchModule extends Module {
 
     private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));

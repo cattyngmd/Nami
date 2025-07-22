@@ -21,7 +21,7 @@ import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "combat")
+@RegisterModule
 public class AutoLogModule extends Module {
 
     private final IntSetting health = addSetting(new IntSetting("on health", 12, 0, 36));

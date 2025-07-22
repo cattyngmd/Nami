@@ -6,7 +6,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.setting.impl.WhitelistSetting;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class FastPlaceModule extends Module {
 
     public final IntSetting delay = addSetting(new IntSetting("delay", 1, 0, 5));

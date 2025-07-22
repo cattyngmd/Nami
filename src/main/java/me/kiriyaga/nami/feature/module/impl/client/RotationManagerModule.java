@@ -7,7 +7,7 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-@RegisterModule(category = "client")
+@RegisterModule
 public class RotationManagerModule extends Module {
     public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 360, 25, 360));
     public final DoubleSetting rotationEaseFactor = addSetting(new DoubleSetting("ease", 1, 0.4, 1));

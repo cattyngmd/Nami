@@ -16,7 +16,7 @@ import net.minecraft.util.math.Direction;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "combat")
+@RegisterModule
 public class AutoBowReleaseModule extends Module {
 
     private final IntSetting ticks = addSetting(new IntSetting("delay", 20, 1, 20));

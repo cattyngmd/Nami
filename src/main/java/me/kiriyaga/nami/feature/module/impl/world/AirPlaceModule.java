@@ -29,7 +29,7 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class AirPlaceModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 3.0, 2.0, 5.0));

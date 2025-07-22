@@ -9,7 +9,7 @@ import net.minecraft.client.option.Perspective;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class FreeLookModule extends Module {
     public float cameraYaw;
     public float cameraPitch;

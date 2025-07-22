@@ -12,7 +12,7 @@ import me.kiriyaga.nami.setting.impl.DoubleSetting;
 
 import java.awt.*;
 
-@RegisterModule(category = "client")
+@RegisterModule
 public class ColorModule extends Module {
 
     public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 0, 170), true));

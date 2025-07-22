@@ -18,7 +18,7 @@ import java.util.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class ElytraSwapModule extends Module {
 
     private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));

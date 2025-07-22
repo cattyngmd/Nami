@@ -12,7 +12,7 @@ import net.minecraft.client.util.InputUtil;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class ParkourModule extends Module {
 
     public ParkourModule() {

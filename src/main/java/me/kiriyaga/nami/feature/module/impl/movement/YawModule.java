@@ -11,7 +11,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class YawModule extends Module {
 
     private final IntSetting directions = addSetting(new IntSetting("directions", 8, 4, 16));

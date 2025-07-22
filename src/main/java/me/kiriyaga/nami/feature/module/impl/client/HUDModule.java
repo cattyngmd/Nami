@@ -29,7 +29,7 @@ import java.util.function.BiFunction;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "client")
+@RegisterModule
 public class HUDModule extends Module {
 
     public enum SpeedMode {

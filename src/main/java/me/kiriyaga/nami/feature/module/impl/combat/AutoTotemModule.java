@@ -18,7 +18,7 @@ import net.minecraft.screen.slot.SlotActionType;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "combat")
+@RegisterModule
 public class AutoTotemModule extends Module {
 
     private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));

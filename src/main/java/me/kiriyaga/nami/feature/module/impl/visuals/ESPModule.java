@@ -19,7 +19,7 @@ import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class ESPModule extends Module {
 
     public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));

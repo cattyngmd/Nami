@@ -30,7 +30,7 @@ import java.util.*;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class VelocityModule extends Module {
 
     private enum Mode {

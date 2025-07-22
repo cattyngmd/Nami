@@ -22,7 +22,7 @@ import java.util.BitSet;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class IllegalDisconnectModule extends Module {
 
     public IllegalDisconnectModule() {

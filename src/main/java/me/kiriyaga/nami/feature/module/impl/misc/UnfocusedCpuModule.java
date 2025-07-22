@@ -5,7 +5,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class UnfocusedCpuModule extends Module {
 
     public final IntSetting limit = addSetting(new IntSetting("limit", 15, 5, 30));

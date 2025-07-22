@@ -24,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class ElytraFlyModule extends Module {
 
     public enum FlyMode {

@@ -7,7 +7,7 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class NoRenderModule extends Module {
 
 

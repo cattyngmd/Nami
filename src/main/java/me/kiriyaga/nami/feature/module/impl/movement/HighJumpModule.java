@@ -5,7 +5,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class HighJumpModule extends Module {
 
     public final DoubleSetting height = addSetting(new DoubleSetting("height", 0.42, 0.00, 1.0));

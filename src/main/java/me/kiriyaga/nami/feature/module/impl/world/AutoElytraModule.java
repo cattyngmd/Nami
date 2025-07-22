@@ -21,7 +21,7 @@ import java.util.Map;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class AutoElytraModule extends Module {
 
     private boolean wasOnGroundLastTick = true;

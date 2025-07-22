@@ -27,7 +27,7 @@ import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "combat")
+@RegisterModule
 public class AuraModule extends Module {
 
     public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.20, 1.0, 7.0));

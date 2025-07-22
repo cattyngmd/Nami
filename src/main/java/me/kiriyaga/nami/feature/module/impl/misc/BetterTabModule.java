@@ -6,7 +6,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class BetterTabModule extends Module {
 
     public final IntSetting limit = addSetting(new IntSetting("limit", 300, 25, 15000));

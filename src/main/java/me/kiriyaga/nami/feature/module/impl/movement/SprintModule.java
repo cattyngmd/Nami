@@ -15,7 +15,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class SprintModule extends Module {
 
     private final BoolSetting keepSprint = addSetting(new BoolSetting("keep sprint", true));

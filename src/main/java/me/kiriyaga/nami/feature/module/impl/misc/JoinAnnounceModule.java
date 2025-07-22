@@ -13,7 +13,7 @@ import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class JoinAnnounceModule extends Module {
 
     public final BoolSetting everyone = addSetting(new BoolSetting("everyone", false));

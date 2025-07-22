@@ -11,7 +11,7 @@ import me.kiriyaga.nami.setting.impl.DoubleSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class AutoGammaModule extends Module {
 
     public final DoubleSetting gamma = addSetting(new DoubleSetting("gamma", 2, 1, 25));

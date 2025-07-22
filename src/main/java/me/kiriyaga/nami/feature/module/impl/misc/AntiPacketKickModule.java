@@ -5,7 +5,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class AntiPacketKickModule extends Module {
 
     public AntiPacketKickModule() {

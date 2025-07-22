@@ -6,7 +6,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import net.minecraft.client.option.Perspective;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class NoWeatherModule extends Module {
     public float cameraYaw;
     public float cameraPitch;

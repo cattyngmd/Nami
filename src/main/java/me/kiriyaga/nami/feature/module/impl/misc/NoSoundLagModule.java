@@ -15,7 +15,7 @@ import net.minecraft.sound.SoundEvents;
 
 import java.util.Set;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class NoSoundLagModule extends Module {
 
     public final BoolSetting armor = addSetting(new BoolSetting("armor", true));

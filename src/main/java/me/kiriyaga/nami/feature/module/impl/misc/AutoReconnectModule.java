@@ -6,7 +6,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class AutoReconnectModule extends Module {
 
     public final BoolSetting hardHide = addSetting(new BoolSetting("hard hide", false));

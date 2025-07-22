@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class SprintResetModule extends Module {
 
     private final IntSetting chance = addSetting(new IntSetting("chance", 100, 0, 100));

@@ -13,7 +13,7 @@ import me.kiriyaga.nami.setting.impl.IntSetting;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class SpinnerModule extends Module {
 
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 1, 1, 10));

@@ -13,7 +13,7 @@ import net.minecraft.sound.SoundEvents;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class VisualRangeModule extends Module {
 
     private final BoolSetting friends = addSetting(new BoolSetting("friends", false));

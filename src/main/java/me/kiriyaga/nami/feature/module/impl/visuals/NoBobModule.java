@@ -11,7 +11,7 @@ import me.kiriyaga.nami.setting.impl.IntSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class NoBobModule extends Module {
 
     public NoBobModule() {

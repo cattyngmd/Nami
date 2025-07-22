@@ -18,7 +18,7 @@ import org.lwjgl.glfw.GLFW;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
-@RegisterModule(category = "movement")
+@RegisterModule
 public class GuiMoveModule extends Module {
 
     private boolean forwardHeld = false;

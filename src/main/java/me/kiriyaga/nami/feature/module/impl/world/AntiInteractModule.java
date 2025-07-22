@@ -18,7 +18,7 @@ import net.minecraft.world.dimension.DimensionTypes;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "world")
+@RegisterModule
 public class AntiInteractModule extends Module {
 
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name));

@@ -14,7 +14,7 @@ import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule(category = "misc")
+@RegisterModule
 public class NoResourcepack extends Module {
 
     public NoResourcepack() {

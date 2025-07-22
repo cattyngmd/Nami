@@ -22,7 +22,7 @@ import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "combat")
+@RegisterModule
 public class BowAimbotModule extends Module {
 
     public final BoolSetting render = addSetting(new BoolSetting("render", true));

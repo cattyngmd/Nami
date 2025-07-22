@@ -26,7 +26,7 @@ import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule(category = "visuals")
+@RegisterModule
 public class NametagsModule extends Module {
 
     public final BoolSetting self = addSetting(new BoolSetting("self", false));
