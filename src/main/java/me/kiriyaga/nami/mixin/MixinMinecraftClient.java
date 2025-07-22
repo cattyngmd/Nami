@@ -38,8 +38,6 @@ public abstract class MixinMinecraftClient {
     public int attackCooldown;
     @Shadow private int itemUseCooldown;
 
-    @Shadow public abstract CompletableFuture<Void> reloadResources();
-    
     private int holdTicks = 0;
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
