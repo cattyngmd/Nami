@@ -116,7 +116,7 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setScreen", at = @At("TAIL"), cancellable = true)
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         OpenScreenEvent event = new OpenScreenEvent(screen);
 
