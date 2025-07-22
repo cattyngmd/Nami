@@ -23,15 +23,15 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
-public class BowAimbotModule extends Module {
+public class BowAim extends Module {
 
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 10));
 
     private Entity currentTarget = null;
 
-    public BowAimbotModule() {
-        super("bow aimbot", "Aims at certain targets with bow/trident.", ModuleCategory.of("combat"), "bowbot", "aimbot", "bowaimbot", "ищцфшьище");
+    public BowAim() {
+        super("bow aim", "Aims at certain targets with bow/trident.", ModuleCategory.of("combat"), "bowbot", "aimbot", "bowaimbot", "ищцфшьище");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class BowAimbotModule extends Module {
 
         Vec3d aimPos = getAimPosition(target);
         ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
-                BowAimbotModule.class.getName(),
+                BowAim.class.getName(),
                 rotationPriority.get(),
                 (float) getYawToVec(MC.player, aimPos),
                 (float) getPitchToVec(MC.player, aimPos)

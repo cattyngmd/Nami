@@ -34,7 +34,7 @@ public class VisualRangeModule extends Module {
                 var entity = MC.world.getEntityById(entityId);
                 if (entity instanceof PlayerEntity player) {
                     if (player == MC.player) return;
-                    if (FRIEND_MANAGER.isFriend(player.getName().getString()) && friends.get()) return;
+                    if (FRIEND_MANAGER.isFriend(player.getName().getString()) && !friends.get()) return;
 
                     CHAT_MANAGER.sendPersistent(player.getUuidAsString(), "§7" + player.getName().getString() + "§f has entered visual range.");
 

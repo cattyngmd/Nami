@@ -39,10 +39,12 @@ public abstract class MixinPlayerListHud {
         if (client == null || client.player == null || client.player.networkHandler == null) return;
 
         List<PlayerListEntry> entries = client.player.networkHandler.getListedPlayerListEntries().stream()
-                .sorted(ENTRY_ORDERING)
                 .filter(entry -> !betterTab.friendsOnly.get() || FRIEND_MANAGER.isFriend(entry.getProfile().getName()))
                 .limit(betterTab.limit.get())
+                .sorted(ENTRY_ORDERING)
+                .limit(betterTab.limit.get())
                 .collect(Collectors.toList());
+
 
         info.setReturnValue(entries);
     }

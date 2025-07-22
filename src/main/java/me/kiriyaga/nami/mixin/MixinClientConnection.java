@@ -5,7 +5,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
-import me.kiriyaga.nami.feature.module.impl.misc.AntiPacketKickModule;
+import me.kiriyaga.nami.feature.module.impl.misc.NoPacketKick;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.listener.PacketListener;
@@ -50,7 +50,7 @@ public class MixinClientConnection {
 
     @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
     private void exceptionCaught(ChannelHandlerContext context, Throwable exception, CallbackInfo call) {
-        AntiPacketKickModule module = MODULE_MANAGER.getStorage().getByClass(AntiPacketKickModule.class);
+        NoPacketKick module = MODULE_MANAGER.getStorage().getByClass(NoPacketKick.class);
         if (module != null && module.isEnabled()) {
             LOGGER.error("Packet ex: \n", exception);
             call.cancel();

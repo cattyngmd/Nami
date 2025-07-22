@@ -18,6 +18,7 @@ import java.util.*;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 
+// TODO make it work
 //@RegisterModule
 public class AntiSpamModule extends Module {
 

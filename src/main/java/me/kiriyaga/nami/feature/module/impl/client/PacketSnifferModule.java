@@ -15,6 +15,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class PacketSnifferModule extends Module {
 
+    // TODO rewrite this
     public final BoolSetting send = addSetting(new BoolSetting("send", false));
     public final BoolSetting receive = addSetting(new BoolSetting("receive", false));
     public final BoolSetting filterCommonPackets = addSetting(new BoolSetting("filter common", true));
