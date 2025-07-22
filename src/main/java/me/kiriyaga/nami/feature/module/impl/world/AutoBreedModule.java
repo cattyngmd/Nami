@@ -87,6 +87,7 @@ public class AutoBreedModule extends Module {
             if (!ROTATION_MANAGER.isRequestCompleted(AutoBreedModule.class.getName())) return;
 
             MC.interactionManager.interactEntity(MC.player, animal, Hand.MAIN_HAND);
+            MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
             animalsFed.add(animal.getId());
             breedCooldown = delay.get();
             break;

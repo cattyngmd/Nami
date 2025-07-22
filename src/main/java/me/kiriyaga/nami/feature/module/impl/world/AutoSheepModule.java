@@ -71,6 +71,7 @@ public class AutoSheepModule extends Module {
             if (!ROTATION_MANAGER.isRequestCompleted(AutoSheepModule.class.getName())) return;
 
             MC.interactionManager.interactEntity(MC.player, sheep, Hand.MAIN_HAND);
+            MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
             swapCooldown = delay.get();
             break;
         }

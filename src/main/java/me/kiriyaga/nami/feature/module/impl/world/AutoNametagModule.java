@@ -79,6 +79,7 @@ public class AutoNametagModule extends Module {
             if (!ROTATION_MANAGER.isRequestCompleted(AutoNametagModule.class.getName())) return;
 
             MC.interactionManager.interactEntity(MC.player, entity, Hand.MAIN_HAND);
+            MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
             swapCooldown = delay.get();
             break;
         }
