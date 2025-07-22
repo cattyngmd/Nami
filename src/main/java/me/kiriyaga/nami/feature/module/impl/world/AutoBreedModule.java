@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -25,7 +26,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoBreedModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 2.5, 1.0, 5.0));
+    private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
@@ -86,7 +87,8 @@ public class AutoBreedModule extends Module {
 
             if (!ROTATION_MANAGER.isRequestCompleted(AutoBreedModule.class.getName())) return;
 
-            MC.interactionManager.interactEntity(MC.player, animal, Hand.MAIN_HAND);
+            EntityHitResult hitResult = new EntityHitResult(animal, center);
+            MC.interactionManager.interactEntityAtLocation(MC.player, animal, hitResult, Hand.MAIN_HAND);
             MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
             animalsFed.add(animal.getId());
             breedCooldown = delay.get();
