@@ -21,7 +21,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoMountModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
+    private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 10.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
@@ -43,12 +43,11 @@ public class AutoMountModule extends Module {
         }
 
         for (Entity entity : MC.world.getEntities()) {
-            if (entity == null) continue;
-            if (entity == MC.player) continue;
-            if (!entity.isAlive()) continue;
-            if (entity.hasPassengers()) continue;
+            if (entity == null || entity == MC.player || !entity.isAlive() || entity.hasPassengers()) continue;
 
-            if (!(entity instanceof HorseEntity || entity instanceof PigEntity || entity instanceof StriderEntity || entity instanceof LlamaEntity || entity instanceof DonkeyEntity|| entity instanceof BoatEntity || entity instanceof MinecartEntity)) continue;
+            if (!(entity instanceof HorseEntity || entity instanceof PigEntity || entity instanceof StriderEntity ||
+                    entity instanceof LlamaEntity || entity instanceof DonkeyEntity ||
+                    entity instanceof BoatEntity || entity instanceof MinecartEntity)) continue;
 
             double distSq = MC.player.squaredDistanceTo(entity);
             if (distSq > range.get() * range.get()) continue;
@@ -65,7 +64,7 @@ public class AutoMountModule extends Module {
 
             if (!ROTATION_MANAGER.isRequestCompleted(AutoMountModule.class.getName())) return;
 
-            MC.interactionManager.interactEntity(MC.player, entity, Hand.MAIN_HAND);
+            MC.interactionManager.interactEntityAtLocation(MC.player, entity, new net.minecraft.util.hit.EntityHitResult(entity, center), Hand.MAIN_HAND);
             actionCooldown = delay.get();
             break;
         }

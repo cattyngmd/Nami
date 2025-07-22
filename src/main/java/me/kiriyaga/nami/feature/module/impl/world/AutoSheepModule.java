@@ -14,6 +14,7 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -22,7 +23,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoSheepModule extends Module {
 
-    private final DoubleSetting shearRange = addSetting(new DoubleSetting("range", 2.5, 1.0, 5.0));
+    private final DoubleSetting shearRange = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 2, 1, 10));
 
@@ -59,6 +60,7 @@ public class AutoSheepModule extends Module {
             }
 
             Vec3d center = getEntityCenter(sheep);
+
             ROTATION_MANAGER.submitRequest(
                     new RotationManager.RotationRequest(
                             AutoSheepModule.class.getName(),
@@ -70,8 +72,9 @@ public class AutoSheepModule extends Module {
 
             if (!ROTATION_MANAGER.isRequestCompleted(AutoSheepModule.class.getName())) return;
 
-            MC.interactionManager.interactEntity(MC.player, sheep, Hand.MAIN_HAND);
-            MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
+            EntityHitResult hitResult = new EntityHitResult(sheep, center);
+            MC.interactionManager.interactEntityAtLocation(MC.player, sheep, hitResult, Hand.MAIN_HAND);
+            MC.player.swingHand(Hand.MAIN_HAND);
             swapCooldown = delay.get();
             break;
         }
