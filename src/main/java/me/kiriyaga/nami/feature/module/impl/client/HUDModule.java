@@ -36,8 +36,6 @@ public class HUDModule extends Module {
         kmh, bps
     }
 
-    public final IntSetting updateInterval = addSetting(new IntSetting("interval", 1, 1, 20));
-
     public final BoolSetting chatAnimation = addSetting(new BoolSetting("chat animation", true));
     public final BoolSetting watermarkEnabled = addSetting(new BoolSetting("watermark", true));
     public final BoolSetting armorEnabled = addSetting(new BoolSetting("armor", true));
@@ -58,7 +56,6 @@ public class HUDModule extends Module {
     public final IntSetting bounceSpeed = addSetting(new IntSetting("bounce speed", 5, 1, 20));
     public final IntSetting bounceIntensity = addSetting(new IntSetting("bounce intensity", 30, 10, 70));
 
-    private int tickCounter = 0;
     private static final int PADDING = 1;
     private float bounceProgress = 0f;
     private boolean increasing = true;
@@ -138,9 +135,6 @@ public class HUDModule extends Module {
         } else {
             bounceProgress = 0f;
         }
-
-        tickCounter++;
-        if (tickCounter % updateInterval.get() != 0) return;
 
         updateAllData();
     }

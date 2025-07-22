@@ -71,8 +71,19 @@ public class PingManager {
     }
 
     public int getPing() {
+        PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
+
+        if (config != null && !config.fastLatency.get()) {
+            if (MC.getNetworkHandler() != null && MC.player != null) {
+                return MC.getNetworkHandler().getPlayerListEntry(MC.player.getUuid()).getLatency();
+            } else {
+                return -1;
+            }
+        }
+
         return lastPing;
     }
+
 
     public boolean isConnectionUnstable() {
         PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);

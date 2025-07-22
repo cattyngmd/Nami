@@ -16,8 +16,8 @@ def getGitHash() {
     return stdout.toString().trim()
 }
 
-version = "2.3.9_17.${getGitHash()}"
-
+//version = "2.3.9_17.${getGitHash()}"
+version = "2.4"
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21

@@ -8,6 +8,7 @@ import me.kiriyaga.nami.setting.impl.IntSetting;
 
 @RegisterModule
 public class PingManagerModule extends Module {
+    public final BoolSetting fastLatency = addSetting(new BoolSetting("fast latency", false));
     public final IntSetting smoothingStrength = addSetting(new IntSetting("smoothing", 10, 1, 50));
     public final IntSetting unstableConnectionTimeout = addSetting(new IntSetting("unstable", 3, 1, 60));
     public final IntSetting keepAliveInterval = addSetting(new IntSetting("interval", 900, 250, 2500));
