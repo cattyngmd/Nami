@@ -65,6 +65,7 @@ public class AutoMountModule extends Module {
             if (!ROTATION_MANAGER.isRequestCompleted(AutoMountModule.class.getName())) return;
 
             MC.interactionManager.interactEntityAtLocation(MC.player, entity, new net.minecraft.util.hit.EntityHitResult(entity, center), Hand.MAIN_HAND);
+            MC.interactionManager.interactEntity(MC.player, entity, Hand.MAIN_HAND);
             actionCooldown = delay.get();
             break;
         }

@@ -89,6 +89,7 @@ public class AutoBreedModule extends Module {
 
             EntityHitResult hitResult = new EntityHitResult(animal, center);
             MC.interactionManager.interactEntityAtLocation(MC.player, animal, hitResult, Hand.MAIN_HAND);
+            MC.interactionManager.interactEntity(MC.player, animal, Hand.MAIN_HAND);
             MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
             animalsFed.add(animal.getId());
             breedCooldown = delay.get();

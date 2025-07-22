@@ -74,6 +74,7 @@ public class AutoSheepModule extends Module {
 
             EntityHitResult hitResult = new EntityHitResult(sheep, center);
             MC.interactionManager.interactEntityAtLocation(MC.player, sheep, hitResult, Hand.MAIN_HAND);
+            MC.interactionManager.interactEntity(MC.player, sheep, Hand.MAIN_HAND);
             MC.player.swingHand(Hand.MAIN_HAND);
             swapCooldown = delay.get();
             break;

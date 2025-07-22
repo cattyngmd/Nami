@@ -17,6 +17,7 @@ import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -46,12 +47,9 @@ public class AutoNametagModule extends Module {
         }
 
         for (Entity entity : MC.world.getEntities()) {
-            if (entity == null) continue;
-            if (entity == MC.player) continue;
+            if (entity == null || entity == MC.player) continue;
             if (entity.getCustomName() != null && !nametagged.get()) continue;
-            if (entity instanceof VillagerEntity) continue;
-            if (entity instanceof EnderPearlEntity) continue;
-            if (entity instanceof EnderDragonEntity) continue;
+            if (entity instanceof VillagerEntity || entity instanceof EnderPearlEntity || entity instanceof EnderDragonEntity) continue;
 
             double distance = MC.player.squaredDistanceTo(entity);
             if (distance > range.get() * range.get()) continue;
@@ -67,19 +65,21 @@ public class AutoNametagModule extends Module {
             }
 
             Vec3d center = getEntityCenter(entity);
-            ROTATION_MANAGER.submitRequest(
-                    new RotationManager.RotationRequest(
-                            AutoNametagModule.class.getName(),
-                            rotationPriority.get(),
-                            (float) getYawToVec(MC.player, center),
-                            (float) getPitchToVec(MC.player, center)
-                    )
-            );
+
+            ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
+                    AutoNametagModule.class.getName(),
+                    rotationPriority.get(),
+                    (float) getYawToVec(MC.player, center),
+                    (float) getPitchToVec(MC.player, center)
+            ));
 
             if (!ROTATION_MANAGER.isRequestCompleted(AutoNametagModule.class.getName())) return;
 
+            EntityHitResult hitResult = new EntityHitResult(entity, center);
+            MC.interactionManager.interactEntityAtLocation(MC.player, entity, hitResult, Hand.MAIN_HAND);
             MC.interactionManager.interactEntity(MC.player, entity, Hand.MAIN_HAND);
-            MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
+            MC.player.swingHand(Hand.MAIN_HAND);
+
             swapCooldown = delay.get();
             break;
         }
@@ -102,9 +102,9 @@ public class AutoNametagModule extends Module {
 
     private static Vec3d getEntityCenter(Entity entity) {
         Box box = entity.getBoundingBox();
-        double centerX = box.minX + (box.getLengthX() / 2);
-        double centerY = box.minY + (box.getLengthY() / 2);
-        double centerZ = box.minZ + (box.getLengthZ() / 2);
+        double centerX = box.minX + box.getLengthX() / 2;
+        double centerY = box.minY + box.getLengthY() / 2;
+        double centerZ = box.minZ + box.getLengthZ() / 2;
         return new Vec3d(centerX, centerY, centerZ);
     }
 
