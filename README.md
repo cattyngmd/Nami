@@ -51,7 +51,7 @@ This project started as a clean, open-source alternative aiming to be transparen
 
 1. Clone the repository:
 
-    git clone https://github.com/Kiriyaga7615/2bEssentials.git  
+    git clone https://github.com/Kiriyaga7615/Nami.git  
     cd nami
 
 2. Build with Gradle:
