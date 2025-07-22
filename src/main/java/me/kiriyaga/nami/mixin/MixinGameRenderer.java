@@ -1,5 +1,8 @@
 package me.kiriyaga.nami.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import me.kiriyaga.nami.feature.module.impl.combat.NoEntityTrace;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.MinecraftClient;
@@ -9,6 +12,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -108,5 +113,14 @@ public abstract class MixinGameRenderer {
             cameraE.lastYaw = lastYaw;
             cameraE.lastPitch = lastPitch;
         }
+    }
+
+
+    @ModifyReturnValue(method = "findCrosshairTarget", at = @At("RETURN"))
+    private HitResult findCrosshairTarget(HitResult original, @Local HitResult hitResult) {
+        if (MODULE_MANAGER.getStorage().getByClass(NoEntityTrace.class) != null && MODULE_MANAGER.getStorage().getByClass(NoEntityTrace.class).isEnabled() && hitResult.getType() == HitResult.Type.BLOCK)
+            return hitResult;
+
+        return original;
     }
 }
