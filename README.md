@@ -31,8 +31,8 @@ This project started as a clean, open-source alternative aiming to be transparen
 <details>
 <summary>View screenshots</summary>
 
-<img width="100%" alt="Nami Client screenshot 1" src="https://github.com/user-attachments/assets/8bbe39b3-0ef0-4f38-94d2-f81df402f005" />  
-<img width="100%" alt="Nami Client screenshot 2" src="https://github.com/user-attachments/assets/71a79d90-b439-490c-8f92-969cd7f2adeb" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/40e82220-d7e0-4827-a397-3a8369f94187" />
+
 
 </details>
 
