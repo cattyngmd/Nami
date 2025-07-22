@@ -22,7 +22,7 @@ import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 @RegisterModule
-public class AutoElytraModule extends Module {
+public class ElytraHelper extends Module {
 
     private boolean wasOnGroundLastTick = true;
     private static final int ARMOR_CHEST_SLOT = 6;
@@ -49,8 +49,8 @@ public class AutoElytraModule extends Module {
     private boolean needJumpImitate = false;
     private int jumpToggleStep = 0;
 
-    public AutoElytraModule() {
-        super("auto elytra", "Controlls elytra fly automatically, based QOL.", ModuleCategory.of("world"), "autoelytra");
+    public ElytraHelper() {
+        super("elytra helper", "Controlls elytra fly automatically, based QOL.", ModuleCategory.of("world"), "autoelytra");
     }
 
     @SubscribeEvent

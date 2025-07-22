@@ -91,7 +91,7 @@ public class ElytraSwapModule extends Module {
                     MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
                     MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
                     this.setEnabled(false);
-                    CHAT_MANAGER.sendTransient("Elytra swapped.");
+                    CHAT_MANAGER.sendTransient("swapped: §7chest");
                 }
             }
         } else {
@@ -101,7 +101,7 @@ public class ElytraSwapModule extends Module {
                 MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
                 MC.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
                 this.setEnabled(false);
-                CHAT_MANAGER.sendTransient("Elytra swapped.");
+                CHAT_MANAGER.sendTransient("swapped: §7elytra");
             }
         }
     }
