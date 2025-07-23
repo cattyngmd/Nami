@@ -25,6 +25,11 @@ public abstract class MixinChatScreen extends Screen {
 
     @Override
     public void removed() {
+        HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
+
+        if (hud == null || !hud.chatAnimation.get() || !hud.isEnabled())
+            return;
+
         super.removed();
         ChatAnimationHelper.setAnimationOffset(0f);
         animatedHeight = 0f;
@@ -32,9 +37,9 @@ public abstract class MixinChatScreen extends Screen {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
     private void redirectFill(DrawContext context, int x1, int y1, int x2, int y2, int color) {
-        if (MODULE_MANAGER.getStorage().getByClass(HUDModule.class) == null)
-            return;
-        if (!MODULE_MANAGER.getStorage().getByClass(HUDModule.class).chatAnimation.get())
+        HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
+
+        if (hud == null || !hud.chatAnimation.get() || !hud.isEnabled())
             return;
 
         long now = System.currentTimeMillis();
