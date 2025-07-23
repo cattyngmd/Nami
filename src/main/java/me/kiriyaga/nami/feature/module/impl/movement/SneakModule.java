@@ -87,6 +87,9 @@ public class SneakModule extends Module {
         Vec3d pos = player.getPos();
         int blockY = (int) Math.floor(pos.y - 0.001);
 
+        if (!MC.player.isOnGround())
+            return false;
+
         checkedBlocks.clear();
 
         BlockPos basePos = new BlockPos(player.getBlockPos().getX(), blockY, player.getBlockPos().getZ());
