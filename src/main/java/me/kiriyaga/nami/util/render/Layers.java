@@ -67,10 +67,14 @@ public class Layers {
             return RenderLayer.of("global_lines", 156, GLOBAL_LINES_PIPELINE, builder().lineWidth(width).build(false));
         });
 
-        GLOBAL_GLINT = RenderLayer.of("global_glint", 156, Pipelines.GLOBAL_GLINT_PIPELINE,
+        GLOBAL_GLINT = RenderLayer.of(
+                "global_glint",
+                1536,
+                GLOBAL_GLINT_PIPELINE,
                 RenderLayer.MultiPhaseParameters.builder()
                         .texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, false))
-                        .texturing(RenderPhase.ENTITY_GLINT_TEXTURING)
-                        .build(false));
+                        .texturing(RenderPhase.GLINT_TEXTURING)
+                        .build(false)
+        );
     }
 }

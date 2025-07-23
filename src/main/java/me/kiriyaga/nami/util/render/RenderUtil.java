@@ -410,7 +410,6 @@ public class RenderUtil {
                 0
         );
 
-        // since we are using our own pipeline and layer, we need to shade ourselfs, but i dont wanna so we just use second layer for glint
         if (stack.hasGlint()) {
             VertexConsumerProvider glintProvider = requestedLayer -> {
                 String name = requestedLayer.getName().toLowerCase();

@@ -10,21 +10,25 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import static net.minecraft.client.gl.RenderPipelines.POSITION_TEX_COLOR_SNIPPET;
 
-import static net.minecraft.client.gl.RenderPipelines.POSITION_COLOR_SNIPPET;
-import static net.minecraft.client.gl.RenderPipelines.RENDERTYPE_LINES_SNIPPET;
+import static net.minecraft.client.gl.RenderPipelines.*;
 
 class Pipelines {
-    static final RenderPipeline GLOBAL_GLINT_PIPELINE = RenderPipeline.builder(POSITION_TEX_COLOR_SNIPPET)
-            .withLocation("rendertype_glint")
-            .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .withBlend(BlendFunction.ADDITIVE)
+    static final RenderPipeline GLOBAL_GLINT_PIPELINE = RenderPipeline.builder(new RenderPipeline.Snippet[]{
+                    TRANSFORMS_AND_PROJECTION_SNIPPET,
+                    FOG_SNIPPET,
+                    GLOBALS_SNIPPET
+            })
+            .withLocation("pipeline/global_glint_pipeline")
+            .withVertexShader("core/glint")
+            .withFragmentShader("core/glint")
+            .withSampler("Sampler0")
             .withDepthWrite(false)
             .withCull(false)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withBlend(BlendFunction.GLINT)
+            .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
             .build();
-
 
     static final RenderPipeline GLOBAL_QUADS_PIPELINE = RenderPipeline.builder(POSITION_COLOR_SNIPPET)
             .withLocation("pipeline/global_fill_pipeline")
