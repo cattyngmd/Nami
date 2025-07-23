@@ -17,6 +17,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
 
 @RegisterModule
 public class AutoMountModule extends Module {
@@ -64,8 +65,8 @@ public class AutoMountModule extends Module {
 
             if (!ROTATION_MANAGER.isRequestCompleted(AutoMountModule.class.getName())) return;
 
-            MC.interactionManager.interactEntityAtLocation(MC.player, entity, new net.minecraft.util.hit.EntityHitResult(entity, center), Hand.MAIN_HAND);
-            MC.interactionManager.interactEntity(MC.player, entity, Hand.MAIN_HAND);
+            interactWithEntity(entity, center, true);
+
             actionCooldown = delay.get();
             break;
         }

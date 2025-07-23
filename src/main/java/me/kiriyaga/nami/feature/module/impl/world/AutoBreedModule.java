@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
 
 @RegisterModule
 public class AutoBreedModule extends Module {
@@ -87,10 +88,8 @@ public class AutoBreedModule extends Module {
 
             if (!ROTATION_MANAGER.isRequestCompleted(AutoBreedModule.class.getName())) return;
 
-            EntityHitResult hitResult = new EntityHitResult(animal, center);
-            MC.interactionManager.interactEntityAtLocation(MC.player, animal, hitResult, Hand.MAIN_HAND);
-            MC.interactionManager.interactEntity(MC.player, animal, Hand.MAIN_HAND);
-            MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
+            interactWithEntity(animal, center, true);
+
             animalsFed.add(animal.getId());
             breedCooldown = delay.get();
             break;

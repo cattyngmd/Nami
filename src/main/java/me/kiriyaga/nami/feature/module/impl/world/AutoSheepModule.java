@@ -19,6 +19,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
 
 @RegisterModule
 public class AutoSheepModule extends Module {
@@ -72,10 +73,8 @@ public class AutoSheepModule extends Module {
 
             if (!ROTATION_MANAGER.isRequestCompleted(AutoSheepModule.class.getName())) return;
 
-            EntityHitResult hitResult = new EntityHitResult(sheep, center);
-            MC.interactionManager.interactEntityAtLocation(MC.player, sheep, hitResult, Hand.MAIN_HAND);
-            MC.interactionManager.interactEntity(MC.player, sheep, Hand.MAIN_HAND);
-            MC.player.swingHand(Hand.MAIN_HAND);
+            interactWithEntity(entity, center, true);
+
             swapCooldown = delay.get();
             break;
         }

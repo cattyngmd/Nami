@@ -12,7 +12,7 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.setting.impl.WhitelistSetting;
-import me.kiriyaga.nami.util.BlockUtil;
+import me.kiriyaga.nami.util.BlockUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -70,8 +70,8 @@ public class SearchModule extends Module {
 
     private void updateCandidateBlocks() {
         Set<Block> blocks = new HashSet<>();
-        if (storages.get()) blocks.addAll(BlockUtil.getStorage());
-        if (nonVanilla.get()) blocks.addAll(BlockUtil.getNonVanillaGeneratedBlocks());
+        if (storages.get()) blocks.addAll(BlockUtils.getStorage());
+        if (nonVanilla.get()) blocks.addAll(BlockUtils.getNonVanillaGeneratedBlocks());
 
         candidateBlockIds = blocks.stream()
                 .map(Registries.BLOCK::getId)
@@ -189,7 +189,7 @@ public class SearchModule extends Module {
                 if (playerPos.getSquaredDistance(pos) > 300 * 300) continue;
 
                 BlockState state = MC.world.getBlockState(pos);
-                Color color = BlockUtil.getColorByBlockId(state);
+                Color color = BlockUtils.getColorByBlockId(state);
 
                 RenderUtil.drawBlockShape(
                         matrices,

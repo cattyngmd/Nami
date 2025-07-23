@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class BlockUtil {
+public class BlockUtils {
     private static final Block AIR_BLOCK = Registries.BLOCK.get(Identifier.of("minecraft", "air"));
 
 
