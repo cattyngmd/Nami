@@ -39,8 +39,13 @@ public abstract class MixinChatScreen extends Screen {
     private void redirectFill(DrawContext context, int x1, int y1, int x2, int y2, int color) {
         HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
 
-        if (hud == null || !hud.chatAnimation.get() || !hud.isEnabled())
+        if (hud == null)
             return;
+
+        if (!hud.chatAnimation.get() || !hud.isEnabled()){
+            context.fill(2, this.height - 14, this.width - 2, this.height - 2, this.client.options.getTextBackgroundColor(Integer.MIN_VALUE)); // net.minecraft.client.gui.screen l176
+            return;
+        }
 
         long now = System.currentTimeMillis();
         float delta = (now - lastTime) / 1000f;
