@@ -27,12 +27,16 @@ public abstract class MixinChatScreen extends Screen {
     public void removed() {
         HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
 
-        if (hud == null || !hud.chatAnimation.get() || !hud.isEnabled())
+        if (hud == null)
             return;
 
+        if (!hud.chatAnimation.get() || !hud.isEnabled()){
+            animatedHeight = 0;
+            ChatAnimationHelper.setAnimationOffset(animatedHeight);
+            return;
+        }
+
         super.removed();
-        ChatAnimationHelper.setAnimationOffset(0f);
-        animatedHeight = 0f;
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
@@ -43,6 +47,8 @@ public abstract class MixinChatScreen extends Screen {
             return;
 
         if (!hud.chatAnimation.get() || !hud.isEnabled()){
+            animatedHeight = 14;
+            ChatAnimationHelper.setAnimationOffset(animatedHeight);
             context.fill(2, this.height - 14, this.width - 2, this.height - 2, this.client.options.getTextBackgroundColor(Integer.MIN_VALUE)); // net.minecraft.client.gui.screen l176
             return;
         }
