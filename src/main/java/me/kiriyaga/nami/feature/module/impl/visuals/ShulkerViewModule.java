@@ -16,6 +16,7 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.setting.impl.ColorSetting;
 
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.BlockItem;
@@ -24,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 
@@ -38,6 +40,7 @@ public class ShulkerViewModule extends Module {
 
     public final BoolSetting compact = addSetting(new BoolSetting("compact", true));
     public final BoolSetting bothSides = addSetting(new BoolSetting("both sides", true));
+    public final BoolSetting borders = addSetting(new BoolSetting("borders", true));
     public final IntSetting scale = addSetting(new IntSetting("scale", 10, 1, 20));
 
     private final List<ShulkerInfo> shulkerList = new ArrayList<>();
@@ -97,7 +100,12 @@ public class ShulkerViewModule extends Module {
             int width = cols * GRID_WIDTH + MARGIN * cols;
             int height = rows * GRID_HEIGHT + MARGIN * rows;
 
-            context.fill(startX, currentY, startX + width, currentY + height, new Color(0,0,0,75).getRGB());
+            context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
+
+            if (borders.get()){
+                int borderColor = getShulkerColor(info.shulker);
+                drawBorder(context, startX, currentY, width, height, borderColor);
+            }
 
             int count = 0;
             for (ItemStack stack : info.stacks) {
@@ -111,7 +119,6 @@ public class ShulkerViewModule extends Module {
                 count++;
             }
 
-
             if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, info.slot, 0, SlotActionType.PICKUP, MC.player);
                 clickedX = clickedY = -1;
@@ -122,6 +129,46 @@ public class ShulkerViewModule extends Module {
 
         context.getMatrices().popMatrix();
         totalHeight = currentY - offset;
+    }
+
+    private void drawBorder(DrawContext context, int x, int y, int width, int height, int color) {
+        context.fill(x, y, x + width, y + 1, color);
+        context.fill(x, y + height - 1, x + width, y + height, color);
+        context.fill(x, y, x + 1, y + height, color);
+        context.fill(x + width - 1, y, x + width, y + height, color);
+    }
+
+    private int getShulkerColor(ItemStack stack) {
+        if (!(stack.getItem() instanceof BlockItem blockItem)) return ColorHelper.getArgb(255, 128, 128, 128);
+
+        if (!(blockItem.getBlock() instanceof ShulkerBoxBlock shulker)) return ColorHelper.getArgb(255, 128, 128, 128);
+
+        DyeColor color = shulker.getColor();
+        if (color == null) return ColorHelper.getArgb(255, 128, 128, 128);
+
+        return DyeColorToARGB(color);
+    }
+
+    private int DyeColorToARGB(DyeColor color) {
+        switch (color) {
+            case WHITE: return ColorHelper.getArgb(255, 255, 255, 255);
+            case ORANGE: return ColorHelper.getArgb(255, 216, 127, 51);
+            case MAGENTA: return ColorHelper.getArgb(255, 178, 76, 216);
+            case LIGHT_BLUE: return ColorHelper.getArgb(255, 102, 153, 216);
+            case YELLOW: return ColorHelper.getArgb(255, 229, 229, 51);
+            case LIME: return ColorHelper.getArgb(255, 127, 204, 25);
+            case PINK: return ColorHelper.getArgb(255, 242, 127, 165);
+            case GRAY: return ColorHelper.getArgb(255, 76, 76, 76);
+            case LIGHT_GRAY: return ColorHelper.getArgb(255, 153, 153, 153);
+            case CYAN: return ColorHelper.getArgb(255, 76, 127, 153);
+            case PURPLE: return ColorHelper.getArgb(255, 127, 63, 178);
+            case BLUE: return ColorHelper.getArgb(255, 51, 76, 178);
+            case BROWN: return ColorHelper.getArgb(255, 102, 76, 51);
+            case GREEN: return ColorHelper.getArgb(255, 102, 127, 51);
+            case RED: return ColorHelper.getArgb(255, 153, 51, 51);
+            case BLACK: return ColorHelper.getArgb(255, 25, 25, 25);
+            default: return ColorHelper.getArgb(255, 128, 128, 128);
+        }
     }
 
     @SubscribeEvent
