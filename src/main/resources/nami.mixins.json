@@ -23,6 +23,7 @@
     "MixinFogRenderer",
     "MixinGameMenuScreen",
     "MixinGameRenderer",
+    "MixinHandledScreen",
     "MixinHeadFeatureRenderer",
     "MixinInactivityFpsLimiter",
     "MixinInGameHud",
