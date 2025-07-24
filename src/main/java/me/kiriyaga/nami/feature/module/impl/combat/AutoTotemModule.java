@@ -8,21 +8,17 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.screen.slot.SlotActionType;
 
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class AutoTotemModule extends Module {
 
-    private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
-    private final IntSetting totemSlotSetting = addSetting(new IntSetting("totem slot", 9, 1, 9));
     private final BoolSetting antiDesync = addSetting(new BoolSetting("desync check", false));
     private final BoolSetting deathLog = addSetting(new BoolSetting("log", false));
     private boolean pendingTotem = false;
@@ -37,17 +33,14 @@ public class AutoTotemModule extends Module {
     public void onPostTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
 
-        if (fastSwap.get() && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
-            attemptFastSwap();
-        } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
+        if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
             attemptPlaceTotem();
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onReceivePacket(PacketReceiveEvent event) {
-        if (MC.world == null || MC.player == null)
-            return;
+        if (MC.world == null || MC.player == null) return;
 
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
             if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 3 && deathLog.get()) {
@@ -55,31 +48,6 @@ public class AutoTotemModule extends Module {
             }
         }
     }
-
-    private void attemptFastSwap() {
-        ClientPlayerEntity player = MC.player;
-        if (player == null) return;
-
-        int hotbarSlot = totemSlotSetting.get() - 1;
-        int syncId = player.currentScreenHandler.syncId;
-
-        ItemStack hotbarStack = player.getInventory().getStack(hotbarSlot);
-        ItemStack offhand = player.getOffHandStack();
-
-        if (hotbarStack.getItem() != Items.TOTEM_OF_UNDYING) {
-            int totemSlot = findTotemSlot();
-            if (totemSlot == -1) return;
-
-            int inventorySlot = convertSlot(totemSlot);
-            MC.interactionManager.clickSlot(syncId, inventorySlot, hotbarSlot, SlotActionType.SWAP, player);
-            return; // we do not want to one-tick swap methods
-        }
-
-        if (offhand.getItem() != Items.TOTEM_OF_UNDYING) {
-            MC.interactionManager.clickSlot(syncId, 45, hotbarSlot, SlotActionType.SWAP, player);
-        }
-    }
-
 
     private void attemptPlaceTotem() {
         ClientPlayerEntity player = MC.player;
@@ -90,12 +58,7 @@ public class AutoTotemModule extends Module {
         if (pendingTotem) {
             int totemSlot = findTotemSlot();
             if (totemSlot != -1) {
-                int syncId = player.currentScreenHandler.syncId;
-                int invSlot = convertSlot(totemSlot);
-
-                MC.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
-                MC.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
-
+                swapToOffhand(totemSlot);
                 lastAttemptTime = System.currentTimeMillis();
             }
         }
@@ -111,16 +74,18 @@ public class AutoTotemModule extends Module {
             if (now - lastAttemptTime > delay) {
                 int totemSlot = findTotemSlot();
                 if (totemSlot != -1) {
-                    int syncId = player.currentScreenHandler.syncId;
-                    int invSlot = convertSlot(totemSlot);
-
-                    MC.interactionManager.clickSlot(syncId, invSlot, 0, SlotActionType.PICKUP, player);
-                    MC.interactionManager.clickSlot(syncId, 45, 0, SlotActionType.PICKUP, player);
-
+                    swapToOffhand(totemSlot);
                     lastAttemptTime = now;
                 }
             }
         }
+    }
+
+    private void swapToOffhand(int invSlot) {
+        int realSlot = convertSlot(invSlot);
+
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
     }
 
     private int findTotemSlot() {

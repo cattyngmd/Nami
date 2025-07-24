@@ -2,6 +2,7 @@ package me.kiriyaga.nami.util;
 
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -24,5 +25,19 @@ public class InteractionUtils {
             MC.player.swingHand(MAIN_HAND);
 
         return true;
+    }
+
+    public static void startUsingItem() {
+        startUsingItem(MAIN_HAND);
+    }
+
+    public static void startUsingItem(Hand hand) {
+        if (!MC.player.isUsingItem())
+            MC.player.setCurrentHand(hand);
+    }
+
+    public static void stopUsingItem() {
+        if (MC.player.isUsingItem())
+            MC.player.stopUsingItem();
     }
 }

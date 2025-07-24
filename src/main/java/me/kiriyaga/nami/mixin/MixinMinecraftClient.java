@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
+import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
 import me.kiriyaga.nami.feature.module.impl.misc.AutoRespawnModule;
@@ -12,6 +13,9 @@ import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -28,6 +32,8 @@ import me.kiriyaga.nami.feature.module.Module;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -39,6 +45,9 @@ public abstract class MixinMinecraftClient {
     @Shadow private int itemUseCooldown;
 
     private int holdTicks = 0;
+    @Shadow public ClientPlayerEntity player;
+    @Shadow public ClientWorld world;
+    private final Set<Integer> deadList = new HashSet<>();
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
@@ -146,5 +155,23 @@ public abstract class MixinMinecraftClient {
         InteractionEvent ev = new InteractionEvent();
         EVENT_MANAGER.post(ev);
         return !ev.isCancelled() && instance.isBreakingBlock();
+    }
+
+    @Inject(method = "tick", at = @At(value = "TAIL"))
+    private void tick(CallbackInfo ci) {
+        if (player == null && world == null)
+            return;
+
+        for (Entity entity : world.getEntities()) {
+            if (entity instanceof LivingEntity e) {
+                if (e.isDead() && !deadList.contains(e.getId())) {
+                    EntityDeathEvent ev = new EntityDeathEvent(e);
+                    EVENT_MANAGER.post(ev);
+                    deadList.add(e.getId());
+                } else if (!e.isDead()) {
+                    deadList.remove(e.getId());
+                }
+            }
+        }
     }
 }

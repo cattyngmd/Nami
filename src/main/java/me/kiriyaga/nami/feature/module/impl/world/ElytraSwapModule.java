@@ -20,11 +20,7 @@ import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class ElytraSwapModule extends Module {
-
-    private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
-    private final IntSetting swapSlotSetting = addSetting(new IntSetting("swap slot", 8 , 1, 9));
-
-    private static final int ARMOR_CHEST_SLOT = 6;
+    private static final int ARMOR_CHEST_SLOT = 2;
     private static final Map<Item, Integer> CHESTPLATE_PRIORITY = Map.of(
             Items.LEATHER_CHESTPLATE, 1,
             Items.GOLDEN_CHESTPLATE, 2,
@@ -42,44 +38,13 @@ public class ElytraSwapModule extends Module {
     public void onPostTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
 
-        if (fastSwap.get() && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
-            attemptFastSwap();
-        } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
+        if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
             attemptSwap();
         }
     }
 
-    private void attemptFastSwap() {
-        ClientPlayerEntity player = MC.player;
-        if (player == null) return;
-
-        int syncId = player.currentScreenHandler.syncId;
-        int hotbarSlotIndex = swapSlotSetting.get() - 1;
-        ItemStack chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
-        ItemStack swapStack = player.getInventory().getStack(hotbarSlotIndex);
-
-        if (swapStack.isEmpty()) return;
-
-        if (chestItem.getItem() == Items.ELYTRA) {
-            if (CHESTPLATE_PRIORITY.containsKey(swapStack.getItem())) {
-                MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
-                this.setEnabled(false);
-                CHAT_MANAGER.sendTransient("Elytra swapped.");
-            }
-        } else {
-            if (swapStack.getItem() == Items.ELYTRA) {
-                MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlotIndex, SlotActionType.SWAP, player);
-                this.setEnabled(false);
-                CHAT_MANAGER.sendTransient("Elytra swapped.");
-            }
-        }
-    }
-
-
-
     private void attemptSwap() {
         ClientPlayerEntity player = MC.player;
-        int syncId = player.currentScreenHandler.syncId;
         ItemStack chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
 
         if (chestItem.getItem() == Items.ELYTRA) {
@@ -87,9 +52,7 @@ public class ElytraSwapModule extends Module {
             if (bestChestplate != null) {
                 int slot = findChestplateSlot(bestChestplate);
                 if (slot != -1) {
-                    MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
-                    MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
-                    MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
+                    swapArmor(ARMOR_CHEST_SLOT, slot);
                     this.setEnabled(false);
                     CHAT_MANAGER.sendTransient("swapped: §7chest");
                 }
@@ -97,13 +60,40 @@ public class ElytraSwapModule extends Module {
         } else {
             int elytraSlot = findElytraSlot();
             if (elytraSlot != -1) {
-                MC.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
-                MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
-                MC.interactionManager.clickSlot(syncId, elytraSlot, 0, SlotActionType.PICKUP, player);
+                swapArmor(ARMOR_CHEST_SLOT, elytraSlot);
                 this.setEnabled(false);
                 CHAT_MANAGER.sendTransient("swapped: §7elytra");
             }
         }
+    }
+
+    public void swapArmor(int armorSlot, int slot) {
+        ClientPlayerEntity player = MC.player;
+
+        ItemStack armorStack = player.getEquippedStack(getArmorEquipmentSlot(armorSlot));
+        int realSlot = slot < 9 ? slot + 36 : slot;
+        int armorSlotCorrected = 8 - armorSlot;
+
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
+        boolean hasArmor = !armorStack.isEmpty();
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(armorSlotCorrected);
+        if (hasArmor) {
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
+        }
+    }
+
+    private EquipmentSlot getArmorEquipmentSlot(int armorSlot) {
+        return switch (armorSlot) {
+            case 0 -> EquipmentSlot.FEET;
+            case 1 -> EquipmentSlot.LEGS;
+            case 2 -> EquipmentSlot.CHEST;
+            case 3 -> EquipmentSlot.HEAD;
+            default -> throw new IllegalArgumentException("Invalid armor slot: " + armorSlot);
+        };
+    }
+
+    private int convertSlot(int slot) {
+        return slot < 9 ? slot + 36 : slot;
     }
 
     private int findElytraSlot() {
@@ -143,9 +133,5 @@ public class ElytraSwapModule extends Module {
             }
         }
         return -1;
-    }
-
-    private int convertSlot(int slot) {
-        return slot < 9 ? slot + 36 : slot;
     }
 }

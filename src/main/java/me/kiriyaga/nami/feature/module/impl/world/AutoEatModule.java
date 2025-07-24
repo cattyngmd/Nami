@@ -5,7 +5,6 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
@@ -18,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
+import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
@@ -60,7 +60,7 @@ public class AutoEatModule extends Module {
         double hunger = MC.player.getHungerManager().getFoodLevel();
         double health = MC.player.getHealth();
 
-        if (hunger >= minHunger.get() && health >= minHealth.get()) {
+        if ((hunger >= 20.0 || hunger >= minHunger.get()) && health >= minHealth.get()){
             if (eating) {
                 setUseHeld(false);
                 eating = false;
@@ -83,7 +83,7 @@ public class AutoEatModule extends Module {
 
         if (!eating) {
             if (currentSlot != bestSlot) {
-                selectHotbarSlotImmediate(bestSlot);
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
                 swapCooldown = (int) swapDelayTicksSetting.get();
             }
             setUseHeld(true);
@@ -155,14 +155,5 @@ public class AutoEatModule extends Module {
         int keyCode = boundKey.getCode();
         boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
         useKey.setPressed(physicallyPressed || held);
-    }
-
-    public static boolean selectHotbarSlotImmediate(int slot) {
-        if (slot == 45) return true;
-        if (slot < 0 || slot > 8) return false;
-
-        MC.player.getInventory().setSelectedSlot(slot);
-        ((ClientPlayerInteractionManagerAccessor) MC.interactionManager).callSyncSelectedSlot();
-        return true;
     }
 }

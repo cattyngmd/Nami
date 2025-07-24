@@ -25,17 +25,8 @@ public abstract class MixinChatScreen extends Screen {
 
     @Override
     public void removed() {
-        HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
-
-        if (hud == null)
-            return;
-
-        if (!hud.chatAnimation.get() || !hud.isEnabled()){
-            animatedHeight = 0;
-            ChatAnimationHelper.setAnimationOffset(animatedHeight);
-            return;
-        }
-
+        animatedHeight = 0;
+        ChatAnimationHelper.setAnimationOffset(animatedHeight);
         super.removed();
     }
 

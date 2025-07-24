@@ -2,6 +2,7 @@ package me.kiriyaga.nami;
 
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
+import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
@@ -42,6 +43,7 @@ public class Nami implements ClientModInitializer {
     public static final FriendManager FRIEND_MANAGER = new FriendManager(CONFIG_MANAGER);
     public static final PingManager PING_MANAGER = new PingManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
+    public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
 
     public static ClickGuiScreen CLICK_GUI = new ClickGuiScreen();
@@ -55,7 +57,7 @@ public class Nami implements ClientModInitializer {
         PING_MANAGER.init();
         ROTATION_MANAGER.init();
         ENTITY_MANAGER.init();
-
+        INVENTORY_MANAGER.init();
         CONFIG_MANAGER.loadModules();
         CONFIG_MANAGER.loadFriends();
 

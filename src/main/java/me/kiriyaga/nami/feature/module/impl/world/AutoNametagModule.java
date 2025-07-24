@@ -6,7 +6,6 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -60,7 +59,7 @@ public class AutoNametagModule extends Module {
 
             int currentSlot = MC.player.getInventory().getSelectedSlot();
             if (currentSlot != nameTagSlot) {
-                selectHotbarSlotImmediate(nameTagSlot);
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(nameTagSlot);
                 swapCooldown = delay.get();
                 return;
             }
@@ -89,13 +88,6 @@ public class AutoNametagModule extends Module {
             if (stack.getItem() == Items.NAME_TAG) return i;
         }
         return -1;
-    }
-
-    private static boolean selectHotbarSlotImmediate(int slot) {
-        if (slot < 0 || slot > 8) return false;
-        MC.player.getInventory().setSelectedSlot(slot);
-        ((ClientPlayerInteractionManagerAccessor) MC.interactionManager).callSyncSelectedSlot();
-        return true;
     }
 
     private static Vec3d getEntityCenter(Entity entity) {

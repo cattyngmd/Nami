@@ -9,23 +9,20 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.*;
-import net.minecraft.screen.slot.SlotActionType;
 
 import java.util.Map;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
-public class ElytraHelper extends Module {
+public class ElytraHelperModule extends Module {
 
     private boolean wasOnGroundLastTick = true;
-    private static final int ARMOR_CHEST_SLOT = 6;
+    private static final int ARMOR_CHEST_SLOT = 2;
     private static final Map<Item, Integer> CHESTPLATE_PRIORITY = Map.of(
             Items.LEATHER_CHESTPLATE, 1,
             Items.GOLDEN_CHESTPLATE, 2,
@@ -35,8 +32,6 @@ public class ElytraHelper extends Module {
             Items.NETHERITE_CHESTPLATE, 6
     );
 
-    private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
-    private final IntSetting swapSlotSetting = addSetting(new IntSetting("swap slot", 8, 1, 9));
     private final BoolSetting pauseEfly = addSetting(new BoolSetting("pause on efly", true));
 
     private enum ElytraState {
@@ -49,7 +44,7 @@ public class ElytraHelper extends Module {
     private boolean needJumpImitate = false;
     private int jumpToggleStep = 0;
 
-    public ElytraHelper() {
+    public ElytraHelperModule() {
         super("elytra helper", "Controlls elytra fly automatically, based QOL.", ModuleCategory.of("world"), "autoelytra");
     }
 
@@ -59,9 +54,7 @@ public class ElytraHelper extends Module {
 
         if (event.key == MC.options.jumpKey.getDefaultKey().getCode() && event.action == 1) {
             ClientPlayerEntity player = MC.player;
-            boolean onGround = player.isOnGround();
-
-            if (!onGround && !wasOnGroundLastTick) {
+            if (!player.isOnGround() && !wasOnGroundLastTick) {
                 swapRequested = true;
             }
         }
@@ -72,11 +65,11 @@ public class ElytraHelper extends Module {
         if (MC.world == null || MC.player == null) return;
 
         ClientPlayerEntity player = MC.player;
-
         boolean onGround = player.isOnGround();
 
         wasOnGroundLastTick = onGround;
-        if (player.isOnGround()) {
+
+        if (onGround) {
             ItemStack chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
             Item bestChestplate = getBestChestplate();
 
@@ -84,13 +77,8 @@ public class ElytraHelper extends Module {
                     (chestItem.isEmpty() || chestItem.getItem() == Items.ELYTRA)) {
 
                 int chestSlot = findChestplateSlot(bestChestplate);
-                if (chestSlot != -1) {
-                    int syncId = player.currentScreenHandler.syncId;
-                    if (fastSwap.get() && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
-                        fastSwapItem(chestSlot, syncId, bestChestplate);
-                    } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
-                        swapWithArmor(chestSlot, syncId);
-                    }
+                if (chestSlot != -1 && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
+                    swapArmor(ARMOR_CHEST_SLOT, chestSlot);
                     currentState = ElytraState.CHESTPLATE;
                 }
             }
@@ -105,30 +93,19 @@ public class ElytraHelper extends Module {
         if (!swapRequested) return;
         swapRequested = false;
 
-        int syncId = player.currentScreenHandler.syncId;
-
         if (currentState == ElytraState.CHESTPLATE) {
             int elytraSlot = findElytraSlot();
-            if (elytraSlot != -1) {
-                if (fastSwap.get()) {
-                    fastSwapItem(elytraSlot, syncId, Items.ELYTRA);
-                } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
-                    swapWithArmor(elytraSlot, syncId);
-                }
+            if (elytraSlot != -1 && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
+                swapArmor(ARMOR_CHEST_SLOT, elytraSlot);
                 currentState = ElytraState.ELYTRA;
-
                 needJumpImitate = true;
                 jumpToggleStep = 0;
             }
         } else {
             Item best = getBestChestplate();
             int chestSlot = findChestplateSlot(best);
-            if (chestSlot != -1) {
-                if (fastSwap.get()) {
-                    fastSwapItem(chestSlot, syncId, best);
-                } else if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
-                    swapWithArmor(chestSlot, syncId);
-                }
+            if (chestSlot != -1 && (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen)) {
+                swapArmor(ARMOR_CHEST_SLOT, chestSlot);
                 currentState = ElytraState.CHESTPLATE;
             }
         }
@@ -136,39 +113,45 @@ public class ElytraHelper extends Module {
 
     private void handleJumpToggleSteps() {
         switch (jumpToggleStep) {
-            case 0:
+            case 0 -> {
                 MC.options.jumpKey.setPressed(false);
                 jumpToggleStep++;
-                break;
-            case 1:
+            }
+            case 1 -> {
                 MC.options.jumpKey.setPressed(true);
                 jumpToggleStep++;
-                break;
-            case 2:
+            }
+            case 2 -> {
                 MC.options.jumpKey.setPressed(false);
                 jumpToggleStep = 0;
                 needJumpImitate = false;
-                break;
+            }
         }
     }
 
-    private void swapWithArmor(int slot, int syncId) {
+    private void swapArmor(int armorSlot, int slot) {
         ClientPlayerEntity player = MC.player;
-        MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
-        MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, 0, SlotActionType.PICKUP, player);
-        MC.interactionManager.clickSlot(syncId, slot, 0, SlotActionType.PICKUP, player);
+
+        ItemStack armorStack = player.getEquippedStack(getArmorEquipmentSlot(armorSlot));
+        int realSlot = slot < 9 ? slot + 36 : slot;
+        int armorSlotCorrected = 8 - armorSlot;
+
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
+        boolean hasArmor = !armorStack.isEmpty();
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(armorSlotCorrected);
+        if (hasArmor) {
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
+        }
     }
 
-    private void fastSwapItem(int inventorySlot, int syncId, Item itemToEquip) {
-        ClientPlayerEntity player = MC.player;
-        int hotbarSlot = swapSlotSetting.get() - 1;
-
-        ItemStack hotbarStack = player.getInventory().getStack(hotbarSlot);
-        if (hotbarStack.isEmpty() || hotbarStack.getItem() != itemToEquip) {
-            return;
-        }
-
-        MC.interactionManager.clickSlot(syncId, ARMOR_CHEST_SLOT, hotbarSlot, SlotActionType.SWAP, player);
+    private EquipmentSlot getArmorEquipmentSlot(int armorSlot) {
+        return switch (armorSlot) {
+            case 0 -> EquipmentSlot.FEET;
+            case 1 -> EquipmentSlot.LEGS;
+            case 2 -> EquipmentSlot.CHEST;
+            case 3 -> EquipmentSlot.HEAD;
+            default -> throw new IllegalArgumentException("Invalid armor slot: " + armorSlot);
+        };
     }
 
     private Item getBestChestplate() {

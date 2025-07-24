@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_20",
   "client": [
     "ChatHudAccessor",
-    "ClientPlayerInteractionManagerAccessor",
     "GameOptionsAccessor",
     "KeyBindingAccessor",
     "MixinArmorFeatureRenderer",
@@ -45,6 +44,7 @@
     "LivingEntityAccessor",
     "MixinClientConnection",
     "MixinEntity",
+    "MixinItemUsageContext",
     "MixinLivingEntity",
     "MixinPlayerEntity",
     "MixinPlayerInteractEntityC2SPacket",

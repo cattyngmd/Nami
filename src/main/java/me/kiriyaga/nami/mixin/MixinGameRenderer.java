@@ -101,7 +101,11 @@ public abstract class MixinGameRenderer {
             cameraE.lastPitch = freecamModule.lastPitch;
 
             freecamSet = true;
-            updateCrosshairTarget(tickDelta);
+
+            if (client.gameRenderer != null && client.gameRenderer.getCamera() != null) {
+                updateCrosshairTarget(tickDelta);
+            }
+
             freecamSet = false;
 
             cameraE.setPos(x, y, z);

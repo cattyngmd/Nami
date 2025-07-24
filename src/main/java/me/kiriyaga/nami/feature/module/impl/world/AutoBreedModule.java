@@ -6,7 +6,6 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
@@ -71,7 +70,7 @@ public class AutoBreedModule extends Module {
 
             int currentSlot = MC.player.getInventory().getSelectedSlot();
             if (currentSlot != foodSlot) {
-                selectHotbarSlotImmediate(foodSlot);
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(foodSlot);
                 breedCooldown = delay.get();
                 return;
             }
@@ -104,13 +103,6 @@ public class AutoBreedModule extends Module {
             }
         }
         return -1;
-    }
-
-    private static boolean selectHotbarSlotImmediate(int slot) {
-        if (slot < 0 || slot > 8) return false;
-        MC.player.getInventory().setSelectedSlot(slot);
-        ((ClientPlayerInteractionManagerAccessor) MC.interactionManager).callSyncSelectedSlot();
-        return true;
     }
 
     private static Vec3d getEntityCenter(Entity entity) {

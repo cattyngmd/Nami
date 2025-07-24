@@ -21,7 +21,7 @@ public class NoRotateModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     private void onPacketRecieve(PacketReceiveEvent ev){
-        if (ev.getPacket() instanceof PlayerPositionLookS2CPacket packet) {
+        if (ev.getPacket() instanceof PlayerPositionLookS2CPacket packet && MC.player != null && MC.world != null) {
 
             ((PlayerPositionAccessor) (Object) packet.change()).setYaw(MC.player.getYaw());
             ((PlayerPositionAccessor) (Object) packet.change()).setPitch(MC.player.getPitch());
