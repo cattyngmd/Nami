@@ -52,11 +52,11 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
 
         int lineOffset = 1;
         context.fill(
-                x - 1,
-                y - lineOffset,
                 x,
+                y - lineOffset,
+                x + 1,
                 y + HEIGHT,
-                primary.getRGB()
+                new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB()
         );
 
         double val = setting.get();

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SettingPanel {
-    public static final int INNER_PADDING = 2;
+    public static final int INNER_PADDING = 1;
     private static final Map<Class<?>, SettingRenderer<?>> renderers = new HashMap<>();
 
     private static Setting<?> draggedSetting = null;

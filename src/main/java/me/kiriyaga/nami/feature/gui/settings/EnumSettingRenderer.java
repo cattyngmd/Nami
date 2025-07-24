@@ -25,7 +25,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
         int lineOffset = 1;
-        context.fill(x - 1, y - lineOffset, x, y + HEIGHT, primary.getRGB());
+        context.fill(x, y - lineOffset, x + 1, y + HEIGHT, new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB());
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;

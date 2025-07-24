@@ -28,11 +28,11 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
         int lineOffset = 1;
         context.fill(
-                x - 1,
-                y - lineOffset,
                 x,
+                y - lineOffset,
+                x + 1,
                 y + HEIGHT,
-                primary.getRGB()
+                new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB()
         );
 
         int textX = x + PADDING + (hovered ? 1 : 0);

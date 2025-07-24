@@ -42,11 +42,11 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
 
         int lineOffset = 1;
         context.fill(
-                x - 1,
-                y - lineOffset,
                 x,
+                y - lineOffset,
+                x + 1,
                 y + HEIGHT,
-                primary.getRGB()
+                new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB()
         );
 
         String hex = String.format("#%02X%02X%02X", setting.getRed(), setting.getGreen(), setting.getBlue());

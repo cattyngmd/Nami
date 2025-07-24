@@ -51,7 +51,7 @@ public class ModulePanel {
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
         if (expanded) {
-            context.fill(x - 1, y, x, y + HEIGHT, primary.getRGB());
+            context.fill(x, y, x + 1, y + HEIGHT, new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB());
         }
 
         int textY = y + (HEIGHT - 8) / 2;

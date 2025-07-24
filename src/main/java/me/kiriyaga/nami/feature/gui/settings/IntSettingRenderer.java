@@ -51,11 +51,11 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
 
         int lineOffset = 1;
         context.fill(
-                x - 1,
-                y - lineOffset,
                 x,
+                y - lineOffset,
+                x + 1,
                 y + HEIGHT,
-                primary.getRGB()
+                new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB()
         );
 
         String valStr = String.valueOf(setting.get());

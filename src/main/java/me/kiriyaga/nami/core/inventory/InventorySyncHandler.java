@@ -34,7 +34,7 @@ public class InventorySyncHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(EntityDeathEvent event) {
-        if (event.getLivingEntity() == MC.player) {
+        if (event.getLivingEntity() == MC.player && MC.player != null) {
             slotSwapper.sendSlotPacket(MC.player.getInventory().getSelectedSlot());
             slotSwapper.markAllForClear();
         }
