@@ -46,7 +46,7 @@ public class Nami implements ClientModInitializer {
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
 
-    public static ClickGuiScreen CLICK_GUI = new ClickGuiScreen();
+    public static ClickGuiScreen CLICK_GUI;
 
 
 
@@ -60,6 +60,8 @@ public class Nami implements ClientModInitializer {
         INVENTORY_MANAGER.init();
         CONFIG_MANAGER.loadModules();
         CONFIG_MANAGER.loadFriends();
+
+        CLICK_GUI = new ClickGuiScreen();
 
         if (CONFIG_MANAGER.loadName() == null)
             CONFIG_MANAGER.saveName(DISPLAY_NAME);

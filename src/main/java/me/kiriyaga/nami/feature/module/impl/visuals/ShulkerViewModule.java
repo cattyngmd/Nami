@@ -12,6 +12,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.setting.impl.ColorSetting;
 
@@ -40,7 +41,7 @@ public class ShulkerViewModule extends Module {
     public final BoolSetting compact = addSetting(new BoolSetting("compact", true));
     public final BoolSetting bothSides = addSetting(new BoolSetting("both sides", true));
     public final BoolSetting borders = addSetting(new BoolSetting("borders", true));
-    public final IntSetting scale = addSetting(new IntSetting("scale", 10, 1, 20));
+    public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1, 0.1, 2));
 
     private final List<ShulkerInfo> shulkerList = new ArrayList<>();
     private final int GRID_WIDTH = 20;
@@ -78,7 +79,7 @@ public class ShulkerViewModule extends Module {
         boolean right = false;
         currentY = bothSides.get() ? MARGIN : MARGIN + offset;
         startX = MARGIN;
-        float scale = this.scale.get() / 10f;
+        float scale = this.scale.get().floatValue();
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);
@@ -141,7 +142,7 @@ public class ShulkerViewModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onScroll(MouseScrollEvent event) {
-        float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get() / 10f), 0);
+        float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get()).floatValue(), 0);
         offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * 10, maxOffset, 0);
     }
 
