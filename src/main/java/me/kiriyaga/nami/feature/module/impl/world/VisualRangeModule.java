@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.world;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.EntitySpawnEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -24,24 +25,21 @@ public class VisualRangeModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onPacketReceive(PacketReceiveEvent event) {
+    public void onPacketReceive(EntitySpawnEvent event) {
         if (MC.player == null || MC.world == null) return;
 
-        if (event.getPacket() instanceof EntitySpawnS2CPacket spawnPacket) {
-            int entityId = spawnPacket.getEntityId();
+        if (event.getEntity() instanceof PlayerEntity player) {
 
-            MC.execute(() -> {
-                var entity = MC.world.getEntityById(entityId);
-                if (entity instanceof PlayerEntity player) {
-                    if (player == MC.player) return;
-                    if (FRIEND_MANAGER.isFriend(player.getName().getString()) && !friends.get()) return;
+            if (player == MC.player)
+                return;
 
-                    CHAT_MANAGER.sendPersistent(player.getUuidAsString(), "§7" + player.getName().getString() + "§f has entered visual range.");
+            if (FRIEND_MANAGER.isFriend(player.getName().getString()) && !friends.get())
+                return;
 
-                    if (sound.get())
-                        MC.player.playSound(SoundEvents.BLOCK_BELL_USE, 1.0f, 1.0f);
-                }
-            });
+            CHAT_MANAGER.sendPersistent(player.getUuidAsString(), "§7" + player.getName().getString() + "§f has entered visual range.");
+
+            if (sound.get())
+                MC.player.playSound(SoundEvents.BLOCK_BELL_USE, 1.0f, 1.0f);
         }
     }
 }
