@@ -4,10 +4,13 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
+import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.IntSetting;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -19,8 +22,10 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoTotemModule extends Module {
 
-    private final BoolSetting antiDesync = addSetting(new BoolSetting("desync check", false));
     private final BoolSetting deathLog = addSetting(new BoolSetting("log", false));
+    private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
+    private final IntSetting fastSlot = addSetting(new IntSetting("swap slot", 8, 0, 8));
+
     private boolean pendingTotem = false;
     private long lastAttemptTime = 0;
     private int totemCount = 0;
@@ -33,7 +38,7 @@ public class AutoTotemModule extends Module {
     public void onPostTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
 
-        if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen) {
+        if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof ClickGuiScreen) {
             attemptPlaceTotem();
         }
     }
@@ -53,11 +58,26 @@ public class AutoTotemModule extends Module {
         ClientPlayerEntity player = MC.player;
         ItemStack offhandStack = player.getOffHandStack();
 
-        pendingTotem = offhandStack.getItem() != Items.TOTEM_OF_UNDYING;
+        boolean hasOffhandTotem = offhandStack.getItem() == Items.TOTEM_OF_UNDYING;
+        int totemSlot = findTotemSlot();
 
-        if (pendingTotem) {
-            int totemSlot = findTotemSlot();
-            if (totemSlot != -1) {
+        if (fastSwap.get()) {
+            int slot = fastSlot.get();
+            if (slot < 0 || slot > 8) return;
+
+            ItemStack fastSlotStack = player.getInventory().getStack(slot);
+            boolean fastSlotHasTotem = fastSlotStack.getItem() == Items.TOTEM_OF_UNDYING;
+
+            if (!fastSlotHasTotem && totemSlot != -1) {
+                INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totemSlot), slot);
+                lastAttemptTime = System.currentTimeMillis();
+            } else if (fastSlotHasTotem && !hasOffhandTotem) {
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(convertSlot(slot));
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
+                lastAttemptTime = System.currentTimeMillis();
+            }
+        } else {
+            if (!hasOffhandTotem && totemSlot != -1) {
                 swapToOffhand(totemSlot);
                 lastAttemptTime = System.currentTimeMillis();
             }
@@ -65,25 +85,10 @@ public class AutoTotemModule extends Module {
 
         totemCount = countTotems();
         setDisplayInfo("" + totemCount);
-
-        if (antiDesync.get() && pendingTotem) {
-            long now = System.currentTimeMillis();
-            int ping = PING_MANAGER.getPing();
-            int delay = Math.max(ping, 15);
-
-            if (now - lastAttemptTime > delay) {
-                int totemSlot = findTotemSlot();
-                if (totemSlot != -1) {
-                    swapToOffhand(totemSlot);
-                    lastAttemptTime = now;
-                }
-            }
-        }
     }
 
     private void swapToOffhand(int invSlot) {
         int realSlot = convertSlot(invSlot);
-
         INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
         INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
     }

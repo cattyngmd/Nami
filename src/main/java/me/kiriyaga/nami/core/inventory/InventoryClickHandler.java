@@ -30,6 +30,10 @@ public class InventoryClickHandler {
         click(slotIndex, 0, SlotActionType.THROW);
     }
 
+    public void swapSlot(int targetSlot, int hotbarSlotIndex) {
+        click(targetSlot, hotbarSlotIndex, SlotActionType.SWAP);
+    }
+
     private int click(int slot, int button, SlotActionType type) {
         if (slot < 0) return -1;
 
