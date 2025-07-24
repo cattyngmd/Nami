@@ -10,10 +10,10 @@ import java.util.Optional;
 
 @Mixin(ExplosionS2CPacket.class)
 public interface ExplosionS2CPacketAccessor {
-    @Accessor("playerKnockback")
+    @Accessor("comp_2884")
     Optional<Vec3d> getPlayerKnockback();
 
-    @Accessor("playerKnockback")
+    @Accessor("comp_2884")
     @Mutable
     void setPlayerKnockback(Optional<Vec3d> playerKnockback);
 }

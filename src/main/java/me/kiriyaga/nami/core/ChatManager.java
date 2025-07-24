@@ -154,12 +154,12 @@ public class ChatManager {
         ChatHud hud = MC.inGameHud.getChatHud();
         ChatHudAccessor accessor = (ChatHudAccessor) hud;
 
-        accessor.getMessages().removeIf(line -> signature.equals(line.signature()));
+        accessor.getMessages().removeIf(line -> signature.equals(line.comp_915()));
 
         accessor.getVisibleMessages().removeIf(visible -> {
             for (ChatHudLine line : accessor.getMessages()) {
-                if (signature.equals(line.signature())) {
-                    return visible.content().equals(line.content());
+                if (signature.equals(line.comp_915())) {
+                    return visible.comp_896().equals(line.comp_893());
                 }
             }
             return false;

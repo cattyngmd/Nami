@@ -91,7 +91,7 @@ public abstract class MixinClientPlayerInteractionManager{
             return;
         }
 
-        if (player.getWorld().getDimension().bedWorks() && antiInteract.isBed(block)) {
+        if (player.getWorld().getDimension().comp_648() && antiInteract.isBed(block)) {
             info.setReturnValue(ActionResult.FAIL);
             return;
         }

@@ -17,7 +17,7 @@ import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class FreecamModule extends Module {
-    private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 15.0));
+    private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 5.0));
 
     private Perspective previousPerspective;
     private Vec3d cameraPos;

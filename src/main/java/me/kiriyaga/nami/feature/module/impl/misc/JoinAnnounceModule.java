@@ -42,7 +42,7 @@ public class JoinAnnounceModule extends Module {
                 }
             }
         } else if (event.getPacket() instanceof PlayerRemoveS2CPacket leavePacket) {
-            for (var playerInfo : leavePacket.profileIds()) {
+            for (var playerInfo : leavePacket.comp_1105()) {
                 var info = MC.getNetworkHandler().getPlayerListEntry(playerInfo);
                 if (info == null) continue;
 

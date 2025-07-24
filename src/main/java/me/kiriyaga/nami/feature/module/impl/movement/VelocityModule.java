@@ -101,10 +101,19 @@ public class VelocityModule extends Module {
         }
 
         else if (packet instanceof ExplosionS2CPacket explosionPacket && handleExplosions.get()) {
-            if (modeSetting.get() == Mode.walls && !isPlayerPhased()) return;
+            boolean phased = isPlayerPhased();
 
             switch (modeSetting.get()) {
-                case normal, walls -> {
+                case normal -> {
+                    if (isNoVelocityConfigured()) {
+                        event.cancel();
+                    } else {
+                        scaleExplosionPacket(explosionPacket);
+                    }
+                }
+                case walls -> {
+                    if (!phased) return;
+
                     if (isNoVelocityConfigured()) {
                         event.cancel();
                     } else {
@@ -112,10 +121,13 @@ public class VelocityModule extends Module {
                     }
                 }
                 case grim -> {
-                    if (isPlayerPhased()) event.cancel();
+                    if (phased) {
+                        event.cancel();
+                    }
                 }
             }
         }
+
 
         else if (packet instanceof BundleS2CPacket bundlePacket) {
             handleBundlePacket(event, bundlePacket);
@@ -162,16 +174,33 @@ public class VelocityModule extends Module {
 
         for (Packet<?> p : bundle.getPackets()) {
             if (p instanceof ExplosionS2CPacket explosion && handleExplosions.get()) {
-                if (modeSetting.get() == Mode.grim && isPlayerPhased()) continue;
+                boolean phased = isPlayerPhased();
 
-                if (modeSetting.get() == Mode.walls && !isPlayerPhased()) {
-                    filteredPackets.add(p);
-                    continue;
+                switch (modeSetting.get()) {
+                    case normal -> {
+                        if (!isNoVelocityConfigured()) {
+                            scaleExplosionPacket(explosion);
+                        } else continue;
+                    }
+                    case walls -> {
+                        if (!phased) {
+                            filteredPackets.add(p);
+                            continue;
+                        }
+                        if (!isNoVelocityConfigured()) {
+                            scaleExplosionPacket(explosion);
+                        } else continue;
+                    }
+                    case grim -> {
+                        if (phased) continue;
+                        filteredPackets.add(p);
+                        continue;
+                    }
                 }
 
-                if (isNoVelocityConfigured()) continue;
-                scaleExplosionPacket(explosion);
+                filteredPackets.add(p);
             }
+
 
             else if (p instanceof EntityVelocityUpdateS2CPacket velocity && handleKnockback.get()) {
                 if (velocity.getEntityId() != MC.player.getId()) {

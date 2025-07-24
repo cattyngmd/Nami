@@ -23,11 +23,11 @@ public class NoRotateModule extends Module {
     private void onPacketRecieve(PacketReceiveEvent ev){
         if (ev.getPacket() instanceof PlayerPositionLookS2CPacket packet && MC.player != null && MC.world != null) {
 
-            ((PlayerPositionAccessor) (Object) packet.change()).setYaw(MC.player.getYaw());
-            ((PlayerPositionAccessor) (Object) packet.change()).setPitch(MC.player.getPitch());
+            ((PlayerPositionAccessor) (Object) packet.comp_3228()).setYaw(MC.player.getYaw());
+            ((PlayerPositionAccessor) (Object) packet.comp_3228()).setPitch(MC.player.getPitch());
 
-            packet.relatives().remove(PositionFlag.X_ROT);
-            packet.relatives().remove(PositionFlag.Y_ROT);
+            packet.comp_3229().remove(PositionFlag.X_ROT);
+            packet.comp_3229().remove(PositionFlag.Y_ROT);
         }
     }
 }
