@@ -42,7 +42,6 @@
     "BundlePacketAccessor",
     "EntityVelocityUpdateS2CPacketAccessor",
     "ExplosionS2CPacketAccessor",
-    "LivingEntityAccessor",
     "MixinClientConnection",
     "MixinEntity",
     "MixinItemUsageContext",

@@ -57,8 +57,6 @@ public abstract class MixinLivingEntity extends Entity {
 
         this.setYaw(spoofYaw);
         this.setPitch(spoofPitch);
-        ((LivingEntityAccessor) this).setBodyYaw(spoofYaw);
-        ((LivingEntityAccessor) this).setHeadYaw(spoofYaw);
     }
 
     @Inject(method = "travel", at = @At("TAIL"))
