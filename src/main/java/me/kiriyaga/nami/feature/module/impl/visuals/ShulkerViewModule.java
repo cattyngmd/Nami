@@ -1,5 +1,6 @@
 /*
  Originally made by @cattyngmd
+ https://github.com/cattyngmd/shulker-view
  MIT (2024)
 */
 package me.kiriyaga.nami.feature.module.impl.visuals;
