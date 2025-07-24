@@ -55,7 +55,7 @@ public class ShulkerViewModule extends Module {
     private double clickedX = -1, clickedY = -1;
 
     public ShulkerViewModule() {
-        super("shulker view", "Improves shulker managment. Originally made by @cattyngmd.", ModuleCategory.of("visuals"),"shulkerview", "ыргдлукмшуц");
+        super("shulker view", "Improves shulker managment. Author @cattyngmd", ModuleCategory.of("visuals"),"shulkerview", "ыргдлукмшуц");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -69,6 +69,7 @@ public class ShulkerViewModule extends Module {
         }
     }
 
+    // TODO: player inventory is not component scoped for some reason, it doesnt work in player inventory
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender(RenderScreenEvent event) {
         if (!(MC.currentScreen instanceof HandledScreen)) return;
