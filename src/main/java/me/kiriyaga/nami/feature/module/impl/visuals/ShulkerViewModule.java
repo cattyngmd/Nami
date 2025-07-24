@@ -18,6 +18,7 @@ import me.kiriyaga.nami.setting.impl.ColorSetting;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -71,63 +72,64 @@ public class ShulkerViewModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender(RenderScreenEvent event) {
-        if (!(MC.currentScreen instanceof HandledScreen)) return;
+        if (MC.currentScreen instanceof HandledScreen || MC.currentScreen instanceof InventoryScreen) {
 
-        DrawContext context = event.getDrawContext();
-        boolean right = false;
-        currentY = bothSides.get() ? MARGIN : MARGIN + offset;
-        startX = MARGIN;
-        float scale = this.scale.get() / 10f;
+            DrawContext context = event.getDrawContext();
+            boolean right = false;
+            currentY = bothSides.get() ? MARGIN : MARGIN + offset;
+            startX = MARGIN;
+            float scale = this.scale.get() / 10f;
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(scale, scale);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().scale(scale, scale);
 
-        for (ShulkerInfo info : shulkerList) {
-            int rows = info.rows();
-            int cols = info.cols();
+            for (ShulkerInfo info : shulkerList) {
+                int rows = info.rows();
+                int cols = info.cols();
 
-            if (currentY >= MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
-                right = true;
-                currentY = MARGIN + offset;
+                if (currentY >= MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
+                    right = true;
+                    currentY = MARGIN + offset;
+                }
+
+                if (right) {
+                    float totalWidth = cols * GRID_WIDTH + MARGIN * cols;
+                    startX = (int) ((MC.getWindow().getScaledWidth() - totalWidth - MARGIN) / scale);
+                }
+
+                int width = cols * GRID_WIDTH + MARGIN * cols;
+                int height = rows * GRID_HEIGHT + MARGIN * rows;
+
+                context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
+
+                if (borders.get()) {
+                    int borderColor = getShulkerColor(info.shulker);
+                    drawBorder(context, startX, currentY, width, height, borderColor);
+                }
+
+                int count = 0;
+                for (ItemStack stack : info.stacks) {
+                    if (compact.get() && stack.isEmpty()) break;
+                    int x = startX + (count % 9) * GRID_WIDTH + MARGIN;
+                    int y = currentY + (count / 9) * GRID_HEIGHT + MARGIN;
+
+                    context.drawItem(stack, x, y);
+                    context.drawStackOverlay(MC.textRenderer, stack, x, y, null);
+
+                    count++;
+                }
+
+                if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
+                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, info.slot, 0, SlotActionType.PICKUP, MC.player);
+                    clickedX = clickedY = -1;
+                }
+
+                currentY += height + MARGIN;
             }
 
-            if (right) {
-                float totalWidth = cols * GRID_WIDTH + MARGIN * cols;
-                startX = (int) ((MC.getWindow().getScaledWidth() - totalWidth - MARGIN) / scale);
-            }
-
-            int width = cols * GRID_WIDTH + MARGIN * cols;
-            int height = rows * GRID_HEIGHT + MARGIN * rows;
-
-            context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
-
-            if (borders.get()){
-                int borderColor = getShulkerColor(info.shulker);
-                drawBorder(context, startX, currentY, width, height, borderColor);
-            }
-
-            int count = 0;
-            for (ItemStack stack : info.stacks) {
-                if (compact.get() && stack.isEmpty()) break;
-                int x = startX + (count % 9) * GRID_WIDTH + MARGIN;
-                int y = currentY + (count / 9) * GRID_HEIGHT + MARGIN;
-
-                context.drawItem(stack, x, y);
-                context.drawStackOverlay(MC.textRenderer, stack, x, y, null);
-
-                count++;
-            }
-
-            if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
-                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, info.slot, 0, SlotActionType.PICKUP, MC.player);
-                clickedX = clickedY = -1;
-            }
-
-            currentY += height + MARGIN;
+            context.getMatrices().popMatrix();
+            totalHeight = currentY - offset;
         }
-
-        context.getMatrices().popMatrix();
-        totalHeight = currentY - offset;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
