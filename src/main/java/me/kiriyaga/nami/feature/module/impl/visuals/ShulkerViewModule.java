@@ -5,11 +5,9 @@
 */
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
+import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.MouseClickEvent;
-import me.kiriyaga.nami.event.impl.MouseScrollEvent;
-import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.event.impl.Render2DEvent;
+import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
@@ -60,7 +58,7 @@ public class ShulkerViewModule extends Module {
         super("shulker view", "Improves shulker managment. Originally made by @cattyngmd.", ModuleCategory.of("visuals"),"shulkerview", "ыргдлукмшуц");
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onTick(PreTickEvent event) {
         if (!(MC.currentScreen instanceof HandledScreen<?> screen)) return;
 
@@ -71,8 +69,8 @@ public class ShulkerViewModule extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onRender(Render2DEvent event) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onRender(RenderScreenEvent event) {
         if (!(MC.currentScreen instanceof HandledScreen)) return;
 
         DrawContext context = event.getDrawContext();
@@ -132,6 +130,20 @@ public class ShulkerViewModule extends Module {
         totalHeight = currentY - offset;
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onClick(MouseClickEvent event) {
+        if (event.button() == 0) {
+            clickedX = event.mouseX();
+            clickedY = event.mouseY();
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onScroll(MouseScrollEvent event) {
+        float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get() / 10f), 0);
+        offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * 10, maxOffset, 0);
+    }
+
     private void drawBorder(DrawContext context, int x, int y, int width, int height, int color) {
         context.fill(x, y, x + width, y + 1, color);
         context.fill(x, y + height - 1, x + width, y + height, color);
@@ -145,7 +157,7 @@ public class ShulkerViewModule extends Module {
         if (!(blockItem.getBlock() instanceof ShulkerBoxBlock shulker)) return ColorHelper.getArgb(255, 128, 128, 128);
 
         DyeColor color = shulker.getColor();
-        if (color == null) return ColorHelper.getArgb(255, 128, 128, 128);
+        if (color == null) return ColorHelper.getArgb(255, 128, 0, 128);
 
         return DyeColorToARGB(color);
     }
@@ -170,20 +182,6 @@ public class ShulkerViewModule extends Module {
             case BLACK: return ColorHelper.getArgb(255, 25, 25, 25);
             default: return ColorHelper.getArgb(255, 128, 128, 128);
         }
-    }
-
-    @SubscribeEvent
-    public void onClick(MouseClickEvent event) {
-        if (event.button() == 0) {
-            clickedX = event.mouseX();
-            clickedY = event.mouseY();
-        }
-    }
-
-    @SubscribeEvent
-    public void onScroll(MouseScrollEvent event) {
-        float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get() / 10f), 0);
-        offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * 10, maxOffset, 0);
     }
 
     private boolean isHovered(double mx, double my, int x, int y, int width, int height, float scale) {
