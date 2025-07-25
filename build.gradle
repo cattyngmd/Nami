@@ -42,6 +42,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.129.0+1.21.8"
     modImplementation("maven.modrinth:sodium:mc1.21.6-0.6.13-fabric") {transitive = false}
     modImplementation("com.github.cattyngmd.catformat:catformat-fabric:2.0.3")
+    implementation("com.github.cattyngmd.catformat:catformat-core:2.0.3")
     implementation "org.osgi:org.osgi.core:6.0.0"
 }
 
