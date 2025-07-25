@@ -1,6 +1,6 @@
 package me.kiriyaga.nami;
 
-import dev.cattyn.catformat.fabric.FabricCatFormat;
+import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
 import me.kiriyaga.nami.core.inventory.InventoryManager;
