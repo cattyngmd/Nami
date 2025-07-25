@@ -1,6 +1,5 @@
 package me.kiriyaga.nami;
 
-import dev.cattyn.catformat.fabric.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
 import me.kiriyaga.nami.core.inventory.InventoryManager;
@@ -46,7 +45,7 @@ public class Nami implements ClientModInitializer {
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
-    public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
+
     public static ClickGuiScreen CLICK_GUI;
 
 
