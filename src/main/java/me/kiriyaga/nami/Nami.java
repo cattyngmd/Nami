@@ -7,6 +7,7 @@ import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
+import me.kiriyaga.nami.util.CatStyles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -62,7 +63,9 @@ public class Nami implements ClientModInitializer {
         CONFIG_MANAGER.loadModules();
         CONFIG_MANAGER.loadFriends();
 
+        CAT_FORMAT.add(new CatStyles());
         CLICK_GUI = new ClickGuiScreen();
+
 
         if (CONFIG_MANAGER.loadName() == null)
             CONFIG_MANAGER.saveName(DISPLAY_NAME);

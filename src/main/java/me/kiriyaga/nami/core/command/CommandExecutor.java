@@ -49,6 +49,7 @@ public class CommandExecutor {
         Command command = storage.getCommandByNameOrAlias(cmdName);
         if (command == null) {
             LOGGER.warn("Unknown command: " + cmdName);
+            CHAT_MANAGER.sendPersistent(CommandExecutor.class.getName(), CAT_FORMAT.format("Unknown command: {global}" + command + "{reset} use {global}" + prefix +"help."));
             return;
         }
 

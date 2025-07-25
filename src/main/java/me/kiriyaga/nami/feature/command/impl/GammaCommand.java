@@ -4,8 +4,8 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.Nami.CAT_FORMAT;
 
 @RegisterCommand
 public class GammaCommand extends Command {
@@ -17,7 +17,9 @@ public class GammaCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Usage: .gamma §7<Value>");
+            String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
+            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
+                    CAT_FORMAT.format("Usage: {global}" + prefix + "gamma <value>{reset}."));
             return;
         }
 
@@ -25,15 +27,18 @@ public class GammaCommand extends Command {
             double newGamma = Double.parseDouble(args[0].trim());
 
             if (newGamma < 0.0 || newGamma > 420.0) {
-                CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Gamma must be between 0.0 and 420.0.");
+                CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
+                        CAT_FORMAT.format("Gamma must be between {global}0.0{reset} and {global}420.0{reset}."));
                 return;
             }
 
             ((ISimpleOption) (Object) MC.options.getGamma()).setValue(newGamma);
-            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Gamma set to: §7" + newGamma);
+            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
+                    CAT_FORMAT.format("Gamma set to: {global}" + newGamma + "{reset}."));
 
         } catch (NumberFormatException e) {
-            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(), "Invalid number format.");
+            CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
+                    CAT_FORMAT.format("Invalid number format."));
         }
     }
 }

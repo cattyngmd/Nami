@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
+import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -15,24 +16,29 @@ public class ChangePrefixCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix §7<char>");
+            Text message = CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "prefix <char>{reset}.");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), message);
             return;
         }
 
         String input = args[0].trim();
 
         if (input.isEmpty()) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix §7<char>");
+            Text message = CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "prefix <char>{reset}.");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), message);
             return;
         }
 
         if (input.length() > 1) {
-            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Usage: .prefix v<char>");
+            Text message = CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "prefix <char>{reset}.");
+            CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), message);
             return;
         }
 
         COMMAND_MANAGER.getExecutor().setPrefix(input);
         CONFIG_MANAGER.savePrefix(input);
-        CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), "Prefix changed to: §7" + input);
+
+        Text message = CAT_FORMAT.format("Prefix changed to: {global}" + input + "{reset}.");
+        CHAT_MANAGER.sendPersistent(ChangePrefixCommand.class.getName(), message);
     }
 }

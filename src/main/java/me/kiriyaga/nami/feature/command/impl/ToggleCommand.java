@@ -4,8 +4,7 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.module.Module;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class ToggleCommand extends Command {
@@ -17,7 +16,8 @@ public class ToggleCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length == 0) {
-            CHAT_MANAGER.sendPersistent(ToggleCommand.class.getName(),"Usage: .toggle §7<moduleName>");
+            CHAT_MANAGER.sendPersistent(getClass().getName(),
+                    CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "toggle <moduleName>{reset}."));
             return;
         }
 
@@ -32,7 +32,8 @@ public class ToggleCommand extends Command {
         }
 
         if (found == null) {
-            CHAT_MANAGER.sendTransient("Module '§7" + input + "§f' not found.");
+            CHAT_MANAGER.sendTransient(
+                    CAT_FORMAT.format("Module '{global}" + input + "{reset}' not found."));
             return;
         }
 

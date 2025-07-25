@@ -1,5 +1,7 @@
 package me.kiriyaga.nami.util;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -16,7 +18,17 @@ public class ClasspathScanner {
         Set<Class<? extends T>> result = new HashSet<>();
 
         try {
-            Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("");
+            String resourcePath;
+
+            if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+                resourcePath = ""; // ide
+            } else {
+                resourcePath = "me/kiriyaga/nami"; //prod
+            }
+
+            //TODO fucking fix this
+
+            Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(resourcePath);
 
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();

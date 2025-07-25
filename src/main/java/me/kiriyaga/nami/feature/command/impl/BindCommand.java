@@ -6,9 +6,9 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import me.kiriyaga.nami.util.KeyUtils;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class BindCommand extends Command {
@@ -20,7 +20,8 @@ public class BindCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 2) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Usage: .bind <module> <key>");
+            Text message = CAT_FORMAT.format("Usage: {global}"+COMMAND_MANAGER.getExecutor().getPrefix()+"bind <module> <key>{reset}.");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
@@ -33,7 +34,8 @@ public class BindCommand extends Command {
                 .orElse(null);
 
         if (module == null) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Module '§7" + moduleName + "§f' not found.");
+            Text message = CAT_FORMAT.format("Module {global}" + moduleName + " {reset}not found.");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
@@ -47,24 +49,29 @@ public class BindCommand extends Command {
         }
 
         if (bindSetting == null) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Module '§7" + moduleName + "§f' does not have a keybind setting.");
+            Text message = CAT_FORMAT.format("Module {global}" + moduleName + " {reset}does not have a keybind setting.");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
         int keyCode = KeyUtils.parseKey(keyName);
 
         if (keyCode == -1) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Invalid key name: §7" + keyName + "§f");
+            Text message = CAT_FORMAT.format("Invalid key name: {global}" + keyName + "{reset}.");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
         InputUtil.Key key = InputUtil.Type.KEYSYM.createFromCode(keyCode);
         if (key == null) {
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Invalid key code: §7" + keyCode + "§f");
+            Text message = CAT_FORMAT.format("Invalid key code: {global}" + keyCode + "{reset}.");
+            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
         bindSetting.set(keyCode);
-        CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), "Bound module '§7" + module.getName() + "§f' to key '§8" + keyName + "§f'.");
+
+        Text message = CAT_FORMAT.format("Bound module {global}" + module.getName() + " {reset}to key {global}" + keyName + "{reset}.");
+        CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
     }
 }

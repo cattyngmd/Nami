@@ -3,8 +3,7 @@ package me.kiriyaga.nami.feature.command.impl;
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.FRIEND_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class FriendCommand extends Command {
@@ -16,7 +15,9 @@ public class FriendCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 2) {
-            CHAT_MANAGER.sendPersistent(FriendCommand.class.getName(), "Usage: .friend §7<add|del> <name>");
+            String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
+            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
+                    CAT_FORMAT.format("Usage: {global}" + prefix + "friend <add|del> <name>{reset}."));
             return;
         }
 
@@ -30,7 +31,8 @@ public class FriendCommand extends Command {
             case "del", "remove" -> {
                 FRIEND_MANAGER.removeFriend(name);
             }
-            default -> CHAT_MANAGER.sendPersistent(FriendCommand.class.getName(), "Unknown action: §7" + action);
+            default -> CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
+                    CAT_FORMAT.format("Unknown action: "+action+"{reset}."));
         }
     }
 }

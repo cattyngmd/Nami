@@ -173,6 +173,6 @@ public class ChatManager {
     }
 
     private Text prefix() {
-        return CAT_FORMAT.format("{secondary}[{global}" + NAME + "{secondary}] ");
+        return CAT_FORMAT.format("{secondary}[{global}" + NAME + "{secondary}] {reset}");
     }
 }

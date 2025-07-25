@@ -54,7 +54,7 @@ public class ElytraSwapModule extends Module {
                 if (slot != -1) {
                     swapArmor(ARMOR_CHEST_SLOT, slot);
                     this.setEnabled(false);
-                    CHAT_MANAGER.sendTransient("swapped: §7chest");
+                    CHAT_MANAGER.sendTransient(CAT_FORMAT.format("swapped: {global}chest{reset}."));
                 }
             }
         } else {
@@ -62,7 +62,7 @@ public class ElytraSwapModule extends Module {
             if (elytraSlot != -1) {
                 swapArmor(ARMOR_CHEST_SLOT, elytraSlot);
                 this.setEnabled(false);
-                CHAT_MANAGER.sendTransient("swapped: §7elytra");
+                CHAT_MANAGER.sendTransient(CAT_FORMAT.format("swapped: {global}elytra{reset}."));
             }
         }
     }

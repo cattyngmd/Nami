@@ -45,48 +45,22 @@ public abstract class Module {
 
         this.enabled = state;
 
-        ColorModule cm = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
-
         if (enabled) {
             EVENT_MANAGER.register(this);
             onEnable();
 
-            if (cm != null) {
-                Color bracketColor = cm.getStyledSecondColor();
-                Color plusColor = cm.getStyledGlobalColor();
+            Text message = CAT_FORMAT.format("{secondary}[{global}+{secondary}] {reset}" + name);
+            CHAT_MANAGER.sendTransient(message, false);
 
-                Style bracketStyle = Style.EMPTY.withColor(bracketColor.getRGB());
-                Style plusStyle = Style.EMPTY.withColor(plusColor.getRGB());
-
-                Text message = Text.empty()
-                        .append(Text.literal("[").setStyle(bracketStyle))
-                        .append(Text.literal("+").setStyle(plusStyle))
-                        .append(Text.literal("] ").setStyle(bracketStyle))
-                        .append(Text.literal(name));
-
-                CHAT_MANAGER.sendTransient(message, false);
-            }
         } else {
             EVENT_MANAGER.unregister(this);
             onDisable();
 
-            if (cm != null) {
-                Color baseRed = new Color(220, 0, 0);
-                Color bracketRed = cm.applyDarkness(baseRed, 0.5);
-
-                Style bracketStyle = Style.EMPTY.withColor(bracketRed.getRGB());
-                Style minusStyle = Style.EMPTY.withColor(baseRed.getRGB());
-
-                Text message = Text.empty()
-                        .append(Text.literal("[").setStyle(bracketStyle))
-                        .append(Text.literal("-").setStyle(minusStyle))
-                        .append(Text.literal("] ").setStyle(bracketStyle))
-                        .append(Text.literal(name));
-
-                CHAT_MANAGER.sendTransient(message, false);
-            }
+            Text message = CAT_FORMAT.format("{namiDarkRed}[{namiRed}-{namiDarkRed}] {reset}" + name);
+            CHAT_MANAGER.sendTransient(message, false);
         }
     }
+
 
 
     public ModuleCategory getCategory() {

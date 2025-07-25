@@ -4,34 +4,39 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class FovCommand extends Command {
 
     public FovCommand() {
-        super("fov", "Changes your FOV. Usage: .fov <Value>", "fav", "ащм", " fv");
+        super("fov", "Changes your FOV. Usage: .fov <Value>", "fav", "ащм", "fv");
     }
 
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "Usage: .fov §7<value>");
+            String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
+            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
+                    CAT_FORMAT.format("Usage: {global}" + prefix + "fov <value>{reset}."));
             return;
         }
 
         try {
             int newFov = Integer.parseInt(args[0].trim());
             if (newFov < 0 || newFov > 162) {
-                CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "FOV must be between 0 and 162.");
+                CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
+                        CAT_FORMAT.format("FOV must be between {global}0{reset} and {global}162{reset}."));
                 return;
             }
-            ((ISimpleOption) (Object) MC.options.getFov()).setValue(newFov);
-            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "FOV set to: §7" + newFov);
+            ((ISimpleOption)(Object) MC.options.getFov()).setValue(newFov);
+
+            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
+                    CAT_FORMAT.format("FOV set to: {global}" + newFov + "{reset}."));
 
         } catch (NumberFormatException e) {
-            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(), "Invalid number format.");
+            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
+                    CAT_FORMAT.format("Invalid number format."));
         }
     }
 }

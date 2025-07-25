@@ -18,6 +18,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -29,8 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class SearchModule extends Module {
@@ -50,7 +50,7 @@ public class SearchModule extends Module {
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
 
     private Set<Identifier> candidateBlockIds = new HashSet<>();
-    private final Queue<String> pendingMessages = new LinkedList<>();
+    private final Queue<Text> pendingMessages = new LinkedList<>();
 
     private int tickCounter = 0;
 
@@ -158,14 +158,21 @@ public class SearchModule extends Module {
             chunkBlocks.put(chunkKey, foundBlocks);
 
             if (notifier.get()) {
-                StringBuilder message = new StringBuilder("§cFound: ");
-                foundCounts.forEach((id, count) -> message.append(count).append("x ").append(id.getPath()).append(", "));
-                if (message.length() > 2) message.setLength(message.length() - 2);
+                StringBuilder message = new StringBuilder("Found: ");
+
+                foundCounts.forEach((id, count) ->
+                        message.append("{global}").append(count).append("x ").append(id.getPath()).append("{reset}, ")
+                );
+
+                if (message.length() > 2) {
+                    message.setLength(message.length() - 2);
+                }
 
                 synchronized (pendingMessages) {
-                    pendingMessages.offer(message.toString());
+                    pendingMessages.offer(CAT_FORMAT.format(message + "."));
                 }
             }
+
         } else {
             chunkBlocks.remove(chunkKey);
         }

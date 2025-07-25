@@ -5,6 +5,7 @@ import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.CONFIG_MANAGER;
+import static me.kiriyaga.nami.Nami.CAT_FORMAT;
 
 @RegisterCommand
 public class LoadCommand extends Command {
@@ -17,9 +18,11 @@ public class LoadCommand extends Command {
     public void execute(String[] args) {
         try {
             CONFIG_MANAGER.loadModules();
-            CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(), "Config has been loaded.");
+            CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(),
+                    CAT_FORMAT.format("Config has been loaded."));
         } catch (Exception e){
-            CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(), "Config has not been loaded: §7" + e);
+            CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(),
+                    CAT_FORMAT.format("Config has not been loaded: {global}" + e + "{reset}."));
         }
     }
 }

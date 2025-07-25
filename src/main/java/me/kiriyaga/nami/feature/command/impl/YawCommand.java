@@ -3,20 +3,20 @@ package me.kiriyaga.nami.feature.command.impl;
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class YawCommand extends Command {
 
     public YawCommand() {
-        super("yaw", "Sets player yaw. Usage: .yaw <Value>", "y", "нфц");
+        super("yaw", "Sets player yaw. Usage: .yaw <value>", "y", "нфц");
     }
 
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Usage: .yaw §7<Value>");
+            CHAT_MANAGER.sendPersistent(getClass().getName(),
+                    CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "yaw <value>{reset}."));
             return;
         }
 
@@ -24,10 +24,12 @@ public class YawCommand extends Command {
             float yaw = Float.parseFloat(args[0]);
 
             MC.player.setYaw(yaw);
-            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Yaw set to: §7" + yaw);
+            CHAT_MANAGER.sendPersistent(getClass().getName(),
+                    CAT_FORMAT.format("Yaw set to: {global}" + yaw + "{reset}."));
 
         } catch (NumberFormatException e) {
-            CHAT_MANAGER.sendPersistent(YawCommand.class.getName(), "Invalid number: §7" + args[0]);
+            CHAT_MANAGER.sendPersistent(getClass().getName(),
+                    CAT_FORMAT.format("Invalid number: {global}" + args[0] + "{reset}."));
         }
     }
 }

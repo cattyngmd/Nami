@@ -16,9 +16,11 @@ public class SaveCommand extends Command {
     public void execute(String[] args) {
         try {
             CONFIG_MANAGER.saveModules();
-            CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(), "Config has been saved.");
-        } catch (Exception e){
-            CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(), "Config has not been saved: §7" + e);
+            CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(),
+                    CAT_FORMAT.format("Config has been saved."));
+        } catch (Exception e) {
+            CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(),
+                    CAT_FORMAT.format("Config has not been saved: {global}" + e + "{reset}."));
         }
     }
 }

@@ -16,6 +16,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -126,25 +127,25 @@ public class AutoTotemModule extends Module {
         boolean hasTotem = totemCount > 0;
         long timeSinceLastSwap = System.currentTimeMillis() - lastAttemptTime;
 
-        StringBuilder reason = new StringBuilder();
-
+        String reason;
         if (!hasTotem) {
-            reason.append("NO_TOTEMS");
+            reason = "NO_TOTEMS";
         } else if (ping > 125) {
-            reason.append("HIGH_PING");
+            reason = "HIGH_PING";
         } else {
-            reason.append("UNKNOWN_CAUSE");
+            reason = "UNKNOWN_CAUSE";
         }
 
-        StringBuilder info = new StringBuilder();
-        info.append("\n§c=== AutoTotem ===")
-                .append("\nCause: ").append(reason)
-                .append("\nPing: ").append(ping).append(" ms")
-                .append("\nTotems Available: ").append(totemCount)
-                .append("\nPending Totem: ").append(pendingTotem)
-                .append("\nLast Swap Attempt: ").append(timeSinceLastSwap).append(" ms ago")
-                .append("\n§c============================");
+        Text message = CAT_FORMAT.format(
+                "\n{primary}=== AutoTotem ===\n" +
+                        "{primary}Cause: {global}" + reason + "{reset}\n" +
+                        "{primary}Ping: {global}" + ping + " ms{reset}\n" +
+                        "{primary}Totems Available: {global}" + totemCount + "{reset}\n" +
+                        "{primary}Pending Totem: {global}" + pendingTotem + "{reset}\n" +
+                        "{primary}Last Swap Attempt: {global}" + timeSinceLastSwap + " ms ago{reset}\n" +
+                        "{primary}============================"
+        );
 
-        CHAT_MANAGER.sendPersistent(AutoTotemModule.class.getName(), info.toString());
+        CHAT_MANAGER.sendPersistent(AutoTotemModule.class.getName(), message);
     }
 }

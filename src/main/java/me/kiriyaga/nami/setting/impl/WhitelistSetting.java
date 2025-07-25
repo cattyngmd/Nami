@@ -4,14 +4,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.impl.WhitelistCommand;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.COMMAND_MANAGER;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class WhitelistSetting extends BoolSetting {
     private final Set<Identifier> whitelist = new HashSet<>();
@@ -78,90 +79,5 @@ public class WhitelistSetting extends BoolSetting {
         }
         obj.add("items", items);
         return obj;
-    }
-
-    private static class WhitelistCommand extends Command {
-        private final String moduleName;
-
-        public WhitelistCommand(String moduleName) {
-            super(moduleName.replace(" ", ""), "Manage list settings for module " + moduleName);
-            this.moduleName = moduleName;
-        }
-        @Override
-        public void execute(String[] args) {
-            if (args.length < 1) {
-                CHAT_MANAGER.sendPersistent(moduleName, "Usage: §7." + moduleName + " <settingName> <add/del/list> [item]");
-                return;
-            }
-
-            String settingName = args[0].toLowerCase();
-
-            var module = MODULE_MANAGER.getStorage().getByName(moduleName);
-            if (module == null) {
-                CHAT_MANAGER.sendPersistent(moduleName, "Module '" + moduleName + "' not found.");
-                return;
-            }
-
-            var setting = module.getSettingByName(settingName);
-            if (!(setting instanceof WhitelistSetting listSetting)) {
-                CHAT_MANAGER.sendPersistent(moduleName, "Setting '" + settingName + "' not found or not a whitelist setting.");
-                return;
-            }
-
-            if (args.length < 2) {
-                CHAT_MANAGER.sendPersistent(moduleName,
-                        "Usage: §7." + moduleName + " " + settingName + " <add/del/list> [item]");
-                return;
-            }
-
-            String action = args[1].toLowerCase();
-
-            switch (action) {
-                case "add" -> {
-                    if (args.length < 3) {
-                        CHAT_MANAGER.sendPersistent(moduleName,
-                                "Usage: §7." + moduleName + " " + settingName + " add <item>");
-                        return;
-                    }
-                    String addItem = args[2].toLowerCase().replace("minecraft:", "");
-                    if (listSetting.addToWhitelist(addItem)) {
-                        CHAT_MANAGER.sendPersistent(moduleName, "Added: §7minecraft:" + addItem + " to " + settingName);
-                    } else {
-                        CHAT_MANAGER.sendPersistent(moduleName,
-                                "Invalid item id or already added: §7minecraft:" + addItem);
-                    }
-                }
-                case "del" -> {
-                    if (args.length < 3) {
-                        CHAT_MANAGER.sendPersistent(moduleName,
-                                "Usage: §7." + moduleName + " " + settingName + " del <item>");
-                        return;
-                    }
-                    String delItem = args[2].toLowerCase().replace("minecraft:", "");
-                    if (listSetting.removeFromWhitelist(delItem)) {
-                        CHAT_MANAGER.sendPersistent(moduleName, "Removed: §7minecraft:" + delItem + " from " + settingName);
-                    } else {
-                        CHAT_MANAGER.sendPersistent(moduleName,
-                                "Invalid or not in list: §7minecraft:" + delItem);
-                    }
-                }
-                case "list" -> {
-                    if (listSetting.getWhitelist().isEmpty()) {
-                        CHAT_MANAGER.sendPersistent(moduleName, settingName + " is empty.");
-                        return;
-                    }
-                    StringBuilder builder = new StringBuilder(settingName + " items: ");
-                    int i = 0;
-                    for (Identifier id : listSetting.getWhitelist()) {
-                        builder.append("§7").append(id.toString()).append("§f");
-                        if (i < listSetting.getWhitelist().size() - 1) builder.append(", ");
-                        i++;
-                    }
-                    CHAT_MANAGER.sendPersistent(moduleName, builder.toString());
-                }
-                default -> CHAT_MANAGER.sendPersistent(moduleName,
-                        "Unknown action: §7" + action + ". Use §7add/del/list");
-            }
-        }
     }
 }

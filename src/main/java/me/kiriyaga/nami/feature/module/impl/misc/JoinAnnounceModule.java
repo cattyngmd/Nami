@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
+import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -36,8 +37,8 @@ public class JoinAnnounceModule extends Module {
                     boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
 
                     if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                        String message = "§7" + playerName + " joined the game";
-                        CHAT_MANAGER.sendPersistent(playerName, message);
+                        Text message = CAT_FORMAT.format("{grey}" + playerName + " joined the game.");
+                        CHAT_MANAGER.sendPersistent(getClass().getName(), message);
                     }
                 }
             }
@@ -52,8 +53,8 @@ public class JoinAnnounceModule extends Module {
                 boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
 
                 if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                    String message = "§7" + playerName + " left the game";
-                    CHAT_MANAGER.sendPersistent(playerName, message);
+                    Text message = CAT_FORMAT.format("{grey}" + playerName + " left the game.");
+                    CHAT_MANAGER.sendPersistent(getClass().getName(), message);
                 }
             }
         }
