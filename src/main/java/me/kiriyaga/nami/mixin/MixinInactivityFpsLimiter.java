@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.misc.UnfocusedCpuModule;
+import me.kiriyaga.nami.feature.module.impl.misc.UnfocusedFpsModule;
 import net.minecraft.client.option.InactivityFpsLimiter;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +16,7 @@ public class MixinInactivityFpsLimiter {
     private void updateHead(CallbackInfoReturnable<Integer> info) {
         if (MODULE_MANAGER.getStorage() == null) return;
 
-        UnfocusedCpuModule module = MODULE_MANAGER.getStorage().getByClass(UnfocusedCpuModule.class);
+        UnfocusedFpsModule module = MODULE_MANAGER.getStorage().getByClass(UnfocusedFpsModule.class);
         if (module == null) return;
 
         if (module.isEnabled() && (MC == null || !MC.isWindowFocused())) {
