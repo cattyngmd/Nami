@@ -16,7 +16,7 @@ def getGitHash() {
     return stdout.toString().trim()
 }
 
-version = "2.4_8.${getGitHash()}"
+version = "2.4_10.${getGitHash()}"
 //version = "2.4"
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -32,6 +32,7 @@ repositories {
             includeGroup("maven.modrinth")
         }
     }
+    maven { url "https://jitpack.io"  }
 }
 
 dependencies {
@@ -40,6 +41,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:0.16.14"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.129.0+1.21.8"
     modImplementation("maven.modrinth:sodium:mc1.21.6-0.6.13-fabric") {transitive = false}
+    modImplementation("com.github.cattyngmd.catformat:catformat-fabric:2.0.3")
     implementation "org.osgi:org.osgi.core:6.0.0"
 }
 

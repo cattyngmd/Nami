@@ -24,8 +24,8 @@ public class VisualRangeModule extends Module {
         super("visual range", "Notifies you when players enter render distance.", ModuleCategory.of("world"), "visualrange", "мшыгфдкфтпу");
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onPacketReceive(EntitySpawnEvent event) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onEntitySpawn(EntitySpawnEvent event) {
         if (MC.player == null || MC.world == null) return;
 
         if (event.getEntity() instanceof PlayerEntity player) {

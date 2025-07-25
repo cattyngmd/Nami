@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.combat;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.DissconectEvent;
+import me.kiriyaga.nami.event.impl.EntitySpawnEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -18,6 +19,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.sound.SoundEvents;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -26,7 +28,7 @@ public class AutoLogModule extends Module {
 
     private final IntSetting health = addSetting(new IntSetting("on health", 12, 0, 36));
     private final BoolSetting onRender = addSetting(new BoolSetting("on render", false));
-    private final BoolSetting packet = addSetting(new BoolSetting("packet", false));
+    private final BoolSetting packet = addSetting(new BoolSetting("on packet", false));
     private final BoolSetting onPop = addSetting(new BoolSetting("on pop", false));
     private final IntSetting onLevel = addSetting(new IntSetting("on level", 0, 0, 15000));
     private final BoolSetting selfToggle = addSetting(new BoolSetting("self toggle", true));
@@ -76,25 +78,27 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (packet.get() && event.getPacket() instanceof EntitySpawnS2CPacket spawnPacket) {
-            int id = spawnPacket.getEntityId();
-            double x = spawnPacket.getX();
-            double y = spawnPacket.getY();
-            double z = spawnPacket.getZ();
-
-            MC.execute(() -> {
-                Entity entity = MC.world.getEntityById(id);
-                if (entity instanceof PlayerEntity player && !FRIEND_MANAGER.isFriend(player.getName().getString())) {
-                    double distance = MC.player.distanceTo(player);
-                    logOut("Untrusted player in range: " + player.getName().toString() + " (" + String.format("%.1f", distance) + " blocks)");
-                }
-            });
-        }
-
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
             if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 35 && onPop.get()) {
                 MC.execute(() -> logOut("AutoLog: totem got popped."));
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        if (MC.player == null || MC.world == null || !packet.get()) return;
+
+        if (event.getEntity() instanceof PlayerEntity player) {
+
+            if (player == MC.player)
+                return;
+
+            if (FRIEND_MANAGER.isFriend(player.getName().getString()))
+                return;
+
+            double distance = MC.player.distanceTo(player);
+            logOut("Untrusted player in range: " + player.getName().toString() + " (" + String.format("%.1f", distance) + " blocks)");
         }
     }
 

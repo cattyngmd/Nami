@@ -16,7 +16,7 @@ import static me.kiriyaga.nami.feature.gui.components.ModulePanel.MODULE_SPACING
 
 public class CategoryPanel {
     public static final int WIDTH = 110;
-    public static final int HEADER_HEIGHT = 15;
+    public static final int HEADER_HEIGHT = 14;
     public static final int GAP = 5;
     private static final int PADDING = 5;
     public static final int BORDER_WIDTH = 1;
