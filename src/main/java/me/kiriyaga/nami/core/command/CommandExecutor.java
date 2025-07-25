@@ -78,7 +78,7 @@ public class CommandExecutor {
             }
             argsFormatted = argsFormatted.trim();
 
-            String usage = "Usage: {s}" + argsFormatted + "{reset}.";
+            String usage = "Wrong input! Usage: {s}" + argsFormatted + "{reset}.";
 
             CHAT_MANAGER.sendPersistent(CommandExecutor.class.getName(),
                     CAT_FORMAT.format(usage));
