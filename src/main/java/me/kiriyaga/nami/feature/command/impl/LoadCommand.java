@@ -1,28 +1,29 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.CONFIG_MANAGER;
-import static me.kiriyaga.nami.Nami.CAT_FORMAT;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class LoadCommand extends Command {
 
     public LoadCommand() {
-        super("load", "Force config load", "l", "laod", "lad", "lod", "дщфв");
+        super("load",
+                new CommandArgument[] {},
+                "l", "laod", "lad", "lod", "дщфв");
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(Object[] args) {
         try {
             CONFIG_MANAGER.loadModules();
             CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(),
                     CAT_FORMAT.format("Config has been loaded."));
-        } catch (Exception e){
+        } catch (Exception e) {
             CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(),
-                    CAT_FORMAT.format("Config has not been loaded: {g}" + e + "{reset}."));
+                    CAT_FORMAT.format("Config has not been loaded: {r}" + e.getMessage() + "{reset}."));
         }
     }
 }

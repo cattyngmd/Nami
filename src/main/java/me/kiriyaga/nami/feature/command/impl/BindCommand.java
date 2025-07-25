@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import me.kiriyaga.nami.util.KeyUtils;
@@ -14,19 +15,20 @@ import static me.kiriyaga.nami.Nami.*;
 public class BindCommand extends Command {
 
     public BindCommand() {
-        super("bind", "Binds a module to a key. Usage: .bind <module> <key>", "bind", "b", "иштв");
+        super(
+                "bind",
+                new CommandArgument[] {
+                        new CommandArgument.StringArg("module", 1, 25),
+                        new CommandArgument.StringArg("key", 1, 10)
+                },
+                "b", "иштв"
+        );
     }
 
     @Override
-    public void execute(String[] args) {
-        if (args.length != 2) {
-            Text message = CAT_FORMAT.format("Usage: {s}"+COMMAND_MANAGER.getExecutor().getPrefix()+"{g}bind {s}<{g}module{s}> <{g}key{s}>{reset}.");
-            CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
-            return;
-        }
-
-        String moduleName = args[0].toLowerCase();
-        String keyName = args[1].toUpperCase();
+    public void execute(Object[] parsedArgs) {
+        String moduleName = ((String) parsedArgs[0]).toLowerCase();
+        String keyName = ((String) parsedArgs[1]).toUpperCase();
 
         Module module = MODULE_MANAGER.getStorage().getAll().stream()
                 .filter(m -> m.getName().equalsIgnoreCase(moduleName) || m.matches(moduleName))
@@ -39,14 +41,11 @@ public class BindCommand extends Command {
             return;
         }
 
-        KeyBindSetting bindSetting = null;
-
-        for (var setting : module.getSettings()) {
-            if (setting instanceof KeyBindSetting) {
-                bindSetting = (KeyBindSetting) setting;
-                break;
-            }
-        }
+        KeyBindSetting bindSetting = module.getSettings().stream()
+                .filter(s -> s instanceof KeyBindSetting)
+                .map(s -> (KeyBindSetting) s)
+                .findFirst()
+                .orElse(null);
 
         if (bindSetting == null) {
             Text message = CAT_FORMAT.format("Module {g}" + moduleName + " {reset}does not have a keybind setting.");

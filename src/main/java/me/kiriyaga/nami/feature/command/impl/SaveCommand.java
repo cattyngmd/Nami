@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -9,11 +10,12 @@ import static me.kiriyaga.nami.Nami.*;
 public class SaveCommand extends Command {
 
     public SaveCommand() {
-        super("save", "Force config save.", "s", "save", "seva", "sv", "ыфму");
+        super("save",
+                new CommandArgument[0], "s", "save", "seva", "sv", "ыфму");
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(Object[] args) {
         try {
             CONFIG_MANAGER.saveModules();
             CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(),

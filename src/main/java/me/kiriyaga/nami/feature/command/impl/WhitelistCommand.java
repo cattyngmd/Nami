@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.setting.impl.WhitelistSetting;
-import net.minecraft.text.MutableText;
 import net.minecraft.util.Identifier;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -11,21 +11,32 @@ public class WhitelistCommand extends Command {
     private final String moduleName;
 
     public WhitelistCommand(String moduleName) {
-        super(moduleName.replace(" ", ""), "Manage list settings for module " + moduleName);
+        super(
+                moduleName.replace(" ", ""),
+                new CommandArgument[] {
+                        new CommandArgument.StringArg("setting", 1, 64),
+                        new CommandArgument.ActionArg("action", "add", "del", "list"),
+                        new CommandArgument.StringArg("item", 1, 64) {
+                            @Override
+                            public boolean isRequired() {
+                                return false;
+                            }
+                        }
+                }
+        );
         this.moduleName = moduleName;
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(Object[] parsedArgs) {
         String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
 
-        if (args.length < 1) {
-            CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + "{s} <{g}setting{s}> <{g}add/del/list{s}> <{g}item{s}>{reset}."));
-            return;
+        String settingName = ((String) parsedArgs[0]).toLowerCase();
+        String action = ((String) parsedArgs[1]).toLowerCase();
+        String item = parsedArgs.length > 2 ? (String) parsedArgs[2] : null;
+        if (item != null) {
+            item = item.toLowerCase().replace("minecraft:", "").trim();
         }
-
-        String settingName = args[0].toLowerCase();
 
         var module = MODULE_MANAGER.getStorage().getByName(moduleName);
         if (module == null) {
@@ -41,57 +52,41 @@ public class WhitelistCommand extends Command {
             return;
         }
 
-        if (args.length < 2) {
-            CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName +
-                            " {s}<{g}add/del/list{s}> [{g}item{s}]{reset}."));
-            return;
-        }
-
-        String action = args[1].toLowerCase();
-
         switch (action) {
             case "add" -> {
-                if (args.length < 3) {
+                if (item == null || item.isEmpty()) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName +
-                                    " add {s}<{g}item{s}>{reset}."));
+                            CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName + " add {s}<{g}item{s}>{reset}."));
                     return;
                 }
-                String addItem = args[2].toLowerCase().replace("minecraft:", "");
-                if (listSetting.addToWhitelist(addItem)) {
+                if (listSetting.addToWhitelist(item)) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Added: {g}minecraft:" + addItem + "{reset} to {g}" + settingName + "{reset}."));
+                            CAT_FORMAT.format("Added: {g}minecraft:" + item + "{reset} to {g}" + settingName + "{reset}."));
                 } else {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Invalid item id or already added: {g}minecraft:" + addItem + "{reset}."));
+                            CAT_FORMAT.format("Invalid item id or already added: {g}minecraft:" + item + "{reset}."));
                 }
             }
-
             case "del" -> {
-                if (args.length < 3) {
+                if (item == null || item.isEmpty()) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName +
-                                    " del {s}<{g}item{s}>{reset}."));
+                            CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName + " del {s}<{g}item{s}>{reset}."));
                     return;
                 }
-                String delItem = args[2].toLowerCase().replace("minecraft:", "");
-                if (listSetting.removeFromWhitelist(delItem)) {
+                if (listSetting.removeFromWhitelist(item)) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Removed: {g}minecraft:" + delItem + "{reset} from {g}" + settingName + "{reset}."));
+                            CAT_FORMAT.format("Removed: {g}minecraft:" + item + "{reset} from {g}" + settingName + "{reset}."));
                 } else {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Invalid or not in list: {g}minecraft:" + delItem + "{reset}."));
+                            CAT_FORMAT.format("Invalid or not in list: {g}minecraft:" + item + "{reset}."));
                 }
             }
-
             case "list" -> {
                 if (listSetting.getWhitelist().isEmpty()) {
                     CHAT_MANAGER.sendPersistent(moduleName,
                             CAT_FORMAT.format("{g}" + settingName + "{reset} is empty."));
                     return;
                 }
-
                 StringBuilder builder = new StringBuilder();
                 builder.append("{g}").append(settingName).append("{reset} items: ");
 
@@ -102,10 +97,8 @@ public class WhitelistCommand extends Command {
                     if (i < size - 1) builder.append("{s}, {reset}");
                     i++;
                 }
-
                 CHAT_MANAGER.sendPersistent(moduleName, CAT_FORMAT.format(builder.toString()));
             }
-
             default -> CHAT_MANAGER.sendPersistent(moduleName,
                     CAT_FORMAT.format("Unknown action: {g}" + action + "{reset}. Use {g}add/del/list{reset}."));
         }

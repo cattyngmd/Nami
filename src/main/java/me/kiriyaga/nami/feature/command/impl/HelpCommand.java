@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import net.minecraft.text.MutableText;
 
@@ -12,44 +13,29 @@ import static me.kiriyaga.nami.Nami.*;
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super("help", "Displays list of available commands. Usage: .help <Command>.",
+        super("help",
+                new CommandArgument[] {},
                 "h", "?", "hlp", "halp", "hilp", "heil", "рудз", "commands", "command");
     }
 
     @Override
-    public void execute(String[] args) {
-        String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
+    public void execute(Object[] args) {
+        List<Command> cmds = COMMAND_MANAGER.getStorage().getCommands();
 
-        if (args.length == 0) {
-            List<Command> cmds = COMMAND_MANAGER.getStorage().getCommands();
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < cmds.size(); i++) {
-                sb.append("{g}").append(cmds.get(i).getName()).append("{reset}");
-                if (i < cmds.size() - 1) sb.append(", ");
-            }
-            sb.append(".");
-
-            MutableText message = CAT_FORMAT.format("Available commands: " + sb.toString());
-            CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), message);
-
-        } else if (args.length == 1) {
-            String search = args[0].toLowerCase();
-
-            for (Command cmd : COMMAND_MANAGER.getStorage().getCommands()) {
-                if (cmd.getName().equalsIgnoreCase(search) || cmd.matches(search)) {
-                    String usageMsg = cmd.getName() + " usage: {g}" + cmd.getDescription() + "{reset}.";
-                    MutableText msg = CAT_FORMAT.format(usageMsg);
-                    CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), msg);
-                    return;
-                }
-            }
+        if (cmds.isEmpty()) {
             CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(),
-                    CAT_FORMAT.format("Command not found: {g}" + search + "{reset}."));
-
-        } else {
-            CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(),
-                    CAT_FORMAT.format("Type {g}" + prefix + "help{reset}."));
+                    CAT_FORMAT.format("No commands registered."));
+            return;
         }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < cmds.size(); i++) {
+            sb.append("{g}").append(cmds.get(i).getName()).append("{reset}");
+            if (i < cmds.size() - 1) sb.append(", ");
+        }
+        sb.append(".");
+
+        MutableText message = CAT_FORMAT.format("Available commands: " + sb.toString());
+        CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), message);
     }
 }

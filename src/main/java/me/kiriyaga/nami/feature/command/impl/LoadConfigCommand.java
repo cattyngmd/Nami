@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -9,18 +10,18 @@ import static me.kiriyaga.nami.Nami.*;
 public class LoadConfigCommand extends Command {
 
     public LoadConfigCommand() {
-        super("loadconfig", "Load a config by name", "loadcfg", "lcfg");
+        super(
+                "loadconfig",
+                new CommandArgument[] {
+                        new CommandArgument.StringArg("configName", 1, 32)
+                },
+                "loadcfg", "lcfg"
+        );
     }
 
     @Override
-    public void execute(String[] args) {
-        if (args.length < 1) {
-            String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
-            CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}loadconfig {s}<{g}configName{s}>{reset}."));
-            return;
-        }
-        String configName = args[0];
+    public void execute(Object[] args) {
+        String configName = (String) args[0];
 
         try {
             CONFIG_MANAGER.loadConfig(configName);
@@ -28,7 +29,7 @@ public class LoadConfigCommand extends Command {
                     CAT_FORMAT.format("Config {g}" + configName + "{reset} has been loaded."));
         } catch (Exception e) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Failed to load config {g}" + configName + "{reset}: {g}" + e + "{reset}."));
+                    CAT_FORMAT.format("Failed to load config {g}" + configName + "{reset}: {r}" + e.getMessage() + "{reset}."));
         }
     }
 }

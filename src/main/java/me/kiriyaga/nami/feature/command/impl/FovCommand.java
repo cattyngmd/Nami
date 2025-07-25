@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.mixininterface.ISimpleOption;
 
@@ -10,33 +11,22 @@ import static me.kiriyaga.nami.Nami.*;
 public class FovCommand extends Command {
 
     public FovCommand() {
-        super("fov", "Changes your FOV. Usage: .fov <Value>", "fav", "ащм", "fv");
+        super(
+                "fov",
+                new CommandArgument[]{
+                        new CommandArgument.IntArg("value", 0, 162)
+                },
+                "fav", "ащм", "fv"
+        );
     }
 
     @Override
-    public void execute(String[] args) {
-        if (args.length != 1) {
-            String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
-            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}fov {s}<{g}value{s}>{reset}."));
-            return;
-        }
+    public void execute(Object[] args) {
+        int newFov = (int) args[0];
 
-        try {
-            int newFov = Integer.parseInt(args[0].trim());
-            if (newFov < 0 || newFov > 162) {
-                CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                        CAT_FORMAT.format("FOV must be between {g}0{reset} and {g}162{reset}."));
-                return;
-            }
-            ((ISimpleOption)(Object) MC.options.getFov()).setValue(newFov);
+        ((ISimpleOption)(Object) MC.options.getFov()).setValue(newFov);
 
-            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                    CAT_FORMAT.format("FOV set to: {g}" + newFov + "{reset}."));
-
-        } catch (NumberFormatException e) {
-            CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                    CAT_FORMAT.format("Invalid number format."));
-        }
+        CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
+                CAT_FORMAT.format("FOV set to: {g}" + newFov + "{reset}."));
     }
 }

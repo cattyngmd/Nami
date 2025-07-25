@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -9,33 +10,26 @@ import static me.kiriyaga.nami.Nami.*;
 public class PitchCommand extends Command {
 
     public PitchCommand() {
-        super("pitch", "Sets player pitch. Usage: .pitch <value>", "p", "зшце");
+        super(
+                "pitch",
+                new CommandArgument[] {
+                        new CommandArgument.IntArg("value", -90, 90)
+                },
+                "p", "зшце"
+        );
     }
 
     @Override
-    public void execute(String[] args) {
-        String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
+    public void execute(Object[] args) {
+        int pitch = (int) args[0];
 
-        if (args.length != 1) {
+        if (MC.player != null) {
+            MC.player.setPitch(pitch);
             CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}pitch {s}<{g}value{s}>{reset}."));
-            return;
-        }
-
-        try {
-            float pitch = Float.parseFloat(args[0].trim());
-
-            if (MC.player != null) {
-                MC.player.setPitch(pitch);
-                CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                        CAT_FORMAT.format("Pitch set to: {g}" + pitch + "{reset}."));
-            } else {
-                CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                        CAT_FORMAT.format("Player is null."));
-            }
-        } catch (NumberFormatException e) {
+                    CAT_FORMAT.format("Pitch set to: {g}" + pitch + "{reset}."));
+        } else {
             CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                    CAT_FORMAT.format("Invalid number: {g}" + args[0] + "{reset}."));
+                    CAT_FORMAT.format("Player is null."));
         }
     }
 }

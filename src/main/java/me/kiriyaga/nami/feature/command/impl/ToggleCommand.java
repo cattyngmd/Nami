@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
+import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.module.Module;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -10,18 +11,22 @@ import static me.kiriyaga.nami.Nami.*;
 public class ToggleCommand extends Command {
 
     public ToggleCommand() {
-        super("toggle", "Toggles a module on or off. Usage: .toggle <moduleName>", "on", "off", "switch", "togle", "turnon", "turnoff", "tggle");
+        super("toggle",
+                new CommandArgument[] {
+                        new CommandArgument.StringArg("moduleName", 1, 25)
+                },
+                "on", "off", "switch", "togle", "turnon", "turnoff", "tggle");
     }
 
     @Override
-    public void execute(String[] args) {
-        if (args.length == 0) {
+    public void execute(Object[] args) {
+        if (args.length < 1) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
                     CAT_FORMAT.format("Usage: {s}" + COMMAND_MANAGER.getExecutor().getPrefix() + "{g}toggle {s}<{g}moduleName{s}>{reset}."));
             return;
         }
 
-        String input = args[0];
+        String input = args[0].toString();
 
         Module found = null;
         for (Module m : MODULE_MANAGER.getStorage().getAll()) {
