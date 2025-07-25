@@ -17,7 +17,7 @@ public class LoadConfigCommand extends Command {
         if (args.length < 1) {
             String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Usage: {global}" + prefix + "loadconfig <configName>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}loadconfig {s}<{g}configName{s}>{reset}."));
             return;
         }
         String configName = args[0];
@@ -25,10 +25,10 @@ public class LoadConfigCommand extends Command {
         try {
             CONFIG_MANAGER.loadConfig(configName);
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Config {global}" + configName + "{reset} has been loaded."));
+                    CAT_FORMAT.format("Config {g}" + configName + "{reset} has been loaded."));
         } catch (Exception e) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Failed to load config {global}" + configName + "{reset}: {global}" + e + "{reset}."));
+                    CAT_FORMAT.format("Failed to load config {g}" + configName + "{reset}: {g}" + e + "{reset}."));
         }
     }
 }

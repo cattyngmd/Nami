@@ -18,7 +18,7 @@ public class FovCommand extends Command {
         if (args.length != 1) {
             String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
             CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                    CAT_FORMAT.format("Usage: {global}" + prefix + "fov <value>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}fov {s}<{g}value{s}>{reset}."));
             return;
         }
 
@@ -26,13 +26,13 @@ public class FovCommand extends Command {
             int newFov = Integer.parseInt(args[0].trim());
             if (newFov < 0 || newFov > 162) {
                 CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                        CAT_FORMAT.format("FOV must be between {global}0{reset} and {global}162{reset}."));
+                        CAT_FORMAT.format("FOV must be between {g}0{reset} and {g}162{reset}."));
                 return;
             }
             ((ISimpleOption)(Object) MC.options.getFov()).setValue(newFov);
 
             CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                    CAT_FORMAT.format("FOV set to: {global}" + newFov + "{reset}."));
+                    CAT_FORMAT.format("FOV set to: {g}" + newFov + "{reset}."));
 
         } catch (NumberFormatException e) {
             CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),

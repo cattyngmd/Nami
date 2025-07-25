@@ -18,7 +18,7 @@ public class NameCommand extends Command {
 
         if (args.length != 1) {
             CHAT_MANAGER.sendPersistent(NameCommand.class.getName(),
-                    CAT_FORMAT.format("Usage: {global}" + prefix + "name <name>{reset}."));
+                    CAT_FORMAT.format("Usage: {g}" + prefix + "name <name>{reset}."));
             return;
         }
 
@@ -40,6 +40,6 @@ public class NameCommand extends Command {
         CONFIG_MANAGER.saveName(newName);
 
         CHAT_MANAGER.sendPersistent(NameCommand.class.getName(),
-                CAT_FORMAT.format("Name set to: {global}" + newName + "{reset}."));
+                CAT_FORMAT.format("Name set to: {g}" + newName + "{reset}."));
     }
 }

@@ -138,11 +138,11 @@ public class AutoTotemModule extends Module {
 
         Text message = CAT_FORMAT.format(
                 "\n{primary}=== AutoTotem ===\n" +
-                        "{primary}Cause: {global}" + reason + "{reset}\n" +
-                        "{primary}Ping: {global}" + ping + " ms{reset}\n" +
-                        "{primary}Totems Available: {global}" + totemCount + "{reset}\n" +
-                        "{primary}Pending Totem: {global}" + pendingTotem + "{reset}\n" +
-                        "{primary}Last Swap Attempt: {global}" + timeSinceLastSwap + " ms ago{reset}\n" +
+                        "{primary}Cause: {g}" + reason + "{reset}\n" +
+                        "{primary}Ping: {g}" + ping + " ms{reset}\n" +
+                        "{primary}Totems Available: {g}" + totemCount + "{reset}\n" +
+                        "{primary}Pending Totem: {g}" + pendingTotem + "{reset}\n" +
+                        "{primary}Last Swap Attempt: {g}" + timeSinceLastSwap + " ms ago{reset}\n" +
                         "{primary}============================"
         );
 

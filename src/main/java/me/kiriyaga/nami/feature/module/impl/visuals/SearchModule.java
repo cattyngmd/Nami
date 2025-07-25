@@ -161,7 +161,7 @@ public class SearchModule extends Module {
                 StringBuilder message = new StringBuilder("Found: ");
 
                 foundCounts.forEach((id, count) ->
-                        message.append("{global}").append(count).append("x ").append(id.getPath()).append("{reset}, ")
+                        message.append("{g}").append(count).append("x ").append(id.getPath()).append("{reset}, ")
                 );
 
                 if (message.length() > 2) {

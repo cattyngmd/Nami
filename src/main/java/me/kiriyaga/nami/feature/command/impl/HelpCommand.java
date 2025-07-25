@@ -25,7 +25,7 @@ public class HelpCommand extends Command {
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < cmds.size(); i++) {
-                sb.append("{global}").append(cmds.get(i).getName()).append("{reset}");
+                sb.append("{g}").append(cmds.get(i).getName()).append("{reset}");
                 if (i < cmds.size() - 1) sb.append(", ");
             }
             sb.append(".");
@@ -38,18 +38,18 @@ public class HelpCommand extends Command {
 
             for (Command cmd : COMMAND_MANAGER.getStorage().getCommands()) {
                 if (cmd.getName().equalsIgnoreCase(search) || cmd.matches(search)) {
-                    String usageMsg = cmd.getName() + " usage: {global}" + cmd.getDescription() + "{reset}.";
+                    String usageMsg = cmd.getName() + " usage: {g}" + cmd.getDescription() + "{reset}.";
                     MutableText msg = CAT_FORMAT.format(usageMsg);
                     CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(), msg);
                     return;
                 }
             }
             CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(),
-                    CAT_FORMAT.format("Command not found: {global}" + search + "{reset}."));
+                    CAT_FORMAT.format("Command not found: {g}" + search + "{reset}."));
 
         } else {
             CHAT_MANAGER.sendPersistent(HelpCommand.class.getName(),
-                    CAT_FORMAT.format("Type {global}" + prefix + "help{reset}."));
+                    CAT_FORMAT.format("Type {g}" + prefix + "help{reset}."));
         }
     }
 }

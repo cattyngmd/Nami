@@ -22,7 +22,7 @@ public class LoadCommand extends Command {
                     CAT_FORMAT.format("Config has been loaded."));
         } catch (Exception e){
             CHAT_MANAGER.sendPersistent(LoadCommand.class.getName(),
-                    CAT_FORMAT.format("Config has not been loaded: {global}" + e + "{reset}."));
+                    CAT_FORMAT.format("Config has not been loaded: {g}" + e + "{reset}."));
         }
     }
 }

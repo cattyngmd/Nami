@@ -16,7 +16,7 @@ public class YawCommand extends Command {
     public void execute(String[] args) {
         if (args.length != 1) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "yaw <value>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + COMMAND_MANAGER.getExecutor().getPrefix() + "{g}yaw {s}<{g}value{s}>{reset}."));
             return;
         }
 
@@ -25,11 +25,11 @@ public class YawCommand extends Command {
 
             MC.player.setYaw(yaw);
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Yaw set to: {global}" + yaw + "{reset}."));
+                    CAT_FORMAT.format("Yaw set to: {g}" + yaw + "{reset}."));
 
         } catch (NumberFormatException e) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Invalid number: {global}" + args[0] + "{reset}."));
+                    CAT_FORMAT.format("Invalid number: {g}" + args[0] + "{reset}."));
         }
     }
 }

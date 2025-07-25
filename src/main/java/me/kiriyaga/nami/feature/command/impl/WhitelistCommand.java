@@ -3,11 +3,9 @@ package me.kiriyaga.nami.feature.command.impl;
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.setting.impl.WhitelistSetting;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.Nami.CAT_FORMAT;
 
 public class WhitelistCommand extends Command {
     private final String moduleName;
@@ -23,9 +21,7 @@ public class WhitelistCommand extends Command {
 
         if (args.length < 1) {
             CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Usage: ")
-                            .append(CAT_FORMAT.format("{global}" + prefix))
-                            .append(CAT_FORMAT.format(moduleName + " {global}<settingName> <add/del/list> <item>{reset}.")));
+                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + "{s} <{g}setting{s}> <{g}add/del/list{s}> <{g}item{s}>{reset}."));
             return;
         }
 
@@ -34,24 +30,21 @@ public class WhitelistCommand extends Command {
         var module = MODULE_MANAGER.getStorage().getByName(moduleName);
         if (module == null) {
             CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Module {global}")
-                            .append(CAT_FORMAT.format(moduleName + "{reset} not found.")));
+                    CAT_FORMAT.format("Module {s}'{g}" + moduleName + "{s}'{reset} not found."));
             return;
         }
 
         var setting = module.getSettingByName(settingName);
         if (!(setting instanceof WhitelistSetting listSetting)) {
             CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Setting {global}")
-                            .append(CAT_FORMAT.format(settingName + "{reset} not found or not a whitelist setting.")));
+                    CAT_FORMAT.format("Setting {s}'{g}" + settingName + "{s}'{reset} not found or not a whitelist setting."));
             return;
         }
 
         if (args.length < 2) {
             CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Usage: ")
-                            .append(CAT_FORMAT.format("{global}" + prefix))
-                            .append(CAT_FORMAT.format(moduleName + " " + settingName + " <add/del/list> [item]{reset}.")));
+                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName +
+                            " {s}<{g}add/del/list{s}> [{g}item{s}]{reset}."));
             return;
         }
 
@@ -61,64 +54,60 @@ public class WhitelistCommand extends Command {
             case "add" -> {
                 if (args.length < 3) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Usage: ")
-                                    .append(CAT_FORMAT.format("{global}" + prefix))
-                                    .append(CAT_FORMAT.format(moduleName + " " + settingName + " add <item>{reset.}")));
+                            CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName +
+                                    " add {s}<{g}item{s}>{reset}."));
                     return;
                 }
                 String addItem = args[2].toLowerCase().replace("minecraft:", "");
                 if (listSetting.addToWhitelist(addItem)) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Added: {global}")
-                                    .append(CAT_FORMAT.format("minecraft:" + addItem + " {reset}to{global} " + settingName + "{reset}.")));
+                            CAT_FORMAT.format("Added: {g}minecraft:" + addItem + "{reset} to {g}" + settingName + "{reset}."));
                 } else {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Invalid item id or already added: {global}")
-                                    .append(CAT_FORMAT.format("{global}" + prefix))
-                                    .append(CAT_FORMAT.format("minecraft:" + addItem + "{reset}.")));
+                            CAT_FORMAT.format("Invalid item id or already added: {g}minecraft:" + addItem + "{reset}."));
                 }
             }
+
             case "del" -> {
                 if (args.length < 3) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Usage: ")
-                                    .append(CAT_FORMAT.format("{global}" + prefix))
-                                    .append(CAT_FORMAT.format(moduleName + " " + settingName + " del <item>{reset}.")));
+                            CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + moduleName + " {g}" + settingName +
+                                    " del {s}<{g}item{s}>{reset}."));
                     return;
                 }
                 String delItem = args[2].toLowerCase().replace("minecraft:", "");
                 if (listSetting.removeFromWhitelist(delItem)) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Removed: {global}")
-                                    .append(CAT_FORMAT.format("minecraft:" + delItem + " {reset}from{global} " + settingName+"{reset}.")));
+                            CAT_FORMAT.format("Removed: {g}minecraft:" + delItem + "{reset} from {g}" + settingName + "{reset}."));
                 } else {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("Invalid or not in list: {global}")
-                                    .append(CAT_FORMAT.format("minecraft:" + delItem + "{reset}.")));
+                            CAT_FORMAT.format("Invalid or not in list: {g}minecraft:" + delItem + "{reset}."));
                 }
             }
+
             case "list" -> {
                 if (listSetting.getWhitelist().isEmpty()) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("{global}"+settingName + " {reset}is empty."));
+                            CAT_FORMAT.format("{g}" + settingName + "{reset} is empty."));
                     return;
                 }
-                MutableText builder = CAT_FORMAT.format("{global}"+settingName + "{reset} items:{global} ");
+
+                StringBuilder builder = new StringBuilder();
+                builder.append("{g}").append(settingName).append("{reset} items: ");
+
                 int i = 0;
                 int size = listSetting.getWhitelist().size();
                 for (Identifier id : listSetting.getWhitelist()) {
-                    builder.append(CAT_FORMAT.format("{global}" + prefix)).append(CAT_FORMAT.format(id.toString()));
-                    if (i < size - 1) builder.append(CAT_FORMAT.format("{reset}, {global}"));
+                    builder.append("{g}").append(id.toString()).append("{reset}");
+                    if (i < size - 1) builder.append("{s}, {reset}");
                     i++;
                 }
-                CHAT_MANAGER.sendPersistent(moduleName, builder);
+
+                CHAT_MANAGER.sendPersistent(moduleName, CAT_FORMAT.format(builder.toString()));
             }
+
             default -> CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Unknown action: ")
-                            .append(CAT_FORMAT.format("{global}" + prefix))
-                            .append(CAT_FORMAT.format(action + ". {reset}Use "))
-                            .append(CAT_FORMAT.format("{global}" + prefix))
-                            .append(CAT_FORMAT.format("add/del/list")));
+                    CAT_FORMAT.format("Unknown action: {g}" + action + "{reset}. Use {g}add/del/list{reset}."));
         }
     }
 }

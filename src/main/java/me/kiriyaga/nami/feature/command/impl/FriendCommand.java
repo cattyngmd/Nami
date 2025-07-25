@@ -17,7 +17,7 @@ public class FriendCommand extends Command {
         if (args.length != 2) {
             String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
             CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
-                    CAT_FORMAT.format("Usage: {global}" + prefix + "friend <add|del> <name>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}friend {s}<{g}add{s}|{g}del{s}> <{g}name{s}>{reset}."));
             return;
         }
 

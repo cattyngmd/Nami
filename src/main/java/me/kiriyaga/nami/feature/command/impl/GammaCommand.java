@@ -19,7 +19,7 @@ public class GammaCommand extends Command {
         if (args.length != 1) {
             String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
             CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
-                    CAT_FORMAT.format("Usage: {global}" + prefix + "gamma <value>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}gamma {s}<{g}value{s}>{reset}."));
             return;
         }
 
@@ -28,13 +28,13 @@ public class GammaCommand extends Command {
 
             if (newGamma < 0.0 || newGamma > 420.0) {
                 CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
-                        CAT_FORMAT.format("Gamma must be between {global}0.0{reset} and {global}420.0{reset}."));
+                        CAT_FORMAT.format("Gamma must be between {g}0.0{reset} and {g}420.0{reset}."));
                 return;
             }
 
             ((ISimpleOption) (Object) MC.options.getGamma()).setValue(newGamma);
             CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
-                    CAT_FORMAT.format("Gamma set to: {global}" + newGamma + "{reset}."));
+                    CAT_FORMAT.format("Gamma set to: {g}" + newGamma + "{reset}."));
 
         } catch (NumberFormatException e) {
             CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),

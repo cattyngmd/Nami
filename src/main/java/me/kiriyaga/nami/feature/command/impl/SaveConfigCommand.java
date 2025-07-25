@@ -16,7 +16,7 @@ public class SaveConfigCommand extends Command {
     public void execute(String[] args) {
         if (args.length < 1) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "saveconfig <configName>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + COMMAND_MANAGER.getExecutor().getPrefix() + "{g}saveconfig {s}<{g}configName{s}>{reset}."));
             return;
         }
 
@@ -25,10 +25,10 @@ public class SaveConfigCommand extends Command {
         try {
             CONFIG_MANAGER.saveConfig(configName);
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Config {global}" + configName + "{reset} has been saved."));
+                    CAT_FORMAT.format("Config {g}" + configName + "{reset} has been saved."));
         } catch (Exception e) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Failed to save config {global}" + configName + "{reset}: {global}" + e + "{reset}."));
+                    CAT_FORMAT.format("Failed to save config {g}" + configName + "{reset}: {g}" + e + "{reset}."));
         }
     }
 }

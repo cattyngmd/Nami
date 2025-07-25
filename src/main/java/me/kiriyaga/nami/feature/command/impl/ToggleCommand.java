@@ -17,7 +17,7 @@ public class ToggleCommand extends Command {
     public void execute(String[] args) {
         if (args.length == 0) {
             CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Usage: {global}" + COMMAND_MANAGER.getExecutor().getPrefix() + "toggle <moduleName>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + COMMAND_MANAGER.getExecutor().getPrefix() + "{g}toggle {s}<{g}moduleName{s}>{reset}."));
             return;
         }
 
@@ -33,7 +33,7 @@ public class ToggleCommand extends Command {
 
         if (found == null) {
             CHAT_MANAGER.sendTransient(
-                    CAT_FORMAT.format("Module '{global}" + input + "{reset}' not found."));
+                    CAT_FORMAT.format("Module '{g}" + input + "{reset}' not found."));
             return;
         }
 

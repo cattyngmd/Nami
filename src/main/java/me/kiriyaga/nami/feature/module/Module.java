@@ -49,7 +49,7 @@ public abstract class Module {
             EVENT_MANAGER.register(this);
             onEnable();
 
-            Text message = CAT_FORMAT.format("{secondary}[{global}+{secondary}] {reset}" + name);
+            Text message = CAT_FORMAT.format("{s}[{g}+{s}] {reset}" + name);
             CHAT_MANAGER.sendTransient(message, false);
 
         } else {

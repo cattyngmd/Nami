@@ -9,12 +9,12 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class CatStyles {
 
-    @Style("global")
+    @Style("g")
     Color global() {
         return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
     }
 
-    @Style("secondary")
+    @Style("s")
     Color secondary() {
         return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor();
     }

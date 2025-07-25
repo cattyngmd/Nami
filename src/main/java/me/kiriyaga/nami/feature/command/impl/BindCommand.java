@@ -20,7 +20,7 @@ public class BindCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length != 2) {
-            Text message = CAT_FORMAT.format("Usage: {global}"+COMMAND_MANAGER.getExecutor().getPrefix()+"bind <module> <key>{reset}.");
+            Text message = CAT_FORMAT.format("Usage: {s}"+COMMAND_MANAGER.getExecutor().getPrefix()+"{g}bind {s}<{g}module{s}> <{g}key{s}>{reset}.");
             CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
@@ -34,7 +34,7 @@ public class BindCommand extends Command {
                 .orElse(null);
 
         if (module == null) {
-            Text message = CAT_FORMAT.format("Module {global}" + moduleName + " {reset}not found.");
+            Text message = CAT_FORMAT.format("Module {g}" + moduleName + " {reset}not found.");
             CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
@@ -49,7 +49,7 @@ public class BindCommand extends Command {
         }
 
         if (bindSetting == null) {
-            Text message = CAT_FORMAT.format("Module {global}" + moduleName + " {reset}does not have a keybind setting.");
+            Text message = CAT_FORMAT.format("Module {g}" + moduleName + " {reset}does not have a keybind setting.");
             CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
@@ -57,21 +57,21 @@ public class BindCommand extends Command {
         int keyCode = KeyUtils.parseKey(keyName);
 
         if (keyCode == -1) {
-            Text message = CAT_FORMAT.format("Invalid key name: {global}" + keyName + "{reset}.");
+            Text message = CAT_FORMAT.format("Invalid key name: {g}" + keyName + "{reset}.");
             CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
         InputUtil.Key key = InputUtil.Type.KEYSYM.createFromCode(keyCode);
         if (key == null) {
-            Text message = CAT_FORMAT.format("Invalid key code: {global}" + keyCode + "{reset}.");
+            Text message = CAT_FORMAT.format("Invalid key code: {g}" + keyCode + "{reset}.");
             CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
         bindSetting.set(keyCode);
 
-        Text message = CAT_FORMAT.format("Bound module {global}" + module.getName() + " {reset}to key {global}" + keyName + "{reset}.");
+        Text message = CAT_FORMAT.format("Bound module {g}" + module.getName() + " {reset}to key {g}" + keyName + "{reset}.");
         CHAT_MANAGER.sendPersistent(BindCommand.class.getName(), message);
     }
 }

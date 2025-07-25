@@ -20,7 +20,7 @@ public class SaveCommand extends Command {
                     CAT_FORMAT.format("Config has been saved."));
         } catch (Exception e) {
             CHAT_MANAGER.sendPersistent(SaveCommand.class.getName(),
-                    CAT_FORMAT.format("Config has not been saved: {global}" + e + "{reset}."));
+                    CAT_FORMAT.format("Config has not been saved: {g}" + e + "{reset}."));
         }
     }
 }

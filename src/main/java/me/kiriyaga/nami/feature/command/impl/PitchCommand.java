@@ -18,7 +18,7 @@ public class PitchCommand extends Command {
 
         if (args.length != 1) {
             CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                    CAT_FORMAT.format("Usage: {global}" + prefix + "pitch <value>{reset}."));
+                    CAT_FORMAT.format("Usage: {s}" + prefix + "{g}pitch {s}<{g}value{s}>{reset}."));
             return;
         }
 
@@ -28,14 +28,14 @@ public class PitchCommand extends Command {
             if (MC.player != null) {
                 MC.player.setPitch(pitch);
                 CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                        CAT_FORMAT.format("Pitch set to: {global}" + pitch + "{reset}."));
+                        CAT_FORMAT.format("Pitch set to: {g}" + pitch + "{reset}."));
             } else {
                 CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
                         CAT_FORMAT.format("Player is null."));
             }
         } catch (NumberFormatException e) {
             CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                    CAT_FORMAT.format("Invalid number: {global}" + args[0] + "{reset}."));
+                    CAT_FORMAT.format("Invalid number: {g}" + args[0] + "{reset}."));
         }
     }
 }
