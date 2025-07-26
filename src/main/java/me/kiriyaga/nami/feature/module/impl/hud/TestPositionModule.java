@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.MC;
 
-@RegisterModule
+//@RegisterModule
 public class TestPositionModule extends HudElementModule {
 
     private boolean toggle = false;
