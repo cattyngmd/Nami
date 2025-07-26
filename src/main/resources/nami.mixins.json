@@ -25,6 +25,7 @@
     "MixinGameRenderer",
     "MixinHandledScreen",
     "MixinHeadFeatureRenderer",
+    "MixinHeldItemRenderer",
     "MixinInactivityFpsLimiter",
     "MixinInGameHud",
     "MixinInGameOverlayRenderer",

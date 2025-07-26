@@ -18,17 +18,8 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class AutoKeyModule extends Module {
 
-    private static final KeyBinding[] TRACKED_KEYS = new KeyBinding[]{
-            MC.options.forwardKey,
-            MC.options.backKey,
-            MC.options.leftKey,
-            MC.options.rightKey,
-            MC.options.jumpKey,
-            MC.options.sprintKey,
-            MC.options.attackKey,
-            MC.options.sneakKey,
-            MC.options.useKey
-    };
+    private KeyBinding[] trackedKeys;
+
 
     private final Map<KeyBinding, Boolean> savedKeyStates = new HashMap<>();
 
@@ -38,8 +29,20 @@ public class AutoKeyModule extends Module {
 
     @Override
     public void onEnable() {
+        trackedKeys = new KeyBinding[]{
+                MC.options.forwardKey,
+                MC.options.backKey,
+                MC.options.leftKey,
+                MC.options.rightKey,
+                MC.options.jumpKey,
+                MC.options.sprintKey,
+                MC.options.attackKey,
+                MC.options.sneakKey,
+                MC.options.useKey
+        };
+
         savedKeyStates.clear();
-        for (KeyBinding key : TRACKED_KEYS) {
+        for (KeyBinding key : trackedKeys) {
             InputUtil.Key boundKey = ((KeyBindingAccessor) key).getBoundKey();
             int keyCode = boundKey.getCode();
             boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
@@ -51,6 +54,7 @@ public class AutoKeyModule extends Module {
 
     @Override
     public void onDisable() {
+        if (trackedKeys == null) return;
         for (KeyBinding key : savedKeyStates.keySet()) {
             key.setPressed(false);
         }
@@ -59,7 +63,8 @@ public class AutoKeyModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdateEvent(PreTickEvent event) {
-        for (KeyBinding key : TRACKED_KEYS) {
+        if (trackedKeys == null) return;
+        for (KeyBinding key : trackedKeys) {
             if (savedKeyStates.getOrDefault(key, false)) {
                 key.setPressed(true);
             } else {
