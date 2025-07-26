@@ -41,14 +41,14 @@ public class WhitelistCommand extends Command {
         var module = MODULE_MANAGER.getStorage().getByName(moduleName);
         if (module == null) {
             CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Module {s}'{g}" + moduleName + "{s}'{reset} not found."));
+                    CAT_FORMAT.format("Module {s}{g}" + moduleName + "{s}{reset} not found."));
             return;
         }
 
         var setting = module.getSettingByName(settingName);
         if (!(setting instanceof WhitelistSetting listSetting)) {
             CHAT_MANAGER.sendPersistent(moduleName,
-                    CAT_FORMAT.format("Setting {s}'{g}" + settingName + "{s}'{reset} not found or not a whitelist setting."));
+                    CAT_FORMAT.format("Setting {s}{g}" + settingName + "{s}{reset} not found or not a whitelist setting."));
             return;
         }
 
@@ -84,11 +84,11 @@ public class WhitelistCommand extends Command {
             case "list" -> {
                 if (listSetting.getWhitelist().isEmpty()) {
                     CHAT_MANAGER.sendPersistent(moduleName,
-                            CAT_FORMAT.format("{g}" + settingName + "{reset} is empty."));
+                            CAT_FORMAT.format("List {g}" + settingName + "{reset} is empty."));
                     return;
                 }
                 StringBuilder builder = new StringBuilder();
-                builder.append("{g}").append(settingName).append("{reset} items: ");
+                builder.append("List {g}").append(settingName).append("{reset} items: ");
 
                 int i = 0;
                 int size = listSetting.getWhitelist().size();

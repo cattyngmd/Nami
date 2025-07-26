@@ -37,7 +37,7 @@ public class JoinAnnounceModule extends Module {
                     boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
 
                     if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                        Text message = CAT_FORMAT.format("{grey}" + playerName + " joined the game.");
+                        Text message = CAT_FORMAT.format("Player {g}" + playerName + " {reset}joined the game.");
                         CHAT_MANAGER.sendPersistent(getClass().getName(), message);
                     }
                 }
@@ -53,7 +53,7 @@ public class JoinAnnounceModule extends Module {
                 boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
 
                 if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                    Text message = CAT_FORMAT.format("{grey}" + playerName + " left the game.");
+                    Text message = CAT_FORMAT.format("Player {g}" + playerName + " {reset}has left the game.");
                     CHAT_MANAGER.sendPersistent(getClass().getName(), message);
                 }
             }
