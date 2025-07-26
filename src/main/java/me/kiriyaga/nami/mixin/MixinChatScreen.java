@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.client.HUDModule;
+import me.kiriyaga.nami.feature.module.impl.client.HudModule;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -32,7 +32,7 @@ public abstract class MixinChatScreen extends Screen {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
     private void redirectFill(DrawContext context, int x1, int y1, int x2, int y2, int color) {
-        HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
+        HudModule hud = MODULE_MANAGER.getStorage().getByClass(HudModule.class);
 
         if (hud == null)
             return;
