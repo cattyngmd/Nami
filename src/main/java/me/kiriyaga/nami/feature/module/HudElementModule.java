@@ -18,6 +18,7 @@ public abstract class HudElementModule extends Module {
     public int width;
     public int height;
     public boolean skipAnimation;
+    public static final int PADDING = 1;
 
     public HudElementModule(String name, String description, int defaultX, int defaultY, int width, int height) {
         super(name, description, ModuleCategory.of("hud"));
@@ -26,27 +27,28 @@ public abstract class HudElementModule extends Module {
         this.height = height;
 
         this.x = addSetting(new IntSetting("x", defaultX, 0, 4321));
+        this.x.setShow(false);
         this.y = addSetting(new IntSetting("y", defaultY, 0, 4321));
+        this.y.setShow(false);
         this.alignment = addSetting(new EnumSetting<>("alignment", HudAlignment.LEFT));
     }
 
     public int getRenderX() {
         int screenWidth = MC.getWindow().getScaledWidth();
         int posX = x.get();
-        int constrainedX = posX;
+        int constrainedX;
 
-        // totallen shitcode
         switch (alignment.get()) {
             case LEFT:
-                constrainedX = Math.min(Math.max(posX, 0), screenWidth - width);
+                constrainedX = Math.min(Math.max(posX, PADDING), screenWidth - width - PADDING);
                 return constrainedX;
 
             case CENTER:
-                constrainedX = Math.min(Math.max(posX, width / 2), screenWidth - width / 2);
+                constrainedX = Math.min(Math.max(posX, width / 2 + PADDING), screenWidth - width / 2 - PADDING);
                 return constrainedX - width / 2;
 
             case RIGHT:
-                constrainedX = Math.min(Math.max(posX, width), screenWidth);
+                constrainedX = Math.min(Math.max(posX, width + PADDING), screenWidth - PADDING);
                 return constrainedX - width;
 
             default:
@@ -58,10 +60,10 @@ public abstract class HudElementModule extends Module {
         int screenHeight = MC.getWindow().getScaledHeight();
         int posY = y.get();
 
-        if (posY + height > screenHeight) {
-            return screenHeight - height;
+        if (posY + height > screenHeight - PADDING) {
+            return screenHeight - height - PADDING;
         }
-        if (posY < 0) return 0;
+        if (posY < PADDING) return PADDING;
 
         return posY;
     }

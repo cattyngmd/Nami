@@ -28,7 +28,11 @@ public class SettingPanel {
     }
 
     public static int getSettingsHeight(Module module) {
-        return module.getSettings().size() * (SettingRenderer.HEIGHT + SettingRenderer.MODULE_SPACING) + SettingRenderer.MODULE_SPACING;
+        int countVisible = 0;
+        for (Setting<?> setting : module.getSettings()) {
+            if (setting.isShow()) countVisible++;
+        }
+        return countVisible * (SettingRenderer.HEIGHT + SettingRenderer.MODULE_SPACING) + SettingRenderer.MODULE_SPACING;
     }
 
     public static int renderSettings(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY) {
@@ -36,6 +40,9 @@ public class SettingPanel {
         int curY = y + SettingRenderer.MODULE_SPACING;
 
         for (Setting<?> setting : settings) {
+            if (!setting.isShow())
+                continue;
+
             render(context, textRenderer, setting, x, curY, mouseX, mouseY);
             curY += SettingRenderer.HEIGHT + SettingRenderer.MODULE_SPACING;
         }
@@ -57,6 +64,10 @@ public class SettingPanel {
         int curY = y + SettingRenderer.MODULE_SPACING;
 
         for (Setting<?> setting : settings) {
+            if (!setting.isShow()) {
+                continue;
+            }
+
             if (isHovered(mouseX, mouseY, x, curY)) {
                 @SuppressWarnings("unchecked")
                 SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(setting.getClass());
