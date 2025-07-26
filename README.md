@@ -31,8 +31,7 @@ This project started as a clean, open-source alternative aiming to be transparen
 <details>
 <summary>View screenshots</summary>
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/40e82220-d7e0-4827-a397-3a8369f94187" />
-
+<img width="1920" height="1080" alt="2025-07-25_16 23 39" src="https://github.com/user-attachments/assets/d20a1bd6-ead5-4328-9c9d-f9b29b7f5f4d" />
 
 </details>
 
@@ -102,4 +101,6 @@ This project is licensed under the MIT License. You are free to contribute, dist
 
 ## Special Thanks
 
-Thanks to [cattyngmd](https://github.com/cattyngmd) for assistance with rotations and Y motion boost methods.
+[cattyngmd](https://github.com/cattyngmd) for assistance with rotations and Y motion boost methods.
+
+[CatFormat](https://github.com/cattyngmd/CatFormat) for awesome cat formatter.
