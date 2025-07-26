@@ -49,11 +49,15 @@ public class HudEditorScreen extends Screen {
                     renderY = y - chatAnimationOffset;
                 }
 
-                context.fill(
-                        x - 1, renderY - 1,
-                        x + hud.width + 1, renderY + height + 1,
-                        0x50FFFFFF
-                );
+                boolean hovered = mouseX >= x && mouseX <= x + hud.width &&
+                        mouseY >= renderY && mouseY <= renderY + height;
+
+                if (hovered)
+                    context.fill(
+                            x - 1, renderY - 1,
+                            x + hud.width + 1, renderY + height + 1,
+                            0x50FFFFFF
+                    );
 
                 context.drawText(MC.textRenderer, text, x, renderY, 0xFFFFFFFF, false);
             }
@@ -101,14 +105,34 @@ public class HudEditorScreen extends Screen {
 
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
 
-        int newX = (int) mouseX - dragOffsetX;
-        int newY = (int) mouseY - dragOffsetY + chatAnimationOffset;
+        int newRenderX = (int) mouseX - dragOffsetX;
+        int newRenderY = (int) mouseY - dragOffsetY + chatAnimationOffset;
 
         int screenWidth = MC.getWindow().getScaledWidth();
         int screenHeight = MC.getWindow().getScaledHeight();
 
-        newX = Math.max(1, Math.min(newX, screenWidth - draggingElement.width - 1));
-        newY = Math.max(1, Math.min(newY, screenHeight - draggingElement.height - 1));
+        newRenderY = Math.max(1, Math.min(newRenderY, screenHeight - draggingElement.height - 1));
+
+        int newX;
+
+        switch (draggingElement.alignment.get()) {
+            case LEFT:
+                newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
+                newX = newRenderX;
+                break;
+            case CENTER:
+                newRenderX = Math.max(draggingElement.width / 2, Math.min(newRenderX, screenWidth - draggingElement.width / 2));
+                newX = newRenderX + draggingElement.width / 2;
+                break;
+            case RIGHT:
+                newRenderX = Math.max(0, Math.min(newRenderX, screenWidth - draggingElement.width));
+                newX = newRenderX + draggingElement.width;
+                break;
+            default:
+                newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
+                newX = newRenderX;
+                break;
+        }
 
         boolean intersects = false;
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
@@ -118,8 +142,8 @@ public class HudEditorScreen extends Screen {
                 int oWidth = other.width;
                 int oHeight = MC.textRenderer.fontHeight;
 
-                boolean overlapX = newX < ox + oWidth && newX + draggingElement.width > ox;
-                boolean overlapY = newY < oy + oHeight && newY + MC.textRenderer.fontHeight > oy;
+                boolean overlapX = newRenderX < ox + oWidth && newRenderX + draggingElement.width > ox;
+                boolean overlapY = newRenderY < oy + oHeight && newRenderY + MC.textRenderer.fontHeight > oy;
 
                 if (overlapX && overlapY) {
                     intersects = true;
@@ -130,7 +154,7 @@ public class HudEditorScreen extends Screen {
 
         if (!intersects) {
             draggingElement.x.set(newX);
-            draggingElement.y.set(newY);
+            draggingElement.y.set(newRenderY);
         }
 
         return true;
