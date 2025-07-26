@@ -51,7 +51,7 @@ public abstract class MixinMinecraftClient {
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
-        if (MC == null || MC.mouse == null) return;
+        if (MC == null || MC.mouse == null || MC.currentScreen != null) return;
 
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             if (module == null) continue;
