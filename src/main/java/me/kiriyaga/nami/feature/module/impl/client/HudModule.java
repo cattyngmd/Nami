@@ -9,6 +9,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -20,7 +21,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class HudModule extends Module {
 
     public final BoolSetting chatAnimation = addSetting(new BoolSetting("chat animation", true));
-
+    public final BoolSetting shadow = addSetting(new BoolSetting("shadow", true));
     public final BoolSetting bounce = addSetting(new BoolSetting("bounce", false));
     public final IntSetting bounceSpeed = addSetting(new IntSetting("bounce speed", 5, 1, 20));
     public final IntSetting bounceIntensity = addSetting(new IntSetting("bounce intensity", 30, 10, 100));
@@ -35,8 +36,7 @@ public class HudModule extends Module {
     @SubscribeEvent
     public void onRender2D(Render2DEvent event) {
         int screenHeight = MC.getWindow().getScaledHeight();
-        int chatAnimationOffset = 0;
-
+        int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
         int chatZoneTop = screenHeight - (screenHeight / 8);
 
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
@@ -54,7 +54,7 @@ public class HudModule extends Module {
                     y -= chatAnimationOffset;
                 }
 
-                event.getDrawContext().drawText(MC.textRenderer, text, x, y, 0xFFFFFFFF, true);
+                event.getDrawContext().drawText(MC.textRenderer, text, x, y, 0xFFFFFFFF, shadow.get());
             }
         }
     }
