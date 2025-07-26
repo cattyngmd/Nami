@@ -6,7 +6,6 @@ import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.impl.client.HUDModule;
 import me.kiriyaga.nami.core.RotationManager;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
@@ -34,7 +33,6 @@ public class ElytraFlyModule extends Module {
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.bounce));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
     private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
-    private final DoubleSetting targetSpeed = addSetting(new DoubleSetting("boost target speed", 100.00, 40.00, 250.00));
     private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
@@ -65,7 +63,7 @@ public class ElytraFlyModule extends Module {
 
         if (mode.get() == FlyMode.bounce) {
 
-            if (boost.get() && MC.player.getVelocity().y > 0 && MODULE_MANAGER.getStorage().getByClass(HUDModule.class).speed < targetSpeed.get()) {
+            if (boost.get() && MC.player.getVelocity().y > 0) {
                 MC.player.setVelocity(MC.player.getVelocity().x, 0.0, MC.player.getVelocity().z);
             }
 
@@ -88,8 +86,7 @@ public class ElytraFlyModule extends Module {
 
         if (!player.isOnGround()) return;
 
-        HUDModule hud = MODULE_MANAGER.getStorage().getByClass(HUDModule.class);
-        double currentBps = hud.speed;
+        double currentBps = Math.sqrt(player.getVelocity().x * player.getVelocity().x + player.getVelocity().z * player.getVelocity().z);
 
         if (player.isSprinting() && currentBps > 9.00 && newBoost.get()) {
 
