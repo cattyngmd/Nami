@@ -10,8 +10,10 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import org.spongepowered.asm.mixin.Final;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 @Mixin(GameRenderer.class)
@@ -122,9 +125,65 @@ public abstract class MixinGameRenderer {
 
     @ModifyReturnValue(method = "findCrosshairTarget", at = @At("RETURN"))
     private HitResult findCrosshairTarget(HitResult original, @Local HitResult hitResult) {
-        if (MODULE_MANAGER.getStorage().getByClass(NoEntityTrace.class) != null && MODULE_MANAGER.getStorage().getByClass(NoEntityTrace.class).isEnabled() && hitResult.getType() == HitResult.Type.BLOCK)
+        NoEntityTrace noEntityTrace = MODULE_MANAGER.getStorage().getByClass(NoEntityTrace.class);
+        if (noEntityTrace == null || !noEntityTrace.isEnabled()) {
+            return original;
+        }
+
+        if (hitResult.getType() == HitResult.Type.BLOCK) {
+            boolean playerOnly = noEntityTrace.playerOnly.get();
+            boolean pickaxeOnly = noEntityTrace.pickaxeOnly.get();
+
+            var targetEntity = getTargetedEntity();
+            var mainHandItem = MC.player.getMainHandStack().getItem();
+
+            boolean lookingAtPlayer = targetEntity != null && targetEntity.isPlayer();
+            boolean holdingPickaxe = isPickaxe(mainHandItem);
+
+            if (playerOnly && pickaxeOnly) {
+                if (lookingAtPlayer && holdingPickaxe) {
+                    return hitResult;
+                } else {
+                    return original;
+                }
+            }
+
+            if (playerOnly) {
+                if (lookingAtPlayer) {
+                    return hitResult;
+                } else {
+                    return original;
+                }
+            }
+
+            if (pickaxeOnly) {
+                if (holdingPickaxe) {
+                    return hitResult;
+                } else {
+                    return original;
+                }
+            }
+
             return hitResult;
+        }
 
         return original;
     }
+
+    private Entity getTargetedEntity() {
+        if (MC.crosshairTarget != null && MC.crosshairTarget.getType() == HitResult.Type.ENTITY) {
+            return ((EntityHitResult) MC.crosshairTarget).getEntity();
+        }
+        return null;
+    }
+
+    private boolean isPickaxe(Item item) { //mojang is wild theres no more thing like toolitem or pickaxeitem
+        return item == Items.WOODEN_PICKAXE
+                || item == Items.STONE_PICKAXE
+                || item == Items.IRON_PICKAXE
+                || item == Items.GOLDEN_PICKAXE
+                || item == Items.DIAMOND_PICKAXE
+                || item == Items.NETHERITE_PICKAXE;
+    }
+
 }
