@@ -1,12 +1,9 @@
 package me.kiriyaga.nami.feature.module;
 
-import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.setting.Setting;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,13 +111,6 @@ public abstract class Module {
         return false;
     }
 
-    public String getDisplayName() {
-        if (displayInfo != null && !displayInfo.isEmpty()) {
-            return name + "[" + displayInfo + "]";
-        }
-        return name;
-    }
-
     public Setting<?> getSettingByName(String name) {
         String lower = name.toLowerCase();
         for (Setting<?> setting : settings) {
@@ -132,11 +122,14 @@ public abstract class Module {
     }
 
     public void setDisplayInfo(String info) {
-        this.displayInfo = info;
+        this.displayInfo = "["+info+"]";
     }
 
     public String getDisplayInfo() {
-        return displayInfo;
+        if (displayInfo != null && !displayInfo.isEmpty()) {
+            return  displayInfo;
+        }
+        return null;
     }
 
     protected void onEnable() {}

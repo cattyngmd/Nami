@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import net.minecraft.text.Text;
 
@@ -20,6 +21,7 @@ public class ModuleListModule extends HudElementModule {
     }
 
     private final List<TextElement> elements = new ArrayList<>();
+    public final BoolSetting showDisplayName = addSetting(new BoolSetting("show display", true));
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.descending));
 
     public ModuleListModule() {
@@ -40,17 +42,25 @@ public class ModuleListModule extends HudElementModule {
         switch (sortMode.get()) {
             case alphabetical -> activeModules.sort(Comparator.comparing(Module::getName, String::compareToIgnoreCase));
             case descending -> activeModules.sort((a, b) -> Integer.compare(
-                    getTextWidth(b.getName()),
-                    getTextWidth(a.getName())
+                    getTextWidth(b.getName() + (showDisplayName.get() ? b.getDisplayInfo() : "")),
+                    getTextWidth(a.getName() + (showDisplayName.get() ? a.getDisplayInfo() : ""))
             ));
-            case ascending -> activeModules.sort(Comparator.comparingInt(a -> getTextWidth(a.getName())));
+            case ascending -> activeModules.sort(Comparator.comparingInt(a -> getTextWidth(a.getName() + (showDisplayName.get() ? a.getDisplayInfo() : ""))));
         }
 
         int yOffset = 0;
         int maxWidth = 0;
 
         for (Module module : activeModules) {
-            Text text = CAT_FORMAT.format("{bg}" + module.getName());
+            String displayName = showDisplayName.get() ? module.getDisplayInfo() : null;
+            Text text;
+
+            if (displayName != null && !displayName.isEmpty()) {
+                text = CAT_FORMAT.format("{bg}" + module.getName() + " {bw}" + displayName);
+            } else {
+                text = CAT_FORMAT.format("{bg}" + module.getName());
+            }
+
             int textWidth = MC.textRenderer.getWidth(text);
             elements.add(new TextElement(text, 0, yOffset));
 
@@ -65,6 +75,6 @@ public class ModuleListModule extends HudElementModule {
     }
 
     private int getTextWidth(String name) {
-        return MC.textRenderer.getWidth(CAT_FORMAT.format("{bg}" + name));
+        return MC.textRenderer.getWidth(CAT_FORMAT.format(name));
     }
 }

@@ -45,14 +45,8 @@ public class HudEditorScreen extends Screen {
 
                 int baseX = hud.getRenderX();
 
-                boolean hovered = false;
-                if (hud.alignment.get() == HudAlignment.left) {
-                    hovered = mouseX >= baseX && mouseX <= baseX + hud.width;
-                } else if (hud.alignment.get() == HudAlignment.center) {
-                    hovered = mouseX >= baseX - hud.width / 2 && mouseX <= baseX + hud.width / 2;
-                } else if (hud.alignment.get() == HudAlignment.right) {
-                    hovered = mouseX >= baseX - hud.width && mouseX <= baseX;
-                }
+                boolean hovered = mouseX >= baseX && mouseX <= baseX + hud.width &&
+                        mouseY >= renderY && mouseY <= renderY + hud.height;
 
                 hovered = hovered && mouseY >= renderY && mouseY <= renderY + hud.height;
 

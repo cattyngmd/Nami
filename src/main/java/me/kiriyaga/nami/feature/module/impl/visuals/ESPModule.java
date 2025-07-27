@@ -44,12 +44,14 @@ public class ESPModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (MC == null || MC.world == null || MC.player == null) return;
 
+        int i = 0;
         MatrixStack matrices = event.getMatrices();
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
 
         if (showPlayers.get()) {
             for (Entity player : ENTITY_MANAGER.getOtherPlayers()) {
                 if (player.isRemoved()) continue;
+                i++;
                 if (FRIEND_MANAGER.isFriend(player.getName().getString()))
                     drawBox(player, colorModule.getStyledGlobalColor(), matrices, event.getTickDelta());
                 else
@@ -60,6 +62,7 @@ public class ESPModule extends Module {
         if (showPeacefuls.get()) {
             for (Entity entity : ENTITY_MANAGER.getPassive()) {
                 if (!entity.isAlive()) continue;
+                i++;
                 drawBox(entity, COLOR_PASSIVE, matrices, event.getTickDelta());
             }
         }
@@ -67,6 +70,7 @@ public class ESPModule extends Module {
         if (showNeutrals.get()) {
             for (Entity entity : ENTITY_MANAGER.getNeutral()) {
                 if (!entity.isAlive()) continue;
+                i++;
                 drawBox(entity, COLOR_NEUTRAL, matrices, event.getTickDelta());
             }
         }
@@ -74,6 +78,7 @@ public class ESPModule extends Module {
         if (showHostiles.get()) {
             for (Entity entity : ENTITY_MANAGER.getHostile()) {
                 if (!entity.isAlive()) continue;
+                i++;
                 drawBox(entity, COLOR_HOSTILE, matrices, event.getTickDelta());
             }
         }
@@ -81,6 +86,7 @@ public class ESPModule extends Module {
         if (showItems.get()) {
             for (ItemEntity item :  ENTITY_MANAGER.getDroppedItems()) {
                 if (item.isRemoved()) continue;
+                i++;
                 drawBox(item, COLOR_ITEM, matrices, event.getTickDelta());
             }
         }

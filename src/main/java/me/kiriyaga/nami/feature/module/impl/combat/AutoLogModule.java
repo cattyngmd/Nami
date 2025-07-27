@@ -45,6 +45,8 @@ public class AutoLogModule extends Module {
         if (MC.player == null || MC.world == null)
             return;
 
+        this.setDisplayInfo(health.get().toString());
+
         ClientPlayerEntity player = MC.player;
 
         if (onLevel.get() != 0) {

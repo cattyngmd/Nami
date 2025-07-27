@@ -20,6 +20,8 @@ public class SprintResetModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onSprintResetEvent(SprintResetEvent event) {
         if (!event.isCancelled()) {
+            this.setDisplayInfo(chance.get().toString());
+
             int random = (int) (Math.random() * 100);
             if (random < chance.get())
                 event.cancel();

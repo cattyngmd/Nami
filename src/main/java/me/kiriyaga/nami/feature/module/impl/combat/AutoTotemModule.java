@@ -39,6 +39,21 @@ public class AutoTotemModule extends Module {
     public void onPostTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
 
+
+        int totemCount = 0;
+
+        for (ItemStack stack : MC.player.getInventory().getMainStacks()) {
+            if (stack.getItem() == net.minecraft.item.Items.TOTEM_OF_UNDYING) {
+                totemCount += stack.getCount();
+            }
+        }
+
+        ItemStack offHandStack = MC.player.getOffHandStack();
+        if (offHandStack.getItem() == net.minecraft.item.Items.TOTEM_OF_UNDYING) {
+            totemCount += offHandStack.getCount();
+        }
+        this.setDisplayInfo(String.valueOf(totemCount));
+
         if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof ClickGuiScreen) {
             attemptPlaceTotem();
         }

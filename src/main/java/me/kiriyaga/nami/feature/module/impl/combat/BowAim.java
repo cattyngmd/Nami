@@ -52,6 +52,7 @@ public class BowAim extends Module {
         }
 
         currentTarget = target;
+        this.setDisplayInfo(target.getName().getString());
 
         Vec3d aimPos = getAimPosition(target);
         ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(

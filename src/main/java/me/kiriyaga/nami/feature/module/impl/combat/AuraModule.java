@@ -68,6 +68,8 @@ public class AuraModule extends Module {
 
         currentTarget = target;
 
+        this.setDisplayInfo(target.getName().getString());
+
         float cooldown = MC.player.getAttackCooldownProgress(0f);
         float tps = 20f;
         if (tpsSync.get() && MC.getServer() != null) {

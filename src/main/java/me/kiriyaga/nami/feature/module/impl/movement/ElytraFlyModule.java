@@ -61,6 +61,8 @@ public class ElytraFlyModule extends Module {
         if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
+        this.setDisplayInfo(mode.get().toString());
+
         if (mode.get() == FlyMode.bounce) {
 
             if (boost.get() && MC.player.getVelocity().y > 0) {

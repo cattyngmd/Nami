@@ -63,22 +63,27 @@ public class NametagsModule extends Module {
     public void onRender3d(Render3DEvent event) {
         if (MC.world == null || MC.player == null) return;
 
+        int i = 0;
+
         MatrixStack matrices = event.getMatrices();
 
         if (players.get()) {
             for (PlayerEntity player : ENTITY_MANAGER.getPlayers()) {
                 if (player == MC.player) continue;
+                i++;
                 renderEntityNametag(player, event.getTickDelta(), matrices, 30, null);
             }
         }
 
         if (self.get() && !MC.options.getPerspective().isFirstPerson()){
+            i++;
             renderEntityNametag(MC.player, event.getTickDelta(), matrices, 30, null);
         }
 
         if (hostiles.get()) {
             for (var entity : ENTITY_MANAGER.getHostile()) {
                 if (entity.isInvisible()) continue;
+                i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
@@ -86,6 +91,7 @@ public class NametagsModule extends Module {
         if (neutrals.get()) {
             for (var entity : ENTITY_MANAGER.getNeutral()) {
                 if (entity.isInvisible()) continue;
+                i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
@@ -93,6 +99,7 @@ public class NametagsModule extends Module {
         if (passives.get()) {
             for (var entity : ENTITY_MANAGER.getPassive()) {
                 if (entity.isInvisible()) continue;
+                i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
@@ -100,6 +107,7 @@ public class NametagsModule extends Module {
         if (items.get()) {
             for (var entity : ENTITY_MANAGER.getDroppedItems()) {
                 if (entity.isInvisible()) continue;
+                i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
@@ -108,7 +116,7 @@ public class NametagsModule extends Module {
             for (var entity : ENTITY_MANAGER.getAllEntities()) {
                 if (entity instanceof Tameable tameable){
                     if (tameable.getOwner() == null) continue;
-
+                    i++;
                     renderEntityNametag(entity, tameable.getOwner().getName().getString(), event.getTickDelta(), matrices, 30, null);
 
                 }
@@ -119,10 +127,11 @@ public class NametagsModule extends Module {
             for (var entity : ENTITY_MANAGER.getAllEntities()) {
                 if (!(entity instanceof EnderPearlEntity pearl)) continue;
                 if (pearl.getOwner() == null) continue;
-
+                i++;
                 renderEntityNametag(pearl, pearl.getOwner().getName().getString(), event.getTickDelta(), matrices, 30, null);
             }
         }
+        this.setDisplayInfo(String.valueOf(i));
     }
 
     private void renderEntityNametag(net.minecraft.entity.Entity entity, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {

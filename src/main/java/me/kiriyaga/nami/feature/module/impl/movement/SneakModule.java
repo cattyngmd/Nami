@@ -62,6 +62,8 @@ public class SneakModule extends Module {
         ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
+        this.setDisplayInfo(mode.get().toString());
+
         boolean shouldSneak = switch (mode.get()) {
             case always -> true;
             case corners -> shouldSneakAtEdges(player);
