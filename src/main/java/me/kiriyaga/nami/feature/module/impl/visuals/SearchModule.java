@@ -36,8 +36,8 @@ import static me.kiriyaga.nami.Nami.*;
 public class SearchModule extends Module {
 
     private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));
-    private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 1, 1, 5));
-    private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 2, 0, 20));
+    private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 2, 1, 5));
+    private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 0, 0, 5));
     private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name));
     private final BoolSetting storages = addSetting(new BoolSetting("storages", true));
     private final BoolSetting nonVanilla = addSetting(new BoolSetting("non-vanilla", false));
@@ -46,7 +46,7 @@ public class SearchModule extends Module {
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 3));
     private final BoolSetting filled = addSetting(new BoolSetting("filled", true));
 
-    private final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
 
     private Set<Identifier> candidateBlockIds = new HashSet<>();
@@ -193,7 +193,10 @@ public class SearchModule extends Module {
 
         for (Set<BlockPos> blockSet : chunkBlocks.values()) {
             for (BlockPos pos : blockSet) {
-                if (playerPos.getSquaredDistance(pos) > 300 * 300) continue;
+                if (playerPos.getSquaredDistance(pos) > 300 * 300){
+                    chunkBlocks.remove(blockSet);
+                    continue;
+                }
 
                 BlockState state = MC.world.getBlockState(pos);
                 Color color = BlockUtils.getColorByBlockId(state);
@@ -237,5 +240,9 @@ public class SearchModule extends Module {
         synchronized (pendingChunks) {
             pendingChunks.clear();
         }
+    }
+
+    public static ConcurrentMap<Long, Set<BlockPos>> getChunkBlocks(){
+        return chunkBlocks;
     }
 }
