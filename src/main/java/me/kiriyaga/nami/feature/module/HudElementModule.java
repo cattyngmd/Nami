@@ -15,7 +15,7 @@ import java.util.List;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
-
+//TODO: refactor
 public abstract class HudElementModule extends Module {
 
     public final IntSetting x;
