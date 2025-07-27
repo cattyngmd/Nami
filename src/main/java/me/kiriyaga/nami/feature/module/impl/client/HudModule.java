@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.client;
 
+import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render2DEvent;
@@ -13,6 +14,7 @@ import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.text.Text;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
@@ -33,7 +35,7 @@ public class HudModule extends Module {
         super("hud", "Main HUD module", ModuleCategory.of("client"));
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender2D(Render2DEvent event) {
         int screenHeight = MC.getWindow().getScaledHeight();
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
@@ -41,25 +43,31 @@ public class HudModule extends Module {
 
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             if (module instanceof HudElementModule hudElement && hudElement.isEnabled()) {
-                Text text = hudElement.getDisplayText();
-                if (text == null) continue;
+                int baseY = hudElement.getRenderY();
 
-                int x = hudElement.getRenderX();
-                int y = hudElement.getRenderY();
-                int height = MC.textRenderer.fontHeight;
+                for (HudElementModule.TextElement element : new ArrayList<>(hudElement.getTextElements())) { // its better be outdated then concurrent, btw maybe some atomic impl?
+                    int drawX = hudElement.getRenderXForElement(element);
+                    int drawY = baseY + element.offsetY();
 
-                boolean isInChatZone = (y + height) >= chatZoneTop;
+                    boolean isInChatZone = (drawY + MC.textRenderer.fontHeight) >= chatZoneTop;
+                    if (chatAnimation.get() && isInChatZone) {
+                        drawY -= chatAnimationOffset;
+                    }
 
-                if (chatAnimation.get() && isInChatZone) {
-                    y -= chatAnimationOffset;
+                    event.getDrawContext().drawText(
+                            MC.textRenderer,
+                            element.text(),
+                            drawX,
+                            drawY,
+                            0xFFFFFFFF,
+                            shadow.get()
+                    );
                 }
-
-                event.getDrawContext().drawText(MC.textRenderer, text, x, y, 0xFFFFFFFF, shadow.get());
             }
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdate(PreTickEvent event) {
         if (bounce.get()) {
             float step = bounceSpeed.get() / 100f;

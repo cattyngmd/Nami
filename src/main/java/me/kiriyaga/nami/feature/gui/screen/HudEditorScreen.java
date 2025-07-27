@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.screen;
 
+import me.kiriyaga.nami.feature.module.HudAlignment;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -10,6 +11,8 @@ import net.minecraft.text.Text;
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
+
+import java.util.ArrayList;
 
 public class HudEditorScreen extends Screen {
     private HudElementModule draggingElement = null;
@@ -35,31 +38,38 @@ public class HudEditorScreen extends Screen {
 
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             if (module instanceof HudElementModule hud && hud.isEnabled()) {
-                Text text = hud.getDisplayText();
-                if (text == null) continue;
-
-                int x = hud.getRenderX();
                 int y = hud.getRenderY();
-                int height = MC.textRenderer.fontHeight;
 
-                boolean isInChatZone = (y + height) >= chatZoneTop;
-                int renderY = y;
+                boolean isInChatZone = (y + hud.height) >= chatZoneTop;
+                int renderY = isInChatZone ? y - chatAnimationOffset : y;
 
-                if (isInChatZone) {
-                    renderY = y - chatAnimationOffset;
+                int baseX = hud.getRenderX();
+
+                boolean hovered = false;
+                if (hud.alignment.get() == HudAlignment.left) {
+                    hovered = mouseX >= baseX && mouseX <= baseX + hud.width;
+                } else if (hud.alignment.get() == HudAlignment.center) {
+                    hovered = mouseX >= baseX - hud.width / 2 && mouseX <= baseX + hud.width / 2;
+                } else if (hud.alignment.get() == HudAlignment.right) {
+                    hovered = mouseX >= baseX - hud.width && mouseX <= baseX;
                 }
 
-                boolean hovered = mouseX >= x && mouseX <= x + hud.width &&
-                        mouseY >= renderY && mouseY <= renderY + height;
+                hovered = hovered && mouseY >= renderY && mouseY <= renderY + hud.height;
 
-                if (hovered)
+                if (hovered) {
                     context.fill(
-                            x - 1, renderY - 1,
-                            x + hud.width + 1, renderY + height + 1,
+                            baseX - 1, renderY - 1,
+                            baseX + hud.width + 1, renderY + hud.height + 1,
                             0x50FFFFFF
                     );
+                }
 
-                context.drawText(MC.textRenderer, text, x, renderY, 0xFFFFFFFF, false);
+                for (HudElementModule.TextElement element : new ArrayList<>(hud.getTextElements())) {
+                    int drawX = hud.getRenderXForElement(element);
+                    int drawY = renderY + element.offsetY();
+
+                    context.drawText(MC.textRenderer, element.text(), drawX, drawY, 0xFFFFFFFF, false);
+                }
             }
         }
 
@@ -78,17 +88,10 @@ public class HudEditorScreen extends Screen {
             if (module instanceof HudElementModule hud && hud.isEnabled()) {
                 int x = hud.getRenderX();
                 int y = hud.getRenderY();
-                int height = MC.textRenderer.fontHeight;
-
-                boolean isInChatZone = (y + height) >= chatZoneTop;
-                int renderY = y;
-
-                if (isInChatZone) {
-                    renderY = y - chatAnimationOffset;
-                }
+                int renderY = (y + hud.height) >= chatZoneTop ? y - chatAnimationOffset : y;
 
                 if (mouseX >= x && mouseX <= x + hud.width &&
-                        mouseY >= renderY && mouseY <= renderY + height) {
+                        mouseY >= renderY && mouseY <= renderY + hud.height) {
                     draggingElement = hud;
                     dragOffsetX = (int) mouseX - x;
                     dragOffsetY = (int) mouseY - renderY;
@@ -96,6 +99,7 @@ public class HudEditorScreen extends Screen {
                 }
             }
         }
+
         return false;
     }
 
@@ -116,15 +120,15 @@ public class HudEditorScreen extends Screen {
         int newX;
 
         switch (draggingElement.alignment.get()) {
-            case LEFT:
+            case left:
                 newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
                 newX = newRenderX;
                 break;
-            case CENTER:
+            case center:
                 newRenderX = Math.max(draggingElement.width / 2, Math.min(newRenderX, screenWidth - draggingElement.width / 2));
                 newX = newRenderX + draggingElement.width / 2;
                 break;
-            case RIGHT:
+            case right:
                 newRenderX = Math.max(0, Math.min(newRenderX, screenWidth - draggingElement.width));
                 newX = newRenderX + draggingElement.width;
                 break;
@@ -140,10 +144,10 @@ public class HudEditorScreen extends Screen {
                 int ox = other.getRenderX();
                 int oy = other.getRenderY();
                 int oWidth = other.width;
-                int oHeight = MC.textRenderer.fontHeight;
+                int oHeight = other.height;
 
                 boolean overlapX = newRenderX < ox + oWidth && newRenderX + draggingElement.width > ox;
-                boolean overlapY = newRenderY < oy + oHeight && newRenderY + MC.textRenderer.fontHeight > oy;
+                boolean overlapY = newRenderY < oy + oHeight && newRenderY + draggingElement.height > oy;
 
                 if (overlapX && overlapY) {
                     intersects = true;

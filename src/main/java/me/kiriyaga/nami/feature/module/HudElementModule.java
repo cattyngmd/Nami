@@ -1,11 +1,11 @@
 package me.kiriyaga.nami.feature.module;
 
-import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+
+import java.awt.*;
+import java.util.List;
 
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -20,6 +20,8 @@ public abstract class HudElementModule extends Module {
     public boolean skipAnimation;
     public static final int PADDING = 1;
 
+    public record TextElement(Text text, int offsetX, int offsetY) {}
+
     public HudElementModule(String name, String description, int defaultX, int defaultY, int width, int height) {
         super(name, description, ModuleCategory.of("hud"));
 
@@ -30,27 +32,69 @@ public abstract class HudElementModule extends Module {
         this.x.setShow(false);
         this.y = addSetting(new IntSetting("y", defaultY, 0, 4321));
         this.y.setShow(false);
-        this.alignment = addSetting(new EnumSetting<>("alignment", HudAlignment.LEFT));
+        this.alignment = addSetting(new EnumSetting<>("alignment", HudAlignment.left));
+    }
+
+    public Text getDisplayText() {
+        return null;
+    }
+
+    public List<TextElement> getTextElements() {
+        Text single = getDisplayText();
+        if (single != null) {
+            return List.of(new TextElement(single, 0, 0));
+        }
+        return List.of();
+    }
+
+    public Rectangle getBoundingBox() {
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+
+        for (TextElement element : getTextElements()) {
+            int textWidth = MC.textRenderer.getWidth(element.text());
+            int textHeight = MC.textRenderer.fontHeight;
+
+            minX = Math.min(minX, element.offsetX());
+            minY = Math.min(minY, element.offsetY());
+            maxX = Math.max(maxX, element.offsetX() + textWidth);
+            maxY = Math.max(maxY, element.offsetY() + textHeight);
+        }
+
+        if (minX == Integer.MAX_VALUE) {
+            return new Rectangle(0, 0, width, height);
+        }
+
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    public int getRenderXForElement(TextElement element) {
+        int baseX = getRenderX();
+        int lineWidth = MC.textRenderer.getWidth(element.text());
+
+        return switch (alignment.get()) {
+            case left -> baseX + element.offsetX();
+            case center -> baseX + (width - lineWidth) / 2 + element.offsetX();
+            case right -> baseX + width - lineWidth - element.offsetX();
+        };
     }
 
     public int getRenderX() {
         int screenWidth = MC.getWindow().getScaledWidth();
         int posX = x.get();
-        int constrainedX;
+        Rectangle bounds = getBoundingBox();
 
         switch (alignment.get()) {
-            case LEFT:
-                constrainedX = Math.min(Math.max(posX, PADDING), screenWidth - width - PADDING);
-                return constrainedX;
-
-            case CENTER:
-                constrainedX = Math.min(Math.max(posX, width / 2 + PADDING), screenWidth - width / 2 - PADDING);
-                return constrainedX - width / 2;
-
-            case RIGHT:
-                constrainedX = Math.min(Math.max(posX, width + PADDING), screenWidth - PADDING);
-                return constrainedX - width;
-
+            case left:
+                return Math.min(Math.max(posX, PADDING - bounds.x),
+                        screenWidth - bounds.width - bounds.x - PADDING);
+            case center:
+                int centerX = posX;
+                int actualX = centerX - (bounds.width / 2 + bounds.x);
+                return Math.min(Math.max(actualX, PADDING), screenWidth - bounds.width - PADDING);
+            case right:
+                int rightX = posX - (bounds.width + bounds.x);
+                return Math.min(Math.max(rightX, PADDING), screenWidth - bounds.width - PADDING);
             default:
                 return posX;
         }
@@ -59,14 +103,14 @@ public abstract class HudElementModule extends Module {
     public int getRenderY() {
         int screenHeight = MC.getWindow().getScaledHeight();
         int posY = y.get();
+        Rectangle bounds = getBoundingBox();
 
-        if (posY + height > screenHeight - PADDING) {
-            return screenHeight - height - PADDING;
-        }
-        if (posY < PADDING) return PADDING;
+        int clamped = posY;
+        if (clamped + bounds.height + bounds.y > screenHeight - PADDING)
+            clamped = screenHeight - bounds.height - bounds.y - PADDING;
+        if (clamped + bounds.y < PADDING)
+            clamped = PADDING - bounds.y;
 
-        return posY;
+        return clamped;
     }
-
-    public abstract Text getDisplayText();
 }
