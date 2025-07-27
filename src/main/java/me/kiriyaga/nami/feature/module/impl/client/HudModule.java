@@ -63,6 +63,8 @@ public class HudModule extends Module {
                             shadow.get()
                     );
                 }
+
+                hudElement.renderItems(event.getDrawContext());
             }
         }
     }

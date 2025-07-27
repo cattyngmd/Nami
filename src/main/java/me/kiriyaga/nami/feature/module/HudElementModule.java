@@ -1,26 +1,35 @@
 package me.kiriyaga.nami.feature.module;
 
+import me.kiriyaga.nami.feature.module.impl.client.HudModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public abstract class HudElementModule extends Module {
 
     public final IntSetting x;
     public final IntSetting y;
     public final EnumSetting<HudAlignment> alignment;
+    public final EnumSetting<LabelPosition> label;
 
     public int width;
     public int height;
-    public boolean skipAnimation;
     public static final int PADDING = 1;
 
     public record TextElement(Text text, int offsetX, int offsetY) {}
+
+    public record ItemElement(ItemStack stack, int offsetX, int offsetY) {}
 
     public HudElementModule(String name, String description, int defaultX, int defaultY, int width, int height) {
         super(name, description, ModuleCategory.of("hud"));
@@ -32,6 +41,8 @@ public abstract class HudElementModule extends Module {
         this.x.setShow(false);
         this.y = addSetting(new IntSetting("y", defaultY, 0, 4321));
         this.y.setShow(false);
+        this.label = addSetting(new EnumSetting<LabelPosition>("label position", LabelPosition.TOP));
+        this.label.setShow(false);
         this.alignment = addSetting(new EnumSetting<>("alignment", HudAlignment.left));
     }
 
@@ -44,6 +55,14 @@ public abstract class HudElementModule extends Module {
         if (single != null) {
             return List.of(new TextElement(single, 0, 0));
         }
+        return List.of();
+    }
+
+    public List<ItemElement> getItemElements() {
+        return List.of();
+    }
+
+    public List<LabeledItemElement> getLabeledItemElements() {
         return List.of();
     }
 
@@ -61,12 +80,38 @@ public abstract class HudElementModule extends Module {
             maxY = Math.max(maxY, element.offsetY() + textHeight);
         }
 
+        for (ItemElement item : getItemElements()) {
+            int x = item.offsetX();
+            int y = item.offsetY();
+            int w = 16;
+            int h = 16;
+
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x + w);
+            maxY = Math.max(maxY, y + h);
+        }
+
+        for (LabeledItemElement item : getLabeledItemElements()) {
+            int x = item.offsetX();
+            int y = item.offsetY();
+            int w = 16;
+            int h = 16;
+
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x + w);
+            maxY = Math.max(maxY, y + h);
+        }
+
         if (minX == Integer.MAX_VALUE) {
             return new Rectangle(0, 0, width, height);
         }
 
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
+
+    public record LabeledItemElement(ItemStack stack, Text label, LabelPosition position, int offsetX, int offsetY, double scale) {}
 
     public int getRenderXForElement(TextElement element) {
         int baseX = getRenderX();
@@ -112,5 +157,91 @@ public abstract class HudElementModule extends Module {
             clamped = PADDING - bounds.y;
 
         return clamped;
+    }
+
+    public void renderItems(DrawContext context) {
+        ItemRenderer itemRenderer = MC.getItemRenderer();
+        TextRenderer textRenderer = MC.textRenderer;
+        int baseY = getRenderY();
+
+        for (ItemElement element : getItemElements()) {
+            int drawX = getRenderXForItem(element);
+            int drawY = baseY + element.offsetY();
+
+            context.drawItem(element.stack(), drawX, drawY);
+
+            context.drawStackOverlay(textRenderer, element.stack(), drawX, drawY, null);
+        }
+
+        for (LabeledItemElement element : getLabeledItemElements()) {
+            int drawX = getRenderX() + element.offsetX();
+            int drawY = baseY + element.offsetY();
+
+            context.drawItem(element.stack(), drawX, drawY);
+            context.drawStackOverlay(MC.textRenderer, element.stack(), drawX, drawY, null);
+
+            Text label = element.label();
+            int labelWidth = MC.textRenderer.getWidth(label);
+            int labelHeight = MC.textRenderer.fontHeight;
+
+            int labelX = 0, labelY = 0;
+            int centerX = drawX + 8;
+            int centerY = drawY + 8;
+
+            switch (element.position()) {
+                case TOP -> {
+                    labelX = centerX - labelWidth / 2;
+                    labelY = centerY - 8 - labelHeight;
+                }
+                case BOTTOM -> {
+                    labelX = centerX - labelWidth / 2;
+                    labelY = centerY + 8;
+                }
+                case LEFT -> {
+                    labelX = centerX - 8 - labelWidth;
+                    labelY = centerY - labelHeight / 2;
+                }
+                case RIGHT -> {
+                    labelX = centerX + 8;
+                    labelY = centerY - labelHeight / 2;
+                }
+                case TOP_LEFT -> {
+                    labelX = centerX - 5 - labelWidth;
+                    labelY = centerY - 5 - labelHeight;
+                }
+                case TOP_RIGHT -> {
+                    labelX = centerX + 5;
+                    labelY = centerY - 5 - labelHeight;
+                }
+                case BOTTOM_LEFT -> {
+                    labelX = centerX - 5 - labelWidth;
+                    labelY = centerY + 5;
+                }
+                case BOTTOM_RIGHT -> {
+                    labelX = centerX + 5;
+                    labelY = centerY + 5;
+                }
+            }
+
+            context.getMatrices().pushMatrix();
+            context.getMatrices().scale((float) element.scale, (float) element.scale);
+
+            context.drawText(
+                    MC.textRenderer,
+                    label,
+                    labelX,
+                    labelY,
+                    0xFFFFFFFF,
+                    MODULE_MANAGER.getStorage().getByClass(HudModule.class).shadow.get()
+            );
+            context.getMatrices().popMatrix();
+        }
+    }
+
+    public int getRenderXForItem(ItemElement element) {
+        int baseX = getRenderX();
+
+
+        return baseX + element.offsetX();
     }
 }
