@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 import java.util.*;
 import java.awt.Point;
 
+import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class ClickGuiScreen extends Screen {
@@ -122,6 +123,7 @@ public class ClickGuiScreen extends Screen {
 
             if (CategoryPanel.isHeaderHovered(scaledMouseX, scaledMouseY, pos.x, pos.y + scrollOffset)) {
                 if (button == 0) {
+                    playClickSound();
                     draggingCategory = true;
                     draggedModuleCategory = moduleCategory;
                     return true;
@@ -131,6 +133,7 @@ public class ClickGuiScreen extends Screen {
                     } else {
                         expandedCategories.add(moduleCategory);
                     }
+                    playClickSound();
                     return true;
                 }
             }
@@ -150,6 +153,7 @@ public class ClickGuiScreen extends Screen {
 
                         if (ModulePanel.isHovered(scaledMouseX, scaledMouseY, modX, curY)) {
                             if (button == 0) {
+                                playClickSound();
                                 module.toggle();
                             } else if (button == 1) {
                                 if (expandedModules.contains(module)) {
@@ -157,9 +161,14 @@ public class ClickGuiScreen extends Screen {
                                 } else {
                                     expandedModules.add(module);
                                 }
+                                playClickSound();
+                            } else if (button == 2) {
+                                playClickSound();
+                                module.setDrawn(!module.isDrawn());
                             }
                             return true;
                         }
+
 
                         curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
 
@@ -222,5 +231,11 @@ public class ClickGuiScreen extends Screen {
     @Override
     public boolean shouldPause() {
         return false;
+    }
+
+    private void playClickSound() {
+        MC.getSoundManager().play(net.minecraft.client.sound.PositionedSoundInstance.master(
+                net.minecraft.sound.SoundEvents.UI_BUTTON_CLICK, 1.0f
+        ));
     }
 }

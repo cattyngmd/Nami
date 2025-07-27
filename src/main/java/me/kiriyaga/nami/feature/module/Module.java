@@ -19,6 +19,7 @@ public abstract class Module {
     protected final String[] aliases;
     protected final ModuleCategory category;
 
+    private boolean drawn = false;
     private boolean enabled = false;
     private String displayInfo = "";
 
@@ -38,6 +39,10 @@ public abstract class Module {
 
     public void toggle() {
         setEnabled(!enabled);
+    }
+
+    public void setDrawn(boolean state){
+        this.drawn = state;
     }
 
     public void setEnabled(boolean state) {
@@ -73,6 +78,10 @@ public abstract class Module {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isDrawn() {
+        return drawn;
     }
 
     public String getName() {
