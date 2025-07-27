@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+import static me.kiriyaga.nami.Nami.MC;
+
 public class SettingPanel {
     public static final int INNER_PADDING = 1;
     private static final Map<Class<?>, SettingRenderer<?>> renderers = new HashMap<>();
@@ -74,7 +76,9 @@ public class SettingPanel {
                 if (renderer != null) {
                     draggedSetting = setting;
                     dragStartX = mouseX;
-                    return renderer.mouseClicked(setting, mouseX, mouseY, button);
+                    boolean handled = renderer.mouseClicked(setting, mouseX, mouseY, button);
+                    if (handled) playClickSound();
+                    return handled;
                 }
             }
             curY += SettingRenderer.HEIGHT + SettingRenderer.MODULE_SPACING;
@@ -104,5 +108,11 @@ public class SettingPanel {
 
     private static boolean isHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + SettingRenderer.WIDTH && mouseY >= y && mouseY <= y + SettingRenderer.HEIGHT;
+    }
+
+    private static void playClickSound() {
+        MC.getSoundManager().play(net.minecraft.client.sound.PositionedSoundInstance.master(
+                net.minecraft.sound.SoundEvents.UI_BUTTON_CLICK, 1.0f
+        ));
     }
 }
