@@ -42,10 +42,10 @@ public class ModuleListModule extends HudElementModule {
         switch (sortMode.get()) {
             case alphabetical -> activeModules.sort(Comparator.comparing(Module::getName, String::compareToIgnoreCase));
             case descending -> activeModules.sort((a, b) -> Integer.compare(
-                    getTextWidth(b.getName() + (showDisplayName.get() ? b.getDisplayInfo() : "")),
-                    getTextWidth(a.getName() + (showDisplayName.get() ? a.getDisplayInfo() : ""))
+                    getTextWidth(b.getName() + (showDisplayName.get() && b.getDisplayInfo() != null && !b.getDisplayInfo().isEmpty() ? " " + b.getDisplayInfo() : "")),
+                    getTextWidth(a.getName() + (showDisplayName.get() && a.getDisplayInfo() != null && !a.getDisplayInfo().isEmpty() ? " " + a.getDisplayInfo() : ""))
             ));
-            case ascending -> activeModules.sort(Comparator.comparingInt(a -> getTextWidth(a.getName() + (showDisplayName.get() ? a.getDisplayInfo() : ""))));
+            case ascending -> activeModules.sort(Comparator.comparingInt(a -> getTextWidth(a.getName() + (showDisplayName.get() && a.getDisplayInfo() != null && !a.getDisplayInfo().isEmpty() ? " " + a.getDisplayInfo() : ""))));
         }
 
         int yOffset = 0;
