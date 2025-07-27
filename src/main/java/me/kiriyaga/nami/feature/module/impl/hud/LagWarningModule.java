@@ -17,7 +17,7 @@ public class LagWarningModule extends HudElementModule {
 
     @Override
     public Text getDisplayText() {
-        if (!PING_MANAGER.isConnectionUnstable()) return Text.empty();
+        if (!PING_MANAGER.isConnectionUnstable() || MC.isInSingleplayer()) return Text.empty();
 
         double seconds = PING_MANAGER.getConnectionUnstableTimeSeconds();
         double roundedSeconds = Math.round(seconds * 100.0) / 100.0;
