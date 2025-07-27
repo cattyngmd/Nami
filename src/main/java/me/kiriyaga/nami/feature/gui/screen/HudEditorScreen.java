@@ -57,21 +57,9 @@ public class HudEditorScreen extends Screen {
                 hovered = hovered && mouseY >= renderY && mouseY <= renderY + hud.height;
 
                 if (hovered) {
-                    int rectLeft;
-                    switch (hud.alignment.get()) {
-                        case left -> rectLeft = baseX - 1;
-                        case center -> rectLeft = baseX - hud.width / 2 - 1;
-                        case right -> rectLeft = baseX - hud.width - 1;
-                        default -> rectLeft = baseX - 1;
-                    }
-
-                    int rectRight = rectLeft + hud.width + 2;
-
                     context.fill(
-                            rectLeft,
-                            renderY - 1,
-                            rectRight,
-                            renderY + hud.height + 1,
+                            baseX - 1, renderY - 1,
+                            baseX + hud.width + 1, renderY + hud.height + 1,
                             0x50FFFFFF
                     );
                 }
