@@ -55,17 +55,31 @@ public class CommandExecutor {
         Object[] parsed = new Object[expected.length];
 
         try {
-            if (args.length < expected.length) {
-                throw new IllegalArgumentException("Missing arguments.");
+            int requiredCount = 0;
+            for (CommandArgument arg : expected) {
+                if (arg.isRequired()) requiredCount++;
+            }
+            if (args.length < requiredCount) {
+                throw new IllegalArgumentException("Missing required arguments.");
             }
 
             for (int i = 0; i < expected.length; i++) {
                 CommandArgument arg = expected[i];
 
+                if (i >= args.length) {
+                    if (!arg.isRequired()) {
+                        parsed[i] = null;
+                        continue;
+                    } else {
+                        throw new IllegalArgumentException("Missing argument: " + arg.getName());
+                    }
+                }
+
+                String input = args[i];
                 if (arg instanceof CommandArgument.ActionArg actionArg) {
-                    parsed[i] = actionArg.getCanonical(args[i]);
+                    parsed[i] = actionArg.getCanonical(input);
                 } else {
-                    parsed[i] = arg.parse(args[i]);
+                    parsed[i] = arg.parse(input);
                 }
             }
 
