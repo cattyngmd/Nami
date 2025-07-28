@@ -30,7 +30,7 @@ public abstract class Module {
         this.category = category;
 
         this.keyBind = new KeyBindSetting("bind", KeyBindSetting.KEY_NONE);
-        this.settings.add(keyBind);
+        addSetting(keyBind);
     }
 
 
