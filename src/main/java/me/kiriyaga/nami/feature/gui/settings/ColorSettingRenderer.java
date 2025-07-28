@@ -19,6 +19,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     public void render(DrawContext context, TextRenderer textRenderer, ColorSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
+        Color secondary = getColorModule().getStyledSecondColor();
         Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
@@ -46,7 +47,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
                 y - lineOffset,
                 x + 1,
                 y + HEIGHT,
-                new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB()
+                setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
         );
 
         String hex = String.format("#%02X%02X%02X", setting.getRed(), setting.getGreen(), setting.getBlue());

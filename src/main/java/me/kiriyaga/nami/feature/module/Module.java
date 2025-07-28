@@ -98,6 +98,7 @@ public abstract class Module {
     }
 
     public <T extends Setting<?>> T addSetting(T setting) {
+        setting.setParentModule(this);
         settings.add(setting);
         return setting;
     }

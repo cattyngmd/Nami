@@ -36,7 +36,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
                 y - lineOffset,
                 x + 1,
                 y + HEIGHT,
-                new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB()
+                setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
         );
 
 

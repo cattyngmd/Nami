@@ -1,12 +1,14 @@
 package me.kiriyaga.nami.setting;
 
 import com.google.gson.JsonElement;
+import me.kiriyaga.nami.feature.module.Module;
 
 public abstract class Setting<T> {
     protected final String name;
     protected T value;
     private Runnable onChanged = null;
     private boolean show = true;
+    private Module parentModule;
 
     public Setting(String name, T defaultValue) {
         this.name = name;
@@ -36,6 +38,14 @@ public abstract class Setting<T> {
 
     public void setShow(boolean show) {
         this.show = show;
+    }
+
+    public void setParentModule(Module module) {
+        this.parentModule = module;
+    }
+
+    public Module getParentModule() {
+        return parentModule;
     }
 
     public abstract void fromJson(JsonElement json);

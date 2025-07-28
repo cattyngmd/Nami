@@ -48,10 +48,10 @@ public class ModulePanel {
         else
             bgColor = new Color(30, 30, 30, 0);
 
-        context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
+        context.fill(expanded ? x + 1 : x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
         if (expanded) {
-            context.fill(x, y, x + 1, y + HEIGHT, new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255).getRGB());
+            context.fill(x, y, x + 1, y + HEIGHT, enabled ? primary.getRGB() : secondary.getRGB());
         }
 
         int textY = y + (HEIGHT - 8) / 2;
