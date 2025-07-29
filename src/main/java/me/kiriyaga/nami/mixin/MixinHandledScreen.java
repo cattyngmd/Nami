@@ -16,11 +16,6 @@ import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
 @Mixin(HandledScreen.class)
 public class MixinHandledScreen {
 
-    @Inject(method = "render", at = @At("TAIL"))
-    public void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        EVENT_MANAGER.post(new RenderScreenEvent(context, null));
-    }
-
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         MouseClickEvent event = new MouseClickEvent(mouseX, mouseY, button);

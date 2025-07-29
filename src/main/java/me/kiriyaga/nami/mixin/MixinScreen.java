@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
+import me.kiriyaga.nami.event.impl.RenderScreenEvent;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.DrawContext;
@@ -8,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 @Mixin(Screen.class)
@@ -21,6 +23,11 @@ public abstract class MixinScreen {
         if (m != null && m.isEnabled() && m.isNoBackground()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    public void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        EVENT_MANAGER.post(new RenderScreenEvent(context, null, mouseX, mouseY));
     }
 }
 

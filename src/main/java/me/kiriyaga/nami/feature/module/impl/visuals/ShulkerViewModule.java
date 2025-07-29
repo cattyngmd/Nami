@@ -33,15 +33,17 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class ShulkerViewModule extends Module {
 
+    public final BoolSetting tooltip = addSetting(new BoolSetting("tooltip", true));
     public final BoolSetting compact = addSetting(new BoolSetting("compact", true));
     public final BoolSetting bothSides = addSetting(new BoolSetting("both sides", true));
     public final BoolSetting borders = addSetting(new BoolSetting("borders", true));
-    public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1, 0.1, 2));
+    public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1, 0.5, 1.5));
 
     private final List<ShulkerInfo> shulkerList = new ArrayList<>();
     private final int GRID_WIDTH = 20;
@@ -70,10 +72,14 @@ public class ShulkerViewModule extends Module {
         }
     }
 
-    // TODO: player inventory is not component scoped for some reason, it doesnt work in player inventory
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender(RenderScreenEvent event) {
+        //CHAT_MANAGER.sendRaw("event called");
+
         if (!(MC.currentScreen instanceof HandledScreen)) return;
+
+        //CHAT_MANAGER.sendRaw("current screen = " + MC.currentScreen.getClass().getName());
+        //CHAT_MANAGER.sendRaw("total shulkers to render = " + shulkerList.size());
 
         DrawContext context = event.getDrawContext();
         boolean right = false;
@@ -101,6 +107,8 @@ public class ShulkerViewModule extends Module {
             int width = cols * GRID_WIDTH + MARGIN * cols;
             int height = rows * GRID_HEIGHT + MARGIN * rows;
 
+           // CHAT_MANAGER.sendRaw("rendering shulker at (" + startX + ", " + currentY + "), size = " + cols + "x" + rows);
+
             context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
 
             if (borders.get()){
@@ -111,16 +119,21 @@ public class ShulkerViewModule extends Module {
             int count = 0;
             for (ItemStack stack : info.stacks) {
                 if (compact.get() && stack.isEmpty()) break;
-                int x = startX + (count % 9) * GRID_WIDTH + MARGIN;
-                int y = currentY + (count / 9) * GRID_HEIGHT + MARGIN;
+                int x = startX + (count % info.cols) * GRID_WIDTH + MARGIN;
+                int y = currentY + (count / info.cols) * GRID_HEIGHT + MARGIN;
 
                 context.drawItem(stack, x, y);
                 context.drawStackOverlay(MC.textRenderer, stack, x, y, null);
+
+                if (tooltip.get() && !stack.isEmpty() && isHovered(event.getMouseX(), event.getMouseY(), x, y, 16, 16, scale)) {
+                    context.drawItemTooltip(MC.textRenderer, stack, (int) event.getMouseX(), (int) event.getMouseY());
+                }
 
                 count++;
             }
 
             if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
+                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, info.slot, 0, SlotActionType.PICKUP, MC.player);
                 MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, info.slot, 0, SlotActionType.PICKUP, MC.player);
                 clickedX = clickedY = -1;
             }
@@ -134,6 +147,7 @@ public class ShulkerViewModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onClick(MouseClickEvent event) {
+       // CHAT_MANAGER.sendRaw("mouse click event called");
         if (event.button() == 0) {
             clickedX = event.mouseX();
             clickedY = event.mouseY();
@@ -142,6 +156,7 @@ public class ShulkerViewModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onScroll(MouseScrollEvent event) {
+      //  CHAT_MANAGER.sendRaw("mouse scroll event called");
         float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get()).floatValue(), 0);
         offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * 10, maxOffset, 0);
     }
