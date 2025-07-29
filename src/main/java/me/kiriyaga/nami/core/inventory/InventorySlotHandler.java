@@ -1,7 +1,9 @@
 package me.kiriyaga.nami.core.inventory;
 
+import me.kiriyaga.nami.Nami;
 import me.kiriyaga.nami.event.*;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
+import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -55,6 +57,8 @@ public class InventorySlotHandler {
 
     public boolean isOutOfSync() {
         if (MC.player == null) return false;
+        if (MODULE_MANAGER.getStorage().getByClass(Debug.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(Debug.class).inventory.get())
+            CHAT_MANAGER.sendRaw("out of sync!");
         return MC.player.getInventory().getSelectedSlot() != syncedSlot;
     }
 

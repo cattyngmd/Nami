@@ -9,6 +9,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.core.RotationManager;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
@@ -57,18 +58,24 @@ public class AuraModule extends Module {
         if (MC.player == null || MC.world == null) return;
         if (!multiTask.get() && MC.player.isUsingItem()) return;
 
+        long startTime = System.nanoTime();
+
         ItemStack stack = MC.player.getMainHandStack();
 
         Entity target = ENTITY_MANAGER.getTarget();
+
+        Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
+
         if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS) || stack.getItem() instanceof TridentItem || stack.getItem() instanceof MaceItem))) {
             currentTarget = null;
             return;
         }
 
-
         currentTarget = target;
 
         this.setDisplayInfo(target.getName().getString());
+
+        long auraLogicStart = System.nanoTime();
 
         float cooldown = MC.player.getAttackCooldownProgress(0f);
         float tps = 20f;
@@ -114,6 +121,16 @@ public class AuraModule extends Module {
 
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
+
+        if (debugModule != null && debugModule.isEnabled() && debugModule.auraGet.get()) {
+            long auraLogicDuration = System.nanoTime() - auraLogicStart;
+            CHAT_MANAGER.sendRaw(String.format("[Debug] Aura logic time: %.3f ms", auraLogicDuration / 1_000_000.0));
+        }
+
+        if (debugModule != null && debugModule.isEnabled() && debugModule.auraGet.get()) {
+            long totalDuration = System.nanoTime() - startTime;
+            CHAT_MANAGER.sendRaw(String.format("aura total %.3f ms", totalDuration / 1_000_000.0));
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
