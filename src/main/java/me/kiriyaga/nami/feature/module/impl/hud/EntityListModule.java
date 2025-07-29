@@ -22,6 +22,8 @@ public class EntityListModule extends HudElementModule {
     }
 
     private final List<TextElement> elements = new ArrayList<>();
+    private long lastUpdateTime = 0;
+    private final long updateIntervalMs = 3000;
 
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.descending));
     public final BoolSetting onlyLiving = addSetting(new BoolSetting("only living", false));
@@ -32,13 +34,17 @@ public class EntityListModule extends HudElementModule {
 
     @Override
     public List<TextElement> getTextElements() {
-        elements.clear();
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastUpdateTime < updateIntervalMs) {
+            return elements;
+        }
+        lastUpdateTime = currentTime;
 
+        elements.clear();
         Map<String, Integer> entityCounts = new HashMap<>();
 
         for (Entity entity : ENTITY_MANAGER.getAllEntities()) {
             if (entity == MC.player) continue;
-
             if (onlyLiving.get() && !(entity instanceof LivingEntity)) continue;
 
             String name = entity.getName().getString();
@@ -64,7 +70,6 @@ public class EntityListModule extends HudElementModule {
 
         for (String name : sortedNames) {
             int count = entityCounts.get(name);
-
             Text text = CAT_FORMAT.format("{bg}" + name + (count > 1 ? " {bw}(x" + count + ")" : ""));
             int textWidth = MC.textRenderer.getWidth(text);
             elements.add(new TextElement(text, 0, yOffset));

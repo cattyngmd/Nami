@@ -34,6 +34,7 @@ public abstract class Module {
         this.drawn = new BoolSetting("drawn", false);
         this.drawn.setShow(false);
         addSetting(keyBind);
+        addSetting(drawn);
     }
 
 
