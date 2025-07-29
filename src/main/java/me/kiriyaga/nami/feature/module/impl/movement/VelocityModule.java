@@ -35,11 +35,10 @@ public class VelocityModule extends Module {
 
     private enum Mode {
         normal,
-        grim,
         walls
     }
 
-    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.grim));
+    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.walls));
     private final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("horizontal", 100.0, 0.0, 100.0));
     private final DoubleSetting verticalPercent = addSetting(new DoubleSetting("vertical", 100.0, 0.0, 100.0));
     private final BoolSetting handleKnockback = addSetting(new BoolSetting("knockback", true));
@@ -94,9 +93,6 @@ public class VelocityModule extends Module {
                         scaleVelocityPacket(velocityPacket);
                     }
                 }
-                case grim -> {
-                    if (isPlayerPhased()) event.cancel();
-                }
             }
         }
 
@@ -118,11 +114,6 @@ public class VelocityModule extends Module {
                         event.cancel();
                     } else {
                         scaleExplosionPacket(explosionPacket);
-                    }
-                }
-                case grim -> {
-                    if (phased) {
-                        event.cancel();
                     }
                 }
             }
@@ -191,11 +182,6 @@ public class VelocityModule extends Module {
                             scaleExplosionPacket(explosion);
                         } else continue;
                     }
-                    case grim -> {
-                        if (phased) continue;
-                        filteredPackets.add(p);
-                        continue;
-                    }
                 }
 
                 filteredPackets.add(p);
@@ -207,9 +193,7 @@ public class VelocityModule extends Module {
                     filteredPackets.add(p);
                     continue;
                 }
-
-                if (modeSetting.get() == Mode.grim && isPlayerPhased()) continue;
-
+                
                 if (modeSetting.get() == Mode.walls) {
                     if (!isPlayerPhased() || (requireGround.get() && !MC.player.isOnGround())) {
                         filteredPackets.add(p);
