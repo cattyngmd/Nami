@@ -48,7 +48,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                 false
         );
 
-        String valueStr = waitingForKeyBind == setting ? "Press a key..." : KeyUtils.getKeyName(setting.get());
+        String valueStr = waitingForKeyBind == setting ? "Press a key or mouse button..." : KeyUtils.getKeyName(setting.get());
 
         context.drawText(
                 textRenderer,
@@ -65,6 +65,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         if (waitingForKeyBind == null) {
             waitingForKeyBind = setting;
         } else if (waitingForKeyBind == setting) {
+            waitingForKeyBind.set(button);
             waitingForKeyBind = null;
         }
         return true;
@@ -85,17 +86,6 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
             return true;
         }
         return false;
-    }
-
-    private float approach(float current, float target, float maxDelta) {
-        if (current < target) {
-            current += maxDelta;
-            if (current > target) current = target;
-        } else if (current > target) {
-            current -= maxDelta;
-            if (current < target) current = target;
-        }
-        return current;
     }
 
     private static boolean isHovered(double mouseX, double mouseY, int x, int y) {

@@ -31,6 +31,24 @@ public class KeyUtils {
             case "END": return GLFW.GLFW_KEY_END;
             case "PAGEUP": return GLFW.GLFW_KEY_PAGE_UP;
             case "PAGEDOWN": return GLFW.GLFW_KEY_PAGE_DOWN;
+
+            case "MOUSELEFT":
+            case "MOUSE_1":
+            case "MBUTTON1":
+            case "LEFTCLICK": return GLFW.GLFW_MOUSE_BUTTON_LEFT;
+
+            case "MOUSERIGHT":
+            case "MOUSE_2":
+            case "MBUTTON2":
+            case "RIGHTCLICK": return GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+
+            case "MOUSEMIDDLE":
+            case "MOUSE_3":
+            case "MBUTTON3":
+            case "MIDDLECLICK": return GLFW.GLFW_MOUSE_BUTTON_MIDDLE;
+
+            case "MOUSE4": return GLFW.GLFW_MOUSE_BUTTON_4;
+            case "MOUSE5": return GLFW.GLFW_MOUSE_BUTTON_5;
         }
 
         if (keyName.length() == 1) {
@@ -69,7 +87,14 @@ public class KeyUtils {
             case GLFW.GLFW_KEY_END: return "END";
             case GLFW.GLFW_KEY_PAGE_UP: return "PAGEUP";
             case GLFW.GLFW_KEY_PAGE_DOWN: return "PAGEDOWN";
+
+            case GLFW.GLFW_MOUSE_BUTTON_LEFT: return "MOUSELEFT";
+            case GLFW.GLFW_MOUSE_BUTTON_RIGHT: return "MOUSERIGHT";
+            case GLFW.GLFW_MOUSE_BUTTON_MIDDLE: return "MOUSEMIDDLE";
+            case GLFW.GLFW_MOUSE_BUTTON_4: return "MOUSE4";
+            case GLFW.GLFW_MOUSE_BUTTON_5: return "MOUSE5";
         }
+
         if (keyCode >= GLFW.GLFW_KEY_A && keyCode <= GLFW.GLFW_KEY_Z) {
             return String.valueOf((char)('A' + (keyCode - GLFW.GLFW_KEY_A)));
         }
