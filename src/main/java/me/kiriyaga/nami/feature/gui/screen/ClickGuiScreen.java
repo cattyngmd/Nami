@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.gui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.module.impl.client.HudEditorModule;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -188,6 +189,11 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
+            MC.setScreen(null);
+            return true;
+        }
+
         if (SettingPanel.keyPressed(keyCode)) {
             return true;
         }

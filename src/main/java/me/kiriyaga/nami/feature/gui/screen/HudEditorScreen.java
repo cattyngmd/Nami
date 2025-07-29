@@ -4,6 +4,7 @@ import me.kiriyaga.nami.feature.module.HudAlignment;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.module.impl.client.HudEditorModule;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -166,7 +167,7 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) {
+        if (keyCode == MODULE_MANAGER.getStorage().getByClass(HudEditorModule.class).getKeyBind().get() && MC.world !=null) {
             MC.setScreen(null);
             return true;
         }

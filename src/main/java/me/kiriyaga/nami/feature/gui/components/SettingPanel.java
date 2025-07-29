@@ -60,7 +60,7 @@ public class SettingPanel {
     }
 
     public static boolean mouseClicked(Module module, double mouseX, double mouseY, int button, int x, int y) {
-        if (button != 0 && button != 1) return false;
+        if (button < 0 || button > 7) return false;
 
         List<Setting<?>> settings = module.getSettings();
         int curY = y + SettingRenderer.MODULE_SPACING;

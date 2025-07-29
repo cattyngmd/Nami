@@ -48,7 +48,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                 false
         );
 
-        String valueStr = waitingForKeyBind == setting ? "Press a key or mouse button..." : KeyUtils.getKeyName(setting.get());
+        String valueStr = waitingForKeyBind == setting ? "Press a key..." : KeyUtils.getKeyName(setting.get());
 
         context.drawText(
                 textRenderer,
@@ -77,7 +77,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
     public static boolean keyPressed(int keyCode) {
         if (waitingForKeyBind != null) {
-            if (keyCode == GLFW.GLFW_KEY_DELETE) {
+            if (keyCode == GLFW.GLFW_KEY_DELETE || keyCode == GLFW.GLFW_KEY_ESCAPE) {
                 waitingForKeyBind.set(-1);
             } else {
                 waitingForKeyBind.set(keyCode);
