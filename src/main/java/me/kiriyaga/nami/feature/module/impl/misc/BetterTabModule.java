@@ -9,7 +9,7 @@ import me.kiriyaga.nami.setting.impl.IntSetting;
 @RegisterModule
 public class BetterTabModule extends Module {
 
-    public final IntSetting limit = addSetting(new IntSetting("limit", 300, 25, 15000));
+    public final IntSetting limit = addSetting(new IntSetting("limit", 300, 25, 2500));
     public final BoolSetting friendsOnly = addSetting(new BoolSetting("friends only", false));
     public final BoolSetting highlighFriends = addSetting(new BoolSetting("highlight friends", true));
 

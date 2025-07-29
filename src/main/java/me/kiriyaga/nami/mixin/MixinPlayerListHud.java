@@ -15,8 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.FRIEND_MANAGER;
@@ -31,22 +30,49 @@ public abstract class MixinPlayerListHud {
 
     @Shadow protected abstract Text applyGameModeFormatting(PlayerListEntry entry, MutableText name);
 
+    private final Set<String> cachedFriends = new HashSet<>();
+    private long lastFriendCacheUpdate = 0;
+    private final long friendCacheInterval = 10000;
+
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntries(CallbackInfoReturnable<List<PlayerListEntry>> info) {
         BetterTabModule betterTab = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class) : null;
         if (betterTab == null || !betterTab.isEnabled()) return;
-
         if (client == null || client.player == null || client.player.networkHandler == null) return;
 
-        List<PlayerListEntry> entries = client.player.networkHandler.getListedPlayerListEntries().stream()
-                .filter(entry -> !betterTab.friendsOnly.get() || FRIEND_MANAGER.isFriend(entry.getProfile().getName()))
-                .limit(betterTab.limit.get())
-                .sorted(ENTRY_ORDERING)
-                .limit(betterTab.limit.get())
-                .collect(Collectors.toList());
+        Collection<PlayerListEntry> allEntries = client.player.networkHandler.getListedPlayerListEntries();
 
+        List<PlayerListEntry> result;
 
-        info.setReturnValue(entries);
+        if (betterTab.friendsOnly.get()) {
+            long now = System.currentTimeMillis();
+            if (now - lastFriendCacheUpdate > friendCacheInterval) {
+                cachedFriends.clear();
+                FRIEND_MANAGER.getFriends().forEach(friend -> cachedFriends.add(friend.toLowerCase()));
+                lastFriendCacheUpdate = now;
+            }
+
+            int limit = betterTab.limit.get();
+            result = new ArrayList<>(limit);
+
+            for (PlayerListEntry entry : allEntries) {
+                String name = entry.getProfile().getName().toLowerCase();
+                if (cachedFriends.contains(name)) {
+                    result.add(entry);
+                    if (result.size() >= limit) break;
+                }
+            }
+
+            result.sort(ENTRY_ORDERING);
+
+        } else {
+            result = allEntries.stream()
+                    .limit(betterTab.limit.get())
+                    .sorted(ENTRY_ORDERING)
+                    .collect(Collectors.toList());
+        }
+
+        info.setReturnValue(result);
     }
 
     @Inject(method = "getPlayerName", at = @At("HEAD"), cancellable = true)
