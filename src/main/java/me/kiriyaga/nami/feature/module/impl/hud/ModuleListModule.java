@@ -25,7 +25,7 @@ public class ModuleListModule extends HudElementModule {
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.descending));
 
     public ModuleListModule() {
-        super("module list", "Shows enabled and drawn modules.", 2, 2, 50, 10);
+        super("module list", "Shows enabled and drawn modules.", 52, 52, 50, 10);
     }
 
     @Override
