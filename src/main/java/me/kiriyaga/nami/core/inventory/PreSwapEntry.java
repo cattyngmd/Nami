@@ -1,12 +1,13 @@
 package me.kiriyaga.nami.core.inventory;
 
+import me.kiriyaga.nami.util.Timer;
 import net.minecraft.item.ItemStack;
 
 public class PreSwapEntry {
 
     private final ItemStack[] snapshot;
     private final int fromSlot, toSlot;
-    private final ExpirationTimer timer = new ExpirationTimer();
+    private final Timer timer = new Timer();
 
     public PreSwapEntry(ItemStack[] snapshot, int from, int to) {
         this.snapshot = snapshot;

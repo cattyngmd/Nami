@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.module;
 
 import me.kiriyaga.nami.setting.Setting;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import net.minecraft.text.Text;
 
@@ -16,7 +17,7 @@ public abstract class Module {
     protected final String[] aliases;
     protected final ModuleCategory category;
 
-    private boolean drawn = false;
+    private BoolSetting drawn;
     private boolean enabled = false;
     private String displayInfo = "";
 
@@ -30,6 +31,8 @@ public abstract class Module {
         this.category = category;
 
         this.keyBind = new KeyBindSetting("bind", KeyBindSetting.KEY_NONE);
+        this.drawn = new BoolSetting("drawn", false);
+        this.drawn.setShow(false);
         addSetting(keyBind);
     }
 
@@ -39,7 +42,7 @@ public abstract class Module {
     }
 
     public void setDrawn(boolean state){
-        this.drawn = state;
+        this.drawn.set(state);
     }
 
     public void setEnabled(boolean state) {
@@ -78,7 +81,7 @@ public abstract class Module {
     }
 
     public boolean isDrawn() {
-        return drawn;
+        return drawn.get();
     }
 
     public String getName() {

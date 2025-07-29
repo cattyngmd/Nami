@@ -1,6 +1,6 @@
-package me.kiriyaga.nami.core.inventory;
+package me.kiriyaga.nami.util;
 
-public class ExpirationTimer {
+public class Timer {
     private long start = System.currentTimeMillis();
 
     public void reset() {
