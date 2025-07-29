@@ -24,6 +24,16 @@ public class InventorySyncHandler {
         EVENT_MANAGER.register(this);
     }
 
+    public void swapSync() {
+        if (!slotSwapper.isOutOfSync())
+            return;
+
+        slotSwapper.sendSlotPacket(MC.player.getInventory().getSelectedSlot());
+        for (PreSwapEntry swapData : slotSwapper.getSwaps()) {
+            swapData.markForClear();
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onItemSync(ItemEvent event) {
         if (slotSwapper.isOutOfSync()) {
@@ -42,6 +52,7 @@ public class InventorySyncHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTick(PreTickEvent event) {
+        swapSync();
         slotSwapper.getSwaps().removeIf(PreSwapEntry::isExpired);
     }
 
