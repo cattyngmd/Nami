@@ -71,33 +71,4 @@ public abstract class MixinClientPlayerInteractionManager{
             this.blockBreakingCooldown = 0;
         }
     }
-
-    @Inject(method = "interactBlock", at = @At(value = "HEAD"), cancellable = true)
-    private void interactBlockHead(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> info) {
-        if (Nami.MODULE_MANAGER.getStorage() == null) return;
-
-        AntiInteractModule antiInteract = Nami.MODULE_MANAGER.getStorage().getByClass(AntiInteractModule.class);
-        if (antiInteract == null || !antiInteract.isEnabled() || !antiInteract.spawnPoint.get()) return;
-
-        if (player.getWorld() == null) return;
-
-        Block block = player.getWorld().getBlockState(hitResult.getBlockPos()).getBlock();
-        String dimension = player.getWorld().getDimension().toString();
-
-        Identifier blockId = Registries.BLOCK.getId(block);
-
-        if (antiInteract.whitelist.get() && antiInteract.whitelist.isWhitelisted(blockId)) {
-            info.setReturnValue(ActionResult.FAIL);
-            return;
-        }
-
-        if (player.getWorld().getDimension().comp_648() && antiInteract.isBed(block)) {
-            info.setReturnValue(ActionResult.FAIL);
-            return;
-        }
-
-        if (block == Blocks.RESPAWN_ANCHOR && dimension.contains("nether")) {
-            info.setReturnValue(ActionResult.FAIL);
-        }
-    }
 }
