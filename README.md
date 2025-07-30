@@ -20,6 +20,7 @@
 **Nami** is a modular and lightweight anarchy client base built for PVE and automation.  
 
 The 1.21.4 branch is outdated!
+
 Please do not use viafabric/viafabricplus on servers 1.21.4 or lower!
 
 Most popular Minecraft clients are closed-source, paid, and obfuscated, making them difficult to audit or trust. Some may include backdoors or malicious code.
