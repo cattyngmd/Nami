@@ -37,6 +37,11 @@ public class CatStyles {
 
     @Style("bw")
     Color bounceWhite() {
-        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(255, 255,255, 255));
+        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(255, 255,255));
+    }
+
+    @Style("bgr")
+    Color bounceGray() {
+        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(170,170,170));
     }
 }
