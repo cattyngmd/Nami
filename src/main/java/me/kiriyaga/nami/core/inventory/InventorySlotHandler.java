@@ -57,8 +57,6 @@ public class InventorySlotHandler {
 
     public boolean isOutOfSync() {
         if (MC.player == null) return false;
-        if (MODULE_MANAGER.getStorage().getByClass(Debug.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(Debug.class).inventory.get())
-            CHAT_MANAGER.sendRaw("out of sync!");
         return MC.player.getInventory().getSelectedSlot() != syncedSlot;
     }
 

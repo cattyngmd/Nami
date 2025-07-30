@@ -5,6 +5,7 @@ import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.ItemEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
@@ -30,7 +31,8 @@ public class InventorySyncHandler {
 
         slotSwapper.sendSlotPacket(MC.player.getInventory().getSelectedSlot());
         for (PreSwapEntry swapData : slotSwapper.getSwaps()) {
-            CHAT_MANAGER.sendRaw("marking entry for clear due to out of sync");
+            if (MODULE_MANAGER.getStorage().getByClass(Debug.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(Debug.class).inventory.get())
+                CHAT_MANAGER.sendRaw("marking entry for clear due to out of sync");
             swapData.markForClear();
         }
     }
@@ -38,7 +40,8 @@ public class InventorySyncHandler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onItemSync(ItemEvent event) {
         if (slotSwapper.isOutOfSync()) {
-            CHAT_MANAGER.sendRaw("cancelling item sync due to desync");
+            if (MODULE_MANAGER.getStorage().getByClass(Debug.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(Debug.class).inventory.get())
+                CHAT_MANAGER.sendRaw("cancelling item sync due to desync");
             event.cancel();
             event.setStack(getCurrentServerStack());
         }
@@ -73,7 +76,8 @@ public class InventorySyncHandler {
             for (PreSwapEntry entry : slotSwapper.getSwaps()) {
                 if (entry.involvesSlot(hotbarSlot)
                         && !entry.getSnapshotItem(hotbarSlot).getItem().equals(update.getStack().getItem())) {
-                    CHAT_MANAGER.sendRaw("packet recieved: desync detected " + hotbarSlot);
+                    if (MODULE_MANAGER.getStorage().getByClass(Debug.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(Debug.class).inventory.get())
+                        CHAT_MANAGER.sendRaw("packet recieved: desync detected " + hotbarSlot);
                     event.cancel();
                     break;
                 }
