@@ -1,4 +1,4 @@
-# Nami Client 1.21.7
+# Nami Client 1.21.8
 
 <p align="center">
   <a href="https://github.com/Kiriyaga7615/2bEssentials/releases">
