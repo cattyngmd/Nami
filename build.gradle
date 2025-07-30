@@ -17,7 +17,17 @@ def getGitHash() {
     return stdout.toString().trim()
 }
 
-version = "2.4.1_14.${getGitHash()}"
+def getCommitsCount() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-list', '--count', 'HEAD', '^$(git describe --tags --abbrev=0)'
+        standardOutput = stdout
+        ignoreExitValue true
+    }
+    return stdout.toString().trim()
+}
+
+version = "2.4.1_${getCommitsCount()}.${getGitHash()}"
 //version = "2.4.1"
 
 java {
