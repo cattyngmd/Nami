@@ -65,7 +65,7 @@ public class ModuleListModule extends HudElementModule {
             elements.add(new TextElement(text, 0, yOffset));
 
             maxWidth = Math.max(maxWidth, textWidth);
-            yOffset += MC.textRenderer.fontHeight + 1;
+            yOffset += MC.textRenderer.fontHeight;
         }
 
         this.width = maxWidth;
