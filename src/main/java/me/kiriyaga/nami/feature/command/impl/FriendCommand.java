@@ -13,7 +13,7 @@ public class FriendCommand extends Command {
         super(
                 "friend",
                 new CommandArgument[] {
-                        new CommandArgument.ActionArg("action", "add", "del", "remove"),
+                        new CommandArgument.ActionArg("action", "add", "del"),
                         new CommandArgument.StringArg("name", 1, 32)
                 },
                 "f", "friends", "акшутв"
@@ -29,10 +29,5 @@ public class FriendCommand extends Command {
             case "add" -> FRIEND_MANAGER.addFriend(name);
             case "del" -> FRIEND_MANAGER.removeFriend(name);
         }
-
-        CHAT_MANAGER.sendPersistent(
-                FriendCommand.class.getName(),
-                CAT_FORMAT.format("Friend list updated: {g}" + action + " {s}" + name + "{reset}.")
-        );
     }
 }

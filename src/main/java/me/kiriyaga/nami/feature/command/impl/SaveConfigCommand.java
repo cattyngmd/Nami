@@ -14,17 +14,11 @@ public class SaveConfigCommand extends Command {
                 new CommandArgument[] {
                         new CommandArgument.StringArg("configName", 1, 32)
                 },
-                "savecfg", "scfg");
+                "savecfg", "scfg","ыфмусщташп");
     }
 
     @Override
     public void execute(Object[] args) {
-        if (args.length < 1) {
-            CHAT_MANAGER.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Usage: {s}" + COMMAND_MANAGER.getExecutor().getPrefix() + "{g}saveconfig {s}<{g}configName{s}>{reset}."));
-            return;
-        }
-
         String configName = args[0].toString();
 
         try {

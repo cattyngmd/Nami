@@ -33,7 +33,7 @@ public class FriendManager {
         if (name == null) return;
         if (friends.add(name.toLowerCase())) {
             configManager.saveFriends(friends);
-            CHAT_MANAGER.sendPersistent(getClass().getName(), "Added friend: §7" + name);
+            CHAT_MANAGER.sendPersistent(getClass().getName(), "Added friend: {g}" + name+"{reset}.");
         }
     }
 
@@ -41,7 +41,7 @@ public class FriendManager {
         if (name == null) return;
         if (friends.remove(name.toLowerCase())) {
             configManager.saveFriends(friends);
-            CHAT_MANAGER.sendPersistent(getClass().getName(), "Removed friend: §7" + name);
+            CHAT_MANAGER.sendPersistent(getClass().getName(), "Removed friend: {g}" + name+"{reset}.");
         }
     }
 

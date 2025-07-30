@@ -27,9 +27,6 @@ public class PitchCommand extends Command {
             MC.player.setPitch(pitch);
             CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
                     CAT_FORMAT.format("Pitch set to: {g}" + pitch + "{reset}."));
-        } else {
-            CHAT_MANAGER.sendPersistent(PitchCommand.class.getName(),
-                    CAT_FORMAT.format("Player is null."));
         }
     }
 }

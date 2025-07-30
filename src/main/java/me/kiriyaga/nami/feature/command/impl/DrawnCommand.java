@@ -1,21 +1,21 @@
 package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
-import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.command.CommandArgument;
+import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.module.Module;
 
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
-public class ToggleCommand extends Command {
+public class DrawnCommand extends Command {
 
-    public ToggleCommand() {
-        super("toggle",
+    public DrawnCommand() {
+        super("drawn",
                 new CommandArgument[] {
                         new CommandArgument.StringArg("moduleName", 1, 25)
                 },
-                "on", "off", "switch", "togle", "turnon", "turnoff", "tggle");
+                "draw", "drawmodule", "moduledraw", "вкфцт");
     }
 
     @Override
@@ -36,6 +36,8 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        found.toggle();
+        found.setDrawn(!found.isDrawn());
+        CHAT_MANAGER.sendTransient(
+                CAT_FORMAT.format("Module {g}" + input + " {reset}drawn changed."));
     }
 }
