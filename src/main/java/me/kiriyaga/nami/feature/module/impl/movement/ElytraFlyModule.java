@@ -37,6 +37,14 @@ public class ElytraFlyModule extends Module {
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
+    private double speed = 0;
+    private double[] speedSamples = new double[]{25};
+    private int speedSampleIndex = 0;
+    private boolean speedBufferFilled = false;
+
+    private double lastX = 0;
+    private double lastZ = 0;
+
     public ElytraFlyModule() {
         super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "уднекфадн", "elytrafly");
     }
@@ -65,7 +73,7 @@ public class ElytraFlyModule extends Module {
 
         if (mode.get() == FlyMode.bounce) {
 
-            if (boost.get() && MC.player.getVelocity().y > 0) {
+            if (boost.get()) {
                 MC.player.setVelocity(MC.player.getVelocity().x, 0.0, MC.player.getVelocity().z);
             }
 
@@ -81,6 +89,32 @@ public class ElytraFlyModule extends Module {
         }
     }
 
+    @SubscribeEvent
+    private void onTickSpeed(PreTickEvent event) {
+        if (MC.player == null) return;
+
+        double dx = MC.player.getX() - lastX;
+        double dz = MC.player.getZ() - lastZ;
+
+        double instantSpeed = Math.sqrt(dx * dx + dz * dz) * 20;
+
+        speedSamples[speedSampleIndex] = instantSpeed;
+        speedSampleIndex = (speedSampleIndex + 1) % speedSamples.length;
+
+        if (speedSampleIndex == 0) speedBufferFilled = true;
+
+        int count = speedBufferFilled ? speedSamples.length : speedSampleIndex;
+        double sum = 0;
+        for (int i = 0; i < count; i++) {
+            sum += speedSamples[i];
+        }
+
+        speed = count > 0 ? sum / count : 0;
+
+        lastX = MC.player.getX();
+        lastZ = MC.player.getZ();
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onMove(MoveEvent event) {
         ClientPlayerEntity player = MC.player;
@@ -88,9 +122,7 @@ public class ElytraFlyModule extends Module {
 
         if (!player.isOnGround()) return;
 
-        double currentBps = Math.sqrt(player.getVelocity().x * player.getVelocity().x + player.getVelocity().z * player.getVelocity().z);
-
-        if (player.isSprinting() && currentBps > 9.00 && newBoost.get()) {
+        if (player.isSprinting() && speed > 9.00 && newBoost.get()) {
 
             Vec3d velocity = player.getVelocity();
             event.setMovement(new Vec3d(velocity.x, 0, velocity.z));
