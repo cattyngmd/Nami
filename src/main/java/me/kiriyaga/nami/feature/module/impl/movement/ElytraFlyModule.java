@@ -89,7 +89,7 @@ public class ElytraFlyModule extends Module {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     private void onTickSpeed(PreTickEvent event) {
         if (MC.player == null) return;
 

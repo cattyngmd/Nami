@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.hud;
 
+import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.HudElementModule;
@@ -43,7 +44,7 @@ public class SpeedModule extends HudElementModule {
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     private void onTick(PreTickEvent event) {
         if (MC.player == null) return;
 
