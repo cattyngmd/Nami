@@ -40,6 +40,33 @@ This project started as a clean, open-source alternative aiming to be transparen
 
 ---
 
+## FAQ
+
+<details>
+<summary>How to open ClickGUI?</summary>
+
+ClickGUI is not bound by default. Use the command:  
+`-bind clickgui KEY`  
+to bind it to your preferred key.
+
+</details>
+
+<details>
+<summary>What is the command prefix?</summary>
+
+The default command prefix is `-`.
+
+</details>
+
+<details>
+<summary>Can I use a custom font?</summary>
+
+Please use the Caxton mod instead of the built-in client font renderers.
+
+</details>
+
+---
+
 ## Requirements
 
 - Java 21  
@@ -66,33 +93,6 @@ This project started as a clean, open-source alternative aiming to be transparen
 
 The compiled JAR will be located at:  
 `build/libs/nami-<version>.jar`
-
----
-
-## FAQ
-
-<details>
-<summary>How to open ClickGUI?</summary>
-
-ClickGUI is not bound by default. Use the command:  
-`-bind clickgui KEY`  
-to bind it to your preferred key.
-
-</details>
-
-<details>
-<summary>What is the command prefix?</summary>
-
-The default command prefix is `-`.
-
-</details>
-
-<details>
-<summary>Can I use a custom font?</summary>
-
-Please use the Caxton mod instead of the built-in client font renderers.
-
-</details>
 
 ---
 
