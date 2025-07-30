@@ -32,6 +32,7 @@ public class ElytraFlyModule extends Module {
 
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.bounce));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
+    private final IntSetting pitchDegree = addSetting(new IntSetting("pitch", 75, 0, 90));
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
@@ -73,9 +74,8 @@ public class ElytraFlyModule extends Module {
 
             setJumpHeld(true);
 
-            //75 magic value = its just the best value
             if (pitch.get())
-                ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), 75.00f));
+                ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), pitchDegree.get().floatValue()));
 
             MC.player.networkHandler.sendPacket(
                     new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
