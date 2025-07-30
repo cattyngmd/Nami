@@ -17,6 +17,7 @@ public class Debug extends Module {
 
     public final BoolSetting inventory = addSetting(new BoolSetting("inventory", false));
     public final BoolSetting auraGet = addSetting(new BoolSetting("aura", false));
+    public final BoolSetting ping = addSetting(new BoolSetting("ping", false));
 
     public Debug() {
         super("debug", ".", ModuleCategory.of("client"), "debug");

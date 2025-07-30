@@ -124,12 +124,12 @@ public class AuraModule extends Module {
 
         if (debugModule != null && debugModule.isEnabled() && debugModule.auraGet.get()) {
             long auraLogicDuration = System.nanoTime() - auraLogicStart;
-            CHAT_MANAGER.sendRaw(String.format("[Debug] Aura logic time: %.3f ms", auraLogicDuration / 1_000_000.0));
+            CHAT_MANAGER.sendRaw(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0));
         }
 
         if (debugModule != null && debugModule.isEnabled() && debugModule.auraGet.get()) {
             long totalDuration = System.nanoTime() - startTime;
-            CHAT_MANAGER.sendRaw(String.format("aura total %.3f ms", totalDuration / 1_000_000.0));
+            CHAT_MANAGER.sendRaw(String.format("total %.3f ms", totalDuration / 1_000_000.0));
         }
     }
 
