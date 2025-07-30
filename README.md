@@ -34,7 +34,8 @@ This project started as a clean, open-source alternative aiming to be transparen
 <details>
 <summary>View screenshots</summary>
 
-<img width="1920" height="1080" alt="2025-07-25_16 23 39" src="https://github.com/user-attachments/assets/d20a1bd6-ead5-4328-9c9d-f9b29b7f5f4d" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1fcb07c5-e0fd-4d7b-b235-96eb4ad15200" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d0135f76-4851-4674-aee1-8257cc1092c6" />
 
 </details>
 
