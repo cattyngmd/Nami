@@ -40,7 +40,7 @@ def getCommitsCount() {
     return stdout.toString().trim()
 }
 
-version = "2.4.1${getCommitsCount()}.${getGitHash()}"
+version = "2.4.1_${getCommitsCount()}.${getGitHash()}"
 //version = "2.4.1"
 
 java {
