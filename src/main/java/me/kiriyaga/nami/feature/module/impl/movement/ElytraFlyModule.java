@@ -32,8 +32,6 @@ public class ElytraFlyModule extends Module {
 
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.bounce));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
-    private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
-    private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
@@ -73,10 +71,6 @@ public class ElytraFlyModule extends Module {
 
         if (mode.get() == FlyMode.bounce) {
 
-            if (boost.get()) {
-                MC.player.setVelocity(MC.player.getVelocity().x, 0.0, MC.player.getVelocity().z);
-            }
-
             setJumpHeld(true);
 
             //75 magic value = its just the best value
@@ -113,20 +107,6 @@ public class ElytraFlyModule extends Module {
 
         lastX = MC.player.getX();
         lastZ = MC.player.getZ();
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private void onMove(MoveEvent event) {
-        ClientPlayerEntity player = MC.player;
-        if (player == null) return;
-
-        if (!player.isOnGround()) return;
-
-        if (player.isSprinting() && speed > 9.00 && newBoost.get()) {
-
-            Vec3d velocity = player.getVelocity();
-            event.setMovement(new Vec3d(velocity.x, 0, velocity.z));
-        }
     }
 
     private void setJumpHeld(boolean held) {
