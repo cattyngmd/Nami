@@ -9,7 +9,10 @@ import me.kiriyaga.nami.util.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 
 import java.util.Comparator;
 import java.util.List;
@@ -50,26 +53,75 @@ public class EntityManager {
 
         List<Entity> candidates = allEntities.stream()
                 .filter(e -> e != MC.player)
-                .filter(e -> e instanceof LivingEntity && e.isAlive())
                 .filter(e -> {
-                    if (e.age < entityManagerModule.minTicksExisted.get().intValue()) return false;
-                    double distSq = e.squaredDistanceTo(MC.player);
-                    return distSq <= entityManagerModule.targetRange.get() * entityManagerModule.targetRange.get();
-                })
-                .filter(e ->
-                        (entityManagerModule.targetPlayers.get() && e instanceof PlayerEntity && !FRIEND_MANAGER.isFriend(e.getName().getString()))
+                    if (e instanceof LivingEntity) {
+                        LivingEntity le = (LivingEntity) e;
+                        if (!le.isAlive()) return false;
+                        if (e.age < entityManagerModule.minTicksExisted.get().intValue()) return false;
+                        double distSq = e.squaredDistanceTo(MC.player);
+                        if (distSq > entityManagerModule.targetRange.get() * entityManagerModule.targetRange.get()) return false;
+
+                        return (entityManagerModule.targetPlayers.get() && e instanceof PlayerEntity && !FRIEND_MANAGER.isFriend(e.getName().getString()))
                                 || (entityManagerModule.targetHostiles.get() && EntityUtils.isHostile(e))
                                 || (entityManagerModule.targetNeutrals.get() && EntityUtils.isNeutral(e))
-                                || (entityManagerModule.targetPassives.get() && EntityUtils.isPassive(e)))
+                                || (entityManagerModule.targetPassives.get() && EntityUtils.isPassive(e));
+                    }
+
+                    if (entityManagerModule.targetPrijectiles.get()) {
+                        return (e instanceof ShulkerBulletEntity) || (e instanceof FireballEntity);
+                    }
+
+                    return false;
+                })
                 .collect(Collectors.toList());
 
-        Comparator<Entity> comparator = switch (entityManagerModule.priority.get()) {
-            case HEALTH -> Comparator.comparingDouble(e -> ((LivingEntity) e).getHealth());
-            case DISTANCE -> Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player));
-        };
+        switch (entityManagerModule.priority.get()) {
+            case HEALTH:
+                return candidates.stream()
+                        .filter(e -> e instanceof LivingEntity)
+                        .min(Comparator.comparingDouble(e -> ((LivingEntity) e).getHealth()))
+                        .orElse(null);
 
-        Optional<Entity> result = candidates.stream().min(comparator);
-        return result.orElse(null);
+            case DISTANCE:
+                return candidates.stream()
+                        .min(Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player)))
+                        .orElse(null);
+
+            case SMART:
+                List<Entity> players = candidates.stream()
+                        .filter(e -> e instanceof PlayerEntity && !FRIEND_MANAGER.isFriend(e.getName().getString()))
+                        .sorted(Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player)))
+                        .toList();
+
+                if (!players.isEmpty()) return players.get(0);
+
+                List<Entity> creepers = candidates.stream()
+                        .filter(e -> e instanceof CreeperEntity)
+                        .sorted(Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player)))
+                        .toList();
+
+                if (!creepers.isEmpty()) return creepers.get(0);
+
+                List<Entity> projectiles = candidates.stream()
+                        .filter(e -> e instanceof ShulkerBulletEntity || e instanceof FireballEntity)
+                        .sorted(Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player)))
+                        .toList();
+
+                if (!projectiles.isEmpty()) return projectiles.get(0);
+
+                List<Entity> others = candidates.stream()
+                        .filter(e -> !(e instanceof PlayerEntity)
+                                && !(e instanceof CreeperEntity)
+                                && !(e instanceof ShulkerBulletEntity)
+                                && !(e instanceof FireballEntity))
+                        .toList();
+
+                return others.stream()
+                        .min(Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player)))
+                        .orElse(null);
+        }
+
+        return null;
     }
 
     public List<Entity> getAllEntities() {
