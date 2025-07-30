@@ -18,14 +18,21 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.text.Text;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class AutoTotemModule extends Module {
 
+    private final BoolSetting fastSwap = addSetting(new BoolSetting("alternative", false));
+    private final BoolSetting fastSwapHotbar = addSetting(new BoolSetting("safety", false));
+    private final IntSetting fastSlot = addSetting(new IntSetting("safety slot", 8, 0, 8));
+    private final BoolSetting cursorStack = addSetting(new BoolSetting("cursor stack", true));
     private final BoolSetting deathLog = addSetting(new BoolSetting("log", false));
-    private final BoolSetting fastSwap = addSetting(new BoolSetting("fast swap", false));
-    private final IntSetting fastSlot = addSetting(new IntSetting("swap slot", 8, 0, 8));
+
+    private final Map<String, String> deathReasons = new ConcurrentHashMap<>();
 
     private boolean pendingTotem = false;
     private long lastAttemptTime = 0;
@@ -33,29 +40,33 @@ public class AutoTotemModule extends Module {
 
     public AutoTotemModule() {
         super("auto totem", "Automatically places totem in your hand.", ModuleCategory.of("combat"), "autototem");
+        fastSwapHotbar.setShowCondition(() -> fastSwap.get());
+        fastSlot.setShowCondition(() -> fastSwapHotbar.get());
+        fastSlot.setShowCondition(() -> (fastSwapHotbar.get()&&fastSwap.get()));
+        cursorStack.setShowCondition(() -> !(fastSwap.get()));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPostTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
 
-
         int totemCount = 0;
-
         for (ItemStack stack : MC.player.getInventory().getMainStacks()) {
-            if (stack.getItem() == net.minecraft.item.Items.TOTEM_OF_UNDYING) {
+            if (stack.getItem() == Items.TOTEM_OF_UNDYING) {
                 totemCount += stack.getCount();
             }
         }
-
         ItemStack offHandStack = MC.player.getOffHandStack();
-        if (offHandStack.getItem() == net.minecraft.item.Items.TOTEM_OF_UNDYING) {
+        if (offHandStack.getItem() == Items.TOTEM_OF_UNDYING) {
             totemCount += offHandStack.getCount();
         }
         this.setDisplayInfo(String.valueOf(totemCount));
 
         if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof ClickGuiScreen) {
             attemptPlaceTotem();
+            removeDeathReason("invfail");
+        } else {
+            addDeathReason("invfail", "WRONG_SCREEN");
         }
     }
 
@@ -75,24 +86,39 @@ public class AutoTotemModule extends Module {
         ItemStack offhandStack = player.getOffHandStack();
 
         boolean hasOffhandTotem = offhandStack.getItem() == Items.TOTEM_OF_UNDYING;
-        int totemSlot = findTotemSlot();
 
         if (fastSwap.get()) {
-            int slot = fastSlot.get();
-            if (slot < 0 || slot > 8) return;
+            int fastSlotIndex = fastSlot.get();
+            if (fastSlotIndex < 0 || fastSlotIndex > 8) return;
 
-            ItemStack fastSlotStack = player.getInventory().getStack(slot);
+            int totemSlot = findTotemSlot();
+
+            if (totemSlot == -1) {
+                return;
+            }
+
+            ItemStack fastSlotStack = player.getInventory().getStack(fastSlotIndex);
             boolean fastSlotHasTotem = fastSlotStack.getItem() == Items.TOTEM_OF_UNDYING;
 
-            if (!fastSlotHasTotem && totemSlot != -1) {
-                INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totemSlot), slot);
-                lastAttemptTime = System.currentTimeMillis();
-            } else if (fastSlotHasTotem && !hasOffhandTotem) {
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(convertSlot(slot));
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
-                lastAttemptTime = System.currentTimeMillis();
+            if (fastSwapHotbar.get()) {
+                if (!fastSlotHasTotem && totemSlot != fastSlotIndex) {
+                    INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totemSlot), fastSlotIndex);
+                    lastAttemptTime = System.currentTimeMillis();
+                    fastSlotHasTotem = true;
+                }
+                if (!hasOffhandTotem && fastSlotHasTotem) {
+                    INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(fastSlotIndex), 40);
+
+                    lastAttemptTime = System.currentTimeMillis();
+                }
+            } else {
+                if (!hasOffhandTotem) {
+                    INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totemSlot), 40);
+                    lastAttemptTime = System.currentTimeMillis();
+                }
             }
         } else {
+            int totemSlot = findTotemSlot();
             if (!hasOffhandTotem && totemSlot != -1) {
                 swapToOffhand(totemSlot);
                 lastAttemptTime = System.currentTimeMillis();
@@ -105,8 +131,22 @@ public class AutoTotemModule extends Module {
 
     private void swapToOffhand(int invSlot) {
         int realSlot = convertSlot(invSlot);
-        INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
-        INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
+
+        if (cursorStack.get()) {
+            ItemStack cursor = MC.player.currentScreenHandler.getCursorStack();
+
+            if (cursor.isEmpty()) {
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
+                cursor = MC.player.currentScreenHandler.getCursorStack();
+            }
+
+            if (!cursor.isEmpty()) {
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
+            }
+        } else {
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
+        }
     }
 
     private int findTotemSlot() {
@@ -134,6 +174,18 @@ public class AutoTotemModule extends Module {
         return slot < 9 ? slot + 36 : slot;
     }
 
+    public void addDeathReason(String key, String reasonDescription) {
+        deathReasons.put(key, reasonDescription);
+    }
+
+    public void removeDeathReason(String key) {
+        deathReasons.remove(key);
+    }
+
+    public void clearDeathReasons() {
+        deathReasons.clear();
+    }
+
     private void logDeathData() {
         ClientPlayerEntity player = MC.player;
         if (player == null) return;
@@ -142,23 +194,37 @@ public class AutoTotemModule extends Module {
         boolean hasTotem = totemCount > 0;
         long timeSinceLastSwap = System.currentTimeMillis() - lastAttemptTime;
 
-        String reason;
         if (!hasTotem) {
-            reason = "NO_TOTEMS";
-        } else if (ping > 125) {
-            reason = "HIGH_PING";
+            addDeathReason("notots", "NO_TOTEMS");
         } else {
-            reason = "UNKNOWN_CAUSE";
+            removeDeathReason("notots");
+        }
+
+        if (ping > 125) {
+            addDeathReason("highping", "HIGH_PING " + ping + " ms");
+        } else {
+            removeDeathReason("highping");
+        }
+
+        if (deathReasons.isEmpty()) {
+            addDeathReason("unknown", "UNKNOWN_CAUSE");
+        } else {
+            removeDeathReason("unknown");
+        }
+
+        StringBuilder reasonsBuilder = new StringBuilder();
+        for (Map.Entry<String, String> entry : deathReasons.entrySet()) {
+            reasonsBuilder.append("- ").append(entry.getValue()).append("\n");
         }
 
         Text message = CAT_FORMAT.format(
-                "\n{primary}=== AutoTotem ===\n" +
-                        "{primary}Cause: {g}" + reason + "{reset}\n" +
-                        "{primary}Ping: {g}" + ping + " ms{reset}\n" +
-                        "{primary}Totems Available: {g}" + totemCount + "{reset}\n" +
-                        "{primary}Pending Totem: {g}" + pendingTotem + "{reset}\n" +
-                        "{primary}Last Swap Attempt: {g}" + timeSinceLastSwap + " ms ago{reset}\n" +
-                        "{primary}============================"
+                "\n=== {g}AutoTotem{reset} ===\n" +
+                        "Death reasons:\n{g}" + reasonsBuilder.toString() + "{reset}\n" +
+                        "Ping: {g}" + ping + " ms{reset}\n" +
+                        "Totems Available: {g}" + totemCount + "{reset}\n" +
+                        "Pending Totem: {g}" + pendingTotem + "{reset}\n" +
+                        "Last Swap Attempt: {g}" + timeSinceLastSwap + " ms ago{reset}\n" +
+                        "============================"
         );
 
         CHAT_MANAGER.sendPersistent(AutoTotemModule.class.getName(), message);

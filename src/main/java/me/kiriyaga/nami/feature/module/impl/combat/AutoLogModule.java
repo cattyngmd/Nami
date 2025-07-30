@@ -28,7 +28,7 @@ public class AutoLogModule extends Module {
 
     private final IntSetting health = addSetting(new IntSetting("on health", 12, 0, 36));
     private final BoolSetting onRender = addSetting(new BoolSetting("on render", false));
-    private final BoolSetting packet = addSetting(new BoolSetting("on packet", false));
+    private final BoolSetting packet = addSetting(new BoolSetting("packet", false));
     private final BoolSetting onPop = addSetting(new BoolSetting("on pop", false));
     private final IntSetting onLevel = addSetting(new IntSetting("on level", 0, 0, 15000));
     private final BoolSetting selfToggle = addSetting(new BoolSetting("self toggle", true));
@@ -38,6 +38,7 @@ public class AutoLogModule extends Module {
 
     public AutoLogModule() {
         super("auto log", "Automatically logs out in certain conditions.", ModuleCategory.of("combat"), "autolog", "panic", "logout", "фгещдщп");
+        packet.setShowCondition(() -> onRender.get());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -89,7 +90,7 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onEntitySpawn(EntitySpawnEvent event) {
-        if (MC.player == null || MC.world == null || !packet.get()) return;
+        if (MC.player == null || MC.world == null || !packet.get() || onRender.get()) return;
 
         if (event.getEntity() instanceof PlayerEntity player) {
 

@@ -3,12 +3,16 @@ package me.kiriyaga.nami.setting;
 import com.google.gson.JsonElement;
 import me.kiriyaga.nami.feature.module.Module;
 
+import java.util.function.BooleanSupplier;
+
 public abstract class Setting<T> {
     protected final String name;
     protected T value;
     private Runnable onChanged = null;
     private boolean show = true;
     private Module parentModule;
+
+    private BooleanSupplier showCondition = null;
 
     public Setting(String name, T defaultValue) {
         this.name = name;
@@ -33,11 +37,18 @@ public abstract class Setting<T> {
     }
 
     public boolean isShow() {
+        if (showCondition != null) {
+            return showCondition.getAsBoolean();
+        }
         return show;
     }
 
     public void setShow(boolean show) {
         this.show = show;
+    }
+
+    public void setShowCondition(BooleanSupplier condition) {
+        this.showCondition = condition;
     }
 
     public void setParentModule(Module module) {
