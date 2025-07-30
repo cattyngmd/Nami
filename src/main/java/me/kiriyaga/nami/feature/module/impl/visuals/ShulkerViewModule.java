@@ -33,8 +33,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class ShulkerViewModule extends Module {
@@ -133,8 +132,7 @@ public class ShulkerViewModule extends Module {
             }
 
             if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
-                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, info.slot, 0, SlotActionType.PICKUP, MC.player);
-                MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, info.slot, 0, SlotActionType.PICKUP, MC.player);
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot);
                 clickedX = clickedY = -1;
             }
 
