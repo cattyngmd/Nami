@@ -22,6 +22,7 @@ public class RotationManagerModule extends Module {
         super("rotation manager", "Allows you to config rotation manager settings.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager", "кщефеу");
         if (!this.isEnabled())
             this.toggle();
+        jitterSpeed.setShowCondition(() -> jitterAmount.get()>0);
     }
     @Override
     public void onDisable(){

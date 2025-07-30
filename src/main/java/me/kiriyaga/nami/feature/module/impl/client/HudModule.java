@@ -33,6 +33,8 @@ public class HudModule extends Module {
 
     public HudModule() {
         super("hud", "Main HUD module", ModuleCategory.of("client"));
+        bounceIntensity.setShowCondition(() -> bounce.get());
+        bounceSpeed.setShowCondition(() -> bounce.get());
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

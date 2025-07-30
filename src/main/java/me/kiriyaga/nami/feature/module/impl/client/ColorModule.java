@@ -30,6 +30,7 @@ public class ColorModule extends Module {
         super("color", "Customizes color scheme.", ModuleCategory.of("client"), "colr", "c", "colors", "clitor", "сщдщк");
         if (!this.isEnabled())
             this.toggle();
+        rainbowSpeed.setShowCondition(() -> rainbowEnabled.get());
     }
 
     @Override

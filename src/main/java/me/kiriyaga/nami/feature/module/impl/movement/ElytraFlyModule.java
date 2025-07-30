@@ -46,6 +46,10 @@ public class ElytraFlyModule extends Module {
 
     public ElytraFlyModule() {
         super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "уднекфадн", "elytrafly");
+        pitch.setShowCondition(() -> mode.get() == FlyMode.bounce);
+        pitchDegree.setShowCondition(() -> mode.get() == FlyMode.bounce);
+        autoWalkEnable.setShowCondition(() -> mode.get() == FlyMode.bounce);
+        rotationPriority.setShowCondition(() -> mode.get() == FlyMode.bounce);
     }
 
     @Override
