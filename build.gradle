@@ -65,7 +65,7 @@ tasks.processResources {
 }
 
 shadowJar {
-    archiveBaseName.set("nami-all")
+    archiveBaseName.set("nami-unremapped")
     archiveClassifier.set("")
     archiveVersion.set(project.version)
 

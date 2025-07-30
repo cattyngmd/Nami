@@ -32,7 +32,7 @@ public abstract class MixinPlayerListHud {
 
     private final Set<String> cachedFriends = new HashSet<>();
     private long lastFriendCacheUpdate = 0;
-    private final long friendCacheInterval = 10000;
+    private final long friendCacheInterval = 1000;
 
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntries(CallbackInfoReturnable<List<PlayerListEntry>> info) {
