@@ -37,7 +37,7 @@ public class VisualRangeModule extends Module {
                 return;
 
             CHAT_MANAGER.sendPersistent(player.getUuidAsString(),
-                    CAT_FORMAT.format("{g}" + player.getName().getString() + "{reset} has entered visual range."));
+                    CAT_FORMAT.format("{g}" + player.getName().getString() + " {reset}has entered visual range."));
 
             if (sound.get())
                 MC.player.playSound(SoundEvents.BLOCK_BELL_USE, 1.0f, 1.0f);
