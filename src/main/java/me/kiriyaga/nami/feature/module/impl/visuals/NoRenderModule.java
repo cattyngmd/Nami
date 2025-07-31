@@ -1,9 +1,17 @@
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.ParticleEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import net.minecraft.client.particle.ExplosionEmitterParticle;
+import net.minecraft.client.particle.ExplosionLargeParticle;
+import net.minecraft.client.particle.ExplosionSmokeParticle;
+import net.minecraft.client.particle.TotemParticle;
+import net.minecraft.particle.ParticleTypes;
 
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -12,20 +20,25 @@ public class NoRenderModule extends Module {
 
 
 
-    private final BoolSetting noFire = addSetting(new BoolSetting("fire", true));
-    private final BoolSetting noBackground = addSetting(new BoolSetting("background", true));
-    private final BoolSetting noLiguid = addSetting(new BoolSetting("liquid", false));
-    private final BoolSetting noWall = addSetting(new BoolSetting("wall", false));
-    private final BoolSetting noVignette = addSetting(new BoolSetting("vignette", true));
-    private final BoolSetting noTotem = addSetting(new BoolSetting("totem", true));
-    private final BoolSetting noBossBar = addSetting(new BoolSetting("boss", true));
-    private final BoolSetting noPortal = addSetting(new BoolSetting("portal", true));
-    private final BoolSetting noPotIcon = addSetting(new BoolSetting("pot", true));
-    private final BoolSetting noFog = addSetting(new BoolSetting("fog", true));
-    private final BoolSetting noArmor = addSetting(new BoolSetting("armor", true));
-    private final BoolSetting noNausea = addSetting(new BoolSetting("nausea", true));
-    private final BoolSetting noPumpkin = addSetting(new BoolSetting("pumpkin", false));
-    private final BoolSetting noPowderedSnow = addSetting(new BoolSetting("powdered snow", false));
+    public final BoolSetting noFire = addSetting(new BoolSetting("fire", true));
+    public final BoolSetting noBackground = addSetting(new BoolSetting("background", true));
+    public final BoolSetting noTotemParticle = addSetting(new BoolSetting("totem particle", false));
+    public final BoolSetting noFirework = addSetting(new BoolSetting("firework", false));
+    public final BoolSetting noWaterParticle = addSetting(new BoolSetting("water particle", true));
+    public final BoolSetting noExplosion = addSetting(new BoolSetting("explosion particle", true));
+    public final BoolSetting noBlockBreak = addSetting(new BoolSetting("block break", false));
+    public final BoolSetting noLiguid = addSetting(new BoolSetting("liquid", false));
+    public final BoolSetting noWall = addSetting(new BoolSetting("wall", false));
+    public final BoolSetting noVignette = addSetting(new BoolSetting("vignette", true));
+    public final BoolSetting noTotem = addSetting(new BoolSetting("totem", true));
+    public final BoolSetting noBossBar = addSetting(new BoolSetting("boss", true));
+    public final BoolSetting noPortal = addSetting(new BoolSetting("portal", true));
+    public final BoolSetting noPotIcon = addSetting(new BoolSetting("pot", true));
+    public final BoolSetting noFog = addSetting(new BoolSetting("fog", true));
+    public final BoolSetting noArmor = addSetting(new BoolSetting("armor", true));
+    public final BoolSetting noNausea = addSetting(new BoolSetting("nausea", true));
+    public final BoolSetting noPumpkin = addSetting(new BoolSetting("pumpkin", false));
+    public final BoolSetting noPowderedSnow = addSetting(new BoolSetting("powdered snow", false));
 
     public NoRenderModule() {
         super("no render", "Prevent rendering certain overlays/effects.", ModuleCategory.of("visuals"), "norender");
@@ -55,63 +68,27 @@ public class NoRenderModule extends Module {
         reloadRenderer();
     }
 
-    public boolean isNoFire() {
-        return noFire.get();
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onParticle(ParticleEvent ev){
+        if (MC.world == null || MC.player == null)
+            return;
+
+//        if (noExplosion.get() && (ev.getParticle() instanceof ExplosionEmitterParticle || ev.getParticle() instanceof ExplosionLargeParticle || ev.getParticle() instanceof ExplosionSmokeParticle))
+//            ev.cancel();
+
+//        if (noTotemParticle.get() && ev.getParticle() instanceof TotemParticle)
+//            ev.cancel();
+
+        if (noExplosion.get() && (ev.getParticle().getType() == ParticleTypes.EXPLOSION || ev.getParticle().getType() == ParticleTypes.EXPLOSION_EMITTER))
+            ev.cancel();
+
+        if (noTotemParticle.get() && ev.getParticle().getType() == ParticleTypes.TOTEM_OF_UNDYING)
+            ev.cancel();
+
+        if (noFirework.get() && ev.getParticle().getType() == ParticleTypes.FIREWORK)
+            ev.cancel();
+
+        if (noWaterParticle.get() && (ev.getParticle().getType() == ParticleTypes.RAIN || ev.getParticle().getType() == ParticleTypes.DRIPPING_DRIPSTONE_WATER || ev.getParticle().getType() == ParticleTypes.DRIPPING_WATER || ev.getParticle().getType() == ParticleTypes.FALLING_DRIPSTONE_WATER || ev.getParticle().getType() == ParticleTypes.FALLING_WATER))
+            ev.cancel();
     }
-
-    public boolean isNoBackground() {
-        if (MC.world == null)
-            return false;
-
-        return noBackground.get();
-    }
-
-    public boolean isNoLiguid() {
-        return noLiguid.get();
-    }
-
-    public boolean isNoWall() {
-        return noWall.get();
-    }
-
-    public boolean isNoVignette() {
-        return noVignette.get();
-    }
-
-    public boolean isNoTotem() {
-        return noTotem.get();
-    }
-
-    public boolean isNoBossBar() {
-        return noBossBar.get();
-    }
-
-    public boolean isNoPortal() {
-        return noPortal.get();
-    }
-
-    public boolean isNoPotIcon() {
-        return noPotIcon.get();
-    }
-
-    public boolean isNoFog() {
-        return noFog.get();
-    }
-
-    public boolean isNoArmor() {
-        return noArmor.get();
-    }
-
-    public boolean isNoNausea() {
-        return noNausea.get();
-    }
-
-    public boolean isNoPumpkin() {
-        return noPumpkin.get();
-    }
-
-    public boolean isNoPowderedSnow() {
-        return noPowderedSnow.get();
-    }
-
 }

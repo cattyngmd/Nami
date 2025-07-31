@@ -17,7 +17,7 @@ public abstract class MixinBossBarHud {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoBossBar()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noBossBar.get()) {
             info.cancel();
         }
     }

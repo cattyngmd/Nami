@@ -18,7 +18,7 @@ public class MixinSodiumWorldRenderer {
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
         if (noRender == null) return fogParameters;
 
-        if (noRender.isNoFog()) {
+        if (noRender.noFog.get()) {
             return FogParameters.NONE;
         }
 

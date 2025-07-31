@@ -59,7 +59,7 @@ public abstract class MixinGameRenderer {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && floatingItem.getItem() == Items.TOTEM_OF_UNDYING && noRender.isEnabled() && noRender.isNoTotem()) {
+        if (noRender != null && floatingItem.getItem() == Items.TOTEM_OF_UNDYING && noRender.isEnabled() && noRender.noTotem.get()) {
             info.cancel();
         }
     }

@@ -17,7 +17,7 @@ public abstract class MixinFogRenderer {
     )
     private boolean modifyFogEnabled(boolean original) {
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoFog()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noFog.get()) {
             return false;
         }
         return original;

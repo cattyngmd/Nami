@@ -21,7 +21,7 @@ public class MixinInGameOverlayRenderer {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoFire()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noFire.get()) {
             ci.cancel();
         }
     }
@@ -31,7 +31,7 @@ public class MixinInGameOverlayRenderer {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoLiguid()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noLiguid.get()) {
             ci.cancel();
         }
     }
@@ -41,7 +41,7 @@ public class MixinInGameOverlayRenderer {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoWall()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noWall.get()) {
             ci.cancel();
         }
     }

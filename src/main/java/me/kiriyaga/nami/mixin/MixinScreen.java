@@ -9,8 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(Screen.class)
 public abstract class MixinScreen {
@@ -20,7 +19,7 @@ public abstract class MixinScreen {
 
         NoRenderModule m = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
 
-        if (m != null && m.isEnabled() && m.isNoBackground()) {
+        if (m != null && m.isEnabled() && m.noBackground.get() && MC.world != null) {
             ci.cancel();
         }
     }

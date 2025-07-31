@@ -28,7 +28,7 @@ public class MixinInGameHud {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoPotIcon()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noPotIcon.get()) {
             info.cancel();
         }
     }
@@ -38,7 +38,7 @@ public class MixinInGameHud {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoPortal()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noPortal.get()) {
             ci.cancel();
         }
     }
@@ -48,7 +48,7 @@ public class MixinInGameHud {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoPumpkin()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noPumpkin.get()) {
             args.set(2, 0f);
         }
     }
@@ -58,7 +58,7 @@ public class MixinInGameHud {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoPowderedSnow()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noPowderedSnow.get()) {
             args.set(2, 0f);
         }
     }
@@ -68,7 +68,7 @@ public class MixinInGameHud {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoVignette()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noVignette.get()) {
             ci.cancel();
         }
     }
@@ -78,7 +78,7 @@ public class MixinInGameHud {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
-        if (noRender != null && noRender.isEnabled() && noRender.isNoNausea()) {
+        if (noRender != null && noRender.isEnabled() && noRender.noNausea.get()) {
             ci.cancel();
         }
     }
