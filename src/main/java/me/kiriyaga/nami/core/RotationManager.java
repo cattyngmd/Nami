@@ -13,7 +13,6 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class RotationManager {
     private final List<RotationRequest> requests = new ArrayList<>();
-    private RotationRequest activeRequest = null;
 
     private float realYaw, realPitch;
     private float rotationYaw, rotationPitch;
@@ -31,6 +30,8 @@ public class RotationManager {
     private boolean returning = false;
     private int ticksHolding = 0;
 
+    private String lastActiveRequestId = null;
+
     public void init() {
         EVENT_MANAGER.register(this);
     }
@@ -41,19 +42,14 @@ public class RotationManager {
     }
 
     public void submitRequest(RotationRequest request) {
-        boolean wasActive = activeRequest != null && Objects.equals(activeRequest.id, request.id);
-
         requests.removeIf(r -> Objects.equals(r.id, request.id));
         requests.add(request);
         requests.sort(Comparator.comparingInt(r -> -r.priority));
 
-        if (wasActive) {
-            activeRequest = request;
-        }
     }
 
     public boolean hasRequest(String id) {
-        if (activeRequest != null && Objects.equals(activeRequest.id, id)) {
+        if (!requests.isEmpty() && Objects.equals(requests.get(0).id, id)) {
             return true;
         }
 
@@ -66,12 +62,11 @@ public class RotationManager {
         return false;
     }
 
-
     public boolean isRequestCompleted(String id) {
         RotationRequest request = null;
 
-        if (activeRequest != null && activeRequest.id.equals(id)) {
-            request = activeRequest;
+        if (!requests.isEmpty() && requests.get(0).id.equals(id)) {
+            request = requests.get(0);
         } else {
             for (RotationRequest r : requests) {
                 if (r.id.equals(id)) {
@@ -91,16 +86,13 @@ public class RotationManager {
         return Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
     }
 
-
     public void cancelRequest(String id) {
-        if (activeRequest.id == id) // this shit is necessary
-            activeRequest = null;
-
         requests.removeIf(r -> Objects.equals(r.id, id));
     }
 
+
     public boolean isRotating() {
-        return activeRequest != null || returning;
+        return !requests.isEmpty() || returning;
     }
 
 
@@ -116,8 +108,6 @@ public class RotationManager {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
-        //CHAT_MANAGER.sendRaw("active req: "+ activeRequest);
-
         RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
         rotationSpeed = rotationModule.rotationSpeed.get().floatValue();
         rotationEaseFactor = rotationModule.rotationEaseFactor.get().floatValue();
@@ -129,14 +119,16 @@ public class RotationManager {
         updateRealRotation(MC.player.getYaw(), MC.player.getPitch());
 
         if (!requests.isEmpty()) {
-            if (activeRequest == null || !requests.contains(activeRequest)) {
-                activeRequest = requests.get(0);
+            RotationRequest activeRequest = requests.get(0);
+
+            if (!activeRequest.id.equals(lastActiveRequestId)) {
                 rotationYaw = realYaw;
                 rotationPitch = realPitch;
-                ticksHolding = 0;
                 currentYawSpeed = 0f;
                 currentPitchSpeed = 0f;
+                ticksHolding = 0;
                 returning = false;
+                lastActiveRequestId = activeRequest.id;
             }
 
             boolean updated = false;
@@ -160,7 +152,6 @@ public class RotationManager {
                 ticksHolding++;
                 if (ticksHolding >= ticksBeforeRelease) {
                     requests.remove(activeRequest);
-                    activeRequest = null;
                     ticksHolding = 0;
                     returning = true;
                 }
@@ -206,8 +197,10 @@ public class RotationManager {
                 returning = false;
                 rotationYaw = realYaw;
                 rotationPitch = realPitch;
+                lastActiveRequestId = null;
             }
         } else {
+            lastActiveRequestId = null;
             rotationYaw = realYaw;
             rotationPitch = realPitch;
             currentYawSpeed = 0f;
@@ -221,6 +214,8 @@ public class RotationManager {
             rotationYaw = wrapDegrees(rotationYaw + jitterYawOffset);
             rotationPitch = MathHelper.clamp(rotationPitch + jitterPitchOffset, -90f, 90f);
         }
+
+        tickCount++;
     }
 
     private float wrapDegrees(float angle) {
