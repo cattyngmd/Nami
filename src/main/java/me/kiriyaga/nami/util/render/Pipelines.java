@@ -56,13 +56,12 @@ class Pipelines {
             .withCull(false)
             .build();
 
-    static final RenderPipeline GLOBAL_ITEM_PIPELINE = RenderPipeline.builder(POSITION_TEX_COLOR_SNIPPET)
-            .withLocation("pipeline/global_item_pipeline")
+    static final RenderPipeline CUSTOM_ITEM_ENTITY_PIPELINE = RenderPipeline.builder(POSITION_TEX_COLOR_SNIPPET)
+            .withLocation("pipeline/custom_item_entity_pipeline")
             .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .withBlend(BlendFunction.TRANSLUCENT)
             .withDepthWrite(false)
             .withCull(false)
             .build();
-
 }

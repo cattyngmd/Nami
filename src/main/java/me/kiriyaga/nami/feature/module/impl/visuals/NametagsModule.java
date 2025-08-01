@@ -12,13 +12,16 @@ import me.kiriyaga.nami.util.NametagFormatter;
 import me.kiriyaga.nami.util.render.Layers;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.Tameable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -248,7 +251,7 @@ public class NametagsModule extends Module {
 
             Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
 
-            RenderUtil.renderItem3D(stack, matrices, itemPos, Layers.getGlobalItem(), dynamicScale);
+            RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale);
 
             renderIndex++;
         }

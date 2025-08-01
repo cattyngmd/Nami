@@ -13,10 +13,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.item.model.ItemModel;
+import net.minecraft.client.render.model.BakedModelManager;
+import net.minecraft.client.render.model.BakedSimpleModel;
+import net.minecraft.client.render.model.ModelBaker;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.font.TextRenderer;
@@ -374,7 +382,7 @@ public class RenderUtil {
         matrices.pop();
     }
 
-    public static void renderItem3D(ItemStack stack, MatrixStack matrices, Vec3d pos, RenderLayer customLayer, float scale) {
+    public static void renderItem3D(ItemStack stack, MatrixStack matrices, Vec3d pos, float scale) {
         MinecraftClient client = MinecraftClient.getInstance();
         ItemRenderer itemRenderer = client.getItemRenderer();
 
@@ -391,50 +399,32 @@ public class RenderUtil {
 
         VertexConsumerProvider.Immediate base = client.getBufferBuilders().getEntityVertexConsumers();
 
-        VertexConsumerProvider redirectingProvider = requestedLayer -> {
-            String name = requestedLayer.getName().toLowerCase();
-            if (name.contains("item") || name.contains("cutout") || name.contains("entity")) {
-                return base.getBuffer(customLayer);
+        RenderLayer combinedLayer = Layers.GLOBAL_ITEM_WITH_GLINT.apply(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+        VertexConsumerProvider combinedProvider = requestedLayer -> {
+            if (requestedLayer.equals(combinedLayer)) {
+                return base.getBuffer(combinedLayer);
             }
             return base.getBuffer(requestedLayer);
         };
 
         itemRenderer.renderItem(
                 stack,
-                ItemDisplayContext.GUI,
+                ItemDisplayContext.NONE,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,
                 OverlayTexture.DEFAULT_UV,
                 matrices,
-                redirectingProvider,
+                combinedProvider,
                 client.world,
                 0
         );
 
-        if (stack.hasGlint()) {
-            VertexConsumerProvider glintProvider = requestedLayer -> {
-                String name = requestedLayer.getName().toLowerCase();
-                if (name.contains("glint")) {
-                    return base.getBuffer(Layers.getGlobalGlint());
-                }
-                return base.getBuffer(requestedLayer);
-            };
-
-            itemRenderer.renderItem(
-                    stack,
-                    ItemDisplayContext.GUI,
-                    LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                    OverlayTexture.DEFAULT_UV,
-                    matrices,
-                    glintProvider,
-                    client.world,
-                    0
-            );
-        }
 
         base.draw();
 
         matrices.pop();
     }
+
+
 
     public static void drawThickLine(MatrixStack matrix, Vec3d start, Vec3d end, float thickness, int color) {
         Matrix4f mat = matrix.peek().getPositionMatrix();
