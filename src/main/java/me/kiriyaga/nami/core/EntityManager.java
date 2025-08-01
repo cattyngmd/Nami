@@ -97,6 +97,7 @@ public class EntityManager {
 
                 List<Entity> creepers = candidates.stream()
                         .filter(e -> e instanceof CreeperEntity)
+                        .filter(e -> e.squaredDistanceTo(MC.player) <= 3 * 3) // yeah its not accurate at all, but its not required here i guess?
                         .sorted(Comparator.comparingDouble(e -> e.squaredDistanceTo(MC.player)))
                         .toList();
 
