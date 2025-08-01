@@ -34,9 +34,9 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class AirPlaceModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 3.0, 2.0, 5.0));
-    public final IntSetting delay = addSetting(new IntSetting("delay", 2, 1, 10));
+    public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
-    private final BoolSetting fluids = addSetting(new BoolSetting("fluids", false));
+    private final BoolSetting airOnly = addSetting(new BoolSetting("air only", false));
     private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 3));
     private final BoolSetting fill = addSetting(new BoolSetting("fill", false));
 
@@ -62,7 +62,7 @@ public class AirPlaceModule extends Module {
             return;
         }
 
-        if (!(MC.crosshairTarget instanceof BlockHitResult hit) || !MC.world.getBlockState(hit.getBlockPos()).isReplaceable()) {
+        if (!(MC.crosshairTarget instanceof BlockHitResult hit) || !checkPosReplaceableOrAir(hit.getBlockPos())) {
             renderPos = null;
             return;
         }
@@ -73,15 +73,14 @@ public class AirPlaceModule extends Module {
             return;
         }
 
-        HitResult ray = MC.player.raycast(range.get(), 1.0f, fluids.get());
+        HitResult ray = MC.player.raycast(range.get(), 1.0f, !airOnly.get());
         if (!(ray instanceof BlockHitResult target)) {
             renderPos = null;
             return;
         }
 
         BlockPos targetPos = BlockPos.ofFloored(target.getPos());
-        BlockState state = MC.world.getBlockState(targetPos);
-        if (!state.isReplaceable() || hasEntity(targetPos)) {
+        if (!checkPosReplaceableOrAir(targetPos) || hasEntity(targetPos)) {
             renderPos = null;
             return;
         }
@@ -93,6 +92,10 @@ public class AirPlaceModule extends Module {
         }
         cooldown = delay.get();
 
+        blockAirPlace(target);
+    }
+
+    public void blockAirPlace(BlockHitResult target) {
         if (grim.get()) {
             MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
@@ -113,7 +116,7 @@ public class AirPlaceModule extends Module {
     public void onRender(Render3DEvent event) {
         if (MC.player == null || MC.world == null || renderPos == null) return;
 
-        if (!MC.world.getBlockState(renderPos).isReplaceable()) return;
+        if (!checkPosReplaceableOrAir(renderPos)) return;
         if (hasEntity(renderPos)) return;
 
         MatrixStack matrices = event.getMatrices();
@@ -132,5 +135,14 @@ public class AirPlaceModule extends Module {
             if (entity.getBoundingBox().intersects(new Box(pos))) return true;
         }
         return false;
+    }
+
+    private boolean checkPosReplaceableOrAir(BlockPos pos) {
+        BlockState state = MC.world.getBlockState(pos);
+        if (airOnly.get()) {
+            return state.isAir();
+        } else {
+            return state.isReplaceable();
+        }
     }
 }
