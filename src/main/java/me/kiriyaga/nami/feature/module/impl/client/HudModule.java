@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -38,10 +39,49 @@ public class HudModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
+    public void onUpdate(PreTickEvent event) {
+        if (bounce.get()) {
+            float step = bounceSpeed.get() / 100f;
+            if (increasing) {
+                bounceProgress += step;
+                if (bounceProgress >= 1f) {
+                    bounceProgress = 1f;
+                    increasing = false;
+                }
+            } else {
+                bounceProgress -= step;
+                if (bounceProgress <= 0f) {
+                    bounceProgress = 0f;
+                    increasing = true;
+                }
+            }
+        } else {
+            bounceProgress = 0f;
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender2D(Render2DEvent event) {
+        if (chatAnimation.get()) {
+            boolean chatOpen = MC.currentScreen instanceof ChatScreen;
+            ChatAnimationHelper.setChatOpen(chatOpen);
+            ChatAnimationHelper.tick();
+
+            int offset = (int) ChatAnimationHelper.getAnimationOffset();
+            if (offset > 0) {
+                event.getDrawContext().fill(
+                        2,
+                        MC.getWindow().getScaledHeight() - offset,
+                        MC.getWindow().getScaledWidth() - 2,
+                        MC.getWindow().getScaledHeight() - 2,
+                        MC.options.getTextBackgroundColor(Integer.MIN_VALUE)
+                );
+            }
+        }
+
         int screenHeight = MC.getWindow().getScaledHeight();
-        int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
         int chatZoneTop = screenHeight - (screenHeight / 8);
+        int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
 
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             if (module instanceof HudElementModule hudElement && hudElement.isEnabled()) {
@@ -68,28 +108,6 @@ public class HudModule extends Module {
 
                 hudElement.renderItems(event.getDrawContext());
             }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void onUpdate(PreTickEvent event) {
-        if (bounce.get()) {
-            float step = bounceSpeed.get() / 100f;
-            if (increasing) {
-                bounceProgress += step;
-                if (bounceProgress >= 1f) {
-                    bounceProgress = 1f;
-                    increasing = false;
-                }
-            } else {
-                bounceProgress -= step;
-                if (bounceProgress <= 0f) {
-                    bounceProgress = 0f;
-                    increasing = true;
-                }
-            }
-        } else {
-            bounceProgress = 0f;
         }
     }
 
