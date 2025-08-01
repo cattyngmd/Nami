@@ -11,6 +11,7 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
@@ -61,7 +62,7 @@ public class AirPlaceModule extends Module {
             return;
         }
 
-        if (!(MC.crosshairTarget instanceof BlockHitResult hit) || !MC.world.isAir(hit.getBlockPos())) {
+        if (!(MC.crosshairTarget instanceof BlockHitResult hit) || !MC.world.getBlockState(hit.getBlockPos()).isReplaceable()) {
             renderPos = null;
             return;
         }
@@ -79,7 +80,8 @@ public class AirPlaceModule extends Module {
         }
 
         BlockPos targetPos = BlockPos.ofFloored(target.getPos());
-        if (!MC.world.isAir(targetPos) || hasEntity(targetPos)) {
+        BlockState state = MC.world.getBlockState(targetPos);
+        if (!state.isReplaceable() || hasEntity(targetPos)) {
             renderPos = null;
             return;
         }
@@ -107,12 +109,11 @@ public class AirPlaceModule extends Module {
         }
     }
 
-
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
         if (MC.player == null || MC.world == null || renderPos == null) return;
 
-        if (!MC.world.isAir(renderPos)) return;
+        if (!MC.world.getBlockState(renderPos).isReplaceable()) return;
         if (hasEntity(renderPos)) return;
 
         MatrixStack matrices = event.getMatrices();
