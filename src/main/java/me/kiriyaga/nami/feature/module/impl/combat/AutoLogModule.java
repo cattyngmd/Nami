@@ -90,7 +90,7 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onEntitySpawn(EntitySpawnEvent event) {
-        if (MC.player == null || MC.world == null || !packet.get() || onRender.get()) return;
+        if (MC.player == null || MC.world == null || !packet.get() || !onRender.get()) return;
 
         if (event.getEntity() instanceof PlayerEntity player) {
 
