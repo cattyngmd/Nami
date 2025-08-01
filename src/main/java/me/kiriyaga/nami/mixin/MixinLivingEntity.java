@@ -6,12 +6,10 @@ import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoJumpDelayModule;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
@@ -148,7 +146,7 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
         ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class) : null;
-        if (elytraFlyModule != null && MC.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce &&
+        if (elytraFlyModule != null && MC.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.BOUNCE &&
                 (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled() &&
                 MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             cir.setReturnValue(true);

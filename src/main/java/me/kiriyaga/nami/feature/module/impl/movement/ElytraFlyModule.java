@@ -2,7 +2,6 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -10,16 +9,13 @@ import me.kiriyaga.nami.core.RotationManager;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -27,10 +23,10 @@ import static me.kiriyaga.nami.Nami.*;
 public class ElytraFlyModule extends Module {
 
     public enum FlyMode {
-        none, bounce
+        NONE, BOUNCE
     }
 
-    public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.bounce));
+    public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.BOUNCE));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
     private final IntSetting pitchDegree = addSetting(new IntSetting("pitch", 75, 0, 90));
     private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
@@ -46,10 +42,10 @@ public class ElytraFlyModule extends Module {
 
     public ElytraFlyModule() {
         super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "уднекфадн", "elytrafly");
-        pitch.setShowCondition(() -> mode.get() == FlyMode.bounce);
-        pitchDegree.setShowCondition(() -> mode.get() == FlyMode.bounce);
-        autoWalkEnable.setShowCondition(() -> mode.get() == FlyMode.bounce);
-        rotationPriority.setShowCondition(() -> mode.get() == FlyMode.bounce);
+        pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
+        pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
+        autoWalkEnable.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
+        rotationPriority.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
     }
 
     @Override
@@ -74,7 +70,7 @@ public class ElytraFlyModule extends Module {
 
         this.setDisplayInfo(mode.get().toString());
 
-        if (mode.get() == FlyMode.bounce) {
+        if (mode.get() == FlyMode.BOUNCE) {
 
             setJumpHeld(true);
 

@@ -55,7 +55,7 @@ public abstract class MixinEntity {
     private void entityPose(CallbackInfoReturnable<EntityPose> cir) {
         ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class);
         if (elytraFlyModule != null && elytraFlyModule.isEnabled()
-                && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.bounce
+                && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.BOUNCE
                 && (Object) this == MinecraftClient.getInstance().player
                 && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             cir.setReturnValue(EntityPose.STANDING);

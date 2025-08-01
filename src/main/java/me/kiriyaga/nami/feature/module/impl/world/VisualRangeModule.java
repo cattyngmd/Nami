@@ -7,21 +7,31 @@ import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.EnumSetting;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.sound.SoundEvents;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.feature.module.impl.world.VisualRangeModule.VisualRangeMode.BELL;
+import static me.kiriyaga.nami.feature.module.impl.world.VisualRangeModule.VisualRangeMode.EXP;
 
 @RegisterModule
 public class VisualRangeModule extends Module {
 
+    public enum VisualRangeMode {
+        BELL, EXP
+    }
+
     private final BoolSetting friends = addSetting(new BoolSetting("friends", false));
     private final BoolSetting sound = addSetting(new BoolSetting("sound", false));
+    private final EnumSetting soundMode = addSetting(new EnumSetting("mode", EXP));
 
     public VisualRangeModule() {
         super("visual range", "Notifies you when players enter render distance.", ModuleCategory.of("world"), "visualrange", "мшыгфдкфтпу");
+        soundMode.setShowCondition(() -> sound.get());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -39,8 +49,13 @@ public class VisualRangeModule extends Module {
             CHAT_MANAGER.sendPersistent(player.getUuidAsString(),
                     CAT_FORMAT.format("{g}" + player.getName().getString() + " {reset}has entered visual range."));
 
-            if (sound.get())
-                MC.player.playSound(SoundEvents.BLOCK_BELL_USE, 1.0f, 1.0f);
+            if (sound.get()) {
+                switch (soundMode.get()) {
+                    case BELL -> MC.player.playSound(SoundEvents.BLOCK_BELL_USE, 1.0f, 1.0f);
+                    case EXP -> MC.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+                    default -> { }
+                }
+            }
         }
     }
 }
