@@ -116,6 +116,9 @@ public class RotationManager {
         jitterAmount = rotationModule.jitterAmount.get().floatValue();
         jitterSpeed = rotationModule.jitterSpeed.get().floatValue();
 
+        float jitterMaxYaw = rotationModule.jitterMaxYaw.get().floatValue();
+        float jitterMaxPitch = rotationModule.jitterMaxPitch.get().floatValue();
+
         updateRealRotation(MC.player.getYaw(), MC.player.getPitch());
 
         if (!requests.isEmpty()) {
@@ -167,6 +170,17 @@ public class RotationManager {
                 rotationYaw = wrapDegrees(rotationYaw + clampedYawSpeed);
                 rotationPitch = MathHelper.clamp(rotationPitch + clampedPitchSpeed, -90f, 90f);
             }
+
+            if (ticksHolding > 0 && jitterAmount > 0) {
+                float jitterYawOffset = jitterAmount * jitterMaxYaw * (float) Math.sin(tickCount * jitterSpeed);
+                float jitterPitchOffset = jitterAmount * jitterMaxPitch * (float) Math.cos(tickCount * jitterSpeed);
+
+                jitterYawOffset = MathHelper.clamp(jitterYawOffset, -jitterMaxYaw, jitterMaxYaw);
+                jitterPitchOffset = MathHelper.clamp(jitterPitchOffset, -jitterMaxPitch, jitterMaxPitch);
+
+                rotationYaw = wrapDegrees(rotationYaw + jitterYawOffset);
+                rotationPitch = MathHelper.clamp(rotationPitch + jitterPitchOffset, -90f, 90f);
+            }
         } else if (returning) {
             float yawDiff = wrapDegrees(realYaw - rotationYaw);
             float pitchDiff = realPitch - rotationPitch;
@@ -205,14 +219,6 @@ public class RotationManager {
             rotationPitch = realPitch;
             currentYawSpeed = 0f;
             currentPitchSpeed = 0f;
-        }
-
-        if (isRotating() && !returning) {
-            float jitterYawOffset = jitterAmount * (float) Math.sin(tickCount * jitterSpeed);
-            float jitterPitchOffset = jitterYawOffset / 5f;
-
-            rotationYaw = wrapDegrees(rotationYaw + jitterYawOffset);
-            rotationPitch = MathHelper.clamp(rotationPitch + jitterPitchOffset, -90f, 90f);
         }
 
         tickCount++;

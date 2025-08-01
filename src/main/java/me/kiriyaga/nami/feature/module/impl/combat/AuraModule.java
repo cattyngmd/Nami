@@ -31,7 +31,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AuraModule extends Module {
 
-    public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.20, 1.0, 7.0));
+    public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.00, 1.0, 6.0));
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("attack", 3.00, 1.0, 6.0));
     public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
