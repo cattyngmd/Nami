@@ -110,6 +110,7 @@ public class ESPModule extends Module {
         if (filled.get()) {
             int filledAlpha = Math.min(alpha, 75);
             RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), filledAlpha));
+            RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lineWidth.get());
         } else {
             RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lineWidth.get());
         }
