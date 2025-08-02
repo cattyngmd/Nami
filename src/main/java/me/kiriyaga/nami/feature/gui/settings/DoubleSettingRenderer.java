@@ -43,7 +43,7 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
                 context,
                 x + PADDING,
                 y + HEIGHT - 2,
-                WIDTH - 4 * PADDING,
+                WIDTH - 2 * PADDING,
                 SLIDER_HEIGHT,
                 setting.get(),
                 setting.getMin(),
