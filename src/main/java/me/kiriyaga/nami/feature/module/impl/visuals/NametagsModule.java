@@ -12,6 +12,7 @@ import me.kiriyaga.nami.util.NametagFormatter;
 import me.kiriyaga.nami.util.render.Layers;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
@@ -143,9 +144,6 @@ public class NametagsModule extends Module {
     }
 
         private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
-            GL32C.glDisable(GL32C.GL_DEPTH_TEST);
-            GL32C.glDepthMask(false);
-            GL32C.glDepthFunc(GL32C.GL_ALWAYS);
 
 
         Vec3d pos = new Vec3d(
@@ -207,10 +205,6 @@ public class NametagsModule extends Module {
         if (showItems.get() && entity instanceof PlayerEntity player) {
             renderPlayerItems(player, matrices, tickDelta, scale);
         }
-
-            GL32C.glDepthFunc(GL32C.GL_LEQUAL);
-            GL32C.glDepthMask(true);
-            GL32C.glEnable(GL32C.GL_DEPTH_TEST);
     }
 
     private void renderPlayerItems(PlayerEntity player, MatrixStack matrices, float tickDelta, float baseScale) {
@@ -240,9 +234,16 @@ public class NametagsModule extends Module {
         double baseZ = (interpMinZ + interpMaxZ) / 2.0;
 
         Vec3d camPos = MC.getEntityRenderDispatcher().camera.getPos();
-        float yaw = MC.gameRenderer.getCamera().getYaw();
-        Vec3d camForward = Vec3d.fromPolar(0, yaw).normalize();
-        Vec3d camRight = camForward.crossProduct(new Vec3d(0, 1, 0)).normalize();
+        Camera camera = MC.gameRenderer.getCamera();
+        float pitch = camera.getPitch();
+        float yaw = camera.getYaw();
+
+        Vec3d lookDir = Vec3d.fromPolar(pitch, yaw).normalize().negate();
+        Vec3d camRight = lookDir.crossProduct(new Vec3d(0, 1, 0)).normalize();
+
+        GL32C.glDisable(GL32C.GL_DEPTH_TEST);
+        GL32C.glDepthMask(false);
+        GL32C.glDepthFunc(GL32C.GL_ALWAYS);
 
         int renderIndex = 0;
 
@@ -250,20 +251,27 @@ public class NametagsModule extends Module {
             Vec3d itemPosBase = new Vec3d(baseX, baseY, baseZ);
 
             float distance = (float) camPos.distanceTo(itemPosBase);
-
             float dynamicScale = 0.0018f + (baseScale / 10000.0f) * distance;
             if (distance <= 8.0f) dynamicScale = 0.0245f;
 
             double itemSpacing = dynamicScale * 12.0;
             double verticalOffset = dynamicScale * 10.0;
-
             double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
 
             Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
 
-            RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale);
+            RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
 
+            if (stack.hasGlint()){
+                GL32C.glDisable(GL32C.GL_DEPTH_TEST);
+                GL32C.glDepthMask(false);
+                GL32C.glDepthFunc(GL32C.GL_ALWAYS);
+            }
             renderIndex++;
         }
+
+        GL32C.glDepthFunc(GL32C.GL_LEQUAL);
+        GL32C.glDepthMask(true);
+        GL32C.glEnable(GL32C.GL_DEPTH_TEST);
     }
 }

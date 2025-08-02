@@ -347,7 +347,7 @@ public class RenderUtil {
             float left = -textWidth - bgPadding;
             float right = textWidth + bgPadding;
             float top = -bgPadding;
-            float bottom = height + bgPadding;
+            float bottom = height;
 
             int backgroundColor = 0x90000000;
             int borderColor = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB();
@@ -371,28 +371,40 @@ public class RenderUtil {
         matrices.pop();
     }
 
-    public static void renderItem3D(ItemStack stack, MatrixStack matrices, Vec3d pos, float scale) {
+    public static void renderItem3D(ItemStack stack, MatrixStack matrices, Vec3d pos, float scale, Vec3d lookDir) {
         ItemRenderer itemRenderer = MC.getItemRenderer();
+        Camera camera = MC.gameRenderer.getCamera();
 
         matrices.push();
 
-        Vec3d camPos = MC.gameRenderer.getCamera().getPos();
-        matrices.translate(pos.x - camPos.x, pos.y - camPos.y, pos.z - camPos.z);
+        Vec3d camPos = camera.getPos();
 
-        Vec3d lookVec = camPos.subtract(pos).normalize();
+        matrices.translate((float)(pos.x - camPos.x), (float)(pos.y - camPos.y), (float)(pos.z - camPos.z));
 
-        float yaw = (float) Math.toDegrees(Math.atan2(lookVec.z, lookVec.x)) - 90f;
-        float pitch = (float) Math.toDegrees(Math.asin(lookVec.y));
+        Vec3d dir = lookDir.normalize();
 
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-pitch));
+        Vec3d up = new Vec3d(0, 1, 0);
+        Vec3d right = up.crossProduct(dir).normalize();
+        if (right.lengthSquared() < 1e-6) {
+            right = new Vec3d(1, 0, 0);
+        }
+        Vec3d newUp = dir.crossProduct(right).normalize();
+
+        Matrix3f basis = new Matrix3f(
+                (float) right.x, (float) right.y, (float) right.z,
+                (float) newUp.x, (float) newUp.y, (float) newUp.z,
+                (float) dir.x, (float) dir.y, (float) dir.z
+        );
+
+        Quaternionf rotation = new Quaternionf().setFromNormalized(basis);
+        matrices.multiply(rotation);
 
         float s = scale * 13f;
         matrices.scale(s, s, s);
 
         itemRenderer.renderItem(
                 stack,
-                ItemDisplayContext.GUI,
+                ItemDisplayContext.FIXED,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,
                 OverlayTexture.DEFAULT_UV,
                 matrices,
