@@ -28,6 +28,10 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(DrawContext context, int i, int j, float f) {
+    }
+
+    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get())

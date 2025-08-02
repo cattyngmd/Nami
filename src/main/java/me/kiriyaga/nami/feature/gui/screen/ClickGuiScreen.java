@@ -112,6 +112,10 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(DrawContext context, int i, int j, float f) {
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         syncCategoryPositions();
 
