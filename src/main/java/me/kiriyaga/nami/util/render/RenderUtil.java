@@ -38,6 +38,8 @@ import org.joml.*;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL32C;
 
 import java.lang.Math;
 
@@ -293,14 +295,7 @@ public class RenderUtil {
         return matrices;
     }
 
-    public static void drawText2D(
-            DrawContext drawContext,
-            Text text,
-            int x,
-            int y,
-            int color,
-            boolean withBackground
-    ) {
+    public static void drawText2D(DrawContext drawContext, Text text, int x, int y, int color, boolean withBackground) {
         if (withBackground) {
             int padding = 2;
             int textWidth = MC.textRenderer.getWidth(text);
@@ -312,13 +307,7 @@ public class RenderUtil {
     }
 
 
-    public static void drawItem2D(
-            DrawContext drawContext,
-            ItemStack stack,
-            int x,
-            int y,
-            float scale
-    ) {
+    public static void drawItem2D(DrawContext drawContext, ItemStack stack, int x, int y, float scale) {
         Matrix3x2fStack matrices = drawContext.getMatrices();
         matrices.pushMatrix();
 
@@ -331,7 +320,7 @@ public class RenderUtil {
     }
 
     public static void drawText3D(MatrixStack matrices, Text text, Vec3d pos, float scale, boolean background, boolean border, float borderWidth) {
-        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+        Camera camera = MC.gameRenderer.getCamera();
 
         matrices.push();
         matrices.translate(
@@ -345,11 +334,11 @@ public class RenderUtil {
 
         matrices.scale(-scale, -scale, scale);
 
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        TextRenderer textRenderer = MC.textRenderer;
         float textWidth = textRenderer.getWidth(text) / 2f;
 
         Matrix4f matrix = matrices.peek().getPositionMatrix();
-        VertexConsumerProvider.Immediate provider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        VertexConsumerProvider.Immediate provider = MC.getBufferBuilders().getEntityVertexConsumers();
 
         if (background) {
             float bgPadding = 1f;
@@ -383,48 +372,50 @@ public class RenderUtil {
     }
 
     public static void renderItem3D(ItemStack stack, MatrixStack matrices, Vec3d pos, float scale) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        ItemRenderer itemRenderer = client.getItemRenderer();
+        ItemRenderer itemRenderer = MC.getItemRenderer();
 
         matrices.push();
 
-        Vec3d camPos = client.gameRenderer.getCamera().getPos();
+        Vec3d camPos = MC.gameRenderer.getCamera().getPos();
         matrices.translate(pos.x - camPos.x, pos.y - camPos.y, pos.z - camPos.z);
 
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-client.gameRenderer.getCamera().getYaw()));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(client.gameRenderer.getCamera().getPitch()));
+        Vec3d lookVec = camPos.subtract(pos).normalize();
+
+        float yaw = (float) Math.toDegrees(Math.atan2(lookVec.z, lookVec.x)) - 90f;
+        float pitch = (float) Math.toDegrees(Math.asin(lookVec.y));
+
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-pitch));
 
         float s = scale * 13f;
         matrices.scale(s, s, s);
 
-        VertexConsumerProvider.Immediate base = client.getBufferBuilders().getEntityVertexConsumers();
+        GL32C.glDisable(GL32C.GL_DEPTH_TEST);
+        GL32C.glDepthMask(false);
+        GL32C.glDepthFunc(GL32C.GL_ALWAYS);
+        GL32C.glDepthRange(1.0, 1.0);
 
-        RenderLayer combinedLayer = Layers.GLOBAL_ITEM_WITH_GLINT.apply(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-        VertexConsumerProvider combinedProvider = requestedLayer -> {
-            if (requestedLayer.equals(combinedLayer)) {
-                return base.getBuffer(combinedLayer);
-            }
-            return base.getBuffer(requestedLayer);
-        };
 
         itemRenderer.renderItem(
                 stack,
-                ItemDisplayContext.NONE,
+                ItemDisplayContext.GUI,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,
                 OverlayTexture.DEFAULT_UV,
                 matrices,
-                combinedProvider,
-                client.world,
+                MC.getBufferBuilders().getEntityVertexConsumers(),
+                MC.world,
                 0
         );
 
+        GL32C.glDepthRange(0.0, 1.0);
+        GL32C.glDepthFunc(GL32C.GL_LEQUAL);
+        GL32C.glDepthMask(true);
+        GL32C.glEnable(GL32C.GL_DEPTH_TEST);
 
-        base.draw();
+        MC.getBufferBuilders().getEntityVertexConsumers().draw();
 
         matrices.pop();
     }
-
-
 
     public static void drawThickLine(MatrixStack matrix, Vec3d start, Vec3d end, float thickness, int color) {
         Matrix4f mat = matrix.peek().getPositionMatrix();
