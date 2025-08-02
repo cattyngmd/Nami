@@ -24,6 +24,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.opengl.GL32C;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -142,6 +143,11 @@ public class NametagsModule extends Module {
     }
 
         private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
+            GL32C.glDisable(GL32C.GL_DEPTH_TEST);
+            GL32C.glDepthMask(false);
+            GL32C.glDepthFunc(GL32C.GL_ALWAYS);
+
+
         Vec3d pos = new Vec3d(
                 MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
                 MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY())
@@ -201,6 +207,10 @@ public class NametagsModule extends Module {
         if (showItems.get() && entity instanceof PlayerEntity player) {
             renderPlayerItems(player, matrices, tickDelta, scale);
         }
+
+            GL32C.glDepthFunc(GL32C.GL_LEQUAL);
+            GL32C.glDepthMask(true);
+            GL32C.glEnable(GL32C.GL_DEPTH_TEST);
     }
 
     private void renderPlayerItems(PlayerEntity player, MatrixStack matrices, float tickDelta, float baseScale) {

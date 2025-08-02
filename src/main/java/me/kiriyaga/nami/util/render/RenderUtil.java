@@ -390,12 +390,6 @@ public class RenderUtil {
         float s = scale * 13f;
         matrices.scale(s, s, s);
 
-        GL32C.glDisable(GL32C.GL_DEPTH_TEST);
-        GL32C.glDepthMask(false);
-        GL32C.glDepthFunc(GL32C.GL_ALWAYS);
-        GL32C.glDepthRange(1.0, 1.0);
-
-
         itemRenderer.renderItem(
                 stack,
                 ItemDisplayContext.GUI,
@@ -406,11 +400,6 @@ public class RenderUtil {
                 MC.world,
                 0
         );
-
-        GL32C.glDepthRange(0.0, 1.0);
-        GL32C.glDepthFunc(GL32C.GL_LEQUAL);
-        GL32C.glDepthMask(true);
-        GL32C.glEnable(GL32C.GL_DEPTH_TEST);
 
         MC.getBufferBuilders().getEntityVertexConsumers().draw();
 
