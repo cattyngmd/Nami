@@ -4,6 +4,7 @@ import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
 import me.kiriyaga.nami.core.inventory.InventoryManager;
+import me.kiriyaga.nami.core.rotation.RotationManager;
 import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;

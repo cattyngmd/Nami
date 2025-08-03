@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
@@ -61,8 +61,8 @@ public class AutoSheepModule extends Module {
 
             Vec3d center = getEntityCenter(sheep);
 
-            ROTATION_MANAGER.submitRequest(
-                    new RotationManager.RotationRequest(
+            ROTATION_MANAGER.getRequestHandler().submit(
+                    new RotationRequest(
                             AutoSheepModule.class.getName(),
                             rotationPriority.get(),
                             (float) getYawToVec(MC.player, center),
@@ -70,7 +70,7 @@ public class AutoSheepModule extends Module {
                     )
             );
 
-            if (!ROTATION_MANAGER.isRequestCompleted(AutoSheepModule.class.getName())) return;
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoSheepModule.class.getName())) return;
 
             interactWithEntity(entity, center, true);
 

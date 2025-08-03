@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
@@ -66,14 +66,14 @@ public class AutoNametagModule extends Module {
 
             Vec3d center = getEntityCenter(entity);
 
-            ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                     AutoNametagModule.class.getName(),
                     rotationPriority.get(),
                     (float) getYawToVec(MC.player, center),
                     (float) getPitchToVec(MC.player, center)
             ));
 
-            if (!ROTATION_MANAGER.isRequestCompleted(AutoNametagModule.class.getName())) return;
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoNametagModule.class.getName())) return;
 
             interactWithEntity(entity, center, true);
 

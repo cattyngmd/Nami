@@ -41,7 +41,7 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating()) return;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
         if (MODULE_MANAGER.getStorage() == null) return;
         RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
@@ -50,8 +50,8 @@ public abstract class MixinLivingEntity extends Entity {
         originalYaw = this.getYaw();
         originalPitch = this.getPitch();
 
-        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
-        float spoofPitch = ROTATION_MANAGER.getRotationPitch();
+        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
 
         this.setYaw(spoofYaw);
         this.setPitch(spoofPitch);
@@ -60,7 +60,7 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(method = "travel", at = @At("TAIL"))
     private void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating()) return;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
         if (MODULE_MANAGER.getStorage() == null) return;
         RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
@@ -73,7 +73,7 @@ public abstract class MixinLivingEntity extends Entity {
     @ModifyVariable(method = "travel", at = @At("HEAD"), ordinal = 0)
     private Vec3d modifyMovementInput(Vec3d movementInput) {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return movementInput;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating()) return movementInput;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return movementInput;
 
         if (MODULE_MANAGER.getStorage() == null) return movementInput;
         RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
@@ -82,7 +82,7 @@ public abstract class MixinLivingEntity extends Entity {
         if (movementInput.lengthSquared() < 1e-4) return movementInput;
 
         float realYaw = originalYaw;
-        float spoofYaw = ROTATION_MANAGER.getRotationYaw();
+        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
 
         float clampedSpoofYaw = findClosestValidYaw(spoofYaw);
 
@@ -132,7 +132,7 @@ public abstract class MixinLivingEntity extends Entity {
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float jumpFix(float originalYaw) {
         if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
-        return ROTATION_MANAGER != null ? ROTATION_MANAGER.getRotationYaw() : originalYaw;
+        return ROTATION_MANAGER != null ? ROTATION_MANAGER.getStateHandler().getRotationYaw() : originalYaw;
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
@@ -177,7 +177,7 @@ public abstract class MixinLivingEntity extends Entity {
         if ((Object)this != MinecraftClient.getInstance().player) return;
 
         RotationManagerModule rotationModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class) : null;
-        if (rotationModule == null || ROTATION_MANAGER == null || !ROTATION_MANAGER.isRotating() || !rotationModule.sprintFix.get())
+        if (rotationModule == null || ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating() || !rotationModule.sprintFix.get())
             return;
 
         if (sprinting && MC.player.input != null) {
@@ -191,7 +191,7 @@ public abstract class MixinLivingEntity extends Entity {
                 return;
             }
 
-            float spoofYaw = ROTATION_MANAGER.getRotationYaw();
+            float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
             float realYaw = MC.player.getYaw();
 
             Vec3d localMovement = new Vec3d(sideways, 0, forward);

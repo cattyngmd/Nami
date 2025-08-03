@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
@@ -76,8 +76,8 @@ public class AutoBreedModule extends Module {
             }
 
             Vec3d center = getEntityCenter(animal);
-            ROTATION_MANAGER.submitRequest(
-                    new RotationManager.RotationRequest(
+            ROTATION_MANAGER.getRequestHandler().submit(
+                    new RotationRequest(
                             AutoBreedModule.class.getName(),
                             rotationPriority.get(),
                             (float) getYawToVec(MC.player, center),
@@ -85,7 +85,7 @@ public class AutoBreedModule extends Module {
                     )
             );
 
-            if (!ROTATION_MANAGER.isRequestCompleted(AutoBreedModule.class.getName())) return;
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoBreedModule.class.getName())) return;
 
             interactWithEntity(animal, center, true);
 

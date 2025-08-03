@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
-import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
@@ -55,7 +55,7 @@ public class BowAim extends Module {
         this.setDisplayInfo(target.getName().getString());
 
         Vec3d aimPos = getAimPosition(target);
-        ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
+        ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                 BowAim.class.getName(),
                 rotationPriority.get(),
                 (float) getYawToVec(MC.player, aimPos),

@@ -71,22 +71,22 @@ public abstract class MixinClientPlayerEntity {
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
-        if (!ROTATION_MANAGER.isRotating())
+        if (!ROTATION_MANAGER.getStateHandler().isRotating())
             return;
 
         originalYaw = MC.player.getYaw();
         originalPitch = MC.player.getPitch();
 
-        MC.player.setYaw(ROTATION_MANAGER.getRotationYaw());
-        MC.player.setPitch(ROTATION_MANAGER.getRotationPitch());
+        MC.player.setYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
+        MC.player.setPitch(ROTATION_MANAGER.getStateHandler().getRotationPitch());
 
-        MC.player.setBodyYaw(ROTATION_MANAGER.getRotationYaw());
-        MC.player.setHeadYaw(ROTATION_MANAGER.getRotationYaw());
+        MC.player.setBodyYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
+        MC.player.setHeadYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
     }
 
     @Inject(method = "sendMovementPackets", at = @At("TAIL"))
     private void postSendMovementPackets(CallbackInfo ci) {
-        if (!ROTATION_MANAGER.isRotating())
+        if (!ROTATION_MANAGER.getStateHandler().isRotating())
             return;
 
         MC.player.setYaw(originalYaw);

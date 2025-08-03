@@ -7,7 +7,7 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
@@ -97,7 +97,7 @@ public class AuraModule extends Module {
                 rotationTarget = getEntityCenter(target);
             }
 
-            ROTATION_MANAGER.submitRequest(new RotationManager.RotationRequest(
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                     AuraModule.class.getName(),
                     rotationPriority.get(),
                     (float) getYawToVec(MC.player, rotationTarget),
@@ -105,7 +105,7 @@ public class AuraModule extends Module {
             ));
         }
 
-        if (!ROTATION_MANAGER.isRequestCompleted(AuraModule.class.getName()) && !raycast.get()) return;
+        if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && !raycast.get()) return;
 
         boolean canAttack;
         if (raycast.get()) {
@@ -195,8 +195,8 @@ public class AuraModule extends Module {
     }
 
     private static EntityHitResult raycastTarget(Entity player, Entity target, double reach) {
-        float yaw = ROTATION_MANAGER.getRotationYaw();
-        float pitch = ROTATION_MANAGER.getRotationPitch();
+        float yaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        float pitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
 
         Vec3d eyePos = player.getCameraPosVec(1.0f);
 

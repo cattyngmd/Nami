@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.RotationManager;
+import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
@@ -59,8 +59,8 @@ public class AutoCowModule extends Module {
 
             Vec3d center = getEntityCenter(cow);
 
-            ROTATION_MANAGER.submitRequest(
-                    new RotationManager.RotationRequest(
+            ROTATION_MANAGER.getRequestHandler().submit(
+                    new RotationRequest(
                             AutoCowModule.class.getName(),
                             rotationPriority.get(),
                             (float) getYawToVec(MC.player, center),
@@ -68,7 +68,7 @@ public class AutoCowModule extends Module {
                     )
             );
 
-            if (!ROTATION_MANAGER.isRequestCompleted(AutoCowModule.class.getName())) return;
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoCowModule.class.getName())) return;
 
             interactWithEntity(entity, center, true);
             swapCooldown = delay.get();
