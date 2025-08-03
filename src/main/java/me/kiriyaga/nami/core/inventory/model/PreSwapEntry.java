@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.core.inventory;
+package me.kiriyaga.nami.core.inventory.model;
 
 import me.kiriyaga.nami.util.Timer;
 import net.minecraft.item.ItemStack;

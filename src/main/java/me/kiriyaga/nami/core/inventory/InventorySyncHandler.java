@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.core.inventory;
 
+import me.kiriyaga.nami.core.inventory.model.PreSwapEntry;
 import me.kiriyaga.nami.event.*;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.ItemEvent;

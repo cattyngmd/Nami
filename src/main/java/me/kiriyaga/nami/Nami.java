@@ -1,5 +1,6 @@
 package me.kiriyaga.nami;
 
+import me.kiriyaga.nami.core.breaking.BreakManager;
 import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
@@ -47,6 +48,7 @@ public class Nami implements ClientModInitializer {
     public static final PingManager PING_MANAGER = new PingManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
+    public static final BreakManager BREAK_MANAGER = new BreakManager();
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
     public static ClickGuiScreen CLICK_GUI;
@@ -61,6 +63,7 @@ public class Nami implements ClientModInitializer {
         ROTATION_MANAGER.init();
         ENTITY_MANAGER.init();
         INVENTORY_MANAGER.init();
+        BREAK_MANAGER.init();
         CONFIG_MANAGER.loadModules();
         CONFIG_MANAGER.loadFriends();
 

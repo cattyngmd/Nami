@@ -1,9 +1,8 @@
 package me.kiriyaga.nami.core.inventory;
 
-import me.kiriyaga.nami.Nami;
+import me.kiriyaga.nami.core.inventory.model.PreSwapEntry;
 import me.kiriyaga.nami.event.*;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
-import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
