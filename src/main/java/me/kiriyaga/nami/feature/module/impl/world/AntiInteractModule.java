@@ -51,7 +51,7 @@ public class AntiInteractModule extends Module {
             return;
         }
 
-        if (player.getWorld().getDimension().comp_648() && isBed(block)) {
+        if (player.getWorld().getDimension().bedWorks() && isBed(block)) {
             event.cancel();
             return;
         }

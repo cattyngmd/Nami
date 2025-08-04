@@ -1,7 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
@@ -15,6 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,7 +30,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class MixinWorldRenderer {
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void onRenderTail(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
+    private void onRenderTail(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         float tickDelta = tickCounter.getTickProgress(true);
 
         MatrixStack matrices = new MatrixStack();
@@ -44,7 +44,7 @@ public class MixinWorldRenderer {
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void captureMatrices(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
+    private void captureMatrices(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         MatrixCache.positionMatrix = new Matrix4f(positionMatrix);
         MatrixCache.projectionMatrix = new Matrix4f(projectionMatrix);
         MatrixCache.camera = camera;

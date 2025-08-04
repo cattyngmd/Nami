@@ -10,6 +10,7 @@ import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.TriState;
 import net.minecraft.util.Util;
 
 import java.util.OptionalDouble;
@@ -45,7 +46,7 @@ public class Layers {
 
     private static RenderLayer.MultiPhaseParameters withTexture() {
         return builder()
-                .texture(new RenderPhase.Texture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, false))
+                .texture(new RenderPhase.Texture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, TriState.FALSE, false))
                 .build(false);
     }
 

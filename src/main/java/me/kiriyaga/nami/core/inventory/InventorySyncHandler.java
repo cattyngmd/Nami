@@ -67,7 +67,7 @@ public class InventorySyncHandler {
         Packet<?> packet = event.getPacket();
 
         if (packet instanceof UpdateSelectedSlotS2CPacket updateSlot) {
-            slotSwapper.sendSlotPacket(updateSlot.comp_3325());
+            slotSwapper.sendSlotPacket(updateSlot.slot());
         }
 
         if (packet instanceof ScreenHandlerSlotUpdateS2CPacket update) {
