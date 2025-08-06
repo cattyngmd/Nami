@@ -51,6 +51,7 @@
     "MixinLivingEntity",
     "MixinPlayerEntity",
     "MixinPlayerInteractEntityC2SPacket",
+    "MixinSodiumWorldRenderer",
     "MixinTextVisitFactory",
     "PlayerInteractEntityC2SPacketAccessor",
     "PlayerPositionAccessor",
