@@ -241,29 +241,37 @@ public class NametagsModule extends Module {
         Vec3d lookDir = Vec3d.fromPolar(pitch, yaw).normalize().negate();
         Vec3d camRight = lookDir.crossProduct(new Vec3d(0, 1, 0)).normalize();
 
+        int renderIndex = 0;
+        for (ItemStack stack : nonEmptyItems) {
+            renderItemWithDepthIsolation(stack, matrices, baseX, baseY, baseZ, renderIndex, itemCount, camPos, camRight, lookDir, baseScale);
+            renderIndex++;
+        }
+    }
+
+    private void renderItemWithDepthIsolation(
+            ItemStack stack,
+            MatrixStack matrices,
+            double baseX, double baseY, double baseZ,
+            int renderIndex, int itemCount,
+            Vec3d camPos, Vec3d camRight, Vec3d lookDir,
+            float baseScale
+    ) {
+        Vec3d itemPosBase = new Vec3d(baseX, baseY, baseZ);
+        float distance = (float) camPos.distanceTo(itemPosBase);
+        float dynamicScale = 0.0018f + (baseScale / 10000.0f) * distance;
+        if (distance <= 8.0f) dynamicScale = 0.0245f;
+
+        double itemSpacing = dynamicScale * 12.0;
+        double verticalOffset = dynamicScale * 10.0;
+        double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
+
+        Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
+
         GL32C.glDisable(GL32C.GL_DEPTH_TEST);
         GL32C.glDepthMask(false);
         GL32C.glDepthFunc(GL32C.GL_ALWAYS);
 
-        int renderIndex = 0;
-
-        for (ItemStack stack : nonEmptyItems) {
-            Vec3d itemPosBase = new Vec3d(baseX, baseY, baseZ);
-
-            float distance = (float) camPos.distanceTo(itemPosBase);
-            float dynamicScale = 0.0018f + (baseScale / 10000.0f) * distance;
-            if (distance <= 8.0f) dynamicScale = 0.0245f;
-
-            double itemSpacing = dynamicScale * 12.0;
-            double verticalOffset = dynamicScale * 10.0;
-            double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
-
-            Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
-
-            RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
-
-            renderIndex++;
-        }
+        RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
 
         GL32C.glDepthFunc(GL32C.GL_LEQUAL);
         GL32C.glDepthMask(true);
