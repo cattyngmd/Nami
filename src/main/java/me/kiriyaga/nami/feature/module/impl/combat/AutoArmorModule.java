@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.*;
 
@@ -25,11 +26,15 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoArmorModule extends Module {
 
-    private enum HelmetPriority { BEST, TURTLE, GOLDEN }
+    private enum ProtectionPriority {PROT, BLAST }
+    private enum BootsPriority { LEATHER, GOLDEN, BEST }
+    private enum HelmetPriority { BEST, TURTLE, GOLDEN, PUMPKIN, NONE }
 
-    private final BoolSetting elytraPriority = addSetting(new BoolSetting("elytra priority", false));
-    private final BoolSetting blastPriority = addSetting(new BoolSetting("blast priority", false));
+    private final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("protection", ProtectionPriority.PROT));
     private final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("helmet", HelmetPriority.BEST));
+    private final BoolSetting helmetSafety = addSetting(new BoolSetting("helmet safety", false));
+    private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("boots", BootsPriority.BEST));
+    private final BoolSetting elytraPriority = addSetting(new BoolSetting("elytra priority", false));
 
     private static final Set<Item> ARMOR_ITEMS_HEAD = Set.of(Items.LEATHER_HELMET, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET, Items.TURTLE_HELMET);
     private static final Set<Item> ARMOR_ITEMS_CHEST = Set.of(Items.LEATHER_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE, Items.ELYTRA);
@@ -38,27 +43,155 @@ public class AutoArmorModule extends Module {
 
     public AutoArmorModule() {
         super("auto armor", "Automatically equips best armor.", ModuleCategory.of("combat"), "autoarmor","фгещфкьщк");
+        helmetSafety.setShowCondition(() -> helmetSetting.get() == HelmetPriority.NONE);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
         if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof ClickGuiScreen || MC.currentScreen instanceof HudEditorScreen) {
+            Entity target = ENTITY_MANAGER.getTarget();
 
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 if (!isArmorSlot(slot)) continue;
 
                 ItemStack current = MC.player.getEquippedStack(slot);
-                ItemStack best = findBestArmor(slot, current);
+                ItemStack best = null;
 
-                if (best != null && !ItemStack.areEqual(best, current)) {
-                    int invSlot = findInventorySlot(best);
-                    if (invSlot != -1) {
-                        swap(slot, invSlot);
+                if (slot == EquipmentSlot.HEAD) {
+                    if (helmetSetting.get() == HelmetPriority.NONE) {
+                        if (helmetSafety.get() && target != null) {
+                            best = findBestHelmet(current, true);
+                        } else {
+                            best = ItemStack.EMPTY;
+                        }
+                    } else {
+                        best = findBestHelmet(current, false);
+                    }
+                } else if (slot == EquipmentSlot.FEET) {
+                    best = findBestBoots(current);
+                } else {
+                    best = findBestArmor(slot, current);
+                }
+
+                if (best != null) {
+                    if (best.isEmpty()) {
+                        if (!current.isEmpty()) {
+                            int invSlot = findEmptySlot();
+                            if (invSlot != -1) {
+                                swap(slot, invSlot);
+                            }
+                        }
+                    } else if (!ItemStack.areEqual(best, current)) {
+                        int invSlot = findInventorySlot(best);
+                        if (invSlot != -1) {
+                            swap(slot, invSlot);
+                        }
                     }
                 }
             }
         }
+    }
+
+    private ItemStack findBestHelmet(ItemStack current, boolean forceBest) {
+        ClientPlayerEntity player = MC.player;
+        List<ItemStack> candidates = new ArrayList<>();
+
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = player.getInventory().getStack(i);
+            if (stack.isEmpty()) continue;
+            Item item = stack.getItem();
+
+            switch (helmetSetting.get()) {
+                case TURTLE:
+                    if (item == Items.TURTLE_HELMET) return stack;
+                    break;
+                case GOLDEN:
+                    if (item == Items.GOLDEN_HELMET) return stack;
+                    break;
+                case PUMPKIN:
+                    if (item == Items.CARVED_PUMPKIN) return stack;
+                    break;
+                case BEST:
+                    if (isArmorForSlot(stack, EquipmentSlot.HEAD)) candidates.add(stack);
+                    break;
+                case NONE:
+                    if (forceBest && isArmorForSlot(stack, EquipmentSlot.HEAD)) candidates.add(stack);
+                    break;
+            }
+        }
+
+        if (candidates.isEmpty()) return forceBest ? null : null;
+
+        ItemStack best = current;
+        for (ItemStack candidate : candidates) {
+            if (isBetterArmor(candidate, best)) best = candidate;
+        }
+
+        return best != current ? best : null;
+    }
+
+    private ItemStack findBestBoots(ItemStack current) {
+        ClientPlayerEntity player = MC.player;
+        List<ItemStack> candidates = new ArrayList<>();
+
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = player.getInventory().getStack(i);
+            if (stack.isEmpty()) continue;
+            Item item = stack.getItem();
+            if (!isArmorForSlot(stack, EquipmentSlot.FEET)) continue;
+
+            switch (bootsPriority.get()) {
+                case LEATHER:
+                    if (item == Items.LEATHER_BOOTS) return stack;
+                    break;
+                case GOLDEN:
+                    if (item == Items.GOLDEN_BOOTS) return stack;
+                    break;
+                case BEST:
+                    candidates.add(stack);
+                    break;
+            }
+        }
+
+        if (candidates.isEmpty()) return null;
+
+        ItemStack best = current;
+        for (ItemStack candidate : candidates) {
+            if (isBetterArmor(candidate, best)) best = candidate;
+        }
+
+        return best != current ? best : null;
+    }
+
+    private boolean isBetterArmor(ItemStack a, ItemStack b) {
+        if (a.isEmpty()) return false;
+        if (b.isEmpty()) return true;
+
+        int aMat = getMaterialScore(a.getItem());
+        int bMat = getMaterialScore(b.getItem());
+        if (aMat != bMat) return aMat > bMat;
+
+        int aProt = EnchantmentUtils.getEnchantmentLevel(a, Enchantments.PROTECTION);
+        int bProt = EnchantmentUtils.getEnchantmentLevel(b, Enchantments.PROTECTION);
+        int aBlast = EnchantmentUtils.getEnchantmentLevel(a, Enchantments.BLAST_PROTECTION);
+        int bBlast = EnchantmentUtils.getEnchantmentLevel(b, Enchantments.BLAST_PROTECTION);
+
+        if (protectionPriority.get() == ProtectionPriority.BLAST) {
+            if (aBlast != bBlast) return aBlast > bBlast;
+        } else {
+            if (aProt != bProt) return aProt > bProt;
+        }
+
+        return (aProt + aBlast) > (bProt + bBlast);
+    }
+
+    private int findEmptySlot() {
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = MC.player.getInventory().getStack(i);
+            if (stack.isEmpty()) return i;
+        }
+        return -1;
     }
 
     private boolean isArmorSlot(EquipmentSlot slot) {
@@ -129,28 +262,6 @@ public class AutoArmorModule extends Module {
         }
 
         return best != current ? best : null;
-    }
-
-    private boolean isBetterArmor(ItemStack a, ItemStack b) {
-        if (a.isEmpty()) return false;
-        if (b.isEmpty()) return true;
-
-        int aMat = getMaterialScore(a.getItem());
-        int bMat = getMaterialScore(b.getItem());
-        if (aMat != bMat) return aMat > bMat;
-
-        int aProt = EnchantmentUtils.getEnchantmentLevel(a, Enchantments.PROTECTION);
-        int bProt = EnchantmentUtils.getEnchantmentLevel(b, Enchantments.PROTECTION);
-        int aBlast = EnchantmentUtils.getEnchantmentLevel(a, Enchantments.BLAST_PROTECTION);
-        int bBlast = EnchantmentUtils.getEnchantmentLevel(b, Enchantments.BLAST_PROTECTION);
-
-        if (blastPriority.get()) {
-            if (aBlast != bBlast) return aBlast > bBlast;
-        } else {
-            if (aProt != bProt) return aProt > bProt;
-        }
-
-        return (aProt + aBlast) > (bProt + bBlast);
     }
 
     // yes this is shitcode, no, i dont see any other solution, no more armormaterial etc, only components
