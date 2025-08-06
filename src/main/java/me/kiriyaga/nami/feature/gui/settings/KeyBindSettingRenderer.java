@@ -41,7 +41,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
         context.drawText(
                 textRenderer,
-                setting.getName(),
+                setting.getName().toLowerCase(),
                 textX,
                 textY,
                 toRGBA(textCol),
@@ -52,7 +52,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
         context.drawText(
                 textRenderer,
-                valueStr,
+                valueStr.toLowerCase(),
                 x + WIDTH - PADDING - textRenderer.getWidth(valueStr),
                 textY,
                 toRGBA(textCol),
