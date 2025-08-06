@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
+import me.kiriyaga.nami.core.macro.model.Macro;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
@@ -72,10 +73,26 @@ public abstract class MixinMinecraftClient {
                         module.toggle();
                     }
                 }
+
                 bind.setWasPressedLastTick(currentlyPressed);
             }
         }
+
+        for (Macro macro : MACRO_MANAGER.getAll()) {
+            int keyCode = macro.getKeyCode();
+            boolean currentlyPressed = MACRO_MANAGER.isKeyPressed(keyCode);
+            boolean wasPressed = MACRO_MANAGER.wasKeyPressedLastTick(keyCode);
+
+            if (currentlyPressed && !wasPressed) {
+                if (MC.player != null) {
+                    MC.player.networkHandler.sendChatMessage(macro.getMessage());
+                }
+            }
+
+            MACRO_MANAGER.setKeyPressedLastTick(keyCode, currentlyPressed);
+        }
     }
+
 
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
