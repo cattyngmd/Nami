@@ -8,7 +8,10 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.HudEditorModule;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.text.Text;
 
 import java.util.*;
@@ -25,6 +28,7 @@ public class ClickGuiScreen extends Screen {
     private boolean draggingCategory = false;
     private ModuleCategory draggedModuleCategory = null;
     public float scale = 1;
+    private Screen previousScreen = null;
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
@@ -49,6 +53,12 @@ public class ClickGuiScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         syncCategoryPositions();
+
+        if (previousScreen instanceof TitleScreen
+        || previousScreen instanceof DisconnectedScreen
+        || previousScreen instanceof MultiplayerScreen){
+            previousScreen.render(context, -1, -1, delta);
+        }
 
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get())
@@ -247,5 +257,13 @@ public class ClickGuiScreen extends Screen {
         MC.getSoundManager().play(net.minecraft.client.sound.PositionedSoundInstance.master(
                 net.minecraft.sound.SoundEvents.UI_BUTTON_CLICK, 1.0f
         ));
+    }
+
+    public Screen getPreviousScreen() {
+        return previousScreen;
+    }
+
+    public void setPreviousScreen(Screen previousScreen) {
+        this.previousScreen = previousScreen;
     }
 }
