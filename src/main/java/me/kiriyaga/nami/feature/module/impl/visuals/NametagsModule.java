@@ -262,11 +262,6 @@ public class NametagsModule extends Module {
 
             RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
 
-            if (stack.hasGlint()){
-                GL32C.glDisable(GL32C.GL_DEPTH_TEST);
-                GL32C.glDepthMask(false);
-                GL32C.glDepthFunc(GL32C.GL_ALWAYS);
-            }
             renderIndex++;
         }
 
