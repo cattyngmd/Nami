@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.LabelPosition;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -13,6 +14,8 @@ import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class TotemCountModule extends HudElementModule {
+
+    public final BoolSetting white = addSetting(new BoolSetting("white", true));
 
     public TotemCountModule() {
         super("totem count", "Displays number of totems in inventory.", 52, 52, 20, 20);
@@ -42,8 +45,12 @@ public class TotemCountModule extends HudElementModule {
     public List<LabeledItemElement> getLabeledItemElements() {
         int totemCount = countTotems();
         ItemStack totemStack = new ItemStack(Items.TOTEM_OF_UNDYING);
+        Text label;
 
-        Text label = CAT_FORMAT.format("{bg}"+totemCount);
+        if (white.get())
+            label = CAT_FORMAT.format("{bw}"+totemCount);
+        else
+            label = CAT_FORMAT.format("{bg}"+totemCount);
 
         width = 16;
         height = 16;
