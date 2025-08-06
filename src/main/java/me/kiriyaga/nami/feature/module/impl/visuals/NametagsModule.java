@@ -267,14 +267,16 @@ public class NametagsModule extends Module {
 
         Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
 
-        GL32C.glDisable(GL32C.GL_DEPTH_TEST);
-        GL32C.glDepthMask(false);
-        GL32C.glDepthFunc(GL32C.GL_ALWAYS);
+        //GL32C.glDisable(GL32C.GL_DEPTH_TEST);
+        //GL32C.glDepthMask(false);
+        //GL32C.glDepthFunc(GL32C.GL_ALWAYS);
+        GL32C.glDepthRange(1.0, 0.1);
 
         RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
 
-        GL32C.glDepthFunc(GL32C.GL_LEQUAL);
-        GL32C.glDepthMask(true);
-        GL32C.glEnable(GL32C.GL_DEPTH_TEST);
+        //GL32C.glDepthFunc(GL32C.GL_LEQUAL);
+        //GL32C.glDepthMask(true);
+        //GL32C.glEnable(GL32C.GL_DEPTH_TEST);
+        GL32C.glDepthRange(0.0, 1.0);
     }
 }
