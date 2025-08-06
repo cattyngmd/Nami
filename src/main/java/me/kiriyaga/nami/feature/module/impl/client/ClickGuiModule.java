@@ -28,7 +28,7 @@ public class ClickGuiModule extends Module {
 
         CLICK_GUI.scale = this.scale.get().floatValue(); // bad
         CLICK_GUI.setPreviousScreen(MC.currentScreen);
-        
+
         MC.setScreen(CLICK_GUI);
         this.toggle();
     }
