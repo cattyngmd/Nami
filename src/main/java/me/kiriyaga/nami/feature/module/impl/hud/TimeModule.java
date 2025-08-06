@@ -15,11 +15,11 @@ import static me.kiriyaga.nami.Nami.*;
 public class TimeModule extends HudElementModule {
 
     public enum TimeMode {
-        real,
-        game
+        REAL,
+        GAME
     }
 
-    public final EnumSetting<TimeMode> mode = addSetting(new EnumSetting<>("mode", TimeMode.real));
+    public final EnumSetting<TimeMode> mode = addSetting(new EnumSetting<>("mode", TimeMode.REAL));
 
     public TimeModule() {
         super("time", "Displays real or game time.", 52, 52, 50, 9);
@@ -32,7 +32,7 @@ public class TimeModule extends HudElementModule {
 
         String timeText;
 
-        if (mode.get() == TimeMode.real) {
+        if (mode.get() == TimeMode.REAL) {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             timeText = now.format(formatter);

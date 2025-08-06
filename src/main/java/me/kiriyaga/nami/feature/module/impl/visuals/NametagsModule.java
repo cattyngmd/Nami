@@ -9,20 +9,16 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.NametagFormatter;
-import me.kiriyaga.nami.util.render.Layers;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.Tameable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL32C;
@@ -49,7 +45,7 @@ public class NametagsModule extends Module {
     public final BoolSetting showGameMode = addSetting(new BoolSetting("gamemode", false));
     public final BoolSetting showPing = addSetting(new BoolSetting("ping", true));
     public final BoolSetting showEntityId = addSetting(new BoolSetting("entityId", false));
-    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.None));
+    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.NONE));
     public final BoolSetting background = addSetting(new BoolSetting("background", false));
     public final BoolSetting border = addSetting(new BoolSetting("border", true));
     public final DoubleSetting borderWidth = addSetting(new DoubleSetting("border width", 0.25, 0.11, 1));
@@ -57,7 +53,7 @@ public class NametagsModule extends Module {
     private final NametagFormatter formatter = new NametagFormatter(this);
 
     public enum TextFormat {
-        None, Bold, Italic, Both
+        NONE, BOLD, ITALIC, BOTH
     }
 
     public NametagsModule() {

@@ -16,12 +16,12 @@ import static me.kiriyaga.nami.Nami.*;
 public class SpeedModule extends HudElementModule {
 
     public enum SpeedMode {
-        kmh, bps
+        KMH, BPS
     }
 
     public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
     public final IntSetting samples = addSetting(new IntSetting("samples", 80, 10, 200));
-    public final EnumSetting<SpeedMode> mode = addSetting(new EnumSetting<>("mode", SpeedMode.kmh));
+    public final EnumSetting<SpeedMode> mode = addSetting(new EnumSetting<>("mode", SpeedMode.KMH));
 
     private double speed = 0;
     private double[] speedSamples;
@@ -82,7 +82,7 @@ public class SpeedModule extends HudElementModule {
         if (MC.player == null) return CAT_FORMAT.format("{bg}NaN");
 
         String speedStr;
-        if (mode.get() == SpeedMode.bps) {
+        if (mode.get() == SpeedMode.BPS) {
             speedStr = formatSpeedNumber(speed) + " bp/s";
         } else {
             speedStr = formatSpeedNumber(speed * 3.6) + " km/h";

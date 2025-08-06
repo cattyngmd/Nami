@@ -75,11 +75,11 @@ public class BreakTickHandler {
 
     private BreakTarget getNextTarget(BreakManagerModule module) {
         return switch (module.breakPriority.get()) {
-            case closest -> requestHandler.getTargets().stream()
+            case CLOSEST -> requestHandler.getTargets().stream()
                     .min(Comparator.comparingDouble(t -> t.getPos().getSquaredDistance(MC.player.getEyePos())))
                     .orElse(null);
-            case first -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(0);
-            case last -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(requestHandler.getTargets().size() - 1);
+            case FIRST -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(0);
+            case LAST -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(requestHandler.getTargets().size() - 1);
         };
     }
 

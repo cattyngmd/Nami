@@ -141,8 +141,8 @@ public class NametagFormatter {
     }
 
     private Style getStyle() {
-        boolean bold = module.formatting.get() == NametagsModule.TextFormat.Bold || module.formatting.get() == NametagsModule.TextFormat.Both;
-        boolean italic = module.formatting.get() == NametagsModule.TextFormat.Italic || module.formatting.get() == NametagsModule.TextFormat.Both;
+        boolean bold = module.formatting.get() == NametagsModule.TextFormat.BOLD || module.formatting.get() == NametagsModule.TextFormat.BOTH;
+        boolean italic = module.formatting.get() == NametagsModule.TextFormat.ITALIC || module.formatting.get() == NametagsModule.TextFormat.BOTH;
         return Style.EMPTY.withBold(bold).withItalic(italic);
     }
 }

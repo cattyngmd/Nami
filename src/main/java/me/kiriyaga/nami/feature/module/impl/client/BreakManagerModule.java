@@ -10,7 +10,7 @@ import me.kiriyaga.nami.setting.impl.EnumSetting;
 public class BreakManagerModule extends Module {
 
     public final DoubleSetting maxDistance = addSetting(new DoubleSetting("distance", 5, 0, 6));
-    public final EnumSetting<BreakPriority> breakPriority = addSetting(new EnumSetting<>("priority", BreakPriority.closest));
+    public final EnumSetting<BreakPriority> breakPriority = addSetting(new EnumSetting<>("priority", BreakPriority.CLOSEST));
 
     public BreakManagerModule() {
         super("break manager", "Allows you to configure break manager.", ModuleCategory.of("client"), "breakmanager", "break", "икуфльфтфпук");
@@ -25,6 +25,6 @@ public class BreakManagerModule extends Module {
     }
 
     public enum BreakPriority {
-        closest, first, last
+        CLOSEST, FIRST, LAST
     }
 }

@@ -22,11 +22,11 @@ import static me.kiriyaga.nami.Nami.*;
 public class NukerModule extends Module {
 
     public enum Mode {
-        floor,
-        around
+        FLOOR,
+        AROUND
     }
 
-    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.around));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.AROUND));
     public final IntSetting radius = addSetting(new IntSetting("radius", 3, 1, 6));
 
     private final Set<BlockPos> targetBlocks = new LinkedHashSet<>();
@@ -53,7 +53,7 @@ public class NukerModule extends Module {
         }
 
         switch (mode.get()) {
-            case floor -> {
+            case FLOOR -> {
                 BlockPos base = playerPos.down();
                 for (int x = -r; x <= r; x++) {
                     for (int z = -r; z <= r; z++) {
@@ -62,7 +62,7 @@ public class NukerModule extends Module {
                     }
                 }
             }
-            case around -> {
+            case AROUND -> {
                 BlockPos base = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
                 for (int x = -r; x <= r; x++) {
                     for (int y = 0; y <= r; y++) {

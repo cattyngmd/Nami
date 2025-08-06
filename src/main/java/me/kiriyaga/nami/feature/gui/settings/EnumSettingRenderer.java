@@ -40,7 +40,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
                 false
         );
 
-        String valueStr = setting.get().toString();
+        String valueStr = setting.get().toString().toLowerCase();
         context.drawText(
                 textRenderer,
                 valueStr,
