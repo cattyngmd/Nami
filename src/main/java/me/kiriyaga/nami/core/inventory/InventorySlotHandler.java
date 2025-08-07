@@ -3,6 +3,7 @@ package me.kiriyaga.nami.core.inventory;
 import me.kiriyaga.nami.core.inventory.model.PreSwapEntry;
 import me.kiriyaga.nami.event.*;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
+import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -23,7 +24,7 @@ public class InventorySlotHandler {
 
     public void attemptSwitch(int targetSlot) {
         if (syncedSlot != targetSlot && PlayerInventory.isValidHotbarIndex(targetSlot)) {
-            sendSlotPacket(targetSlot);
+            forceClientSlot(targetSlot);
 
             ItemStack[] snapshot = new ItemStack[9];
             for (int i = 0; i < 9; i++) {
@@ -62,14 +63,35 @@ public class InventorySlotHandler {
         swaps.forEach(PreSwapEntry::markForClear);
     }
 
+    private boolean debugInventoryEnabled() {
+        return MODULE_MANAGER.getStorage().getByClass(Debug.class).isEnabled()
+                && MODULE_MANAGER.getStorage().getByClass(Debug.class).inventory.get();
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onSend(PacketSendEvent event) {
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet) {
             int slot = packet.getSelectedSlot();
-            if (!PlayerInventory.isValidHotbarIndex(slot) || syncedSlot == slot) {
+
+            if (debugInventoryEnabled()) {
+                CHAT_MANAGER.sendRaw("[onSend] Received UpdateSelectedSlotC2SPacket: " + slot);
+            }
+
+            if (!PlayerInventory.isValidHotbarIndex(slot)) {
+                if (debugInventoryEnabled()) {
+                    CHAT_MANAGER.sendRaw("[onSend] Invalid hotbar index: " + slot + " → cancelling");
+                }
+                event.cancel();
+            } else if (syncedSlot == slot) {
+                if (debugInventoryEnabled()) {
+                    CHAT_MANAGER.sendRaw("[onSend] Slot " + slot + " already synced → cancelling");
+                }
                 event.cancel();
             } else {
                 syncedSlot = slot;
+                if (debugInventoryEnabled()) {
+                    CHAT_MANAGER.sendRaw("[onSend] syncedSlot updated to " + syncedSlot);
+                }
             }
         }
     }
