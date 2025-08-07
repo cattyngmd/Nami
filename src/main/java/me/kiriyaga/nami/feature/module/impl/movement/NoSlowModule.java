@@ -46,7 +46,7 @@ public class NoSlowModule extends Module {
         boolean boost = true; //cattyngmd
         if (mode.get() == SlowMode.ACCEL){
             boost = MC.player.age % 3 == 0 || MC.player.age % 4 == 0;
-            if (MC.player.age % 12 == 0) boost = false;
+            //if (MC.player.age % 12 == 0) boost = false;
 
             if (boost){
                 ev.cancel();
