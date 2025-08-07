@@ -35,6 +35,19 @@ public class InventorySlotHandler {
         }
     }
 
+    public void attemptSilentSwitch(int targetSlot) {
+        if (syncedSlot != targetSlot && PlayerInventory.isValidHotbarIndex(targetSlot)) {
+            sendSlotPacket(targetSlot);
+
+            ItemStack[] snapshot = new ItemStack[9];
+            for (int i = 0; i < 9; i++) {
+                snapshot[i] = MC.player.getInventory().getStack(i);
+            }
+
+            swaps.add(new PreSwapEntry(snapshot, syncedSlot, targetSlot));
+        }
+    }
+
     public void forceClientSlot(int slot) {
         if (MC.player.getInventory().getSelectedSlot() != slot) {
             MC.player.getInventory().setSelectedSlot(slot);

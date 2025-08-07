@@ -24,7 +24,7 @@ public abstract class HudElementModule extends Module {
     public final EnumSetting<HudAlignment> alignment;
     public final EnumSetting<LabelPosition> label;
 
-    public int width;  // размер в пикселях
+    public int width;
     public int height;
     public static final int PADDING = 1;
 

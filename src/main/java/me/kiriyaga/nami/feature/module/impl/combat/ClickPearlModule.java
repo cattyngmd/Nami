@@ -42,7 +42,7 @@ public class ClickPearlModule extends Module {
             if (slot == -1)
                 return;
 
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+            INVENTORY_MANAGER.getSlotHandler().attemptSilentSwitch(slot);
             MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
             INVENTORY_MANAGER.getSyncHandler().swapSync();
             return;
