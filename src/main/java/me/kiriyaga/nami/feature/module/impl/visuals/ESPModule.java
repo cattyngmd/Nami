@@ -88,10 +88,8 @@ public class ESPModule extends Module {
     }
 
     private Color getColorForEntity(Entity entity, ColorModule colorModule) {
-        if (entity instanceof PlayerEntity) {
-            if (FRIEND_MANAGER.isFriend(entity.getName().getString())) {
-                return colorModule.getStyledGlobalColor();
-            }
+        if (entity instanceof PlayerEntity) {             
+            return colorModule.getStyledGlobalColor();
         } else if (ENTITY_MANAGER.getPassive().contains(entity)) {
             return COLOR_PASSIVE;
         } else if (ENTITY_MANAGER.getNeutral().contains(entity)) {

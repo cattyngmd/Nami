@@ -139,22 +139,28 @@ public class NametagsModule extends Module {
         renderEntityNametag(entity, entity.getName().getString(), tickDelta, matrices, scale, forcedColor);
     }
 
-        private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
-
-
-        Vec3d pos = new Vec3d(
-                MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
-                MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY())
-                        + (entity.isSneaking() ? entity.getBoundingBox().getLengthY() + 0.0 : entity.getBoundingBox().getLengthY() + 0.3),
-                MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ())
-        );
+    private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
 
         Vec3d camPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
-        float distance = (float) camPos.distanceTo(pos);
+
+        double baseHeightOffset = entity.isSneaking() ? entity.getBoundingBox().getLengthY() : entity.getBoundingBox().getLengthY() + 0.3;
+
+        double interpX = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
+        double interpY = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
+        double interpZ = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
+
+        float distance = (float) camPos.distanceTo(new Vec3d(interpX, interpY, interpZ));
+
+        double distanceYOffset = distance * 0.02;
+
+        Vec3d pos = new Vec3d(
+                interpX,
+                interpY + baseHeightOffset + distanceYOffset,
+                interpZ
+        );
 
         float dynamicScale = 0.0018f + (scale / 10000.0f) * distance;
         if (distance <= 8.0f) dynamicScale = 0.0245f;
-
 
         Text displayName;
 
@@ -162,31 +168,16 @@ public class NametagsModule extends Module {
             displayName = formatter.formatPlayer(player);
 
             if (showHealth.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.getHealthText(player));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.getHealthText(player));
             }
-
             if (showPing.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.formatPing(player));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatPing(player));
             }
-
             if (showGameMode.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.formatGameMode(player));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatGameMode(player));
             }
-
             if (showEntityId.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.formatEntityId(entity));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatEntityId(entity));
             }
         } else if (entity.getClass().getSimpleName().equals("ItemEntity")) {
             displayName = formatter.formatItem((net.minecraft.entity.ItemEntity) entity);
@@ -258,7 +249,9 @@ public class NametagsModule extends Module {
         if (distance <= 8.0f) dynamicScale = 0.0245f;
 
         double itemSpacing = dynamicScale * 12.0;
-        double verticalOffset = dynamicScale * 10.0;
+
+        double verticalOffset = dynamicScale * 10.0 + distance * 0.02;
+
         double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
 
         Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
@@ -269,7 +262,7 @@ public class NametagsModule extends Module {
         GL32C.glDepthRange(1.0, 0.1);
 
         RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
-
+        
         //GL32C.glDepthFunc(GL32C.GL_LEQUAL);
         //GL32C.glDepthMask(true);
         //GL32C.glEnable(GL32C.GL_DEPTH_TEST);
