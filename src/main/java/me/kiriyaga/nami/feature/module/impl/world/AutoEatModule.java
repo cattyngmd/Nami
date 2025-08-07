@@ -45,49 +45,28 @@ public class AutoEatModule extends Module {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
-        if (swapCooldown > 0) {
-            swapCooldown--;
-            return;
-        }
-
-        if (eating && !MC.player.isUsingItem()) {
-            setUseHeld(false);
-            eating = false;
-            swapCooldown = swapDelayTicksSetting.get();
-            return;
-        }
+        setUseHeld(false);
 
         double hunger = MC.player.getHungerManager().getFoodLevel();
         double health = MC.player.getHealth();
 
-        if ((hunger >= 20.0 || hunger >= minHunger.get()) && health >= minHealth.get()){
-            if (eating) {
-                setUseHeld(false);
-                eating = false;
-                swapCooldown = (int) swapDelayTicksSetting.get();
-            }
-            return;
-        }
+        boolean needsEat = hunger < minHunger.get() || health < minHealth.get();
+        if (!needsEat) return;
 
         int bestSlot = getBestFoodSlot();
-        if (bestSlot == -1) {
-            if (eating) {
-                setUseHeld(false);
-                eating = false;
-                swapCooldown = (int) swapDelayTicksSetting.get();
-            }
-            return;
-        }
+        if (bestSlot == -1) return;
 
         int currentSlot = MC.player.getInventory().getSelectedSlot();
 
-        if (!eating) {
-            if (currentSlot != bestSlot) {
-                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
-                swapCooldown = (int) swapDelayTicksSetting.get();
-            }
+        if (currentSlot == bestSlot) {
             setUseHeld(true);
-            eating = true;
+        } else {
+            if (swapCooldown > 0) {
+                swapCooldown--;
+            } else {
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
+                swapCooldown = swapDelayTicksSetting.get();
+            }
         }
     }
 
@@ -151,9 +130,6 @@ public class AutoEatModule extends Module {
 
     private void setUseHeld(boolean held) {
         KeyBinding useKey = MC.options.useKey;
-        InputUtil.Key boundKey = ((KeyBindingAccessor) useKey).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
-        useKey.setPressed(physicallyPressed || held);
+        useKey.setPressed(held);
     }
 }

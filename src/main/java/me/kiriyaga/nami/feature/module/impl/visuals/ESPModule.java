@@ -88,7 +88,7 @@ public class ESPModule extends Module {
     }
 
     private Color getColorForEntity(Entity entity, ColorModule colorModule) {
-        if (entity instanceof PlayerEntity) {             
+        if (entity instanceof PlayerEntity) {
             return colorModule.getStyledGlobalColor();
         } else if (ENTITY_MANAGER.getPassive().contains(entity)) {
             return COLOR_PASSIVE;
@@ -132,10 +132,7 @@ public class ESPModule extends Module {
 
         if (entity instanceof PlayerEntity) {
             if (!esp.showPlayers.get()) return null;
-            if (FRIEND_MANAGER.isFriend(entity.getName().getString()))
-                return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
-            else
-                return COLOR_HOSTILE;
+            return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
         }
 
         if (esp.showPeacefuls.get() && ENTITY_MANAGER.getPassive().contains(entity)) return COLOR_PASSIVE;

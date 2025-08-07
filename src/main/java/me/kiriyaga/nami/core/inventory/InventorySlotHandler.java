@@ -22,8 +22,6 @@ public class InventorySlotHandler {
     }
 
     public void attemptSwitch(int targetSlot) {
-        if (MC.player == null) return;
-
         if (syncedSlot != targetSlot && PlayerInventory.isValidHotbarIndex(targetSlot)) {
             sendSlotPacket(targetSlot);
 
@@ -37,8 +35,6 @@ public class InventorySlotHandler {
     }
 
     public void forceClientSlot(int slot) {
-        if (MC.player == null) return;
-
         if (MC.player.getInventory().getSelectedSlot() != slot) {
             MC.player.getInventory().setSelectedSlot(slot);
             sendSlotPacket(slot);
@@ -46,7 +42,6 @@ public class InventorySlotHandler {
     }
 
     public void sendSlotPacket(int slot) {
-        if (MC.getNetworkHandler() == null) return;
         MC.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
     }
 
