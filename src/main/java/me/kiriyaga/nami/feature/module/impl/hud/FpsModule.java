@@ -14,7 +14,7 @@ public class FpsModule extends HudElementModule {
     public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
 
     public FpsModule() {
-        super("fps", "Displays current FPS.", 52, 52, 50, 9);
+        super("fps", "Displays current FPS.", 0, 0, 50, 9);
     }
 
     @Override

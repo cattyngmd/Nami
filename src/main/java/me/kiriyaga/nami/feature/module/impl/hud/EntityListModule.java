@@ -29,7 +29,7 @@ public class EntityListModule extends HudElementModule {
     public final BoolSetting onlyLiving = addSetting(new BoolSetting("only living", false));
 
     public EntityListModule() {
-        super("entity list", "Shows nearby entities", 52, 52, 50, 10);
+        super("entity list", "Shows nearby entities", 0, 0, 50, 10);
     }
 
     @Override

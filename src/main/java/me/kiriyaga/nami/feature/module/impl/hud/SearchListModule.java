@@ -28,7 +28,7 @@ public class SearchListModule extends HudElementModule {
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.DESCENDING));
 
     public SearchListModule() {
-        super("search list", "Shows nearby blocks found by search.", 52, 52, 50, 10);
+        super("search list", "Shows nearby blocks found by search.", 0, 0, 50, 10);
     }
 
     @Override

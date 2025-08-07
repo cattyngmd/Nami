@@ -22,7 +22,7 @@ public class TimeModule extends HudElementModule {
     public final EnumSetting<TimeMode> mode = addSetting(new EnumSetting<>("mode", TimeMode.REAL));
 
     public TimeModule() {
-        super("time", "Displays real or game time.", 52, 52, 50, 9);
+        super("time", "Displays real or game time.", 0, 0, 50, 9);
     }
 
     @Override

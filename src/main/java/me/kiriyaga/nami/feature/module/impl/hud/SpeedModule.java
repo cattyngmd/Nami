@@ -32,7 +32,7 @@ public class SpeedModule extends HudElementModule {
     private double lastZ = 0;
 
     public SpeedModule() {
-        super("speed", "Displays current player speed.", 52, 52, 50, 9);
+        super("speed", "Displays current player speed.", 0, 0, 50, 9);
 
         samples.setOnChanged(() -> {
             speedSamples = new double[samples.get()];

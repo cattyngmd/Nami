@@ -24,7 +24,7 @@ public class CoordinatesModule extends HudElementModule {
     public final EnumSetting<LayoutMode> layout = addSetting(new EnumSetting<>("layout", LayoutMode.HORIZONTAL));
 
     public CoordinatesModule() {
-        super("coordinates", "Displays player coordinates.", 52, 52, 100, 30);
+        super("coordinates", "Displays player coordinates.", 0, 0, 100, 30);
     }
 
     @Override

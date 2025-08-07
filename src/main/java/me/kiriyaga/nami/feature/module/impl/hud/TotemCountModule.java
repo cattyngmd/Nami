@@ -18,7 +18,7 @@ public class TotemCountModule extends HudElementModule {
     public final BoolSetting white = addSetting(new BoolSetting("white", true));
 
     public TotemCountModule() {
-        super("totem count", "Displays number of totems in inventory.", 52, 52, 20, 20);
+        super("totem count", "Displays number of totems in inventory.", 0, 0, 20, 20);
         this.label.setShow(true);
     }
 

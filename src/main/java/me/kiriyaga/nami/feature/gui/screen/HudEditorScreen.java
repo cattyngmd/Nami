@@ -156,8 +156,9 @@ public class HudEditorScreen extends Screen {
         }
 
         if (!intersects) {
-            draggingElement.x.set(newX);
-            draggingElement.y.set(newRenderY);
+            draggingElement.x.set(newX / (double)screenWidth);
+            draggingElement.y.set(newRenderY / (double)screenHeight);
+
         }
 
         return true;

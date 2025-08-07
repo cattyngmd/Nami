@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.module;
 
 import me.kiriyaga.nami.feature.module.impl.client.HudModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.font.TextRenderer;
@@ -18,12 +19,12 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 //TODO: refactor
 public abstract class HudElementModule extends Module {
 
-    public final IntSetting x;
-    public final IntSetting y;
+    public final DoubleSetting x;
+    public final DoubleSetting y;
     public final EnumSetting<HudAlignment> alignment;
     public final EnumSetting<LabelPosition> label;
 
-    public int width;
+    public int width;  // размер в пикселях
     public int height;
     public static final int PADDING = 1;
 
@@ -37,9 +38,9 @@ public abstract class HudElementModule extends Module {
         this.width = width;
         this.height = height;
 
-        this.x = addSetting(new IntSetting("x", defaultX, 0, 4321));
+        this.x = addSetting(new DoubleSetting("x", defaultX, 0, 1));
         this.x.setShow(false);
-        this.y = addSetting(new IntSetting("y", defaultY, 0, 4321));
+        this.y = addSetting(new DoubleSetting("y", defaultY, 0, 1));
         this.y.setShow(false);
         this.label = addSetting(new EnumSetting<LabelPosition>("label position", LabelPosition.TOP));
         this.label.setShow(false);
@@ -124,9 +125,19 @@ public abstract class HudElementModule extends Module {
         };
     }
 
+    public int getAbsoluteX() {
+        int screenWidth = MC.getWindow().getScaledWidth();
+        return (int)(x.get() * screenWidth);
+    }
+
+    public int getAbsoluteY() {
+        int screenHeight = MC.getWindow().getScaledHeight();
+        return (int)(y.get() * screenHeight);
+    }
+
     public int getRenderX() {
         int screenWidth = MC.getWindow().getScaledWidth();
-        int posX = x.get();
+        int posX = getAbsoluteX();
         Rectangle bounds = getBoundingBox();
 
         switch (alignment.get()) {
@@ -147,7 +158,7 @@ public abstract class HudElementModule extends Module {
 
     public int getRenderY() {
         int screenHeight = MC.getWindow().getScaledHeight();
-        int posY = y.get();
+        int posY = getAbsoluteY();
         Rectangle bounds = getBoundingBox();
 
         int clamped = posY;

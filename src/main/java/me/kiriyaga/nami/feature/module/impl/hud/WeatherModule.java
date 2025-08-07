@@ -13,7 +13,7 @@ public class WeatherModule extends HudElementModule {
     public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
 
     public WeatherModule() {
-        super("weather", "Displays current weather.", 52, 52, 50, 9);
+        super("weather", "Displays current weather.", 0, 0, 50, 9);
     }
 
     @Override

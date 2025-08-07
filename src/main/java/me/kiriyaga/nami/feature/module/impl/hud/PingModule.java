@@ -13,7 +13,7 @@ public class PingModule extends HudElementModule {
     public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
 
     public PingModule() {
-        super("ping", "Displays current Ping.", 52, 52, 50, 9);
+        super("ping", "Displays current Ping.", 0, 0, 50, 9);
     }
 
     @Override
