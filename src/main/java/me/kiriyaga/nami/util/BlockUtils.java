@@ -12,6 +12,7 @@ import java.util.Set;
 
 public class BlockUtils {
     private static final Block AIR_BLOCK = Registries.BLOCK.get(Identifier.of("minecraft", "air"));
+    private static final Block VOID_AIR_BLOCK = Registries.BLOCK.get(Identifier.of("minecraft", "void_air"));
 
 
     private static final Set<String> NON_VANILLA_GENERATED_IDS = Set.of(
@@ -122,7 +123,7 @@ public class BlockUtils {
         Set<Block> blocks = new HashSet<>();
         for (Identifier id : NON_VANILLA_GENERATED_IDENTIFIERS) {
             Block block = Registries.BLOCK.get(id);
-            if (block != null && block != AIR_BLOCK) {
+            if (block != null && block != AIR_BLOCK && block != VOID_AIR_BLOCK) {
                 blocks.add(block);
             }
         }
@@ -190,7 +191,7 @@ public class BlockUtils {
         Set<Block> blocks = new HashSet<>();
         for (Identifier id : STORAGE_IDENTIFIERS) {
             Block block = Registries.BLOCK.get(id);
-            if (block != null && block != AIR_BLOCK) {
+            if (block != null && block != AIR_BLOCK && block != VOID_AIR_BLOCK) {
                 blocks.add(block);
             }
         }
