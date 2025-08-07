@@ -2,6 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.EntityPushEvent;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.MinecraftClient;
@@ -16,12 +17,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.awt.*;
+
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity {
 
     @Shadow public abstract boolean isPlayer();
+
+    @Inject(method = "getTeamColorValue", at = @At("HEAD"), cancellable = true)
+    private void onGetTeamColorValue(CallbackInfoReturnable<Integer> cir) {
+        Entity self = (Entity) (Object) this;
+
+        Color espColor = ESPModule.getESPColor(self);
+        if (espColor != null) {
+            cir.setReturnValue(espColor.getRGB() & 0xFFFFFF);
+        }
+    }
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
     private void updateChangeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {

@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(WorldRenderer.class)
-
 public class MixinWorldRenderer {
 
     @Inject(method = "render", at = @At("RETURN"))
