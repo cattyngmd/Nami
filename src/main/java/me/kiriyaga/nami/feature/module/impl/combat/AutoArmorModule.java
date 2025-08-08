@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
+import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -31,6 +32,7 @@ public class AutoArmorModule extends Module {
     private enum HelmetPriority { BEST, TURTLE, GOLDEN, PUMPKIN, NONE }
 
     private final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("protection", ProtectionPriority.PROT));
+    private final IntSetting damageThreshold = addSetting(new IntSetting("damage", 3, 1, 15));
     private final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("helmet", HelmetPriority.BEST));
     private final BoolSetting helmetSafety = addSetting(new BoolSetting("helmet safety", false));
     private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("boots", BootsPriority.BEST));
@@ -225,10 +227,16 @@ public class AutoArmorModule extends Module {
             ItemStack stack = player.getInventory().getStack(i);
             if (stack.isEmpty()) continue;
 
+            if (isBroken(stack)) continue;
+
             if (!isArmorForSlot(stack, targetSlot)) continue;
 
             if (targetSlot == EquipmentSlot.CHEST && stack.getItem() == Items.ELYTRA && elytraPriority.get()) {
-                return stack;
+                if (current.isEmpty() || isBroken(current) || current.getItem() != Items.ELYTRA) {
+                    return stack;
+                } else {
+                    continue; // rekursia
+                }
             }
 
             if (targetSlot == EquipmentSlot.HEAD) {
@@ -248,8 +256,9 @@ public class AutoArmorModule extends Module {
             candidates.add(stack);
         }
 
-        if (targetSlot == EquipmentSlot.CHEST && current.getItem() == Items.ELYTRA && elytraPriority.get())
+        if (targetSlot == EquipmentSlot.CHEST && current.getItem() == Items.ELYTRA && elytraPriority.get() && !isBroken(current)) {
             return null;
+        }
 
         if (candidates.isEmpty()) return null;
 
@@ -305,5 +314,13 @@ public class AutoArmorModule extends Module {
             }
         }
         return -1;
+    }
+
+    private boolean isBroken(ItemStack stack) {
+        if (!stack.isDamageable()) return false;
+        int max = stack.getMaxDamage();
+        int damage = stack.getDamage();
+        int percent = (int) ((damage / (float) max) * 100);
+        return percent >= damageThreshold.get();
     }
 }
