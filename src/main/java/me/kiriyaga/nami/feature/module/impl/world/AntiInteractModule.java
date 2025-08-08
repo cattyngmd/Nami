@@ -34,8 +34,6 @@ public class AntiInteractModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onPlaceBlock(PlaceBlockEvent event) {
-        if (!spawnPoint.get()) return;
-
         ClientPlayerEntity player = event.getPlayer();
         BlockHitResult hitResult = event.getHitResult();
 
@@ -51,6 +49,8 @@ public class AntiInteractModule extends Module {
             return;
         }
 
+        if (!spawnPoint.get()) return;
+
         if (player.getWorld().getDimension().comp_648() && isBed(block)) {
             event.cancel();
             return;
@@ -64,7 +64,7 @@ public class AntiInteractModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onPacketSendRespawn(PacketSendEvent ev) {
-        if (!packet.get() || !spawnPoint.get()) return;
+        if (!packet.get()) return;
 
         if (!(ev.getPacket() instanceof PlayerInteractBlockC2SPacket interactPacket)) return;
         if (MC.world == null) return;
@@ -81,6 +81,8 @@ public class AntiInteractModule extends Module {
         if (whitelist.get() && whitelist.isWhitelisted(blockId)) {
             ev.cancel();
         }
+
+        if (!spawnPoint.get()) return;
 
         if (isBed(block) && dimension.equals("overworld")) {
             ev.cancel();
