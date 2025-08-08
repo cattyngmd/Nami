@@ -21,6 +21,7 @@ public class BreakTickHandler {
     private final BreakStateHandler stateHandler;
     private final BreakRequestHandler requestHandler;
     private BlockPos currentBreakingBlock = null;
+    private long lastBreakTime = 0L;
 
     public BreakTickHandler(BreakStateHandler stateHandler, BreakRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -49,6 +50,10 @@ public class BreakTickHandler {
 
         if (isBlockAirOrFluid(pos)) {
             requestHandler.removeBlock(pos);
+            if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
+                currentBreakingBlock = null;
+                lastBreakTime = System.currentTimeMillis();
+            }
             return;
         }
 
@@ -90,8 +95,14 @@ public class BreakTickHandler {
         Direction direction = Direction.UP;
 
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
-            MC.interactionManager.attackBlock(pos, direction);
+            long now = System.currentTimeMillis();
+            BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+            if (now - lastBreakTime < module.delayMs.get()) {
+                return false;
+            }
             currentBreakingBlock = pos;
+            lastBreakTime = now;
+            MC.interactionManager.attackBlock(pos, direction);
         } else {
             boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
             if (!success) {
