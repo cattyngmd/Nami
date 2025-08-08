@@ -19,6 +19,7 @@ import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -86,11 +87,11 @@ public class AutoEatModule extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private void onPlaceBlock(PlaceBlockEvent event) {
-        if (MC.player != null && MC.world != null && eating.get())
-            event.cancel();
-    }
+//            @SubscribeEvent(priority = EventPriority.HIGHEST)
+//        private void onPlaceBlock(PlaceBlockEvent event) {
+//            if (MC.player != null && MC.world != null && eating.get())
+//                event.cancel();
+//        }
 
     private int getBestFoodSlot() {
         int bestSlot = -1;
@@ -153,8 +154,21 @@ public class AutoEatModule extends Module {
     private void setUseHeld(boolean held) {
         KeyBinding useKey = MC.options.useKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) useKey).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+
+        boolean physicallyPressed = false;
+
+        if (boundKey.getCategory() == InputUtil.Type.KEYSYM) {
+            int keyCode = boundKey.getCode();
+            if (keyCode >= 0) {
+                physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+            }
+        } else if (boundKey.getCategory() == InputUtil.Type.MOUSE) {
+            int mouseCode = boundKey.getCode();
+            if (mouseCode >= 0) {
+                physicallyPressed = GLFW.glfwGetMouseButton(MC.getWindow().getHandle(), mouseCode) == GLFW.GLFW_PRESS;
+            }
+        }
+
         useKey.setPressed(physicallyPressed || held);
     }
 }
