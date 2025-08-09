@@ -5,11 +5,11 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.util.Hand;
+import net.minecraft.client.util.InputUtil;
 
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -21,18 +21,25 @@ public class AutoClickModule extends Module {
         RIGHT
     }
 
-    private final EnumSetting<ClickButton> button = addSetting(new EnumSetting<>("button", ClickButton.LEFT));
-    private final IntSetting delay = addSetting(new IntSetting("delay", 0, 0, 1200));
+    private final EnumSetting<ClickButton> button = addSetting(new EnumSetting<>("button", ClickButton.RIGHT));
+    private final IntSetting delay = addSetting(new IntSetting("delay", 80, 1, 1200));
 
     private int tickCounter = 0;
+    private boolean clickHeld = false;
 
     public AutoClickModule() {
-        super("auto click", "Automatically clicks.", ModuleCategory.of("movement"), "autoclick", "фгещсдшсл");
+        super("auto click", "Automatically clicks like a real mouse press.", ModuleCategory.of("combat"), "autoclick");
     }
 
     @Override
     public void onEnable() {
         tickCounter = 0;
+        clickHeld = false;
+    }
+
+    @Override
+    public void onDisable() {
+        releaseKey(getKeyBinding());
     }
 
     @SubscribeEvent
@@ -44,25 +51,35 @@ public class AutoClickModule extends Module {
             return;
         }
 
-        switch (button.get()) {
-            case LEFT -> performLeftClick();
-            case RIGHT -> performRightClick();
+        if (!clickHeld) {
+            setKeyHeld(getKeyBinding(), true);
+            clickHeld = true;
+            tickCounter = 1;
+        } else {
+            setKeyHeld(getKeyBinding(), false);
+            clickHeld = false;
+            tickCounter = delay.get();
         }
-
-        tickCounter = delay.get();
     }
 
-    private void performRightClick() {
-        KeyBinding useKey = MC.options.useKey;
-        boolean physicallyPressed = useKey.isPressed();
-
-        useKey.setPressed(true);
+    private KeyBinding getKeyBinding() {
+        return switch (button.get()) {
+            case LEFT -> MC.options.attackKey;
+            case RIGHT -> MC.options.useKey;
+        };
     }
 
-    private void performLeftClick() {
-        KeyBinding attackKey = MC.options.attackKey;
-        boolean physicallyPressed = attackKey.isPressed();
+    private void setKeyHeld(KeyBinding key, boolean held) {
+        InputUtil.Key boundKey = ((KeyBindingAccessor) key).getBoundKey();
+        int keyCode = boundKey.getCode();
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+        key.setPressed(physicallyPressed || held);
+    }
 
-        attackKey.setPressed(true);
+    private void releaseKey(KeyBinding key) {
+        InputUtil.Key boundKey = ((KeyBindingAccessor) key).getBoundKey();
+        int keyCode = boundKey.getCode();
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+        key.setPressed(physicallyPressed);
     }
 }
