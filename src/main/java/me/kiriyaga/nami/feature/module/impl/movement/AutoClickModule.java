@@ -8,6 +8,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.Hand;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -26,7 +27,7 @@ public class AutoClickModule extends Module {
     private int tickCounter = 0;
 
     public AutoClickModule() {
-        super("auto click", "Automatically clicks.", ModuleCategory.of("combat"), "autoclick", "фгещсдшсл");
+        super("auto click", "Automatically clicks.", ModuleCategory.of("movement"), "autoclick", "фгещсдшсл");
     }
 
     @Override
@@ -51,16 +52,17 @@ public class AutoClickModule extends Module {
         tickCounter = delay.get();
     }
 
-    private void performLeftClick() {
-        ClientPlayerInteractionManager im = MC.interactionManager;
-        if (im != null) {
-            MC.player.swingHand(Hand.MAIN_HAND);
-            im.attackEntity(MC.player, MC.targetedEntity != null ? MC.targetedEntity : null);
-        }
+    private void performRightClick() {
+        KeyBinding useKey = MC.options.useKey;
+        boolean physicallyPressed = useKey.isPressed();
+
+        useKey.setPressed(true);
     }
 
-    private void performRightClick() {
-        MC.player.swingHand(Hand.MAIN_HAND);
-        MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+    private void performLeftClick() {
+        KeyBinding attackKey = MC.options.attackKey;
+        boolean physicallyPressed = attackKey.isPressed();
+
+        attackKey.setPressed(true);
     }
 }

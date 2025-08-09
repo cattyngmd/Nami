@@ -15,6 +15,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
 
@@ -27,13 +30,16 @@ public class AutoFrameModule extends Module {
 
     private int cooldown = 0;
 
+    private final Set<Integer> clickedFrames = new HashSet<>();
+
     public AutoFrameModule() {
-        super("auto item frame", "Automatically puts a map in nearby item frames.", ModuleCategory.of("world"));
+        super("auto frame", "Automatically puts a map in nearby item frames.", ModuleCategory.of("world"));
     }
 
     @Override
     public void onDisable() {
         cooldown = 0;
+        clickedFrames.clear();
     }
 
     @SubscribeEvent
@@ -47,6 +53,8 @@ public class AutoFrameModule extends Module {
 
         for (Entity entity : MC.world.getEntities()) {
             if (!(entity instanceof ItemFrameEntity frame)) continue;
+
+            if (clickedFrames.contains(frame.getId())) continue;
 
             if (MC.player.squaredDistanceTo(frame) > range.get() * range.get()) continue;
 
@@ -73,6 +81,8 @@ public class AutoFrameModule extends Module {
             if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoFrameModule.class.getName())) return;
 
             interactWithEntity(frame, center, true);
+
+            clickedFrames.add(frame.getId());
 
             cooldown = delay.get();
             break;
