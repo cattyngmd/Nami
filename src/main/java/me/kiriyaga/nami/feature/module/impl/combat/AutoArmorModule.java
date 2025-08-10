@@ -256,8 +256,16 @@ public class AutoArmorModule extends Module {
             candidates.add(stack);
         }
 
-        if (targetSlot == EquipmentSlot.CHEST && current.getItem() == Items.ELYTRA && elytraPriority.get() && !isBroken(current)) {
-            return null;
+        if (targetSlot == EquipmentSlot.CHEST && elytraPriority.get()) {
+            boolean wearingElytra = current.getItem() == Items.ELYTRA;
+            if (wearingElytra && !isBroken(current)) {
+                return null;
+            }
+            for (ItemStack stack : candidates) {
+                if (stack.getItem() == Items.ELYTRA && !isBroken(stack)) {
+                    return stack;
+                }
+            }
         }
 
         if (candidates.isEmpty()) return null;
