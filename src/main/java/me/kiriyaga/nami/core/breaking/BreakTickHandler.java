@@ -93,20 +93,21 @@ public class BreakTickHandler {
             return false;
 
         Direction direction = Direction.UP;
+        BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+        long now = System.currentTimeMillis();
 
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
-            long now = System.currentTimeMillis();
-            BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
             if (now - lastBreakTime < module.delayMs.get()) {
                 return false;
             }
             currentBreakingBlock = pos;
-            lastBreakTime = now;
             MC.interactionManager.attackBlock(pos, direction);
         } else {
             boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
             if (!success) {
-                MC.interactionManager.attackBlock(pos, direction);
+                currentBreakingBlock = null;
+                lastBreakTime = now;
+                return false;
             }
         }
 
