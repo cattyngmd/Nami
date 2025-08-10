@@ -6,6 +6,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
@@ -25,7 +26,8 @@ import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
 public class AutoFrameModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 4, 1.0, 6.0));
-    private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
+    private final IntSetting delay = addSetting(new IntSetting("delay", 10, 0, 20));
+    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private int cooldown = 0;
@@ -69,16 +71,18 @@ public class AutoFrameModule extends Module {
             }
 
             Vec3d center = getEntityCenter(frame);
-            ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(
-                            AutoFrameModule.class.getName(),
-                            rotationPriority.get(),
-                            (float) getYawToVec(MC.player, center),
-                            (float) getPitchToVec(MC.player, center)
-                    )
-            );
 
-            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoFrameModule.class.getName())) return;
+            if (rotate.get()) {
+                ROTATION_MANAGER.getRequestHandler().submit(
+                        new RotationRequest(
+                                AutoFrameModule.class.getName(),
+                                rotationPriority.get(),
+                                (float) getYawToVec(MC.player, center),
+                                (float) getPitchToVec(MC.player, center)
+                        )
+                );
+                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoFrameModule.class.getName())) return;
+            }
 
             interactWithEntity(frame, center, true);
 
