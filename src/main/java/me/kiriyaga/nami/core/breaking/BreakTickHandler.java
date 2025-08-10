@@ -2,6 +2,7 @@ package me.kiriyaga.nami.core.breaking;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.impl.BreakBlockEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.BreakManagerModule;
@@ -63,6 +64,16 @@ public class BreakTickHandler {
             return;
 
         tryBreak(pos);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onBlockBreak(BreakBlockEvent event) {
+        if (MC.isInSingleplayer()) return;
+
+        if (MC.player == null || MC.interactionManager == null || !requestHandler.hasTarget())
+            return;
+        
+        event.cancel();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
