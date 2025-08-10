@@ -72,7 +72,7 @@ public class BreakTickHandler {
 
         if (MC.player == null || MC.interactionManager == null || !requestHandler.hasTarget())
             return;
-        
+
         event.cancel();
     }
 
