@@ -328,7 +328,7 @@ public class AutoArmorModule extends Module {
         if (!stack.isDamageable()) return false;
         int max = stack.getMaxDamage();
         int damage = stack.getDamage();
-        int percent = (int) ((damage / (float) max) * 100);
-        return percent >= damageThreshold.get();
+        int percentRemaining = (int) (((max - damage) / (float) max) * 100);
+        return percentRemaining <= damageThreshold.get();
     }
 }
