@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
@@ -24,47 +24,48 @@ public abstract class MixinPlayerEntity extends LivingEntity {
         super(entityType, world);
     }
 
-    @Inject(method = "clipAtLedge", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "clipAtLedge", at = @At("HEAD"), cancellable = true)
     private void clipAtLedge(CallbackInfoReturnable<Boolean> cir) {
         LedgeClipEvent ledgeClipEvent = new LedgeClipEvent();
         EVENT_MANAGER.post(ledgeClipEvent);
-        
-        if (ledgeClipEvent.isCancelled())
+
+        if (ledgeClipEvent.isCancelled()) {
             cir.setReturnValue(ledgeClipEvent.getClipped());
-    }
-
-    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
-    private void attack(PlayerEntity playerEntity, Vec3d movementInput) {
-        if (playerEntity instanceof ClientPlayerEntity) {
-            SprintResetEvent sprintResetEvent = new SprintResetEvent();
-            EVENT_MANAGER.post(sprintResetEvent);
-            if (!sprintResetEvent.isCancelled())
-                MC.player.setVelocity(MC.player.getVelocity().multiply(0.6, 1.0, 0.6));
         }
     }
 
-    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V"))
-    private void attack2(PlayerEntity playerEntity, boolean liv) {
-        if (playerEntity instanceof ClientPlayerEntity) {
+    @ModifyArg(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
+    private Vec3d attack(Vec3d original) {
+        if ((Object)this == MC.player) {
             SprintResetEvent sprintResetEvent = new SprintResetEvent();
             EVENT_MANAGER.post(sprintResetEvent);
-            if (!sprintResetEvent.isCancelled())
-                MC.player.setSprinting(false);
-
+            if (!sprintResetEvent.isCancelled()) {
+                return original.multiply(0.6, 1.0, 0.6);
+            }
         }
+        return original;
     }
 
+    @ModifyArg(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V"))
+    private boolean attack(boolean original) {
+        if ((Object)this == MC.player) {
+            SprintResetEvent sprintResetEvent = new SprintResetEvent();
+            EVENT_MANAGER.post(sprintResetEvent);
+            if (!sprintResetEvent.isCancelled()) {
+                return false;
+            }
+        }
+        return original;
+    }
 
-    @Inject(method = "isPushedByFluids", at = @At(value = "HEAD"),
-            cancellable = true)
+    @Inject(method = "isPushedByFluids", at = @At("HEAD"), cancellable = true)
     private void isPushedByFluids(CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this != MC.player)
             return;
 
         LiquidPushEvent pushFluidsEvent = new LiquidPushEvent();
         EVENT_MANAGER.post(pushFluidsEvent);
-        if (pushFluidsEvent.isCancelled())
-        {
+        if (pushFluidsEvent.isCancelled()) {
             cir.setReturnValue(false);
             cir.cancel();
         }

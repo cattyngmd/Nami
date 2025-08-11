@@ -155,18 +155,22 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-    @Redirect(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
-    private boolean handleBlockBreaking(ClientPlayerEntity instance) {
+    @Inject(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), cancellable = true)
+    private void handleBlockBreaking(boolean bl, CallbackInfo ci) {
         InteractionEvent ev = new InteractionEvent();
         EVENT_MANAGER.post(ev);
-        return !ev.isCancelled() && instance.isUsingItem();
+        if (ev.isCancelled()) {
+            ci.cancel();
+        }
     }
 
-    @Redirect(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
-    private boolean doItemUse(ClientPlayerInteractionManager instance) {
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"), cancellable = true)
+    private void doItemUse2(CallbackInfo ci) {
         InteractionEvent ev = new InteractionEvent();
         EVENT_MANAGER.post(ev);
-        return !ev.isCancelled() && instance.isBreakingBlock();
+        if (ev.isCancelled()) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
