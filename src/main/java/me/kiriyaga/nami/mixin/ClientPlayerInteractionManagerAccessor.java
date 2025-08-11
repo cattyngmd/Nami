@@ -13,7 +13,4 @@ public interface ClientPlayerInteractionManagerAccessor {
 
     @Accessor("blockBreakingCooldown")
     void setBlockBreakingCooldown(int value);
-
-    @Invoker("syncSelectedSlot")
-    void syncSelectedSlot();
 }
