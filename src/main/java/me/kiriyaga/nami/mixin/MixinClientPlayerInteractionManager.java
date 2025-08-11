@@ -25,8 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(ClientPlayerInteractionManager.class)
 public abstract class MixinClientPlayerInteractionManager{
@@ -67,6 +66,8 @@ public abstract class MixinClientPlayerInteractionManager{
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"))
     private void disableBreakCooldown(CallbackInfoReturnable<Boolean> cir) {
         if (MODULE_MANAGER.getStorage() == null) return;
+
+        CHAT_MANAGER.sendRaw(""+this.blockBreakingCooldown);
 
         NoBreakDelayModule noBreakDelay = MODULE_MANAGER.getStorage().getByClass(NoBreakDelayModule.class);
         if (noBreakDelay != null && noBreakDelay.isEnabled()) {

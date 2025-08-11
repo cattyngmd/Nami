@@ -7,6 +7,7 @@ import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.BreakManagerModule;
 import me.kiriyaga.nami.core.breaking.model.BreakTarget;
+import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +23,8 @@ public class BreakTickHandler {
     private final BreakStateHandler stateHandler;
     private final BreakRequestHandler requestHandler;
     private BlockPos currentBreakingBlock = null;
-    private long lastBreakTime = 0L;
+    private long lastAttackBlockTime = 0;
+    private static final long ATTACK_BLOCK_COOLDOWN_MS = 250; // grim is wild
 
     public BreakTickHandler(BreakStateHandler stateHandler, BreakRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -53,7 +55,6 @@ public class BreakTickHandler {
             requestHandler.removeBlock(pos);
             if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
                 currentBreakingBlock = null;
-                lastBreakTime = System.currentTimeMillis();
             }
             return;
         }
@@ -64,16 +65,6 @@ public class BreakTickHandler {
             return;
 
         tryBreak(pos);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onBlockBreak(BreakBlockEvent event) {
-        if (MC.isInSingleplayer()) return;
-
-        if (MC.player == null || MC.interactionManager == null || !requestHandler.hasTarget())
-            return;
-
-        event.cancel();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -104,20 +95,19 @@ public class BreakTickHandler {
             return false;
 
         Direction direction = Direction.UP;
-        BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+
         long now = System.currentTimeMillis();
 
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
-            if (now - lastBreakTime < module.delayMs.get()) {
-                return false;
+            if (now - lastAttackBlockTime >= ATTACK_BLOCK_COOLDOWN_MS) {
+                currentBreakingBlock = pos;
+                MC.interactionManager.attackBlock(pos, direction);
+                lastAttackBlockTime = now;
             }
-            currentBreakingBlock = pos;
-            MC.interactionManager.attackBlock(pos, direction);
         } else {
             boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
             if (!success) {
                 currentBreakingBlock = null;
-                lastBreakTime = now;
                 return false;
             }
         }
