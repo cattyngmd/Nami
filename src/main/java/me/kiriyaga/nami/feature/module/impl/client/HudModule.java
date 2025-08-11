@@ -62,11 +62,11 @@ public class HudModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender2D(Render2DEvent event) {
-        if (chatAnimation.get()) {
-            boolean chatOpen = MC.currentScreen instanceof ChatScreen;
-            ChatAnimationHelper.setChatOpen(chatOpen);
-            ChatAnimationHelper.tick();
+        boolean chatOpen = MC.currentScreen instanceof ChatScreen;
+        ChatAnimationHelper.setChatOpen(chatOpen);
+        ChatAnimationHelper.tick();
 
+        if (chatAnimation.get()) {
             int offset = (int) ChatAnimationHelper.getAnimationOffset();
             if (offset > 0) {
                 event.getDrawContext().fill(
@@ -92,7 +92,7 @@ public class HudModule extends Module {
                     int drawY = baseY + element.offsetY();
 
                     boolean isInChatZone = (drawY + MC.textRenderer.fontHeight) >= chatZoneTop;
-                    if (chatAnimation.get() && isInChatZone) {
+                    if (isInChatZone) {
                         drawY -= chatAnimationOffset;
                     }
 
