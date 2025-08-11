@@ -39,12 +39,13 @@ public class ClickPearlModule extends Module {
 
         if (MC.player.isGliding() && glideFirework.get()) {
             int slot = getSlot(Items.FIREWORK_ROCKET);
+            int prevSlot = MC.player.getInventory().getSelectedSlot();
             if (slot == -1)
                 return;
 
-            INVENTORY_MANAGER.getSlotHandler().attemptSilentSwitch(slot);
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
             MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
-            INVENTORY_MANAGER.getSyncHandler().swapSync();
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
             return;
         }
 
@@ -52,9 +53,11 @@ public class ClickPearlModule extends Module {
         if (slot == -1 || MC.player.getItemCooldownManager().isCoolingDown(Items.ENDER_PEARL.getDefaultStack()))
             return;
 
+        int prevSlot = MC.player.getInventory().getSelectedSlot();
+
         INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
         MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
-        INVENTORY_MANAGER.getSyncHandler().swapSync();
+        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
     }
 
     @Override
