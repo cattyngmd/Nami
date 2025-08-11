@@ -61,8 +61,11 @@ public class ClickGuiScreen extends Screen {
         }
 
         ClickGuiModule clickGuiModule = getClickGuiModule();
-        if (clickGuiModule != null && clickGuiModule.background.get())
-            context.fill(0, 0, this.width, this.height, 0xC0101010);
+        if (clickGuiModule != null && clickGuiModule.background.get()) {
+            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
+            int color = alpha | 0x101010;
+            context.fill(0, 0, this.width, this.height, color);
+        }
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);

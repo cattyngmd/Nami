@@ -73,7 +73,7 @@ public class CategoryPanel {
             context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, primary.getRGB());
 
         }
-        
+
         context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, toRGBA(primary));
 
         int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
