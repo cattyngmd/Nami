@@ -36,6 +36,7 @@ public class AutoFrameModule extends Module {
 
     public AutoFrameModule() {
         super("auto frame", "Automatically puts a map in nearby item frames.", ModuleCategory.of("world"));
+    rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override

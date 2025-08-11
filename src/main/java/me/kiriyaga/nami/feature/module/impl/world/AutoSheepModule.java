@@ -6,14 +6,13 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -25,12 +24,14 @@ public class AutoSheepModule extends Module {
 
     private final DoubleSetting shearRange = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
+    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 2, 1, 10));
 
     private int swapCooldown = 0;
 
     public AutoSheepModule() {
         super("auto sheep", "Automatically shears nearby sheep.", ModuleCategory.of("world"), "sheep", "autowool", "фгещырууз");
+        rotationPriority.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent
@@ -61,16 +62,18 @@ public class AutoSheepModule extends Module {
 
             Vec3d center = getEntityCenter(sheep);
 
-            ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(
-                            AutoSheepModule.class.getName(),
-                            rotationPriority.get(),
-                            (float) getYawToVec(MC.player, center),
-                            (float) getPitchToVec(MC.player, center)
-                    )
-            );
+            if (rotate.get()) {
+                ROTATION_MANAGER.getRequestHandler().submit(
+                        new RotationRequest(
+                                AutoSheepModule.class.getName(),
+                                rotationPriority.get(),
+                                (float) getYawToVec(MC.player, center),
+                                (float) getPitchToVec(MC.player, center)
+                        )
+                );
 
-            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoSheepModule.class.getName())) return;
+                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoSheepModule.class.getName())) return;
+            }
 
             interactWithEntity(entity, center, true);
 

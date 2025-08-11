@@ -65,6 +65,7 @@ public class NukerModule extends Module {
                     for (int y = -r; y <= r; y++) {
                         for (int z = -r; z <= r; z++) {
                             BlockPos checkPos = base.add(x, y, z);
+                            if (checkPos.getY() < playerPos.getY()) continue;
                             if (checkPos.equals(playerPos)) continue;
                             addBlockToBreak(checkPos);
                         }

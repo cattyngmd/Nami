@@ -15,8 +15,6 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -29,12 +27,14 @@ public class AutoNametagModule extends Module {
     private final BoolSetting nametagged = addSetting(new BoolSetting("nametagged", false));
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
+    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private int swapCooldown = 0;
 
     public AutoNametagModule() {
         super("auto nametag", "Automatically renames nearby entities with nametags.", ModuleCategory.of("world"), "nametag", "autoname", "autonametag", "фгещтфьуефп");
+        rotationPriority.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent
@@ -66,14 +66,16 @@ public class AutoNametagModule extends Module {
 
             Vec3d center = getEntityCenter(entity);
 
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
-                    AutoNametagModule.class.getName(),
-                    rotationPriority.get(),
-                    (float) getYawToVec(MC.player, center),
-                    (float) getPitchToVec(MC.player, center)
-            ));
+            if (rotate.get()) {
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+                        AutoNametagModule.class.getName(),
+                        rotationPriority.get(),
+                        (float) getYawToVec(MC.player, center),
+                        (float) getPitchToVec(MC.player, center)
+                ));
 
-            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoNametagModule.class.getName())) return;
+                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoNametagModule.class.getName())) return;
+            }
 
             interactWithEntity(entity, center, true);
 
