@@ -67,7 +67,7 @@ public abstract class MixinClientPlayerInteractionManager{
     private void disableBreakCooldown(CallbackInfoReturnable<Boolean> cir) {
         if (MODULE_MANAGER.getStorage() == null) return;
 
-        CHAT_MANAGER.sendRaw(""+this.blockBreakingCooldown);
+        //CHAT_MANAGER.sendRaw(""+this.blockBreakingCooldown);
 
         NoBreakDelayModule noBreakDelay = MODULE_MANAGER.getStorage().getByClass(NoBreakDelayModule.class);
         if (noBreakDelay != null && noBreakDelay.isEnabled()) {
