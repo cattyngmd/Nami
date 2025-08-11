@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.core.inventory;
 
-import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
+import me.kiriyaga.nami.mixininterface.IClientPlayerInteractionManager;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -12,6 +12,10 @@ public class InventorySlotHandler {
             return;
 
         MC.player.getInventory().setSelectedSlot(targetSlot);
-        ((ClientPlayerInteractionManagerAccessor)MC.interactionManager).syncSelectedSlot();
+        syncSelectedSlot();
+    }
+
+    public void syncSelectedSlot(){
+        ((IClientPlayerInteractionManager)MC.interactionManager).updateSlot(); // this one is the same as mc default one
     }
 }
