@@ -49,7 +49,7 @@ public class NoSoundLagModule extends Module {
         if (!isEnabled()) return;
 
         if (event.getPacket() instanceof PlaySoundS2CPacket packet) {
-            SoundEvent sound = packet.getSound().comp_349();
+            SoundEvent sound = packet.getSound().value();
 
             boolean cancel = false;
 

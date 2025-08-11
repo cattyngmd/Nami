@@ -308,15 +308,15 @@ public class RenderUtil {
 
 
     public static void drawItem2D(DrawContext drawContext, ItemStack stack, int x, int y, float scale) {
-        Matrix3x2fStack matrices = drawContext.getMatrices();
-        matrices.pushMatrix();
+        MatrixStack matrices = drawContext.getMatrices();
+        matrices.pop();
 
-        matrices.translate(x, y);
-        matrices.scale(scale, scale);
+        matrices.translate(x, y, 1.0);
+        matrices.scale(scale, scale, 1.0f);
 
         drawContext.drawItem(stack, -8, -8);
 
-        matrices.popMatrix();
+        matrices.pop();
     }
 
     public static void drawText3D(MatrixStack matrices, Text text, Vec3d pos, float scale, boolean background, boolean border, float borderWidth) {
