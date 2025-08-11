@@ -42,6 +42,10 @@ public abstract class CommandArgument {
             }
             return input;
         }
+
+        public Object parse(String[] input, int index) {
+            return parse(input[index]);
+        }
     }
 
     public static class IntArg extends CommandArgument {

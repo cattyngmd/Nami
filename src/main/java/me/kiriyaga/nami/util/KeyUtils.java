@@ -101,6 +101,10 @@ public class KeyUtils {
         if (keyCode >= GLFW.GLFW_KEY_0 && keyCode <= GLFW.GLFW_KEY_9) {
             return String.valueOf((char)('0' + (keyCode - GLFW.GLFW_KEY_0)));
         }
+
+        if (keyCode == -1)
+            return "none";
+
         return "KEY_" + keyCode;
     }
 

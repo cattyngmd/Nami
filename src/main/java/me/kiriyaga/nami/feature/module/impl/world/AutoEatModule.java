@@ -1,6 +1,9 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
+import me.kiriyaga.nami.event.Event;
+import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PlaceBlockEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -16,6 +19,9 @@ import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
@@ -29,8 +35,8 @@ public class AutoEatModule extends Module {
     private final BoolSetting allowGapples = addSetting(new BoolSetting("gapples", true));
     private final BoolSetting allowPoisoned = addSetting(new BoolSetting("poisoned", false));
 
-    private boolean eating = false;
-    private int swapCooldown = 0;
+    private final AtomicBoolean eating = new AtomicBoolean(false);
+    private volatile int swapCooldown = 0;
 
     public AutoEatModule() {
         super("auto eat", "Automatically eats best food.", ModuleCategory.of("world"), "фгещуфв", "autoeat");
@@ -39,57 +45,53 @@ public class AutoEatModule extends Module {
     @Override
     public void onDisable() {
         setUseHeld(false);
+        eating.set(false);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
-        if (swapCooldown > 0) {
-            swapCooldown--;
-            return;
-        }
-
-        if (eating && !MC.player.isUsingItem()) {
+        if (!eating.get())
             setUseHeld(false);
-            eating = false;
-            swapCooldown = swapDelayTicksSetting.get();
-            return;
-        }
+
+        eating.set(false);
 
         double hunger = MC.player.getHungerManager().getFoodLevel();
         double health = MC.player.getHealth();
-
-        if ((hunger >= 20.0 || hunger >= minHunger.get()) && health >= minHealth.get()){
-            if (eating) {
-                setUseHeld(false);
-                eating = false;
-                swapCooldown = (int) swapDelayTicksSetting.get();
-            }
+        boolean needsEat = hunger < minHunger.get() || health < minHealth.get();
+        if (!needsEat) {
+            eating.set(false);
             return;
         }
 
         int bestSlot = getBestFoodSlot();
         if (bestSlot == -1) {
-            if (eating) {
-                setUseHeld(false);
-                eating = false;
-                swapCooldown = (int) swapDelayTicksSetting.get();
-            }
+            eating.set(false);
             return;
         }
 
         int currentSlot = MC.player.getInventory().getSelectedSlot();
 
-        if (!eating) {
-            if (currentSlot != bestSlot) {
-                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
-                swapCooldown = (int) swapDelayTicksSetting.get();
-            }
+        if (currentSlot == bestSlot) {
             setUseHeld(true);
-            eating = true;
+            eating.set(true);
+        } else {
+            if (swapCooldown > 0) {
+                swapCooldown--;
+            } else {
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
+                swapCooldown = swapDelayTicksSetting.get();
+            }
+            eating.set(false);
         }
     }
+
+//            @SubscribeEvent(priority = EventPriority.HIGHEST)
+//        private void onPlaceBlock(PlaceBlockEvent event) {
+//            if (MC.player != null && MC.world != null && eating.get())
+//                event.cancel();
+//        }
 
     private int getBestFoodSlot() {
         int bestSlot = -1;
@@ -152,8 +154,21 @@ public class AutoEatModule extends Module {
     private void setUseHeld(boolean held) {
         KeyBinding useKey = MC.options.useKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) useKey).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+
+        boolean physicallyPressed = false;
+
+        if (boundKey.getCategory() == InputUtil.Type.KEYSYM) {
+            int keyCode = boundKey.getCode();
+            if (keyCode >= 0) {
+                physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+            }
+        } else if (boundKey.getCategory() == InputUtil.Type.MOUSE) {
+            int mouseCode = boundKey.getCode();
+            if (mouseCode >= 0) {
+                physicallyPressed = GLFW.glfwGetMouseButton(MC.getWindow().getHandle(), mouseCode) == GLFW.GLFW_PRESS;
+            }
+        }
+
         useKey.setPressed(physicallyPressed || held);
     }
 }

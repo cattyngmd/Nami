@@ -26,7 +26,8 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
         int lineOffset = 1;
-        context.fill(x, y - lineOffset, x + 1, y + HEIGHT, setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB());
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
+            context.fill(x, y - lineOffset, x + 1, y + HEIGHT, setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB());
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
@@ -40,7 +41,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
                 false
         );
 
-        String valueStr = setting.get().toString();
+        String valueStr = setting.get().toString().toLowerCase();
         context.drawText(
                 textRenderer,
                 valueStr,

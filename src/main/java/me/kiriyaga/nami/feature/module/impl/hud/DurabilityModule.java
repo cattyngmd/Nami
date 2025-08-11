@@ -15,7 +15,7 @@ public class DurabilityModule extends HudElementModule {
     public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
 
     public DurabilityModule() {
-        super("durability", "Displays item durability in main hand.", 52, 52, 50, 9);
+        super("durability", "Displays item durability in main hand.", 0, 0, 50, 9);
     }
 
     @Override

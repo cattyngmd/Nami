@@ -6,18 +6,16 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -28,6 +26,7 @@ public class AutoBreedModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
+    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private final Set<Integer> animalsFed = new HashSet<>();
@@ -35,6 +34,7 @@ public class AutoBreedModule extends Module {
 
     public AutoBreedModule() {
         super("auto breed", "Automatically breeds nearby animals.", ModuleCategory.of("world"), "autobreed", "фгещикуув");
+        rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override
@@ -76,16 +76,18 @@ public class AutoBreedModule extends Module {
             }
 
             Vec3d center = getEntityCenter(animal);
-            ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(
-                            AutoBreedModule.class.getName(),
-                            rotationPriority.get(),
-                            (float) getYawToVec(MC.player, center),
-                            (float) getPitchToVec(MC.player, center)
-                    )
-            );
 
-            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoBreedModule.class.getName())) return;
+            if (rotate.get()) {
+                ROTATION_MANAGER.getRequestHandler().submit(
+                        new RotationRequest(
+                                AutoBreedModule.class.getName(),
+                                rotationPriority.get(),
+                                (float) getYawToVec(MC.player, center),
+                                (float) getPitchToVec(MC.player, center)
+                        )
+                );
+                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoBreedModule.class.getName())) return;
+            }
 
             interactWithEntity(animal, center, true);
 

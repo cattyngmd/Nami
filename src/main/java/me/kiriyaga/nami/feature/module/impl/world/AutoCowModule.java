@@ -6,6 +6,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
@@ -23,12 +24,14 @@ public class AutoCowModule extends Module {
 
     private final DoubleSetting milkRange = addSetting(new DoubleSetting("range", 2.5, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
+    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 2, 1, 10));
 
     private int swapCooldown = 0;
 
     public AutoCowModule() {
         super("auto cow", "Automatically milks nearby cows.", ModuleCategory.of("world"), "cow", "milk", "autocow");
+        rotationPriority.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent
@@ -59,16 +62,18 @@ public class AutoCowModule extends Module {
 
             Vec3d center = getEntityCenter(cow);
 
-            ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(
-                            AutoCowModule.class.getName(),
-                            rotationPriority.get(),
-                            (float) getYawToVec(MC.player, center),
-                            (float) getPitchToVec(MC.player, center)
-                    )
-            );
+            if (rotate.get()) {
+                ROTATION_MANAGER.getRequestHandler().submit(
+                        new RotationRequest(
+                                AutoCowModule.class.getName(),
+                                rotationPriority.get(),
+                                (float) getYawToVec(MC.player, center),
+                                (float) getPitchToVec(MC.player, center)
+                        )
+                );
 
-            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoCowModule.class.getName())) return;
+                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoCowModule.class.getName())) return;
+            }
 
             interactWithEntity(entity, center, true);
             swapCooldown = delay.get();

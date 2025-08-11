@@ -19,7 +19,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         ColorModule colorModule = getColorModule();
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = new Color(255, 255, 255, GUI_ALPHA);
+        Color textCol = new Color(255, 255, 255, 122);
         Color bgColor = new Color(30, 30, 30, 0);
         Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
@@ -31,13 +31,14 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
         int lineOffset = 1;
-        context.fill(
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
+            context.fill(
                 x,
                 y - lineOffset,
                 x + 1,
                 y + HEIGHT,
                 setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
-        );
+            );
 
 
         int textX = x + PADDING + (hovered ? 1 : 0);

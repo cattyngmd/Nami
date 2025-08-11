@@ -1,18 +1,19 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.event.impl.BlockPushEvent;
-import me.kiriyaga.nami.event.impl.MoveEvent;
-import me.kiriyaga.nami.event.impl.PostTickEvent;
-import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.event.impl.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -91,5 +92,24 @@ public abstract class MixinClientPlayerEntity {
 
         MC.player.setYaw(originalYaw);
         MC.player.setPitch(originalPitch);
+    }
+
+    @Inject(method = "applyMovementSpeedFactors", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec2f;multiply(F)Lnet/minecraft/util/math/Vec2f;", ordinal = 1), cancellable = true)    private void onApplyMovementSpeedFactors(Vec2f vec2f, CallbackInfoReturnable<Vec2f> cir) {
+        LivingEntity self = (LivingEntity)(Object)this;
+
+        if (self instanceof PlayerEntity player && player.isUsingItem() && !player.hasVehicle()) {
+            ItemUseSlowEvent event = new ItemUseSlowEvent(player, player.getActiveItem());
+            EVENT_MANAGER.post(event);
+
+            if (event.isCancelled()) {
+                Vec2f vec2f2 = vec2f.multiply(0.98F);
+                cir.setReturnValue(applyDirectionalMovementSpeedFactors(vec2f2));
+            }
+        }
+    }
+
+    @Shadow
+    private static Vec2f applyDirectionalMovementSpeedFactors(Vec2f vec2f) {
+        throw new AssertionError();
     }
 }

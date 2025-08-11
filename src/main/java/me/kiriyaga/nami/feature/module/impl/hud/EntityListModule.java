@@ -4,9 +4,12 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
+import me.kiriyaga.nami.setting.impl.WhitelistSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.*;
 
@@ -25,11 +28,12 @@ public class EntityListModule extends HudElementModule {
     private long lastUpdateTime = 0;
     private final long updateIntervalMs = 3000;
 
+    private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name));
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.descending));
     public final BoolSetting onlyLiving = addSetting(new BoolSetting("only living", false));
 
     public EntityListModule() {
-        super("entity list", "Shows nearby entities", 52, 52, 50, 10);
+        super("entity list", "Shows nearby entities", 0, 0, 50, 10);
     }
 
     @Override
@@ -46,6 +50,13 @@ public class EntityListModule extends HudElementModule {
         for (Entity entity : ENTITY_MANAGER.getAllEntities()) {
             if (entity == MC.player) continue;
             if (onlyLiving.get() && !(entity instanceof LivingEntity)) continue;
+
+            if (whitelist.get()) {
+                Identifier entityId = Registries.ENTITY_TYPE.getId(entity.getType());
+                if (entityId == null || !whitelist.isWhitelisted(entityId)) {
+                    continue;
+                }
+            }
 
             String name = entity.getName().getString();
             entityCounts.put(name, entityCounts.getOrDefault(name, 0) + 1);

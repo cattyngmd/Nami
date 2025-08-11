@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.core.config;
 
 import com.google.gson.*;
+import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.feature.module.Module;
 
 import java.io.File;
@@ -18,6 +19,7 @@ public class ConfigManager {
     private final ModuleConfigReader moduleLoader = new ModuleConfigReader(dirProvider);
     private final ConfigSerializer configSerializer = new ConfigSerializer(dirProvider);
     private final FriendStorage friendStorage = new FriendStorage(dirProvider);
+    private final MacroStorage macroStorage = new MacroStorage(dirProvider);
 
     public void saveModules() {
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
@@ -99,5 +101,14 @@ public class ConfigManager {
             LOGGER.error("Failed to load prefix.json", e);
             return null;
         }
+    }
+
+    public void saveMacros() {
+        macroStorage.save(MACRO_MANAGER.getAll());
+    }
+
+    public void loadMacros() {
+        MACRO_MANAGER.clear();
+        MACRO_MANAGER.getAll().addAll(macroStorage.load());
     }
 }

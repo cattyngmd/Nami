@@ -25,7 +25,7 @@ public class TpsModule extends HudElementModule {
     private boolean bufferFilled = false;
 
     public TpsModule() {
-        super("tps", "Displays server TPS.", 52, 52, 50, 9);
+        super("tps", "Displays server TPS.", 0, 0, 50, 9);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

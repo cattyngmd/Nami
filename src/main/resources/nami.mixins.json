@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_20",
   "client": [
     "ChatHudAccessor",
+    "ClientPlayerInteractionManagerAccessor",
     "GameOptionsAccessor",
     "KeyBindingAccessor",
     "MixinArmorFeatureRenderer",

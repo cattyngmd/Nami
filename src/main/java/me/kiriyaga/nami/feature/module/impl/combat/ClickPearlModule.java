@@ -1,5 +1,8 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
@@ -9,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 
+
 import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -16,36 +20,49 @@ import static me.kiriyaga.nami.Nami.MC;
 public class ClickPearlModule extends Module {
 
     public final BoolSetting glideFirework = addSetting(new BoolSetting("glide firework", true));
+    private boolean hasActivated = false;
 
     public ClickPearlModule() {
         super("click pearl", "Throws a pearl on activation.", ModuleCategory.of("combat"), "clickpearl", "сдшслашкуцщкл");
     }
 
-    @Override
-    public void onEnable(){
-        toggle(); // as-is so we dont care
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    private void onTick(PreTickEvent ev) { // onTick due to post-held item change
+        if (!isEnabled() || hasActivated)
+            return;
+
         if (MC.world == null || MC.player == null)
             return;
 
-        if (MC.player.isGliding() && glideFirework.get()){
-            int i = getSlot(Items.FIREWORK_ROCKET);
-            if (i == -1)
+        hasActivated = true;
+        toggle();
+
+        if (MC.player.isGliding() && glideFirework.get()) {
+            int slot = getSlot(Items.FIREWORK_ROCKET);
+            int prevSlot = MC.player.getInventory().getSelectedSlot();
+            if (slot == -1)
                 return;
 
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(i);
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
             MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
-            INVENTORY_MANAGER.getSyncHandler().swapSync();
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
             return;
         }
 
-        int i = getSlot(Items.ENDER_PEARL);
-        if (i == -1 || MC.player.getItemCooldownManager().isCoolingDown(Items.ENDER_PEARL.getDefaultStack()))
+        int slot = getSlot(Items.ENDER_PEARL);
+        if (slot == -1 || MC.player.getItemCooldownManager().isCoolingDown(Items.ENDER_PEARL.getDefaultStack()))
             return;
 
-        //INVENTORY_MANAGER.getSlotHandler().sendSlotPacket(i);
-        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(i);
+        int prevSlot = MC.player.getInventory().getSelectedSlot();
+
+        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
         MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
-        INVENTORY_MANAGER.getSyncHandler().swapSync();
+        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
+    }
+
+    @Override
+    public void onEnable() {
+        hasActivated = false;
     }
 
     private int getSlot(Item item) {

@@ -11,7 +11,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class GreetingModule extends HudElementModule {
 
-    public final IntSetting greetingDelay = addSetting(new IntSetting("greeting delay", 240, 120, 520));
+    public final IntSetting greetingDelay = addSetting(new IntSetting("greeting delay", 240, 120, 500));
     public final IntSetting charRevealDelay = addSetting(new IntSetting("char reveal delay", 20, 15, 50));
 
     private static final String[] GREETINGS = {
@@ -47,7 +47,7 @@ public class GreetingModule extends HudElementModule {
     private final long greetingDisplayDuration = 5000;
 
     public GreetingModule() {
-        super("greeting", "Displays a greeting splash text.", 52, 52, 100, 9);
+        super("greeting", "Displays a greeting splash text.", 0, 0, 100, 9);
     }
 
     @Override

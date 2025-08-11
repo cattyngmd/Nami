@@ -30,6 +30,10 @@ public class CategoryPanel {
         return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
     }
 
+    private ClickGuiModule getClickGuiModule() {
+        return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
+    }
+
     public CategoryPanel(ModuleCategory moduleCategory, Set<ModuleCategory> expandedCategories, Set<Module> expandedModules) {
         this.moduleCategory = moduleCategory;
         this.expandedCategories = expandedCategories;
@@ -57,14 +61,17 @@ public class CategoryPanel {
             totalHeight += BOTTOM_MARGIN;
         }
 
-        int bgColor = toRGBA(new Color(30, 30, 30, GUI_ALPHA));
+        int bgColor = toRGBA(new Color(30, 30, 30, getClickGuiModule().guiAlpha.get()));
 
         context.fill(x, y, x + WIDTH, y + totalHeight, bgColor);
 
-        context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, primary.getRGB());
-        context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, primary.getRGB());
-        context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, primary.getRGB());
-        context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, primary.getRGB());
+        if (getClickGuiModule() != null && getClickGuiModule().lines.get()) {
+            context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, primary.getRGB());
+            context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, primary.getRGB());
+            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, primary.getRGB());
+            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, primary.getRGB());
+
+        }
 
         context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, toRGBA(primary));
 

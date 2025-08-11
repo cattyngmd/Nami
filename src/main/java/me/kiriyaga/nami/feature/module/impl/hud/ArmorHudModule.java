@@ -25,7 +25,7 @@ public class ArmorHudModule extends HudElementModule {
     public final BoolSetting showDurability = addSetting(new BoolSetting("showDurability", true));
 
     public ArmorHudModule() {
-        super("armor hud", "Displays equipped armor.", 52, 52, 64, 16);
+        super("armor hud", "Displays equipped armor.", 0, 0, 64, 16);
         this.label.setShow(true);
     }
 

@@ -23,6 +23,7 @@ public class NametagFormatter {
     private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
     private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
     private static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
+    private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public NametagFormatter(NametagsModule module) {
         this.module = module;
@@ -124,7 +125,7 @@ public class NametagFormatter {
                     color = Color.WHITE;
                 }
             } else if (entity instanceof ItemEntity) {
-                color = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+                color = COLOR_ITEM;
             } else if (EntityUtils.isHostile(entity)) {
                 color = COLOR_HOSTILE;
             } else if (EntityUtils.isNeutral(entity)) {
@@ -141,8 +142,8 @@ public class NametagFormatter {
     }
 
     private Style getStyle() {
-        boolean bold = module.formatting.get() == NametagsModule.TextFormat.Bold || module.formatting.get() == NametagsModule.TextFormat.Both;
-        boolean italic = module.formatting.get() == NametagsModule.TextFormat.Italic || module.formatting.get() == NametagsModule.TextFormat.Both;
+        boolean bold = module.formatting.get() == NametagsModule.TextFormat.BOLD || module.formatting.get() == NametagsModule.TextFormat.BOTH;
+        boolean italic = module.formatting.get() == NametagsModule.TextFormat.ITALIC || module.formatting.get() == NametagsModule.TextFormat.BOTH;
         return Style.EMPTY.withBold(bold).withItalic(italic);
     }
 }

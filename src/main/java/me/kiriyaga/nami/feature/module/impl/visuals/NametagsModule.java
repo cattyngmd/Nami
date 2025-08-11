@@ -9,20 +9,16 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.NametagFormatter;
-import me.kiriyaga.nami.util.render.Layers;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.Tameable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL32C;
@@ -49,7 +45,7 @@ public class NametagsModule extends Module {
     public final BoolSetting showGameMode = addSetting(new BoolSetting("gamemode", false));
     public final BoolSetting showPing = addSetting(new BoolSetting("ping", true));
     public final BoolSetting showEntityId = addSetting(new BoolSetting("entityId", false));
-    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.None));
+    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.NONE));
     public final BoolSetting background = addSetting(new BoolSetting("background", false));
     public final BoolSetting border = addSetting(new BoolSetting("border", true));
     public final DoubleSetting borderWidth = addSetting(new DoubleSetting("border width", 0.25, 0.11, 1));
@@ -57,7 +53,7 @@ public class NametagsModule extends Module {
     private final NametagFormatter formatter = new NametagFormatter(this);
 
     public enum TextFormat {
-        None, Bold, Italic, Both
+        NONE, BOLD, ITALIC, BOTH
     }
 
     public NametagsModule() {
@@ -143,22 +139,28 @@ public class NametagsModule extends Module {
         renderEntityNametag(entity, entity.getName().getString(), tickDelta, matrices, scale, forcedColor);
     }
 
-        private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
-
-
-        Vec3d pos = new Vec3d(
-                MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
-                MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY())
-                        + (entity.isSneaking() ? entity.getBoundingBox().getLengthY() + 0.0 : entity.getBoundingBox().getLengthY() + 0.3),
-                MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ())
-        );
+    private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
 
         Vec3d camPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
-        float distance = (float) camPos.distanceTo(pos);
+
+        double baseHeightOffset = entity.isSneaking() ? entity.getBoundingBox().getLengthY() : entity.getBoundingBox().getLengthY() + 0.3;
+
+        double interpX = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
+        double interpY = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
+        double interpZ = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
+
+        float distance = (float) camPos.distanceTo(new Vec3d(interpX, interpY, interpZ));
+
+        double distanceYOffset = distance * 0.02;
+
+        Vec3d pos = new Vec3d(
+                interpX,
+                interpY + baseHeightOffset + distanceYOffset,
+                interpZ
+        );
 
         float dynamicScale = 0.0018f + (scale / 10000.0f) * distance;
         if (distance <= 8.0f) dynamicScale = 0.0245f;
-
 
         Text displayName;
 
@@ -166,31 +168,16 @@ public class NametagsModule extends Module {
             displayName = formatter.formatPlayer(player);
 
             if (showHealth.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.getHealthText(player));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.getHealthText(player));
             }
-
             if (showPing.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.formatPing(player));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatPing(player));
             }
-
             if (showGameMode.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.formatGameMode(player));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatGameMode(player));
             }
-
             if (showEntityId.get()) {
-                displayName = Text.literal("")
-                        .append(displayName)
-                        .append(Text.literal(" "))
-                        .append(formatter.formatEntityId(entity));
+                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatEntityId(entity));
             }
         } else if (entity.getClass().getSimpleName().equals("ItemEntity")) {
             displayName = formatter.formatItem((net.minecraft.entity.ItemEntity) entity);
@@ -241,37 +228,44 @@ public class NametagsModule extends Module {
         Vec3d lookDir = Vec3d.fromPolar(pitch, yaw).normalize().negate();
         Vec3d camRight = lookDir.crossProduct(new Vec3d(0, 1, 0)).normalize();
 
-        GL32C.glDisable(GL32C.GL_DEPTH_TEST);
-        GL32C.glDepthMask(false);
-        GL32C.glDepthFunc(GL32C.GL_ALWAYS);
-
         int renderIndex = 0;
-
         for (ItemStack stack : nonEmptyItems) {
-            Vec3d itemPosBase = new Vec3d(baseX, baseY, baseZ);
-
-            float distance = (float) camPos.distanceTo(itemPosBase);
-            float dynamicScale = 0.0018f + (baseScale / 10000.0f) * distance;
-            if (distance <= 8.0f) dynamicScale = 0.0245f;
-
-            double itemSpacing = dynamicScale * 12.0;
-            double verticalOffset = dynamicScale * 10.0;
-            double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
-
-            Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
-
-            RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
-
-            if (stack.hasGlint()){
-                GL32C.glDisable(GL32C.GL_DEPTH_TEST);
-                GL32C.glDepthMask(false);
-                GL32C.glDepthFunc(GL32C.GL_ALWAYS);
-            }
+            renderItemWithDepthIsolation(stack, matrices, baseX, baseY, baseZ, renderIndex, itemCount, camPos, camRight, lookDir, baseScale);
             renderIndex++;
         }
+    }
 
-        GL32C.glDepthFunc(GL32C.GL_LEQUAL);
-        GL32C.glDepthMask(true);
-        GL32C.glEnable(GL32C.GL_DEPTH_TEST);
+    private void renderItemWithDepthIsolation(
+            ItemStack stack,
+            MatrixStack matrices,
+            double baseX, double baseY, double baseZ,
+            int renderIndex, int itemCount,
+            Vec3d camPos, Vec3d camRight, Vec3d lookDir,
+            float baseScale
+    ) {
+        Vec3d itemPosBase = new Vec3d(baseX, baseY, baseZ);
+        float distance = (float) camPos.distanceTo(itemPosBase);
+        float dynamicScale = 0.0018f + (baseScale / 10000.0f) * distance;
+        if (distance <= 8.0f) dynamicScale = 0.0245f;
+
+        double itemSpacing = dynamicScale * 12.0;
+
+        double verticalOffset = dynamicScale * 10.0 + distance * 0.02;
+
+        double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
+
+        Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
+
+        //GL32C.glDisable(GL32C.GL_DEPTH_TEST);
+        //GL32C.glDepthMask(false);
+        //GL32C.glDepthFunc(GL32C.GL_ALWAYS);
+        GL32C.glDepthRange(1.0, 0.1);
+
+        RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
+        
+        //GL32C.glDepthFunc(GL32C.GL_LEQUAL);
+        //GL32C.glDepthMask(true);
+        //GL32C.glEnable(GL32C.GL_DEPTH_TEST);
+        GL32C.glDepthRange(0.0, 1.0);
     }
 }

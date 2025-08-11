@@ -1,15 +1,15 @@
 package me.kiriyaga.nami.mixin;
 
+import me.kiriyaga.nami.core.macro.model.Macro;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
-import me.kiriyaga.nami.feature.module.impl.misc.AutoRespawnModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.world.AirPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.FastPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.NoHitDelayModule;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -20,8 +20,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,10 +29,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.kiriyaga.nami.feature.module.Module;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -72,10 +68,26 @@ public abstract class MixinMinecraftClient {
                         module.toggle();
                     }
                 }
+
                 bind.setWasPressedLastTick(currentlyPressed);
             }
         }
+
+        for (Macro macro : MACRO_MANAGER.getAll()) {
+            int keyCode = macro.getKeyCode();
+            boolean currentlyPressed = MACRO_MANAGER.isKeyPressed(keyCode);
+            boolean wasPressed = MACRO_MANAGER.wasKeyPressedLastTick(keyCode);
+
+            if (currentlyPressed && !wasPressed) {
+                if (MC.player != null) {
+                    MC.player.networkHandler.sendChatMessage(macro.getMessage());
+                }
+            }
+
+            MACRO_MANAGER.setKeyPressedLastTick(keyCode, currentlyPressed);
+        }
     }
+
 
     @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
@@ -143,18 +155,22 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-    @Redirect(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
-    private boolean handleBlockBreaking(ClientPlayerEntity instance) {
+    @Inject(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), cancellable = true)
+    private void handleBlockBreaking(boolean bl, CallbackInfo ci) {
         InteractionEvent ev = new InteractionEvent();
         EVENT_MANAGER.post(ev);
-        return !ev.isCancelled() && instance.isUsingItem();
+        if (ev.isCancelled()) {
+            ci.cancel();
+        }
     }
 
-    @Redirect(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
-    private boolean doItemUse(ClientPlayerInteractionManager instance) {
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"), cancellable = true)
+    private void doItemUse2(CallbackInfo ci) {
         InteractionEvent ev = new InteractionEvent();
         EVENT_MANAGER.post(ev);
-        return !ev.isCancelled() && instance.isBreakingBlock();
+        if (ev.isCancelled()) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
@@ -171,6 +187,17 @@ public abstract class MixinMinecraftClient {
                 } else if (!e.isDead()) {
                     deadList.remove(e.getId());
                 }
+            }
+        }
+    }
+
+
+    @Inject(method = "hasOutline", at = @At("HEAD"), cancellable = true)
+    private void onHasOutline(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        ESPModule esp = MODULE_MANAGER.getStorage().getByClass(ESPModule.class);
+        if (esp != null && esp.isEnabled() && esp.renderMode.get() == ESPModule.RenderMode.OUTLINE) {
+            if (ESPModule.getESPColor(entity) != null) {
+                cir.setReturnValue(true);
             }
         }
     }

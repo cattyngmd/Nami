@@ -1,81 +1,21 @@
 package me.kiriyaga.nami.core.inventory;
 
-import me.kiriyaga.nami.core.inventory.model.PreSwapEntry;
-import me.kiriyaga.nami.event.*;
-import me.kiriyaga.nami.event.impl.PacketSendEvent;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import me.kiriyaga.nami.mixininterface.IClientPlayerInteractionManager;
 
 import static me.kiriyaga.nami.Nami.*;
 
 public class InventorySlotHandler {
 
-    private final List<PreSwapEntry> swaps = new CopyOnWriteArrayList<>();
-    private int syncedSlot = -1;
-
-    public void init() {
-        EVENT_MANAGER.register(this);
-    }
-
+    // this shit was overengeneered and uncompat with like any client so i made it mc vanilla way
     public void attemptSwitch(int targetSlot) {
-        if (MC.player == null) return;
+        if (MC.player == null || MC.world == null || MC.interactionManager == null || targetSlot < 0 || targetSlot > 8)
+            return;
 
-        if (syncedSlot != targetSlot && PlayerInventory.isValidHotbarIndex(targetSlot)) {
-            sendSlotPacket(targetSlot);
-
-            ItemStack[] snapshot = new ItemStack[9];
-            for (int i = 0; i < 9; i++) {
-                snapshot[i] = MC.player.getInventory().getStack(i);
-            }
-
-            swaps.add(new PreSwapEntry(snapshot, syncedSlot, targetSlot));
-        }
+        MC.player.getInventory().setSelectedSlot(targetSlot);
+        syncSelectedSlot();
     }
 
-    public void forceClientSlot(int slot) {
-        if (MC.player == null) return;
-
-        if (MC.player.getInventory().getSelectedSlot() != slot) {
-            MC.player.getInventory().setSelectedSlot(slot);
-            sendSlotPacket(slot);
-        }
-    }
-
-    public void sendSlotPacket(int slot) {
-        if (MC.getNetworkHandler() == null) return;
-        MC.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-    }
-
-    public int getSyncedSlot() {
-        return syncedSlot;
-    }
-
-    public boolean isOutOfSync() {
-        if (MC.player == null) return false;
-        return MC.player.getInventory().getSelectedSlot() != syncedSlot;
-    }
-
-    public List<PreSwapEntry> getSwaps() {
-        return swaps;
-    }
-
-    public void markAllForClear() {
-        swaps.forEach(PreSwapEntry::markForClear);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onSend(PacketSendEvent event) {
-        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet) {
-            int slot = packet.getSelectedSlot();
-            if (!PlayerInventory.isValidHotbarIndex(slot) || syncedSlot == slot) {
-                event.cancel();
-            } else {
-                syncedSlot = slot;
-            }
-        }
+    public void syncSelectedSlot(){
+        ((IClientPlayerInteractionManager)MC.interactionManager).updateSlot(); // this one is the same as mc default one
     }
 }

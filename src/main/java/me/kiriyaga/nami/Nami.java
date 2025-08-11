@@ -5,6 +5,7 @@ import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
 import me.kiriyaga.nami.core.inventory.InventoryManager;
+import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.core.rotation.RotationManager;
 import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
@@ -39,6 +40,7 @@ public class Nami implements ClientModInitializer {
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 
     public static final EventManager EVENT_MANAGER = new EventManager();
+    public static final MacroManager MACRO_MANAGER = new MacroManager();
     public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
     public static final ModuleManager MODULE_MANAGER = new ModuleManager();
     public static final EntityManager ENTITY_MANAGER = new EntityManager();
@@ -78,12 +80,15 @@ public class Nami implements ClientModInitializer {
 
         COMMAND_MANAGER.getExecutor().setPrefix(CONFIG_MANAGER.loadPrefix());
 
+        CONFIG_MANAGER.loadMacros();
+
         FRIEND_MANAGER.load();
 
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             CONFIG_MANAGER.saveModules();
+            CONFIG_MANAGER.saveMacros();
         });
 
     }

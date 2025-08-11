@@ -34,11 +34,11 @@ import static me.kiriyaga.nami.Nami.MC;
 public class VelocityModule extends Module {
 
     private enum Mode {
-        normal,
-        walls
+        VANILLA,
+        WALLS
     }
 
-    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.walls));
+    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.WALLS));
     private final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("horizontal", 100.0, 0.0, 100.0));
     private final DoubleSetting verticalPercent = addSetting(new DoubleSetting("vertical", 100.0, 0.0, 100.0));
     private final BoolSetting handleKnockback = addSetting(new BoolSetting("knockback", true));
@@ -81,12 +81,12 @@ public class VelocityModule extends Module {
                 return;
             }
 
-            if (modeSetting.get() == Mode.walls && (!isPlayerPhased() || (requireGround.get() && !player.isOnGround()))) {
+            if (modeSetting.get() == Mode.WALLS && (!isPlayerPhased() || (requireGround.get() && !player.isOnGround()))) {
                 return;
             }
 
             switch (modeSetting.get()) {
-                case normal, walls -> {
+                case VANILLA, WALLS -> {
                     if (isNoVelocityConfigured()) {
                         event.cancel();
                     } else {
@@ -100,14 +100,14 @@ public class VelocityModule extends Module {
             boolean phased = isPlayerPhased();
 
             switch (modeSetting.get()) {
-                case normal -> {
+                case VANILLA -> {
                     if (isNoVelocityConfigured()) {
                         event.cancel();
                     } else {
                         scaleExplosionPacket(explosionPacket);
                     }
                 }
-                case walls -> {
+                case WALLS -> {
                     if (!phased) return;
 
                     if (isNoVelocityConfigured()) {
@@ -168,12 +168,12 @@ public class VelocityModule extends Module {
                 boolean phased = isPlayerPhased();
 
                 switch (modeSetting.get()) {
-                    case normal -> {
+                    case VANILLA -> {
                         if (!isNoVelocityConfigured()) {
                             scaleExplosionPacket(explosion);
                         } else continue;
                     }
-                    case walls -> {
+                    case WALLS -> {
                         if (!phased) {
                             filteredPackets.add(p);
                             continue;
@@ -194,7 +194,7 @@ public class VelocityModule extends Module {
                     continue;
                 }
                 
-                if (modeSetting.get() == Mode.walls) {
+                if (modeSetting.get() == Mode.WALLS) {
                     if (!isPlayerPhased() || (requireGround.get() && !MC.player.isOnGround())) {
                         filteredPackets.add(p);
                         continue;

@@ -61,6 +61,9 @@ public class SearchModule extends Module {
         nonVanilla.setOnChanged(this::reloadChunksAroundPlayer);
         notAtSpawn.setOnChanged(this::reloadChunksAroundPlayer);
         notifier.setOnChanged(this::reloadChunksAroundPlayer); // i just want it dont blame me
+
+        chunksPerTick.setShowCondition(() -> lazyLoadEnabled.get());
+        cooldownTicks.setShowCondition(() -> lazyLoadEnabled.get());
     }
 
     @Override

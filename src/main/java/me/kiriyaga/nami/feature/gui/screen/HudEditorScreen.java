@@ -23,8 +23,8 @@ public class HudEditorScreen extends Screen {
         super(Text.literal("nami hud editor"));
     }
 
-    private ClickGuiModule getClickGuiModule() {
-        return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
+    private HudEditorModule getHudEditorModule() {
+        return MODULE_MANAGER.getStorage().getByClass(HudEditorModule.class);
     }
 
     @Override
@@ -33,9 +33,12 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        ClickGuiModule clickGuiModule = getClickGuiModule();
-        if (clickGuiModule != null && clickGuiModule.background.get())
-            context.fill(0, 0, this.width, this.height, 0xC0101010);
+        HudEditorModule hudEditorModule = getHudEditorModule();
+        if (hudEditorModule != null && hudEditorModule.background.get()) {
+            int alpha = (hudEditorModule.backgroundAlpha.get() & 0xFF) << 24;
+            int color = alpha | 0x101010;
+            context.fill(0, 0, this.width, this.height, color);
+        }
 
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
         int screenHeight = MC.getWindow().getScaledHeight();
@@ -156,8 +159,9 @@ public class HudEditorScreen extends Screen {
         }
 
         if (!intersects) {
-            draggingElement.x.set(newX);
-            draggingElement.y.set(newRenderY);
+            draggingElement.x.set(newX / (double)screenWidth);
+            draggingElement.y.set(newRenderY / (double)screenHeight);
+
         }
 
         return true;

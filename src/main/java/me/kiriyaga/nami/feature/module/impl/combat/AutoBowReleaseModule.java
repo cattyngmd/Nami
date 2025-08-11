@@ -19,7 +19,7 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class AutoBowReleaseModule extends Module {
 
-    private final IntSetting ticks = addSetting(new IntSetting("delay", 20, 1, 20));
+    private final IntSetting ticks = addSetting(new IntSetting("delay", 3, 1, 21));
     private final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", false));
     private float tps = 20.0f;
 

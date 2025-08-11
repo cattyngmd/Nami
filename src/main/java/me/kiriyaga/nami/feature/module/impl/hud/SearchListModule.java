@@ -18,17 +18,17 @@ import static me.kiriyaga.nami.Nami.*;
 public class SearchListModule extends HudElementModule {
 
     public enum SortMode {
-        alphabetical,
-        descending,
-        ascending
+        ALPHABETICAL,
+        DESCENDING,
+        ASCENDING
     }
 
     private final List<TextElement> elements = new ArrayList<>();
 
-    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.descending));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.DESCENDING));
 
     public SearchListModule() {
-        super("search list", "Shows nearby blocks found by search.", 52, 52, 50, 10);
+        super("search list", "Shows nearby blocks found by search.", 0, 0, 50, 10);
     }
 
     @Override
@@ -57,12 +57,12 @@ public class SearchListModule extends HudElementModule {
         List<String> sortedNames = new ArrayList<>(blockCounts.keySet());
 
         switch (sortMode.get()) {
-            case alphabetical -> sortedNames.sort(String::compareToIgnoreCase);
-            case descending -> sortedNames.sort((a, b) -> Integer.compare(
+            case ALPHABETICAL -> sortedNames.sort(String::compareToIgnoreCase);
+            case DESCENDING -> sortedNames.sort((a, b) -> Integer.compare(
                     getTextWidth(b, blockCounts.get(b)),
                     getTextWidth(a, blockCounts.get(a))
             ));
-            case ascending -> sortedNames.sort((a, b) -> Integer.compare(
+            case ASCENDING -> sortedNames.sort((a, b) -> Integer.compare(
                     getTextWidth(a, blockCounts.get(a)),
                     getTextWidth(b, blockCounts.get(b))
             ));

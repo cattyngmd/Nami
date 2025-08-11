@@ -6,13 +6,13 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -24,12 +24,14 @@ public class AutoMountModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 10.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
+    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private int actionCooldown = 0;
 
     public AutoMountModule() {
-        super("auto mount", "Automatically mounts nearby entities.", ModuleCategory.of("world"), "mount", "automount", "фгещьщгте");
+        super("auto mount", "Automatically mounts nearby entities.", ModuleCategory.of("world"), "mount", "automount");
+        rotationPriority.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent
@@ -54,16 +56,19 @@ public class AutoMountModule extends Module {
             if (distSq > range.get() * range.get()) continue;
 
             Vec3d center = getEntityCenter(entity);
-            ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(
-                            AutoMountModule.class.getName(),
-                            rotationPriority.get(),
-                            (float) getYawToVec(MC.player, center),
-                            (float) getPitchToVec(MC.player, center)
-                    )
-            );
 
-            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoMountModule.class.getName())) return;
+            if (rotate.get()) {
+                ROTATION_MANAGER.getRequestHandler().submit(
+                        new RotationRequest(
+                                AutoMountModule.class.getName(),
+                                rotationPriority.get(),
+                                (float) getYawToVec(MC.player, center),
+                                (float) getPitchToVec(MC.player, center)
+                        )
+                );
+
+                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoMountModule.class.getName())) return;
+            }
 
             interactWithEntity(entity, center, true);
 

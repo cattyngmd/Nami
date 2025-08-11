@@ -13,7 +13,7 @@ public class TestPositionModule extends HudElementModule {
     private long lastToggleTime = 0;
 
     public TestPositionModule() {
-        super("testpos", ".", 52, 52, 50, 9);
+        super("testpos", ".", 0, 0, 50, 9);
     }
 
     @Override

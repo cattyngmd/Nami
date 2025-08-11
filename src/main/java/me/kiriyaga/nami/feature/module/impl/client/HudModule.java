@@ -117,14 +117,17 @@ public class HudModule extends Module {
         float intensity = bounceIntensity.get() / 100f;
         float pulseFactor = (float) Math.sin(bounceProgress * Math.PI);
 
+        float darkenFactor = 1f - intensity * pulseFactor;
+
+        int r = (int) (originalColor.getRed() * darkenFactor);
+        int g = (int) (originalColor.getGreen() * darkenFactor);
+        int b = (int) (originalColor.getBlue() * darkenFactor);
         int a = originalColor.getAlpha();
-        int r = originalColor.getRed();
-        int g = originalColor.getGreen();
-        int b = originalColor.getBlue();
 
-        int minAlpha = (int) (a * (1 - intensity));
-        int pulsingAlpha = minAlpha + (int) ((a - minAlpha) * pulseFactor);
+        r = Math.max(0, Math.min(255, r));
+        g = Math.max(0, Math.min(255, g));
+        b = Math.max(0, Math.min(255, b));
 
-        return new Color(r, g, b, pulsingAlpha);
+        return new Color(r, g, b, a);
     }
 }

@@ -2,10 +2,12 @@ package me.kiriyaga.nami.core.breaking;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.impl.BreakBlockEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.BreakManagerModule;
 import me.kiriyaga.nami.core.breaking.model.BreakTarget;
+import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +23,8 @@ public class BreakTickHandler {
     private final BreakStateHandler stateHandler;
     private final BreakRequestHandler requestHandler;
     private BlockPos currentBreakingBlock = null;
+    private long lastAttackBlockTime = 0;
+    private static final long ATTACK_BLOCK_COOLDOWN_MS = 250; // grim is wild
 
     public BreakTickHandler(BreakStateHandler stateHandler, BreakRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -49,6 +53,9 @@ public class BreakTickHandler {
 
         if (isBlockAirOrFluid(pos)) {
             requestHandler.removeBlock(pos);
+            if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
+                currentBreakingBlock = null;
+            }
             return;
         }
 
@@ -75,11 +82,11 @@ public class BreakTickHandler {
 
     private BreakTarget getNextTarget(BreakManagerModule module) {
         return switch (module.breakPriority.get()) {
-            case closest -> requestHandler.getTargets().stream()
+            case CLOSEST -> requestHandler.getTargets().stream()
                     .min(Comparator.comparingDouble(t -> t.getPos().getSquaredDistance(MC.player.getEyePos())))
                     .orElse(null);
-            case first -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(0);
-            case last -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(requestHandler.getTargets().size() - 1);
+            case FIRST -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(0);
+            case LAST -> requestHandler.getTargets().isEmpty() ? null : requestHandler.getTargets().get(requestHandler.getTargets().size() - 1);
         };
     }
 
@@ -89,13 +96,19 @@ public class BreakTickHandler {
 
         Direction direction = Direction.UP;
 
+        long now = System.currentTimeMillis();
+
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
-            MC.interactionManager.attackBlock(pos, direction);
-            currentBreakingBlock = pos;
+            if (now - lastAttackBlockTime >= ATTACK_BLOCK_COOLDOWN_MS) {
+                currentBreakingBlock = pos;
+                MC.interactionManager.attackBlock(pos, direction);
+                lastAttackBlockTime = now;
+            }
         } else {
             boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
             if (!success) {
-                MC.interactionManager.attackBlock(pos, direction);
+                currentBreakingBlock = null;
+                return false;
             }
         }
 

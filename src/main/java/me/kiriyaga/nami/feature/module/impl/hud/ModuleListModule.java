@@ -15,17 +15,17 @@ import static me.kiriyaga.nami.Nami.*;
 public class ModuleListModule extends HudElementModule {
 
     public enum SortMode {
-        alphabetical,
-        descending,
-        ascending
+        ALPHABETICAL,
+        DESCENDING,
+        ASCENDING
     }
 
     private final List<TextElement> elements = new ArrayList<>();
     public final BoolSetting showDisplayName = addSetting(new BoolSetting("show display", true));
-    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.descending));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.DESCENDING));
 
     public ModuleListModule() {
-        super("module list", "Shows enabled and drawn modules.", 52, 52, 50, 10);
+        super("module list", "Shows enabled and drawn modules.", 0, 0, 50, 10);
     }
 
     @Override
@@ -40,12 +40,12 @@ public class ModuleListModule extends HudElementModule {
         if (activeModules.isEmpty()) return elements;
 
         switch (sortMode.get()) {
-            case alphabetical -> activeModules.sort(Comparator.comparing(Module::getName, String::compareToIgnoreCase));
-            case descending -> activeModules.sort((a, b) -> Integer.compare(
+            case ALPHABETICAL -> activeModules.sort(Comparator.comparing(Module::getName, String::compareToIgnoreCase));
+            case DESCENDING -> activeModules.sort((a, b) -> Integer.compare(
                     getTextWidth(b.getName() + (showDisplayName.get() && b.getDisplayInfo() != null && !b.getDisplayInfo().isEmpty() ? " " + b.getDisplayInfo() : "")),
                     getTextWidth(a.getName() + (showDisplayName.get() && a.getDisplayInfo() != null && !a.getDisplayInfo().isEmpty() ? " " + a.getDisplayInfo() : ""))
             ));
-            case ascending -> activeModules.sort(Comparator.comparingInt(a -> getTextWidth(a.getName() + (showDisplayName.get() && a.getDisplayInfo() != null && !a.getDisplayInfo().isEmpty() ? " " + a.getDisplayInfo() : ""))));
+            case ASCENDING -> activeModules.sort(Comparator.comparingInt(a -> getTextWidth(a.getName() + (showDisplayName.get() && a.getDisplayInfo() != null && !a.getDisplayInfo().isEmpty() ? " " + a.getDisplayInfo() : ""))));
         }
 
         int yOffset = 0;

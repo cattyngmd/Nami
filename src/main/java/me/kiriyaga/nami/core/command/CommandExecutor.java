@@ -75,6 +75,11 @@ public class CommandExecutor {
                     }
                 }
 
+                if (i == expected.length - 1 && arg instanceof CommandArgument.StringArg stringArg) {
+                    parsed[i] = stringArg.parse(args, i);
+                    break;
+                }
+
                 String input = args[i];
                 if (arg instanceof CommandArgument.ActionArg actionArg) {
                     parsed[i] = actionArg.getCanonical(input);
