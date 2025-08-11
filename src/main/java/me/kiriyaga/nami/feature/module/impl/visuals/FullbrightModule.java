@@ -54,7 +54,7 @@ public class FullbrightModule extends Module {
     public void onDisable() {
         super.onDisable();
         if (MC.options != null) {
-            ((ISimpleOption) (Object) MC.options.getGamma()).setValue(1);
+            ((ISimpleOption) (Object) MC.options.getGamma()).setValue(1.0);
         }
         if (MC.player != null && MC.player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
             MC.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
