@@ -48,7 +48,7 @@ public class ModulePanel {
         else
             bgColor = new Color(30, 30, 30, 0);
 
-        context.fill(expanded ? x + 1 : x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
+        context.fill(expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get() ? x + 1 : x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
         if (expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
             context.fill(x, y, x + 1, y + HEIGHT, enabled ? primary.getRGB() : secondary.getRGB());

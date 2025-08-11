@@ -24,31 +24,36 @@ public class FullbrightModule extends Module {
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.GAMMA));
     public final DoubleSetting amount = addSetting(new DoubleSetting("amount", 2, 1, 25));
 
-    private double defaultGamma;
+    private double defaultGamma = 1.0;
+    private boolean gammaSaved = false;
 
     public FullbrightModule() {
         super("fullbright", "Modifies your game brightness", ModuleCategory.of("misc"), "autogamma", "gamma", "autogmam", "фгещпфььф");
         amount.setShowCondition(() -> mode.get() == Mode.GAMMA);
-        defaultGamma = MC.options.getGamma().getValue();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     private void onTick(PostTickEvent ev) {
+        if (MC.options == null || MC.player == null) return;
+
+        if (!gammaSaved) {
+            defaultGamma = MC.options.getGamma().getValue();
+            gammaSaved = true;
+        }
+
         if (mode.get() == Mode.GAMMA) {
             double current = MC.options.getGamma().getValue();
             if (current != amount.get()) {
                 ((ISimpleOption) (Object) MC.options.getGamma()).setValue(amount.get());
             }
-
             if (MC.player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
                 MC.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
             }
-
-        } else if (mode.get() == Mode.POTION) {
+        }
+        else if (mode.get() == Mode.POTION) {
             if (MC.options.getGamma().getValue() != defaultGamma) {
                 ((ISimpleOption) (Object) MC.options.getGamma()).setValue(defaultGamma);
             }
-
             MC.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 220, 0, false, false, false));
         }
     }
@@ -56,9 +61,12 @@ public class FullbrightModule extends Module {
     @Override
     public void onDisable() {
         super.onDisable();
-        ((ISimpleOption) (Object) MC.options.getGamma()).setValue(defaultGamma);
+        if (MC.options != null) {
+            ((ISimpleOption) (Object) MC.options.getGamma()).setValue(defaultGamma);
+        }
         if (MC.player != null && MC.player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
             MC.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
         }
+        gammaSaved = false;
     }
 }
