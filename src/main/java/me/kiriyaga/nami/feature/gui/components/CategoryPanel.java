@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.components;
 
+import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -28,6 +29,10 @@ public class CategoryPanel {
 
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
+    }
+
+    private ClickGuiModule getClickGuiModule() {
+        return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
     public CategoryPanel(ModuleCategory moduleCategory, Set<ModuleCategory> expandedCategories, Set<Module> expandedModules) {
@@ -61,11 +66,14 @@ public class CategoryPanel {
 
         context.fill(x, y, x + WIDTH, y + totalHeight, bgColor);
 
-        context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, primary.getRGB());
-        context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, primary.getRGB());
-        context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, primary.getRGB());
-        context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, primary.getRGB());
+        if (getClickGuiModule() != null && getClickGuiModule().lines.get()) {
+            context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, primary.getRGB());
+            context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, primary.getRGB());
+            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, primary.getRGB());
+            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, primary.getRGB());
 
+        }
+        
         context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, toRGBA(primary));
 
         int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
