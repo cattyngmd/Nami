@@ -44,8 +44,8 @@ public class FullbrightModule extends Module {
             }
         }
         else if (mode.get() == Mode.POTION) {
-            if (MC.options.getGamma().getValue() > 1)
-                ((ISimpleOption) (Object) MC.options.getGamma()).setValue(1);
+            if (MC.options.getGamma().getValue() > 1.0)
+                ((ISimpleOption) (Object) MC.options.getGamma()).setValue(1.0);
             MC.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 220, 0, false, false, false));
         }
     }
