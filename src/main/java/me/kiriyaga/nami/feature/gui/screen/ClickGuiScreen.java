@@ -67,8 +67,8 @@ public class ClickGuiScreen extends Screen {
             context.fill(0, 0, this.width, this.height, color);
         }
 
-        context.getMatrices().push();
-        context.getMatrices().scale(scale, scale, 1.0f);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(scale, scale);
 
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
@@ -107,7 +107,7 @@ public class ClickGuiScreen extends Screen {
                                     0x7F000000);
                             context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, false);
                         }
-                        context.getMatrices().pop();
+                        context.getMatrices().popMatrix();
                         return;
                     }
 
@@ -120,7 +120,7 @@ public class ClickGuiScreen extends Screen {
             }
         }
 
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
         super.render(context, mouseX, mouseY, delta);
     }
 

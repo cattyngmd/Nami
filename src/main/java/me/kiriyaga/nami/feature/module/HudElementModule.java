@@ -236,9 +236,9 @@ public abstract class HudElementModule extends Module {
 
             float scale = (float) element.scale;
 
-            context.getMatrices().push();
-            context.getMatrices().translate(labelX, labelY, 1.0);
-            context.getMatrices().scale(scale, scale, 1.0f);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate(labelX, labelY);
+            context.getMatrices().scale(scale, scale);
             context.drawText(
                     MC.textRenderer,
                     label,
@@ -247,7 +247,7 @@ public abstract class HudElementModule extends Module {
                     0xFFFFFFFF,
                     MODULE_MANAGER.getStorage().getByClass(HudModule.class).shadow.get()
             );
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
         }
     }
 
