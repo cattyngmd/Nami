@@ -51,7 +51,8 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
         );
 
         int lineOffset = 1;
-        context.fill(
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
+            context.fill(
                 x,
                 y - lineOffset,
                 x + 1,

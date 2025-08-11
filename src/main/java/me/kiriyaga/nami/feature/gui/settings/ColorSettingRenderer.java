@@ -42,7 +42,8 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         renderHueSlider(context, x + PADDING, y + HEIGHT - 2, WIDTH - 2 * PADDING, SLIDER_HEIGHT, hue);
 
         int lineOffset = 1;
-        context.fill(
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
+            context.fill(
                 x,
                 y - lineOffset,
                 x + 1,

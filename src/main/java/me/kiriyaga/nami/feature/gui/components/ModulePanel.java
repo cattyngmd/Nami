@@ -37,7 +37,7 @@ public class ModulePanel {
 
         Color primary = getColorModule().getStyledGlobalColor();
         Color secondary = getColorModule().getStyledSecondColor();
-        Color textCol = new Color(255, 255, 255, GUI_ALPHA);
+        Color textCol = new Color(255, 255, 255, 122);
         Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
@@ -50,7 +50,7 @@ public class ModulePanel {
 
         context.fill(expanded ? x + 1 : x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
-        if (expanded) {
+        if (expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
             context.fill(x, y, x + 1, y + HEIGHT, enabled ? primary.getRGB() : secondary.getRGB());
         }
 

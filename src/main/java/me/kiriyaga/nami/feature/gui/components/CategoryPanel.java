@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.feature.gui.components;
 
-import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -62,7 +61,7 @@ public class CategoryPanel {
             totalHeight += BOTTOM_MARGIN;
         }
 
-        int bgColor = toRGBA(new Color(30, 30, 30, GUI_ALPHA));
+        int bgColor = toRGBA(new Color(30, 30, 30, getClickGuiModule().guiAlpha.get()));
 
         context.fill(x, y, x + WIDTH, y + totalHeight, bgColor);
 

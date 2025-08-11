@@ -28,7 +28,8 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
 
         int lineOffset = 1;
-        context.fill(
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
+            context.fill(
                 x,
                 y - lineOffset,
                 x + 1,

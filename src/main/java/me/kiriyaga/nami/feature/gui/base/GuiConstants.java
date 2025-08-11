@@ -3,8 +3,6 @@ package me.kiriyaga.nami.feature.gui.base;
 import java.awt.*;
 
 public class GuiConstants {
-    public static final int GUI_ALPHA = 122;
-
     public static int toRGBA(Color color) {
         return (color.getAlpha() << 24) |
                 (color.getRed() << 16) |
