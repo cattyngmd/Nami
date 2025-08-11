@@ -21,6 +21,7 @@
     "MixinConnectScreen",
     "MixinDisconnectedScreen",
     "MixinEntityRenderer",
+    "MixinFogRenderer",
     "MixinGameMenuScreen",
     "MixinGameRenderer",
     "MixinHandledScreen",
