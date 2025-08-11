@@ -18,7 +18,7 @@ public class ClickGuiModule extends Module {
     public final BoolSetting lines = addSetting(new BoolSetting("lines", true));
     public final BoolSetting descriptions = addSetting(new BoolSetting("descriptions", true));
     public final BoolSetting background = addSetting(new BoolSetting("background", true));
-    public final IntSetting backgroundAlpha = addSetting(new IntSetting("background alpha", 200, 0, 255));
+    public final IntSetting backgroundAlpha = addSetting(new IntSetting("background alpha", 75, 0, 255));
 
     public ClickGuiModule() {
         super("click gui", "Opens client UI.", ModuleCategory.of("client"), "clickgui","click", "gui", "menu", "clckgui", "сдшслпгш");
