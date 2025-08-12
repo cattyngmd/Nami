@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.core.macro.model.Macro;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
 import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.world.AirPlaceModule;
+import me.kiriyaga.nami.feature.module.impl.world.AutoEatModule;
 import me.kiriyaga.nami.feature.module.impl.world.FastPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.NoHitDelayModule;
 import me.kiriyaga.nami.setting.impl.KeyBindSetting;
@@ -200,5 +202,13 @@ public abstract class MixinMinecraftClient {
                 cir.setReturnValue(true);
             }
         }
+    }
+
+    // Author @cattyngmd
+    @ModifyExpressionValue(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
+    private boolean handleInputEvents(boolean original) {
+        if (MODULE_MANAGER.getStorage().getByClass(AutoEatModule.class).eating.get())
+            return false;
+        return original;
     }
 }
