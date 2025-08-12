@@ -7,6 +7,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,6 +20,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class AutoFireworkModule extends Module {
 
     public final DoubleSetting delaySeconds = addSetting(new DoubleSetting("delay", 4.5, 0.1, 25.0));
+    public final IntSetting onLevel = addSetting(new IntSetting("on level", -64, -64, 360));
 
     private int tickDelay;
     private int lastUseTick = 0;
@@ -36,6 +38,8 @@ public class AutoFireworkModule extends Module {
         tickDelay = (int) Math.round(delaySeconds.get() * 20);
 
         if (!MC.player.isGliding()) return;
+
+        if (MC.player.getY() <= onLevel.get()) return;
 
         if (MC.player.age - lastUseTick < tickDelay) return;
 
@@ -57,7 +61,7 @@ public class AutoFireworkModule extends Module {
 
         int invSlot = getSlotInInventory(item);
         if (invSlot != -1) {
-            int selectedHotbarIndex = MC.player.getInventory().getSelectedSlot(); // 0–8
+            int selectedHotbarIndex = MC.player.getInventory().getSelectedSlot();
             int containerInvSlot = convertSlot(invSlot);
 
             INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
