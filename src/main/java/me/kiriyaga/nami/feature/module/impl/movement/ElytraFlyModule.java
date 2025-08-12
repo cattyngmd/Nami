@@ -53,7 +53,6 @@ public class ElytraFlyModule extends Module {
         newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE && pitch.get());
-        autoWalkEnable.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         rotationPriority.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         lockPitch.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
     }
@@ -76,7 +75,7 @@ public class ElytraFlyModule extends Module {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onMove(MoveEvent event) {
         ClientPlayerEntity player = MC.player;
-        if (player == null) return;
+        if (player == null || mode.get() != FlyMode.BOUNCE) return;
 
         if (!player.isOnGround()) return;
 
@@ -124,10 +123,9 @@ public class ElytraFlyModule extends Module {
         } else {
             finalYaw = (float) Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90f;
             finalPitch = MC.player.getPitch();
-        }
-
-        if (lockPitch.get()) {
-            finalPitch = -3f;
+            if (lockPitch.get()) {
+                finalPitch = -3f;
+            }
         }
 
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
