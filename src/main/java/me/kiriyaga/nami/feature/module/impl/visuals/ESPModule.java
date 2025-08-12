@@ -140,7 +140,7 @@ public class ESPModule extends Module {
 
         if (MC.player.distanceTo(entity) > maxDistSq)
             return null;
-        
+
         if (entity == null || entity.isRemoved() || !entity.isAlive()) return null;
 
         if (entity instanceof PlayerEntity) {
