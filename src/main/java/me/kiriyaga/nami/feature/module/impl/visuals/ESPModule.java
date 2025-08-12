@@ -37,6 +37,7 @@ public class ESPModule extends Module {
     public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", true));
     public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
     public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("mode", RenderMode.OUTLINE));
+    public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("distance", 52, 15, 256));
     public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth appearance", true));
     public final DoubleSetting lineWidth = addSetting(new DoubleSetting("line", 1.5, 0.5, 2.5));
     public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
@@ -51,6 +52,7 @@ public class ESPModule extends Module {
         smoothAppear.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
         lineWidth.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
         filled.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
+        outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -83,6 +85,11 @@ public class ESPModule extends Module {
         if (showNeutrals.get()) entities.addAll(ENTITY_MANAGER.getNeutral());
         if (showHostiles.get()) entities.addAll(ENTITY_MANAGER.getHostile());
         if (showItems.get()) entities.addAll(ENTITY_MANAGER.getDroppedItems());
+
+        if (renderMode.get() == RenderMode.OUTLINE) {
+            double maxDistSq = outlineDistance.get() * outlineDistance.get();
+            entities.removeIf(entity -> MC.player.squaredDistanceTo(entity) > maxDistSq);
+        }
 
         return entities;
     }
