@@ -12,7 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 
-
 import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -28,36 +27,44 @@ public class ClickPearlModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onTick(PreTickEvent ev) { // onTick due to post-held item change
-        if (!isEnabled() || hasActivated)
-            return;
-
-        if (MC.world == null || MC.player == null)
-            return;
+        if (!isEnabled() || hasActivated) return;
+        if (MC.world == null || MC.player == null) return;
 
         hasActivated = true;
         toggle();
 
         if (MC.player.isGliding() && glideFirework.get()) {
-            int slot = getSlot(Items.FIREWORK_ROCKET);
-            int prevSlot = MC.player.getInventory().getSelectedSlot();
-            if (slot == -1)
-                return;
+            useItemAnywhere(Items.FIREWORK_ROCKET);
+            return;
+        }
 
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+        if (!MC.player.getItemCooldownManager().isCoolingDown(Items.ENDER_PEARL.getDefaultStack())) {
+            useItemAnywhere(Items.ENDER_PEARL);
+        }
+    }
+
+    private void useItemAnywhere(Item item) {
+        int hotbarSlot = getSlotInHotbar(item);
+
+        if (hotbarSlot != -1) {
+            int prevSlot = MC.player.getInventory().getSelectedSlot();
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(hotbarSlot);
             MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
             return;
         }
 
-        int slot = getSlot(Items.ENDER_PEARL);
-        if (slot == -1 || MC.player.getItemCooldownManager().isCoolingDown(Items.ENDER_PEARL.getDefaultStack()))
-            return;
+        int invSlot = getSlotInInventory(item);
+        if (invSlot != -1) {
+            int selectedHotbarIndex = MC.player.getInventory().getSelectedSlot(); // 0–8
+            int containerInvSlot = convertSlot(invSlot);
 
-        int prevSlot = MC.player.getInventory().getSelectedSlot();
+            INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
 
-        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
-        MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
-        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
+            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+
+            INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
+        }
     }
 
     @Override
@@ -65,11 +72,23 @@ public class ClickPearlModule extends Module {
         hasActivated = false;
     }
 
-    private int getSlot(Item item) {
+    private int getSlotInHotbar(Item item) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getStack(i);
             if (stack.getItem() == item) return i;
         }
         return -1;
+    }
+
+    private int getSlotInInventory(Item item) {
+        for (int i = 9; i < 36; i++) {
+            ItemStack stack = MC.player.getInventory().getStack(i);
+            if (stack.getItem() == item) return i;
+        }
+        return -1;
+    }
+
+    private int convertSlot(int slot) {
+        return slot < 9 ? slot + 36 : slot;
     }
 }
