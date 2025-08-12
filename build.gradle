@@ -40,8 +40,8 @@ def getCommitsCount() {
     return stdout.toString().trim()
 }
 
-//version = "2.4.1_${getCommitsCount()}.${getGitHash()}"
-version = "2.4.2_hotfix"
+version = "2.4.2_${getCommitsCount()}.${getGitHash()}"
+//version = "2.4.2_hotfix"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
