@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.EntityPushEvent;
+import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
@@ -8,8 +9,11 @@ import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,9 +26,20 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity {
+public abstract class MixinEntity{
+
+    @Shadow
+    public abstract Vec3d getRotationVector(float pitch, float yaw);
 
     @Shadow public abstract boolean isPlayer();
+
+    @Shadow public abstract float getYaw();
+
+    @Shadow public abstract float getPitch();
+
+    @Shadow public abstract void setYaw(float f);
+
+    @Shadow public abstract void setPitch(float f);
 
     @Inject(method = "getTeamColorValue", at = @At("HEAD"), cancellable = true)
     private void onGetTeamColorValue(CallbackInfoReturnable<Integer> cir) {
@@ -73,5 +88,16 @@ public abstract class MixinEntity {
                 && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             cir.setReturnValue(EntityPose.STANDING);
         }
+    }
+
+    @Inject(method = "getRotationVector()Lnet/minecraft/util/math/Vec3d;", at = @At("HEAD"), cancellable = true)
+    private void onGetRotationVector(CallbackInfoReturnable<Vec3d> cir) {
+        if ((Object) this != MC.player) return;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
+
+        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+
+        cir.setReturnValue(((Entity) (Object) this).getRotationVector(spoofPitch, spoofYaw));
     }
 }
