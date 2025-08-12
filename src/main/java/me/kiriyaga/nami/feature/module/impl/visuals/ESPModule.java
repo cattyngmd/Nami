@@ -135,6 +135,12 @@ public class ESPModule extends Module {
         ESPModule esp = MODULE_MANAGER.getStorage().getByClass(ESPModule.class);
         if (esp == null || !esp.isEnabled()) return null;
 
+        double d = MODULE_MANAGER.getStorage().getByClass(ESPModule.class).outlineDistance.get();
+        double maxDistSq = d * d;
+
+        if (MC.player.distanceTo(entity) > maxDistSq)
+            return null;
+        
         if (entity == null || entity.isRemoved() || !entity.isAlive()) return null;
 
         if (entity instanceof PlayerEntity) {
