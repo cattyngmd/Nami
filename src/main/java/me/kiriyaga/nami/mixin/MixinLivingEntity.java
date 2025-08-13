@@ -70,50 +70,13 @@ public abstract class MixinLivingEntity extends Entity {
         this.setPitch(originalPitch);
     }
 
-    @ModifyVariable(method = "travel", at = @At("HEAD"), ordinal = 0)
-    private Vec3d modifyMovementInput(Vec3d movementInput) {
-        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return movementInput;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return movementInput;
-
-        if (MODULE_MANAGER.getStorage() == null) return movementInput;
-        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
-        if (rotationModule == null || !rotationModule.moveFix.get()) return movementInput;
-
-        if (movementInput.lengthSquared() < 1e-4) return movementInput;
-
-        float realYaw = originalYaw;
-        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-
-        float clampedSpoofYaw = findClosestValidYaw(spoofYaw);
-
-        Vec3d globalMovement = localToGlobal(movementInput, realYaw);
-
-        Vec3d clampedLocalMovement = globalToLocal(globalMovement, clampedSpoofYaw);
-
-        return clampedLocalMovement;
-    }
-
-    private float findClosestValidYaw(float yaw) {
-        float[] allowedYawAngles = new float[]{0, 45, 90, 135, 180, 225, 270, 315};
-        float bestYaw = allowedYawAngles[0];
-        float minDiff = Float.MAX_VALUE;
-        for (float allowedYaw : allowedYawAngles) {
-            float diff = Math.abs(((allowedYaw - yaw + 540f) % 360f) - 180f);
-            if (diff < minDiff) {
-                minDiff = diff;
-                bestYaw = allowedYaw;
-            }
-        }
-        return bestYaw;
-    }
-
     private Vec3d localToGlobal(Vec3d localVec, float yaw) {
         double rad = Math.toRadians(yaw);
         double cos = Math.cos(rad);
         double sin = Math.sin(rad);
 
         double x = localVec.x * cos - localVec.z * sin;
-        double z = localVec.z * cos + localVec.x * sin;
+        double z = localVec.x * sin + localVec.z * cos;
 
         return new Vec3d(x, localVec.y, z);
     }
@@ -124,7 +87,7 @@ public abstract class MixinLivingEntity extends Entity {
         double sin = Math.sin(rad);
 
         double x = globalVec.x * cos + globalVec.z * sin;
-        double z = globalVec.z * cos - globalVec.x * sin;
+        double z = -globalVec.x * sin + globalVec.z * cos;
 
         return new Vec3d(x, globalVec.y, z);
     }
