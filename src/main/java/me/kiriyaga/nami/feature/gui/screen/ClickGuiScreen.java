@@ -44,6 +44,8 @@ public class ClickGuiScreen extends Screen {
         int x = 20;
         int y = 20;
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
             categoryPositions.putIfAbsent(moduleCategory, new Point(x, y));
             x += CategoryPanel.WIDTH + CategoryPanel.GAP;
         }
@@ -74,6 +76,8 @@ public class ClickGuiScreen extends Screen {
         int scaledMouseY = (int) (mouseY / scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
             Point pos = categoryPositions.get(moduleCategory);
             if (pos == null) continue;
 
@@ -84,6 +88,7 @@ public class ClickGuiScreen extends Screen {
         if (clickGuiModule != null && clickGuiModule.descriptions.get()) {
             for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
                 if (!expandedCategories.contains(moduleCategory)) continue;
+                if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
 
                 Point pos = categoryPositions.get(moduleCategory);
                 if (pos == null) continue;
@@ -136,6 +141,8 @@ public class ClickGuiScreen extends Screen {
         int scaledMouseY = (int) (mouseY / scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
             Point pos = categoryPositions.get(moduleCategory);
             if (pos == null) continue;
 
@@ -159,6 +166,8 @@ public class ClickGuiScreen extends Screen {
 
         if (!draggingCategory) {
             for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+                if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
                 if (expandedCategories.contains(moduleCategory)) {
                     Point pos = categoryPositions.get(moduleCategory);
                     if (pos == null) continue;
