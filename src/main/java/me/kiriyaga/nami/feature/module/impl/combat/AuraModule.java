@@ -188,11 +188,22 @@ public class AuraModule extends Module {
     }
 
     private static Vec3d getClosestPointToEye(Vec3d eyePos, Box box) {
-        double x = MathHelper.clamp(eyePos.x, box.minX, box.maxX);
-        double y = MathHelper.clamp(eyePos.y, box.minY, box.maxY);
-        double z = MathHelper.clamp(eyePos.z, box.minZ, box.maxZ);
+        double x = eyePos.x;
+        double y = eyePos.y;
+        double z = eyePos.z;
+
+        if (eyePos.x < box.minX) x = box.minX;
+        else if (eyePos.x > box.maxX) x = box.maxX;
+
+        if (eyePos.y < box.minY) y = box.minY;
+        else if (eyePos.y > box.maxY) y = box.maxY;
+
+        if (eyePos.z < box.minZ) z = box.minZ;
+        else if (eyePos.z > box.maxZ) z = box.maxZ;
+
         return new Vec3d(x, y, z);
     }
+
 
     private static EntityHitResult raycastTarget(Entity player, Entity target, double reach) {
         float yaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
