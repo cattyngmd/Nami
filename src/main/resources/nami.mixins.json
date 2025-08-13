@@ -34,6 +34,7 @@
     "MixinKeyboard",
     "MixinMinecraftClient",
     "MixinParticleManager",
+    "MixinPlayerEntityRenderer",
     "MixinPlayerListHud",
     "MixinScreen",
     "MixinSimpleOption",
