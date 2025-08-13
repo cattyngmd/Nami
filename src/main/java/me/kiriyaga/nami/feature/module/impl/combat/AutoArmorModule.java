@@ -52,14 +52,13 @@ public class AutoArmorModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
-        if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof ClickGuiScreen || MC.currentScreen instanceof HudEditorScreen) {
-            Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = ENTITY_MANAGER.getTarget();
 
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                if (!isArmorSlot(slot)) continue;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (!isArmorSlot(slot)) continue;
 
-                ItemStack current = MC.player.getEquippedStack(slot);
-                ItemStack best = null;
+            ItemStack current = MC.player.getEquippedStack(slot);
+            ItemStack best = null;
 
                 if (mendingRepair.get()) {
                     if (shouldEquipMendingRepair(slot, current)) {
@@ -107,7 +106,6 @@ public class AutoArmorModule extends Module {
                             return;
                         }
                     }
-                }
             }
         }
     }
