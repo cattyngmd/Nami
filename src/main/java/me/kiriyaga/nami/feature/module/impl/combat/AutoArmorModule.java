@@ -68,7 +68,7 @@ public class AutoArmorModule extends Module {
                             int invSlot = findInventorySlot(mendingPiece);
                             if (invSlot != -1) {
                                 swap(slot, invSlot);
-                                continue;
+                                return;
                             }
                         }
                     }
@@ -96,12 +96,14 @@ public class AutoArmorModule extends Module {
                             int invSlot = findEmptySlot();
                             if (invSlot != -1) {
                                 swap(slot, invSlot);
+                                return;
                             }
                         }
                     } else if (!ItemStack.areEqual(best, current)) {
                         int invSlot = findInventorySlot(best);
                         if (invSlot != -1) {
                             swap(slot, invSlot);
+                            return;
                         }
                     }
                 }
@@ -234,23 +236,33 @@ public class AutoArmorModule extends Module {
     }
 
     private boolean shouldEquipMendingRepair(EquipmentSlot slot, ItemStack current) {
-        if (current.isEmpty() || !hasMending(current) || isFullyRepaired(current)) {
-            return true;
-        }
+        if (current.isEmpty()) return true;
+
+        if (!hasMending(current)) return true;
+
+        if (isFullyRepaired(current)) return true;
+
         return false;
     }
 
+
     private ItemStack findDamagedMendingArmor(EquipmentSlot slot) {
+        ClientPlayerEntity player = MC.player;
+
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = player.getInventory().getStack(i);
+
             if (stack.isEmpty()) continue;
             if (!isArmorForSlot(stack, slot)) continue;
             if (!hasMending(stack)) continue;
             if (isFullyRepaired(stack)) continue;
+
             return stack;
         }
+
         return null;
     }
+
 
     private boolean hasMending(ItemStack stack) {
         return EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0;
