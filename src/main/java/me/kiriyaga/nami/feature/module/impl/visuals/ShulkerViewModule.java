@@ -93,7 +93,10 @@ public class ShulkerViewModule extends Module {
             int rows = info.rows();
             int cols = info.cols();
 
-            if (currentY >= MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
+            int width = cols * GRID_WIDTH + MARGIN * cols;
+            int height = rows * GRID_HEIGHT + MARGIN * rows;
+
+            if (currentY + height > MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
                 right = true;
                 currentY = MARGIN + offset;
             }
@@ -102,9 +105,6 @@ public class ShulkerViewModule extends Module {
                 float totalWidth = cols * GRID_WIDTH + MARGIN * cols;
                 startX = (int) ((MC.getWindow().getScaledWidth() - totalWidth - MARGIN) / scale);
             }
-
-            int width = cols * GRID_WIDTH + MARGIN * cols;
-            int height = rows * GRID_HEIGHT + MARGIN * rows;
 
            // CHAT_MANAGER.sendRaw("rendering shulker at (" + startX + ", " + currentY + "), size = " + cols + "x" + rows);
 
