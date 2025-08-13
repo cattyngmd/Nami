@@ -43,6 +43,7 @@ public class ShulkerViewModule extends Module {
     public final BoolSetting bothSides = addSetting(new BoolSetting("both sides", true));
     public final BoolSetting borders = addSetting(new BoolSetting("borders", true));
     public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1, 0.5, 1.5));
+    public final DoubleSetting scrollsensitivity = addSetting(new DoubleSetting("sensitivity", 1, 0.5, 3));
 
     private final List<ShulkerInfo> shulkerList = new ArrayList<>();
     private final int GRID_WIDTH = 20;
@@ -156,7 +157,7 @@ public class ShulkerViewModule extends Module {
     public void onScroll(MouseScrollEvent event) {
       //  CHAT_MANAGER.sendRaw("mouse scroll event called");
         float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get()).floatValue(), 0);
-        offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * 10, maxOffset, 0);
+        offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * (scrollsensitivity.get() * 10), maxOffset, 0);
     }
 
     private void drawBorder(DrawContext context, int x, int y, int width, int height, int color) {
