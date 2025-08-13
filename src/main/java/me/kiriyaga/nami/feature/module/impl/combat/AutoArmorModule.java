@@ -37,6 +37,7 @@ public class AutoArmorModule extends Module {
     private final BoolSetting helmetSafety = addSetting(new BoolSetting("helmet safety", false));
     private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("boots", BootsPriority.BEST));
     private final BoolSetting elytraPriority = addSetting(new BoolSetting("elytra priority", false));
+    private final BoolSetting mendingRepair = addSetting(new BoolSetting("mending repair", false));
 
     private static final Set<Item> ARMOR_ITEMS_HEAD = Set.of(Items.LEATHER_HELMET, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET, Items.TURTLE_HELMET);
     private static final Set<Item> ARMOR_ITEMS_CHEST = Set.of(Items.LEATHER_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE, Items.ELYTRA);
@@ -59,6 +60,19 @@ public class AutoArmorModule extends Module {
 
                 ItemStack current = MC.player.getEquippedStack(slot);
                 ItemStack best = null;
+
+                if (mendingRepair.get()) {
+                    if (shouldEquipMendingRepair(slot, current)) {
+                        ItemStack mendingPiece = findDamagedMendingArmor(slot);
+                        if (mendingPiece != null) {
+                            int invSlot = findInventorySlot(mendingPiece);
+                            if (invSlot != -1) {
+                                swap(slot, invSlot);
+                                continue;
+                            }
+                        }
+                    }
+                }
 
                 if (slot == EquipmentSlot.HEAD) {
                     if (helmetSetting.get() == HelmetPriority.NONE) {
@@ -217,6 +231,34 @@ public class AutoArmorModule extends Module {
         if (hasEquipped) {
             INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
         }
+    }
+
+    private boolean shouldEquipMendingRepair(EquipmentSlot slot, ItemStack current) {
+        if (current.isEmpty() || !hasMending(current) || isFullyRepaired(current)) {
+            return true;
+        }
+        return false;
+    }
+
+    private ItemStack findDamagedMendingArmor(EquipmentSlot slot) {
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = MC.player.getInventory().getStack(i);
+            if (stack.isEmpty()) continue;
+            if (!isArmorForSlot(stack, slot)) continue;
+            if (!hasMending(stack)) continue;
+            if (isFullyRepaired(stack)) continue;
+            return stack;
+        }
+        return null;
+    }
+
+    private boolean hasMending(ItemStack stack) {
+        return EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0;
+    }
+
+    private boolean isFullyRepaired(ItemStack stack) {
+        if (!stack.isDamageable()) return true;
+        return stack.getDamage() == 0;
     }
 
     private ItemStack findBestArmor(EquipmentSlot targetSlot, ItemStack current) {
