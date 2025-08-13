@@ -133,7 +133,7 @@ public class ShulkerViewModule extends Module {
             }
 
             if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot);
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot, true);
                 clickedX = clickedY = -1;
             }
 
