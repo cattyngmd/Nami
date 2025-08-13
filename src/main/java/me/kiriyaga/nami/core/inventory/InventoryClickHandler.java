@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.core.inventory;
 
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.ScreenHandler;
@@ -38,7 +38,7 @@ public class InventoryClickHandler {
     private int click(int slot, int button, SlotActionType type) {
         if (slot < 0) return -1;
 
-        if (MC.currentScreen instanceof GenericContainerScreen)
+        if (MC.currentScreen instanceof GenericContainerScreen || MC.currentScreen instanceof AnvilScreen || MC.currentScreen instanceof AbstractCommandBlockScreen || MC.currentScreen instanceof StructureBlockScreen || MC.currentScreen instanceof CreativeInventoryScreen)
             return -1;
 
         ScreenHandler handler = MC.player.currentScreenHandler;
