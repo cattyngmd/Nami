@@ -110,7 +110,7 @@ public abstract class MixinCamera implements ICamera {
                 : null;
 
         if (viewClipModule != null && viewClipModule.isEnabled()) {
-            args.set(0, viewClipModule.distance.get().floatValue());
+            args.set(0, viewClipModule.getAnimatedDistance());
         }
     }
 }
