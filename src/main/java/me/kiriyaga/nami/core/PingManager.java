@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.module.impl.client.PingManagerModule;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
+import net.minecraft.util.profiler.MultiValueDebugSampleLogImpl;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -29,7 +30,6 @@ public class PingManager {
     public void onPacketReceive(PacketReceiveEvent packet) {
         if (packet.getPacket() instanceof KeepAliveS2CPacket) {
             long now = System.currentTimeMillis();
-
             PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
             int keepAliveInterval = config != null ? config.keepAliveInterval.get() : 1000;
 
@@ -74,17 +74,31 @@ public class PingManager {
 
     public int getPing() {
         PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
+        if (config == null) return lastPing;
 
-        if (config != null && !config.fastLatency.get()) {
-            if (MC.getNetworkHandler() != null && MC.player != null) {
-                return MC.getNetworkHandler().getPlayerListEntry(MC.player.getUuid()).getLatency();
-            } else {
-                return -1;
-            }
-        }
+        switch (config.fastLatencyMode.get()) {
+            case OLD:
+                return lastPing;
+            case OFF:
+                if (MC.getNetworkHandler() != null && MC.player != null) {
+                    return MC.getNetworkHandler().getPlayerListEntry(MC.player.getUuid()).getLatency();
+                } else {
+                    return -1;
+                }
+            case NEW:
+                try {
+                    if (MC.getDebugHud() != null && MC.getDebugHud().getPingLog() != null) {
+                        MultiValueDebugSampleLogImpl pingLog = MC.getDebugHud().getPingLog();
+                        int count = pingLog.getLength();
+                        if (count == 0) return -1;
 
-        return lastPing;
+                        return (int) pingLog.get(count - 1, 0);
+                    }
+                } catch (Exception ignored) {
+                }
+        }   return -1;
     }
+
 
 
     public boolean isConnectionUnstable() {
@@ -93,17 +107,40 @@ public class PingManager {
 
         Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
-        if (lastUpdated == -1) {
-            if (debugModule.isEnabled() && debugModule.ping.get())
-                CHAT_MANAGER.sendRaw("Connection unstable: no ping data yet");
-            return true;
+
+        switch (config.fastLatencyMode.get()) {
+            case OLD:
+                if (lastUpdated == -1) {
+                    if (debugModule.isEnabled() && debugModule.ping.get())
+                        CHAT_MANAGER.sendRaw("Connection unstable: no ping data yet");
+                    return true;
+                }
+                boolean unstableOld = (System.currentTimeMillis() - lastUpdated) > timeoutMillis;
+                if (unstableOld && debugModule.ping.get() && debugModule.isEnabled()) {
+                    CHAT_MANAGER.sendRaw("Connection unstable: last ping updated "
+                            + (System.currentTimeMillis() - lastUpdated) + "ms ago");
+                }
+                return unstableOld;
+            case NEW:
+                try {
+                    if (MC.getDebugHud() != null && MC.getDebugHud().getPingLog() != null) {
+                        MultiValueDebugSampleLogImpl pingLog = MC.getDebugHud().getPingLog();
+                        int count = pingLog.getLength();
+                        if (count == 0) return true;
+                        long lastPingTime = System.currentTimeMillis() - pingLog.get(count - 1, 0);
+                        boolean unstableNew = lastPingTime > timeoutMillis;
+                        if (unstableNew && debugModule.ping.get() && debugModule.isEnabled()) {
+                            CHAT_MANAGER.sendRaw("Connection unstable: last ping updated " + lastPingTime + "ms ago");
+                        }
+                        return unstableNew;
+                    }
+                } catch (Exception ignored) {}
+                return true;
         }
-        boolean unstable = (System.currentTimeMillis() - lastUpdated) > timeoutMillis;
-        if (unstable && debugModule.ping.get() && debugModule.isEnabled()) {
-            CHAT_MANAGER.sendRaw("Connection unstable: last ping updated " + (System.currentTimeMillis() - lastUpdated) + "ms ago");
-        }
-        return unstable;
+
+        return false;
     }
+
     public float getConnectionUnstableTimeSeconds() {
         if (lastUpdated == -1) return Float.POSITIVE_INFINITY;
         long deltaMillis = System.currentTimeMillis() - lastUpdated;
