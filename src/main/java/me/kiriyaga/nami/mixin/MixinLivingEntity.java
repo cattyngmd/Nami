@@ -41,14 +41,13 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
-
         if (MODULE_MANAGER.getStorage() == null) return;
         RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
         if (rotationModule == null || !rotationModule.moveFix.get()) return;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
-        originalYaw = this.getYaw();
-        originalPitch = this.getPitch();
+        originalYaw = super.getYaw();
+        originalPitch = super.getPitch();
 
         float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
         float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
@@ -166,7 +165,7 @@ public abstract class MixinLivingEntity extends Entity {
             float moveAngleDeg = (float) Math.toDegrees(moveAngleRad);
             moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
 
-            if (Math.abs(moveAngleDeg) > 45f) {
+            if (Math.abs(moveAngleDeg) > 36f) {
                 ci.cancel();
                 super.setSprinting(false);
             }

@@ -6,6 +6,7 @@
     "ChatHudAccessor",
     "ClientPlayerInteractionManagerAccessor",
     "GameOptionsAccessor",
+    "InputAccessor",
     "KeyBindingAccessor",
     "MixinArmorFeatureRenderer",
     "MixinBossBarHud",
