@@ -99,8 +99,6 @@ public class PingManager {
         }   return -1;
     }
 
-
-
     public boolean isConnectionUnstable() {
         PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
         if (config == null) return false;
@@ -127,11 +125,21 @@ public class PingManager {
                         MultiValueDebugSampleLogImpl pingLog = MC.getDebugHud().getPingLog();
                         int count = pingLog.getLength();
                         if (count == 0) return true;
-                        long lastPingTime = System.currentTimeMillis() - pingLog.get(count - 1, 0);
-                        boolean unstableNew = lastPingTime > timeoutMillis;
-                        if (unstableNew && debugModule.ping.get() && debugModule.isEnabled()) {
-                            CHAT_MANAGER.sendRaw("Connection unstable: last ping updated " + lastPingTime + "ms ago");
+
+                        long lastValue = pingLog.get(count - 1, 0);
+
+                        int repeatCount = 1;
+                        for (int i = count - 2; i >= 0; i--) {
+                            if (pingLog.get(i, 0) == lastValue) repeatCount++;
+                            else break;
                         }
+
+                        boolean unstableNew = repeatCount >= timeoutMillis / 50;
+                        if (unstableNew && debugModule.ping.get() && debugModule.isEnabled()) {
+                            CHAT_MANAGER.sendRaw("Connection unstable: last ping " + lastValue
+                                    + " repeated " + repeatCount + " times");
+                        }
+
                         return unstableNew;
                     }
                 } catch (Exception ignored) {}

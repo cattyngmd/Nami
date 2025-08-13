@@ -1,0 +1,22 @@
+package me.kiriyaga.nami.mixin;
+
+import me.kiriyaga.nami.feature.module.impl.client.PingManagerModule;
+import net.minecraft.client.gui.hud.DebugHud;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+
+@Mixin(DebugHud.class)
+public class MixinDebugHud {
+
+    @Inject(method = "shouldShowPacketSizeAndPingCharts", at = @At("HEAD"), cancellable = true)
+    private void shouldShowPacketSizeAndPingCharts(CallbackInfoReturnable<Boolean> cir) {
+        var config = MODULE_MANAGER.getStorage().getByClass(me.kiriyaga.nami.feature.module.impl.client.PingManagerModule.class);
+        if (config != null && config.fastLatencyMode.get() == PingManagerModule.FastLatencyMode.NEW) {
+            cir.setReturnValue(true);
+        }
+    }
+}
