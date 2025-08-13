@@ -72,6 +72,7 @@ public class AutoArmorModule extends Module {
                             }
                         }
                     }
+                    return; //yes
                 }
 
                 if (slot == EquipmentSlot.HEAD) {
