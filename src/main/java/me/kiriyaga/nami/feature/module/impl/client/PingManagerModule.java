@@ -15,7 +15,7 @@ public class PingManagerModule extends Module {
         OFF
     }
 
-    public final EnumSetting<FastLatencyMode> fastLatencyMode = addSetting(new EnumSetting<>("fast latency mode", FastLatencyMode.OLD));
+    public final EnumSetting<FastLatencyMode> fastLatencyMode = addSetting(new EnumSetting<>("fast latency mode", FastLatencyMode.NEW));
     public final IntSetting smoothingStrength = addSetting(new IntSetting("smoothing", 10, 1, 50));
     public final IntSetting unstableConnectionTimeout = addSetting(new IntSetting("unstable", 3, 1, 60));
     public final IntSetting keepAliveInterval = addSetting(new IntSetting("interval", 900, 250, 2500));
