@@ -28,9 +28,13 @@ public class PingManager {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPacketReceive(PacketReceiveEvent packet) {
+        PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
+
+        if (config.fastLatencyMode.get() != PingManagerModule.FastLatencyMode.OLD)
+            return;
+
         if (packet.getPacket() instanceof KeepAliveS2CPacket) {
             long now = System.currentTimeMillis();
-            PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
             int keepAliveInterval = config != null ? config.keepAliveInterval.get() : 1000;
 
             if (lastReceiveTime != -1) {
@@ -51,8 +55,7 @@ public class PingManager {
                 pingHistory[index++ % smoothingStrength] = ping;
                 count = Math.min(count + 1, smoothingStrength);
 
-                lastPing = averagePing();
-                lastUpdated = now;
+                updatePing(averagePing());
                 Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
 
                 if (config != null && debugModule.isEnabled() && debugModule.ping.get()) {
@@ -92,6 +95,8 @@ public class PingManager {
                         int count = pingLog.getLength();
                         if (count == 0) return -1;
 
+                        updatePing((int) pingLog.get(count - 1, 0));
+
                         return (int) pingLog.get(count - 1, 0);
                     }
                 } catch (Exception ignored) {
@@ -106,47 +111,25 @@ public class PingManager {
         Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
 
-        switch (config.fastLatencyMode.get()) {
-            case OLD:
-                if (lastUpdated == -1) {
-                    if (debugModule.isEnabled() && debugModule.ping.get())
-                        CHAT_MANAGER.sendRaw("Connection unstable: no ping data yet");
-                    return true;
-                }
-                boolean unstableOld = (System.currentTimeMillis() - lastUpdated) > timeoutMillis;
-                if (unstableOld && debugModule.ping.get() && debugModule.isEnabled()) {
-                    CHAT_MANAGER.sendRaw("Connection unstable: last ping updated "
-                            + (System.currentTimeMillis() - lastUpdated) + "ms ago");
-                }
-                return unstableOld;
-            case NEW:
-                try {
-                    if (MC.getDebugHud() != null && MC.getDebugHud().getPingLog() != null) {
-                        MultiValueDebugSampleLogImpl pingLog = MC.getDebugHud().getPingLog();
-                        int count = pingLog.getLength();
-                        if (count == 0) return true;
-
-                        long lastValue = pingLog.get(count - 1, 0);
-
-                        int repeatCount = 1;
-                        for (int i = count - 2; i >= 0; i--) {
-                            if (pingLog.get(i, 0) == lastValue) repeatCount++;
-                            else break;
-                        }
-
-                        boolean unstableNew = repeatCount >= timeoutMillis / 50;
-                        if (unstableNew && debugModule.ping.get() && debugModule.isEnabled()) {
-                            CHAT_MANAGER.sendRaw("Connection unstable: last ping " + lastValue
-                                    + " repeated " + repeatCount + " times");
-                        }
-
-                        return unstableNew;
-                    }
-                } catch (Exception ignored) {}
-                return true;
+        if (lastUpdated == -1) {
+            if (debugModule.isEnabled() && debugModule.ping.get())
+                CHAT_MANAGER.sendRaw("Connection unstable: no ping data yet");
+            return true;
         }
 
-        return false;
+        boolean unstable = (System.currentTimeMillis() - lastUpdated) > timeoutMillis;
+        if (unstable && debugModule.isEnabled() && debugModule.ping.get()) {
+            CHAT_MANAGER.sendRaw("Connection unstable: last ping updated "
+                    + (System.currentTimeMillis() - lastUpdated) + "ms ago");
+        }
+        return unstable;
+    }
+
+    public void updatePing(int ping) {
+        if (ping != lastPing) {
+            lastPing = ping;
+            lastUpdated = System.currentTimeMillis();
+        }
     }
 
     public float getConnectionUnstableTimeSeconds() {
@@ -154,5 +137,4 @@ public class PingManager {
         long deltaMillis = System.currentTimeMillis() - lastUpdated;
         return deltaMillis / 1000.0f;
     }
-
 }

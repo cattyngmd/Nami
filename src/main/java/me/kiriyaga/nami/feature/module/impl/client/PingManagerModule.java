@@ -24,7 +24,7 @@ public class PingManagerModule extends Module {
         super("ping manager", "Allows you to config ping manager settings.", ModuleCategory.of("client"), "ping", "manager", "managr", "png", "зштп");
 
         smoothingStrength.setShowCondition(() -> fastLatencyMode.get() == FastLatencyMode.OLD);
-        unstableConnectionTimeout.setShowCondition(() -> fastLatencyMode.get() == FastLatencyMode.OLD);
+        unstableConnectionTimeout.setShowCondition(() -> fastLatencyMode.get() != FastLatencyMode.OFF);
         keepAliveInterval.setShowCondition(() -> fastLatencyMode.get() == FastLatencyMode.OLD);
     }
 
