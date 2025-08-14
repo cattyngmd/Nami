@@ -1,17 +1,18 @@
 package me.kiriyaga.nami.core;
 
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.mixin.ChatHudAccessor;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -33,8 +34,14 @@ public class ChatManager {
      *
      */
 
-    private final Map<String, MessageSignatureData> persistentMessages = new HashMap<>();
-    private MessageSignatureData transientSignature = null;
+    public final Map<String, MessageSignatureData> persistentMessages = new HashMap<>();
+    public MessageSignatureData transientSignature = null;
+
+    private final List<Text> allMessages = new ArrayList<>(); // theese are always key == null
+
+    public void init(){
+        EVENT_MANAGER.register(this);
+    }
 
     private MessageSignatureData generateSignature() {
         byte[] data = new byte[256];
@@ -142,6 +149,8 @@ public class ChatManager {
             removeSilently(transientSignature);
             transientSignature = null;
         }
+
+        allMessages.clear();
     }
 
     private ChatHud getChatHud() {
@@ -165,6 +174,8 @@ public class ChatManager {
             return false;
         });
         accessor.callRefresh();
+
+        allMessages.remove(signature);
     }
 
     private MessageIndicator indicator() {
@@ -174,5 +185,40 @@ public class ChatManager {
 
     private Text prefix() {
         return CAT_FORMAT.format("{s}[{g}" + NAME + "{s}] {reset}");
+    }
+
+    public void removeByText(String text) {
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
+
+        ChatHud hud = getChatHud();
+        ChatHudAccessor accessor = (ChatHudAccessor) hud;
+
+        accessor.getMessages().removeIf(line -> line.comp_893().getString().equals(text));
+
+        accessor.getVisibleMessages().removeIf(visible -> visible.comp_896().toString().equals(text));
+
+        allMessages.removeIf(t -> t.getString().equals(text));
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onPreTick(PreTickEvent ev) {
+        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
+
+        ChatHud hud = getChatHud();
+        ChatHudAccessor accessor = (ChatHudAccessor) hud;
+
+        allMessages.clear();
+        for (ChatHudLine line : accessor.getMessages()) {
+            Text text = line.comp_893();
+
+            if (persistentMessages.containsValue(line.comp_915())) continue;
+            if (transientSignature != null && transientSignature.equals(line.comp_915())) continue;
+
+            allMessages.add(text);
+        }
+    }
+
+    public List<Text> getAllMessages() {
+        return allMessages;
     }
 }

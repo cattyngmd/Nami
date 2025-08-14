@@ -68,6 +68,7 @@ public class Nami implements ClientModInitializer {
         BREAK_MANAGER.init();
         CONFIG_MANAGER.loadModules();
         CONFIG_MANAGER.loadFriends();
+        CHAT_MANAGER.init();
 
         CAT_FORMAT.add(new CatStyles());
         CLICK_GUI = new ClickGuiScreen();

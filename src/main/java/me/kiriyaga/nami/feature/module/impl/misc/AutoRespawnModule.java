@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.misc;
 
+import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -25,7 +26,7 @@ public class AutoRespawnModule extends Module {
         super("auto respawn", "Automatically respawns after death.", ModuleCategory.of("misc"), "autorespawn");
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onOpenScreen(OpenScreenEvent event) {
         if (!(event.getScreen() instanceof DeathScreen)) return;
         if (MC == null || MC.player == null) return;
