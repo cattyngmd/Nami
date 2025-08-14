@@ -32,6 +32,8 @@
         public void onPreTick(PreTickEvent ev) {
             if (MC == null || MC.inGameHud == null || MC.player == null) return;
 
+            if (MC.player.age % 4 != 0) return;
+
             List<Text> recentTexts = CHAT_MANAGER.getAllMessages();
             List<ChatMessage> recent = recentTexts.subList(Math.max(0, recentTexts.size() - amount.get()), recentTexts.size())
                     .stream().map(t -> new ChatMessage(t.getString())).collect(Collectors.toList());
