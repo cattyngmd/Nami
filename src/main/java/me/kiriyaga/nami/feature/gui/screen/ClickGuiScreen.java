@@ -19,8 +19,7 @@ import net.minecraft.util.Util;
 import java.util.*;
 import java.awt.Point;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class ClickGuiScreen extends Screen {
     private final Set<ModuleCategory> expandedCategories = new HashSet<>();
@@ -228,11 +227,11 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get()) {
+        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.currentScreen == CLICK_GUI) {
             beginClose();
             return true;
         }
-        if (keyCode == MC.options.inventoryKey.getDefaultKey().getCode() || keyCode == 256) {
+        if (keyCode == 256) {
             beginClose();
             return true;
         }
