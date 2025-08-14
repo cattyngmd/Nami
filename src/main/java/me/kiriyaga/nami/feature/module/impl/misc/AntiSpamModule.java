@@ -19,7 +19,7 @@
     @RegisterModule
     public class AntiSpamModule extends Module {
 
-        private final Map<String, Integer> spamCounts = new HashMap<>();
+        private final Map<Text, Integer> spamCounts = new HashMap<>();
         private final double SIMILARITY_THRESHOLD = 0.85;
 
         public final IntSetting amount = addSetting(new IntSetting("amount", 25, 10, 125));
@@ -36,15 +36,15 @@
 
             List<Text> recentTexts = CHAT_MANAGER.getAllMessages();
             List<ChatMessage> recent = recentTexts.subList(Math.max(0, recentTexts.size() - amount.get()), recentTexts.size())
-                    .stream().map(t -> new ChatMessage(t.getString())).collect(Collectors.toList());
+                    .stream().map(t -> new ChatMessage(t)).collect(Collectors.toList());
 
             spamCounts.entrySet().removeIf(e -> e.getValue() < 2);
 
             for (ChatMessage msg : recent) {
                 boolean found = false;
 
-                for (String key : new ArrayList<>(spamCounts.keySet())) {
-                    double sim = similar(msg.text, key);
+                for (Text key : new ArrayList<>(spamCounts.keySet())) {
+                    double sim = similar(msg.text.getString(), key.getString());
                     if (sim >= SIMILARITY_THRESHOLD) {
                         spamCounts.put(key, spamCounts.get(key) + 1);
                         found = true;
@@ -57,23 +57,22 @@
                 }
             }
 
-            for (Map.Entry<String, Integer> entry : spamCounts.entrySet()) {
-                String text = entry.getKey();
+            for (Map.Entry<Text, Integer> entry : spamCounts.entrySet()) {
+                Text text = entry.getKey();
                 int count = entry.getValue();
 
                 if (count <= 1) continue;
 
                 List<Text> toRemove = CHAT_MANAGER.getAllMessages().stream()
-                        .filter(m -> similar(m.getString(), text) >= SIMILARITY_THRESHOLD)
+                        .filter(m -> similar(m.getString(), text.getString()) >= SIMILARITY_THRESHOLD)
                         .collect(Collectors.toList());
-
-                toRemove.stream().map(Text::getString).toList();
 
                 for (Text t : toRemove) {
                     CHAT_MANAGER.removeByText(t.getString());
-                    Text newText = CAT_FORMAT.format(text + " {s}x{g}" + count + "{reset}");
-                    CHAT_MANAGER.sendPersistent(text, newText, false);
                 }
+
+                Text newText = CAT_FORMAT.format(text + " {s}x{g}" + count);
+                CHAT_MANAGER.sendPersistent(text.getString(), newText, false);
             }
         }
 
@@ -100,8 +99,8 @@
         }
 
         private static class ChatMessage {
-            String text;
-            ChatMessage(String text) {
+            Text text;
+            ChatMessage(Text text) {
                 this.text = text;
             }
         }
