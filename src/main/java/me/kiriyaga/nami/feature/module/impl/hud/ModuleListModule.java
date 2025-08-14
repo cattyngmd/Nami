@@ -56,7 +56,7 @@ public class ModuleListModule extends HudElementModule {
             Text text;
 
             if (displayName != null && !displayName.isEmpty()) {
-                text = CAT_FORMAT.format("{bg}" + module.getName() + " {bgr}[{bw}" + displayName+"{bgr}]");
+                text = CAT_FORMAT.format("{bg}" + module.getName() + " {bg}[{bw}" + displayName+"{bg}]");
             } else {
                 text = CAT_FORMAT.format("{bg}" + module.getName());
             }
