@@ -19,6 +19,7 @@ public class ClickGuiModule extends Module {
     public final BoolSetting expandedIdentifier = addSetting(new BoolSetting("expanded identifier", true));
     public final BoolSetting descriptions = addSetting(new BoolSetting("descriptions", true));
     public final IntSetting guiAlpha = addSetting(new IntSetting("ui alpha", 122, 0, 255));
+    public final BoolSetting fade = addSetting(new BoolSetting("fade", true));
     public final BoolSetting background = addSetting(new BoolSetting("background", true));
     public final IntSetting backgroundAlpha = addSetting(new IntSetting("background alpha", 75, 0, 255));
 

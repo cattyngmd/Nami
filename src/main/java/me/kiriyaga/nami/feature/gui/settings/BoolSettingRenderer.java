@@ -8,6 +8,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 
+import static me.kiriyaga.nami.Nami.CLICK_GUI;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
@@ -25,21 +26,23 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
                 ? new Color(255, 255, 255, 255)
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
-        int bgColorInt = toRGBA(bgColor);
-        int textColorInt = setting.get() ? toRGBA(textColActivated) : toRGBA(textCol);
+        int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
+        int textColorInt = CLICK_GUI.applyFade(setting.get() ? toRGBA(textColActivated) : toRGBA(textCol));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
         int lineOffset = 1;
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
             context.fill(
-                x,
-                y - lineOffset,
-                x + 1,
-                y + HEIGHT,
-                setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                    x,
+                    y - lineOffset,
+                    x + 1,
+                    y + HEIGHT,
+                    CLICK_GUI.applyFade(
+                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                    )
             );
-
+        }
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;

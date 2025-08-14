@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.gui.components.ModulePanel;
 import me.kiriyaga.nami.feature.gui.components.SettingPanel;
@@ -13,6 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 import java.util.*;
 import java.awt.Point;
@@ -29,6 +31,9 @@ public class ClickGuiScreen extends Screen {
     private ModuleCategory draggedModuleCategory = null;
     public float scale = 1;
     private Screen previousScreen = null;
+    private static final long FADE_DURATION_MS = 122L;
+    private long fadeStartMs = Util.getMeasuringTimeMs();
+    private boolean closing = false;
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
@@ -53,7 +58,15 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
+    protected void init() {
+        super.init();
+        fadeStartMs = Util.getMeasuringTimeMs();
+        closing = false;
+    }
+
+    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        checkClose();
         syncCategoryPositions();
 
         if (previousScreen instanceof TitleScreen
@@ -215,15 +228,23 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
-            MC.setScreen(null);
+        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get()) {
+            beginClose();
+            return true;
+        }
+        if (keyCode == MC.options.inventoryKey.getDefaultKey().getCode() || keyCode == 256) {
+            beginClose();
             return true;
         }
 
-        if (SettingPanel.keyPressed(keyCode)) {
-            return true;
-        }
+        if (SettingPanel.keyPressed(keyCode)) return true;
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    private void beginClose() {
+        if (closing) return;
+        closing = true;
+        fadeStartMs = Util.getMeasuringTimeMs();
     }
 
     @Override
@@ -277,5 +298,37 @@ public class ClickGuiScreen extends Screen {
 
     public void setPreviousScreen(Screen previousScreen) {
         this.previousScreen = previousScreen;
+    }
+
+    private float getFadeFactor() {
+        long elapsed = Util.getMeasuringTimeMs() - fadeStartMs;
+        float t = Math.min(1.0f, Math.max(0.0f, elapsed / (float) FADE_DURATION_MS));
+        return closing ? (1.0f - t) : t;
+    }
+
+    private void checkClose() { // shitcode ikik
+        ClickGuiModule clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
+        if (!closing) return;
+
+        if (clickGuiModule.fade.get()) {
+            if (getFadeFactor() <= 0.0f) {
+                MC.setScreen(null);
+            }
+        } else {
+            MC.setScreen(null);
+        }
+    }
+
+    public int applyFade(int argb) {
+        if (!MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).fade.get())
+            return argb;
+
+        int a = (argb >>> 24) & 0xFF;
+        int rgb = argb & 0x00FFFFFF;
+        float factor = getFadeFactor();
+        int newA = Math.round(a * factor);
+        if (newA < 0) newA = 0;
+        if (newA > a) newA = a;
+        return (newA << 24) | rgb;
     }
 }

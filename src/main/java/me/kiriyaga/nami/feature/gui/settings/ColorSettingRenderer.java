@@ -8,6 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
+import static me.kiriyaga.nami.Nami.CLICK_GUI;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
@@ -28,8 +29,8 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
         float hue = hsb[0];
 
-        int bgColorInt = toRGBA(bgColor);
-        int textColorInt = toRGBA(textCol);
+        int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
+        int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
@@ -42,17 +43,27 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         renderHueSlider(context, x + PADDING, y + HEIGHT - 2, WIDTH - 2 * PADDING, SLIDER_HEIGHT, hue);
 
         int lineOffset = 1;
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
             context.fill(
-                x,
-                y - lineOffset,
-                x + 1,
-                y + HEIGHT,
-                setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
-        );
+                    x,
+                    y - lineOffset,
+                    x + 1,
+                    y + HEIGHT,
+                    CLICK_GUI.applyFade(
+                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                    )
+            );
+        }
 
         String hex = String.format("#%02X%02X%02X", setting.getRed(), setting.getGreen(), setting.getBlue());
-        context.drawText(textRenderer, hex, x + WIDTH - PADDING - textRenderer.getWidth(hex), textY, textColorInt, false);
+        context.drawText(
+                textRenderer,
+                hex,
+                x + WIDTH - PADDING - textRenderer.getWidth(hex),
+                textY,
+                textColorInt,
+                false
+        );
     }
 
     @Override

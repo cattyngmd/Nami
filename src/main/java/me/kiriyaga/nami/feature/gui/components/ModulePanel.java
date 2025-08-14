@@ -43,26 +43,39 @@ public class ModulePanel {
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
         Color bgColor;
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get())
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()) {
             bgColor = enabled ? primary : secondary;
-        else
+        } else {
             bgColor = new Color(30, 30, 30, 0);
+        }
 
-        context.fill(expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get() ? x + 1 : x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
+        context.fill(
+                expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()
+                        ? x + 1 : x,
+                y,
+                x + WIDTH,
+                y + HEIGHT,
+                CLICK_GUI.applyFade(toRGBA(bgColor))
+        );
 
         if (expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
-            context.fill(x, y, x + 1, y + HEIGHT, enabled ? primary.getRGB() : secondary.getRGB());
+            context.fill(
+                    x,
+                    y,
+                    x + 1,
+                    y + HEIGHT,
+                    CLICK_GUI.applyFade(enabled ? primary.getRGB() : secondary.getRGB())
+            );
         }
 
         int textY = y + (HEIGHT - 8) / 2;
         int baseTextX = x + PADDING + (hovered ? 1 : 0);
-
         context.drawText(
                 textRenderer,
                 module.getName(),
                 baseTextX,
                 textY,
-                toRGBA(enabled ? textColActivated : textCol),
+                CLICK_GUI.applyFade(toRGBA(enabled ? textColActivated : textCol)),
                 false
         );
     }
