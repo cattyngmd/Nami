@@ -227,7 +227,7 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.currentScreen == CLICK_GUI) {
+        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.currentScreen == CLICK_GUI && MC.world != null) {
             beginClose();
             return true;
         }
