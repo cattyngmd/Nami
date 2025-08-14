@@ -14,7 +14,7 @@ import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
 @RegisterModule
-public class SpinnerModule extends Module {
+public class AntiAimModule extends Module {
 
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 1, 1, 10));
     private final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 5.0, 0.1, 50.0));
@@ -22,8 +22,8 @@ public class SpinnerModule extends Module {
 
     private float currentYaw = 0.0f;
 
-    public SpinnerModule() {
-        super("spinner", "Make you, spin!.", ModuleCategory.of("movement"), "ызшттук");
+    public AntiAimModule() {
+        super("anti aim", "Make you, spin!.", ModuleCategory.of("movement"), "antiaim", "фтешфшь");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SpinnerModule extends Module {
         float pitch = pitchSetting.get().floatValue();
 
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
-                SpinnerModule.class.getName(),
+                AntiAimModule.class.getName(),
                 rotationPriority.get(),
                 yaw,
                 pitch
