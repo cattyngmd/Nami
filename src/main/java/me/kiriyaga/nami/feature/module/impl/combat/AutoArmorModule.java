@@ -19,7 +19,6 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.*;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 
 import java.util.*;
 
@@ -39,15 +38,11 @@ public class AutoArmorModule extends Module {
     private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("boots", BootsPriority.BEST));
     private final BoolSetting elytraPriority = addSetting(new BoolSetting("elytra priority", false));
     private final BoolSetting mendingRepair = addSetting(new BoolSetting("mending repair", false));
-    private final BoolSetting infinityElytra = addSetting(new BoolSetting("infinity elytra", false));
 
     private static final Set<Item> ARMOR_ITEMS_HEAD = Set.of(Items.LEATHER_HELMET, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET, Items.TURTLE_HELMET);
     private static final Set<Item> ARMOR_ITEMS_CHEST = Set.of(Items.LEATHER_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE, Items.ELYTRA);
     private static final Set<Item> ARMOR_ITEMS_LEGS = Set.of(Items.LEATHER_LEGGINGS, Items.GOLDEN_LEGGINGS, Items.CHAINMAIL_LEGGINGS, Items.IRON_LEGGINGS, Items.DIAMOND_LEGGINGS, Items.NETHERITE_LEGGINGS);
     private static final Set<Item> ARMOR_ITEMS_FEET = Set.of(Items.LEATHER_BOOTS, Items.GOLDEN_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS);
-
-    private int tickCounter = 0;
-    private int infinityElytraStage = 0;
 
     public AutoArmorModule() {
         super("auto armor", "Automatically equips best armor.", ModuleCategory.of("combat"), "autoarmor","фгещфкьщк");
@@ -289,48 +284,11 @@ public class AutoArmorModule extends Module {
 
             if (!isArmorForSlot(stack, targetSlot)) continue;
 
-            if (targetSlot == EquipmentSlot.CHEST && elytraPriority.get()) {
-                boolean wearingElytra = current.getItem() == Items.ELYTRA;
-
-                if (infinityElytra.get() && !MC.player.isOnGround()) {
-                    tickCounter++;
-                    if (tickCounter >= 15) {
-                        switch (infinityElytraStage) {
-                            case 0 -> {
-                                int chestSlot = 6;
-                                INVENTORY_MANAGER.getClickHandler().pickupSlot(chestSlot);
-                                infinityElytraStage++;
-                            }
-                            case 1 -> {
-                                int chestSlot = 6;
-                                INVENTORY_MANAGER.getClickHandler().pickupSlot(chestSlot);
-                                infinityElytraStage++;
-                            }
-
-                            case 2 -> {
-                                if (wearingElytra) {
-                                    MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-                                    infinityElytraStage = 0;
-                                    tickCounter = 0;
-                                }
-                            }
-
-                            default -> {
-                                infinityElytraStage = 0; // fall fucking back
-                                tickCounter = 0;
-                            }
-                        }
-                    }
-                }
-
-                if (wearingElytra && !isBroken(current)) {
-                    return null;
-                }
-
-                for (ItemStack stackk : candidates) {
-                    if (stackk.getItem() == Items.ELYTRA && !isBroken(stackk)) {
-                        return stackk;
-                    }
+            if (targetSlot == EquipmentSlot.CHEST && stack.getItem() == Items.ELYTRA && elytraPriority.get()) {
+                if (current.isEmpty() || isBroken(current) || current.getItem() != Items.ELYTRA) {
+                    return stack;
+                } else {
+                    continue; // rekursia
                 }
             }
 
