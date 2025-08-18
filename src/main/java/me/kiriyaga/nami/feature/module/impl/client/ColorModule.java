@@ -19,7 +19,6 @@ public class ColorModule extends Module {
 
     public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.33, 0.0, 1.0));
     public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.00, 0.0, 1.0));
-    public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.4, 0.0, 1.0));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
     public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbow speed", 0.4, 0.01, 5.0));
@@ -40,7 +39,7 @@ public class ColorModule extends Module {
     }
 
     private int getAlpha255() {
-        return (int) (Math.max(0.0, Math.min(1.0, alpha.get())) * 255);
+        return (int) (Math.max(0.0, Math.min(1.0, 0.5)) * 255);
     }
 
     public Color applySaturation(Color base, double saturationFactor) {

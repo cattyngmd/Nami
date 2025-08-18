@@ -68,6 +68,16 @@ public class ModulePanel {
             );
         }
 
+        if (!expanded) {
+            context.fill(
+                    x,
+                    y + HEIGHT,
+                    x + WIDTH,
+                    y + HEIGHT + 1,
+                    CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB())
+            );
+        }
+
         int textY = y + (HEIGHT - 8) / 2;
         int baseTextX = x + PADDING + (hovered ? 1 : 0);
         context.drawText(

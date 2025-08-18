@@ -79,7 +79,18 @@ public class CategoryPanel {
             context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, lineColor);
         }
 
+        context.fill(x + 1, y + HEADER_HEIGHT + 1, x + 2, y + totalHeight - 1, CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
+        context.fill(x + WIDTH - 2, y + HEADER_HEIGHT + 1, x + WIDTH - 1, y + totalHeight - 1, CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
+
         context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, CLICK_GUI.applyFade(toRGBA(primary)));
+
+        context.fill(
+                x + 2,
+                y + HEADER_HEIGHT + 1,
+                x + WIDTH - 2,
+                y + HEADER_HEIGHT + 2,
+                CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB())
+        );
 
         int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
         context.drawText(textRenderer, moduleCategory.getName(),
