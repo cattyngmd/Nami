@@ -36,23 +36,23 @@ public class FriendCommand extends Command {
             case "add" -> {
                 String name = (String) args[1];
                 FRIEND_MANAGER.addFriend(name);
-                CHAT_MANAGER.sendPersistent(this.getName(),"Added friend: " + name);
+                CHAT_MANAGER.sendPersistent(this.getName(),CAT_FORMAT.format("Added friend: {g}" + name)+"{reset}.");
             }
             case "del" -> {
                 String name = (String) args[1];
                 FRIEND_MANAGER.removeFriend(name);
-                CHAT_MANAGER.sendPersistent(this.getName(),"Removed friend: " + name);
+                CHAT_MANAGER.sendPersistent(this.getName(),CAT_FORMAT.format("Removed friend: {g}" + name+"{reset}."));
             }
             case "list" -> {
                 Set<String> friends = FRIEND_MANAGER.getFriends();
                 if (friends.isEmpty()) {
-                    CHAT_MANAGER.sendPersistent(this.getName(),"Friend list is empty.");
+                    CHAT_MANAGER.sendPersistent(this.getName(),CAT_FORMAT.format("Friend list is empty."));
                 } else {
-                    StringBuilder sb = new StringBuilder("Friends: ");
+                    StringBuilder sb = new StringBuilder("Friends: {g}");
                     int i = 0;
                     for (String friend : friends) {
                         sb.append(friend);
-                        if (++i < friends.size()) sb.append(", ");
+                        if (++i < friends.size()) sb.append("{reset},{g} ");
                     }
                     CHAT_MANAGER.sendPersistent(this.getName(),sb.toString());
                 }
