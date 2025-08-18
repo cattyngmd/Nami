@@ -30,7 +30,7 @@ public class VisualRangeModule extends Module {
     private final EnumSetting soundMode = addSetting(new EnumSetting("mode", EXP));
 
     public VisualRangeModule() {
-        super("visual range", "Notifies you when players enter render distance.", ModuleCategory.of("world"), "visualrange", "мшыгфдкфтпу");
+        super("visual range", "Notifies you when players enter render distance.", ModuleCategory.of("world"), "visualrange");
         soundMode.setShowCondition(() -> sound.get());
     }
 

@@ -55,7 +55,7 @@ public class SearchModule extends Module {
     private int tickCounter = 0;
 
     public SearchModule() {
-        super("search", "Search certain blocks on loaded chunks.", ModuleCategory.of("visuals"), "srcj", "blockesp", "serch", "ыуфкср");
+        super("search", "Search certain blocks on loaded chunks.", ModuleCategory.of("visuals"), "srcj", "blockesp", "serch");
         whitelist.setOnChanged(this::reloadChunksAroundPlayer);
         storages.setOnChanged(this::reloadChunksAroundPlayer);
         nonVanilla.setOnChanged(this::reloadChunksAroundPlayer);

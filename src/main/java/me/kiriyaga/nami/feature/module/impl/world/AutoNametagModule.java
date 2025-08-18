@@ -33,7 +33,7 @@ public class AutoNametagModule extends Module {
     private int swapCooldown = 0;
 
     public AutoNametagModule() {
-        super("auto nametag", "Automatically renames nearby entities with nametags.", ModuleCategory.of("world"), "nametag", "autoname", "autonametag", "фгещтфьуефп");
+        super("auto nametag", "Automatically renames nearby entities with nametags.", ModuleCategory.of("world"), "nametag", "autoname", "autonametag");
         rotationPriority.setShowCondition(rotate::get);
     }
 

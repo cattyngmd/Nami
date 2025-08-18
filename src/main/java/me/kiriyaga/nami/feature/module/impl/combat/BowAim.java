@@ -31,7 +31,7 @@ public class BowAim extends Module {
     private Entity currentTarget = null;
 
     public BowAim() {
-        super("bow aim", "Aims at certain targets with bow/trident.", ModuleCategory.of("combat"), "bowbot", "aimbot", "bowaimbot", "ищцфшьище");
+        super("bow aim", "Aims at certain targets with bow/trident.", ModuleCategory.of("combat"), "bowbot", "aimbot", "bowaimbot");
     }
 
     @Override

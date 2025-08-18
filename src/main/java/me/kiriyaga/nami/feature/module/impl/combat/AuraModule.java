@@ -44,7 +44,7 @@ public class AuraModule extends Module {
     private Entity currentTarget = null;
 
     public AuraModule() {
-        super("aura", "Attacks certain targets automatically.", ModuleCategory.of("combat"), "killaura", "ara", "killara", "фгкф");
+        super("aura", "Attacks certain targets automatically.", ModuleCategory.of("combat"), "killaura", "ara", "killara");
     }
 
     @Override

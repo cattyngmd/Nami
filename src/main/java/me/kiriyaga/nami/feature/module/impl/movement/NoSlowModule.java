@@ -36,7 +36,7 @@ public class NoSlowModule extends Module {
 
 
     public NoSlowModule() {
-        super("no slow", "Reduces slowdown effect caused on player.", ModuleCategory.of("movement"), "тщыдщц");
+        super("no slow", "Reduces slowdown effect caused on player.", ModuleCategory.of("movement"), "noslow");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

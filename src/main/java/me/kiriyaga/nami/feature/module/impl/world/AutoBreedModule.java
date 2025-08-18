@@ -33,7 +33,7 @@ public class AutoBreedModule extends Module {
     private int breedCooldown = 0;
 
     public AutoBreedModule() {
-        super("auto breed", "Automatically breeds nearby animals.", ModuleCategory.of("world"), "autobreed", "фгещикуув");
+        super("auto breed", "Automatically breeds nearby animals.", ModuleCategory.of("world"), "autobreed");
         rotationPriority.setShowCondition(rotate::get);
     }
 

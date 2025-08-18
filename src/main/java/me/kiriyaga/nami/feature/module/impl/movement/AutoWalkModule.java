@@ -16,7 +16,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class AutoWalkModule extends Module {
 
     public AutoWalkModule() {
-        super("auto walk", "Automatically makes you walk.", ModuleCategory.of("movement"),"autowalk","фгещцфдл");
+        super("auto walk", "Automatically makes you walk.", ModuleCategory.of("movement"),"autowalk");
     }
 
     @Override

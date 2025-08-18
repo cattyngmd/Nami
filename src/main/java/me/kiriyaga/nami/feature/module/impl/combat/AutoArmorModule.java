@@ -45,7 +45,7 @@ public class AutoArmorModule extends Module {
     private static final Set<Item> ARMOR_ITEMS_FEET = Set.of(Items.LEATHER_BOOTS, Items.GOLDEN_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS);
 
     public AutoArmorModule() {
-        super("auto armor", "Automatically equips best armor.", ModuleCategory.of("combat"), "autoarmor","фгещфкьщк");
+        super("auto armor", "Automatically equips best armor.", ModuleCategory.of("combat"), "autoarmor");
         helmetSafety.setShowCondition(() -> helmetSetting.get() == HelmetPriority.NONE);
     }
 

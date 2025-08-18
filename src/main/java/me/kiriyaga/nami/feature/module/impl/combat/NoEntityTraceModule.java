@@ -12,6 +12,6 @@ public class NoEntityTraceModule extends Module {
     public final BoolSetting pickaxeOnly = addSetting(new BoolSetting("pickaxe only", false));
 
     public NoEntityTraceModule() {
-        super("no entity trace", "Prevents entity from blocking your client raycast.", ModuleCategory.of("combat"), "noentitytrace", "тщутешенекфсу");
+        super("no entity trace", "Prevents entity from blocking your client raycast.", ModuleCategory.of("combat"), "noentitytrace");
     }
 }

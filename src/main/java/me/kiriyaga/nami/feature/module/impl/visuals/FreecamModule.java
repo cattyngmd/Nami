@@ -31,7 +31,7 @@ public class FreecamModule extends Module {
     private boolean forward, back, left, right, up, down;
 
     public FreecamModule() {
-        super("freecam", "Fly around freely without moving your player.", ModuleCategory.of("visuals"), "freecum", "акуусгь");
+        super("freecam", "Fly around freely without moving your player.", ModuleCategory.of("visuals"), "freecum");
     }
 
     @Override

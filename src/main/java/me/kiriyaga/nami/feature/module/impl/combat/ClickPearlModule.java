@@ -22,7 +22,7 @@ public class ClickPearlModule extends Module {
     private boolean hasActivated = false;
 
     public ClickPearlModule() {
-        super("click pearl", "Throws a pearl on activation.", ModuleCategory.of("combat"), "clickpearl", "сдшслашкуцщкл");
+        super("click pearl", "Throws a pearl on activation.", ModuleCategory.of("combat"), "clickpearl");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

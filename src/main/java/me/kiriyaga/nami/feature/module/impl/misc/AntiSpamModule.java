@@ -25,14 +25,14 @@
         public final IntSetting amount = addSetting(new IntSetting("amount", 25, 10, 125));
 
         public AntiSpamModule() {
-            super("anti spam", "Automatically combines repeated chat messages.", ModuleCategory.of("misc"), "antispam", "фтешызфь");
+            super("anti spam", "Automatically combines repeated chat messages.", ModuleCategory.of("misc"), "antispam");
         }
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public void onPreTick(PreTickEvent ev) {
             if (MC == null || MC.inGameHud == null || MC.player == null) return;
 
-            if (MC.player.age % 4 != 0) return;
+            if (MC.player.age % 40 != 0) return;
 
             List<Text> recentTexts = CHAT_MANAGER.getAllMessages();
             List<ChatMessage> recent = recentTexts.subList(Math.max(0, recentTexts.size() - amount.get()), recentTexts.size())

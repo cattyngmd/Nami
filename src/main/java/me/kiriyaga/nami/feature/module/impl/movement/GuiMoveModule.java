@@ -30,7 +30,7 @@ public class GuiMoveModule extends Module {
     private Screen lastScreen = null;
 
     public GuiMoveModule() {
-        super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"));
+        super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"), "guimove");
     }
 
     @Override

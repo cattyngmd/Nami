@@ -26,7 +26,7 @@ public class ColorModule extends Module {
     private int phase = 0;
 
     public ColorModule() {
-        super("color", "Customizes color scheme.", ModuleCategory.of("client"), "colr", "c", "colors", "clitor", "сщдщк");
+        super("color", "Customizes color scheme.", ModuleCategory.of("client"), "colr", "c", "colors", "clitor");
         if (!this.isEnabled())
             this.toggle();
         rainbowSpeed.setShowCondition(() -> rainbowEnabled.get());

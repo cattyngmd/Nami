@@ -26,7 +26,7 @@ public class ReplenishModule extends Module {
     private final BoolSetting inScreen = addSetting(new BoolSetting("in screen", false));
 
     public ReplenishModule() {
-        super("replenish", "Automatically refills items in hotbar.", ModuleCategory.of("combat"),"куздутшыр");
+        super("replenish", "Automatically refills items in hotbar.", ModuleCategory.of("combat"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

@@ -26,7 +26,7 @@ public class FullbrightModule extends Module {
 
 
     public FullbrightModule() {
-        super("fullbright", "Modifies your game brightness", ModuleCategory.of("visuals"), "autogamma", "gamma", "autogmam", "фгещпфььф");
+        super("fullbright", "Modifies your game brightness", ModuleCategory.of("visuals"), "autogamma", "gamma", "autogmam");
         amount.setShowCondition(() -> mode.get() == Mode.GAMMA);
     }
 

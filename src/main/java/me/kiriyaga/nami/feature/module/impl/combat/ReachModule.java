@@ -15,6 +15,6 @@ public class ReachModule extends Module {
     public final DoubleSetting entity = addSetting(new DoubleSetting("entity", 0.00,0.00, 3.00));
 
     public ReachModule() {
-        super("reach", "Extends player reach values.", ModuleCategory.of("combat"), "куфср");
+        super("reach", "Extends player reach values.", ModuleCategory.of("combat"));
     }
 }

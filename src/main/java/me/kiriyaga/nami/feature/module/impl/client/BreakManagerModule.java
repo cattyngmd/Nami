@@ -13,7 +13,7 @@ public class BreakManagerModule extends Module {
     public final EnumSetting<BreakPriority> breakPriority = addSetting(new EnumSetting<>("priority", BreakPriority.CLOSEST));
 
     public BreakManagerModule() {
-        super("break manager", "Allows you to configure break manager.", ModuleCategory.of("client"), "breakmanager", "break", "икуфльфтфпук");
+        super("break manager", "Allows you to configure break manager.", ModuleCategory.of("client"), "breakmanager", "break");
         if (!this.isEnabled())
             this.toggle();
     }

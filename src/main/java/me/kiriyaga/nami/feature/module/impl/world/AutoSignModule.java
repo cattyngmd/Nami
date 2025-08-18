@@ -27,7 +27,7 @@ public class AutoSignModule extends Module {
     private boolean isReplacingPacket = false;  // stackoverflow lol
 
     public AutoSignModule() {
-        super("auto sign", "Automatically fills signs.", ModuleCategory.of("world"), "sign", "autosign", "фгещышпт");
+        super("auto sign", "Automatically fills signs.", ModuleCategory.of("world"), "sign", "autosign");
     }
 
     @Override

@@ -40,7 +40,7 @@ public class AutoEatModule extends Module {
     private volatile int swapCooldown = 0;
 
     public AutoEatModule() {
-        super("auto eat", "Automatically eats best food.", ModuleCategory.of("world"), "фгещуфв", "autoeat");
+        super("auto eat", "Automatically eats best food.", ModuleCategory.of("world"), "autoeat");
     }
 
     @Override

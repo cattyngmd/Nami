@@ -36,7 +36,7 @@ public class TracersModule extends Module {
     private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public TracersModule() {
-        super("tracers", "Draws lines from the center of the screen to entities.", ModuleCategory.of("visuals"), "екфсукы");
+        super("tracers", "Draws lines from the center of the screen to entities.", ModuleCategory.of("visuals"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

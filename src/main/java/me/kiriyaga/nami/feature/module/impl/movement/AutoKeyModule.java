@@ -24,7 +24,7 @@ public class AutoKeyModule extends Module {
     private final Map<KeyBinding, Boolean> savedKeyStates = new HashMap<>();
 
     public AutoKeyModule() {
-        super("auto key", "Holds all physically pressed keys automatically.", ModuleCategory.of("movement"),"autokey","фгещлун");
+        super("auto key", "Holds all physically pressed keys automatically.", ModuleCategory.of("movement"),"autokey");
     }
 
     @Override

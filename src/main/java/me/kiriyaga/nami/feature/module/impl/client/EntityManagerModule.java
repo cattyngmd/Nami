@@ -26,7 +26,7 @@ public class EntityManagerModule extends Module {
     }
 
     public EntityManagerModule() {
-        super("entity manager", "Allows you to config entity manager settings", ModuleCategory.of("client"), "entity", "entitymanager", "enity", "утешеньфтфпук");
+        super("entity manager", "Allows you to config entity manager settings", ModuleCategory.of("client"), "entity", "entitymanager", "enity");
         if (!this.isEnabled())
             this.toggle();
     }

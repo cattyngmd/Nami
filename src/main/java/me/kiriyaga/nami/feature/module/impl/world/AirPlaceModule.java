@@ -44,7 +44,7 @@ public class AirPlaceModule extends Module {
     private BlockPos renderPos = null;
 
     public AirPlaceModule() {
-        super("air place", "Allows placing blocks mid-air.", ModuleCategory.of("world"), "airplace", "фшкздфсу");
+        super("air place", "Allows placing blocks mid-air.", ModuleCategory.of("world"), "airplace");
     }
 
     @Override

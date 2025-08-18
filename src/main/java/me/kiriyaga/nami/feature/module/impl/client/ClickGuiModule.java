@@ -24,7 +24,7 @@ public class ClickGuiModule extends Module {
     public final IntSetting backgroundAlpha = addSetting(new IntSetting("background alpha", 75, 0, 255));
 
     public ClickGuiModule() {
-        super("click gui", "Opens client UI.", ModuleCategory.of("client"), "clickgui","click", "gui", "menu", "clckgui", "сдшслпгш");
+        super("click gui", "Opens client UI.", ModuleCategory.of("client"), "clickgui","click", "gui", "menu", "clckgui");
         backgroundAlpha.setShowCondition(background::get);
     }
 

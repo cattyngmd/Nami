@@ -26,7 +26,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class IllegalDisconnectModule extends Module {
 
     public IllegalDisconnectModule() {
-        super("illegal disconnect", "Cancels disconnects and sends invalid packets to force close connection.", ModuleCategory.of("misc"));
+        super("illegal disconnect", "Cancels disconnects and sends invalid packets to force close connection.", ModuleCategory.of("misc"), "illegaldisconnect");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

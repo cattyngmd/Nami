@@ -21,7 +21,7 @@ public class JoinAnnounceModule extends Module {
     public final BoolSetting friends = addSetting(new BoolSetting("friends", true));
 
     public JoinAnnounceModule() {
-        super("join announce", "Announces in chat when a certain player joins the server.", ModuleCategory.of("misc"), "joinannounce", "joins", "announce", "ощштфттщгтсу");
+        super("join announce", "Announces in chat when a certain player joins the server.", ModuleCategory.of("misc"), "joinannounce", "joins", "announce");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

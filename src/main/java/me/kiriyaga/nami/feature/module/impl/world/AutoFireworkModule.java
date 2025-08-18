@@ -26,8 +26,7 @@ public class AutoFireworkModule extends Module {
     private int lastUseTick = 0;
 
     public AutoFireworkModule() {
-        super("auto firework", "Automatically fires fireworks.",
-                ModuleCategory.of("world"), "autofirework", "фгещашкуцщкл");
+        super("auto firework", "Automatically fires fireworks.", ModuleCategory.of("world"), "autofirework");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

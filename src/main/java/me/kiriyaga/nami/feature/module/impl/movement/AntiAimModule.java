@@ -23,7 +23,7 @@ public class AntiAimModule extends Module {
     private float currentYaw = 0.0f;
 
     public AntiAimModule() {
-        super("anti aim", "Make you, spin!.", ModuleCategory.of("movement"), "antiaim", "фтешфшь");
+        super("anti aim", "Make you, spin!.", ModuleCategory.of("movement"), "antiaim");
     }
 
     @Override

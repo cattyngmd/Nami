@@ -48,7 +48,7 @@ public class ESPModule extends Module {
     private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public ESPModule() {
-        super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "WH", "boxes", "уыз");
+        super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "wh", "boxes");
         smoothAppear.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
         lineWidth.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
         filled.setShowCondition(() -> renderMode.get() == RenderMode.BOX);

@@ -36,7 +36,7 @@ public class AutoRespawnModule extends Module {
             String coords = String.format("X: %d Y: %d Z: %d",
                     Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
 
-            CHAT_MANAGER.sendPersistent(AutoRespawnModule.class.getName(), "Death coordinates: §7" + coords);
+            CHAT_MANAGER.sendPersistent(AutoRespawnModule.class.getName(), "Death coordinates: {g}" + coords+"{reset}.");
         }
 
         MC.player.requestRespawn();

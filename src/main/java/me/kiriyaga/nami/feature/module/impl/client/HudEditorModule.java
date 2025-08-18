@@ -15,7 +15,7 @@ public class HudEditorModule extends Module {
     public final IntSetting backgroundAlpha = addSetting(new IntSetting("background alpha", 75, 0, 255));
 
     public HudEditorModule() {
-        super("hud editor", "Opens HUD editor screen.", ModuleCategory.of("client"), "hudeditor", "hudedit", "he", "худ", "худе");
+        super("hud editor", "Opens HUD editor screen.", ModuleCategory.of("client"), "hudeditor", "hudedit", "he");
         backgroundAlpha.setShowCondition(background::get);
     }
 

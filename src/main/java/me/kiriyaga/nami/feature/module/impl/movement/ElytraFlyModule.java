@@ -48,7 +48,7 @@ public class ElytraFlyModule extends Module {
     private double lastZ = 0;
 
     public ElytraFlyModule() {
-        super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "уднекфадн", "elytrafly");
+        super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "elytrafly");
         boost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
