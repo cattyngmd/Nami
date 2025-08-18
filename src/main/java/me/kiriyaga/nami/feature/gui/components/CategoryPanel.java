@@ -77,6 +77,12 @@ public class CategoryPanel {
             context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, lineColor);
             context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, lineColor);
             context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, lineColor);
+        } else if (!getClickGuiModule().lines.get()){
+            int lineColor = CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB());
+            context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, lineColor);
+            context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, lineColor);
+            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, lineColor);
+            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, lineColor);
         }
 
         context.fill(x + 1, y + HEADER_HEIGHT + 1, x + 2, y + totalHeight - 1, CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
