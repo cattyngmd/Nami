@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.MaceItem;
 import net.minecraft.item.TridentItem;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.util.hit.EntityHitResult;
 
@@ -122,15 +123,11 @@ public class AuraModule extends Module {
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
 
-        if (debugModule != null && debugModule.isEnabled() && debugModule.auraGet.get()) {
-            long auraLogicDuration = System.nanoTime() - auraLogicStart;
-            CHAT_MANAGER.sendRaw(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0));
-        }
+        long auraLogicDuration = System.nanoTime() - auraLogicStart;
+        debugModule.debugAura(Text.of(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0)));
 
-        if (debugModule != null && debugModule.isEnabled() && debugModule.auraGet.get()) {
-            long totalDuration = System.nanoTime() - startTime;
-            CHAT_MANAGER.sendRaw(String.format("total %.3f ms", totalDuration / 1_000_000.0));
-        }
+        long totalDuration = System.nanoTime() - startTime;
+        debugModule.debugAura(Text.of(String.format("total %.3f ms", totalDuration / 1_000_000.0)));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

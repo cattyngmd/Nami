@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.module.impl.client.PingManagerModule;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
+import net.minecraft.text.Text;
 import net.minecraft.util.profiler.MultiValueDebugSampleLogImpl;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -58,9 +59,7 @@ public class PingManager {
                 updatePing(averagePing());
                 Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
 
-                if (config != null && debugModule.isEnabled() && debugModule.ping.get()) {
-                    CHAT_MANAGER.sendRaw("Interval=" + interval + "ms, Ping=" + ping + "ms, Average=" + lastPing + "ms");
-                }
+                debugModule.debugPing(Text.of("Interval=" + interval + "ms, Ping=" + ping + "ms, Average=" + lastPing + "ms"));
             }
 
             lastReceiveTime = now;
@@ -112,16 +111,13 @@ public class PingManager {
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
 
         if (lastUpdated == -1) {
-            if (debugModule.isEnabled() && debugModule.ping.get())
-                CHAT_MANAGER.sendRaw("Connection unstable: no ping data yet");
+
+            debugModule.debugPing(Text.of("Connection unstable: no ping data yet"));
             return true;
         }
 
         boolean unstable = (System.currentTimeMillis() - lastUpdated) > timeoutMillis;
-        if (unstable && debugModule.isEnabled() && debugModule.ping.get()) {
-            CHAT_MANAGER.sendRaw("Connection unstable: last ping updated "
-                    + (System.currentTimeMillis() - lastUpdated) + "ms ago");
-        }
+        debugModule.debugPing(Text.of("Connection unstable: last ping updated " + (System.currentTimeMillis() - lastUpdated) + "ms ago"));
         return unstable;
     }
 
