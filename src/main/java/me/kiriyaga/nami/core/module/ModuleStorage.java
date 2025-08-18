@@ -4,18 +4,23 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ModuleStorage {
 
     private final List<Module> modules = new ArrayList<>();
+    private final Map<String, Module> modulesByName = new HashMap<>();
+    private final Map<Class<? extends Module>, Module> modulesByClass = new HashMap<>();
 
     public void add(Module module) {
         modules.add(module);
+        modulesByName.put(module.getName().toLowerCase(), module);
+        modulesByClass.put(module.getClass(), module);
     }
 
     public void remove(Module module) {
         modules.remove(module);
+        modulesByName.remove(module.getName().toLowerCase());
+        modulesByClass.remove(module.getClass());
         module.setEnabled(false);
     }
 
@@ -24,25 +29,18 @@ public class ModuleStorage {
     }
 
     public <T extends Module> T getByClass(Class<T> clazz) {
-        return modules.stream()
-                .filter(clazz::isInstance)
-                .map(clazz::cast)
-                .findFirst()
-                .orElse(null);
+        return clazz.cast(modulesByClass.get(clazz));
     }
 
     public Module getByName(String name) {
-        return modules.stream()
-                .filter(m -> m.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+        return modulesByName.get(name.toLowerCase());
     }
 
     public List<Module> getByCategory(ModuleCategory category) {
         return modules.stream()
                 .filter(m -> m.getCategory().equals(category))
                 .sorted(Comparator.comparing(Module::getName, String.CASE_INSENSITIVE_ORDER))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public int size() {
