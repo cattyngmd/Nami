@@ -26,7 +26,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class ElytraFlyModule extends Module {
 
     public enum FlyMode {
-        BOUNCE, FIREWORK_CONTROL
+        BOUNCE, CONTROL
     }
 
 
@@ -53,8 +53,8 @@ public class ElytraFlyModule extends Module {
         newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE && pitch.get());
-        lockPitch.setShowCondition(() -> mode.get() == FlyMode.FIREWORK_CONTROL);
-        midAirFreeze.setShowCondition(() -> mode.get() == FlyMode.FIREWORK_CONTROL);
+        lockPitch.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
+        midAirFreeze.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ElytraFlyModule extends Module {
                     new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
             );
         } else
-        if (mode.get() == FlyMode.FIREWORK_CONTROL) {
+        if (mode.get() == FlyMode.CONTROL) {
             if (!MC.player.isGliding()) return;
 
             Vec3d dir = getControlDirection();
@@ -108,7 +108,7 @@ public class ElytraFlyModule extends Module {
                 float yaw = MC.player.getYaw();
                 float pitchFreeze = -3f;
 
-                double forwardMotion = (Math.sin(System.currentTimeMillis() / 100.0) > 0 ? 0.1 : -0.1);
+                double forwardMotion = (MC.player.age % 8 < 4) ? 0.1 : -0.1;
 
                 double radYaw = Math.toRadians(yaw);
                 Vec3d freezeVel = new Vec3d(

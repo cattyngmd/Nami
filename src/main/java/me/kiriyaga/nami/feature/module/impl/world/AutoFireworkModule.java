@@ -29,10 +29,22 @@ public class AutoFireworkModule extends Module {
         super("auto firework", "Automatically fires fireworks.", ModuleCategory.of("world"), "autofirework");
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        if (MC.player != null) {
+            lastUseTick = MC.player.age - (int) Math.round(delaySeconds.get() * 20);
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onTick(PreTickEvent ev) {
         if (!isEnabled()) return;
         if (MC.world == null || MC.player == null) return;
+
+        if (MC.player.age < lastUseTick) {
+            lastUseTick = MC.player.age - tickDelay;
+        }
 
         tickDelay = (int) Math.round(delaySeconds.get() * 20);
 
