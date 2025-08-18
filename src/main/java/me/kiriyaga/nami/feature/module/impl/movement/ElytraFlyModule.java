@@ -26,17 +26,17 @@ import static me.kiriyaga.nami.Nami.*;
 public class ElytraFlyModule extends Module {
 
     public enum FlyMode {
-        BOUNCE, CONTROL
+        BOUNCE, FIREWORK_CONTROL
     }
 
 
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.BOUNCE));
+    private final BoolSetting midAirFreeze = addSetting(new BoolSetting("mid air freeze", false));
     private final BoolSetting lockPitch = addSetting(new BoolSetting("lock pitch", true));
     private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
     private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
     private final IntSetting pitchDegree = addSetting(new IntSetting("pitch", 75, 0, 90));
-    private final BoolSetting autoWalkEnable = addSetting(new BoolSetting("auto walk enable", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private double speed = 0;
@@ -53,23 +53,15 @@ public class ElytraFlyModule extends Module {
         newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE && pitch.get());
-        rotationPriority.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
-        lockPitch.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
-    }
-
-    @Override
-    public void onEnable() {
-        if (autoWalkEnable.get() && !MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).isEnabled()) {
-            MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).toggle();
-        }
+        lockPitch.setShowCondition(() -> mode.get() == FlyMode.FIREWORK_CONTROL);
+        midAirFreeze.setShowCondition(() -> mode.get() == FlyMode.FIREWORK_CONTROL);
     }
 
     @Override
     public void onDisable() {
-        if (autoWalkEnable.get() && MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).isEnabled()) {
-            MODULE_MANAGER.getStorage().getByClass(AutoWalkModule.class).toggle();
-        }
-        setJumpHeld(false);
+
+        if (mode.get() == FlyMode.BOUNCE)
+            setJumpHeld(false);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -106,37 +98,57 @@ public class ElytraFlyModule extends Module {
             MC.player.networkHandler.sendPacket(
                     new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
             );
-        } else if (mode.get() == FlyMode.CONTROL) {
-        if (!MC.player.isGliding()) return;
+        } else
+        if (mode.get() == FlyMode.FIREWORK_CONTROL) {
+            if (!MC.player.isGliding()) return;
 
-        Vec3d dir = getControlDirection();
-        if (dir == null) {
-            return;
-        }
+            Vec3d dir = getControlDirection();
 
-        float finalYaw;
-        float finalPitch;
+            if (midAirFreeze.get() && dir == null) {
+                float yaw = MC.player.getYaw();
+                float pitchFreeze = -3f;
 
-        if (Math.abs(dir.y) > 0.5) {
-            finalYaw = MC.player.getYaw();
-            finalPitch = dir.y > 0 ? -90f : 90f;
-        } else {
-            finalYaw = (float) Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90f;
-            finalPitch = MC.player.getPitch();
-            if (lockPitch.get()) {
-                finalPitch = -3f;
+                double forwardMotion = (Math.sin(System.currentTimeMillis() / 100.0) > 0 ? 0.1 : -0.1);
+
+                double radYaw = Math.toRadians(yaw);
+                Vec3d freezeVel = new Vec3d(
+                        -Math.sin(radYaw) * forwardMotion,
+                        0,
+                        Math.cos(radYaw) * forwardMotion
+                );
+
+                MC.player.setVelocity(freezeVel);
+
+                ROTATION_MANAGER.getRequestHandler().submit(
+                        new RotationRequest(this.getName(), rotationPriority.get(), yaw, pitchFreeze)
+                );
+
+                setJumpHeld(true);
+                return;
+            }
+
+            if (dir != null) {
+                float finalYaw;
+                float finalPitch;
+
+                if (Math.abs(dir.y) > 0.5) {
+                    finalYaw = MC.player.getYaw();
+                    finalPitch = dir.y > 0 ? -90f : 90f;
+                } else {
+                    finalYaw = (float) Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90f;
+                    finalPitch = MC.player.getPitch();
+                    if (lockPitch.get()) {
+                        finalPitch = -3f;
+                    }
+                }
+
+                ROTATION_MANAGER.getRequestHandler().submit(
+                        new RotationRequest(this.getName(), rotationPriority.get(), finalYaw, finalPitch)
+                );
+
+                setJumpHeld(true);
             }
         }
-
-        ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
-                this.getName(),
-                rotationPriority.get(),
-                finalYaw,
-                finalPitch
-        ));
-
-        setJumpHeld(true);
-    }
 }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
