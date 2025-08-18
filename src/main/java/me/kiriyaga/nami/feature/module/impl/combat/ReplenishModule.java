@@ -11,10 +11,14 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.slot.SlotActionType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
@@ -24,6 +28,9 @@ public class ReplenishModule extends Module {
 
     private final IntSetting percentage = addSetting(new IntSetting("percentage", 20, 10, 50));
     private final BoolSetting inScreen = addSetting(new BoolSetting("in screen", false));
+
+    private final Map<Integer, Integer> hotbarTicks = new HashMap<>();
+    private final Map<Integer, Item> lastHotbarItems = new HashMap<>();
 
     public ReplenishModule() {
         super("replenish", "Automatically refills items in hotbar.", ModuleCategory.of("combat"));
@@ -36,11 +43,21 @@ public class ReplenishModule extends Module {
         ClientPlayerEntity player = MC.player;
         ItemStack cursor = player.currentScreenHandler.getCursorStack();
 
-        if (!cursor.isEmpty())
-            return;
+        if (!cursor.isEmpty()) return;
 
         for (int hotbarSlot = 0; hotbarSlot < 9; hotbarSlot++) {
             ItemStack stack = player.getInventory().getStack(hotbarSlot);
+            Item currentItem = stack.isEmpty() ? null : stack.getItem();
+
+            if (lastHotbarItems.getOrDefault(hotbarSlot, null) != currentItem) {
+                hotbarTicks.put(hotbarSlot, 0);
+                lastHotbarItems.put(hotbarSlot, currentItem);
+            } else {
+                hotbarTicks.put(hotbarSlot, hotbarTicks.getOrDefault(hotbarSlot, 0) + 1);
+            }
+
+            if (hotbarTicks.getOrDefault(hotbarSlot, 0) < 10) continue;
+
             if (stack.isEmpty()) continue;
 
             int maxCount = stack.getMaxCount();
