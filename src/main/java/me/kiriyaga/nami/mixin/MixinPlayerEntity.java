@@ -1,8 +1,10 @@
 package me.kiriyaga.nami.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.kiriyaga.nami.event.impl.LedgeClipEvent;
 import me.kiriyaga.nami.event.impl.LiquidPushEvent;
 import me.kiriyaga.nami.event.impl.SprintResetEvent;
+import me.kiriyaga.nami.feature.module.impl.combat.ReachModule;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -15,8 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity extends LivingEntity {
@@ -69,5 +70,21 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             cir.setReturnValue(false);
             cir.cancel();
         }
+    }
+
+    @ModifyReturnValue(method = "getBlockInteractionRange", at = @At("RETURN"))
+    private double getBlockInteractionRange(double d) {
+        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null)
+            return d;
+
+        return MODULE_MANAGER.getStorage().getByClass(ReachModule.class).block.get() + d;
+    }
+
+    @ModifyReturnValue(method = "getEntityInteractionRange", at = @At("RETURN"))
+    private double getEntityInteractionRange(double d) {
+        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null)
+            return d;
+
+        return MODULE_MANAGER.getStorage().getByClass(ReachModule.class).entity.get() + d;
     }
 }
