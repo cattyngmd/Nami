@@ -7,18 +7,24 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
+import net.minecraft.client.gui.screen.*;
 
 import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class FreecamModule extends Module {
     private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 5.0));
+    private final DoubleSetting accelerate = addSetting(new DoubleSetting("accelerate", 1.0, 1.0, 3.0));
 
+    private double currentFactor = 1.0;
+    private long accelStartTime = -1;
+    private final double accelDuration = 0.8;
     private Perspective previousPerspective;
     private Vec3d cameraPos;
     public Vec3d pos = Vec3d.ZERO;
@@ -63,33 +69,36 @@ public class FreecamModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        if (cameraPos == null){
+        if (cameraPos == null || MC.player == null) {
             this.toggle();
             return;
         }
+
+        if (MC.currentScreen instanceof ChatScreen)
+            return;
+
+        boolean moving = forward || back || left || right || up || down;
+
+        if (moving) {
+            if (accelStartTime < 0) accelStartTime = System.currentTimeMillis();
+            double elapsed = (System.currentTimeMillis() - accelStartTime) / 1000.0;
+            double t = MathHelper.clamp(elapsed / accelDuration, 0, 1);
+            currentFactor = 1.0 + t * (accelerate.get() - 1.0);
+        } else {
+            currentFactor = 1.0;
+            accelStartTime = -1;
+        }
+
+        double spd = speed.get() * currentFactor;
 
         double dx = 0, dy = 0, dz = 0;
         Vec3d forwardVec = Vec3d.fromPolar(0, yaw);
         Vec3d rightVec = Vec3d.fromPolar(0, yaw + 90);
 
-        double spd = speed.get();
-
-        if (forward) {
-            dx += forwardVec.x * spd;
-            dz += forwardVec.z * spd;
-        }
-        if (back) {
-            dx -= forwardVec.x * spd;
-            dz -= forwardVec.z * spd;
-        }
-        if (left) {
-            dx -= rightVec.x * spd;
-            dz -= rightVec.z * spd;
-        }
-        if (right) {
-            dx += rightVec.x * spd;
-            dz += rightVec.z * spd;
-        }
+        if (forward) { dx += forwardVec.x * spd; dz += forwardVec.z * spd; }
+        if (back)    { dx -= forwardVec.x * spd; dz -= forwardVec.z * spd; }
+        if (left)    { dx -= rightVec.x * spd; dz -= rightVec.z * spd; }
+        if (right)   { dx += rightVec.x * spd; dz += rightVec.z * spd; }
         if (up) dy += spd;
         if (down) dy -= spd;
 
