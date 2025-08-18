@@ -1,6 +1,8 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.*;
+import me.kiriyaga.nami.feature.module.impl.combat.ReachModule;
+import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
@@ -68,8 +70,6 @@ public abstract class MixinClientPlayerEntity {
         }
     }
 
-
-
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
         if (!ROTATION_MANAGER.getStateHandler().isRotating())
@@ -111,5 +111,16 @@ public abstract class MixinClientPlayerEntity {
     @Shadow
     private static Vec2f applyDirectionalMovementSpeedFactors(Vec2f vec2f) {
         throw new AssertionError();
+    }
+
+    @Inject(method = "shouldSlowDown", at = @At("HEAD"), cancellable = true)
+    private void shouldSlowDown(CallbackInfoReturnable<Boolean> info) {
+        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class) == null || !MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class).isEnabled() || !MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class).fastCrawl.get())
+            return;
+
+        boolean b = !MC.player.isCrawling();
+        if (b) return;
+
+        info.setReturnValue(b);
     }
 }

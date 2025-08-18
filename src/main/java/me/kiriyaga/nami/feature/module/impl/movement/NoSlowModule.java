@@ -24,6 +24,8 @@ public class NoSlowModule extends Module {
     }
 
     public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("mode", SlowMode.ACCEL));
+    public final BoolSetting fastCrawl = addSetting(new BoolSetting("fast crawl", false));
+    private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
     private final BoolSetting onlyOnGround = addSetting(new BoolSetting("only on ground", true));
 
 

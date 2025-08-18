@@ -74,7 +74,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
     @ModifyReturnValue(method = "getBlockInteractionRange", at = @At("RETURN"))
     private double getBlockInteractionRange(double d) {
-        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null)
+        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null || !MODULE_MANAGER.getStorage().getByClass(ReachModule.class).isEnabled())
             return d;
 
         return MODULE_MANAGER.getStorage().getByClass(ReachModule.class).block.get() + d;
@@ -82,7 +82,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
     @ModifyReturnValue(method = "getEntityInteractionRange", at = @At("RETURN"))
     private double getEntityInteractionRange(double d) {
-        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null)
+        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null || !MODULE_MANAGER.getStorage().getByClass(ReachModule.class).isEnabled())
             return d;
 
         return MODULE_MANAGER.getStorage().getByClass(ReachModule.class).entity.get() + d;
