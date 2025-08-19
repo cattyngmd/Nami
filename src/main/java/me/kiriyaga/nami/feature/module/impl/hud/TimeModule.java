@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -20,6 +21,7 @@ public class TimeModule extends HudElementModule {
     }
 
     public final EnumSetting<TimeMode> mode = addSetting(new EnumSetting<>("mode", TimeMode.REAL));
+    public final BoolSetting grey = addSetting(new BoolSetting("grey", true));
 
     public TimeModule() {
         super("time", "Displays real or game time.", 0, 0, 50, 9);
@@ -47,6 +49,9 @@ public class TimeModule extends HudElementModule {
         width = MC.textRenderer.getWidth(timeText);
         height = MC.textRenderer.fontHeight;
 
-        return CAT_FORMAT.format("{bg}" + timeText);
+        if (grey.get())
+            return CAT_FORMAT.format("{bg}" + timeText);
+        else
+            return CAT_FORMAT.format("{bgr}" + timeText);
     }
 }
