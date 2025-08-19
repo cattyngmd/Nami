@@ -40,8 +40,8 @@ public class ClickGuiScreen extends Screen {
 
     // TODO: unhardcode this garbage
     private final List<Text> statusMessages = Arrays.asList(
-            Text.literal("Click Mouse Middle on the module for changing drawn state."),
-            Text.literal("Click Mouse Middle on the keybind for changing hold/toggle state.")
+            Text.literal("Middle-click a module to toggle its drawn state."),
+            Text.literal("Middle-click a keybind to switch hold/toggle mode.")
     );
 
     public ClickGuiScreen() {
