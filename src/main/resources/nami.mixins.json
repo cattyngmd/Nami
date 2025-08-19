@@ -36,6 +36,7 @@
     "MixinMinecraftClient",
     "MixinParticleManager",
     "MixinPlayerEntityRenderer",
+    "MixinPlayerListEntry",
     "MixinPlayerListHud",
     "MixinScreen",
     "MixinSimpleOption",
