@@ -29,6 +29,7 @@ import static me.kiriyaga.nami.Nami.*;
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {
 
+    private float lastSendedYaw;
     private float originalYaw;
     @Shadow
     private int jumpingCooldown;
@@ -51,6 +52,8 @@ public abstract class MixinLivingEntity extends Entity {
 
         float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
         float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+
+        lastSendedYaw = spoofYaw;
 
         this.setYaw(spoofYaw);
         this.setPitch(spoofPitch);
@@ -153,7 +156,7 @@ public abstract class MixinLivingEntity extends Entity {
                 return;
             }
 
-            float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+            float spoofYaw = lastSendedYaw;
             float realYaw = MC.player.getYaw();
 
             Vec3d localMovement = new Vec3d(sideways, 0, forward);
@@ -165,7 +168,7 @@ public abstract class MixinLivingEntity extends Entity {
             float moveAngleDeg = (float) Math.toDegrees(moveAngleRad);
             moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
 
-            if (Math.abs(moveAngleDeg) > 36f) {
+            if (Math.abs(moveAngleDeg) > 33f) {
                 ci.cancel();
                 super.setSprinting(false);
             }
