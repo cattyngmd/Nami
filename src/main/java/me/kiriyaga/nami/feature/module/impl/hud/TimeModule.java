@@ -49,7 +49,7 @@ public class TimeModule extends HudElementModule {
         width = MC.textRenderer.getWidth(timeText);
         height = MC.textRenderer.fontHeight;
 
-        if (grey.get())
+        if (!grey.get())
             return CAT_FORMAT.format("{bg}" + timeText);
         else
             return CAT_FORMAT.format("{bgr}" + timeText);
