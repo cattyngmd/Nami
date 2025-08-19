@@ -7,6 +7,7 @@ import me.kiriyaga.nami.util.KeyUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
+
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.CLICK_GUI;
@@ -54,11 +55,22 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                 false
         );
 
-        String valueStr = waitingForKeyBind == setting ? "Press a key..." : KeyUtils.getKeyName(setting.get());
+        String valueStr;
+        if (waitingForKeyBind == setting) {
+            valueStr = "listening...";
+        } else {
+            String keyName = KeyUtils.getKeyName(setting.get());
+            //valueStr = (setting.isHoldMode() ? "hold: " : "toggle: ") + keyName;
+            setting.setName(setting.isHoldMode() ? "hold" : "toggle"); // yes unfortunatelly
+            valueStr = keyName;
+        }
+
+        int textWidth = textRenderer.getWidth(valueStr);
+        int valueX = x + WIDTH - PADDING - textWidth;
         context.drawText(
                 textRenderer,
                 valueStr.toLowerCase(),
-                x + WIDTH - PADDING - textRenderer.getWidth(valueStr),
+                valueX,
                 textY,
                 textColorInt,
                 false
@@ -67,6 +79,13 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
     @Override
     public boolean mouseClicked(KeyBindSetting setting, double mouseX, double mouseY, int button) {
+        if (isHovered(mouseX, mouseY, (int) mouseX, (int) mouseY)) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
+                setting.setHoldMode(!setting.isHoldMode());
+                return true;
+            }
+        }
+
         if (waitingForKeyBind == null) {
             waitingForKeyBind = setting;
         } else if (waitingForKeyBind == setting) {

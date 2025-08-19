@@ -17,7 +17,6 @@ public class FreeLookModule extends Module {
     private Perspective previousPerspective;
 
     public DoubleSetting sensivity = addSetting(new DoubleSetting("sensivity", 5, 2, 15));
-    public BoolSetting holdMode = addSetting(new BoolSetting("hold", true));
 
 
     public FreeLookModule() {
@@ -26,8 +25,6 @@ public class FreeLookModule extends Module {
 
     @Override
     public void onEnable() {
-        this.getKeyBind().setHoldMode(holdMode.get());
-
         if (MC.player == null) return;
 
         cameraYaw = MC.player.getYaw();

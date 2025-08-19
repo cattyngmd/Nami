@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.setting.impl;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import me.kiriyaga.nami.setting.Setting;
 import org.lwjgl.glfw.GLFW;
@@ -76,15 +77,21 @@ public class KeyBindSetting extends Setting<Integer> {
 
     @Override
     public JsonElement toJson() {
-        return new JsonPrimitive(value);
+        JsonObject obj = new JsonObject();
+        obj.addProperty("value", value);
+        obj.addProperty("holdMode", holdMode);
+        return obj;
     }
 
     @Override
     public void fromJson(JsonElement json) {
-        if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
-            this.value = json.getAsInt();
+        if (json.isJsonObject()) {
+            JsonObject obj = json.getAsJsonObject();
+            this.value = obj.has("value") ? obj.get("value").getAsInt() : KEY_NONE;
+            this.holdMode = obj.has("holdMode") && obj.get("holdMode").getAsBoolean();
         } else {
             this.value = KEY_NONE;
+            this.holdMode = false;
         }
     }
 }
