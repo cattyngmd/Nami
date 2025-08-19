@@ -38,6 +38,12 @@ public class ClickGuiScreen extends Screen {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
+    // TODO: unhardcode this garbage
+    private final List<Text> statusMessages = Arrays.asList(
+            Text.literal("Click Mouse Middle on the module for changing drawn state."),
+            Text.literal("Click Mouse Middle on the keybind for changing hold/toggle state.")
+    );
+
     public ClickGuiScreen() {
         super(Text.literal("NamiGui"));
         syncCategoryPositions();
@@ -72,6 +78,16 @@ public class ClickGuiScreen extends Screen {
         || previousScreen instanceof DisconnectedScreen
         || previousScreen instanceof MultiplayerScreen){
             previousScreen.render(context, -1, -1, delta);
+        }
+
+        int startY = this.height - 1;
+        for (int i = statusMessages.size() - 1; i >= 0; i--) {
+            Text message = statusMessages.get(i);
+            int textWidth = textRenderer.getWidth(message);
+            int x = this.width - textWidth - 1;
+            int y = startY - textRenderer.fontHeight;
+            context.drawText(textRenderer, message, x, y, applyFade(0xFFFFFFFF), true);
+            startY = y;
         }
 
         ClickGuiModule clickGuiModule = getClickGuiModule();
