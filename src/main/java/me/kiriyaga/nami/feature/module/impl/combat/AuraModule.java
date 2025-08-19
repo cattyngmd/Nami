@@ -13,13 +13,19 @@ import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.MaceItem;
-import net.minecraft.item.TridentItem;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
+import net.minecraft.item.*;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
@@ -85,7 +91,47 @@ public class AuraModule extends Module {
             tps = (float) Math.min(20.0, 1000.0 / tickTimeMs);
         }
 
-        float ticksUntilReady = (1.0f - cooldown) * tps;
+        boolean skipCooldown = false;
+
+        if (target instanceof ShulkerBulletEntity) {
+            skipCooldown = true;
+        } else {
+            ItemStack held = MC.player.getMainHandStack();
+            float attackDamage = 1.0f; // without charge the damage always 1 i guess
+//
+//            if (held.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
+//                AttributeModifiersComponent modifiers = held.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+//                for (var entry : modifiers.comp_2393()) {
+//                    if (entry.comp_2395().matches(EntityAttributes.ATTACK_DAMAGE)) {
+//                        attackDamage += (float) entry.comp_2396().value();
+//                    }
+//                }
+//            }
+
+            // idk that shit doesnt apply, i thought it should
+//            int sharpnessLevel = EnchantmentUtils.getEnchantmentLevel(held, Enchantments.SHARPNESS);
+//            if (sharpnessLevel > 0) {
+//                attackDamage += 0.5f * sharpnessLevel + 0.5f;
+//            }
+
+            if (MC.player.hasStatusEffect(StatusEffects.STRENGTH)) {
+                var strength = MC.player.getStatusEffect(StatusEffects.STRENGTH);
+                attackDamage += 3.0f * (strength.getAmplifier() + 1);
+            }
+
+            if (MC.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+                var weakness = MC.player.getStatusEffect(StatusEffects.WEAKNESS);
+                attackDamage -= 4.0f * (weakness.getAmplifier() + 1); // im not sure is it 4 or 3 btw
+            }
+
+            if (target instanceof LivingEntity living) {
+                if (living.getMaxHealth() <= attackDamage) {
+                    skipCooldown = true;
+                }
+            }
+        }
+
+        float ticksUntilReady = skipCooldown ? 0.0f : (1.0f - cooldown) * tps;
 
         double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
 
@@ -118,7 +164,10 @@ public class AuraModule extends Module {
         }
 
         if (!canAttack) return;
-        if (cooldown < (tpsSync.get() ? 1.0f * (20f / tps) : 1.0f)) return;
+
+        if (!skipCooldown) {
+            if (cooldown < (tpsSync.get() ? 1.0f * (20f / tps) : 1.0f)) return;
+        }
 
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
@@ -231,5 +280,4 @@ public class AuraModule extends Module {
 
         return new Vec3d(x, y, z).normalize();
     }
-
 }
