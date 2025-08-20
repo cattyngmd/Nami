@@ -13,6 +13,7 @@ import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
@@ -143,7 +144,11 @@ public class LiquidFillModule extends Module {
                     MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                 } else {
-                    MC.world.setBlockState(pos, ((BlockItem) MC.player.getInventory().getStack(blockSlot).getItem()).getBlock().getDefaultState());
+                    MC.interactionManager.interactBlock(MC.player, Hand.MAIN_HAND, new BlockHitResult(
+                            Vec3d.of(pos).add(0.5,0.5,0.5),
+                            Direction.UP,
+                            pos,
+                            false));
                     MC.player.swingHand(Hand.MAIN_HAND);
                 }
 
@@ -178,7 +183,12 @@ public class LiquidFillModule extends Module {
     private int findBlockInHotbar() {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getStack(i);
-            if (stack.getItem() instanceof BlockItem) return i;
+            if (stack.getItem() instanceof BlockItem blockItem) {
+                Block block = blockItem.getBlock();
+                if (block != Blocks.AIR && block.getDefaultState().isOpaqueFullCube()) {
+                    return i;
+                }
+            }
         }
         return -1;
     }
