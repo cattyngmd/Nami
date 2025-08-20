@@ -10,30 +10,40 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 @Mixin(PlayerListEntry.class)
 public class MixinPlayerListEntry {
-    @Inject(method = "getSkinTextures", at = @At("RETURN"), cancellable = true)
-    private void getSkinTextures(CallbackInfoReturnable<SkinTextures> cir) {
-        CapeModule capeModule = MODULE_MANAGER.getStorage().getByClass(CapeModule.class);
 
-        if (capeModule != null && capeModule.isEnabled()) {
-            CapeType type = capeModule.getSelectedCape();
-            Identifier capeTex = type.getTexture();
+        @Inject(method = "getSkinTextures", at = @At("RETURN"), cancellable = true)
+        private void getSkinTextures(CallbackInfoReturnable<SkinTextures> cir) {
+            if (MC.player == null) return;
 
-            SkinTextures orig = cir.getReturnValue();
+            PlayerListEntry self = (PlayerListEntry) (Object) this;
 
-            SkinTextures custom = new SkinTextures(
-                    orig.comp_1626(), // identifier
-                    orig.comp_1911(), // url
-                    capeTex, // our
-                    orig.comp_1628(), // ely
-                    orig.comp_1629(), // slim wide
-                    orig.comp_1630() // idk
-            );
+            if (!self.getProfile().getId().equals(MC.player.getUuid())) {
+                return;
+            }
 
-            cir.setReturnValue(custom);
+            CapeModule capeModule = MODULE_MANAGER.getStorage().getByClass(CapeModule.class);
+
+            if (capeModule != null && capeModule.isEnabled()) {
+                CapeType type = capeModule.getSelectedCape();
+                Identifier capeTex = type.getTexture();
+
+                SkinTextures orig = cir.getReturnValue();
+
+                SkinTextures custom = new SkinTextures(
+                        orig.comp_1626(), // identifier
+                        orig.comp_1911(), // url
+                        capeTex, // cape
+                        orig.comp_1628(), // ely
+                        orig.comp_1629(), // body type
+                        orig.comp_1630()  // idk
+                );
+
+                cir.setReturnValue(custom);
+            }
         }
-    }
 }
