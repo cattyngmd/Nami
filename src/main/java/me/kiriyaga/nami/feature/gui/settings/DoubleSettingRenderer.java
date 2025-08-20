@@ -40,7 +40,7 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
                 textX,
                 textY,
                 textColorInt,
-                false
+                true
         );
 
         renderSlider(
@@ -77,7 +77,7 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
                 x + WIDTH - PADDING - textRenderer.getWidth(valStr),
                 textY,
                 textColorInt,
-                false
+                true
         );
     }
 

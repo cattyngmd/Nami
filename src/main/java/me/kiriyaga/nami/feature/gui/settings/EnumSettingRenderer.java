@@ -50,7 +50,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
                 textX,
                 textY,
                 textColorInt,
-                false
+                true
         );
 
         String valueStr = setting.get().toString().toLowerCase();
@@ -60,7 +60,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
                 x + WIDTH - PADDING - textRenderer.getWidth(valueStr),
                 textY,
                 textColorInt,
-                false
+                true
         );
     }
 

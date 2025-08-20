@@ -38,7 +38,7 @@ public class ESPModule extends Module {
     public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
     public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("mode", RenderMode.OUTLINE));
     public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("distance", 52, 15, 256));
-    public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth appearance", true));
+    public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth", true));
     public final DoubleSetting lineWidth = addSetting(new DoubleSetting("line", 1.5, 0.5, 2.5));
     public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 

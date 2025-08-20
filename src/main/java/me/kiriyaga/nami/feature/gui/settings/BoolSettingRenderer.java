@@ -20,7 +20,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         ColorModule colorModule = getColorModule();
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = new Color(255, 255, 255, 122);
+        Color textCol = new Color(155, 155, 155, 255);
         Color bgColor = new Color(30, 30, 30, 0);
         Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
@@ -47,7 +47,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, false);
+        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, true);
     }
 
     @Override

@@ -80,16 +80,6 @@ public class ClickGuiScreen extends Screen {
             previousScreen.render(context, -1, -1, delta);
         }
 
-        int startY = this.height - 1;
-        for (int i = statusMessages.size() - 1; i >= 0; i--) {
-            Text message = statusMessages.get(i);
-            int textWidth = textRenderer.getWidth(message);
-            int x = this.width - textWidth - 1;
-            int y = startY - textRenderer.fontHeight;
-            context.drawText(textRenderer, message, x, y, applyFade(0xFFFFFFFF), true);
-            startY = y;
-        }
-
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get()) {
             int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
@@ -99,6 +89,16 @@ public class ClickGuiScreen extends Screen {
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);
+
+        int startY = this.height - 1;
+        for (int i = statusMessages.size() - 1; i >= 0; i--) {
+            Text message = statusMessages.get(i);
+            int textWidth = textRenderer.getWidth(message);
+            int x = this.width - textWidth - 1;
+            int y = startY - textRenderer.fontHeight;
+            context.drawText(textRenderer, message, x, y, applyFade(0xFFFFFFFF), true);
+            startY = y;
+        }
 
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
@@ -138,7 +138,7 @@ public class ClickGuiScreen extends Screen {
 
                             context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2,
                                     0x7F000000);
-                            context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, false);
+                            context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
                         }
                         context.getMatrices().popMatrix();
                         return;

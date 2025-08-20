@@ -52,7 +52,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                 textX,
                 textY,
                 textColorInt,
-                false
+                true
         );
 
         String valueStr;
@@ -65,15 +65,17 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
             valueStr = keyName;
         }
 
-        int textWidth = textRenderer.getWidth(valueStr);
+        String renderStr = valueStr.toLowerCase(); // fuck ahaha
+        int textWidth = textRenderer.getWidth(renderStr);
         int valueX = x + WIDTH - PADDING - textWidth;
+
         context.drawText(
                 textRenderer,
-                valueStr.toLowerCase(),
+                renderStr,
                 valueX,
                 textY,
                 textColorInt,
-                false
+                true
         );
     }
 

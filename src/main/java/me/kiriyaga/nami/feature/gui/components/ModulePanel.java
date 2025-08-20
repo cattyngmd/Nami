@@ -13,8 +13,8 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class ModulePanel {
-    public static final int WIDTH = 110 - CategoryPanel.BORDER_WIDTH * 2 - SettingPanel.INNER_PADDING * 2;
-    public static final int HEIGHT = 14;
+    public static final int WIDTH = 100 - CategoryPanel.BORDER_WIDTH * 2 - SettingPanel.INNER_PADDING * 2;
+    public static final int HEIGHT = 13;
     public static final int PADDING = 3;
     public static final int MODULE_SPACING = 1;
 
@@ -37,7 +37,7 @@ public class ModulePanel {
 
         Color primary = getColorModule().getStyledGlobalColor();
         Color secondary = getColorModule().getStyledSecondColor();
-        Color textCol = new Color(255, 255, 255, 122);
+        Color textCol = new Color(155, 155, 155, 255);
         Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
@@ -86,7 +86,7 @@ public class ModulePanel {
                 baseTextX,
                 textY,
                 CLICK_GUI.applyFade(toRGBA(enabled ? textColActivated : textCol)),
-                false
+                true
         );
     }
 

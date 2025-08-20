@@ -16,8 +16,8 @@ import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 import static me.kiriyaga.nami.feature.gui.components.ModulePanel.MODULE_SPACING;
 
 public class CategoryPanel {
-    public static final int WIDTH = 110;
-    public static final int HEADER_HEIGHT = 14;
+    public static final int WIDTH = 100;
+    public static final int HEADER_HEIGHT = 13;
     public static final int GAP = 5;
     private static final int PADDING = 5;
     public static final int BORDER_WIDTH = 1;
@@ -99,9 +99,14 @@ public class CategoryPanel {
         );
 
         int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
-        context.drawText(textRenderer, moduleCategory.getName(),
-                x + PADDING, textY,
-                CLICK_GUI.applyFade(toRGBA(textCol)), false);
+        context.drawText(
+                textRenderer,
+                moduleCategory.getName(),
+                x + PADDING,
+                textY + 1,
+                CLICK_GUI.applyFade(toRGBA(textCol)),
+                true
+        );
 
         if (expanded) {
             int moduleY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;

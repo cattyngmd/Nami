@@ -33,7 +33,7 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, false);
+        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, true);
 
         renderSlider(
                 context,
@@ -66,7 +66,7 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
                 x + WIDTH - PADDING - textRenderer.getWidth(valStr),
                 textY,
                 textColorInt,
-                false
+                true
         );
     }
 

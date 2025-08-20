@@ -32,7 +32,7 @@ public class HudEditorScreen extends Screen {
     private int dragOffsetX, dragOffsetY;
 
     public HudEditorScreen() {
-        super(Text.literal("nami hud editor"));
+        super(Text.literal("NamiHudEditor"));
         syncCategoryPositions();
         expandedCategories.add(ModuleCategory.of("hud"));
     }
@@ -93,7 +93,7 @@ public class HudEditorScreen extends Screen {
                         int textHeight = 8;
 
                         context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
-                        context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, false);
+                        context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
                     }
                     context.getMatrices().popMatrix();
                     super.render(context, mouseX, mouseY, delta);
@@ -136,7 +136,7 @@ public class HudEditorScreen extends Screen {
                 for (HudElementModule.TextElement element : new ArrayList<>(hud.getTextElements())) {
                     int drawX = hud.getRenderXForElement(element);
                     int drawY = renderY + element.offsetY();
-                    context.drawText(MC.textRenderer, element.text(), drawX, drawY, 0xFFFFFFFF, false);
+                    context.drawText(MC.textRenderer, element.text(), drawX, drawY, 0xFFFFFFFF, true);
                 }
             }
         }

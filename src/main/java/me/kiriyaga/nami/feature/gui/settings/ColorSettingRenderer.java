@@ -38,7 +38,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(textRenderer, text, textX, textY, textColorInt, false);
+        context.drawText(textRenderer, text, textX, textY, textColorInt, true);
 
         renderHueSlider(context, x + PADDING, y + HEIGHT - 2, WIDTH - 2 * PADDING, SLIDER_HEIGHT, hue);
 
@@ -62,7 +62,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
                 x + WIDTH - PADDING - textRenderer.getWidth(hex),
                 textY,
                 textColorInt,
-                false
+                true
         );
     }
 
