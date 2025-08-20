@@ -43,8 +43,6 @@ public class SearchModule extends Module {
     private final BoolSetting nonVanilla = addSetting(new BoolSetting("non-vanilla", false));
     private final BoolSetting notifier = addSetting(new BoolSetting("notifier", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("not at spawn", false));
-    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 3));
-    private final BoolSetting filled = addSetting(new BoolSetting("filled", true));
 
     private static final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
@@ -211,8 +209,8 @@ public class SearchModule extends Module {
                         state,
                         new Color(color.getRed(), color.getGreen(), color.getBlue(), 60),
                         color,
-                        lineWidth.get(),
-                        filled.get()
+                        1.5f,
+                        true
                 );
             }
         }

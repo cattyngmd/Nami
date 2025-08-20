@@ -39,8 +39,6 @@ public class ESPModule extends Module {
     public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("mode", RenderMode.OUTLINE));
     public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("distance", 52, 15, 256));
     public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth", true));
-    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("line", 1.5, 0.5, 2.5));
-    public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
 
     private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
     private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
@@ -50,8 +48,6 @@ public class ESPModule extends Module {
     public ESPModule() {
         super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "wh", "boxes");
         smoothAppear.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
-        lineWidth.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
-        filled.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
         outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
     }
 
@@ -122,13 +118,9 @@ public class ESPModule extends Module {
 
         int alphaCoef = smoothAppear.get() ? Math.min(entity.age * 10, 255) : 255;
 
-        if (filled.get()) {
-            int filledAlpha = Math.min(alphaCoef, 75);
-            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), filledAlpha));
-            RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaCoef), lineWidth.get());
-        } else {
-            RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaCoef), lineWidth.get());
-        }
+        int filledAlpha = Math.min(alphaCoef, 75);
+        RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), filledAlpha));
+        RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaCoef), 1.5f);
     }
 
     public static Color getESPColor(Entity entity) {

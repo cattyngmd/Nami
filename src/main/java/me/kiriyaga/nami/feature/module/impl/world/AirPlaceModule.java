@@ -33,12 +33,10 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 @RegisterModule
 public class AirPlaceModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 3.0, 2.0, 5.0));
+    private final DoubleSetting range = addSetting(new DoubleSetting("range", 3.0, 2.0, 7.0));
     public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
     private final BoolSetting airOnly = addSetting(new BoolSetting("air only", false));
-    private final DoubleSetting lineWidth = addSetting(new DoubleSetting("line width", 1.5, 0.5, 3));
-    private final BoolSetting fill = addSetting(new BoolSetting("fill", false));
 
     public int cooldown = 0;
     private BlockPos renderPos = null;
@@ -127,7 +125,7 @@ public class AirPlaceModule extends Module {
 
         Box box = new Box(renderPos);
 
-        RenderUtil.drawBox(matrices, box, fillColor, color, lineWidth.get().floatValue(), fill.get(), true);
+        RenderUtil.drawBox(matrices, box, fillColor, color, 1.5f, true, true);
     }
 
     private boolean hasEntity(BlockPos pos) {
