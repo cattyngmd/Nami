@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
@@ -82,7 +83,7 @@ public class AutoSignModule extends Module {
 
     // TODO its not working lol
     @SubscribeEvent
-    public void onTick() {
+    public void onPreTick(PreTickEvent ev) {
         if (shouldFill) {
             ticksWaited++;
             if (ticksWaited >= delay.get()) {
