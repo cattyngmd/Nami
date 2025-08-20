@@ -31,7 +31,7 @@ public class ElytraFlyModule extends Module {
 
 
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.BOUNCE));
-    private final BoolSetting midAirFreeze = addSetting(new BoolSetting("mid air freeze", false));
+    //private final BoolSetting midAirFreeze = addSetting(new BoolSetting("mid air freeze", false));
     private final BoolSetting lockPitch = addSetting(new BoolSetting("lock pitch", true));
     private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
     private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
@@ -54,7 +54,7 @@ public class ElytraFlyModule extends Module {
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE && pitch.get());
         lockPitch.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
-        midAirFreeze.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
+        //midAirFreeze.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
     }
 
     @Override
@@ -104,28 +104,28 @@ public class ElytraFlyModule extends Module {
 
             Vec3d dir = getControlDirection();
 
-            if (midAirFreeze.get() && dir == null) {
-                float yaw = MC.player.getYaw();
-                float pitchFreeze = -3f;
-
-                double forwardMotion = (MC.player.age % 8 < 4) ? 0.1 : -0.1;
-
-                double radYaw = Math.toRadians(yaw);
-                Vec3d freezeVel = new Vec3d(
-                        -Math.sin(radYaw) * forwardMotion,
-                        0,
-                        Math.cos(radYaw) * forwardMotion
-                );
-
-                MC.player.setVelocity(freezeVel);
-
-                ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(this.getName(), rotationPriority.get(), yaw, pitchFreeze)
-                );
-
-                setJumpHeld(true);
-                return;
-            }
+//            if (midAirFreeze.get() && dir == null) {
+//                float yaw = MC.player.getYaw();
+//                float pitchFreeze = -3f;
+//
+//                double forwardMotion = (MC.player.age % 8 < 4) ? 0.1 : -0.1;
+//
+//                double radYaw = Math.toRadians(yaw);
+//                Vec3d freezeVel = new Vec3d(
+//                        -Math.sin(radYaw) * forwardMotion,
+//                        0,
+//                        Math.cos(radYaw) * forwardMotion
+//                );
+//
+//                MC.player.setVelocity(freezeVel);
+//
+//                ROTATION_MANAGER.getRequestHandler().submit(
+//                        new RotationRequest(this.getName(), rotationPriority.get(), yaw, pitchFreeze)
+//                );
+//
+//                setJumpHeld(true);
+//                return;
+//            }
 
             if (dir != null) {
                 float finalYaw;
