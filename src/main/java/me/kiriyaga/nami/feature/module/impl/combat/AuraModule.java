@@ -131,7 +131,7 @@ public class AuraModule extends Module {
             }
         }
 
-        float ticksUntilReady = skipCooldown ? 0.0f : (1.0f - cooldown) * tps;
+        float ticksUntilReady = skipCooldown ? (1.0f - cooldown) * tps / 6.0f : (1.0f - cooldown) * tps;
 
         double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
 
