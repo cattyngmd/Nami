@@ -49,6 +49,10 @@ public class ModulePanel {
             bgColor = new Color(30, 30, 30, 0);
         }
 
+        if (hovered) {
+            bgColor = brighten(bgColor, 0.1f);
+        }
+
         context.fill(
                 expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()
                         ? x + 1 : x,
@@ -64,7 +68,7 @@ public class ModulePanel {
                     y,
                     x + 1,
                     y + HEIGHT,
-                    CLICK_GUI.applyFade(enabled ? primary.getRGB() : secondary.getRGB())
+                    CLICK_GUI.applyFade(toRGBA(bgColor))
             );
         }
 

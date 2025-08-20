@@ -57,7 +57,7 @@ public class ClickGuiScreen extends Screen {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
 
             categoryPositions.putIfAbsent(moduleCategory, new Point(x, y));
-            x += CategoryPanel.WIDTH + CategoryPanel.GAP;
+            x += CategoryPanel.WIDTH + 1;
         }
         categoryPositions.keySet().removeIf(cat -> !ModuleCategory.getAll().contains(cat));
     }
