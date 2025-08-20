@@ -31,7 +31,7 @@ public class NoSlowModule extends Module {
 
     public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("mode", SlowMode.ACCEL));
     public final BoolSetting fastCrawl = addSetting(new BoolSetting("fast crawl", false));
-    private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
+    //private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
     private final BoolSetting onlyOnGround = addSetting(new BoolSetting("only on ground", true));
 
 
@@ -71,16 +71,16 @@ public class NoSlowModule extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    private void onPreTick(PreTickEvent event) {
-        if (!fastWeb.get()) return;
-
-        BlockPos webPos = getPhasedWebBlock();
-        if (webPos != null) {
-            //CHAT_MANAGER.sendRaw("c");
-            MC.world.setBlockState(webPos, Blocks.AIR.getDefaultState(), 3);
-        }
-    }
+//    @SubscribeEvent(priority = EventPriority.LOW)
+//    private void onPreTick(PreTickEvent event) {
+//        if (!fastWeb.get()) return;
+//
+//        BlockPos webPos = getPhasedWebBlock();
+//        if (webPos != null) {
+//            //CHAT_MANAGER.sendRaw("c");
+//            MC.world.setBlockState(webPos, Blocks.AIR.getDefaultState(), 3);
+//        }
+//    }
 
     private BlockPos getPhasedWebBlock() {
         if (MC.player == null || MC.world == null) return null;
