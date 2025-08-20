@@ -1,9 +1,12 @@
 package me.kiriyaga.nami.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.impl.combat.ReachModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.PortalGuiModule;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
@@ -122,5 +125,16 @@ public abstract class MixinClientPlayerEntity {
         if (b) return;
 
         info.setReturnValue(b);
+    }
+
+    @ModifyExpressionValue(method = "tickNausea", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;"))
+    private Screen tickNausea(Screen s) {
+        if (MODULE_MANAGER == null)
+            return s;
+
+        if (MODULE_MANAGER.getStorage().getByClass(PortalGuiModule.class).isEnabled())
+            return null;
+
+        return s;
     }
 }
