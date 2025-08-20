@@ -19,10 +19,6 @@
 
 **Nami** is a modular and lightweight anarchy client base built for PVE and automation.  
 
-The 1.21.4 branch is outdated!
-
-Please do not use viafabric/viafabricplus on servers 1.21.4 or lower!
-
 Most popular Minecraft clients are closed-source, paid, and obfuscated, making them difficult to audit or trust. Some may include backdoors or malicious code.
 
 This project started as a clean, open-source alternative aiming to be transparent, secure, and easy to extend without relying on unsafe third-party clients.
@@ -59,20 +55,13 @@ The default command prefix is `-`.
 
 </details>
 
-<details>
-<summary>Can I use a custom font?</summary>
-
-Please use the Caxton mod instead of the built-in client font renderers.
-
-</details>
-
 ---
 
 ## Requirements
 
 - Java 21  
 - Gradle 8+  
-- Minecraft 1.21.7  
+- Minecraft 1.21.8  
 - Fabric loader, API
 
 ---
@@ -94,6 +83,8 @@ Please use the Caxton mod instead of the built-in client font renderers.
 
 The compiled JAR will be located at:  
 `build/libs/nami-<version>.jar`
+
+Do not launch -unremapped!
 
 ---
 
