@@ -66,7 +66,11 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
 
     @Override
     public boolean mouseClicked(EnumSetting<?> setting, double mouseX, double mouseY, int button) {
-        setting.cycle();
+        if (button == 0) {
+            setting.cycle(false);
+        } else if (button == 1) {
+            setting.cycle(true);
+        }
         return true;
     }
 

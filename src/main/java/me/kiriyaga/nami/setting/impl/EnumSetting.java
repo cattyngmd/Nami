@@ -13,8 +13,13 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
         this.values = defaultValue.getDeclaringClass().getEnumConstants();
     }
 
-    public void cycle() {
-        int index = (value.ordinal() + 1) % values.length;
+    public void cycle(boolean forward) {
+        int index = value.ordinal();
+        if (forward) {
+            index = (index + 1) % values.length;
+        } else {
+            index = (index - 1 + values.length) % values.length;
+        }
         value = values[index];
     }
 
