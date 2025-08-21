@@ -1,4 +1,6 @@
-# Nami 1.21.8
+# Nami
+
+1.21.8 and 1.21.5
 
 <p align="left">
   <a href="https://github.com/Kiriyaga7615/Nami/releases">
