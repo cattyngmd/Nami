@@ -1,25 +1,42 @@
 package me.kiriyaga.nami.core.inventory;
 
+import me.kiriyaga.nami.feature.module.impl.combat.AutoTotemModule;
+import me.kiriyaga.nami.util.EnchantmentUtils;
+import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.screen.sync.ItemStackHash;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.collection.DefaultedList;
 
 import com.google.common.collect.Lists;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class InventoryClickHandler {
 
-    public int pickupSlot(int slotIndex) {
-        return click(slotIndex, 0, SlotActionType.PICKUP);
+    public void pickupSlot(int slotIndex, boolean skipGeneric) {
+        click(slotIndex, 0, SlotActionType.PICKUP, skipGeneric);
+    }
+
+    public void quickMoveSlot(int slotIndex, boolean skipGeneric) {
+        click(slotIndex, 0, SlotActionType.QUICK_MOVE, skipGeneric);
+    }
+
+    public void throwSlot(int slotIndex, boolean skipGeneric) {
+        click(slotIndex, 0, SlotActionType.THROW, skipGeneric);
+    }
+
+    public void swapSlot(int targetSlot, int hotbarSlotIndex, boolean skipGeneric) {
+        click(targetSlot, hotbarSlotIndex, SlotActionType.SWAP, skipGeneric);
+    }
+
+
+    public void pickupSlot(int slotIndex) {
+        click(slotIndex, 0, SlotActionType.PICKUP);
     }
 
     public void quickMoveSlot(int slotIndex) {
@@ -34,34 +51,39 @@ public class InventoryClickHandler {
         click(targetSlot, hotbarSlotIndex, SlotActionType.SWAP);
     }
 
-    private int click(int slot, int button, SlotActionType type) {
-        if (slot < 0) return -1;
+    private void click(int slot, int button, SlotActionType type) {
+        click(slot, button, type, false);
+    }
 
-        ScreenHandler handler = MC.player.currentScreenHandler;
-        DefaultedList<Slot> slots = handler.slots;
-        List<ItemStack> before = Lists.newArrayListWithCapacity(slots.size());
+    private void click(int slot, int button, SlotActionType type, boolean skipGeneric) {
+        if (slot < 0) return;
 
-        for (Slot s : slots) before.add(s.getStack().copy());
-
-        handler.onSlotClick(slot, button, type, MC.player);
-
-        Int2ObjectMap<ItemStackHash> changes = new Int2ObjectOpenHashMap<>();
-        for (int i = 0; i < slots.size(); i++) {
-            if (!ItemStack.areEqual(before.get(i), slots.get(i).getStack())) {
-                changes.put(i, ItemStackHash.fromItemStack(slots.get(i).getStack().copy(), c -> 0));
-            }
+        if (MC.currentScreen instanceof ShulkerBoxScreen
+                || MC.currentScreen instanceof AnvilScreen
+                || MC.currentScreen instanceof BrewingStandScreen
+                || MC.currentScreen instanceof CartographyTableScreen
+                || MC.currentScreen instanceof CrafterScreen
+                || MC.currentScreen instanceof EnchantmentScreen
+                || MC.currentScreen instanceof FurnaceScreen
+                || MC.currentScreen instanceof GrindstoneScreen
+                || MC.currentScreen instanceof HopperScreen
+                || MC.currentScreen instanceof HorseScreen
+                || MC.currentScreen instanceof MerchantScreen
+                || MC.currentScreen instanceof SmithingScreen
+                || MC.currentScreen instanceof SmokerScreen
+                || MC.currentScreen instanceof StonecutterScreen
+                || (MC.currentScreen instanceof GenericContainerScreen && !skipGeneric)
+                || MC.currentScreen instanceof CreativeInventoryScreen) {
+            MODULE_MANAGER.getStorage().getByClass(AutoTotemModule.class).addDeathReason("invfail", "Inventory Fail");
+            return;
         }
 
-        MC.player.networkHandler.sendPacket(new ClickSlotC2SPacket(
-                handler.syncId,
-                handler.getRevision(),
-                (short) slot,
-                (byte) button,
-                type,
-                changes,
-                ItemStackHash.fromItemStack(handler.getCursorStack().copy(), c -> 0)
-        ));
+        ScreenHandler handler = MC.player.currentScreenHandler;
 
-        return handler.getRevision();
+        DefaultedList<Slot> slots = handler.slots;
+        List<ItemStack> before = Lists.newArrayListWithCapacity(slots.size());
+        for (Slot s : slots) before.add(s.getStack().copy());
+
+        MC.interactionManager.clickSlot(handler.syncId, slot, button, type, MC.player);
     }
 }

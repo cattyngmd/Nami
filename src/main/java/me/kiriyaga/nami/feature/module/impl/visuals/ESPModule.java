@@ -37,9 +37,8 @@ public class ESPModule extends Module {
     public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", true));
     public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
     public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("mode", RenderMode.OUTLINE));
-    public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth appearance", true));
-    public final DoubleSetting lineWidth = addSetting(new DoubleSetting("line", 1.5, 0.5, 2.5));
-    public final BoolSetting filled = addSetting(new BoolSetting("filled", false));
+    public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("distance", 52, 15, 256));
+    public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth", true));
 
     private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
     private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
@@ -47,15 +46,16 @@ public class ESPModule extends Module {
     private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public ESPModule() {
-        super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "WH", "boxes", "уыз");
+        super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "wh", "boxes");
         smoothAppear.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
-        lineWidth.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
-        filled.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
+        outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
         if (MC == null || MC.world == null || MC.player == null) return;
+
+        this.setDisplayInfo(renderMode.get().toString());
 
         if (renderMode.get() == RenderMode.BOX) {
             renderBoxes(event);
@@ -83,6 +83,11 @@ public class ESPModule extends Module {
         if (showNeutrals.get()) entities.addAll(ENTITY_MANAGER.getNeutral());
         if (showHostiles.get()) entities.addAll(ENTITY_MANAGER.getHostile());
         if (showItems.get()) entities.addAll(ENTITY_MANAGER.getDroppedItems());
+
+        if (renderMode.get() == RenderMode.OUTLINE) {
+            double maxDistSq = outlineDistance.get() * outlineDistance.get();
+            entities.removeIf(entity -> MC.player.squaredDistanceTo(entity) > maxDistSq);
+        }
 
         return entities;
     }
@@ -115,18 +120,19 @@ public class ESPModule extends Module {
 
         int alphaCoef = smoothAppear.get() ? Math.min(entity.age * 10, 255) : 255;
 
-        if (filled.get()) {
-            int filledAlpha = Math.min(alphaCoef, 75);
-            RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), filledAlpha));
-            RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaCoef), lineWidth.get());
-        } else {
-            RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaCoef), lineWidth.get());
-        }
+        int filledAlpha = Math.min(alphaCoef, 75);
+        RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), filledAlpha));
+        RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaCoef), 1.5f);
     }
 
     public static Color getESPColor(Entity entity) {
         ESPModule esp = MODULE_MANAGER.getStorage().getByClass(ESPModule.class);
         if (esp == null || !esp.isEnabled()) return null;
+
+        double d = MODULE_MANAGER.getStorage().getByClass(ESPModule.class).outlineDistance.get();
+
+        if (MC.getCameraEntity().distanceTo(entity) > d)
+            return null;
 
         if (entity == null || entity.isRemoved() || !entity.isAlive()) return null;
 

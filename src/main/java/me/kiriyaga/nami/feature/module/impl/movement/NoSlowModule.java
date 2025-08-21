@@ -12,10 +12,16 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.shape.VoxelShape;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class NoSlowModule extends Module {
@@ -24,11 +30,13 @@ public class NoSlowModule extends Module {
     }
 
     public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("mode", SlowMode.ACCEL));
+    public final BoolSetting fastCrawl = addSetting(new BoolSetting("fast crawl", false));
+    //private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
     private final BoolSetting onlyOnGround = addSetting(new BoolSetting("only on ground", true));
 
 
     public NoSlowModule() {
-        super("no slow", "Reduces slowdown effect caused on player.", ModuleCategory.of("movement"), "тщыдщц");
+        super("no slow", "Reduces slowdown effect caused on player.", ModuleCategory.of("movement"), "noslow");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -61,5 +69,42 @@ public class NoSlowModule extends Module {
                 return;
             }
         }
+    }
+
+//    @SubscribeEvent(priority = EventPriority.LOW)
+//    private void onPreTick(PreTickEvent event) {
+//        if (!fastWeb.get()) return;
+//
+//        BlockPos webPos = getPhasedWebBlock();
+//        if (webPos != null) {
+//            //CHAT_MANAGER.sendRaw("c");
+//            MC.world.setBlockState(webPos, Blocks.AIR.getDefaultState(), 3);
+//        }
+//    }
+
+    private BlockPos getPhasedWebBlock() {
+        if (MC.player == null || MC.world == null) return null;
+
+        Box bb = MC.player.getBoundingBox();
+
+        int minX = MathHelper.floor(bb.minX);
+        int maxX = MathHelper.ceil(bb.maxX);
+        int minY = MathHelper.floor(bb.minY);
+        int maxY = MathHelper.ceil(bb.maxY);
+        int minZ = MathHelper.floor(bb.minZ);
+        int maxZ = MathHelper.ceil(bb.maxZ);
+
+        for (int x = minX; x < maxX; x++) {
+            for (int y = minY; y < maxY; y++) {
+                for (int z = minZ; z < maxZ; z++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    if (MC.world.getBlockState(pos).getBlock() == Blocks.COBWEB) {
+                        return pos;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

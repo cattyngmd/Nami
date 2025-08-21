@@ -4,7 +4,10 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
+import me.kiriyaga.nami.mixin.InputAccessor;
+import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -50,7 +53,56 @@ public class RotationTickHandler {
             idleReset();
         }
 
+        if (module.moveFix.get())
+            fixMovementForSpoof();
+
         tickCount++;
+    }
+
+    private void fixMovementForSpoof() {
+        if (MC.player == null) return;
+
+        InputCache.update(
+                MC.options.forwardKey.isPressed(),
+                MC.options.backKey.isPressed(),
+                MC.options.leftKey.isPressed(),
+                MC.options.rightKey.isPressed()
+        );
+
+        float realYaw = MC.player.getYaw();
+        float spoofYaw = stateHandler.getRotationYaw();
+        float delta = MathHelper.wrapDegrees(realYaw - spoofYaw);
+
+        boolean forward = MC.options.forwardKey.isPressed();
+        boolean back = MC.options.backKey.isPressed();
+        boolean left = MC.options.leftKey.isPressed();
+        boolean right = MC.options.rightKey.isPressed();
+
+        float inputX = (right ? 1 : 0) - (left ? 1 : 0);
+        float inputZ = (forward ? 1 : 0) - (back ? 1 : 0);
+
+        if (inputX == 0 && inputZ == 0) return;
+
+        double moveAngle = Math.toDegrees(Math.atan2(inputX, inputZ));
+        double finalAngle = moveAngle + delta;
+        int sector = (int) Math.round(finalAngle / 45.0) & 7;
+
+        MC.options.forwardKey.setPressed(false);
+        MC.options.backKey.setPressed(false);
+        MC.options.leftKey.setPressed(false);
+        MC.options.rightKey.setPressed(false);
+
+        // i hate myself its 02:28
+        switch (sector) {
+            case 0: MC.options.forwardKey.setPressed(true); break;
+            case 1: MC.options.forwardKey.setPressed(true); MC.options.rightKey.setPressed(true); break;
+            case 2: MC.options.rightKey.setPressed(true); break;
+            case 3: MC.options.backKey.setPressed(true); MC.options.rightKey.setPressed(true); break;
+            case 4: MC.options.backKey.setPressed(true); break;
+            case 5: MC.options.backKey.setPressed(true); MC.options.leftKey.setPressed(true); break;
+            case 6: MC.options.leftKey.setPressed(true); break;
+            case 7: MC.options.forwardKey.setPressed(true); MC.options.leftKey.setPressed(true); break;
+        }
     }
 
     private void loadSettings(RotationManagerModule module) {

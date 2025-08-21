@@ -37,7 +37,7 @@ public class AutoLogModule extends Module {
     private boolean triggeredLevel = false;
 
     public AutoLogModule() {
-        super("auto log", "Automatically logs out in certain conditions.", ModuleCategory.of("combat"), "autolog", "panic", "logout", "фгещдщп");
+        super("auto log", "Automatically logs out in certain conditions.", ModuleCategory.of("combat"), "autolog", "panic", "logout");
         packet.setShowCondition(() -> onRender.get());
     }
 

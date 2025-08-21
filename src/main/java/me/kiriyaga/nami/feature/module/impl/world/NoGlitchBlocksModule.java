@@ -22,7 +22,7 @@ public class NoGlitchBlocksModule extends Module {
     private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
 
     public NoGlitchBlocksModule() {
-        super("no glitch blocks", "Prevents ghost/place/destroy glitches.", ModuleCategory.of("world"));
+        super("no glitch blocks", "Prevents ghost/place/destroy glitches.", ModuleCategory.of("world"), "noglitchblocks");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

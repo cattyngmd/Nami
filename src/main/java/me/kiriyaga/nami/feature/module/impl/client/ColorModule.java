@@ -19,7 +19,6 @@ public class ColorModule extends Module {
 
     public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.33, 0.0, 1.0));
     public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.00, 0.0, 1.0));
-    public final DoubleSetting alpha = addSetting(new DoubleSetting("alpha", 0.4, 0.0, 1.0));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
     public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbow speed", 0.4, 0.01, 5.0));
@@ -27,7 +26,7 @@ public class ColorModule extends Module {
     private int phase = 0;
 
     public ColorModule() {
-        super("color", "Customizes color scheme.", ModuleCategory.of("client"), "colr", "c", "colors", "clitor", "сщдщк");
+        super("color", "Customizes color scheme.", ModuleCategory.of("client"), "colr", "c", "colors", "clitor");
         if (!this.isEnabled())
             this.toggle();
         rainbowSpeed.setShowCondition(() -> rainbowEnabled.get());
@@ -40,7 +39,7 @@ public class ColorModule extends Module {
     }
 
     private int getAlpha255() {
-        return (int) (Math.max(0.0, Math.min(1.0, alpha.get())) * 255);
+        return (int) (Math.max(0.0, Math.min(1.0, 0.45)) * 255);
     }
 
     public Color applySaturation(Color base, double saturationFactor) {
@@ -51,12 +50,16 @@ public class ColorModule extends Module {
     }
 
     public Color applyDarkness(Color base, double darknessFactor) {
-        float factor = (float) (1.0 - darknessFactor);
-        int r = Math.max(0, (int) (base.getRed() * factor));
-        int g = Math.max(0, (int) (base.getGreen() * factor));
-        int b = Math.max(0, (int) (base.getBlue() * factor));
-        int a = base.getAlpha();
-        return new Color(r, g, b, a);
+        float[] hsb = Color.RGBtoHSB(base.getRed(), base.getGreen(), base.getBlue(), null);
+
+        float brightness = hsb[2] * (float)(1.0 - darknessFactor);
+
+        int rgb = Color.HSBtoRGB(hsb[0], hsb[1], Math.max(0f, Math.min(1f, brightness)));
+
+        return new Color((rgb >> 16) & 0xFF,
+                (rgb >> 8) & 0xFF,
+                rgb & 0xFF,
+                base.getAlpha());
     }
 
     public Color getStyledColor(Color base, double saturation, double darkness) {

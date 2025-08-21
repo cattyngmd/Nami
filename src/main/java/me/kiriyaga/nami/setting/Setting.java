@@ -6,7 +6,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import java.util.function.BooleanSupplier;
 
 public abstract class Setting<T> {
-    protected final String name;
+    private String name;
     protected T value;
     private Runnable onChanged = null;
     private boolean show = true;
@@ -21,6 +21,10 @@ public abstract class Setting<T> {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name){
+        this.name = name;
     }
 
     public T get() {

@@ -26,13 +26,11 @@ public class GuiMoveModule extends Module {
     private boolean leftHeld = false;
     private boolean rightHeld = false;
     private boolean jumpHeld = false;
-    private boolean sneakHeld = false;
-    private boolean sprintHeld = false;
 
     private Screen lastScreen = null;
 
     public GuiMoveModule() {
-        super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"));
+        super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"), "guimove");
     }
 
     @Override
@@ -42,8 +40,6 @@ public class GuiMoveModule extends Module {
         leftHeld = false;
         rightHeld = false;
         jumpHeld = false;
-        sneakHeld = false;
-        sprintHeld = false;
         setKeysPressed(false);
         lastScreen = null;
     }
@@ -57,8 +53,6 @@ public class GuiMoveModule extends Module {
         updateHeld(MC.options.leftKey, event.key, event.action, false, v -> leftHeld = v);
         updateHeld(MC.options.rightKey, event.key, event.action, false, v -> rightHeld = v);
         updateHeld(MC.options.jumpKey, event.key, event.action, false, v -> jumpHeld = v);
-        updateHeld(MC.options.sneakKey, event.key, event.action, false, v -> sneakHeld = v);
-        updateHeld(MC.options.sprintKey, event.key, event.action, false, v -> sprintHeld = v);
     }
 
     private void updateHeld(KeyBinding bind, int key, int action, boolean mouse, java.util.function.Consumer<Boolean> setter) {
@@ -94,8 +88,6 @@ public class GuiMoveModule extends Module {
         updateKeyWithHold(MC.options.leftKey, leftHeld);
         updateKeyWithHold(MC.options.rightKey, rightHeld);
         updateKeyWithHold(MC.options.jumpKey, jumpHeld);
-        updateKeyWithHold(MC.options.sneakKey, sneakHeld);
-        updateKeyWithHold(MC.options.sprintKey, sprintHeld);
     }
 
     private void resetHeldKeys() {
@@ -104,8 +96,6 @@ public class GuiMoveModule extends Module {
         leftHeld = false;
         rightHeld = false;
         jumpHeld = false;
-        sneakHeld = false;
-        sprintHeld = false;
         setKeysPressed(false);
     }
 

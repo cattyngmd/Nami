@@ -17,7 +17,7 @@ public class YawModule extends Module {
     private final IntSetting directions = addSetting(new IntSetting("directions", 8, 4, 16));
 
     public YawModule() {
-        super("yaw", "Snap player yaw to nearest fixed angle.", ModuleCategory.of("movement"), "гфц");
+        super("yaw", "Snap player yaw to nearest fixed angle.", ModuleCategory.of("movement"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -19,6 +19,7 @@ import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,16 +36,16 @@ public class AutoEatModule extends Module {
     private final BoolSetting allowGapples = addSetting(new BoolSetting("gapples", true));
     private final BoolSetting allowPoisoned = addSetting(new BoolSetting("poisoned", false));
 
-    private final AtomicBoolean eating = new AtomicBoolean(false);
+    public final AtomicBoolean eating = new AtomicBoolean(false);
     private volatile int swapCooldown = 0;
 
     public AutoEatModule() {
-        super("auto eat", "Automatically eats best food.", ModuleCategory.of("world"), "фгещуфв", "autoeat");
+        super("auto eat", "Automatically eats best food.", ModuleCategory.of("world"), "autoeat");
     }
 
     @Override
     public void onDisable() {
-        setUseHeld(false);
+        eating.set(false);
         eating.set(false);
     }
 
@@ -52,10 +53,8 @@ public class AutoEatModule extends Module {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
-        if (!eating.get())
-            setUseHeld(false);
-
-        eating.set(false);
+        if (eating.get())
+            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
 
         double hunger = MC.player.getHungerManager().getFoodLevel();
         double health = MC.player.getHealth();
@@ -74,7 +73,6 @@ public class AutoEatModule extends Module {
         int currentSlot = MC.player.getInventory().getSelectedSlot();
 
         if (currentSlot == bestSlot) {
-            setUseHeld(true);
             eating.set(true);
         } else {
             if (swapCooldown > 0) {
@@ -149,26 +147,5 @@ public class AutoEatModule extends Module {
                 || item == Items.PUFFERFISH
                 || item == Items.SPIDER_EYE
                 || item == Items.CHORUS_FRUIT;
-    }
-
-    private void setUseHeld(boolean held) {
-        KeyBinding useKey = MC.options.useKey;
-        InputUtil.Key boundKey = ((KeyBindingAccessor) useKey).getBoundKey();
-
-        boolean physicallyPressed = false;
-
-        if (boundKey.getCategory() == InputUtil.Type.KEYSYM) {
-            int keyCode = boundKey.getCode();
-            if (keyCode >= 0) {
-                physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
-            }
-        } else if (boundKey.getCategory() == InputUtil.Type.MOUSE) {
-            int mouseCode = boundKey.getCode();
-            if (mouseCode >= 0) {
-                physicallyPressed = GLFW.glfwGetMouseButton(MC.getWindow().getHandle(), mouseCode) == GLFW.GLFW_PRESS;
-            }
-        }
-
-        useKey.setPressed(physicallyPressed || held);
     }
 }

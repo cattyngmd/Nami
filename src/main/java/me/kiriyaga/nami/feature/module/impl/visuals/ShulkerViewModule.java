@@ -43,6 +43,7 @@ public class ShulkerViewModule extends Module {
     public final BoolSetting bothSides = addSetting(new BoolSetting("both sides", true));
     public final BoolSetting borders = addSetting(new BoolSetting("borders", true));
     public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1, 0.5, 1.5));
+    public final DoubleSetting scrollsensitivity = addSetting(new DoubleSetting("sensitivity", 1, 0.5, 3));
 
     private final List<ShulkerInfo> shulkerList = new ArrayList<>();
     private final int GRID_WIDTH = 20;
@@ -57,7 +58,7 @@ public class ShulkerViewModule extends Module {
     private double clickedX = -1, clickedY = -1;
 
     public ShulkerViewModule() {
-        super("shulker view", "Improves shulker managment. Author @cattyngmd", ModuleCategory.of("visuals"),"shulkerview", "ыргдлукмшуц");
+        super("shulker view", "Improves shulker managment. Author @cattyngmd", ModuleCategory.of("visuals"),"shulkerview");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -93,7 +94,10 @@ public class ShulkerViewModule extends Module {
             int rows = info.rows();
             int cols = info.cols();
 
-            if (currentY >= MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
+            int width = cols * GRID_WIDTH + MARGIN * cols;
+            int height = rows * GRID_HEIGHT + MARGIN * rows;
+
+            if (currentY + height > MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
                 right = true;
                 currentY = MARGIN + offset;
             }
@@ -102,9 +106,6 @@ public class ShulkerViewModule extends Module {
                 float totalWidth = cols * GRID_WIDTH + MARGIN * cols;
                 startX = (int) ((MC.getWindow().getScaledWidth() - totalWidth - MARGIN) / scale);
             }
-
-            int width = cols * GRID_WIDTH + MARGIN * cols;
-            int height = rows * GRID_HEIGHT + MARGIN * rows;
 
            // CHAT_MANAGER.sendRaw("rendering shulker at (" + startX + ", " + currentY + "), size = " + cols + "x" + rows);
 
@@ -132,7 +133,7 @@ public class ShulkerViewModule extends Module {
             }
 
             if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot);
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot, true);
                 clickedX = clickedY = -1;
             }
 
@@ -156,7 +157,7 @@ public class ShulkerViewModule extends Module {
     public void onScroll(MouseScrollEvent event) {
       //  CHAT_MANAGER.sendRaw("mouse scroll event called");
         float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get()).floatValue(), 0);
-        offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * 10, maxOffset, 0);
+        offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * (scrollsensitivity.get() * 10), maxOffset, 0);
     }
 
     private void drawBorder(DrawContext context, int x, int y, int width, int height, int color) {

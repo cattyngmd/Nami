@@ -21,7 +21,7 @@ public class JoinAnnounceModule extends Module {
     public final BoolSetting friends = addSetting(new BoolSetting("friends", true));
 
     public JoinAnnounceModule() {
-        super("join announce", "Announces in chat when a certain player joins the server.", ModuleCategory.of("misc"), "joinannounce", "joins", "announce", "ощштфттщгтсу");
+        super("join announce", "Announces in chat when a certain player joins the server.", ModuleCategory.of("misc"), "joinannounce", "joins", "announce");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -37,8 +37,8 @@ public class JoinAnnounceModule extends Module {
                     boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
 
                     if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                        Text message = CAT_FORMAT.format("Player {g}" + playerName + " {reset}joined the game.");
-                        CHAT_MANAGER.sendPersistent(getClass().getName(), message);
+                        Text message = CAT_FORMAT.format("{g}" + playerName + " {reset}joined the game.");
+                        CHAT_MANAGER.sendPersistent(playerName, message);
                     }
                 }
             }
@@ -53,8 +53,8 @@ public class JoinAnnounceModule extends Module {
                 boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
 
                 if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                    Text message = CAT_FORMAT.format("Player {g}" + playerName + " {reset}has left the game.");
-                    CHAT_MANAGER.sendPersistent(getClass().getName(), message);
+                    Text message = CAT_FORMAT.format("{g}" + playerName + " {reset}has left the game.");
+                    CHAT_MANAGER.sendPersistent(playerName, message);
                 }
             }
         }

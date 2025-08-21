@@ -23,6 +23,7 @@ public class NoRenderModule extends Module {
     public final BoolSetting noFire = addSetting(new BoolSetting("fire", true));
     public final BoolSetting noBackground = addSetting(new BoolSetting("background", true));
     public final BoolSetting noTotemParticle = addSetting(new BoolSetting("totem particle", false));
+    public final BoolSetting noPotionParticle = addSetting(new BoolSetting("potion particle", false));
     public final BoolSetting noFirework = addSetting(new BoolSetting("firework", false));
     public final BoolSetting noWaterParticle = addSetting(new BoolSetting("water particle", true));
     public final BoolSetting noExplosion = addSetting(new BoolSetting("explosion particle", true));
@@ -33,7 +34,7 @@ public class NoRenderModule extends Module {
     public final BoolSetting noTotem = addSetting(new BoolSetting("totem", true));
     public final BoolSetting noBossBar = addSetting(new BoolSetting("boss", true));
     public final BoolSetting noPortal = addSetting(new BoolSetting("portal", true));
-    public final BoolSetting noPotIcon = addSetting(new BoolSetting("pot", true));
+    public final BoolSetting noPotIcon = addSetting(new BoolSetting("potion icon", true));
     public final BoolSetting noFog = addSetting(new BoolSetting("fog", true));
     public final BoolSetting noArmor = addSetting(new BoolSetting("armor", true));
     public final BoolSetting noNausea = addSetting(new BoolSetting("nausea", true));
@@ -83,6 +84,9 @@ public class NoRenderModule extends Module {
             ev.cancel();
 
         if (noTotemParticle.get() && ev.getParticle().getType() == ParticleTypes.TOTEM_OF_UNDYING)
+            ev.cancel();
+
+        if (noPotionParticle.get() && ev.getParticle().getType() == ParticleTypes.ENTITY_EFFECT)
             ev.cancel();
 
         if (noFirework.get() && ev.getParticle().getType() == ParticleTypes.FIREWORK)

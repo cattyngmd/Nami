@@ -30,7 +30,7 @@ public class AutoSheepModule extends Module {
     private int swapCooldown = 0;
 
     public AutoSheepModule() {
-        super("auto sheep", "Automatically shears nearby sheep.", ModuleCategory.of("world"), "sheep", "autowool", "фгещырууз");
+        super("auto sheep", "Automatically shears nearby sheep.", ModuleCategory.of("world"), "sheep", "autowool");
         rotationPriority.setShowCondition(rotate::get);
     }
 

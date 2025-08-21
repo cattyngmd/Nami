@@ -18,7 +18,7 @@ public class LowTotemModule extends Module {
     public final DoubleSetting amount = addSetting(new DoubleSetting("amount", 0.3, 0.1, 0.5));
 
     public LowTotemModule() {
-        super("low totem", "Makes your shield/totem lower.", ModuleCategory.of("visuals"), "lowshield", "lowtotem", "дщцещеуь");
+        super("low totem", "Makes your shield/totem lower.", ModuleCategory.of("visuals"), "lowshield", "lowtotem");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

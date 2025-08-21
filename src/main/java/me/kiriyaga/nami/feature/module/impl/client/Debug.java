@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
@@ -19,9 +20,8 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class Debug extends Module {
 
-    public final BoolSetting auraGet = addSetting(new BoolSetting("aura", false));
-    public final BoolSetting ping = addSetting(new BoolSetting("ping", false));
-    public final BoolSetting shulkerSave = addSetting(new BoolSetting("shulkerSave", false));
+    private final BoolSetting aura = addSetting(new BoolSetting("aura", false));
+    private final BoolSetting ping = addSetting(new BoolSetting("ping", false));
 
     private Integer savedSyncId = null;
 
@@ -29,40 +29,56 @@ public class Debug extends Module {
         super("debug", ".", ModuleCategory.of("client"), "debug");
     }
 
-    @Override
-    public void onEnable() {
-        if (shulkerSave.get() && savedSyncId != null) {
-            if (MC.player != null && MC.player.currentScreenHandler != null) {
-                int currentSyncId = MC.player.currentScreenHandler.syncId;
-
-                if (currentSyncId != savedSyncId) {
-                    CHAT_MANAGER.sendRaw("No sync id");
-                    toggle();
-                } else {
-                    CHAT_MANAGER.sendRaw("sync id matched: " + currentSyncId + " " + savedSyncId);
-                }
-            }
+    public boolean debugAura(Text text){
+        if (this.isEnabled() && aura.get()) {
+            CHAT_MANAGER.sendRaw(text);
+            return true;
         }
+        return false;
     }
 
-    @SubscribeEvent
-    public void onPacketReceive(PacketReceiveEvent event) {
-        if (!shulkerSave.get()) return;
-
-        if (event.getPacket() instanceof OpenScreenS2CPacket packet) {
-            if (packet.getScreenHandlerType().equals(net.minecraft.screen.ScreenHandlerType.SHULKER_BOX)) {
-                savedSyncId = packet.getSyncId();
-            }
+    public boolean debugPing(Text text){
+        if (this.isEnabled() && ping.get()) {
+            CHAT_MANAGER.sendRaw(text);
+            return true;
         }
+        return false;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private void onUpdate(PreTickEvent ev) {
-        if (!shulkerSave.get()) return;
-
-        Screen currentScreen = MC.currentScreen;
-        if (currentScreen == null && isEnabled()) {
-            toggle();
-        }
-    }
+//    @Override
+//    public void onEnable() {
+//        if (shulkerSave.get() && savedSyncId != null) {
+//            if (MC.player != null && MC.player.currentScreenHandler != null) {
+//                int currentSyncId = MC.player.currentScreenHandler.syncId;
+//
+//                if (currentSyncId != savedSyncId) {
+//                    CHAT_MANAGER.sendRaw("No sync id");
+//                    toggle();
+//                } else {
+//                    CHAT_MANAGER.sendRaw("sync id matched: " + currentSyncId + " " + savedSyncId);
+//                }
+//            }
+//        }
+//    }
+//
+//    @SubscribeEvent
+//    public void onPacketReceive(PacketReceiveEvent event) {
+//        if (!shulkerSave.get()) return;
+//
+//        if (event.getPacket() instanceof OpenScreenS2CPacket packet) {
+//            if (packet.getScreenHandlerType().equals(net.minecraft.screen.ScreenHandlerType.SHULKER_BOX)) {
+//                savedSyncId = packet.getSyncId();
+//            }
+//        }
+//    }
+//
+//    @SubscribeEvent(priority = EventPriority.HIGHEST)
+//    private void onUpdate(PreTickEvent ev) {
+//        if (!shulkerSave.get()) return;
+//
+//        Screen currentScreen = MC.currentScreen;
+//        if (currentScreen == null && isEnabled()) {
+//            toggle();
+//        }
+//    }
 }

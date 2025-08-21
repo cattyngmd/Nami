@@ -1,14 +1,17 @@
-# Nami Client 1.21.8
+# Nami 1.21.8
 
-<p align="center">
-  <a href="https://github.com/Kiriyaga7615/2bEssentials/releases">
+<p align="left">
+  <a href="https://github.com/Kiriyaga7615/Nami/releases">
+    <img src="https://img.shields.io/github/downloads/Kiriyaga7615/2bEssentials/total?color=green&label=Total%20Downloads" alt="Total Downloads" />
+  </a>
+  <a href="https://github.com/Kiriyaga7615/Nami/releases">
     <img src="https://img.shields.io/github/v/release/Kiriyaga7615/2bEssentials?color=blue&label=Latest%20Release" alt="Latest Release" />
   </a>
-  <a href="https://github.com/Kiriyaga7615/2bEssentials/blob/master/LICENSE">
+  <a href="https://github.com/Kiriyaga7615/Nami/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/Kiriyaga7615/2bEssentials?color=blue" alt="License" />
   </a>
   <a href="https://discord.gg/qy3eS42beW">
-    <img src="https://img.shields.io/discord/your_discord_id_here?color=7289DA&label=Discord" alt="Discord" />
+    <img src="https://img.shields.io/discord/1298742596633497744?color=7289DB&label=Discord" alt="Discord" />
   </a>
 </p>
 
@@ -18,10 +21,6 @@
 
 
 **Nami** is a modular and lightweight anarchy client base built for PVE and automation.  
-
-The 1.21.4 branch is outdated!
-
-Please do not use viafabric/viafabricplus on servers 1.21.4 or lower!
 
 Most popular Minecraft clients are closed-source, paid, and obfuscated, making them difficult to audit or trust. Some may include backdoors or malicious code.
 
@@ -34,8 +33,8 @@ This project started as a clean, open-source alternative aiming to be transparen
 <details>
 <summary>View screenshots</summary>
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1fcb07c5-e0fd-4d7b-b235-96eb4ad15200" />
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d0135f76-4851-4674-aee1-8257cc1092c6" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/200e7c2a-bfd0-4c2f-b7f1-f976a4e110f0" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/815adf88-c8fd-44f0-8f8d-f169a9d52b8b" />
 
 </details>
 
@@ -59,20 +58,13 @@ The default command prefix is `-`.
 
 </details>
 
-<details>
-<summary>Can I use a custom font?</summary>
-
-Please use the Caxton mod instead of the built-in client font renderers.
-
-</details>
-
 ---
 
 ## Requirements
 
 - Java 21  
 - Gradle 8+  
-- Minecraft 1.21.7  
+- Minecraft 1.21.8  
 - Fabric loader, API
 
 ---
@@ -81,19 +73,27 @@ Please use the Caxton mod instead of the built-in client font renderers.
 
 1. Clone the repository:
 
+    ```bash
     git clone https://github.com/Kiriyaga7615/Nami.git  
     cd nami
+    ```
 
 2. Build with Gradle:
 
-    Linux / macOS  
+    Linux / macOS
+    ```bash
     ./gradlew build
+    ```
 
     Windows  
+    ```bat
     gradlew.bat build
+    ```
 
 The compiled JAR will be located at:  
 `build/libs/nami-<version>.jar`
+
+Do not launch -unremapped!
 
 ---
 

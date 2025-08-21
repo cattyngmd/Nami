@@ -41,14 +41,13 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
-
         if (MODULE_MANAGER.getStorage() == null) return;
         RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
         if (rotationModule == null || !rotationModule.moveFix.get()) return;
+        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
-        originalYaw = this.getYaw();
-        originalPitch = this.getPitch();
+        originalYaw = super.getYaw();
+        originalPitch = super.getPitch();
 
         float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
         float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
@@ -70,50 +69,13 @@ public abstract class MixinLivingEntity extends Entity {
         this.setPitch(originalPitch);
     }
 
-    @ModifyVariable(method = "travel", at = @At("HEAD"), ordinal = 0)
-    private Vec3d modifyMovementInput(Vec3d movementInput) {
-        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return movementInput;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return movementInput;
-
-        if (MODULE_MANAGER.getStorage() == null) return movementInput;
-        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
-        if (rotationModule == null || !rotationModule.moveFix.get()) return movementInput;
-
-        if (movementInput.lengthSquared() < 1e-4) return movementInput;
-
-        float realYaw = originalYaw;
-        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-
-        float clampedSpoofYaw = findClosestValidYaw(spoofYaw);
-
-        Vec3d globalMovement = localToGlobal(movementInput, realYaw);
-
-        Vec3d clampedLocalMovement = globalToLocal(globalMovement, clampedSpoofYaw);
-
-        return clampedLocalMovement;
-    }
-
-    private float findClosestValidYaw(float yaw) {
-        float[] allowedYawAngles = new float[]{0, 45, 90, 135, 180, 225, 270, 315};
-        float bestYaw = allowedYawAngles[0];
-        float minDiff = Float.MAX_VALUE;
-        for (float allowedYaw : allowedYawAngles) {
-            float diff = Math.abs(((allowedYaw - yaw + 540f) % 360f) - 180f);
-            if (diff < minDiff) {
-                minDiff = diff;
-                bestYaw = allowedYaw;
-            }
-        }
-        return bestYaw;
-    }
-
     private Vec3d localToGlobal(Vec3d localVec, float yaw) {
         double rad = Math.toRadians(yaw);
         double cos = Math.cos(rad);
         double sin = Math.sin(rad);
 
         double x = localVec.x * cos - localVec.z * sin;
-        double z = localVec.z * cos + localVec.x * sin;
+        double z = localVec.x * sin + localVec.z * cos;
 
         return new Vec3d(x, localVec.y, z);
     }
@@ -124,7 +86,7 @@ public abstract class MixinLivingEntity extends Entity {
         double sin = Math.sin(rad);
 
         double x = globalVec.x * cos + globalVec.z * sin;
-        double z = globalVec.z * cos - globalVec.x * sin;
+        double z = -globalVec.x * sin + globalVec.z * cos;
 
         return new Vec3d(x, globalVec.y, z);
     }
@@ -172,41 +134,41 @@ public abstract class MixinLivingEntity extends Entity {
         ci.cancel();
     }
 
-    @Inject(method = "setSprinting", at = @At("HEAD"), cancellable = true)
-    private void setSprinting(boolean sprinting, CallbackInfo ci) {
-        if ((Object)this != MinecraftClient.getInstance().player) return;
-
-        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class) : null;
-        if (rotationModule == null || ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating() || !rotationModule.sprintFix.get())
-            return;
-
-        if (sprinting && MC.player.input != null) {
-            Vec2f movement = MC.player.input.getMovementInput();
-            float forward = movement.x;
-            float sideways = movement.y;
-
-            if (forward == 0 && sideways == 0) {
-                ci.cancel();
-                super.setSprinting(false);
-                return;
-            }
-
-            float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-            float realYaw = MC.player.getYaw();
-
-            Vec3d localMovement = new Vec3d(sideways, 0, forward);
-            Vec3d globalMovement = localToGlobal(localMovement, realYaw);
-
-            Vec3d localRelativeToSpoof = globalToLocal(globalMovement, spoofYaw);
-
-            double moveAngleRad = Math.atan2(localRelativeToSpoof.z, localRelativeToSpoof.x);
-            float moveAngleDeg = (float) Math.toDegrees(moveAngleRad);
-            moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
-
-            if (Math.abs(moveAngleDeg) > 45f) {
-                ci.cancel();
-                super.setSprinting(false);
-            }
-        }
-    }
+//    @Inject(method = "setSprinting", at = @At("HEAD"), cancellable = true)
+//    private void setSprinting(boolean sprinting, CallbackInfo ci) {
+//        if ((Object)this != MinecraftClient.getInstance().player) return;
+//
+//        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class) : null;
+//        if (rotationModule == null || ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating() || !rotationModule.sprintFix.get())
+//            return;
+//
+//        if (sprinting && MC.player.input != null) {
+//            Vec2f movement = MC.player.input.getMovementInput();
+//            float forward = movement.x;
+//            float sideways = movement.y;
+//
+//            if (forward == 0 && sideways == 0) {
+//                ci.cancel();
+//                super.setSprinting(false);
+//                return;
+//            }
+//
+//            float spoofYaw = lastSendedYaw;
+//            float realYaw = MC.player.getYaw();
+//
+//            Vec3d localMovement = new Vec3d(sideways, 0, forward);
+//            Vec3d globalMovement = localToGlobal(localMovement, realYaw);
+//
+//            Vec3d localRelativeToSpoof = globalToLocal(globalMovement, spoofYaw);
+//
+//            double moveAngleRad = Math.atan2(localRelativeToSpoof.z, localRelativeToSpoof.x);
+//            float moveAngleDeg = (float) Math.toDegrees(moveAngleRad);
+//            moveAngleDeg = MathHelper.wrapDegrees(moveAngleDeg);
+//
+//            if (Math.abs(moveAngleDeg) > 33f) {
+//                ci.cancel();
+//                super.setSprinting(false);
+//            }
+//        }
+//    }
 }

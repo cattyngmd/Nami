@@ -14,7 +14,7 @@ public class SprintResetModule extends Module {
     private final IntSetting chance = addSetting(new IntSetting("chance", 100, 0, 100));
 
     public SprintResetModule() {
-        super("sprint reset", "Control how sprint resets after attacking.", ModuleCategory.of("movement"), "ызкштекуыуе");
+        super("sprint reset", "Control how sprint resets after attacking.", ModuleCategory.of("movement"), "sprintreset");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

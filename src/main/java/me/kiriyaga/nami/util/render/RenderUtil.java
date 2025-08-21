@@ -401,6 +401,7 @@ public class RenderUtil {
 
         float s = scale * 13f;
         matrices.scale(s, s, s);
+        matrices.scale(1.0f, 1.0f, 0.0001f);
 
         itemRenderer.renderItem(
                 stack,

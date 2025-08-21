@@ -35,7 +35,7 @@ public class AutoFrameModule extends Module {
     private final Set<Integer> clickedFrames = new HashSet<>();
 
     public AutoFrameModule() {
-        super("auto frame", "Automatically puts a map in nearby item frames.", ModuleCategory.of("world"));
+        super("auto frame", "Automatically puts a map in nearby item frames.", ModuleCategory.of("world"), "autoframe");
     rotationPriority.setShowCondition(rotate::get);
     }
 

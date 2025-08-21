@@ -16,7 +16,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class ParkourModule extends Module {
 
     public ParkourModule() {
-        super("parkour", "Automatically jumps at the edge of blocks.", ModuleCategory.of("movement"), "зфклщгк");
+        super("parkour", "Automatically jumps at the edge of blocks.", ModuleCategory.of("movement"));
     }
 
     @Override

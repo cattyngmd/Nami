@@ -1,7 +1,12 @@
 package me.kiriyaga.nami.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
+import me.kiriyaga.nami.feature.module.impl.combat.ReachModule;
+import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.PortalGuiModule;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
@@ -68,8 +73,6 @@ public abstract class MixinClientPlayerEntity {
         }
     }
 
-
-
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
         if (!ROTATION_MANAGER.getStateHandler().isRotating())
@@ -111,5 +114,27 @@ public abstract class MixinClientPlayerEntity {
     @Shadow
     private static Vec2f applyDirectionalMovementSpeedFactors(Vec2f vec2f) {
         throw new AssertionError();
+    }
+
+    @Inject(method = "shouldSlowDown", at = @At("HEAD"), cancellable = true)
+    private void shouldSlowDown(CallbackInfoReturnable<Boolean> info) {
+        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class) == null || !MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class).isEnabled() || !MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class).fastCrawl.get())
+            return;
+
+        boolean b = !MC.player.isCrawling();
+        if (b) return;
+
+        info.setReturnValue(b);
+    }
+
+    @ModifyExpressionValue(method = "tickNausea", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;"))
+    private Screen tickNausea(Screen s) {
+        if (MODULE_MANAGER == null)
+            return s;
+
+        if (MODULE_MANAGER.getStorage().getByClass(PortalGuiModule.class).isEnabled())
+            return null;
+
+        return s;
     }
 }

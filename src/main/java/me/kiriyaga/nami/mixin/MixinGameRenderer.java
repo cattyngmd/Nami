@@ -2,7 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.kiriyaga.nami.feature.module.impl.combat.NoEntityTrace;
+import me.kiriyaga.nami.feature.module.impl.combat.NoEntityTraceModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.MinecraftClient;
@@ -13,7 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import org.spongepowered.asm.mixin.Final;
@@ -125,14 +124,14 @@ public abstract class MixinGameRenderer {
 
     @ModifyReturnValue(method = "findCrosshairTarget", at = @At("RETURN"))
     private HitResult findCrosshairTarget(HitResult original, @Local HitResult hitResult) {
-        NoEntityTrace noEntityTrace = MODULE_MANAGER.getStorage().getByClass(NoEntityTrace.class);
-        if (noEntityTrace == null || !noEntityTrace.isEnabled()) {
+        NoEntityTraceModule noEntityTraceModule = MODULE_MANAGER.getStorage().getByClass(NoEntityTraceModule.class);
+        if (noEntityTraceModule == null || !noEntityTraceModule.isEnabled()) {
             return original;
         }
 
         if (hitResult.getType() == HitResult.Type.BLOCK) {
-            boolean playerOnly = noEntityTrace.playerOnly.get();
-            boolean pickaxeOnly = noEntityTrace.pickaxeOnly.get();
+            boolean playerOnly = noEntityTraceModule.playerOnly.get();
+            boolean pickaxeOnly = noEntityTraceModule.pickaxeOnly.get();
 
             var targetEntity = getTargetedEntity();
             var mainHandItem = MC.player.getMainHandStack().getItem();

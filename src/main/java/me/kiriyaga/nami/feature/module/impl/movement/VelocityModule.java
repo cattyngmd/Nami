@@ -249,7 +249,6 @@ public class VelocityModule extends Module {
         return false;
     }
 
-
     private void scaleVelocityPacket(EntityVelocityUpdateS2CPacket packet) {
         int scaledX = (int) (packet.getVelocityX() * (horizontalPercent.get() / 100.0));
         int scaledY = (int) (packet.getVelocityY() * (verticalPercent.get() / 100.0));

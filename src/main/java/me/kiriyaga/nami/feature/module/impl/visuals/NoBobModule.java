@@ -15,7 +15,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class NoBobModule extends Module {
 
     public NoBobModule() {
-        super("no bob", "Disables bobbing.", ModuleCategory.of("visuals"), "nobob", "тщищ");
+        super("no bob", "Disables bobbing.", ModuleCategory.of("visuals"), "nobob");
     }
 
     /*

@@ -21,6 +21,30 @@ public class ConfigManager {
     private final FriendStorage friendStorage = new FriendStorage(dirProvider);
     private final MacroStorage macroStorage = new MacroStorage(dirProvider);
 
+    public ConfigDirectoryProvider getDirectoryProvider() {
+        return dirProvider;
+    }
+
+    public ModuleConfigWriter getModuleWriter() {
+        return moduleWriter;
+    }
+
+    public ModuleConfigReader getModuleLoader() {
+        return moduleLoader;
+    }
+
+    public ConfigSerializer getConfigSerializer() {
+        return configSerializer;
+    }
+
+    public FriendStorage getFriendStorage() {
+        return friendStorage;
+    }
+
+    public MacroStorage getMacroStorage() {
+        return macroStorage;
+    }
+
     public void saveModules() {
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             moduleWriter.saveModule(module);

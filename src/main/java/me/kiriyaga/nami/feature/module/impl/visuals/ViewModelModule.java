@@ -25,7 +25,7 @@ public class ViewModelModule extends Module {
     public final DoubleSetting rotZ = addSetting(new DoubleSetting("rotZ", 0.0, -180.0, 180.0));
 
     public ViewModelModule() {
-        super("viewmodel", "Modifies hand position, scale, and rotation.", ModuleCategory.of("visuals"), "vm", "handpos", "мшуцьщвуд");
+        super("viewmodel", "Modifies hand position, scale, and rotation.", ModuleCategory.of("visuals"), "vm", "handpos");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

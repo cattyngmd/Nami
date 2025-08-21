@@ -10,7 +10,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class NoTiltModule extends Module {
 
     public NoTiltModule() {
-        super("no tilt", "Disables damage tilting.", ModuleCategory.of("visuals"), "notilt", "тщешде");
+        super("no tilt", "Disables damage tilting.", ModuleCategory.of("visuals"), "notilt");
     }
 
     /*

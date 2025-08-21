@@ -12,7 +12,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 public class MultiTaskModule extends Module {
 
     public MultiTaskModule() {
-        super("multi task", "Allows you using and breaking interaction at the same time.", ModuleCategory.of("world"), "multitask", "ьгдешефыл");
+        super("multi task", "Allows you using and breaking interaction at the same time.", ModuleCategory.of("world"), "multitask");
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)

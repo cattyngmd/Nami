@@ -8,6 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
+import static me.kiriyaga.nami.Nami.CLICK_GUI;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
@@ -24,19 +25,15 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
-        context.fill(x, y, x + WIDTH, y + HEIGHT, toRGBA(bgColor));
+        int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
+        int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
+
+        context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(
-                textRenderer,
-                setting.getName(),
-                textX,
-                textY,
-                toRGBA(textCol),
-                false
-        );
+        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, true);
 
         renderSlider(
                 context,
@@ -53,12 +50,14 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
         int lineOffset = 1;
         if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
             context.fill(
-                x,
-                y - lineOffset,
-                x + 1,
-                y + HEIGHT,
-                setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
-        );
+                    x,
+                    y - lineOffset,
+                    x + 1,
+                    y + HEIGHT,
+                    CLICK_GUI.applyFade(
+                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                    )
+            );
 
         String valStr = String.valueOf(setting.get());
         context.drawText(
@@ -66,8 +65,8 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
                 valStr,
                 x + WIDTH - PADDING - textRenderer.getWidth(valStr),
                 textY,
-                toRGBA(textCol),
-                false
+                textColorInt,
+                true
         );
     }
 
@@ -84,13 +83,13 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
 
     private void renderSlider(DrawContext context, int x, int y, int width, int height,
                               int value, int min, int max, Color color) {
-        context.fill(x, y, x + width, y + height, toRGBA(new Color(60, 60, 60, 150)));
+        context.fill(x, y, x + width, y + height, CLICK_GUI.applyFade(toRGBA(new Color(60, 60, 60, 150))));
 
         value = Math.max(min, Math.min(max, value));
         double percent = (value - min) / (double)(max - min);
         int filledWidth = (int)(width * percent);
 
-        context.fill(x, y, x + filledWidth, y + height, toRGBA(color));
+        context.fill(x, y, x + filledWidth, y + height, CLICK_GUI.applyFade(toRGBA(color)));
     }
 
     private int slideInt(int start, double deltaX, IntSetting setting) {

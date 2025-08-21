@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.gui.components.ModulePanel;
 import me.kiriyaga.nami.feature.gui.components.SettingPanel;
@@ -13,12 +14,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 import java.util.*;
 import java.awt.Point;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class ClickGuiScreen extends Screen {
     private final Set<ModuleCategory> expandedCategories = new HashSet<>();
@@ -29,10 +30,19 @@ public class ClickGuiScreen extends Screen {
     private ModuleCategory draggedModuleCategory = null;
     public float scale = 1;
     private Screen previousScreen = null;
+    private static final long FADE_DURATION_MS = 122L;
+    private long fadeStartMs = Util.getMeasuringTimeMs();
+    private boolean closing = false;
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
+
+    // TODO: unhardcode this garbage
+    private final List<Text> statusMessages = Arrays.asList(
+            Text.literal("Middle-click a module to toggle its drawn state."),
+            Text.literal("Middle-click a keybind to switch hold/toggle mode.")
+    );
 
     public ClickGuiScreen() {
         super(Text.literal("NamiGui"));
@@ -44,14 +54,24 @@ public class ClickGuiScreen extends Screen {
         int x = 20;
         int y = 20;
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
             categoryPositions.putIfAbsent(moduleCategory, new Point(x, y));
-            x += CategoryPanel.WIDTH + CategoryPanel.GAP;
+            x += CategoryPanel.WIDTH + 1;
         }
         categoryPositions.keySet().removeIf(cat -> !ModuleCategory.getAll().contains(cat));
     }
 
     @Override
+    protected void init() {
+        super.init();
+        fadeStartMs = Util.getMeasuringTimeMs();
+        closing = false;
+    }
+
+    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        checkClose();
         syncCategoryPositions();
 
         if (previousScreen instanceof TitleScreen
@@ -70,10 +90,22 @@ public class ClickGuiScreen extends Screen {
         context.getMatrices().push();
         context.getMatrices().scale(scale, scale, 1.0f);
 
+        int startY = this.height - 1;
+        for (int i = statusMessages.size() - 1; i >= 0; i--) {
+            Text message = statusMessages.get(i);
+            int textWidth = textRenderer.getWidth(message);
+            int x = this.width - textWidth - 1;
+            int y = startY - textRenderer.fontHeight;
+            context.drawText(textRenderer, message, x, y, applyFade(0xFFFFFFFF), true);
+            startY = y;
+        }
+
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
             Point pos = categoryPositions.get(moduleCategory);
             if (pos == null) continue;
 
@@ -84,6 +116,7 @@ public class ClickGuiScreen extends Screen {
         if (clickGuiModule != null && clickGuiModule.descriptions.get()) {
             for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
                 if (!expandedCategories.contains(moduleCategory)) continue;
+                if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
 
                 Point pos = categoryPositions.get(moduleCategory);
                 if (pos == null) continue;
@@ -105,7 +138,7 @@ public class ClickGuiScreen extends Screen {
 
                             context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2,
                                     0x7F000000);
-                            context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, false);
+                            context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
                         }
                         context.getMatrices().pop();
                         return;
@@ -136,6 +169,8 @@ public class ClickGuiScreen extends Screen {
         int scaledMouseY = (int) (mouseY / scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
             Point pos = categoryPositions.get(moduleCategory);
             if (pos == null) continue;
 
@@ -159,6 +194,8 @@ public class ClickGuiScreen extends Screen {
 
         if (!draggingCategory) {
             for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+                if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
                 if (expandedCategories.contains(moduleCategory)) {
                     Point pos = categoryPositions.get(moduleCategory);
                     if (pos == null) continue;
@@ -206,15 +243,23 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
-            MC.setScreen(null);
+        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.currentScreen == CLICK_GUI && MC.world != null) {
+            beginClose();
+            return true;
+        }
+        if (keyCode == 256) {
+            beginClose();
             return true;
         }
 
-        if (SettingPanel.keyPressed(keyCode)) {
-            return true;
-        }
+        if (SettingPanel.keyPressed(keyCode)) return true;
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    private void beginClose() {
+        if (closing) return;
+        closing = true;
+        fadeStartMs = Util.getMeasuringTimeMs();
     }
 
     @Override
@@ -268,5 +313,37 @@ public class ClickGuiScreen extends Screen {
 
     public void setPreviousScreen(Screen previousScreen) {
         this.previousScreen = previousScreen;
+    }
+
+    private float getFadeFactor() {
+        long elapsed = Util.getMeasuringTimeMs() - fadeStartMs;
+        float t = Math.min(1.0f, Math.max(0.0f, elapsed / (float) FADE_DURATION_MS));
+        return closing ? (1.0f - t) : t;
+    }
+
+    private void checkClose() { // shitcode ikik
+        ClickGuiModule clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
+        if (!closing) return;
+
+        if (clickGuiModule.fade.get()) {
+            if (getFadeFactor() <= 0.0f) {
+                MC.setScreen(null);
+            }
+        } else {
+            MC.setScreen(null);
+        }
+    }
+
+    public int applyFade(int argb) {
+        if (!MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).fade.get())
+            return argb;
+
+        int a = (argb >>> 24) & 0xFF;
+        int rgb = argb & 0x00FFFFFF;
+        float factor = getFadeFactor();
+        int newA = Math.round(a * factor);
+        if (newA < 0) newA = 0;
+        if (newA > a) newA = a;
+        return (newA << 24) | rgb;
     }
 }

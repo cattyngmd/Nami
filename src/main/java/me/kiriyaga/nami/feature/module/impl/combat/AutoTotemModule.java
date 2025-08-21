@@ -63,12 +63,7 @@ public class AutoTotemModule extends Module {
         }
         this.setDisplayInfo(String.valueOf(totemCount));
 
-        if (MC.currentScreen == null || MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof ChatScreen || MC.currentScreen instanceof ClickGuiScreen || MC.currentScreen instanceof HudEditorScreen) {
-            attemptPlaceTotem();
-            removeDeathReason("invfail");
-        } else {
-            addDeathReason("invfail", "WRONG_SCREEN");
-        }
+        attemptPlaceTotem();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

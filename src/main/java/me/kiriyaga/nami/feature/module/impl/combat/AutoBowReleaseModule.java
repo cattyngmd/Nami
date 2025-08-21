@@ -26,7 +26,7 @@ public class AutoBowReleaseModule extends Module {
     private float ticker = 0f;
 
     public AutoBowReleaseModule() {
-        super("auto bow release", "Automatically releases bow after holding for a set time.", ModuleCategory.of("combat"));
+        super("auto bow release", "Automatically releases bow after holding for a set time.", ModuleCategory.of("combat"), "autbowrelease");
     }
 
     @Override

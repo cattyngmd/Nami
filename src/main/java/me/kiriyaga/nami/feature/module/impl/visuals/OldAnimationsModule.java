@@ -15,6 +15,6 @@ import static me.kiriyaga.nami.Nami.MC;
 public class OldAnimationsModule extends Module {
 
     public OldAnimationsModule() {
-        super("old animations", "Makes your hands animated like 1.8.", ModuleCategory.of("visuals"), "oldanimations","щдвфтшьфешщты");
+        super("old animations", "Makes your hands animated like 1.8.", ModuleCategory.of("visuals"), "oldanimations");
     }
 }
