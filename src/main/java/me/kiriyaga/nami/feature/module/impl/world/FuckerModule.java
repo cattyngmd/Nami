@@ -121,9 +121,16 @@ public class FuckerModule extends Module {
 
         if (block == Blocks.BEDROCK || state.isAir()) return false;
 
-        return block instanceof CropBlock
-                || block instanceof SweetBerryBushBlock
-                || block instanceof TallPlantBlock;
+        if (block instanceof CropBlock cropBlock) {
+            return cropBlock.isMature(state);
+        }
+
+        if (block instanceof SweetBerryBushBlock) {
+            Integer age = state.get(SweetBerryBushBlock.AGE);
+            return age != null && age >= 3; // it should be 3 but im not sure TODO: check this
+        }
+
+        return false;
     }
 
     private boolean isSugarCaneBlock(BlockPos pos) {
