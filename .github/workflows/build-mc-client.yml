@@ -46,6 +46,13 @@ jobs:
           SAFE_BRANCH="${SAFE_BRANCH//./-}"
           echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
 
+      - name: Rename JAR to include branch
+        run: |
+          for jar in build/libs/*.jar; do
+            BASENAME=$(basename "$jar")
+            mv "$jar" "build/libs/nami-${SAFE_BRANCH}-${BASENAME}"
+          done
+
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
         with:
@@ -83,7 +90,7 @@ jobs:
       - name: Upload all JARs to Release
         run: |
           shopt -s nullglob
-          JAR_FILES=(./artifact/*.jar)
+          JAR_FILES=(./artifact/*/*.jar)
           if [ ${#JAR_FILES[@]} -eq 0 ]; then
             echo "No JAR files found, exiting"
             exit 1
