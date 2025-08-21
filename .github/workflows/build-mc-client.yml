@@ -1,21 +1,25 @@
 name: build release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - '**'
-  workflow_dispatch:
 
 jobs:
   build:
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [1.21.5, 1.21.8]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: true
-          ref: ${{ github.ref_name }}
+          ref: ${{ matrix.branch }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -36,10 +40,13 @@ jobs:
       - name: List files in build/libs
         run: ls -l build/libs/
 
+      - name: Set safe branch name
+        run: echo "SAFE_BRANCH=${{ matrix.branch//./- }}" >> $GITHUB_ENV
+
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
         with:
-          name: nami-${{ github.ref_name }}
+          name: nami-${{ env.SAFE_BRANCH }}
           path: build/libs/*.jar
 
   release:
@@ -47,24 +54,18 @@ jobs:
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
+      - name: Set version for release
+        run: |
+          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
+          echo "VERSION=multi-branch-latest-${SHORT_SHA}" >> $GITHUB_ENV
 
-      - name: Download artifact
+      - name: Download all branch artifacts
         uses: actions/download-artifact@v4
         with:
-          name: nami-${{ github.ref_name }}
           path: ./artifact
 
       - name: List downloaded files
         run: ls -l ./artifact
-
-      - name: Set version from branch name and short SHA
-        run: |
-          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
-          echo "VERSION=${GITHUB_REF_NAME}-${SHORT_SHA}" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -72,14 +73,15 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: Nami ${{ env.VERSION }}
           body: |
-            Release for branch ${{ github.ref_name }}
+            Combined release for branches: 1.21.5 and 1.21.8
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
-      - name: Upload JAR to Release
+      - name: Upload all JARs to Release
         run: |
-          JAR_FILE=$(ls ./artifact/*.jar | head -n 1)
-          echo "Uploading $JAR_FILE to release tag ${{ env.VERSION }}"
-          gh release upload ${{ env.VERSION }} "$JAR_FILE" --clobber
+          for file in ./artifact/*.jar; do
+            echo "Uploading $file to release tag ${{ env.VERSION }}"
+            gh release upload ${{ env.VERSION }} "$file" --clobber
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
