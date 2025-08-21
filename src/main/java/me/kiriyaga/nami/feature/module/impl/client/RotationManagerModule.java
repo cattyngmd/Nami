@@ -18,7 +18,6 @@ public class RotationManagerModule extends Module {
     public final DoubleSetting jitterMaxYaw = addSetting(new DoubleSetting("jitter vertical", 1, 0, 3));
     public final DoubleSetting jitterMaxPitch = addSetting(new DoubleSetting("jitter horizontal", 2, 0, 5));
     public final BoolSetting moveFix = addSetting(new BoolSetting("move fix", true));
-    public final BoolSetting sprintFix = addSetting(new BoolSetting("sprint fix", true));
 
     public RotationManagerModule() {
         super("rotation manager", "Allows you to config rotation manager settings.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager");

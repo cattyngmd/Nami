@@ -5,6 +5,7 @@ import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 import me.kiriyaga.nami.mixin.InputAccessor;
+import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 
@@ -60,6 +61,13 @@ public class RotationTickHandler {
 
     private void fixMovementForSpoof() {
         if (MC.player == null) return;
+
+        InputCache.update(
+                MC.options.forwardKey.isPressed(),
+                MC.options.backKey.isPressed(),
+                MC.options.leftKey.isPressed(),
+                MC.options.rightKey.isPressed()
+        );
 
         float realYaw = MC.player.getYaw();
         float spoofYaw = stateHandler.getRotationYaw();
