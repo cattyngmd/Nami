@@ -76,7 +76,7 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: Nami ${{ env.VERSION }}
           body: |
-            Combined release for branches: 1.21.5 and 1.21.8
+            wrw
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
