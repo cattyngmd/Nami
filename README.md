@@ -1,10 +1,13 @@
 # Nami Client 1.21.8
 
 <p align="center">
-  <a href="https://github.com/Kiriyaga7615/2bEssentials/releases">
+  <a href="https://github.com/Kiriyaga7615/Nami/releases">
+    <img src="https://img.shields.io/github/downloads/Kiriyaga7615/2bEssentials/total?color=green&label=Total%20Downloads" alt="Total Downloads" />
+  </a>
+  <a href="https://github.com/Kiriyaga7615/Nami/releases">
     <img src="https://img.shields.io/github/v/release/Kiriyaga7615/2bEssentials?color=blue&label=Latest%20Release" alt="Latest Release" />
   </a>
-  <a href="https://github.com/Kiriyaga7615/2bEssentials/blob/master/LICENSE">
+  <a href="https://github.com/Kiriyaga7615/Nami/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/Kiriyaga7615/2bEssentials?color=blue" alt="License" />
   </a>
   <a href="https://discord.gg/qy3eS42beW">
