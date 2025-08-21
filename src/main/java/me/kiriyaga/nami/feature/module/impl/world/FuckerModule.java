@@ -21,7 +21,8 @@ public class FuckerModule extends Module {
 
     public enum Mode {
         FARM,
-        SUGAR_CANE
+        SUGAR_CANE,
+        GRASS
     }
 
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.FARM));
@@ -39,7 +40,7 @@ public class FuckerModule extends Module {
         s.clear();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTickEvent(PreTickEvent ev) {
         if (MC.player == null || MC.world == null) return;
 
@@ -77,7 +78,7 @@ public class FuckerModule extends Module {
                         for (int z = -r; z <= r; z++) {
                             BlockPos checkPos = playerPos.add(x, y, z);
                             if (checkPos.equals(playerPos)) continue;
-                            if (isPlantBlock(checkPos)) {
+                            if (isFarmPlant(checkPos)) {
                                 validTargets.add(checkPos);
                             }
                         }
@@ -91,6 +92,19 @@ public class FuckerModule extends Module {
                             BlockPos checkPos = playerPos.add(x, y, z);
                             if (checkPos.equals(playerPos)) continue;
                             if (isSugarCaneBlock(checkPos)) {
+                                validTargets.add(checkPos);
+                            }
+                        }
+                    }
+                }
+            }
+            case GRASS -> {
+                for (int x = -r; x <= r; x++) {
+                    for (int y = -r; y <= r; y++) {
+                        for (int z = -r; z <= r; z++) {
+                            BlockPos checkPos = playerPos.add(x, y, z);
+                            if (checkPos.equals(playerPos)) continue;
+                            if (isGrassLike(checkPos)) {
                                 validTargets.add(checkPos);
                             }
                         }
@@ -115,7 +129,7 @@ public class FuckerModule extends Module {
         }
     }
 
-    private boolean isPlantBlock(BlockPos pos) {
+    private boolean isFarmPlant(BlockPos pos) {
         BlockState state = MC.world.getBlockState(pos);
         Block block = state.getBlock();
 
@@ -127,7 +141,12 @@ public class FuckerModule extends Module {
 
         if (block instanceof SweetBerryBushBlock) {
             Integer age = state.get(SweetBerryBushBlock.AGE);
-            return age != null && age >= 3; // it should be 3 but im not sure TODO: check this
+            return age != null && age >= 3;
+        }
+
+        if (block instanceof NetherWartBlock) {
+            Integer age = state.get(NetherWartBlock.AGE);
+            return age != null && age >= 3;  // it should be 3 but im not sure TODO: check this
         }
 
         return false;
@@ -146,5 +165,14 @@ public class FuckerModule extends Module {
         }
 
         return false;
+    }
+
+    private boolean isGrassLike(BlockPos pos) {
+        BlockState state = MC.world.getBlockState(pos);
+        Block block = state.getBlock();
+
+        if (block == Blocks.BEDROCK || state.isAir()) return false;
+
+        return block instanceof PlantBlock;
     }
 }
