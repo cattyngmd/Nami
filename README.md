@@ -70,16 +70,22 @@ The default command prefix is `-`.
 
 1. Clone the repository:
 
+    ```bash
     git clone https://github.com/Kiriyaga7615/Nami.git  
     cd nami
+    ```
 
 2. Build with Gradle:
 
-    Linux / macOS  
+    Linux / macOS
+    ```bash
     ./gradlew build
+    ```
 
     Windows  
+    ```bat
     gradlew.bat build
+    ```
 
 The compiled JAR will be located at:  
 `build/libs/nami-<version>.jar`
