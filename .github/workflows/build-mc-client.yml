@@ -59,50 +59,50 @@ jobs:
           name: nami-${{ env.SAFE_BRANCH }}
           path: build/libs/*.jar
 
-release:
-  needs: build
-  if: github.actor == 'Kiriyaga7615'
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout repository for release
-      uses: actions/checkout@v4
-      with:
-        submodules: true
+  release:
+    needs: build
+    if: github.actor == 'Kiriyaga7615'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository for release
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: Set version for release
-      run: |
-        SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
-        echo "VERSION=multi-branch-latest-${SHORT_SHA}" >> $GITHUB_ENV
+      - name: Set version for release
+        run: |
+          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
+          echo "VERSION=multi-branch-latest-${SHORT_SHA}" >> $GITHUB_ENV
 
-    - name: Download all branch artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: ./artifact
+      - name: Download all branch artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifact
 
-    - name: List downloaded files
-      run: ls -l ./artifact
+      - name: List downloaded files
+        run: ls -l ./artifact
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ env.VERSION }}
-        name: Nami ${{ env.VERSION }}
-        body: |
-          Multi-branch release
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: Nami ${{ env.VERSION }}
+          body: |
+            Multi-branch release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
-    - name: Upload all JARs to Release
-      run: |
-        shopt -s nullglob
-        JAR_FILES=(./artifact/*/*.jar)
-        if [ ${#JAR_FILES[@]} -eq 0 ]; then
-          echo "No JAR files found, exiting"
-          exit 1
-        fi
-        for file in "${JAR_FILES[@]}"; do
-          echo "Uploading $file to release tag ${{ env.VERSION }}"
-          gh release upload ${{ env.VERSION }} "$file" --clobber
-        done
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      - name: Upload all JARs to Release
+        run: |
+          shopt -s nullglob
+          JAR_FILES=(./artifact/*/*.jar)
+          if [ ${#JAR_FILES[@]} -eq 0 ]; then
+            echo "No JAR files found, exiting"
+            exit 1
+          fi
+          for file in "${JAR_FILES[@]}"; do
+            echo "Uploading $file to release tag ${{ env.VERSION }}"
+            gh release upload ${{ env.VERSION }} "$file" --clobber
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
