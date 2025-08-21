@@ -30,9 +30,13 @@ public class SpeedModule extends Module {
         rotationPriority.setShowCondition(() -> mode.get() == Mode.ROTATION);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
+
+        if (MC.player.isCrawling() || MC.player.isInSneakingPose() || MC.player.isSneaking() || MC.player.isGliding())
+            return; // this fallback need due to sprinting not apply for theese states
+        // also we do not need swimming because swimming do apply speed for sprinitng
 
         this.setDisplayInfo(mode.get().toString());
 
