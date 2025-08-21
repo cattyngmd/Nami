@@ -36,7 +36,7 @@ public class FriendCommand extends Command {
             case "add" -> {
                 String name = (String) args[1];
                 FRIEND_MANAGER.addFriend(name);
-                CHAT_MANAGER.sendPersistent(this.getName(),CAT_FORMAT.format("Added friend: {g}" + name)+"{reset}.");
+                CHAT_MANAGER.sendPersistent(this.getName(),CAT_FORMAT.format("Added friend: {g}" + name + "{reset}."));
             }
             case "del" -> {
                 String name = (String) args[1];
