@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/github/license/Kiriyaga7615/2bEssentials?color=blue" alt="License" />
   </a>
   <a href="https://discord.gg/qy3eS42beW">
-    <img src="https://img.shields.io/discord/your_discord_id_here?color=7289DA&label=Discord" alt="Discord" />
+    <img src="https://img.shields.io/discord/1298742596633497744?color=7289DB&label=Discord" alt="Discord" />
   </a>
 </p>
 
