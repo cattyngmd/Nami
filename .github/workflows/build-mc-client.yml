@@ -76,13 +76,19 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: Nami ${{ env.VERSION }}
           body: |
-            wrw
+            Multi-branch release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Upload all JARs to Release
         run: |
-          for file in ./artifact/*.jar; do
+          shopt -s nullglob
+          JAR_FILES=(./artifact/*.jar)
+          if [ ${#JAR_FILES[@]} -eq 0 ]; then
+            echo "No JAR files found, exiting"
+            exit 1
+          fi
+          for file in "${JAR_FILES[@]}"; do
             echo "Uploading $file to release tag ${{ env.VERSION }}"
             gh release upload ${{ env.VERSION }} "$file" --clobber
           done
