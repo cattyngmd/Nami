@@ -75,6 +75,7 @@ public class AuraModule extends Module {
 
         if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS) || stack.getItem() instanceof TridentItem || stack.getItem() instanceof MaceItem))) {
             currentTarget = null;
+            this.setDisplayInfo("");
             return;
         }
 

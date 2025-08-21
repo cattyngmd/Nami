@@ -34,6 +34,8 @@ public class SpeedModule extends Module {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
+        this.setDisplayInfo(mode.get().toString());
+
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
             float pitch = MC.player.getPitch();

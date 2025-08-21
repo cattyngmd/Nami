@@ -55,6 +55,8 @@ public class ESPModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (MC == null || MC.world == null || MC.player == null) return;
 
+        this.setDisplayInfo(renderMode.get().toString());
+
         if (renderMode.get() == RenderMode.BOX) {
             renderBoxes(event);
         }
