@@ -99,10 +99,20 @@ public class BreakTickHandler {
         long now = System.currentTimeMillis();
 
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
-            if (now - lastAttackBlockTime >= ATTACK_BLOCK_COOLDOWN_MS) {
-                currentBreakingBlock = pos;
+            boolean instant = MC.world.getBlockState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos) >= 1.0f;
+
+            if (instant) {
+                currentBreakingBlock = null;
                 MC.interactionManager.attackBlock(pos, direction);
-                lastAttackBlockTime = now;
+                MC.player.swingHand(Hand.MAIN_HAND);
+                stateHandler.confirmBreaking();
+                return true;
+            } else {
+                if (now - lastAttackBlockTime >= ATTACK_BLOCK_COOLDOWN_MS) {
+                    currentBreakingBlock = pos;
+                    MC.interactionManager.attackBlock(pos, direction);
+                    lastAttackBlockTime = now;
+                }
             }
         } else {
             boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
