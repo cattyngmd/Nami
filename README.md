@@ -1,4 +1,4 @@
-# Nami Client 1.21.8
+# Nami 1.21.8
 
 <p align="center">
   <a href="https://github.com/Kiriyaga7615/Nami/releases">
