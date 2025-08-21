@@ -41,7 +41,10 @@ jobs:
         run: ls -l build/libs/
 
       - name: Set safe branch name
-        run: echo "SAFE_BRANCH=${{ matrix.branch//./- }}" >> $GITHUB_ENV
+        run: |
+          SAFE_BRANCH="${{ matrix.branch }}"
+          SAFE_BRANCH="${SAFE_BRANCH//./-}"
+          echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
 
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
