@@ -1,6 +1,6 @@
 # Nami Client 1.21.8
 
-<p align="center">
+<p align="left">
   <a href="https://github.com/Kiriyaga7615/Nami/releases">
     <img src="https://img.shields.io/github/downloads/Kiriyaga7615/2bEssentials/total?color=green&label=Total%20Downloads" alt="Total Downloads" />
   </a>
