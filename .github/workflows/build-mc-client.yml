@@ -1,18 +1,25 @@
 name: build release
 
 on:
+  push:
+    branches:
+      - '**'
   workflow_dispatch:
 
 jobs:
   build:
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: ${{ github.ref_name }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: true
+          ref: ${{ matrix.branch }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -36,29 +43,36 @@ jobs:
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
         with:
-          name: nami-client
+          name: nami-${{ matrix.branch }}
           path: build/libs/*.jar
 
   release:
     needs: build
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: ${{ needs.build.outputs.branch || github.ref_name }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
 
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: nami-client
+          name: nami-${{ matrix.branch }}
           path: ./artifact
 
       - name: List downloaded files
         run: ls -l ./artifact
 
-      - name: Set version from short commit SHA
-        run: echo "VERSION=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_ENV
+      - name: Set version from branch name and short SHA
+        run: |
+          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
+          echo "VERSION=${{ matrix.branch }}-${SHORT_SHA}" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -66,7 +80,7 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: Nami ${{ env.VERSION }}
           body: |
-            First release!
+            Release for branch ${{ matrix.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
