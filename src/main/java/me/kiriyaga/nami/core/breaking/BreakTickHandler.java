@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.core.breaking;
 
+import me.kiriyaga.nami.core.rotation.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.impl.BreakBlockEvent;
@@ -8,6 +9,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.BreakManagerModule;
 import me.kiriyaga.nami.core.breaking.model.BreakTarget;
 import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
+import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -95,6 +97,20 @@ public class BreakTickHandler {
             return false;
 
         Direction direction = Direction.UP;
+        BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+
+        if (module.rotate.get()) {
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+                    BreakTickHandler.class.getName(),
+                    module.rotationPriority.get(),
+                    (float) getYawToVec(MC.player, Vec3d.ofCenter(pos)),
+                    (float) getPitchToVec(MC.player, Vec3d.ofCenter(pos))
+            ));
+
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(BreakTickHandler.class.getName())) {
+                return false;
+            }
+        }
 
         long now = System.currentTimeMillis();
 
@@ -133,5 +149,26 @@ public class BreakTickHandler {
         }
         FluidState fluidState = MC.world.getFluidState(pos);
         return !fluidState.isEmpty();
+    }
+
+    private static int getYawToVec(Entity from, Vec3d to) {
+        double dx = to.x - from.getX();
+        double dz = to.z - from.getZ();
+        return wrapDegrees((int) Math.round(Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
+    }
+
+    private static int getPitchToVec(Entity from, Vec3d to) {
+        Vec3d eyePos = from.getEyePos();
+        double dx = to.x - eyePos.x;
+        double dy = to.y - eyePos.y;
+        double dz = to.z - eyePos.z;
+        return (int) Math.round(-Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))));
+    }
+
+    private static int wrapDegrees(int angle) {
+        angle %= 360;
+        if (angle >= 180) angle -= 360;
+        if (angle < -180) angle += 360;
+        return angle;
     }
 }
