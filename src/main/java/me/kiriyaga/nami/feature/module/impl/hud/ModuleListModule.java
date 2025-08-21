@@ -7,7 +7,10 @@ import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.EnumSetting;
 import net.minecraft.text.Text;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -21,6 +24,11 @@ public class ModuleListModule extends HudElementModule {
     }
 
     private final List<TextElement> elements = new ArrayList<>();
+    private final Map<String, ModuleAnimationState> animationStates = new ConcurrentHashMap<>();
+    private long lastUpdateTime = System.currentTimeMillis();
+    private int cachedWidth = 0;
+    private int cachedHeight = 0;
+
     public final BoolSetting showDisplayName = addSetting(new BoolSetting("show display", true));
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.DESCENDING));
 
@@ -28,8 +36,20 @@ public class ModuleListModule extends HudElementModule {
         super("module list", "Shows enabled and drawn modules.", 0, 0, 50, 10);
     }
 
+    private static class ModuleAnimationState {
+        public float progress = 0f;
+        public long startTime;
+        public int textWidth;
+    }
+
+    @Override
+    public Rectangle getBoundingBox() {
+        return new Rectangle(0, 0, cachedWidth, cachedHeight);
+    }
+
     @Override
     public List<TextElement> getTextElements() {
+        long currentTime = System.currentTimeMillis();
         elements.clear();
 
         List<Module> activeModules = new ArrayList<>(MODULE_MANAGER.getStorage().getAll().stream()
@@ -37,44 +57,151 @@ public class ModuleListModule extends HudElementModule {
                 .filter(Module::isDrawn)
                 .toList());
 
-        if (activeModules.isEmpty()) return elements;
+        animationStates.keySet().removeIf(name ->
+                activeModules.stream().noneMatch(module -> module.getName().equals(name))
+        );
+
+        for (Module module : activeModules) {
+            String name = module.getName();
+            if (!animationStates.containsKey(name)) {
+                ModuleAnimationState state = new ModuleAnimationState();
+                state.startTime = currentTime;
+
+                String displayName = showDisplayName.get() ? module.getDisplayInfo() : null;
+                String rawText;
+                if (displayName != null && !displayName.isEmpty()) {
+                    rawText = module.getName() + " [" + displayName + "]";
+                } else {
+                    rawText = module.getName();
+                }
+                Text formattedText = CAT_FORMAT.format("{bg}" + rawText);
+                state.textWidth = MC.textRenderer.getWidth(formattedText);
+
+                animationStates.put(name, state);
+            }
+        }
+
+        for (ModuleAnimationState state : animationStates.values()) {
+            long elapsed = currentTime - state.startTime;
+            float normalizedTime = Math.min(elapsed / 150f, 1f);
+
+            if (normalizedTime < 0.5f) {
+                state.progress = 2 * normalizedTime * normalizedTime;
+            } else {
+                float t = normalizedTime * 2 - 2;
+                state.progress = -0.5f * (t * t - 2);
+            }
+
+            if (elapsed >= 150) {
+                state.progress = 1f;
+            }
+        }
+
+        if (activeModules.isEmpty()) {
+            return elements;
+        }
+
+        List<ModuleTextInfo> moduleTexts = new ArrayList<>();
+        for (Module module : activeModules) {
+            String displayName = showDisplayName.get() ? module.getDisplayInfo() : null;
+            String rawText;
+            if (displayName != null && !displayName.isEmpty()) {
+                rawText = module.getName() + " [" + displayName + "]";
+            } else {
+                rawText = module.getName();
+            }
+
+            String formattedTextStr;
+            if (displayName != null && !displayName.isEmpty()) {
+                formattedTextStr = "{bg}" + module.getName() + " {bg}[{bw}" + displayName + "{bg}]";
+            } else {
+                formattedTextStr = "{bg}" + module.getName();
+            }
+
+            Text formattedText = CAT_FORMAT.format(formattedTextStr);
+            int width = MC.textRenderer.getWidth(formattedText);
+            moduleTexts.add(new ModuleTextInfo(module, formattedText, rawText, width));
+        }
 
         switch (sortMode.get()) {
-            case ALPHABETICAL -> activeModules.sort(Comparator.comparing(Module::getName, String::compareToIgnoreCase));
-            case DESCENDING -> activeModules.sort((a, b) -> Integer.compare(
-                    getTextWidth(b.getName() + (showDisplayName.get() && b.getDisplayInfo() != null && !b.getDisplayInfo().isEmpty() ? " " + b.getDisplayInfo() : "")),
-                    getTextWidth(a.getName() + (showDisplayName.get() && a.getDisplayInfo() != null && !a.getDisplayInfo().isEmpty() ? " " + a.getDisplayInfo() : ""))
-            ));
-            case ASCENDING -> activeModules.sort(Comparator.comparingInt(a -> getTextWidth(a.getName() + (showDisplayName.get() && a.getDisplayInfo() != null && !a.getDisplayInfo().isEmpty() ? " " + a.getDisplayInfo() : ""))));
+            case ALPHABETICAL -> moduleTexts.sort(Comparator.comparing(info -> info.rawText, String::compareToIgnoreCase));
+            case DESCENDING -> moduleTexts.sort((a, b) -> Integer.compare(b.width, a.width));
+            case ASCENDING -> moduleTexts.sort(Comparator.comparingInt(a -> a.width));
         }
 
         int yOffset = 0;
         int maxWidth = 0;
 
-        for (Module module : activeModules) {
-            String displayName = showDisplayName.get() ? module.getDisplayInfo() : null;
-            Text text;
-
-            if (displayName != null && !displayName.isEmpty()) {
-                text = CAT_FORMAT.format("{bg}" + module.getName() + " {bg}[{bw}" + displayName+"{bg}]");
-            } else {
-                text = CAT_FORMAT.format("{bg}" + module.getName());
-            }
-
-            int textWidth = MC.textRenderer.getWidth(text);
-            elements.add(new TextElement(text, 0, yOffset));
-
-            maxWidth = Math.max(maxWidth, textWidth);
+        for (ModuleTextInfo info : moduleTexts) {
+            maxWidth = Math.max(maxWidth, info.width);
             yOffset += MC.textRenderer.fontHeight;
         }
 
-        this.width = maxWidth;
-        this.height = yOffset;
+        cachedWidth = maxWidth;
+        cachedHeight = yOffset;
+        this.width = cachedWidth;
+        this.height = cachedHeight;
 
+        yOffset = 0;
+        for (ModuleTextInfo info : moduleTexts) {
+            String moduleName = info.module.getName();
+            ModuleAnimationState state = animationStates.get(moduleName);
+
+            if (state == null || state.progress <= 0f) {
+                yOffset += MC.textRenderer.fontHeight;
+                continue;
+            }
+
+            Text text = info.formattedText;
+
+            int animatedOffsetX = 0;
+            switch (alignment.get()) {
+                case left:
+                    animatedOffsetX = (int) ((state.progress - 1) * state.textWidth);
+                    break;
+                case center:
+                    animatedOffsetX = (int) ((1 - state.progress) * -state.textWidth);
+                    break;
+                case right:
+                    animatedOffsetX = (int) ((state.progress - 1) * state.textWidth);
+                    break;
+            }
+
+            elements.add(new TextElement(text, animatedOffsetX, yOffset));
+            yOffset += MC.textRenderer.fontHeight;
+        }
+
+        lastUpdateTime = currentTime;
         return elements;
     }
 
-    private int getTextWidth(String name) {
-        return MC.textRenderer.getWidth(CAT_FORMAT.format(name));
+    @Override
+    public int getRenderXForElement(TextElement element) {
+        int baseX = getRenderX();
+        int lineWidth = MC.textRenderer.getWidth(element.text());
+
+        return switch (alignment.get()) {
+            case left -> baseX + element.offsetX();
+            case center -> baseX + (width - lineWidth) / 2 + element.offsetX();
+            case right -> baseX + width - lineWidth - element.offsetX();
+        };
+    }
+
+    private int getTextWidth(String text) {
+        return MC.textRenderer.getWidth(CAT_FORMAT.format("{bg}" + text));
+    }
+
+    private static class ModuleTextInfo {
+        public final Module module;
+        public final Text formattedText;
+        public final String rawText;
+        public final int width;
+
+        public ModuleTextInfo(Module module, Text formattedText, String rawText, int width) {
+            this.module = module;
+            this.formattedText = formattedText;
+            this.rawText = rawText;
+            this.width = width;
+        }
     }
 }
