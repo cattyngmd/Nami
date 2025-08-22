@@ -1,10 +1,10 @@
 name: build release
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - '**'
+#on:
+#  workflow_dispatch:
+#  push:
+#    branches:
+#      - '**'
 
 jobs:
   build:
