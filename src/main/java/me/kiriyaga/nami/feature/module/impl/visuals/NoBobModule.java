@@ -17,17 +17,4 @@ public class NoBobModule extends Module {
     public NoBobModule() {
         super("no bob", "Disables bobbing.", ModuleCategory.of("visuals"), "nobob");
     }
-
-    /*
-    Yeah people dumb as fuck and they REALLY cant find theese in settings
-    so i decided to make these cringe modules, just because i dont wanna see any video/screenshot/anyhting with nami
-    and tilt/bobbing on it
-     */
-
-    @Override
-    public void onEnable() {
-        if (MC != null && MC.options != null) {
-            MC.options.getBobView().setValue(false);
-        }
-    }
 }
