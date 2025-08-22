@@ -31,8 +31,6 @@ public class GuiMoveModule extends Module {
 
     private Screen lastScreen = null;
 
-    public final BoolSetting stopOnClick = addSetting(new BoolSetting("stop on click", false));
-
     public GuiMoveModule() {
         super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"), "guimove");
     }
@@ -81,7 +79,7 @@ public class GuiMoveModule extends Module {
             lastScreen = null;
         }
 
-        if (!canMove() || (stopOnClick.get() && isClickingItem())) {
+        if (!canMove()) {
             setKeysPressed(false);
             return;
         }
@@ -128,10 +126,5 @@ public class GuiMoveModule extends Module {
         MC.options.jumpKey.setPressed(pressed);
         MC.options.sneakKey.setPressed(pressed);
         MC.options.sprintKey.setPressed(pressed);
-    }
-
-    private boolean isClickingItem() {
-        ItemStack carried = MC.player.currentScreenHandler.getCursorStack();
-        return carried != null && !carried.isEmpty();
     }
 }
