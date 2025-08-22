@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import me.kiriyaga.nami.feature.module.impl.visuals.OldAnimationsModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ViewModelModule;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -12,6 +13,8 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -84,5 +87,24 @@ public abstract class MixinHeldItemRenderer {
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
         if (vm != null && vm.isEnabled() && !vm.eating.get())
             ci.cancel();
+    }
+
+    @WrapWithCondition(
+            method = "applyEatOrDrinkTransformation(Lnet/minecraft/client/util/math/MatrixStack;FLnet/minecraft/util/Arm;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
+    private boolean applyEatOrDrinkTransformation2(MatrixStack matrixStack, float x, float y, float z) {
+        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        if (vm != null && vm.isEnabled() && vm.eating.get() && !vm.eatingBob.get() && x == 0.0F) {
+            return false;
+        }
+        return true;
+    }
+    @WrapWithCondition(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;multiply(Lorg/joml/Quaternionfc;)V"))
+    private boolean renderItem(MatrixStack instance, Quaternionfc quaternion) {
+        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+
+        if (vm != null && vm.isEnabled() && !vm.sway.get())
+            return false;
+
+        return true;
     }
 }
