@@ -66,54 +66,54 @@ public class GuiMoveModule extends Module {
             ev.cancel();
     }
 
-    @SubscribeEvent
-    public void onPacketSend(PacketSendEvent ev) {
-        if (!_2b2t.get()) return;
+//    @SubscribeEvent
+//    public void onPacketSend(PacketSendEvent ev) {
+//        if (!_2b2t.get()) return;
+//
+//        if (!(ev.getPacket() instanceof ClickSlotC2SPacket packet)) return;
+//
+//        if (!isPlayerInv()) {
+//            if (!clickBuffer.isEmpty()) clickBuffer.clear();
+//            return;
+//        }
+//
+//        if (packet.syncId() != MC.player.playerScreenHandler.syncId) return;
+//
+//        if (packet.actionType() != SlotActionType.PICKUP) return;
+//
+//        ev.cancel();
+//        clickBuffer.addLast(packet);
+//
+//        if (clickBuffer.size() > 2) {
+//            clickBuffer.clear();
+//        }
+//    }
 
-        if (!(ev.getPacket() instanceof ClickSlotC2SPacket packet)) return;
-
-        if (!isPlayerInv()) {
-            if (!clickBuffer.isEmpty()) clickBuffer.clear();
-            return;
-        }
-
-        if (packet.syncId() != MC.player.playerScreenHandler.syncId) return;
-
-        if (packet.actionType() != SlotActionType.PICKUP) return;
-
-        ev.cancel();
-        clickBuffer.addLast(packet);
-
-        if (clickBuffer.size() > 2) {
-            clickBuffer.clear();
-        }
-    }
-
-    @SubscribeEvent
-    public void onPreTick(PreTickEvent ev) {
-        if (!_2b2t.get()) return;
-
-        if (!isPlayerInv()) {
-            if (!clickBuffer.isEmpty()) clickBuffer.clear();
-            return;
-        }
-
-        if (clickBuffer.size() < 2) return;
-
-        ClickSlotC2SPacket first = clickBuffer.pollFirst();
-        ClickSlotC2SPacket second = clickBuffer.pollFirst();
-
-        if (first == null || second == null) {
-            clickBuffer.clear();
-            return;
-        }
-
-        MC.getNetworkHandler().sendPacket(first);
-        MC.getNetworkHandler().sendPacket(second);
-        MC.getNetworkHandler().sendPacket(first);
-
-        clickBuffer.clear();
-    }
+//    @SubscribeEvent
+//    public void onPreTick(PreTickEvent ev) {
+//        if (!_2b2t.get()) return;
+//
+//        if (!isPlayerInv()) {
+//            if (!clickBuffer.isEmpty()) clickBuffer.clear();
+//            return;
+//        }
+//
+//        if (clickBuffer.size() < 2) return;
+//
+//        ClickSlotC2SPacket first = clickBuffer.pollFirst();
+//        ClickSlotC2SPacket second = clickBuffer.pollFirst();
+//
+//        if (first == null || second == null) {
+//            clickBuffer.clear();
+//            return;
+//        }
+//
+//        MC.getNetworkHandler().sendPacket(first);
+//        MC.getNetworkHandler().sendPacket(second);
+//        MC.getNetworkHandler().sendPacket(first);
+//
+//        clickBuffer.clear();
+//    }
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
