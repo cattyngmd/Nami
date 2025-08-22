@@ -107,6 +107,6 @@ This project is licensed under the MIT License. You are free to contribute, dist
 
 ## Special Thanks
 
-[cattyngmd](https://github.com/cattyngmd) for assistance with rotations and Y motion boost methods.
+- [cattyngmd](https://github.com/cattyngmd) for assistance with rotations and Y motion boost methods.
 
-[CatFormat](https://github.com/cattyngmd/CatFormat) for awesome cat formatter.
+- [CatFormat](https://github.com/cattyngmd/CatFormat) for awesome cat formatter.
