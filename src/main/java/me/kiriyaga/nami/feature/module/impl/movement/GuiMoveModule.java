@@ -8,11 +8,13 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
+import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -28,6 +30,8 @@ public class GuiMoveModule extends Module {
     private boolean jumpHeld = false;
 
     private Screen lastScreen = null;
+
+    public final BoolSetting stopOnClick = addSetting(new BoolSetting("stop on click", false));
 
     public GuiMoveModule() {
         super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"), "guimove");
@@ -77,8 +81,7 @@ public class GuiMoveModule extends Module {
             lastScreen = null;
         }
 
-
-        if (!canMove()) {
+        if (!canMove() || (stopOnClick.get() && isClickingItem())) {
             setKeysPressed(false);
             return;
         }
@@ -125,5 +128,10 @@ public class GuiMoveModule extends Module {
         MC.options.jumpKey.setPressed(pressed);
         MC.options.sneakKey.setPressed(pressed);
         MC.options.sprintKey.setPressed(pressed);
+    }
+
+    private boolean isClickingItem() {
+        ItemStack carried = MC.player.currentScreenHandler.getCursorStack();
+        return carried != null && !carried.isEmpty();
     }
 }
