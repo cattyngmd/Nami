@@ -63,9 +63,10 @@ public class ShulkerViewModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onTick(PreTickEvent event) {
+        shulkerList.clear();
+
         if (!(MC.currentScreen instanceof HandledScreen<?> screen)) return;
 
-        shulkerList.clear();
         for (Slot slot : screen.getScreenHandler().slots) {
             ShulkerInfo info = ShulkerInfo.create(slot.getStack(), slot.id, compact.get());
             if (info != null) shulkerList.add(info);
@@ -74,17 +75,13 @@ public class ShulkerViewModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender(RenderScreenEvent event) {
-        //CHAT_MANAGER.sendRaw("event called");
-
         if (!(MC.currentScreen instanceof HandledScreen)) return;
-
-        //CHAT_MANAGER.sendRaw("current screen = " + MC.currentScreen.getClass().getName());
-        //CHAT_MANAGER.sendRaw("total shulkers to render = " + shulkerList.size());
 
         DrawContext context = event.getDrawContext();
         boolean right = false;
-        currentY = bothSides.get() ? MARGIN : MARGIN + offset;
-        startX = MARGIN;
+        int edgePadding = 6;
+        currentY = bothSides.get() ? edgePadding : edgePadding + offset;
+        startX = edgePadding;
         float scale = this.scale.get().floatValue();
 
         context.getMatrices().pushMatrix();
@@ -99,15 +96,12 @@ public class ShulkerViewModule extends Module {
 
             if (currentY + height > MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
                 right = true;
-                currentY = MARGIN + offset;
+                currentY = edgePadding + offset;
             }
 
             if (right) {
-                float totalWidth = cols * GRID_WIDTH + MARGIN * cols;
-                startX = (int) ((MC.getWindow().getScaledWidth() - totalWidth - MARGIN) / scale);
+                startX = (int) ((MC.getWindow().getScaledWidth() - width - edgePadding) / scale);
             }
-
-           // CHAT_MANAGER.sendRaw("rendering shulker at (" + startX + ", " + currentY + "), size = " + cols + "x" + rows);
 
             context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
 
