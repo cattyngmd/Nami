@@ -55,7 +55,7 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
                     x + 1,
                     y + HEIGHT,
                     CLICK_GUI.applyFade(
-                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                            textCol.getRGB()
                     )
             );
 

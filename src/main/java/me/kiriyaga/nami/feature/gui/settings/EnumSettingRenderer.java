@@ -37,7 +37,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
                     x + 1,
                     y + HEIGHT,
                     CLICK_GUI.applyFade(
-                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                            textCol.getRGB()
                     )
             );
 

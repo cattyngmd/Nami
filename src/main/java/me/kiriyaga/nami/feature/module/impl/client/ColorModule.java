@@ -109,6 +109,6 @@ public class ColorModule extends Module {
     }
 
     public Color getStyledSecondColor() {
-        return applyDarkness(getStyledGlobalColor(), 0.5);
+        return applyDarkness(getStyledGlobalColor(), 0.35);
     }
 }

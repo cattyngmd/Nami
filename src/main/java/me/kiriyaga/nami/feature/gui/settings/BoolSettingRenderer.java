@@ -39,7 +39,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
                     x + 1,
                     y + HEIGHT,
                     CLICK_GUI.applyFade(
-                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                            textColActivated.getRGB()
                     )
             );
         }

@@ -39,7 +39,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                     y - lineOffset,
                     x + 1,
                     y + HEIGHT,
-                    CLICK_GUI.applyFade(setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB())
+                    CLICK_GUI.applyFade(textCol.getRGB())
             );
         }
 

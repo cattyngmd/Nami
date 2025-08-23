@@ -54,23 +54,12 @@ public class ModulePanel {
         }
 
         context.fill(
-                expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()
-                        ? x + 1 : x,
+                x,
                 y,
                 x + WIDTH,
                 y + HEIGHT,
                 CLICK_GUI.applyFade(toRGBA(bgColor))
         );
-
-        if (expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
-            context.fill(
-                    x,
-                    y,
-                    x + 1,
-                    y + HEIGHT,
-                    CLICK_GUI.applyFade(toRGBA(bgColor))
-            );
-        }
 
         if (!expanded) {
             context.fill(

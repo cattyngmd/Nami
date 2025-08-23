@@ -63,7 +63,7 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
                     x + 1,
                     y + HEIGHT,
                     CLICK_GUI.applyFade(
-                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                            textCol.getRGB()
                     )
             );
 
