@@ -52,13 +52,13 @@ public class AutoLogModule extends Module {
 
         if (onLevel.get() != 0) {
 
-            if (triggeredLevel && player.getBlockZ() <= onLevel.get()) {
-                logOut("Too low level: §7" + player.getBlockZ() + "§f Blocks");
+            if (triggeredLevel && player.getBlockY() <= onLevel.get()) {
+                logOut("Too low level: §7" + player.getBlockY() + "§f Blocks");
                 triggeredLevel = false;
                 return;
             }
 
-            if (player.getBlockZ() > onLevel.get()) {
+            if (player.getBlockY() > onLevel.get()) {
                 triggeredLevel = true;
             }
         }
