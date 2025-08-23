@@ -46,9 +46,13 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
+        String nameStr = hovered
+                ? (setting.isHoldMode() ? "hold" : "toggle")
+                : setting.getName().toLowerCase();
+
         context.drawText(
                 textRenderer,
-                setting.getName().toLowerCase() + (setting.isHoldMode() ? " hold" : " toggle"),
+                nameStr,
                 textX,
                 textY,
                 textColorInt,
