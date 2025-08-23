@@ -7,6 +7,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.KeyBindSetting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,28 +20,28 @@ import static me.kiriyaga.nami.Nami.MC;
 public class ClickPearlModule extends Module {
 
     public final BoolSetting glideFirework = addSetting(new BoolSetting("glide firework", true));
-    private boolean hasActivated = false;
+    private final KeyBindSetting pearlKey = addSetting(new KeyBindSetting("use", KeyBindSetting.KEY_NONE));
 
     public ClickPearlModule() {
         super("click pearl", "Throws a pearl on activation.", ModuleCategory.of("combat"), "clickpearl");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private void onTick(PreTickEvent ev) { // onTick due to post-held item change
-        if (!isEnabled() || hasActivated) return;
+    private void onTick(PreTickEvent ev) {
+        if (!isEnabled()) return;
         if (MC.world == null || MC.player == null) return;
 
-        hasActivated = true;
-        toggle();
+        boolean pressed = pearlKey.isPressed();
 
-        if (MC.player.isGliding() && glideFirework.get()) {
-            useItemAnywhere(Items.FIREWORK_ROCKET);
-            return;
+        if (pressed && !pearlKey.wasPressedLastTick()) {
+            if (MC.player.isGliding() && glideFirework.get()) {
+                useItemAnywhere(Items.FIREWORK_ROCKET);
+            } else if (!MC.player.getItemCooldownManager().isCoolingDown(Items.ENDER_PEARL.getDefaultStack())) {
+                useItemAnywhere(Items.ENDER_PEARL);
+            }
         }
 
-        if (!MC.player.getItemCooldownManager().isCoolingDown(Items.ENDER_PEARL.getDefaultStack())) {
-            useItemAnywhere(Items.ENDER_PEARL);
-        }
+        pearlKey.setWasPressedLastTick(pressed);
     }
 
     private void useItemAnywhere(Item item) {
@@ -69,7 +70,7 @@ public class ClickPearlModule extends Module {
 
     @Override
     public void onEnable() {
-        hasActivated = false;
+        pearlKey.setWasPressedLastTick(false);
     }
 
     private int getSlotInHotbar(Item item) {

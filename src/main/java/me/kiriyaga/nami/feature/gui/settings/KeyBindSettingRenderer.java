@@ -48,7 +48,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
         context.drawText(
                 textRenderer,
-                setting.isHoldMode() ? "hold" : "toggle",
+                setting.getName().toLowerCase() + (setting.isHoldMode() ? " hold" : " toggle"),
                 textX,
                 textY,
                 textColorInt,
