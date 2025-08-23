@@ -48,7 +48,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
         context.drawText(
                 textRenderer,
-                setting.getName().toLowerCase(),
+                setting.isHoldMode() ? "hold" : "toggle",
                 textX,
                 textY,
                 textColorInt,
@@ -61,7 +61,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         } else {
             String keyName = KeyUtils.getKeyName(setting.get());
             //valueStr = (setting.isHoldMode() ? "hold: " : "toggle: ") + keyName;
-            setting.setName(setting.isHoldMode() ? "hold" : "toggle"); // yes unfortunatelly
+            //setting.setName(setting.isHoldMode() ? "hold" : "toggle"); // yes unfortunatelly
             valueStr = keyName;
         }
 
