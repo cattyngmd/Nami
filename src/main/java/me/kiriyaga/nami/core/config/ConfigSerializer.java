@@ -33,6 +33,10 @@ public class ConfigSerializer {
 
             JsonObject settings = new JsonObject();
             for (Setting<?> s : m.getSettings()) {
+                if (s instanceof me.kiriyaga.nami.setting.impl.KeyBindSetting ||
+                        s instanceof me.kiriyaga.nami.setting.impl.ColorSetting) {
+                    continue;
+                }
                 settings.add(s.getName(), s.toJson());
             }
 
@@ -73,6 +77,10 @@ public class ConfigSerializer {
 
                 JsonObject settings = mod.getAsJsonObject("settings");
                 for (Setting<?> s : m.getSettings()) {
+                    if (s instanceof me.kiriyaga.nami.setting.impl.KeyBindSetting ||
+                            s instanceof me.kiriyaga.nami.setting.impl.ColorSetting) {
+                        continue;
+                    }
                     if (settings.has(s.getName())) {
                         s.fromJson(settings.get(s.getName()));
                     }
