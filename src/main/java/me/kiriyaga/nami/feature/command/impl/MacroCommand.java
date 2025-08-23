@@ -59,7 +59,7 @@ public class MacroCommand extends Command {
                     return;
                 }
 
-                MACRO_MANAGER.removeMacro(keyCode);
+                //MACRO_MANAGER.removeMacro(keyCode);
                 MACRO_MANAGER.addMacro(new Macro(keyCode, message));
                 CONFIG_MANAGER.saveMacros();
 
