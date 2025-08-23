@@ -33,9 +33,10 @@ public class ESPModule extends Module {
 
     public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));
     public final BoolSetting showPeacefuls = addSetting(new BoolSetting("peacefuls", true));
-    public final BoolSetting showNeutrals = addSetting(new BoolSetting("neutrals", true));
-    public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", true));
+    public final BoolSetting showNeutrals = addSetting(new BoolSetting("neutrals", false));
+    public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", false));
     public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
+    public final BoolSetting itemBoundingBox = addSetting(new BoolSetting("itemBoundingBox", true));
     public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("mode", RenderMode.OUTLINE));
     public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("distance", 52, 15, 256));
     public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth", true));
@@ -47,8 +48,9 @@ public class ESPModule extends Module {
 
     public ESPModule() {
         super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "wh", "boxes");
-        smoothAppear.setShowCondition(() -> renderMode.get() == RenderMode.BOX);
+        smoothAppear.setShowCondition(() -> (renderMode.get() == RenderMode.BOX || showItems.get() && itemBoundingBox.get()));
         outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
+        itemBoundingBox.setShowCondition(() -> showItems.get());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -59,6 +61,13 @@ public class ESPModule extends Module {
 
         if (renderMode.get() == RenderMode.BOX) {
             renderBoxes(event);
+            return;
+        }
+
+        if (renderMode.get() == RenderMode.OUTLINE) {
+            if (itemBoundingBox.get()) {
+                renderItemBoxes(event);
+            }
         }
     }
 
@@ -107,6 +116,18 @@ public class ESPModule extends Module {
         return Color.WHITE;
     }
 
+    private void renderItemBoxes(Render3DEvent event) {
+        MatrixStack matrices = event.getMatrices();
+        float partialTicks = event.getTickDelta();
+
+        for (Entity entity : ENTITY_MANAGER.getDroppedItems()) {
+            if (!showItems.get() || entity.isRemoved() || !entity.isAlive()) continue;
+
+            Color color = COLOR_ITEM;
+            drawBox(entity, color, matrices, partialTicks);
+        }
+    }
+
     private void drawBox(Entity entity, Color color, MatrixStack matrices, float partialTicks) {
         double interpX = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * partialTicks;
         double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
@@ -144,8 +165,11 @@ public class ESPModule extends Module {
         if (esp.showPeacefuls.get() && ENTITY_MANAGER.getPassive().contains(entity)) return COLOR_PASSIVE;
         if (esp.showNeutrals.get() && ENTITY_MANAGER.getNeutral().contains(entity)) return COLOR_NEUTRAL;
         if (esp.showHostiles.get() && ENTITY_MANAGER.getHostile().contains(entity)) return COLOR_HOSTILE;
-        if (esp.showItems.get() && entity instanceof ItemEntity) return COLOR_ITEM;
-
+        if (entity instanceof ItemEntity) {
+            if (!esp.showItems.get()) return null;
+            if (esp.itemBoundingBox.get()) return null;
+            return COLOR_ITEM;
+        }
         return null;
     }
 }
