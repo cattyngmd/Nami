@@ -4,13 +4,16 @@
 
 <p align="left">
   <a href="https://github.com/Kiriyaga7615/Nami/releases">
-    <img src="https://img.shields.io/github/downloads/Kiriyaga7615/2bEssentials/total?color=green&label=Total%20Downloads" alt="Total Downloads" />
+    <img src="https://img.shields.io/github/downloads/Kiriyaga7615/Nami/total?color=green&label=Total%20Downloads" alt="Total Downloads" />
+  </a>
+  <a href="https://github.com/Kiriyaga7615/Nami/commits">
+  <img src="https://img.shields.io/github/commit-activity/m/Kiriyaga7615/Nami?label=Commits%20(last%20month)&color=yellow" alt="month" />
   </a>
   <a href="https://github.com/Kiriyaga7615/Nami/releases">
-    <img src="https://img.shields.io/github/v/release/Kiriyaga7615/2bEssentials?color=blue&label=Latest%20Release" alt="Latest Release" />
+    <img src="https://img.shields.io/github/v/release/Kiriyaga7615/Nami?color=blue&label=Latest%20Release" alt="Latest Release" />
   </a>
   <a href="https://github.com/Kiriyaga7615/Nami/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/Kiriyaga7615/2bEssentials?color=blue" alt="License" />
+    <img src="https://img.shields.io/github/license/Kiriyaga7615/Nami?color=blue" alt="License" />
   </a>
   <a href="https://discord.gg/qy3eS42beW">
     <img src="https://img.shields.io/discord/1298742596633497744?color=7289DB&label=Discord" alt="Discord" />
