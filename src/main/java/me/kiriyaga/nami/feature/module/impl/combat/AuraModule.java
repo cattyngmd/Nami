@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.combat;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -13,16 +14,10 @@ import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
-import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.*;
@@ -62,18 +57,14 @@ public class AuraModule extends Module {
         //ROTATION_MANAGER.cancelRequest(AuraModule.class.getName()); //no
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onTick(PreTickEvent event) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onPreTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) return;
         if (!multiTask.get() && MC.player.isUsingItem()) return;
-
-        long startTime = System.nanoTime();
 
         ItemStack stack = MC.player.getMainHandStack();
 
         Entity target = ENTITY_MANAGER.getTarget();
-
-        Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
 
         if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS) || stack.getItem() instanceof TridentItem || stack.getItem() instanceof MaceItem))) {
             currentTarget = null;
@@ -82,10 +73,7 @@ public class AuraModule extends Module {
         }
 
         currentTarget = target;
-
         this.setDisplayInfo(target.getName().getString());
-
-        long auraLogicStart = System.nanoTime();
 
         float cooldown = MC.player.getAttackCooldownProgress(0f);
         float tps = 20f;
@@ -101,21 +89,6 @@ public class AuraModule extends Module {
         } else {
             ItemStack held = MC.player.getMainHandStack();
             float attackDamage = 1.0f; // without charge the damage always 1 i guess
-//
-//            if (held.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
-//                AttributeModifiersComponent modifiers = held.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-//                for (var entry : modifiers.comp_2393()) {
-//                    if (entry.comp_2395().matches(EntityAttributes.ATTACK_DAMAGE)) {
-//                        attackDamage += (float) entry.comp_2396().value();
-//                    }
-//                }
-//            }
-
-            // idk that shit doesnt apply, i thought it should
-//            int sharpnessLevel = EnchantmentUtils.getEnchantmentLevel(held, Enchantments.SHARPNESS);
-//            if (sharpnessLevel > 0) {
-//                attackDamage += 0.5f * sharpnessLevel + 0.5f;
-//            }
 
             if (MC.player.hasStatusEffect(StatusEffects.STRENGTH)) {
                 var strength = MC.player.getStatusEffect(StatusEffects.STRENGTH);
@@ -124,7 +97,7 @@ public class AuraModule extends Module {
 
             if (MC.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
                 var weakness = MC.player.getStatusEffect(StatusEffects.WEAKNESS);
-                attackDamage -= 4.0f * (weakness.getAmplifier() + 1); // im not sure is it 4 or 3 btw
+                attackDamage -= 4.0f * (weakness.getAmplifier() + 1);
             }
 
             if (target instanceof LivingEntity living) {
@@ -154,32 +127,51 @@ public class AuraModule extends Module {
                     (float) getPitchToVec(MC.player, rotationTarget)
             ));
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onAfterTick(PostTickEvent event) {
+        if (currentTarget == null) return;
 
         if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && (!raycast.get() || !raycastConfirm.get()))
             return;
+
+        Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
+        long auraLogicStart = System.nanoTime();
+
+        float cooldown = MC.player.getAttackCooldownProgress(0f);
+        float tps = 20f;
+        if (tpsSync.get() && MC.getServer() != null) {
+            double tickTimeMs = MC.getServer().getAverageTickTime() / 1_000_000.0;
+            tps = (float) Math.min(20.0, 1000.0 / tickTimeMs);
+        }
+
+        boolean skipCooldown = false;
+        if (currentTarget instanceof ShulkerBulletEntity) {
+            skipCooldown = true;
+        }
 
         boolean canAttack;
         if (raycast.get()) {
             EntityHitResult attackHit;
 
             if (raycastConfirm.get()) {
-                attackHit = raycastTarget(MC.player, target, attackRange.get(),
+                attackHit = raycastTarget(MC.player, currentTarget, attackRange.get(),
                         ROTATION_MANAGER.getStateHandler().getRotationYaw(),
                         ROTATION_MANAGER.getStateHandler().getRotationPitch());
             } else {
                 Vec3d eyePos = MC.player.getEyePos();
-                Vec3d closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
+                Vec3d closestPoint = getClosestPointToEye(eyePos, currentTarget.getBoundingBox());
                 float idealYaw = (float) getYawToVec(MC.player, closestPoint);
                 float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
 
-                attackHit = raycastTarget(MC.player, target, attackRange.get(), idealYaw, idealPitch);
+                attackHit = raycastTarget(MC.player, currentTarget, attackRange.get(), idealYaw, idealPitch);
             }
 
-            boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePos()); // i dont fucking know why raycast doesnt apply while inside AABB, i thought mc aabb fixes it
-
-            canAttack = insideBox || (attackHit != null && attackHit.getEntity() == target);
+            boolean insideBox = currentTarget.getBoundingBox().contains(MC.player.getEyePos());
+            canAttack = insideBox || (attackHit != null && attackHit.getEntity() == currentTarget);
         } else {
-            double dist = MC.player.getPos().distanceTo(getEntityCenter(target));
+            double dist = MC.player.getPos().distanceTo(getEntityCenter(currentTarget));
             canAttack = dist <= attackRange.get();
         }
 
@@ -189,15 +181,13 @@ public class AuraModule extends Module {
             if (cooldown < (tpsSync.get() ? 1.0f * (20f / tps) : 1.0f)) return;
         }
 
-        MC.interactionManager.attackEntity(MC.player, target);
+        MC.interactionManager.attackEntity(MC.player, currentTarget);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
 
         long auraLogicDuration = System.nanoTime() - auraLogicStart;
         debugModule.debugAura(Text.of(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0)));
-
-        long totalDuration = System.nanoTime() - startTime;
-        debugModule.debugAura(Text.of(String.format("total %.3f ms", totalDuration / 1_000_000.0)));
     }
+
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {

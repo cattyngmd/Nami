@@ -36,13 +36,13 @@ public abstract class MixinClientPlayerEntity {
     private float originalYaw, originalPitch;
 
     @Inject(method = "tick", at = @At("HEAD"))
-    private void tickHookPre(CallbackInfo ci) {
+    private void tick(CallbackInfo ci) {
 
         EVENT_MANAGER.post(new PreTickEvent());
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void tickHookPost(CallbackInfo ci) {
+    private void tick2(CallbackInfo ci) {
 
         EVENT_MANAGER.post(new PostTickEvent());
     }
