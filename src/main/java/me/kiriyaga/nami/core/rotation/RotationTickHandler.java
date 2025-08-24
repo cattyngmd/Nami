@@ -36,8 +36,7 @@ public class RotationTickHandler {
         EVENT_MANAGER.register(this);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPreTick(PreTickEvent event) {
+    public void pre() {
         if (MC.player == null) return;
 
         RotationManagerModule module = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
@@ -70,7 +69,7 @@ public class RotationTickHandler {
         );
 
         float realYaw = MC.player.getYaw();
-        float spoofYaw = stateHandler.getRotationYaw();
+        float spoofYaw = stateHandler.getServerYaw();
         float delta = MathHelper.wrapDegrees(realYaw - spoofYaw);
 
         boolean forward = MC.options.forwardKey.isPressed();

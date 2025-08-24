@@ -164,8 +164,8 @@ public class AuraModule extends Module {
 
             if (raycastConfirm.get()) {
                 attackHit = raycastTarget(MC.player, target, attackRange.get(),
-                        ROTATION_MANAGER.getStateHandler().getRotationYaw(),
-                        ROTATION_MANAGER.getStateHandler().getRotationPitch());
+                        ROTATION_MANAGER.getStateHandler().getServerYaw(),
+                        ROTATION_MANAGER.getStateHandler().getServerPitch());
             } else {
                 Vec3d eyePos = MC.player.getEyePos();
                 Vec3d closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
