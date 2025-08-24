@@ -49,8 +49,8 @@ public abstract class MixinLivingEntity extends Entity {
         originalYaw = super.getYaw();
         originalPitch = super.getPitch();
 
-        float spoofYaw = ROTATION_MANAGER.getStateHandler().getServerYaw();
-        float spoofPitch = ROTATION_MANAGER.getStateHandler().getServerPitch();
+        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
 
         this.setYaw(spoofYaw);
         this.setPitch(spoofPitch);
@@ -69,10 +69,32 @@ public abstract class MixinLivingEntity extends Entity {
         this.setPitch(originalPitch);
     }
 
+    private Vec3d localToGlobal(Vec3d localVec, float yaw) {
+        double rad = Math.toRadians(yaw);
+        double cos = Math.cos(rad);
+        double sin = Math.sin(rad);
+
+        double x = localVec.x * cos - localVec.z * sin;
+        double z = localVec.x * sin + localVec.z * cos;
+
+        return new Vec3d(x, localVec.y, z);
+    }
+
+    private Vec3d globalToLocal(Vec3d globalVec, float yaw) {
+        double rad = Math.toRadians(yaw);
+        double cos = Math.cos(rad);
+        double sin = Math.sin(rad);
+
+        double x = globalVec.x * cos + globalVec.z * sin;
+        double z = -globalVec.x * sin + globalVec.z * cos;
+
+        return new Vec3d(x, globalVec.y, z);
+    }
+
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float jumpFix(float originalYaw) {
         if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
-        return ROTATION_MANAGER != null ? ROTATION_MANAGER.getStateHandler().getServerYaw() : originalYaw;
+        return ROTATION_MANAGER != null ? ROTATION_MANAGER.getStateHandler().getRotationYaw() : originalYaw;
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
