@@ -36,7 +36,7 @@ public class RotationTickHandler {
         EVENT_MANAGER.register(this);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
@@ -53,7 +53,7 @@ public class RotationTickHandler {
             idleReset();
         }
 
-        if (module.moveFix.get() && stateHandler.isRotating())
+        if (module.moveFix.get())
             fixMovementForSpoof();
 
         tickCount++;
