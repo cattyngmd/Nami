@@ -45,6 +45,7 @@ public class AuraModule extends Module {
     public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", false));
     public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
     public final BoolSetting raycast = addSetting(new BoolSetting("raycast", true));
+    public final BoolSetting raycastConfirm = addSetting(new BoolSetting("raycast confirm", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 10));
     public final DoubleSetting preRotate = addSetting(new DoubleSetting("pre rotate", 0.1, 0.0, 1.0));
 
@@ -52,6 +53,7 @@ public class AuraModule extends Module {
 
     public AuraModule() {
         super("aura", "Attacks certain targets automatically.", ModuleCategory.of("combat"), "killaura", "ara", "killara");
+    raycastConfirm.setShowCondition(raycast::get);
     }
 
     @Override
@@ -132,7 +134,7 @@ public class AuraModule extends Module {
             }
         }
 
-        float ticksUntilReady = skipCooldown ? (1.0f - cooldown) * tps / 6.0f : (1.0f - cooldown) * tps;
+        float ticksUntilReady = skipCooldown ? (1.0f - cooldown) * tps / 6.0f : (1.0f - cooldown) * tps; // we do not wanna 1 tick delay attacks on most servers, %6 is fast enough
 
         double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
 
@@ -153,12 +155,29 @@ public class AuraModule extends Module {
             ));
         }
 
-        if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && !raycast.get()) return;
+        if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && (!raycast.get() || !raycastConfirm.get()))
+            return;
 
         boolean canAttack;
         if (raycast.get()) {
-            EntityHitResult attackHit = raycastTarget(MC.player, target, attackRange.get());
-            canAttack = attackHit != null && attackHit.getEntity() == target;
+            EntityHitResult attackHit;
+
+            if (raycastConfirm.get()) {
+                attackHit = raycastTarget(MC.player, target, attackRange.get(),
+                        ROTATION_MANAGER.getStateHandler().getRotationYaw(),
+                        ROTATION_MANAGER.getStateHandler().getRotationPitch());
+            } else {
+                Vec3d eyePos = MC.player.getEyePos();
+                Vec3d closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
+                float idealYaw = (float) getYawToVec(MC.player, closestPoint);
+                float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
+
+                attackHit = raycastTarget(MC.player, target, attackRange.get(), idealYaw, idealPitch);
+            }
+
+            boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePos()); // i dont fucking know why raycast doesnt apply while inside AABB, i thought mc aabb fixes it
+
+            canAttack = insideBox || (attackHit != null && attackHit.getEntity() == target);
         } else {
             double dist = MC.player.getPos().distanceTo(getEntityCenter(target));
             canAttack = dist <= attackRange.get();
@@ -252,14 +271,9 @@ public class AuraModule extends Module {
     }
 
 
-    private static EntityHitResult raycastTarget(Entity player, Entity target, double reach) {
-        float yaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-        float pitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
-
+    private static EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
         Vec3d eyePos = player.getCameraPosVec(1.0f);
-
         Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
-
         Vec3d reachEnd = eyePos.add(look.multiply(reach));
 
         Box targetBox = target.getBoundingBox();
