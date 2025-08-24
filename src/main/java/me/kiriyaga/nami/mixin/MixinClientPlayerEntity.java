@@ -75,14 +75,25 @@ public abstract class MixinClientPlayerEntity {
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
-        if (!ROTATION_MANAGER.getStateHandler().isRotating())
+        if (!ROTATION_MANAGER.getStateHandler().isRotating()){
+            ROTATION_MANAGER.getStateHandler().setServerPitch(MC.player.getPitch());
+            ROTATION_MANAGER.getStateHandler().setServerYaw(MC.player.getYaw());
             return;
+        }
+
+        ROTATION_MANAGER.getTickHandler().pre(); // yes
 
         originalYaw = MC.player.getYaw();
         originalPitch = MC.player.getPitch();
 
-        MC.player.setYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
-        MC.player.setPitch(ROTATION_MANAGER.getStateHandler().getRotationPitch());
+        float y = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        float p = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+
+        MC.player.setYaw(y);
+        MC.player.setPitch(p);
+
+        ROTATION_MANAGER.getStateHandler().setServerYaw(y);
+        ROTATION_MANAGER.getStateHandler().setServerPitch(p);
 
         MC.player.setBodyYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
         MC.player.setHeadYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
