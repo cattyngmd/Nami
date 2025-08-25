@@ -21,7 +21,7 @@ public class TickRateManager {
         LOGGER.info("Tick Manager loaded");
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacket() instanceof WorldTimeUpdateS2CPacket) {
             long now = System.currentTimeMillis();

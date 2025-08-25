@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -35,11 +36,16 @@ public class ElytraFlyModule extends Module {
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.BOUNCE));
 
     // GLIDE
-    private final IntSetting minSpeed = addSetting(new IntSetting("min speed", 8, 1, 30));
-    private final IntSetting climbPitch = addSetting(new IntSetting("climb pitch", 27, 0, 89));
-    private final IntSetting divePitch = addSetting(new IntSetting("dive pitch", 38, 0, 89));
-    private final IntSetting cruisePitch = addSetting(new IntSetting("cruise pitch", 8, 0, 30));
+    private final IntSetting vLow = addSetting(new IntSetting("min speed", 14, 6, 40));
+    private final IntSetting vHigh = addSetting(new IntSetting("max speed", 27, 10, 60));
+    private final IntSetting climbPitch = addSetting(new IntSetting("climb pitch", 40, 0, 40));
+    private final IntSetting divePitch = addSetting(new IntSetting("dive pitch", 38, 20, 60));
+    private final IntSetting cruiseMin = addSetting(new IntSetting("cruise min", 4, 0, 20));
+    private final IntSetting cruiseMax = addSetting(new IntSetting("cruise max", 12, 2, 25));
+    private final BoolSetting allowRockets = addSetting(new BoolSetting("allow rockets", false));
+    private final IntSetting rocketSpeed = addSetting(new IntSetting("rocket below", 9, 0, 30));
 
+    //
     // CONTROL
     //private final BoolSetting midAirFreeze = addSetting(new BoolSetting("mid air freeze", false));
     private final BoolSetting lockPitch = addSetting(new BoolSetting("lock pitch", true));
@@ -51,14 +57,16 @@ public class ElytraFlyModule extends Module {
     private final IntSetting pitchDegree = addSetting(new IntSetting("pitch", 75, 0, 90));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
+    private enum GlideState { DIVE, CRUISE, CLIMB }
+    private GlideState glideState = GlideState.CRUISE;
     private double speed = 0;
-    private double[] speedSamples = new double[]{25};
+    private double[] speedSamples = new double[25];
     private int speedSampleIndex = 0;
     private boolean speedBufferFilled = false;
     private double baseY = 0;
-
     private double lastX = 0;
     private double lastZ = 0;
+    private double cruisePhase = 0;
 
     public ElytraFlyModule() {
         super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "elytrafly");
@@ -67,18 +75,24 @@ public class ElytraFlyModule extends Module {
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE && pitch.get());
         lockPitch.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
-        //midAirFreeze.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
-        minSpeed.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
+        vLow.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
+        vHigh.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         climbPitch.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         divePitch.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
-        cruisePitch.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
+        cruiseMin.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
+        cruiseMax.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
+        allowRockets.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
+        rocketSpeed.setShowCondition(() -> mode.get() == FlyMode.GLIDE && allowRockets.get());
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
-        if (MC.player != null)
+        if (MC.player != null) {
             baseY = MC.player.getY();
+            glideState = GlideState.CLIMB;
+            cruisePhase = 0;
+        }
     }
 
     @Override
@@ -172,31 +186,71 @@ public class ElytraFlyModule extends Module {
                 setJumpHeld(true);
             }
         } else if (mode.get() == FlyMode.GLIDE) {
+            if (!MC.player.isGliding()) return;
 
-            float currentPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
-            float targetPitch;
+            final double v = speed;
+            final int vLowVal = vLow.get();
+            final int vHighVal = Math.max(vHigh.get(), vLowVal + 2);
 
-            if (speed < minSpeed.get()) {
-                useItemAnywhere(Items.FIREWORK_ROCKET);
-                targetPitch = -climbPitch.get().floatValue();
-            } else {
-                if (MC.player.getY() > baseY + 2) {
-                    targetPitch = divePitch.get().floatValue();
-                } else {
-                    targetPitch = cruisePitch.get().floatValue() * (Math.sin(System.currentTimeMillis() * 0.005) > 0 ? 1 : -1);
-                }
+            switch (glideState) {
+                case DIVE:
+                    if (v >= vHighVal) glideState = GlideState.CRUISE;
+                    break;
+                case CLIMB:
+                    if (v <= vLowVal) glideState = GlideState.DIVE;
+                    break;
+                case CRUISE:
+                    if (v <= vLowVal - 1) glideState = GlideState.DIVE;
+                    else if (v >= vHighVal + 2) glideState = GlideState.CLIMB;
+                    break;
             }
 
-            float maxDelta = 10f;
-            float delta = targetPitch - currentPitch;
-            if (delta > maxDelta) delta = maxDelta;
-            if (delta < -maxDelta) delta = -maxDelta;
-            float smoothPitch = currentPitch + delta;
+            float targetPitch;
+            if (glideState == GlideState.DIVE) {
+                targetPitch = clampPitch(+divePitch.get());
+            } else if (glideState == GlideState.CLIMB) {
+                targetPitch = clampPitch(-climbPitch.get());
+            } else {targetPitch = cruisePitch();
+            }
+
+            float currentPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+            float smoothPitch = approach(currentPitch, targetPitch, 10);
+
+            //TODO yaw smooth n
 
             ROTATION_MANAGER.getRequestHandler().submit(
                     new RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), smoothPitch)
             );
+
+            if (allowRockets.get() && v < rocketSpeed.get()) {
+                useItemAnywhere(Items.FIREWORK_ROCKET);
+            }
         }
+    }
+
+
+    private float cruisePitch() {
+        double dt = 1.0 / 20.0;
+        double period = 2.6;
+        cruisePhase += dt / period;
+        if (cruisePhase > 1.0) cruisePhase -= 1.0;
+        double tri = 2.0 * Math.abs(2.0 * (cruisePhase - Math.floor(cruisePhase + 0.5))) - 1.0;
+        tri = Math.copySign(tri * tri, tri);
+        double min = cruiseMin.get();
+        double max = Math.max(cruiseMax.get(), cruiseMin.get() + 1);
+        double ampPitch = min + (max - min) * (0.5 * (tri + 1.0));
+        return clampPitch((float) -ampPitch);
+    }
+
+
+    private float approach(float current, float target, float maxDelta) {
+        float delta = MathHelper.clamp(target - current, -maxDelta, +maxDelta);
+        return current + delta;
+    }
+
+
+    private float clampPitch(float pitchDeg) {
+        return MathHelper.clamp(pitchDeg, -89f, 89f);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

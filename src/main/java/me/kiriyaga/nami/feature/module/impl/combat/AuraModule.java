@@ -197,7 +197,7 @@ public class AuraModule extends Module {
         if (!canAttack) return;
 
         if (!skipCooldown) {
-            if (cooldown < (tpsSync.get() ? 1.0f * (20f / tps) : 1.0f)) return;
+            if (cooldown < (tpsMode.get() != TpsMode.NONE ? 1.0f * (20f / tps) : 1.0f)) return;
         }
 
         MC.interactionManager.attackEntity(MC.player, target);
