@@ -36,6 +36,7 @@ public class ElytraFlyModule extends Module {
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.BOUNCE));
 
     // GLIDE
+    private final IntSetting targetY = addSetting(new IntSetting("targetY", 180, 60, 600));
     private final IntSetting vLow = addSetting(new IntSetting("min speed", 14, 6, 40));
     private final IntSetting vHigh = addSetting(new IntSetting("max speed", 27, 10, 60));
     private final IntSetting climbPitch = addSetting(new IntSetting("climb pitch", 40, 0, 40));
@@ -67,6 +68,8 @@ public class ElytraFlyModule extends Module {
     private double lastX = 0;
     private double lastZ = 0;
     private double cruisePhase = 0;
+    private long rocket = 0;
+    private boolean climbingToTarget = false;
 
     public ElytraFlyModule() {
         super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "elytrafly");
@@ -186,45 +189,66 @@ public class ElytraFlyModule extends Module {
                 setJumpHeld(true);
             }
         } else if (mode.get() == FlyMode.GLIDE) {
-            if (!MC.player.isGliding()) return;
+            if (!MC.player.isGliding())
+                return;
 
-            final double v = speed;
-            final int vLowVal = vLow.get();
-            final int vHighVal = Math.max(vHigh.get(), vLowVal + 2);
+            double playerY = MC.player.getY();
+            double target = targetY.get();
+            long currentTime = System.currentTimeMillis();
 
-            switch (glideState) {
-                case DIVE:
-                    if (v >= vHighVal) glideState = GlideState.CRUISE;
-                    break;
-                case CLIMB:
-                    if (v <= vLowVal) glideState = GlideState.DIVE;
-                    break;
-                case CRUISE:
-                    if (v <= vLowVal - 1) glideState = GlideState.DIVE;
-                    else if (v >= vHighVal + 2) glideState = GlideState.CLIMB;
-                    break;
+            if (!climbingToTarget && playerY < target - 80) {
+                climbingToTarget = true;
+            }
+
+            GlideState effectiveState;
+
+            if (climbingToTarget) {
+                effectiveState = GlideState.CLIMB;
+
+                if (allowRockets.get() && currentTime - rocket >= 3500) {
+                    useItemAnywhere(Items.FIREWORK_ROCKET);
+                    rocket = currentTime;
+                }
+
+                if (playerY >= target) {
+                    climbingToTarget = false;
+                }
+            } else {
+                final double v = speed;
+                final int vLowVal = vLow.get();
+                final int vHighVal = Math.max(vHigh.get(), vLowVal + 2);
+
+                switch (glideState) {
+                    case DIVE:
+                        if (v >= vHighVal) glideState = GlideState.CRUISE;
+                        break;
+                    case CLIMB:
+                        if (v <= vLowVal) glideState = GlideState.DIVE;
+                        break;
+                    case CRUISE:
+                        if (v <= vLowVal - 1) glideState = GlideState.DIVE;
+                        else if (v >= vHighVal + 2) glideState = GlideState.CLIMB;
+                        break;
+                }
+                effectiveState = glideState;
             }
 
             float targetPitch;
-            if (glideState == GlideState.DIVE) {
+            if (effectiveState == GlideState.DIVE) {
                 targetPitch = clampPitch(+divePitch.get());
-            } else if (glideState == GlideState.CLIMB) {
+            } else if (effectiveState == GlideState.CLIMB) {
                 targetPitch = clampPitch(-climbPitch.get());
-            } else {targetPitch = cruisePitch();
+            } else {
+                targetPitch = cruisePitch();
             }
 
             float currentPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
             float smoothPitch = approach(currentPitch, targetPitch, 10);
 
             //TODO yaw smooth n
-
             ROTATION_MANAGER.getRequestHandler().submit(
                     new RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), smoothPitch)
             );
-
-            if (allowRockets.get() && v < rocketSpeed.get()) {
-                useItemAnywhere(Items.FIREWORK_ROCKET);
-            }
         }
     }
 
