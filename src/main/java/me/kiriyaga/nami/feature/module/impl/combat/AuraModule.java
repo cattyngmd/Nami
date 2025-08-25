@@ -40,6 +40,7 @@ public class AuraModule extends Module {
 
     public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.00, 1.0, 6.0));
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("attack", 3.00, 1.0, 6.0));
+    public final BoolSetting vanillaRange = addSetting(new BoolSetting("vanilla range", true));
     public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
     public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", false));
@@ -137,6 +138,9 @@ public class AuraModule extends Module {
         float ticksUntilReady = skipCooldown ? (1.0f - cooldown) * tps / 6.0f : (1.0f - cooldown) * tps; // we do not wanna 1 tick delay attacks on most servers, %6 is fast enough
 
         double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
+
+//        if (MC.player.isGliding() && eyeDist >= 2.601) // yes
+//            return;
 
         if (eyeDist <= rotateRange.get() && ticksUntilReady <= preRotate.get() * tps) {
             Vec3d rotationTarget;
@@ -249,7 +253,14 @@ public class AuraModule extends Module {
     }
 
     private static double getClosestEyeDistance(Vec3d eyePos, Box box) {
-        Vec3d closest = getClosestPointToEye(eyePos, box);
+        Vec3d closest;
+
+        if (MC.player.isGliding()) {
+            closest = box.getCenter();
+        } else {
+            closest = getClosestPointToEye(eyePos, box);
+        }
+
         return eyePos.distanceTo(closest);
     }
 
@@ -271,10 +282,10 @@ public class AuraModule extends Module {
     }
 
 
-    private static EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
+    private EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
         Vec3d eyePos = player.getCameraPosVec(1.0f);
         Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3d reachEnd = eyePos.add(look.multiply(reach));
+        Vec3d reachEnd = eyePos.add(look.multiply(vanillaRange.get() ? 3.00 : reach));
 
         Box targetBox = target.getBoundingBox();
 
