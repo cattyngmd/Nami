@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.core.TickRateManager;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
@@ -12,6 +13,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
 import me.kiriyaga.nami.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
@@ -39,12 +41,14 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AuraModule extends Module {
 
+    public enum TpsMode { NONE, LATEST, AVERAGE }
+
     public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.00, 1.0, 6.0));
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("attack", 3.00, 1.0, 6.0));
     public final BoolSetting vanillaRange = addSetting(new BoolSetting("vanilla range", true));
     public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
-    public final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", false));
+    public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("tps", TpsMode.NONE));
     public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
     public final BoolSetting raycast = addSetting(new BoolSetting("raycast", true));
     public final BoolSetting raycastConfirm = addSetting(new BoolSetting("raycast confirm", true));
@@ -91,10 +95,12 @@ public class AuraModule extends Module {
 
         float cooldown = MC.player.getAttackCooldownProgress(0f);
         float tps = 20f;
-        if (tpsSync.get() && MC.getServer() != null) {
-            double tickTimeMs = MC.getServer().getAverageTickTime() / 1_000_000.0;
-            tps = (float) Math.min(20.0, 1000.0 / tickTimeMs);
+        switch (tpsMode.get()) {
+            case LATEST -> tps = TICK_MANAGER.getLatestTPS();
+            case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
+            default -> tps = 20f;
         }
+
 
         boolean skipCooldown = false;
 

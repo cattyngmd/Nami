@@ -17,7 +17,6 @@ import static me.kiriyaga.nami.Nami.*;
 public class TpsModule extends HudElementModule {
 
     public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
-    public final BoolSetting tpsSync = addSetting(new BoolSetting("sync with server tick", true));
 
     public TpsModule() {
         super("tps", "Displays server TPS.", 0, 0, 50, 9);
@@ -27,7 +26,7 @@ public class TpsModule extends HudElementModule {
     public Text getDisplayText() {
         float avgTps = TICK_MANAGER.getAverageTPS();
         float latestTps = TICK_MANAGER.getLatestTPS();
-        String tpsText = String.format("%.2f {bg}[{bw}%d{bw}]", avgTps, Math.round(latestTps));
+        String tpsText = String.format("%.2f {bg}[{bw}%.2f{bw}]", avgTps, latestTps);
         String text = displayLabel.get() ? "{bg}TPS: {bw}" + tpsText : "{bw}" + tpsText;
 
         width = MC.textRenderer.getWidth(text.replace("{bg}", "").replace("{bw}", ""));

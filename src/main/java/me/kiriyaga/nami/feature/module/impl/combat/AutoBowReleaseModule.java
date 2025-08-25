@@ -1,11 +1,12 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.core.TickRateManager;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -14,25 +15,27 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class AutoBowReleaseModule extends Module {
+    public enum TpsMode {NONE, LATEST, AVERAGE}
 
     private final IntSetting ticks = addSetting(new IntSetting("delay", 3, 1, 21));
-    private final BoolSetting tpsSync = addSetting(new BoolSetting("tps sync", false));
-    private float tps = 20.0f;
+    private final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("tps", TpsMode.NONE));
 
     private float ticker = 0f;
 
     public AutoBowReleaseModule() {
-        super("auto bow release", "Automatically releases bow after holding for a set time.", ModuleCategory.of("combat"), "autbowrelease");
+        super("auto bow release",
+                "Automatically releases bow after holding for a set time.",
+                ModuleCategory.of("combat"),
+                "autbowrelease");
     }
 
     @Override
     public void onEnable() {
         ticker = 0f;
-        tps = 20.0f;
     }
 
     @SubscribeEvent
@@ -42,21 +45,20 @@ public class AutoBowReleaseModule extends Module {
         Item usedItem = MC.player.getActiveItem().getItem();
         if (usedItem != Items.BOW && usedItem != Items.TRIDENT) return;
 
-        if (tpsSync.get() && MC.getServer() != null) {
-            double tickTimeMs = MC.getServer().getAverageTickTime() / 1_000_000.0;
-            tps = (float) Math.min(20.0, 1000.0 / tickTimeMs);
-        } else {
-            tps = 20.0f;
-        }
+        float tps = switch (tpsMode.get()) {
+            case LATEST -> TICK_MANAGER.getLatestTPS();
+            case AVERAGE -> TICK_MANAGER.getAverageTPS();
+            default -> 20.0f;
+        };
 
         ticker += tps / 20.0f;
 
         if (ticker >= ticks.get()) {
             ticker = 0f;
 
-            // i had some smart fucking key handling and press imitation here, but mc i fucked up so ill just use packets and interactions
-
-            MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
+            MC.getNetworkHandler().sendPacket(
+                    new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN)
+            );
             MC.player.stopUsingItem();
             MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
         }
