@@ -36,7 +36,6 @@ public class ElytraFlyModule extends Module {
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.BOUNCE));
 
     // GLIDE
-    private final IntSetting targetY = addSetting(new IntSetting("target Y", 180, 80, 700));
     private final IntSetting vLow = addSetting(new IntSetting("min speed", 14, 6, 40));
     private final IntSetting vHigh = addSetting(new IntSetting("max speed", 27, 10, 60));
     private final IntSetting climbPitch = addSetting(new IntSetting("climb pitch", 40, 0, 40));
@@ -68,8 +67,6 @@ public class ElytraFlyModule extends Module {
     private double lastX = 0;
     private double lastZ = 0;
     private double cruisePhase = 0;
-    private long lastFireworkTime = 0;
-    private final long fireworkCooldown = 3000;
 
     public ElytraFlyModule() {
         super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "elytrafly");
@@ -86,7 +83,6 @@ public class ElytraFlyModule extends Module {
         cruiseMax.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         allowRockets.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         rocketSpeed.setShowCondition(() -> mode.get() == FlyMode.GLIDE && allowRockets.get());
-        targetY.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
     }
 
     @Override
@@ -188,58 +184,46 @@ public class ElytraFlyModule extends Module {
                 );
 
                 setJumpHeld(true);
-            } else if (mode.get() == FlyMode.GLIDE) {
-                if (!MC.player.isGliding()) return;
+            }
+        } else if (mode.get() == FlyMode.GLIDE) {
+            if (!MC.player.isGliding()) return;
 
-                final double currentY = MC.player.getY();
-                final double dyTarget = targetY.get() - currentY;
+            final double v = speed;
+            final int vLowVal = vLow.get();
+            final int vHighVal = Math.max(vHigh.get(), vLowVal + 2);
 
-                boolean ascendOnly = dyTarget > 60;
+            switch (glideState) {
+                case DIVE:
+                    if (v >= vHighVal) glideState = GlideState.CRUISE;
+                    break;
+                case CLIMB:
+                    if (v <= vLowVal) glideState = GlideState.DIVE;
+                    break;
+                case CRUISE:
+                    if (v <= vLowVal - 1) glideState = GlideState.DIVE;
+                    else if (v >= vHighVal + 2) glideState = GlideState.CLIMB;
+                    break;
+            }
 
-                float targetPitch;
+            float targetPitch;
+            if (glideState == GlideState.DIVE) {
+                targetPitch = clampPitch(+divePitch.get());
+            } else if (glideState == GlideState.CLIMB) {
+                targetPitch = clampPitch(-climbPitch.get());
+            } else {targetPitch = cruisePitch();
+            }
 
-                if (ascendOnly) {
-                    targetPitch = clampPitch(-40f);
-                    long now = System.currentTimeMillis();
-                    if (allowRockets.get() && now - lastFireworkTime > fireworkCooldown) {
-                        if (useItemAnywhere(Items.FIREWORK_ROCKET)) {
-                            lastFireworkTime = now;
-                        }
-                    }
-                } else {
-                    final double v = speed;
-                    final int vLowVal = vLow.get();
-                    final int vHighVal = Math.max(vHigh.get(), vLowVal + 2);
+            float currentPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+            float smoothPitch = approach(currentPitch, targetPitch, 10);
 
-                    switch (glideState) {
-                        case DIVE:
-                            if (v >= vHighVal) glideState = GlideState.CRUISE;
-                            break;
-                        case CLIMB:
-                            if (v <= vLowVal) glideState = GlideState.DIVE;
-                            break;
-                        case CRUISE:
-                            if (v <= vLowVal - 1) glideState = GlideState.DIVE;
-                            else if (v >= vHighVal + 2) glideState = GlideState.CLIMB;
-                            break;
-                    }
+            //TODO yaw smooth n
 
-                    if (glideState == GlideState.DIVE) {
-                        targetPitch = clampPitch(+divePitch.get());
-                    } else if (glideState == GlideState.CLIMB) {
-                        targetPitch = clampPitch(-climbPitch.get());
-                    } else {
-                        targetPitch = cruisePitch();
-                    }
-                }
+            ROTATION_MANAGER.getRequestHandler().submit(
+                    new RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), smoothPitch)
+            );
 
-                float currentPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
-                float smoothPitch = approach(currentPitch, targetPitch, 10);
-                //TODO yaw smooth n
-
-                ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), smoothPitch)
-                );
+            if (allowRockets.get() && v < rocketSpeed.get()) {
+                useItemAnywhere(Items.FIREWORK_ROCKET);
             }
         }
     }
