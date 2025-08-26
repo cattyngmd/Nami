@@ -13,7 +13,7 @@ import net.minecraft.text.Text;
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
-public class SpeedModule extends HudElementModule {
+public class SpeedometerModule extends HudElementModule {
 
     public enum SpeedMode {
         KMH, BPS
@@ -31,8 +31,8 @@ public class SpeedModule extends HudElementModule {
     private double lastX = 0;
     private double lastZ = 0;
 
-    public SpeedModule() {
-        super("speed", "Displays current player speed.", 0, 0, 50, 9);
+    public SpeedometerModule() {
+        super("speedometer", "Displays current player speed.", 0, 0, 50, 9);
 
         samples.setOnChanged(() -> {
             speedSamples = new double[samples.get()];
