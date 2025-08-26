@@ -39,11 +39,11 @@ public class ElytraFlyModule extends Module {
     private final IntSetting targetY = addSetting(new IntSetting("targetY", 180, 60, 600));
     private final IntSetting vLow = addSetting(new IntSetting("min speed", 14, 6, 40));
     private final IntSetting vHigh = addSetting(new IntSetting("max speed", 27, 10, 60));
-    private final IntSetting climbPitch = addSetting(new IntSetting("climb pitch", 40, 0, 40));
+    private final IntSetting climbPitch = addSetting(new IntSetting("climb pitch", 40, 0, 60));
     private final IntSetting divePitch = addSetting(new IntSetting("dive pitch", 38, 20, 60));
     private final IntSetting cruiseMin = addSetting(new IntSetting("cruise min", 4, 0, 20));
     private final IntSetting cruiseMax = addSetting(new IntSetting("cruise max", 12, 2, 25));
-    private final BoolSetting allowRockets = addSetting(new BoolSetting("allow rockets", false));
+    private final BoolSetting allowRockets = addSetting(new BoolSetting("allow rockets", true));
     private final IntSetting rocketSpeed = addSetting(new IntSetting("rocket below", 9, 0, 30));
 
     //
