@@ -11,6 +11,8 @@ import net.minecraft.client.MinecraftClient;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 
+import java.util.Locale;
+
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
@@ -26,7 +28,7 @@ public class TpsModule extends HudElementModule {
     public Text getDisplayText() {
         float avgTps = TICK_MANAGER.getAverageTPS();
         float latestTps = TICK_MANAGER.getLatestTPS();
-        String tpsText = String.format("%.2f {bg}[{bw}%.2f{bg}]", avgTps, latestTps);
+        String tpsText = String.format(Locale.US, "%.2f {bg}[{bw}%.2f{bg}]", avgTps, latestTps); // locale is wild
         String text = displayLabel.get() ? "{bg}TPS: {bw}" + tpsText : "{bw}" + tpsText;
 
         width = MC.textRenderer.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
