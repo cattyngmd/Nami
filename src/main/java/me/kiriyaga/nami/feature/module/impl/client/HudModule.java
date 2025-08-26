@@ -85,7 +85,7 @@ public class HudModule extends Module {
 
         if (MC.getDebugHud().shouldShowDebugHud())
             return;
-        
+
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             if (module instanceof HudElementModule hudElement && hudElement.isEnabled()) {
                 int baseY = hudElement.getRenderY();

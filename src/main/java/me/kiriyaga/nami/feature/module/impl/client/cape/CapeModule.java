@@ -11,6 +11,7 @@ public class CapeModule extends Module {
 
     public CapeModule() {
         super("cape", "Defines cape renderer logic.", ModuleCategory.of("client"), "customcape");
+        cape.setShow(false);//haha
     }
 
     public CapeType getSelectedCape() {
