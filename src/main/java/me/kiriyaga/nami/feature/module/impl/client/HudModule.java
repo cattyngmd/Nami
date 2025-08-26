@@ -83,6 +83,9 @@ public class HudModule extends Module {
         int chatZoneTop = screenHeight - (screenHeight / 8);
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
 
+        if (MC.getDebugHud().shouldShowDebugHud())
+            return;
+        
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             if (module instanceof HudElementModule hudElement && hudElement.isEnabled()) {
                 int baseY = hudElement.getRenderY();
