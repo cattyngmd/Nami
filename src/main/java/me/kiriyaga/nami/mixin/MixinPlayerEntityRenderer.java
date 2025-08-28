@@ -20,7 +20,7 @@ public abstract class MixinPlayerEntityRenderer {
             if (MinecraftClient.getInstance().player != null &&
                     playerEntityRenderState.name != null &&
                     playerEntityRenderState.name.equals(MinecraftClient.getInstance().player.getName().getString())) {
-                playerEntityRenderState.pitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+                playerEntityRenderState.pitch = ROTATION_MANAGER.getStateHandler().getRenderPitch();
             }
         }
     }

@@ -84,8 +84,8 @@ public abstract class MixinClientPlayerEntity {
         MC.player.setYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
         MC.player.setPitch(ROTATION_MANAGER.getStateHandler().getRotationPitch());
 
-        MC.player.setBodyYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
-        MC.player.setHeadYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
+        MC.player.setBodyYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
+        MC.player.setHeadYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
     }
 
     @Inject(method = "sendMovementPackets", at = @At("TAIL"))
