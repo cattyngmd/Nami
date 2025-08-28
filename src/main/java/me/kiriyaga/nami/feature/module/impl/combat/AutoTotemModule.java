@@ -10,16 +10,24 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.setting.impl.EnumSetting;
 import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -27,6 +35,11 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoTotemModule extends Module {
 
+    private enum Offhand { CRYSTAL, GAPPLE, ITEMFRAME, MENDING}
+
+    private final BoolSetting offhandOverride = addSetting(new BoolSetting("override", false));
+    private final IntSetting overrideHealth = addSetting(new IntSetting("health", 16, 10, 36));
+    private final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("item", Offhand.CRYSTAL));
     private final BoolSetting fastSwap = addSetting(new BoolSetting("alternative", false));
     private final BoolSetting fastSwapHotbar = addSetting(new BoolSetting("safety", false));
     private final IntSetting fastSlot = addSetting(new IntSetting("safety slot", 8, 0, 8));
@@ -45,6 +58,9 @@ public class AutoTotemModule extends Module {
         fastSlot.setShowCondition(() -> fastSwapHotbar.get());
         fastSlot.setShowCondition(() -> (fastSwapHotbar.get()&&fastSwap.get()));
         cursorStack.setShowCondition(() -> !(fastSwap.get()));
+
+        overrideHealth.setShowCondition(offhandOverride::get);
+        overrideItem.setShowCondition(offhandOverride::get);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -63,7 +79,7 @@ public class AutoTotemModule extends Module {
         }
         this.setDisplayInfo(String.valueOf(totemCount));
 
-        attemptPlaceTotem();
+        attemptPlaceOffhand();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -77,52 +93,104 @@ public class AutoTotemModule extends Module {
         }
     }
 
-    private void attemptPlaceTotem() {
+    private void attemptPlaceOffhand() {
         ClientPlayerEntity player = MC.player;
-        ItemStack offhandStack = player.getOffHandStack();
+        if (player == null) return;
 
-        boolean hasOffhandTotem = offhandStack.getItem() == Items.TOTEM_OF_UNDYING;
+        ItemStack offhandStack = player.getOffHandStack();
+        ItemStack targetStack = null;
+        boolean overrideActive = false;
+
+        if (offhandOverride.get()) {
+            int effectiveHealth = (int) (player.getHealth() + player.getAbsorptionAmount());
+            if (effectiveHealth >= overrideHealth.get()) {
+                targetStack = getOverrideStack();
+                if (targetStack != null) {
+                    overrideActive = true;
+                }
+            }
+        }
+
+        if (targetStack == null) {
+            targetStack = findTotemStack();
+            if (targetStack == null) return;
+        }
+
+        if (offhandStack.getItem() == targetStack.getItem()) return;
+
+        int targetSlot = findInventorySlot(targetStack);
+        if (targetSlot == -1) return;
 
         if (fastSwap.get()) {
             int fastSlotIndex = fastSlot.get();
-            if (fastSlotIndex < 0 || fastSlotIndex > 8) return;
+            if (fastSlotIndex >= 0 && fastSlotIndex <= 8) {
+                ItemStack fastSlotStack = player.getInventory().getStack(fastSlotIndex);
+                boolean fastSlotHasTarget = fastSlotStack.getItem() == targetStack.getItem();
 
-            int totemSlot = findTotemSlot();
-
-            if (totemSlot == -1) {
-                return;
-            }
-
-            ItemStack fastSlotStack = player.getInventory().getStack(fastSlotIndex);
-            boolean fastSlotHasTotem = fastSlotStack.getItem() == Items.TOTEM_OF_UNDYING;
-
-            if (fastSwapHotbar.get()) {
-                if (!fastSlotHasTotem && totemSlot != fastSlotIndex) {
-                    INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totemSlot), fastSlotIndex);
-                    lastAttemptTime = System.currentTimeMillis();
-                    fastSlotHasTotem = true;
-                }
-                if (!hasOffhandTotem && fastSlotHasTotem) {
-                    INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(fastSlotIndex), 40);
-
-                    lastAttemptTime = System.currentTimeMillis();
-                }
-            } else {
-                if (!hasOffhandTotem) {
-                    INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totemSlot), 40);
-                    lastAttemptTime = System.currentTimeMillis();
+                if (fastSwapHotbar.get()) {
+                    if (!fastSlotHasTarget && targetSlot != fastSlotIndex) {
+                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(targetSlot), fastSlotIndex);
+                        lastAttemptTime = System.currentTimeMillis();
+                        fastSlotHasTarget = true;
+                    }
+                    offhandStack = player.getOffHandStack();
+                    if (offhandStack.getItem() != targetStack.getItem() && fastSlotHasTarget) {
+                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(fastSlotIndex), 40);
+                        lastAttemptTime = System.currentTimeMillis();
+                    }
+                } else {
+                    if (offhandStack.getItem() != targetStack.getItem()) {
+                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(targetSlot), 40);
+                        lastAttemptTime = System.currentTimeMillis();
+                    }
                 }
             }
         } else {
-            int totemSlot = findTotemSlot();
-            if (!hasOffhandTotem && totemSlot != -1) {
-                swapToOffhand(totemSlot);
-                lastAttemptTime = System.currentTimeMillis();
-            }
+            swapToOffhand(targetSlot);
+            lastAttemptTime = System.currentTimeMillis();
         }
 
         totemCount = countTotems();
         setDisplayInfo("" + totemCount);
+    }
+
+    private ItemStack findTotemStack() {
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = MC.player.getInventory().getStack(i);
+            if (stack.getItem() == Items.TOTEM_OF_UNDYING) return stack;
+        }
+        return null;
+    }
+
+    private ItemStack getOverrideStack() {
+        Offhand type = overrideItem.get();
+        ClientPlayerEntity player = MC.player;
+
+        switch (type) {
+            case CRYSTAL:
+                return new ItemStack(Items.END_CRYSTAL);
+            case GAPPLE:
+                return new ItemStack(Items.ENCHANTED_GOLDEN_APPLE);
+            case ITEMFRAME:
+                return new ItemStack(Items.ITEM_FRAME);
+            case MENDING:
+                for (int i = 0; i < 36; i++) {
+                    ItemStack stack = player.getInventory().getStack(i);
+                    if (stack.isEmpty()) continue;
+
+                    if (stack.isIn(ItemTags.HEAD_ARMOR)) continue;
+                    if (stack.isIn(ItemTags.CHEST_ARMOR)) continue;
+                    if (stack.isIn(ItemTags.LEG_ARMOR)) continue;
+                    if (stack.isIn(ItemTags.FOOT_ARMOR)) continue;
+
+                    if (!hasMending(stack)) continue;
+                    if (isFullyRepaired(stack)) continue;
+
+                    return stack;
+                }
+                break;
+        }
+        return null;
     }
 
     private void swapToOffhand(int invSlot) {
@@ -224,5 +292,23 @@ public class AutoTotemModule extends Module {
         );
 
         CHAT_MANAGER.sendPersistent(AutoTotemModule.class.getName(), message);
+    }
+
+    private int findInventorySlot(ItemStack stack) {
+        for (int i = 0; i < 36; i++) {
+            if (MC.player.getInventory().getStack(i).getItem() == stack.getItem()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean hasMending(ItemStack stack) {
+        return EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0;
+    }
+
+    private boolean isFullyRepaired(ItemStack stack) {
+        if (!stack.isDamageable()) return true;
+        return stack.getDamage() == 0;
     }
 }
