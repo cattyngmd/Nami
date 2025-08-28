@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.combat;
 import me.kiriyaga.nami.core.TickRateManager;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -28,6 +29,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.*;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.text.Text;
@@ -57,6 +59,7 @@ public class AuraModule extends Module {
     public final DoubleSetting preRotate = addSetting(new DoubleSetting("pre rotate", 0.1, 0.0, 1.0));
 
     private Entity currentTarget = null;
+    private float attackCooldownTicks = 0f;
 
     public AuraModule() {
         super("aura", "Attacks certain targets automatically.", ModuleCategory.of("combat"), "killaura", "ara", "killara");
@@ -77,54 +80,44 @@ public class AuraModule extends Module {
         long startTime = System.nanoTime();
 
         ItemStack stack = MC.player.getMainHandStack();
-
         Entity target = ENTITY_MANAGER.getTarget();
-
         Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
 
-        if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem || stack.isIn(ItemTags.SWORDS) || stack.getItem() instanceof TridentItem || stack.getItem() instanceof MaceItem))) {
+        if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem
+                || stack.isIn(ItemTags.SWORDS)
+                || stack.getItem() instanceof TridentItem
+                || stack.getItem() instanceof MaceItem))) {
             currentTarget = null;
             this.setDisplayInfo("");
             return;
         }
 
         currentTarget = target;
-
         this.setDisplayInfo(target.getName().getString());
-
         long auraLogicStart = System.nanoTime();
 
-        float cooldown = MC.player.getAttackCooldownProgress(0f);
-        float tps = 20f;
+        float tps;
         switch (tpsMode.get()) {
             case LATEST -> tps = TICK_MANAGER.getLatestTPS();
             case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
             default -> tps = 20f;
         }
 
+//        if (!ItemStack.areEqual(stack, lastHeldStack)) {
+//            lastHeldStack = stack;
+//            attackCooldownTicks = getBaseCooldownTicks(stack, tps);
+//        }
+
+        attackCooldownTicks -= 1f * (tps / 20f);
+        if (attackCooldownTicks < 0f) attackCooldownTicks = 0f;
 
         boolean skipCooldown = false;
 
         if (target instanceof ShulkerBulletEntity) {
             skipCooldown = true;
         } else {
-            ItemStack held = MC.player.getMainHandStack();
-            float attackDamage = 1.0f; // without charge the damage always 1 i guess
-//
-//            if (held.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
-//                AttributeModifiersComponent modifiers = held.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-//                for (var entry : modifiers.comp_2393()) {
-//                    if (entry.comp_2395().matches(EntityAttributes.ATTACK_DAMAGE)) {
-//                        attackDamage += (float) entry.comp_2396().value();
-//                    }
-//                }
-//            }
-
-            // idk that shit doesnt apply, i thought it should
-//            int sharpnessLevel = EnchantmentUtils.getEnchantmentLevel(held, Enchantments.SHARPNESS);
-//            if (sharpnessLevel > 0) {
-//                attackDamage += 0.5f * sharpnessLevel + 0.5f;
-//            }
+            ItemStack held = stack;
+            float attackDamage = 1.0f;
 
             if (MC.player.hasStatusEffect(StatusEffects.STRENGTH)) {
                 var strength = MC.player.getStatusEffect(StatusEffects.STRENGTH);
@@ -143,14 +136,12 @@ public class AuraModule extends Module {
             }
         }
 
-        float ticksUntilReady = skipCooldown ? (1.0f - cooldown) * tps / 6.0f : (1.0f - cooldown) * tps; // we do not wanna 1 tick delay attacks on most servers, %6 is fast enough
+        //        if (MC.player.isGliding() && eyeDist >= 2.601) // yes
+        //            return;
 
         double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
 
-//        if (MC.player.isGliding() && eyeDist >= 2.601) // yes
-//            return;
-
-        if (eyeDist <= rotateRange.get() && ticksUntilReady <= preRotate.get() * tps) {
+        if (eyeDist <= rotateRange.get() && (skipCooldown || attackCooldownTicks <= preRotate.get() * tps)) {
             Vec3d rotationTarget;
             if (raycast.get()) {
                 Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
@@ -173,7 +164,6 @@ public class AuraModule extends Module {
         boolean canAttack;
         if (raycast.get()) {
             EntityHitResult attackHit;
-
             if (raycastConfirm.get()) {
                 attackHit = raycastTarget(MC.player, target, attackRange.get(),
                         ROTATION_MANAGER.getStateHandler().getRotationYaw(),
@@ -183,12 +173,9 @@ public class AuraModule extends Module {
                 Vec3d closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
                 float idealYaw = (float) getYawToVec(MC.player, closestPoint);
                 float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
-
                 attackHit = raycastTarget(MC.player, target, attackRange.get(), idealYaw, idealPitch);
             }
-
             boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePos()); // i dont fucking know why raycast doesnt apply while inside AABB, i thought mc aabb fixes it
-
             canAttack = insideBox || (attackHit != null && attackHit.getEntity() == target);
         } else {
             double dist = MC.player.getPos().distanceTo(getEntityCenter(target));
@@ -196,10 +183,7 @@ public class AuraModule extends Module {
         }
 
         if (!canAttack) return;
-
-        if (!skipCooldown) {
-            if (cooldown < (tpsMode.get() != TpsMode.NONE ? 1.0f * (20f / tps) : 1.0f)) return;
-        }
+        if (!skipCooldown && attackCooldownTicks > 0f) return;
 
         if (stopSprinting.get())
             MC.player.setSprinting(false);
@@ -207,11 +191,32 @@ public class AuraModule extends Module {
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
 
+        if (!skipCooldown) attackCooldownTicks = getBaseCooldownTicks(stack, tps);
+
         long auraLogicDuration = System.nanoTime() - auraLogicStart;
         debugModule.debugAura(Text.of(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0)));
-
         long totalDuration = System.nanoTime() - startTime;
         debugModule.debugAura(Text.of(String.format("total %.3f ms", totalDuration / 1_000_000.0)));
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPacketReceive(PacketReceiveEvent ev) {
+        if (!(ev.getPacket() instanceof UpdateSelectedSlotC2SPacket)) return;
+        if (MC.player == null || MC.world == null) return;
+
+        MC.execute(() -> {
+            ItemStack stack = MC.player.getMainHandStack();
+            if (stack == null || stack.isEmpty()) return;
+
+            float tps;
+            switch (tpsMode.get()) {
+                case LATEST -> tps = TICK_MANAGER.getLatestTPS();
+                case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
+                default -> tps = 20f;
+            }
+
+            attackCooldownTicks = getBaseCooldownTicks(stack, tps);
+        });
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -316,5 +321,20 @@ public class AuraModule extends Module {
         double z = Math.cos(fPitch) * Math.cos(fYaw);
 
         return new Vec3d(x, y, z).normalize();
+    }
+
+    private static float getBaseCooldownTicks(ItemStack stack, float tps) {
+        float baseTicks;
+
+        if (stack.isIn(ItemTags.SWORDS)) baseTicks = 12f;
+        else if (stack.isIn(ItemTags.AXES)) baseTicks = 25f;
+        else if (stack.getItem() instanceof TridentItem) baseTicks = 18f;
+        else if (stack.getItem() instanceof MaceItem) baseTicks = 33f;
+        else {
+            float attackSpeed = 6f; // 2b2t allows from 4 to 6
+            baseTicks = 20f / attackSpeed;
+        }
+
+        return baseTicks * (20f / tps);
     }
 }
