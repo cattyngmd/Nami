@@ -54,7 +54,6 @@ public class PrinterModule extends Module {
     private int cooldown = 0;
     private int swapCooldown = 0;
     private BlockPos renderPos = null;
-    private BlockPos dynamicBase = null; // fuck ahah
 
     public PrinterModule() {
         super("printer", "Simplified printer module, it uses air place only.", ModuleCategory.of("world"));
@@ -98,16 +97,8 @@ public class PrinterModule extends Module {
                 Block required = Registries.BLOCK.get(Identifier.of(blockId));
                 BlockPos worldPos;
                 if ("dynamic".equalsIgnoreCase(type)) {
-                    if (dynamicBase == null) {
-                        if (PrinterCommand.pos1 != null) {
-                            dynamicBase = PrinterCommand.pos1;
-                        } else if (MC.player != null) {
-                            dynamicBase = MC.player.getBlockPos();
-                        } else {
-                            continue;
-                        }
-                    }
-                    worldPos = dynamicBase.add(bx, by, bz);
+                    if (PrinterCommand.pos1 == null) continue;
+                    worldPos = PrinterCommand.pos1.add(bx, by, bz);
                 } else {
                     worldPos = new BlockPos(bx, by, bz);
                 }
@@ -205,7 +196,6 @@ public class PrinterModule extends Module {
         Color color = colorModule.getStyledGlobalColor();
         Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
 
-        // 1. Если схем нет → рендерим pos1/pos2
         if (PrinterCommand.getLoadedSchematics().isEmpty()) {
             BlockPos p1 = PrinterCommand.pos1;
             BlockPos p2 = PrinterCommand.pos2;
@@ -240,8 +230,8 @@ public class PrinterModule extends Module {
 
                 BlockPos worldPos;
                 if ("dynamic".equalsIgnoreCase(schematic.getType())) {
-                    if (dynamicBase == null) continue;
-                    worldPos = dynamicBase.add(bx, by, bz);
+                    if (PrinterCommand.pos1 == null) continue;
+                    worldPos = PrinterCommand.pos1.add(bx, by, bz);
                 } else {
                     worldPos = new BlockPos(bx, by, bz);
                 }
