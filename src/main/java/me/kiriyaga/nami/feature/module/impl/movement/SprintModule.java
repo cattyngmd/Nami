@@ -25,7 +25,7 @@ public class SprintModule extends Module {
         super("sprint", "Automatically makes you sprint while moving forward.", ModuleCategory.of("movement"));
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onUpdateEvent(PreTickEvent event) {
         ClientPlayerEntity player = MC.player;
         if (player == null) return;

@@ -50,6 +50,7 @@ public class AuraModule extends Module {
     public final BoolSetting render = addSetting(new BoolSetting("render", true));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("tps", TpsMode.NONE));
     public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
+    public final BoolSetting stopSprinting = addSetting(new BoolSetting("stop sprinting", true));
     public final BoolSetting raycast = addSetting(new BoolSetting("raycast", true));
     public final BoolSetting raycastConfirm = addSetting(new BoolSetting("raycast confirm", true));
     private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 10));
@@ -68,7 +69,7 @@ public class AuraModule extends Module {
         //ROTATION_MANAGER.cancelRequest(AuraModule.class.getName()); //no
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) return;
         if (!multiTask.get() && MC.player.isUsingItem()) return;
@@ -199,6 +200,9 @@ public class AuraModule extends Module {
         if (!skipCooldown) {
             if (cooldown < (tpsMode.get() != TpsMode.NONE ? 1.0f * (20f / tps) : 1.0f)) return;
         }
+
+        if (stopSprinting.get())
+            MC.player.setSprinting(false);
 
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
