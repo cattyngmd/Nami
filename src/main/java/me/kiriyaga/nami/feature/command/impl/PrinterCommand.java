@@ -58,8 +58,9 @@ public class PrinterCommand extends Command {
             case "reset" -> {
                 pos1 = null;
                 pos2 = null;
+                loadedSchematics.clear();
                 CHAT_MANAGER.sendPersistent(getClass().getName(),
-                        CAT_FORMAT.format("Positions reset."));
+                        CAT_FORMAT.format("All states cleared."));
             }
 
             case "list" -> {
@@ -72,7 +73,7 @@ public class PrinterCommand extends Command {
                             CAT_FORMAT.format("Schematics:"));
                     for (String name : list) {
                         CHAT_MANAGER.sendPersistent(getClass().getName(),
-                                CAT_FORMAT.format("  {g}" + name + "{reset}"));
+                                CAT_FORMAT.format("  {g}" + name + "{reset},"));
                     }
                 }
             }
