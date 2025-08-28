@@ -16,6 +16,5 @@ public class CapeModule extends Module {
 
     public CapeType getSelectedCape() {
         return cape.get();
-        //123123123123123
     }
 }
