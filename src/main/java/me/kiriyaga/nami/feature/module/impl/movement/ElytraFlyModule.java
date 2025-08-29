@@ -86,6 +86,7 @@ public class ElytraFlyModule extends Module {
         cruiseMax.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         allowRockets.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         rocketSpeed.setShowCondition(() -> mode.get() == FlyMode.GLIDE && allowRockets.get());
+        targetY.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
     }
 
     @Override
