@@ -2,12 +2,20 @@ package me.kiriyaga.nami.core.rotation;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
+import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.nami.mixin.InputAccessor;
+import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.util.InputCache;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
+import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -26,6 +34,10 @@ public class RotationTickHandler {
     private int ticksHolding = 0;
     private boolean returning = false;
     private int tickCount = 0;
+    private boolean forwardPressed = false;
+    private boolean leftPressed = false;
+    private boolean backPressed = false;
+    private boolean rightPressed = false;
 
     public RotationTickHandler(RotationStateHandler stateHandler, RotationRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -37,6 +49,18 @@ public class RotationTickHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onKeyInput(KeyInputEvent event) {
+        int key = event.key;
+        int action = event.action;
+        int scancode = event.scancode;
+
+        updateHeld(MC.options.forwardKey, key, scancode, action, false, v -> forwardPressed = v);
+        updateHeld(MC.options.leftKey,    key, scancode, action, false, v -> leftPressed = v);
+        updateHeld(MC.options.backKey,    key, scancode, action, false, v -> backPressed = v);
+        updateHeld(MC.options.rightKey,   key, scancode, action, false, v -> rightPressed = v);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
@@ -54,7 +78,7 @@ public class RotationTickHandler {
             idleReset();
         }
 
-        if (module.moveFix.get())
+        if (module.moveFix.get() && stateHandler.isRotating())
             fixMovementForSpoof();
 
         tickCount++;
@@ -63,35 +87,36 @@ public class RotationTickHandler {
     private void fixMovementForSpoof() {
         if (MC.player == null) return;
 
-        InputCache.update(
-                MC.options.forwardKey.isPressed(),
-                MC.options.backKey.isPressed(),
-                MC.options.leftKey.isPressed(),
-                MC.options.rightKey.isPressed()
-        );
-
         float realYaw = MC.player.getYaw();
         float spoofYaw = stateHandler.getRotationYaw();
         float delta = MathHelper.wrapDegrees(realYaw - spoofYaw);
 
-        boolean forward = MC.options.forwardKey.isPressed();
-        boolean back = MC.options.backKey.isPressed();
-        boolean left = MC.options.leftKey.isPressed();
-        boolean right = MC.options.rightKey.isPressed();
+        // theese are tick thread and render thread
+        boolean forward = forwardPressed;
+        boolean back = backPressed;
+        boolean left = leftPressed;
+        boolean right = rightPressed;
+
+        InputCache.update(
+                forward,
+                back,
+                left,
+                right
+        );
 
         float inputX = (right ? 1 : 0) - (left ? 1 : 0);
         float inputZ = (forward ? 1 : 0) - (back ? 1 : 0);
+
+        MC.options.forwardKey.setPressed(false);
+        MC.options.backKey.setPressed(false);
+        MC.options.leftKey.setPressed(false);
+        MC.options.rightKey.setPressed(false);
 
         if (inputX == 0 && inputZ == 0) return;
 
         double moveAngle = Math.toDegrees(Math.atan2(inputX, inputZ));
         double finalAngle = moveAngle + delta;
         int sector = (int) Math.round(finalAngle / 45.0) & 7;
-
-        MC.options.forwardKey.setPressed(false);
-        MC.options.backKey.setPressed(false);
-        MC.options.leftKey.setPressed(false);
-        MC.options.rightKey.setPressed(false);
 
         // i hate myself its 02:28
         switch (sector) {
@@ -205,7 +230,6 @@ public class RotationTickHandler {
         stateHandler.setRenderPitch(newRenderPitch);
     }
 
-
     private float lerpAngle(float start, float end, float factor) {
         float delta = wrapDegrees(end - start);
         return start + delta * factor;
@@ -232,6 +256,57 @@ public class RotationTickHandler {
         if (angle >= 180f) angle -= 360f;
         if (angle < -180f) angle += 360f;
         return angle;
+    }
+
+    private void updateHeld(KeyBinding bind, int key, int scancode, int action, boolean mouse, java.util.function.Consumer<Boolean> setter) {
+        if (!canMove())
+            return;
+
+        if (!mouse && !bind.matchesKey(key, scancode)) return;
+        if (mouse && !bind.matchesMouse(key)) return;
+
+        setter.accept(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT);
+        if (action == GLFW.GLFW_RELEASE) {
+            setter.accept(false);
+        }
+    }
+
+    private boolean canMove() {
+        if (MC.currentScreen == null) return true;
+
+        if (MC.currentScreen != null && !MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class).isEnabled())
+            return false;
+
+        if (MC.currentScreen instanceof ChatScreen
+                || MC.currentScreen instanceof SignEditScreen
+                || MC.currentScreen instanceof AnvilScreen
+                || MC.currentScreen instanceof AbstractCommandBlockScreen
+                || MC.currentScreen instanceof StructureBlockScreen
+                || MC.currentScreen instanceof CreativeInventoryScreen) {
+            return false;
+        }
+
+        if (MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class)._2b2t.get() && (
+                MC.currentScreen instanceof ShulkerBoxScreen
+                        || MC.currentScreen instanceof AnvilScreen
+                        || MC.currentScreen instanceof BrewingStandScreen
+                        || MC.currentScreen instanceof CartographyTableScreen
+                        || MC.currentScreen instanceof CrafterScreen
+                        || MC.currentScreen instanceof EnchantmentScreen
+                        || MC.currentScreen instanceof FurnaceScreen
+                        || MC.currentScreen instanceof GrindstoneScreen
+                        || MC.currentScreen instanceof HopperScreen
+                        || MC.currentScreen instanceof HorseScreen
+                        || MC.currentScreen instanceof MerchantScreen
+                        || MC.currentScreen instanceof SmithingScreen
+                        || MC.currentScreen instanceof SmokerScreen
+                        || MC.currentScreen instanceof StonecutterScreen
+                        || MC.currentScreen instanceof GenericContainerScreen
+                        || MC.currentScreen instanceof CreativeInventoryScreen)) {
+            return false;
+        }
+
+        return true;
     }
 
     private float lerp(float from, float to, float factor) {

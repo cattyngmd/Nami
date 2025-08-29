@@ -69,28 +69,6 @@ public abstract class MixinLivingEntity extends Entity {
         this.setPitch(originalPitch);
     }
 
-    private Vec3d localToGlobal(Vec3d localVec, float yaw) {
-        double rad = Math.toRadians(yaw);
-        double cos = Math.cos(rad);
-        double sin = Math.sin(rad);
-
-        double x = localVec.x * cos - localVec.z * sin;
-        double z = localVec.x * sin + localVec.z * cos;
-
-        return new Vec3d(x, localVec.y, z);
-    }
-
-    private Vec3d globalToLocal(Vec3d globalVec, float yaw) {
-        double rad = Math.toRadians(yaw);
-        double cos = Math.cos(rad);
-        double sin = Math.sin(rad);
-
-        double x = globalVec.x * cos + globalVec.z * sin;
-        double z = -globalVec.x * sin + globalVec.z * cos;
-
-        return new Vec3d(x, globalVec.y, z);
-    }
-
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float jumpFix(float originalYaw) {
         if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
