@@ -17,9 +17,6 @@ public class ColorModule extends Module {
 
     public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 0, 170), true));
 
-    public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.33, 0.0, 1.0));
-    public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.00, 0.0, 1.0));
-
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
     public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbow speed", 0.4, 0.01, 5.0));
 
@@ -105,7 +102,7 @@ public class ColorModule extends Module {
     }
 
     public Color getStyledGlobalColor() {
-        return getStyledColor(getEffectiveGlobalColor(), globalSaturation.get(), globalDarskness.get());
+        return getStyledColor(getEffectiveGlobalColor(), 1.00, 0.00);
     }
 
     public Color getStyledSecondColor() {

@@ -6,8 +6,9 @@ import me.kiriyaga.nami.setting.Setting;
 import me.kiriyaga.nami.setting.impl.*;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import java.util.List;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -30,11 +31,18 @@ public class SettingPanel {
     }
 
     public static int getSettingsHeight(Module module) {
-        int countVisible = 0;
-        for (Setting<?> setting : module.getSettings()) {
-            if (setting.isShow()) countVisible++;
+        List<Setting<?>> settings = module.getSettings();
+        int height = 0;
+        for (Setting<?> setting : settings) {
+            if (!setting.isShow()) continue;
+
+            @SuppressWarnings("unchecked")
+            SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(setting.getClass());
+
+            int settingHeight = renderer != null ? renderer.getHeight(setting) : SettingRenderer.HEIGHT;
+            height += settingHeight + SettingRenderer.MODULE_SPACING;
         }
-        return countVisible * (SettingRenderer.HEIGHT + SettingRenderer.MODULE_SPACING) + SettingRenderer.MODULE_SPACING;
+        return height + SettingRenderer.MODULE_SPACING;
     }
 
     public static int renderSettings(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY) {
@@ -42,22 +50,30 @@ public class SettingPanel {
         int curY = y + SettingRenderer.MODULE_SPACING;
 
         for (Setting<?> setting : settings) {
-            if (!setting.isShow())
-                continue;
+            if (!setting.isShow()) continue;
 
-            render(context, textRenderer, setting, x, curY, mouseX, mouseY);
-            curY += SettingRenderer.HEIGHT + SettingRenderer.MODULE_SPACING;
+            @SuppressWarnings("unchecked")
+            SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(setting.getClass());
+
+            if (renderer != null) {
+                renderer.render(context, textRenderer, setting, x, curY, mouseX, mouseY);
+            }
+
+            int settingHeight = renderer != null ? renderer.getHeight(setting) : SettingRenderer.HEIGHT;
+            curY += settingHeight + SettingRenderer.MODULE_SPACING;
         }
+
         return getSettingsHeight(module);
     }
 
-    @SuppressWarnings("unchecked")
-    public static void render(DrawContext context, TextRenderer textRenderer, Setting<?> setting, int x, int y, int mouseX, int mouseY) {
-        SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(setting.getClass());
-        if (renderer != null) {
-            renderer.render(context, textRenderer, setting, x, y, mouseX, mouseY);
+
+        @SuppressWarnings("unchecked")
+        public static void render(DrawContext context, TextRenderer textRenderer, Setting<?> setting, int x, int y, int mouseX, int mouseY) {
+            SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(setting.getClass());
+            if (renderer != null) {
+                renderer.render(context, textRenderer, setting, x, y, mouseX, mouseY);
+            }
         }
-    }
 
     public static boolean mouseClicked(Module module, double mouseX, double mouseY, int button, int x, int y) {
         if (button < 0 || button > 7) return false;
@@ -66,13 +82,14 @@ public class SettingPanel {
         int curY = y + SettingRenderer.MODULE_SPACING;
 
         for (Setting<?> setting : settings) {
-            if (!setting.isShow()) {
-                continue;
-            }
+            if (!setting.isShow()) continue;
 
-            if (isHovered(mouseX, mouseY, x, curY)) {
-                @SuppressWarnings("unchecked")
-                SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(setting.getClass());
+            @SuppressWarnings("unchecked")
+            SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(setting.getClass());
+
+            int settingHeight = renderer != null ? renderer.getHeight(setting) : SettingRenderer.HEIGHT;
+
+            if (isHovered(mouseX, mouseY, x, curY, settingHeight)) {
                 if (renderer != null) {
                     draggedSetting = setting;
                     dragStartX = mouseX;
@@ -81,20 +98,27 @@ public class SettingPanel {
                     return handled;
                 }
             }
-            curY += SettingRenderer.HEIGHT + SettingRenderer.MODULE_SPACING;
+
+            curY += settingHeight + SettingRenderer.MODULE_SPACING;
         }
+
         draggedSetting = null;
         return false;
     }
 
     public static void mouseDragged(double mouseX, double mouseY) {
-        if (draggedSetting != null) {
+        if (draggedSetting == null) return;
+
+        SettingRenderer<?> renderer = renderers.get(draggedSetting.getClass());
+        if (renderer == null) return;
+
+        if (renderer instanceof ColorSettingRenderer colorRenderer) {
+            colorRenderer.updateMouseDrag((ColorSetting) draggedSetting, mouseX, mouseY);
+        } else {
             @SuppressWarnings("unchecked")
-            SettingRenderer<Setting<?>> renderer = (SettingRenderer<Setting<?>>) renderers.get(draggedSetting.getClass());
-            if (renderer != null) {
-                renderer.mouseDragged(draggedSetting, mouseX - dragStartX);
-                dragStartX = mouseX;
-            }
+            SettingRenderer<Setting<?>> generic = (SettingRenderer<Setting<?>>) renderer;
+            generic.mouseDragged(draggedSetting, mouseX - dragStartX);
+            dragStartX = mouseX;
         }
     }
 
@@ -106,8 +130,8 @@ public class SettingPanel {
         return KeyBindSettingRenderer.keyPressed(keyCode);
     }
 
-    private static boolean isHovered(double mouseX, double mouseY, int x, int y) {
-        return mouseX >= x && mouseX <= x + SettingRenderer.WIDTH && mouseY >= y && mouseY <= y + SettingRenderer.HEIGHT;
+    private static boolean isHovered(double mouseX, double mouseY, int x, int y, int height) {
+        return mouseX >= x && mouseX <= x + SettingRenderer.WIDTH && mouseY >= y && mouseY <= y + height;
     }
 
     private static void playClickSound() {
