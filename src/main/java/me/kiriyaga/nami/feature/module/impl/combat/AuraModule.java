@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.Debug;
+import me.kiriyaga.nami.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
@@ -148,6 +149,12 @@ public class AuraModule extends Module {
                     (float) getYawToVec(MC.player, rotationTarget),
                     (float) getPitchToVec(MC.player, rotationTarget)
             ));
+
+            SprintModule m = MODULE_MANAGER.getStorage().getByClass(SprintModule.class);
+            // This one done in rotation since its the most easy and stable as i see now, somehow people also 0-tick them but it doesnt for for us, and its either flags grim or doesnt work properly
+            // TODO: 1 tick them instead of rotation
+            if (stopSprinting.get() && m != null && m.isEnabled())
+                m.stopSprinting(3);
         }
 
         if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && (!raycast.get() || !raycastConfirm.get()))
@@ -176,9 +183,6 @@ public class AuraModule extends Module {
 
         if (!canAttack) return;
         if (!skipCooldown && attackCooldownTicks > 0f) return;
-
-        if (stopSprinting.get())
-            MC.player.setSprinting(false);
 
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
