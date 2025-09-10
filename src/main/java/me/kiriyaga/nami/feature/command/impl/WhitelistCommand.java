@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.command.impl;
 
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.CommandArgument;
-import me.kiriyaga.nami.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import net.minecraft.util.Identifier;
 
 import static me.kiriyaga.nami.Nami.*;

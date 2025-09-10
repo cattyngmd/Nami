@@ -1,14 +1,11 @@
 package me.kiriyaga.nami.feature.gui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
-
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class WhitelistSettingRenderer implements SettingRenderer<WhitelistSetting> {
     private final BoolSettingRenderer boolRenderer = new BoolSettingRenderer();

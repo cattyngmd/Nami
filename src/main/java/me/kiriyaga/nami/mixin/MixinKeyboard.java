@@ -1,9 +1,8 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
-import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.setting.impl.KeyBindSetting;
+import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.gui.EditBox;
 import net.minecraft.client.gui.screen.Screen;

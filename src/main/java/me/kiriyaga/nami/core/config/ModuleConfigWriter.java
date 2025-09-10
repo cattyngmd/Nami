@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.setting.Setting;
+import me.kiriyaga.nami.feature.setting.Setting;
 
 import java.io.File;
 import java.io.FileWriter;

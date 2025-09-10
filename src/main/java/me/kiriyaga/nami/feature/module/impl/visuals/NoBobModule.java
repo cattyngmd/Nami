@@ -1,15 +1,8 @@
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
-import me.kiriyaga.nami.event.EventPriority;
-import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixininterface.ISimpleOption;
-import me.kiriyaga.nami.setting.impl.IntSetting;
-
-import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class NoBobModule extends Module {

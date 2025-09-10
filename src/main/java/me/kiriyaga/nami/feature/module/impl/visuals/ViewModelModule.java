@@ -1,14 +1,10 @@
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
-import me.kiriyaga.nami.event.EventPriority;
-import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.RotationAxis;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
 @RegisterModule
 public class ViewModelModule extends Module {

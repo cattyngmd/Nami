@@ -1,8 +1,6 @@
 package me.kiriyaga.nami.core.config;
 
 import com.google.gson.*;
-import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.setting.Setting;
 
 import java.io.File;
 import java.io.FileReader;

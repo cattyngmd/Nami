@@ -1,12 +1,9 @@
-package me.kiriyaga.nami.setting.impl;
+package me.kiriyaga.nami.feature.setting.impl;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.impl.WhitelistCommand;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.HashSet;

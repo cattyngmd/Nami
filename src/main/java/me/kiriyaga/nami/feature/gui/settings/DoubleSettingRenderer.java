@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.gui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

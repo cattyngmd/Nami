@@ -3,24 +3,18 @@ package me.kiriyaga.nami.feature.module.impl.combat;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
-import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
-import me.kiriyaga.nami.feature.gui.screen.HudEditorScreen;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.screen.slot.SlotActionType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule

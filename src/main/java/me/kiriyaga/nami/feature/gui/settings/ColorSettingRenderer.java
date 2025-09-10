@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.gui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.setting.impl.ColorSetting;
+import me.kiriyaga.nami.feature.setting.impl.ColorSetting;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -10,7 +10,6 @@ import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.CLICK_GUI;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     private boolean draggingHue = false;

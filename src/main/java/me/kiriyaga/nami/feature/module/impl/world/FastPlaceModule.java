@@ -3,8 +3,8 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.IntSetting;
-import me.kiriyaga.nami.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 
 @RegisterModule
 public class FastPlaceModule extends Module {

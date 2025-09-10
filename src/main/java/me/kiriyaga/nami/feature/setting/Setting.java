@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.setting;
+package me.kiriyaga.nami.feature.setting;
 
 import com.google.gson.JsonElement;
 import me.kiriyaga.nami.feature.module.Module;

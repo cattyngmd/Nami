@@ -6,11 +6,7 @@ import me.kiriyaga.nami.event.impl.ParticleEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import net.minecraft.client.particle.ExplosionEmitterParticle;
-import net.minecraft.client.particle.ExplosionLargeParticle;
-import net.minecraft.client.particle.ExplosionSmokeParticle;
-import net.minecraft.client.particle.TotemParticle;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.particle.ParticleTypes;
 
 import static me.kiriyaga.nami.Nami.MC;

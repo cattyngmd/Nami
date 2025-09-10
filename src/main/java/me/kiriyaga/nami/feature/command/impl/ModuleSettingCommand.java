@@ -4,8 +4,8 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.setting.Setting;
-import me.kiriyaga.nami.setting.impl.*;
+import me.kiriyaga.nami.feature.setting.Setting;
+import me.kiriyaga.nami.feature.setting.impl.*;
 
 import static me.kiriyaga.nami.Nami.*;
 

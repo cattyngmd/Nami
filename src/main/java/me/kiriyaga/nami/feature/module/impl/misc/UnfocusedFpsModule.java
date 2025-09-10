@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.misc;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 @RegisterModule
 public class UnfocusedFpsModule extends Module {

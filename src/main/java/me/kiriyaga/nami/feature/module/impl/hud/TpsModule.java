@@ -1,15 +1,9 @@
 package me.kiriyaga.nami.feature.module.impl.hud;
 
-import me.kiriyaga.nami.event.EventPriority;
-import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
-
-import me.kiriyaga.nami.event.SubscribeEvent;
 
 import java.util.Locale;
 

@@ -1,21 +1,12 @@
 package me.kiriyaga.nami.feature.module.impl.client;
 
-import me.kiriyaga.nami.event.EventPriority;
-import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.screen.ShulkerBoxScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class Debug extends Module {

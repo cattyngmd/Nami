@@ -2,13 +2,11 @@
 
     import me.kiriyaga.nami.event.EventPriority;
     import me.kiriyaga.nami.event.SubscribeEvent;
-    import me.kiriyaga.nami.event.impl.PostTickEvent;
     import me.kiriyaga.nami.event.impl.PreTickEvent;
-    import me.kiriyaga.nami.event.impl.ReceiveMessageEvent;
     import me.kiriyaga.nami.feature.module.Module;
     import me.kiriyaga.nami.feature.module.ModuleCategory;
     import me.kiriyaga.nami.feature.module.RegisterModule;
-    import me.kiriyaga.nami.setting.impl.IntSetting;
+    import me.kiriyaga.nami.feature.setting.impl.IntSetting;
     import net.minecraft.text.Text;
 
     import java.util.*;

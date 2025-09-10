@@ -7,8 +7,8 @@
     import me.kiriyaga.nami.feature.module.ModuleCategory;
     import me.kiriyaga.nami.feature.module.RegisterModule;
     import me.kiriyaga.nami.mixininterface.ISimpleOption;
-    import me.kiriyaga.nami.setting.impl.DoubleSetting;
-    import me.kiriyaga.nami.setting.impl.EnumSetting;
+    import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
+    import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
     import net.minecraft.entity.effect.StatusEffectInstance;
     import net.minecraft.entity.effect.StatusEffects;
 

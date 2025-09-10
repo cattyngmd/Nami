@@ -1,38 +1,40 @@
-package me.kiriyaga.nami.setting.impl;
+package me.kiriyaga.nami.feature.setting.impl;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import me.kiriyaga.nami.setting.Setting;
+import me.kiriyaga.nami.feature.setting.Setting;
 
-public class DoubleSetting extends Setting<Double> {
+public class IntSetting extends Setting<Integer> {
 
-    private final double min, max;
+    private final int min, max;
 
-    public DoubleSetting(String name, double defaultValue, double min, double max) {
+    public IntSetting(String name, int defaultValue, int min, int max) {
         super(name, defaultValue);
         this.min = min;
         this.max = max;
     }
 
-    public double getMin() {
+    public int getMin() {
         return min;
     }
 
-    public double getMax() {
+    public int getMax() {
         return max;
     }
 
     @Override
-    public void set(Double value) {
+    public void set(Integer value) {
         this.value = Math.max(min, Math.min(max, value));
     }
 
+    @Override
     public void fromJson(JsonElement json) {
         if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
-            set(json.getAsDouble());
+            this.value = json.getAsInt();
         }
     }
 
+    @Override
     public JsonElement toJson() {
         return new JsonPrimitive(value);
     }

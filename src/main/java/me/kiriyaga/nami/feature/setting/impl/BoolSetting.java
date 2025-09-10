@@ -1,8 +1,8 @@
-package me.kiriyaga.nami.setting.impl;
+package me.kiriyaga.nami.feature.setting.impl;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import me.kiriyaga.nami.setting.Setting;
+import me.kiriyaga.nami.feature.setting.Setting;
 
 public class BoolSetting extends Setting<Boolean> {
 

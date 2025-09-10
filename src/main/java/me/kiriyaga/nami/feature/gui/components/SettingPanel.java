@@ -2,8 +2,8 @@ package me.kiriyaga.nami.feature.gui.components;
 
 import me.kiriyaga.nami.feature.gui.settings.*;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.setting.Setting;
-import me.kiriyaga.nami.setting.impl.*;
+import me.kiriyaga.nami.feature.setting.Setting;
+import me.kiriyaga.nami.feature.setting.impl.*;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
