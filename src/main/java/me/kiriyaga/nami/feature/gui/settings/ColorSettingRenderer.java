@@ -15,11 +15,13 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     private boolean draggingHue = false;
     private boolean draggingSV = false;
 
-    // TODO: dragging on hsv slider, fade animation
     private static final int SV_SIZE = WIDTH - PADDING * 2;
     private static final int HUE_HEIGHT = SLIDER_HEIGHT;
     private static final int RENDER_STEP = 2; // i mean yeah we can render sv image instead but whatever its blockgame cheat
     private static final int HUE_CLICK_PADDING = 4;
+
+    private static final int SV_HUE_PADDING = 6;
+    private static final int BOTTOM_PADDING = 6;
 
     private int lastSvX, lastSvY;
     private int lastHueX, lastHueY;
@@ -59,7 +61,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         renderSVSquare(context, lastSvX, lastSvY, SV_SIZE, SV_SIZE, setting);
 
         lastHueX = lastSvX;
-        lastHueY = lastSvY + SV_SIZE + 4;
+        lastHueY = lastSvY + SV_SIZE + SV_HUE_PADDING + 3;
         renderHueSlider(context, lastHueX, lastHueY, SV_SIZE, HUE_HEIGHT, setting);
 
         String hex = String.format("#%02X%02X%02X", setting.getRed(), setting.getGreen(), setting.getBlue());
@@ -75,7 +77,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
 
     @Override
     public int getHeight(ColorSetting setting) {
-        return HEIGHT + SV_SIZE + 4 + HUE_HEIGHT + 6;
+        return HEIGHT + SV_SIZE + SV_HUE_PADDING + HUE_HEIGHT + BOTTOM_PADDING;
     }
 
     private void renderSVSquare(DrawContext context, int x, int y, int w, int h, ColorSetting setting) {
@@ -87,15 +89,15 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
                 float sat = i / (float) w;
                 float bri = 1f - j / (float) h;
                 Color c = Color.getHSBColor(hue, sat, bri);
-                context.fill(x + i, y + j, x + i + RENDER_STEP, y + j + RENDER_STEP, toRGBA(c));
+                context.fill(x + i, y + j, x + i + RENDER_STEP, y + j + RENDER_STEP, CLICK_GUI.applyFade(toRGBA(c)));
             }
         }
 
-        int cursorX = (int) (hsb[1] * SV_SIZE);
-        int cursorY = (int) ((1 - hsb[2]) * SV_SIZE);
-        context.fill(lastSvX + cursorX - 2, lastSvY + cursorY - 2,
-                lastSvX + cursorX + 2, lastSvY + cursorY + 2,
-                toRGBA(Color.WHITE));
+        int cursorX = (int) (hsb[1] * w);
+        int cursorY = (int) ((1 - hsb[2]) * h);
+        context.fill(x + cursorX - 2, y + cursorY - 2,
+                x + cursorX + 2, y + cursorY + 2,
+                CLICK_GUI.applyFade(toRGBA(Color.WHITE)));
     }
 
     private void renderHueSlider(DrawContext context, int x, int y, int width, int height, ColorSetting setting) {
@@ -108,7 +110,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         }
 
         int huePos = (int) (hsb[0] * width);
-        context.fill(x + huePos - 2, y - 1, x + huePos + 2, y + height + 1, toRGBA(Color.WHITE));
+        context.fill(x + huePos - 2, y - 1, x + huePos + 2, y + height + 1, CLICK_GUI.applyFade(toRGBA(Color.WHITE)));
     }
 
     @Override
@@ -142,8 +144,8 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
 
     private void updateSV(ColorSetting setting, double mouseX, double mouseY) {
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
-        float sat = (float)((mouseX - lastSvX) / SV_SIZE);
-        float bri = 1f - (float)((mouseY - lastSvY) / SV_SIZE);
+        float sat = (float)((mouseX - lastSvX) / (float)SV_SIZE);
+        float bri = 1f - (float)((mouseY - lastSvY) / (float)SV_SIZE);
         sat = Math.max(0f, Math.min(1f, sat));
         bri = Math.max(0f, Math.min(1f, bri));
 
@@ -154,7 +156,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
 
     private void updateHue(ColorSetting setting, double mouseX) {
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
-        float hue = (float)((mouseX - lastHueX) / SV_SIZE);
+        float hue = (float)((mouseX - lastHueX) / (float)SV_SIZE);
         hue = Math.max(0f, Math.min(1f, hue));
 
         int rgb = Color.HSBtoRGB(hue, hsb[1], hsb[2]);
@@ -180,5 +182,14 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
 
     private static boolean isHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEIGHT;
+    }
+
+    @Override
+    public boolean mouseReleased(ColorSetting setting, double mouseX, double mouseY, int button) {
+        if (button != 0) return false;
+        boolean wasDragging = draggingHue || draggingSV;
+        draggingHue = false;
+        draggingSV = false;
+        return wasDragging;
     }
 }

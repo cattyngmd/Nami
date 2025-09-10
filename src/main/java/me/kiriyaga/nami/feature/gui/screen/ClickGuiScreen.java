@@ -285,7 +285,7 @@ public class ClickGuiScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         draggingCategory = false;
         draggedModuleCategory = null;
-        SettingPanel.mouseReleased();
+        SettingPanel.mouseReleased(mouseX, mouseY, button);
         return super.mouseReleased(mouseX, mouseY, button);
     }
 

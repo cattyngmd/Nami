@@ -18,7 +18,7 @@ public class ColorModule extends Module {
     public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 0, 170), true));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
-    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbow speed", 0.4, 0.01, 5.0));
+    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("speed", 0.4, 0.01, 5.0));
 
     private int phase = 0;
 

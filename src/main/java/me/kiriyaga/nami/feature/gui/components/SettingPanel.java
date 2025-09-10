@@ -122,9 +122,18 @@ public class SettingPanel {
         }
     }
 
-    public static void mouseReleased() {
+    public static void mouseReleased(double mouseX, double mouseY, int button) {
+        if (draggedSetting != null) {
+            SettingRenderer<?> renderer = renderers.get(draggedSetting.getClass());
+            if (renderer != null) {
+                @SuppressWarnings("unchecked")
+                SettingRenderer<Setting<?>> generic = (SettingRenderer<Setting<?>>) renderer;
+                generic.mouseReleased(draggedSetting, mouseX, mouseY, button);
+            }
+        }
         draggedSetting = null;
     }
+
 
     public static boolean keyPressed(int keyCode) {
         return KeyBindSettingRenderer.keyPressed(keyCode);

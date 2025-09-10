@@ -314,7 +314,7 @@ public class HudEditorScreen extends Screen {
 
         if (button == 0) draggingElement = null;
 
-        SettingPanel.mouseReleased();
+        SettingPanel.mouseReleased(mouseX, mouseY, button);
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
