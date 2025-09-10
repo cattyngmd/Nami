@@ -42,7 +42,7 @@ public class SpeedModule extends Module {
 
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
-            float pitch = MC.player.getPitch();
+            float pitch = 0;
 
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), rotationPriority.get(), yaw, pitch));
         }
@@ -68,10 +68,17 @@ public class SpeedModule extends Module {
 
         if (inputX == 0 && inputZ == 0) return realYaw;
 
-        float moveAngle = (float) Math.toDegrees(Math.atan2(inputX, inputZ));
-        float movementYaw = realYaw + moveAngle;
+        if (inputZ > 0) return realYaw;
 
-        movementYaw = MathHelper.wrapDegrees(movementYaw);
-        return movementYaw;
+        if (inputZ < 0) return MathHelper.wrapDegrees(realYaw + 180);
+
+        if (inputX != 0 && inputZ == 0) return MathHelper.wrapDegrees(realYaw + (inputX > 0 ? 90 : -90));
+
+        if (inputZ > 0 && inputX != 0) return realYaw;
+
+        if (inputZ < 0 && inputX != 0) return MathHelper.wrapDegrees(realYaw + 180);
+
+        return realYaw;
     }
+
 }
