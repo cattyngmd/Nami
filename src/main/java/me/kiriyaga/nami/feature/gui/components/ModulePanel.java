@@ -36,7 +36,7 @@ public class ModulePanel {
         boolean expanded = expandedModules.contains(module);
 
         Color primary = getColorModule().getStyledGlobalColor();
-        Color secondary = getColorModule().getStyledSecondColor();
+        Color secondary = new Color(20, 20, 20, 33);
         Color textCol = new Color(155, 155, 155, 255);
         Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)

@@ -36,7 +36,7 @@ public class ColorModule extends Module {
     }
 
     private int getAlpha255() {
-        return (int) (Math.max(0.0, Math.min(1.0, 0.45)) * 255);
+        return 130;
     }
 
     public Color applySaturation(Color base, double saturationFactor) {
