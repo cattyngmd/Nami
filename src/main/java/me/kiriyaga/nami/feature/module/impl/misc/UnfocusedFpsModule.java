@@ -11,6 +11,6 @@ public class UnfocusedFpsModule extends Module {
     public final IntSetting limit = addSetting(new IntSetting("limit", 15, 5, 30));
 
     public UnfocusedFpsModule() {
-        super("unfocused fps", "Limits your frame generate usage while unfocused", ModuleCategory.of("misc"), "unfocusedcpu");
+        super("unfocused fps", "Limits your frame generation while unfocused.", ModuleCategory.of("misc"), "unfocusedcpu");
     }
 }
