@@ -73,7 +73,7 @@ public class ReplenishModule extends Module {
         for (int i = 9; i < 36; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (stack.isEmpty()) continue;
-            if (!stack.isOf(target.getItem())) continue;
+            if (!ItemStack.areItemsAndComponentsEqual(stack, target)) continue; // this is component not nbt, but anyway it works the same since components are just wrapper for nbt
             return i;
         }
         return -1;
