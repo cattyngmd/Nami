@@ -188,25 +188,25 @@ public class GuiMoveModule extends Module {
             return false;
         }
 
-        if (_2b2t.get() && ( // theese containers doesnt work on 2b, or they do but i dont care
-                MC.currentScreen instanceof ShulkerBoxScreen
-                        || MC.currentScreen instanceof AnvilScreen
-                        || MC.currentScreen instanceof BrewingStandScreen
-                        || MC.currentScreen instanceof CartographyTableScreen
-                        || MC.currentScreen instanceof CrafterScreen
-                        || MC.currentScreen instanceof EnchantmentScreen
-                        || MC.currentScreen instanceof FurnaceScreen
-                        || MC.currentScreen instanceof GrindstoneScreen
-                        || MC.currentScreen instanceof HopperScreen
-                        || MC.currentScreen instanceof HorseScreen
-                        || MC.currentScreen instanceof MerchantScreen
-                        || MC.currentScreen instanceof SmithingScreen
-                        || MC.currentScreen instanceof SmokerScreen
-                        || MC.currentScreen instanceof StonecutterScreen
-                        || MC.currentScreen instanceof GenericContainerScreen
-                        || MC.currentScreen instanceof CreativeInventoryScreen)) {
-            return false;
-        }
+//        if (_2b2t.get() && ( // theese containers doesnt work on 2b, or they do but i dont care
+//                MC.currentScreen instanceof ShulkerBoxScreen
+//                        || MC.currentScreen instanceof AnvilScreen
+//                        || MC.currentScreen instanceof BrewingStandScreen
+//                        || MC.currentScreen instanceof CartographyTableScreen
+//                        || MC.currentScreen instanceof CrafterScreen
+//                        || MC.currentScreen instanceof EnchantmentScreen
+//                        || MC.currentScreen instanceof FurnaceScreen
+//                        || MC.currentScreen instanceof GrindstoneScreen
+//                        || MC.currentScreen instanceof HopperScreen
+//                        || MC.currentScreen instanceof HorseScreen
+//                        || MC.currentScreen instanceof MerchantScreen
+//                        || MC.currentScreen instanceof SmithingScreen
+//                        || MC.currentScreen instanceof SmokerScreen
+//                        || MC.currentScreen instanceof StonecutterScreen
+//                        || MC.currentScreen instanceof GenericContainerScreen
+//                        || MC.currentScreen instanceof CreativeInventoryScreen)) {
+//            return false;
+//        }
 
         return true;
     }

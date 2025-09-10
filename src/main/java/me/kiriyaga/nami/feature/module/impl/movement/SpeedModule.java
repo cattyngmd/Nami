@@ -6,14 +6,15 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.core.rotation.RotationRequest;
 import me.kiriyaga.nami.util.InputCache;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class SpeedModule extends Module {
@@ -43,8 +44,9 @@ public class SpeedModule extends Module {
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
             float pitch = 0;
-
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), rotationPriority.get(), yaw, pitch));
+
+            MODULE_MANAGER.getStorage().getByClass(Debug.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
         }
     }
 
