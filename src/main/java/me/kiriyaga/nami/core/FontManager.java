@@ -21,20 +21,23 @@ public class FontManager {
 
     private static TextRenderer customRenderer;
     private static int currentSize = -1;
+    private static int currentOversample = -1;
 
-    private static final String FONT_NAME = "verdana";
+    private static final String FONT_NAME = "verdanapro";
 
     public void init() {
-        int newSize = MODULE_MANAGER.getStorage().getByClass(FontModule.class).glyphSize.get();
+        FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
+        int newSize = fontModule.glyphSize.get();
+        int newOversample = fontModule.oversample.get();
 
-        if (customRenderer != null && currentSize == newSize) {
+        if (customRenderer != null && currentSize == newSize && currentOversample == newOversample) {
             return;
         }
 
         TrueTypeFontLoader loader = new TrueTypeFontLoader(
                 Identifier.of("nami", FONT_NAME + ".ttf"),
                 newSize,
-                2.0F,
+                newOversample,
                 TrueTypeFontLoader.Shift.NONE,
                 ""
         );
@@ -53,10 +56,12 @@ public class FontManager {
 
             customRenderer = new TextRenderer(id -> storage, true);
             currentSize = newSize;
+            currentOversample = newOversample;
         } catch (IOException e) {
             e.printStackTrace();
             customRenderer = MC.textRenderer;
             currentSize = -1;
+            currentOversample = -1;
         }
     }
 
@@ -64,7 +69,7 @@ public class FontManager {
         FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
 
         if (fontModule.isEnabled()) {
-            if (fontModule.glyphSize.get() != currentSize) {
+            if (fontModule.glyphSize.get() != currentSize || fontModule.oversample.get() != currentOversample) {
                 new FontManager().init();
             }
             return customRenderer != null ? customRenderer : MC.textRenderer;
@@ -92,5 +97,4 @@ public class FontManager {
     public int getHeight() {
         return getRenderer().fontHeight;
     }
-
 }

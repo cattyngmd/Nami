@@ -14,6 +14,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class FontModule extends Module {
 
     public final IntSetting glyphSize = addSetting(new IntSetting("size", 10, 8, 18));
+    public final IntSetting oversample = addSetting(new IntSetting("oversample", 2, 2, 8));
 
     public FontModule() {
         super("font", "Custom client font renderer.", ModuleCategory.of("client"), "f", "customfont");
