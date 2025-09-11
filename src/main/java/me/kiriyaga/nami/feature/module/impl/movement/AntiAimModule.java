@@ -16,7 +16,6 @@ import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 @RegisterModule
 public class AntiAimModule extends Module {
 
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 1, 1, 10));
     private final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 5.0, 0.1, 50.0));
     private final DoubleSetting pitchSetting = addSetting(new DoubleSetting("pitch", 0.0, -90.0, 90.0));
 
@@ -45,7 +44,7 @@ public class AntiAimModule extends Module {
 
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                 AntiAimModule.class.getName(),
-                rotationPriority.get(),
+                0,
                 yaw,
                 pitch
         ));

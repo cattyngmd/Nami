@@ -25,13 +25,11 @@ public class AutoSheepModule extends Module {
     private final DoubleSetting shearRange = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 2, 1, 10));
 
     private int swapCooldown = 0;
 
     public AutoSheepModule() {
         super("auto sheep", "Automatically shears nearby sheep.", ModuleCategory.of("world"), "sheep", "autowool");
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent
@@ -66,7 +64,7 @@ public class AutoSheepModule extends Module {
                 ROTATION_MANAGER.getRequestHandler().submit(
                         new RotationRequest(
                                 AutoSheepModule.class.getName(),
-                                rotationPriority.get(),
+                                2,
                                 (float) getYawToVec(MC.player, center),
                                 (float) getPitchToVec(MC.player, center)
                         )

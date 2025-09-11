@@ -48,7 +48,6 @@ public class LiquidFillModule extends Module {
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
     private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("liquid", LiquidType.BOTH));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation priority", 2, 1, 10));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;
@@ -56,7 +55,6 @@ public class LiquidFillModule extends Module {
 
     public LiquidFillModule() {
         super("liquid fill", "Automatically fills nearby liquids with blocks.", ModuleCategory.of("world"), "liquidfill");
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override
@@ -124,7 +122,7 @@ public class LiquidFillModule extends Module {
             if (rotate.get()) {
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                         LiquidFillModule.class.getName(),
-                        rotationPriority.get(),
+                        3,
                         (float) getYawToVec(MC.player, Vec3d.of(pos)),
                         (float) getPitchToVec(MC.player, Vec3d.of(pos))
                 ));

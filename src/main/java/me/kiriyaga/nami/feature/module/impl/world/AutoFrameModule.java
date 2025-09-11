@@ -28,7 +28,6 @@ public class AutoFrameModule extends Module {
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 4, 1.0, 6.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 0, 20));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private int cooldown = 0;
 
@@ -36,7 +35,6 @@ public class AutoFrameModule extends Module {
 
     public AutoFrameModule() {
         super("auto frame", "Automatically puts a map in nearby item frames.", ModuleCategory.of("world"), "autoframe");
-    rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override
@@ -77,7 +75,7 @@ public class AutoFrameModule extends Module {
                 ROTATION_MANAGER.getRequestHandler().submit(
                         new RotationRequest(
                                 AutoFrameModule.class.getName(),
-                                rotationPriority.get(),
+                                2,
                                 (float) getYawToVec(MC.player, center),
                                 (float) getPitchToVec(MC.player, center)
                         )

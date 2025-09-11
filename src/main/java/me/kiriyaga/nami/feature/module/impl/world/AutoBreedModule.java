@@ -27,14 +27,12 @@ public class AutoBreedModule extends Module {
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private final Set<Integer> animalsFed = new HashSet<>();
     private int breedCooldown = 0;
 
     public AutoBreedModule() {
         super("auto breed", "Automatically breeds nearby animals.", ModuleCategory.of("world"), "autobreed");
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override
@@ -81,7 +79,7 @@ public class AutoBreedModule extends Module {
                 ROTATION_MANAGER.getRequestHandler().submit(
                         new RotationRequest(
                                 AutoBreedModule.class.getName(),
-                                rotationPriority.get(),
+                                2,
                                 (float) getYawToVec(MC.player, center),
                                 (float) getPitchToVec(MC.player, center)
                         )

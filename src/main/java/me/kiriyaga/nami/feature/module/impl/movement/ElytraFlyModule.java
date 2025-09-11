@@ -56,7 +56,6 @@ public class ElytraFlyModule extends Module {
     private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
     private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
     private final IntSetting pitchDegree = addSetting(new IntSetting("pitch", 75, 0, 90));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private enum GlideState { DIVE, CRUISE, CLIMB }
     private GlideState glideState = GlideState.CRUISE;
@@ -134,7 +133,7 @@ public class ElytraFlyModule extends Module {
             }
 
             if (pitch.get())
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), pitchDegree.get().floatValue()));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYaw(), pitchDegree.get().floatValue()));
 
             MC.player.networkHandler.sendPacket(
                     new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
@@ -184,7 +183,7 @@ public class ElytraFlyModule extends Module {
                 }
 
                 ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(this.getName(), rotationPriority.get(), finalYaw, finalPitch)
+                        new RotationRequest(this.getName(), 1, finalYaw, finalPitch)
                 );
 
                 setJumpHeld(true);
@@ -248,7 +247,7 @@ public class ElytraFlyModule extends Module {
 
             //TODO yaw smooth n
             ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(this.getName(), rotationPriority.get(), MC.player.getYaw(), smoothPitch)
+                    new RotationRequest(this.getName(), 1, MC.player.getYaw(), smoothPitch)
             );
         }
     }

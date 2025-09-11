@@ -25,13 +25,11 @@ public class AutoCowModule extends Module {
     private final DoubleSetting milkRange = addSetting(new DoubleSetting("range", 2.5, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 2, 1, 10));
 
     private int swapCooldown = 0;
 
     public AutoCowModule() {
         super("auto cow", "Automatically milks nearby cows.", ModuleCategory.of("world"), "cow", "milk", "autocow");
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent
@@ -66,7 +64,7 @@ public class AutoCowModule extends Module {
                 ROTATION_MANAGER.getRequestHandler().submit(
                         new RotationRequest(
                                 AutoCowModule.class.getName(),
-                                rotationPriority.get(),
+                                2,
                                 (float) getYawToVec(MC.player, center),
                                 (float) getPitchToVec(MC.player, center)
                         )

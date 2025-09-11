@@ -24,11 +24,9 @@ public class SpeedModule extends Module {
     }
 
     private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.ROTATION));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotate", 1, 0, 10));
 
     public SpeedModule() {
         super("speed", "Increases movement speed.", ModuleCategory.of("movement"));
-        rotationPriority.setShowCondition(() -> mode.get() == Mode.ROTATION);
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -44,7 +42,7 @@ public class SpeedModule extends Module {
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
             float pitch = 0;
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), rotationPriority.get(), yaw, pitch));
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), 1, yaw, pitch));
 
             MODULE_MANAGER.getStorage().getByClass(Debug.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
         }

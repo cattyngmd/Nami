@@ -102,7 +102,7 @@ public class BreakTickHandler {
         if (module.rotate.get()) {
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                     BreakTickHandler.class.getName(),
-                    module.rotationPriority.get(),
+                    3,
                     (float) getYawToVec(MC.player, Vec3d.ofCenter(pos)),
                     (float) getPitchToVec(MC.player, Vec3d.ofCenter(pos))
             ));

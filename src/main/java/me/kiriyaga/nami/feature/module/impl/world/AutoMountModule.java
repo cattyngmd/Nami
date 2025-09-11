@@ -25,13 +25,11 @@ public class AutoMountModule extends Module {
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 10.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private int actionCooldown = 0;
 
     public AutoMountModule() {
         super("auto mount", "Automatically mounts nearby entities.", ModuleCategory.of("world"), "mount", "automount");
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent
@@ -61,7 +59,7 @@ public class AutoMountModule extends Module {
                 ROTATION_MANAGER.getRequestHandler().submit(
                         new RotationRequest(
                                 AutoMountModule.class.getName(),
-                                rotationPriority.get(),
+                                2,
                                 (float) getYawToVec(MC.player, center),
                                 (float) getPitchToVec(MC.player, center)
                         )

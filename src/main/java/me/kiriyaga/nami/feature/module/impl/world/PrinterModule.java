@@ -49,7 +49,6 @@ public class PrinterModule extends Module {
     private final IntSetting shiftTicks = addSetting(new IntSetting("shift ticks", 1, 1, 6));
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation priority", 2, 1, 10));
 
     private int cooldown = 0;
     private int swapCooldown = 0;
@@ -57,7 +56,6 @@ public class PrinterModule extends Module {
 
     public PrinterModule() {
         super("printer", "Simplified printer module, it uses air place only.", ModuleCategory.of("world"));
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override
@@ -150,7 +148,7 @@ public class PrinterModule extends Module {
             if (rotate.get()) {
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                         LiquidFillModule.class.getName(),
-                        rotationPriority.get(),
+                        2,
                         (float) getYawToVec(MC.player, Vec3d.of(t.pos)),
                         (float) getPitchToVec(MC.player, Vec3d.of(t.pos))
                 ));
