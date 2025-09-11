@@ -24,7 +24,7 @@ import net.minecraft.util.Pair;
 
 public class Nami implements ClientModInitializer {
     public static String NAME = "nami";
-    public static String DISPLAY_NAME = "Nami 波";
+    public static String DISPLAY_NAME = "Nami";
     public static final String VERSION;
     static {
         ModContainer mod = FabricLoader.getInstance().getModContainer("nami").orElse(null);
@@ -43,6 +43,7 @@ public class Nami implements ClientModInitializer {
     public static final MacroManager MACRO_MANAGER = new MacroManager();
     public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
     public static final ModuleManager MODULE_MANAGER = new ModuleManager();
+    public static final FontManager FONT_MANAGER = new FontManager();
     public static final EntityManager ENTITY_MANAGER = new EntityManager();
     public static final CommandManager COMMAND_MANAGER = new CommandManager();
     public static final ChatManager CHAT_MANAGER = new ChatManager();
@@ -62,6 +63,7 @@ public class Nami implements ClientModInitializer {
     public void onInitializeClient() {
         COMMAND_MANAGER.init();
         MODULE_MANAGER.init();
+        //FONT_MANAGER.init();
         PING_MANAGER.init();
         TICK_MANAGER.init();
         ROTATION_MANAGER.init();
@@ -88,6 +90,10 @@ public class Nami implements ClientModInitializer {
         FRIEND_MANAGER.load();
 
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
+
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            FONT_MANAGER.init();
+        });
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             CONFIG_MANAGER.saveModules();

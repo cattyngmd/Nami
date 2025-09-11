@@ -16,8 +16,7 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import java.awt.*;
 import java.util.ArrayList;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class HudModule extends Module {
@@ -98,14 +97,16 @@ public class HudModule extends Module {
                         drawY -= chatAnimationOffset;
                     }
 
-                    event.getDrawContext().drawText(
-                            MC.textRenderer,
-                            element.text(),
-                            drawX,
-                            drawY,
-                            0xFFFFFFFF,
-                            shadow.get()
-                    );
+//                    event.getDrawContext().drawText(
+//                            MC.textRenderer,
+//                            element.text(),
+//                            drawX,
+//                            drawY,
+//                            0xFFFFFFFF,
+//                            shadow.get()
+//                    );
+
+                    FONT_MANAGER.drawText(event.getDrawContext(), element.text(), drawX, drawY, shadow.get());
                 }
 
                 hudElement.renderItems(event.getDrawContext());
