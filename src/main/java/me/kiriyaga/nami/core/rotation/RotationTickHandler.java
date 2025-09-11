@@ -6,6 +6,7 @@ import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.mixin.InputAccessor;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.util.InputCache;
@@ -272,6 +273,8 @@ public class RotationTickHandler {
     }
 
     private boolean canMove() {
+        if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return false;
+        
         if (MC.currentScreen == null) return true;
 
         if (MC.currentScreen != null && !MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class).isEnabled())
