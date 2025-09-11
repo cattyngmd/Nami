@@ -9,7 +9,9 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class FontRendererProvider {
 
     private final FontLoader fontLoader;
-    private TextRenderer customRenderer;
+    private TextRenderer cachedRenderer;
+    private int cachedSize = -1;
+    private int cachedOversample = -1;
 
     public FontRendererProvider(FontLoader fontLoader) {
         this.fontLoader = fontLoader;
@@ -22,12 +24,22 @@ public class FontRendererProvider {
             return MC.textRenderer;
         }
 
-        if (fontLoader.getCurrentSize() != fontModule.glyphSize.get() ||
-                fontLoader.getCurrentOversample() != fontModule.oversample.get()) {
+        int newSize = fontModule.glyphSize.get();
+        int newOversample = fontModule.oversample.get();
+
+        if (cachedRenderer == null || cachedSize != newSize || cachedOversample != newOversample) {
             fontLoader.init();
-            customRenderer = new TextRenderer(id -> fontLoader.getStorage(), true);
+
+            if (fontLoader.getStorage() != null) {
+                cachedRenderer = new TextRenderer(id -> fontLoader.getStorage(), true);
+            } else {
+                cachedRenderer = MC.textRenderer;
+            }
+
+            cachedSize = newSize;
+            cachedOversample = newOversample;
         }
 
-        return customRenderer != null ? customRenderer : MC.textRenderer;
+        return cachedRenderer;
     }
 }
