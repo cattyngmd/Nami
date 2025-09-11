@@ -1,12 +1,11 @@
 package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.feature.module.impl.client.FontModule;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.Font;
+import net.minecraft.client.font.FontFilterType;
 import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.font.TrueTypeFontLoader;
-import net.minecraft.client.font.FontFilterType;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -21,13 +20,20 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class FontManager {
 
     private static TextRenderer customRenderer;
+    private static int currentSize = -1;
 
     private static final String FONT_NAME = "impact";
 
     public void init() {
+        int newSize = MODULE_MANAGER.getStorage().getByClass(FontModule.class).glyphSize.get();
+
+        if (customRenderer != null && currentSize == newSize) {
+            return;
+        }
+
         TrueTypeFontLoader loader = new TrueTypeFontLoader(
                 Identifier.of("nami", FONT_NAME + ".ttf"),
-                MODULE_MANAGER.getStorage().getByClass(FontModule.class).glyphSize.get(),
+                newSize,
                 2.0F,
                 TrueTypeFontLoader.Shift.NONE,
                 ""
@@ -46,9 +52,11 @@ public class FontManager {
             );
 
             customRenderer = new TextRenderer(id -> storage, true);
+            currentSize = newSize;
         } catch (IOException e) {
             e.printStackTrace();
             customRenderer = MC.textRenderer;
+            currentSize = -1;
         }
     }
 
@@ -57,7 +65,15 @@ public class FontManager {
     }
 
     public void drawText(DrawContext context, Text text, int x, int y, boolean shadow) {
-        TextRenderer renderer = MODULE_MANAGER.getStorage().getByClass(FontModule.class).isEnabled() ? getCustomRenderer() : MC.textRenderer;
-        context.drawText(renderer, text, x, y, 0xFFFFFFFF, shadow);
+        FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
+
+        if (fontModule.isEnabled()) {
+            if (fontModule.glyphSize.get() != currentSize) {
+                init();
+            }
+            context.drawText(getCustomRenderer(), text, x, y, 0xFFFFFFFF, shadow);
+        } else {
+            context.drawText(MC.textRenderer, text, x, y, 0xFFFFFFFF, shadow);
+        }
     }
 }
