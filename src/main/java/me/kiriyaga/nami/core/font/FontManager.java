@@ -25,6 +25,14 @@ public class FontManager {
         context.drawText(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, shadow);
     }
 
+    public void drawText(DrawContext context, Text text, int x, int y, int rgb, boolean shadow) {
+        context.drawText(rendererProvider.getRenderer(), text, x, y, rgb, shadow);
+    }
+
+    public void drawText(DrawContext context, String text, int x, int y, int rgb, boolean shadow) {
+        context.drawText(rendererProvider.getRenderer(), text, x, y, rgb, shadow);
+    }
+
     public int getWidth(Text text) {
         return rendererProvider.getRenderer().getWidth(text);
     }

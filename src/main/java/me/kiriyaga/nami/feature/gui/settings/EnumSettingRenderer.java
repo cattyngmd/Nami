@@ -8,8 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
@@ -44,8 +43,8 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 setting.getName(),
                 textX,
                 textY,
@@ -54,10 +53,10 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
         );
 
         String valueStr = setting.get().toString().toLowerCase();
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 valueStr,
-                x + WIDTH - PADDING - textRenderer.getWidth(valueStr),
+                x + WIDTH - PADDING - FONT_MANAGER.getWidth(valueStr),
                 textY,
                 textColorInt,
                 true

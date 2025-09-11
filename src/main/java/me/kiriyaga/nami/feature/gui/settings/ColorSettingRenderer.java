@@ -8,8 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     private boolean draggingHue = false;
@@ -43,7 +42,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
-        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, true);
+        FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);
 
         if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
             context.fill(
@@ -65,10 +64,10 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         renderHueSlider(context, lastHueX, lastHueY, SV_SIZE, HUE_HEIGHT, setting);
 
         String hex = String.format("#%02X%02X%02X", setting.getRed(), setting.getGreen(), setting.getBlue());
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 hex,
-                x + WIDTH - PADDING - textRenderer.getWidth(hex),
+                x + WIDTH - PADDING - FONT_MANAGER.getWidth(hex),
                 textY,
                 textColorInt,
                 true

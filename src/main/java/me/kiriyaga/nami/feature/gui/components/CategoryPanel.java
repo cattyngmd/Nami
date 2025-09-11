@@ -10,8 +10,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.Set;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 import static me.kiriyaga.nami.feature.gui.components.ModulePanel.MODULE_SPACING;
 
@@ -98,14 +97,16 @@ public class CategoryPanel {
         );
 
         int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
-        context.drawText(
-                textRenderer,
-                moduleCategory.getName(),
-                x + PADDING,
-                textY + 1,
-                CLICK_GUI.applyFade(toRGBA(textCol)),
-                true
-        );
+//        context.drawText(
+//                textRenderer,
+//                moduleCategory.getName(),
+//                x + PADDING,
+//                textY + 1,
+//                CLICK_GUI.applyFade(toRGBA(textCol)),
+//                true
+//        );
+
+        FONT_MANAGER.drawText(context, moduleCategory.getName(), x + PADDING, textY + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);
 
         if (expanded) {
             int moduleY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;

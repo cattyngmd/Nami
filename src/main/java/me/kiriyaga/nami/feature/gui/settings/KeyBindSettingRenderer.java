@@ -10,8 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
@@ -50,8 +49,8 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                 ? (setting.isHoldMode() ? "hold" : "toggle")
                 : setting.getName().toLowerCase();
 
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 nameStr,
                 textX,
                 textY,
@@ -70,11 +69,11 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         }
 
         String renderStr = valueStr.toLowerCase(); // fuck ahaha
-        int textWidth = textRenderer.getWidth(renderStr);
+        int textWidth = FONT_MANAGER.getWidth(renderStr);
         int valueX = x + WIDTH - PADDING - textWidth;
 
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 renderStr,
                 valueX,
                 textY,

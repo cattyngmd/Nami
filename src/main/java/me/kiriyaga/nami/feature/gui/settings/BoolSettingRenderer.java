@@ -7,8 +7,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
@@ -46,7 +45,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, true);
+        FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);
     }
 
     @Override
