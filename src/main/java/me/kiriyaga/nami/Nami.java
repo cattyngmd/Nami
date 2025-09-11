@@ -4,6 +4,7 @@ import me.kiriyaga.nami.core.breaking.BreakManager;
 import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
+import me.kiriyaga.nami.core.font.FontManager;
 import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.core.rotation.RotationManager;
