@@ -27,7 +27,7 @@ public class FontManager {
 
     public void init() {
         FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
-        int newSize = fontModule.glyphSize.get();
+        int newSize = fontModule.glyphSize.get(); // yes i know its bad
         int newOversample = fontModule.oversample.get();
 
         if (customRenderer != null && currentSize == newSize && currentOversample == newOversample) {
@@ -95,6 +95,16 @@ public class FontManager {
     }
 
     public int getHeight() {
-        return getRenderer().fontHeight;
+        FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
+
+        if (!fontModule.isEnabled()) {
+            return getRenderer().fontHeight;
+        }
+
+        int baseSize = 9;
+        int size = fontModule.glyphSize.get();
+        int oversample = fontModule.oversample.get();
+
+        return (int) (baseSize * (size / 9.0)); //magic
     }
 }
