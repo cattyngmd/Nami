@@ -11,12 +11,12 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 @RegisterModule
 public class BreakManagerModule extends Module {
 
-    public final DoubleSetting maxDistance = addSetting(new DoubleSetting("distance", 5, 0, 6));
+    public final DoubleSetting maxDistance = addSetting(new DoubleSetting("distance", 5, 0, 7));
     public final EnumSetting<BreakPriority> breakPriority = addSetting(new EnumSetting<>("priority", BreakPriority.CLOSEST));
     public final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
 
     public BreakManagerModule() {
-        super("break manager", "Allows you to configure break manager.", ModuleCategory.of("client"), "breakmanager", "break");
+        super("break", "Allows you to configure break manager.", ModuleCategory.of("client"), "breakmanager", "break");
         if (!this.isEnabled())
             this.toggle();
     }
