@@ -9,9 +9,9 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class FontManager {
 
-    private final FontLoader fontLoader = new FontLoader();
-    private final FontRendererProvider rendererProvider = new FontRendererProvider(fontLoader);
-    private final FontMetrics fontMetrics = new FontMetrics(rendererProvider);
+    public final FontLoader fontLoader = new FontLoader();
+    public final FontRendererProvider rendererProvider = new FontRendererProvider(fontLoader);
+    public final FontMetrics fontMetrics = new FontMetrics(rendererProvider);
 
     public void init() {
         fontLoader.init();
