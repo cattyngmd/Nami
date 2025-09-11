@@ -37,19 +37,18 @@ import static me.kiriyaga.nami.Nami.*;
 public class AuraModule extends Module {
 
     public enum TpsMode { NONE, LATEST, AVERAGE }
+    public enum Rotate { NORMAL, HOLD}
 
-    public final DoubleSetting rotateRange = addSetting(new DoubleSetting("rotate", 3.00, 1.0, 6.0));
-    public final DoubleSetting attackRange = addSetting(new DoubleSetting("attack", 3.00, 1.0, 6.0));
+    public final DoubleSetting attackRange = addSetting(new DoubleSetting("range", 3.00, 1.0, 6.0));
     public final BoolSetting vanillaRange = addSetting(new BoolSetting("vanilla range", true));
     public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
-    public final BoolSetting render = addSetting(new BoolSetting("render", true));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("tps", TpsMode.NONE));
-    public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false)); // TODO: fix this it resets eating
     public final BoolSetting stopSprinting = addSetting(new BoolSetting("stop sprinting", true));
     public final BoolSetting raycast = addSetting(new BoolSetting("raycast", true));
     public final BoolSetting raycastConfirm = addSetting(new BoolSetting("raycast confirm", true));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 5, 1, 10));
-    public final DoubleSetting preRotate = addSetting(new DoubleSetting("pre rotate", 0.1, 0.0, 1.0));
+    public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("rotate", Rotate.NORMAL));
+    public final BoolSetting render = addSetting(new BoolSetting("render", true));
 
     private Entity currentTarget = null;
     private float attackCooldownTicks = 0f;
@@ -134,7 +133,15 @@ public class AuraModule extends Module {
 
         double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
 
-        if (eyeDist <= rotateRange.get() && (skipCooldown || attackCooldownTicks <= preRotate.get() * tps)) {
+        double preRotate;
+
+        switch (rotate.get()) { // yes
+            case NORMAL -> preRotate = 0.10;
+            case HOLD -> preRotate = 1.00;
+            default -> preRotate = 0.10;
+        }
+
+        if (eyeDist <= attackRange.get()+0.10 && (skipCooldown || attackCooldownTicks <= preRotate * tps)) {
             Vec3d rotationTarget;
             if (raycast.get()) {
                 Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
@@ -145,7 +152,7 @@ public class AuraModule extends Module {
 
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                     AuraModule.class.getName(),
-                    rotationPriority.get(),
+                    5,
                     (float) getYawToVec(MC.player, rotationTarget),
                     (float) getPitchToVec(MC.player, rotationTarget)
             ));
@@ -154,7 +161,7 @@ public class AuraModule extends Module {
             // This one done in rotation since its the most easy and stable as i see now, somehow people also 0-tick them but it doesnt for for us, and its either flags grim or doesnt work properly
             // TODO: 1 tick them instead of rotation
             if (stopSprinting.get() && m != null && m.isEnabled())
-                m.stopSprinting(3);
+                m.stopSprinting(1);
         }
 
         if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && (!raycast.get() || !raycastConfirm.get()))
@@ -221,7 +228,7 @@ public class AuraModule extends Module {
 
         double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), currentTarget.getBoundingBox());
 
-        if (eyeDist > rotateRange.get()) return;
+        if (eyeDist > attackRange.get()+0.10) return;
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
