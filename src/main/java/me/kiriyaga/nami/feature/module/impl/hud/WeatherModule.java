@@ -39,8 +39,8 @@ public class WeatherModule extends HudElementModule {
             text = "{bw}" + weather;
         }
 
-        width = MC.textRenderer.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(text);
     }

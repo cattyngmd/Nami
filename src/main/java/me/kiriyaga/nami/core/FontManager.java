@@ -22,7 +22,7 @@ public class FontManager {
     private static TextRenderer customRenderer;
     private static int currentSize = -1;
 
-    private static final String FONT_NAME = "impact";
+    private static final String FONT_NAME = "verdana";
 
     public void init() {
         int newSize = MODULE_MANAGER.getStorage().getByClass(FontModule.class).glyphSize.get();
@@ -60,20 +60,37 @@ public class FontManager {
         }
     }
 
-    private static TextRenderer getCustomRenderer() {
-        return customRenderer != null ? customRenderer : MC.textRenderer;
-    }
-
-    public void drawText(DrawContext context, Text text, int x, int y, boolean shadow) {
+    private static TextRenderer getRenderer() {
         FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
 
         if (fontModule.isEnabled()) {
             if (fontModule.glyphSize.get() != currentSize) {
-                init();
+                new FontManager().init();
             }
-            context.drawText(getCustomRenderer(), text, x, y, 0xFFFFFFFF, shadow);
+            return customRenderer != null ? customRenderer : MC.textRenderer;
         } else {
-            context.drawText(MC.textRenderer, text, x, y, 0xFFFFFFFF, shadow);
+            return MC.textRenderer;
         }
     }
+
+    public void drawText(DrawContext context, Text text, int x, int y, boolean shadow) {
+        context.drawText(getRenderer(), text, x, y, 0xFFFFFFFF, shadow);
+    }
+
+    public void drawText(DrawContext context, String text, int x, int y, boolean shadow) {
+        context.drawText(getRenderer(), text, x, y, 0xFFFFFFFF, shadow);
+    }
+
+    public int getWidth(Text text) {
+        return getRenderer().getWidth(text);
+    }
+
+    public int getWidth(String text) {
+        return getRenderer().getWidth(text);
+    }
+
+    public int getHeight() {
+        return getRenderer().fontHeight;
+    }
+
 }

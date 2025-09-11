@@ -5,8 +5,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.text.Text;
 
-import static me.kiriyaga.nami.Nami.CAT_FORMAT;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class FpsModule extends HudElementModule {
@@ -28,8 +27,8 @@ public class FpsModule extends HudElementModule {
             textStr = String.valueOf(fps);
         }
 
-        width = MC.textRenderer.getWidth(textStr);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(textStr);
+        height = FONT_MANAGER.getHeight();
 
         if (displayLabel.get()) {
             return CAT_FORMAT.format("{bg}FPS: {bw}" + fps);

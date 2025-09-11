@@ -59,8 +59,8 @@ public class CoordinatesModule extends HudElementModule {
             formatted += " {bg}[{bw}" + formatNumber(xAlt) + "{bg}, {bw}" + formatNumber(zAlt) + "{bg}]";
         }
 
-        width = MC.textRenderer.getWidth(formatted.replaceAll("\\{.*?}", ""));
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(formatted.replaceAll("\\{.*?}", ""));
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(formatted);
     }
@@ -88,7 +88,7 @@ public class CoordinatesModule extends HudElementModule {
         double xAlt = isNether ? x * 8 : x / 8;
         double zAlt = isNether ? z * 8 : z / 8;
 
-        int lineHeight = MC.textRenderer.fontHeight + 1;
+        int lineHeight = FONT_MANAGER.getHeight() + 1;
         int offsetY = 0;
 
         String fx = "{bg}X: {bw}" + formatNumber(x);
@@ -111,7 +111,7 @@ public class CoordinatesModule extends HudElementModule {
         offsetY += lineHeight;
 
         int maxWidth = lines.stream()
-                .mapToInt(te -> MC.textRenderer.getWidth(te.text().getString().replaceAll("\\{.*?}", "")))
+                .mapToInt(te -> FONT_MANAGER.getWidth(te.text().getString().replaceAll("\\{.*?}", "")))
                 .max().orElse(0);
 
         width = maxWidth;

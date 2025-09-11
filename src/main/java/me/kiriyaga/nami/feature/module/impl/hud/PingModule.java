@@ -27,8 +27,8 @@ public class PingModule extends HudElementModule {
             textStr = String.valueOf(ping);
         }
 
-        width = MC.textRenderer.getWidth(textStr);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(textStr);
+        height = FONT_MANAGER.getHeight();
 
         if (displayLabel.get()) {
             return CAT_FORMAT.format("{bg}Ping: {bw}" + ping);

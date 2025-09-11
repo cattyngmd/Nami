@@ -25,8 +25,8 @@ public class TpsModule extends HudElementModule {
         String tpsText = String.format(Locale.US, "%.2f {bg}[{bw}%.2f{bg}]", avgTps, latestTps); // locale is wild
         String text = displayLabel.get() ? "{bg}TPS: {bw}" + tpsText : "{bw}" + tpsText;
 
-        width = MC.textRenderer.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(text);
     }

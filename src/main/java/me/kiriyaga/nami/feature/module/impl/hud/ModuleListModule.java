@@ -75,7 +75,7 @@ public class ModuleListModule extends HudElementModule {
                     rawText = module.getName();
                 }
                 Text formattedText = CAT_FORMAT.format("{bg}" + rawText);
-                state.textWidth = MC.textRenderer.getWidth(formattedText);
+                state.textWidth = FONT_MANAGER.getWidth(formattedText);
 
                 animationStates.put(name, state);
             }
@@ -119,7 +119,7 @@ public class ModuleListModule extends HudElementModule {
             }
 
             Text formattedText = CAT_FORMAT.format(formattedTextStr);
-            int width = MC.textRenderer.getWidth(formattedText);
+            int width = FONT_MANAGER.getWidth(formattedText);
             moduleTexts.add(new ModuleTextInfo(module, formattedText, rawText, width));
         }
 
@@ -134,7 +134,7 @@ public class ModuleListModule extends HudElementModule {
 
         for (ModuleTextInfo info : moduleTexts) {
             maxWidth = Math.max(maxWidth, info.width);
-            yOffset += MC.textRenderer.fontHeight;
+            yOffset += FONT_MANAGER.getHeight();
         }
 
         cachedWidth = maxWidth;
@@ -148,7 +148,7 @@ public class ModuleListModule extends HudElementModule {
             ModuleAnimationState state = animationStates.get(moduleName);
 
             if (state == null || state.progress <= 0f) {
-                yOffset += MC.textRenderer.fontHeight;
+                yOffset += FONT_MANAGER.getHeight();
                 continue;
             }
 
@@ -168,7 +168,7 @@ public class ModuleListModule extends HudElementModule {
             }
 
             elements.add(new TextElement(text, animatedOffsetX, yOffset));
-            yOffset += MC.textRenderer.fontHeight;
+            yOffset += FONT_MANAGER.getHeight();
         }
 
         lastUpdateTime = currentTime;
@@ -178,7 +178,7 @@ public class ModuleListModule extends HudElementModule {
     @Override
     public int getRenderXForElement(TextElement element) {
         int baseX = getRenderX();
-        int lineWidth = MC.textRenderer.getWidth(element.text());
+        int lineWidth = FONT_MANAGER.getWidth(element.text());
 
         return switch (alignment.get()) {
             case left -> baseX + element.offsetX();
@@ -188,7 +188,7 @@ public class ModuleListModule extends HudElementModule {
     }
 
     private int getTextWidth(String text) {
-        return MC.textRenderer.getWidth(CAT_FORMAT.format("{bg}" + text));
+        return FONT_MANAGER.getWidth(CAT_FORMAT.format("{bg}" + text));
     }
 
     private static class ModuleTextInfo {

@@ -13,7 +13,7 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class FontModule extends Module {
 
-    public final IntSetting glyphSize = addSetting(new IntSetting("size", 15, 8, 32));
+    public final IntSetting glyphSize = addSetting(new IntSetting("size", 10, 8, 18));
 
     public FontModule() {
         super("font", "Custom client font renderer.", ModuleCategory.of("client"), "f", "customfont");

@@ -102,8 +102,8 @@ public class GreetingModule extends HudElementModule {
 
         String formattedText = "{bg}" + currentGreeting;
 
-        width = MC.textRenderer.getWidth(currentGreeting);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(currentGreeting);
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(formattedText);
     }

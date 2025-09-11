@@ -4,6 +4,7 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import net.minecraft.text.Text;
 
+import static me.kiriyaga.nami.Nami.FONT_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
 //@RegisterModule
@@ -26,8 +27,8 @@ public class TestPositionModule extends HudElementModule {
 
         String textStr = toggle ? "9999999" : "9";
 
-        width = MC.textRenderer.getWidth(textStr);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(textStr);
+        height = FONT_MANAGER.getHeight();
 
         return Text.literal(textStr);
     }

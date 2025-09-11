@@ -12,8 +12,8 @@ import net.minecraft.text.Text;
 import java.awt.*;
 import java.util.List;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
+
 //TODO: refactor
 public abstract class HudElementModule extends Module {
 
@@ -70,8 +70,8 @@ public abstract class HudElementModule extends Module {
         int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 
         for (TextElement element : getTextElements()) {
-            int textWidth = MC.textRenderer.getWidth(element.text());
-            int textHeight = MC.textRenderer.fontHeight;
+            int textWidth = FONT_MANAGER.getWidth(element.text());
+            int textHeight = FONT_MANAGER.getHeight();
 
             minX = Math.min(minX, element.offsetX());
             minY = Math.min(minY, element.offsetY());
@@ -114,7 +114,7 @@ public abstract class HudElementModule extends Module {
 
     public int getRenderXForElement(TextElement element) {
         int baseX = getRenderX();
-        int lineWidth = MC.textRenderer.getWidth(element.text());
+        int lineWidth = FONT_MANAGER.getWidth(element.text());
 
         return switch (alignment.get()) {
             case left -> baseX + element.offsetX();
@@ -190,8 +190,8 @@ public abstract class HudElementModule extends Module {
             context.drawStackOverlay(MC.textRenderer, element.stack(), drawX, drawY, null);
 
             Text label = element.label();
-            int labelWidth = MC.textRenderer.getWidth(label);
-            int labelHeight = MC.textRenderer.fontHeight;
+            int labelWidth = FONT_MANAGER.getWidth(label);
+            int labelHeight = FONT_MANAGER.getHeight();
 
             int labelX = 0, labelY = 0;
             int centerX = drawX + 8;
@@ -237,14 +237,8 @@ public abstract class HudElementModule extends Module {
             context.getMatrices().pushMatrix();
             context.getMatrices().translate(labelX, labelY);
             context.getMatrices().scale(scale, scale);
-            context.drawText(
-                    MC.textRenderer,
-                    label,
-                    0,
-                    0,
-                    0xFFFFFFFF,
-                    MODULE_MANAGER.getStorage().getByClass(HudModule.class).shadow.get()
-            );
+
+            FONT_MANAGER.drawText(context, label, 0, 0, MODULE_MANAGER.getStorage().getByClass(HudModule.class).shadow.get());
             context.getMatrices().popMatrix();
         }
     }

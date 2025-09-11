@@ -46,8 +46,8 @@ public class TimeModule extends HudElementModule {
             timeText = String.format("%02d:%02d", minecraftHour, minecraftMinute);
         }
 
-        width = MC.textRenderer.getWidth(timeText);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(timeText);
+        height = FONT_MANAGER.getHeight();
 
         if (!grey.get())
             return CAT_FORMAT.format("{bg}" + timeText);
