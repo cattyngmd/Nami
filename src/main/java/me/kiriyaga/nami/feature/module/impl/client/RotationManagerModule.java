@@ -20,7 +20,7 @@ public class RotationManagerModule extends Module {
     public final BoolSetting moveFix = addSetting(new BoolSetting("move fix", true));
 
     public RotationManagerModule() {
-        super("rotation", "Allows you to config rotation manager settings.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager");
+        super("rotation", "Client rotations configuration.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager");
         if (!this.isEnabled())
             this.toggle();
 //        jitterSpeed.setShowCondition(() -> jitterAmount.get()>0);

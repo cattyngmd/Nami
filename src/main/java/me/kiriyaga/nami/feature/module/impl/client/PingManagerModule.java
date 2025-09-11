@@ -21,7 +21,7 @@ public class PingManagerModule extends Module {
     public final IntSetting keepAliveInterval = addSetting(new IntSetting("interval", 900, 250, 2500));
 
     public PingManagerModule() {
-        super("ping", "Allows you to config ping manager settings.", ModuleCategory.of("client"), "ping", "manager", "managr", "png");
+        super("ping", "defines how ping should be received.", ModuleCategory.of("client"), "ping", "manager", "managr", "png");
 
         smoothingStrength.setShowCondition(() -> fastLatencyMode.get() == FastLatencyMode.OLD);
         unstableConnectionTimeout.setShowCondition(() -> fastLatencyMode.get() != FastLatencyMode.OFF);

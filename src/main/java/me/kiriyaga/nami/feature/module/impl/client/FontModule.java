@@ -17,6 +17,6 @@ public class FontModule extends Module {
     public final IntSetting oversample = addSetting(new IntSetting("oversample", 2, 2, 8));
 
     public FontModule() {
-        super("font", "Custom client font renderer.", ModuleCategory.of("client"), "f", "customfont");
+        super("font", "Custom font renderer.", ModuleCategory.of("client"), "f", "customfont");
     }
 }

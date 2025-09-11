@@ -31,7 +31,7 @@ public class HudModule extends Module {
     private boolean increasing = true;
 
     public HudModule() {
-        super("hud", "Main HUD module", ModuleCategory.of("client"));
+        super("hud", "Renders in-game hud.", ModuleCategory.of("client"));
         bounceIntensity.setShowCondition(() -> bounce.get());
         bounceSpeed.setShowCondition(() -> bounce.get());
     }
