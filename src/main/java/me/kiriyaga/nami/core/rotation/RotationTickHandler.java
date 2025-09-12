@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.core.rotation;
 
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
@@ -7,15 +8,11 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import me.kiriyaga.nami.mixin.InputAccessor;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -286,26 +283,6 @@ public class RotationTickHandler {
                 || MC.currentScreen instanceof AbstractCommandBlockScreen
                 || MC.currentScreen instanceof StructureBlockScreen
                 || MC.currentScreen instanceof CreativeInventoryScreen) {
-            return false;
-        }
-
-        if (MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class)._2b2t.get() && (
-                MC.currentScreen instanceof ShulkerBoxScreen
-                        || MC.currentScreen instanceof AnvilScreen
-                        || MC.currentScreen instanceof BrewingStandScreen
-                        || MC.currentScreen instanceof CartographyTableScreen
-                        || MC.currentScreen instanceof CrafterScreen
-                        || MC.currentScreen instanceof EnchantmentScreen
-                        || MC.currentScreen instanceof FurnaceScreen
-                        || MC.currentScreen instanceof GrindstoneScreen
-                        || MC.currentScreen instanceof HopperScreen
-                        || MC.currentScreen instanceof HorseScreen
-                        || MC.currentScreen instanceof MerchantScreen
-                        || MC.currentScreen instanceof SmithingScreen
-                        || MC.currentScreen instanceof SmokerScreen
-                        || MC.currentScreen instanceof StonecutterScreen
-                        || MC.currentScreen instanceof GenericContainerScreen
-                        || MC.currentScreen instanceof CreativeInventoryScreen)) {
             return false;
         }
 

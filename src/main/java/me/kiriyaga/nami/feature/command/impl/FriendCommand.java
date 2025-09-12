@@ -24,7 +24,7 @@ public class FriendCommand extends Command {
                             }
                         }
                 },
-                "f", "friends", "акшутв"
+                "f", "friends"
         );
     }
 

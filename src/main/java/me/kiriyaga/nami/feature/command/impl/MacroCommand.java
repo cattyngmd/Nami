@@ -39,7 +39,7 @@ public class MacroCommand extends Command {
                             }
                         }
                 },
-                "mac", "m", "ьфскщ"
+                "mac", "m"
         );
     }
 

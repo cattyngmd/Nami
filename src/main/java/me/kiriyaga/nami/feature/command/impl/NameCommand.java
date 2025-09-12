@@ -15,7 +15,7 @@ public class NameCommand extends Command {
                 new CommandArgument[] {
                         new CommandArgument.StringArg("name", 1, 24)
                 },
-                "n", "nam", "mne", "nome", "brand", "changename", "тфьу"
+                "n", "nam", "mne", "nome", "brand", "changename"
         );
     }
 

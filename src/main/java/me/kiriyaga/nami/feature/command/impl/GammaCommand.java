@@ -16,7 +16,7 @@ public class GammaCommand extends Command {
                 new CommandArgument[]{
                         new CommandArgument.IntArg("value", 0, 420)
                 },
-                "light", "brightens", "bright", "пфььф"
+                "light", "brightens", "bright"
         );
     }
 

@@ -11,7 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 public class RotationManagerModule extends Module {
     public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 360, 25, 360));
     public final DoubleSetting rotationEaseFactor = addSetting(new DoubleSetting("ease", 1, 0.5, 1));
-    public final DoubleSetting rotationThreshold = addSetting(new DoubleSetting("threshold", 3, 0, 15));
+    public final DoubleSetting rotationThreshold = addSetting(new DoubleSetting("threshold", 5, 0, 15));
     public final IntSetting ticksBeforeRelease = addSetting(new IntSetting("hold", 1, 00, 30));
     public final DoubleSetting jitterAmount = addSetting(new DoubleSetting("jitter amount", 0, 0, 3));
     public final DoubleSetting jitterSpeed = addSetting(new DoubleSetting("jitter speed", 1, 0.015, 1));

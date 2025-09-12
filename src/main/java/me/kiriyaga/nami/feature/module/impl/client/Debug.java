@@ -14,6 +14,7 @@ public class Debug extends Module {
     private final BoolSetting aura = addSetting(new BoolSetting("aura", false));
     private final BoolSetting ping = addSetting(new BoolSetting("ping", false));
     private final BoolSetting speedrot = addSetting(new BoolSetting("speedrot", false));
+    private final BoolSetting peek = addSetting(new BoolSetting("peek", false));
 
     private Integer savedSyncId = null;
 
@@ -39,6 +40,14 @@ public class Debug extends Module {
 
     public boolean debugSpeedRot(Text text){
         if (this.isEnabled() && speedrot.get()) {
+            CHAT_MANAGER.sendRaw(text);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean debugPeek(Text text){
+        if (this.isEnabled() && peek.get()) {
             CHAT_MANAGER.sendRaw(text);
             return true;
         }

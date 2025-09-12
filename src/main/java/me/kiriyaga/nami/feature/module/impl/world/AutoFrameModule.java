@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.rotation.RotationRequest;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;

@@ -15,7 +15,7 @@ public class PitchCommand extends Command {
                 new CommandArgument[] {
                         new CommandArgument.IntArg("value", -90, 90)
                 },
-                "p", "зшце"
+                "p"
         );
     }
 

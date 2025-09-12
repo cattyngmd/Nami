@@ -4,6 +4,7 @@ import me.kiriyaga.nami.core.breaking.BreakManager;
 import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
+import me.kiriyaga.nami.core.executable.ExecutableManager;
 import me.kiriyaga.nami.core.font.FontManager;
 import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.core.macro.MacroManager;
@@ -54,6 +55,7 @@ public class Nami implements ClientModInitializer {
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static final BreakManager BREAK_MANAGER = new BreakManager();
+    public static final ExecutableManager EXECUTABLE_MANAGER = new ExecutableManager();
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
     public static ClickGuiScreen CLICK_GUI;
@@ -71,6 +73,7 @@ public class Nami implements ClientModInitializer {
         ENTITY_MANAGER.init();
         INVENTORY_MANAGER.init();
         BREAK_MANAGER.init();
+        EXECUTABLE_MANAGER.init();
         CONFIG_MANAGER.loadModules();
         CONFIG_MANAGER.loadFriends();
         CHAT_MANAGER.init();
@@ -93,7 +96,7 @@ public class Nami implements ClientModInitializer {
         LOGGER.info(NAME + " " + VERSION + " has been initialized");
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            FONT_MANAGER.init();
+            FONT_MANAGER.init(); // font is making glyph textures, it should be after game loaded not on initialize
         });
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {

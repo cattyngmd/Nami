@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.core.rotation;
+package me.kiriyaga.nami.core.rotation.model;
 
 import java.util.function.Supplier;
 

@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
-import me.kiriyaga.nami.core.rotation.RotationRequest;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
@@ -9,7 +9,6 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;

@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import me.kiriyaga.nami.core.config.model.PrinterSchematic;
-import me.kiriyaga.nami.core.rotation.RotationRequest;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;

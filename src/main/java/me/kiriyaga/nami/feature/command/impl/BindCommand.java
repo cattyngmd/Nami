@@ -21,7 +21,7 @@ public class BindCommand extends Command {
                         new CommandArgument.StringArg("module", 1, 25),
                         new CommandArgument.StringArg("key", 1, 10)
                 },
-                "b", "иштв"
+                "b"
         );
     }
 

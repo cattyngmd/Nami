@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.core.rotation;
 
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 
 import java.util.ArrayList;
