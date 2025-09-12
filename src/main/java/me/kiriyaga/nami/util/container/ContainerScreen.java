@@ -1,12 +1,19 @@
 package me.kiriyaga.nami.util.container;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.PlayerScreenHandler;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static net.minecraft.client.gl.RenderPipelines.GUI_TEXTURED;
@@ -15,9 +22,12 @@ public class ContainerScreen extends ShulkerBoxScreen {
     private static final Identifier TEXTURE = Identifier.of("textures/gui/container/shulker_box.png");
     private final ItemStack[] contents;
     private final ItemStack containerStack;
+    private static final Deque<Screen> screenStack = new ArrayDeque<>();
 
     public ContainerScreen(ItemStack containerStack, ItemStack[] contents) {
-        super(new ShulkerBoxScreenHandler(0, MC.player.getInventory(), new SimpleInventory(contents)), MC.player.getInventory(), Text.translatable(containerStack.getItemName().getString()));
+        super(new ShulkerBoxScreenHandler(0, MC.player.getInventory(), new SimpleInventory(contents)),
+                MC.player.getInventory(),
+                Text.translatable(containerStack.getItemName().getString()));
         this.containerStack = containerStack;
         this.contents = contents;
     }
@@ -36,21 +46,28 @@ public class ContainerScreen extends ShulkerBoxScreen {
     }
 
     public static void open(ItemStack stack, ItemStack[] contents) {
+        Screen current = MC.currentScreen;
+        if (current != null && !(current instanceof ContainerScreen)) {
+            screenStack.push(current);
+        }
+
         MC.setScreen(new ContainerScreen(stack, contents));
     }
 
     @Override
+    public void close() {
+        super.close();
+        if (!screenStack.isEmpty()) {
+            MC.setScreen(screenStack.pop());
+        }
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return false;
-    }
+        if (button == 1 || button == 0)
+             return false;
 
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        return false;
+        super.mouseClicked(mouseX, mouseY, button);
+        return true;
     }
 }

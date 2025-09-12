@@ -33,6 +33,7 @@ import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.container.ContainerUtils.DyeColorToARGB;
+import static me.kiriyaga.nami.util.container.ContainerUtils.openContainer;
 
 @RegisterModule
 public class ShulkerViewModule extends Module {
@@ -56,6 +57,7 @@ public class ShulkerViewModule extends Module {
     private int totalHeight = 0;
 
     private double clickedX = -1, clickedY = -1;
+    private int button = -1;
 
     public ShulkerViewModule() {
         super("shulker view", "Improves shulker managment. Author @cattyngmd", ModuleCategory.of("visuals"),"shulkerview");
@@ -126,9 +128,14 @@ public class ShulkerViewModule extends Module {
                 count++;
             }
 
-            if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot(), true);
-                clickedX = clickedY = -1;
+            if (button != -1 && clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
+                if (button == 0)
+                    INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot(), true);
+
+                if (button == 2 && middleOpen.get())
+                    openContainer(info.shulker());
+
+                clickedX = clickedY = button = -1;
             }
 
             currentY += height + MARGIN;
@@ -140,10 +147,10 @@ public class ShulkerViewModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onClick(MouseClickEvent event) {
-       // CHAT_MANAGER.sendRaw("mouse click event called");
-        if (event.button() == 0) {
+        if (event.button() == 0 || event.button() == 2) {
             clickedX = event.mouseX();
             clickedY = event.mouseY();
+            button = event.button();
         }
     }
 

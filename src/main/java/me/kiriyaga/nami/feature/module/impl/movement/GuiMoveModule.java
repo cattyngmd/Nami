@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.CloseScreenS2CPacket;
 import org.lwjgl.glfw.GLFW;

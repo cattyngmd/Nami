@@ -74,22 +74,10 @@ public class Nami implements ClientModInitializer {
         INVENTORY_MANAGER.init();
         BREAK_MANAGER.init();
         EXECUTABLE_MANAGER.init();
-        CONFIG_MANAGER.loadModules();
-        CONFIG_MANAGER.loadFriends();
         CHAT_MANAGER.init();
 
         CAT_FORMAT.add(new CatStyles());
         CLICK_GUI = new ClickGuiScreen();
-
-
-        if (CONFIG_MANAGER.loadName() == null)
-            CONFIG_MANAGER.saveName(DISPLAY_NAME);
-        else
-            DISPLAY_NAME = CONFIG_MANAGER.loadName();
-
-        COMMAND_MANAGER.getExecutor().setPrefix(CONFIG_MANAGER.loadPrefix());
-
-        CONFIG_MANAGER.loadMacros();
 
         FRIEND_MANAGER.load();
 
@@ -97,6 +85,16 @@ public class Nami implements ClientModInitializer {
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             FONT_MANAGER.init(); // font is making glyph textures, it should be after game loaded not on initialize
+
+
+            CONFIG_MANAGER.loadModules();
+            CONFIG_MANAGER.loadFriends();
+            if (CONFIG_MANAGER.loadName() == null)
+                CONFIG_MANAGER.saveName(DISPLAY_NAME);
+            else
+                DISPLAY_NAME = CONFIG_MANAGER.loadName();
+            COMMAND_MANAGER.getExecutor().setPrefix(CONFIG_MANAGER.loadPrefix());
+            CONFIG_MANAGER.loadMacros();
         });
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {

@@ -34,8 +34,7 @@ public class ContainerUtils {
 
         ContainerScreen.open(stack, contents);
 
-        MODULE_MANAGER.getStorage().getByClass(Debug.class)
-                .debugPeek(Text.of("peek opened container preview for " + stack));
+        MODULE_MANAGER.getStorage().getByClass(Debug.class).debugPeek(Text.of("peek opened container preview for " + stack));
         return true;
     }
 
