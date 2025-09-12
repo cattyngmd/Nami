@@ -4,11 +4,15 @@ import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import net.fabricmc.fabric.mixin.transfer.ContainerComponentAccessor;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.ColorHelper;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
@@ -52,4 +56,25 @@ public class ContainerUtils {
         }
     }
 
+    public static int DyeColorToARGB(DyeColor color) {
+        switch (color) {
+            case WHITE: return ColorHelper.getArgb(255, 255, 255, 255);
+            case ORANGE: return ColorHelper.getArgb(255, 216, 127, 51);
+            case MAGENTA: return ColorHelper.getArgb(255, 178, 76, 216);
+            case LIGHT_BLUE: return ColorHelper.getArgb(255, 102, 153, 216);
+            case YELLOW: return ColorHelper.getArgb(255, 229, 229, 51);
+            case LIME: return ColorHelper.getArgb(255, 127, 204, 25);
+            case PINK: return ColorHelper.getArgb(255, 242, 127, 165);
+            case GRAY: return ColorHelper.getArgb(255, 76, 76, 76);
+            case LIGHT_GRAY: return ColorHelper.getArgb(255, 153, 153, 153);
+            case CYAN: return ColorHelper.getArgb(255, 76, 127, 153);
+            case PURPLE: return ColorHelper.getArgb(255, 127, 63, 178);
+            case BLUE: return ColorHelper.getArgb(255, 51, 76, 178);
+            case BROWN: return ColorHelper.getArgb(255, 102, 76, 51);
+            case GREEN: return ColorHelper.getArgb(255, 102, 127, 51);
+            case RED: return ColorHelper.getArgb(255, 153, 51, 51);
+            case BLACK: return ColorHelper.getArgb(255, 25, 25, 25);
+            default: return ColorHelper.getArgb(255, 128, 128, 128);
+        }
+    }
 }

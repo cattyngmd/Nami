@@ -14,6 +14,8 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
+import me.kiriyaga.nami.util.container.ContainerUtils;
+import me.kiriyaga.nami.util.container.ShulkerInfo;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -30,6 +32,7 @@ import java.util.*;
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.container.ContainerUtils.DyeColorToARGB;
 
 @RegisterModule
 public class ShulkerViewModule extends Module {
@@ -38,6 +41,7 @@ public class ShulkerViewModule extends Module {
     public final BoolSetting compact = addSetting(new BoolSetting("compact", true));
     public final BoolSetting bothSides = addSetting(new BoolSetting("both sides", true));
     public final BoolSetting borders = addSetting(new BoolSetting("borders", true));
+    public final BoolSetting middleOpen = addSetting(new BoolSetting("middleclick open", false));
     public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1, 0.5, 1.5));
     public final DoubleSetting scrollsensitivity = addSetting(new DoubleSetting("sensitivity", 1, 0.5, 3));
 
@@ -102,15 +106,15 @@ public class ShulkerViewModule extends Module {
             context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
 
             if (borders.get()){
-                int borderColor = getShulkerColor(info.shulker);
+                int borderColor = getShulkerColor(info.shulker());
                 drawBorder(context, startX, currentY, width, height, borderColor);
             }
 
             int count = 0;
-            for (ItemStack stack : info.stacks) {
+            for (ItemStack stack : info.stacks()) {
                 if (compact.get() && stack.isEmpty()) break;
-                int x = startX + (count % info.cols) * GRID_WIDTH + MARGIN;
-                int y = currentY + (count / info.cols) * GRID_HEIGHT + MARGIN;
+                int x = startX + (count % info.cols()) * GRID_WIDTH + MARGIN;
+                int y = currentY + (count / info.cols()) * GRID_HEIGHT + MARGIN;
 
                 context.drawItem(stack, x, y);
                 context.drawStackOverlay(MC.textRenderer, stack, x, y, null);
@@ -123,7 +127,7 @@ public class ShulkerViewModule extends Module {
             }
 
             if (clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot, true);
+                INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot(), true);
                 clickedX = clickedY = -1;
             }
 
@@ -168,90 +172,9 @@ public class ShulkerViewModule extends Module {
         return DyeColorToARGB(color);
     }
 
-    private int DyeColorToARGB(DyeColor color) {
-        switch (color) {
-            case WHITE: return ColorHelper.getArgb(255, 255, 255, 255);
-            case ORANGE: return ColorHelper.getArgb(255, 216, 127, 51);
-            case MAGENTA: return ColorHelper.getArgb(255, 178, 76, 216);
-            case LIGHT_BLUE: return ColorHelper.getArgb(255, 102, 153, 216);
-            case YELLOW: return ColorHelper.getArgb(255, 229, 229, 51);
-            case LIME: return ColorHelper.getArgb(255, 127, 204, 25);
-            case PINK: return ColorHelper.getArgb(255, 242, 127, 165);
-            case GRAY: return ColorHelper.getArgb(255, 76, 76, 76);
-            case LIGHT_GRAY: return ColorHelper.getArgb(255, 153, 153, 153);
-            case CYAN: return ColorHelper.getArgb(255, 76, 127, 153);
-            case PURPLE: return ColorHelper.getArgb(255, 127, 63, 178);
-            case BLUE: return ColorHelper.getArgb(255, 51, 76, 178);
-            case BROWN: return ColorHelper.getArgb(255, 102, 76, 51);
-            case GREEN: return ColorHelper.getArgb(255, 102, 127, 51);
-            case RED: return ColorHelper.getArgb(255, 153, 51, 51);
-            case BLACK: return ColorHelper.getArgb(255, 25, 25, 25);
-            default: return ColorHelper.getArgb(255, 128, 128, 128);
-        }
-    }
-
     private boolean isHovered(double mx, double my, int x, int y, int width, int height, float scale) {
         mx /= scale;
         my /= scale;
         return mx >= x && mx <= x + width && my >= y && my <= y + height;
-    }
-
-    private static class ShulkerInfo {
-        final ItemStack shulker;
-        final int slot;
-        final List<ItemStack> stacks;
-        final int rows;
-        final int cols;
-
-        public ShulkerInfo(ItemStack shulker, int slot, List<ItemStack> stacks) {
-            this.shulker = shulker;
-            this.slot = slot;
-            this.stacks = stacks;
-            int size = stacks.size();
-            this.rows = (int) Math.ceil(size / 9f);
-            this.cols = Math.min(9, size);
-        }
-
-        public static ShulkerInfo create(ItemStack stack, int slot, boolean compact) {
-            if (!(stack.getItem() instanceof BlockItem item)) return null;
-            if (!(item.getBlock() instanceof net.minecraft.block.ShulkerBoxBlock)) return null;
-
-            List<ItemStack> items = new ArrayList<>(Collections.nCopies(27, ItemStack.EMPTY));
-            var component = stack.getComponents().getOrDefault(net.minecraft.component.DataComponentTypes.CONTAINER, null);
-            if (component == null) return null;
-
-            List<ItemStack> input = component.stream().toList();
-            for (int i = 0; i < input.size(); i++) items.set(i, input.get(i));
-
-            if (compact) items = compactList(items);
-
-            return new ShulkerInfo(stack, slot, items);
-        }
-
-        private static List<ItemStack> compactList(List<ItemStack> input) {
-            Map<Item, Integer> map = new HashMap<>();
-            for (ItemStack stack : input) {
-                if (stack.isEmpty()) continue;
-                map.put(stack.getItem(), map.getOrDefault(stack.getItem(), 0) + stack.getCount());
-            }
-
-            List<ItemStack> result = new ArrayList<>();
-            for (Map.Entry<Item, Integer> entry : map.entrySet()) {
-                result.add(new ItemStack(entry.getKey(), entry.getValue()));
-            }
-            return result;
-        }
-
-        public int slot() {
-            return slot;
-        }
-
-        public int rows() {
-            return rows;
-        }
-
-        public int cols() {
-            return cols;
-        }
     }
 }
