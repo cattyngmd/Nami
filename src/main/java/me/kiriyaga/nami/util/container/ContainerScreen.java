@@ -58,10 +58,10 @@ public class ContainerScreen extends ShulkerBoxScreen {
 
     @Override
     public void close() {
-        super.close();
         if (!screenStack.isEmpty()) {
             MC.setScreen(screenStack.pop());
-        }
+        } else
+            super.close();
     }
 
     @Override
