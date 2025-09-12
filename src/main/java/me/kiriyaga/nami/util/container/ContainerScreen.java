@@ -4,6 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -11,6 +12,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -68,6 +70,18 @@ public class ContainerScreen extends ShulkerBoxScreen {
              return false;
 
         super.mouseClicked(mouseX, mouseY, button);
+        return true;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        KeyBinding keyBindEscape = MC.options.inventoryKey;
+        int escKey = keyBindEscape.getDefaultKey().getCode();
+
+        if (keyCode == escKey || keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
+
         return true;
     }
 }
