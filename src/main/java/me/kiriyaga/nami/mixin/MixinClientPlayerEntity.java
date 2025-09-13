@@ -2,6 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
+import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.feature.module.impl.combat.ReachModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.PortalGuiModule;
@@ -11,6 +12,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.*;
@@ -24,9 +26,6 @@ import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class MixinClientPlayerEntity {
-
-    @Shadow private float lastYawClient;
-    @Shadow private float lastPitchClient;
 
     @Shadow
     protected MinecraftClient client;
@@ -75,23 +74,41 @@ public abstract class MixinClientPlayerEntity {
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
-        if (!ROTATION_MANAGER.getStateHandler().isRotating())
+        if (!ROTATION_MANAGER.getStateHandler().isRotating()) {
+            ROTATION_MANAGER.getStateHandler().setServerYaw(MC.player.getYaw()); // we do update server rotations even tho no rotation is proceeded
+            ROTATION_MANAGER.getStateHandler().setServerPitch(MC.player.getPitch());
+            ROTATION_MANAGER.getStateHandler().setServerDeltaYaw(120f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
             return;
+        }
 
         originalYaw = MC.player.getYaw();
         originalPitch = MC.player.getPitch();
 
-        MC.player.setYaw(ROTATION_MANAGER.getStateHandler().getRotationYaw());
-        MC.player.setPitch(ROTATION_MANAGER.getStateHandler().getRotationPitch());
+        float newYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        float newPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+        MC.player.setYaw(newYaw);
+        MC.player.setPitch(newPitch);
 
         MC.player.setBodyYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
         MC.player.setHeadYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
+
+        float deltaYaw = newYaw - ROTATION_MANAGER.getStateHandler().getServerYaw();
+        //float deltaPitch = newPitch - ROTATION_MANAGER.getStateHandler().getServerPitch();
+
+        ROTATION_MANAGER.getStateHandler().setServerDeltaYaw(deltaYaw);
+
+        ROTATION_MANAGER.getStateHandler().setServerYaw(newYaw);
+        ROTATION_MANAGER.getStateHandler().setServerPitch(newPitch);
     }
 
     @Inject(method = "sendMovementPackets", at = @At("TAIL"))
     private void postSendMovementPackets(CallbackInfo ci) {
         if (!ROTATION_MANAGER.getStateHandler().isRotating())
             return;
+
+        MODULE_MANAGER.getStorage().getByClass(Debug.class).debugRot(Text.of(
+                "post yaw=" + MC.player.getYaw() + ", pitch=" + MC.player.getPitch() + "\n "
+        ));
 
         MC.player.setYaw(originalYaw);
         MC.player.setPitch(originalPitch);

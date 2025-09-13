@@ -3,12 +3,20 @@ package me.kiriyaga.nami.feature.module.impl.client;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 @RegisterModule
 public class RotationManagerModule extends Module {
+
+    public enum RotationMode {
+        MOTION
+    }
+
+    public final EnumSetting<RotationMode> rotation = addSetting(new EnumSetting<>("rotation",RotationMode.MOTION));
     public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 360, 25, 360));
     public final DoubleSetting rotationEaseFactor = addSetting(new DoubleSetting("ease", 1, 0.5, 1));
     public final DoubleSetting rotationThreshold = addSetting(new DoubleSetting("threshold", 5, 0, 15));
@@ -23,9 +31,9 @@ public class RotationManagerModule extends Module {
         super("rotation", "Client rotations configuration.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager");
         if (!this.isEnabled())
             this.toggle();
-//        jitterSpeed.setShowCondition(() -> jitterAmount.get()>0);
-//        jitterMaxYaw.setShowCondition(() -> jitterAmount.get() > 0);
-//        jitterMaxPitch.setShowCondition(() -> jitterAmount.get() > 0);
+        jitterSpeed.setShowCondition(() -> jitterAmount.get()>0);
+        jitterMaxYaw.setShowCondition(() -> jitterAmount.get() > 0);
+        jitterMaxPitch.setShowCondition(() -> jitterAmount.get() > 0);
         rotationSpeed.setShow(false);
         rotationEaseFactor.setShow(false);
         rotationThreshold.setShow(false);

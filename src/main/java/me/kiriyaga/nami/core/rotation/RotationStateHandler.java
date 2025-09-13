@@ -8,9 +8,11 @@ public class RotationStateHandler {
     private float realYaw, realPitch;
     private float rotationYaw, rotationPitch;
     private float renderYaw, renderPitch;
+    private float serverYaw, serverPitch;
+    private float serverDeltaYaw;
 
     public void updateRealRotation(float yaw, float pitch) {
-        realYaw = wrapDegrees(yaw);
+        realYaw = yaw;
         realPitch = MathHelper.clamp(pitch, -90f, 90f);
 
         if (!isRotating()) {
@@ -19,47 +21,33 @@ public class RotationStateHandler {
         }
     }
 
-    public float getRealYaw() {
-        return realYaw;
-    }
+    public float getRealYaw() { return realYaw; }
+    public float getRealPitch() { return realPitch; }
 
-    public float getRealPitch() {
-        return realPitch;
-    }
+    public float getRotationYaw() { return rotationYaw; }
+    public float getRotationPitch() { return rotationPitch; }
 
-    public float getRotationYaw() {
-        return rotationYaw;
-    }
+    public void setRotationYaw(float yaw) {this.rotationYaw = yaw;}
 
-    public float getRotationPitch() {
-        return rotationPitch;
-    }
+    public void setRotationPitch(float pitch) {this.rotationPitch = MathHelper.clamp(pitch, -90f, 90f);}
 
-    public void setRotationYaw(float yaw) {
-        this.rotationYaw = wrapDegrees(yaw);
-    }
+    public float getRenderYaw() { return renderYaw; }
+    public float getRenderPitch() { return renderPitch; }
 
-    public void setRotationPitch(float pitch) {
-        this.rotationPitch = MathHelper.clamp(pitch, -90f, 90f);
-    }
+    // WE DO NOT WRAP/NORMALIZE SERVER ROTATIONS!!!
+    public void setRenderYaw(float yaw) { this.renderYaw = wrapDegrees(yaw); }
+    public void setRenderPitch(float pitch) { this.renderPitch = MathHelper.clamp(pitch, -90f, 90f); }
 
-    public float getRenderYaw() {
-        return renderYaw;
-    }
+    public float getServerYaw() {return serverYaw;}
+    public void setServerYaw(float yaw) {this.serverYaw = yaw;}
 
-    public float getRenderPitch() {
-        return renderPitch;
-    }
+    public float getServerPitch() {return serverPitch;}
+    public void setServerPitch(float pitch) {this.serverPitch = pitch;}
 
-    public void setRenderYaw(float yaw) {
-        this.renderYaw = wrapDegrees(yaw);
-    }
+    public float getServerDeltaYaw() {return serverDeltaYaw;}
+    public void setServerDeltaYaw(float deltaYaw) {this.serverDeltaYaw = deltaYaw;}
 
-    public void setRenderPitch(float pitch) {
-        this.renderPitch = MathHelper.clamp(pitch, -90f, 90f);
-    }
-
-    private float wrapDegrees(float angle) {
+    public static float wrapDegrees(float angle) {
         angle %= 360f;
         if (angle >= 180f) angle -= 360f;
         if (angle < -180f) angle += 360f;

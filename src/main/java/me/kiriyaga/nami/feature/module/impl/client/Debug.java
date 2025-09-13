@@ -15,6 +15,8 @@ public class Debug extends Module {
     private final BoolSetting ping = addSetting(new BoolSetting("ping", false));
     private final BoolSetting speedrot = addSetting(new BoolSetting("speedrot", false));
     private final BoolSetting peek = addSetting(new BoolSetting("peek", false));
+    private final BoolSetting deltafix = addSetting(new BoolSetting("deltafix", false));
+    private final BoolSetting rotdata = addSetting(new BoolSetting("rot data", false));
 
     private Integer savedSyncId = null;
 
@@ -32,6 +34,22 @@ public class Debug extends Module {
 
     public boolean debugPing(Text text){
         if (this.isEnabled() && ping.get()) {
+            CHAT_MANAGER.sendRaw(text);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean debugDelta(Text text){
+        if (this.isEnabled() && deltafix.get()) {
+            CHAT_MANAGER.sendRaw(text);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean debugRot(Text text){
+        if (this.isEnabled() && rotdata.get()) {
             CHAT_MANAGER.sendRaw(text);
             return true;
         }

@@ -5,6 +5,7 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.feature.module.impl.client.Debug;
 import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
@@ -12,6 +13,7 @@ import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
@@ -153,7 +155,7 @@ public class RotationTickHandler {
             if (updated) ticksHolding = 0;
         }
 
-        float yawDiff = wrapDegrees(request.targetYaw - stateHandler.getRotationYaw());
+        float yawDiff = yawDifference(request.targetYaw, stateHandler.getRotationYaw());
         float pitchDiff = request.targetPitch - stateHandler.getRotationPitch();
 
         boolean reached = Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
@@ -184,7 +186,8 @@ public class RotationTickHandler {
     }
 
     private void returnToRealRotation() {
-        float yawDiff = wrapDegrees(stateHandler.getRealYaw() - stateHandler.getRotationYaw());
+        float targetYaw = alignYaw(stateHandler.getRealYaw(), stateHandler.getRotationYaw());
+        float yawDiff = targetYaw - stateHandler.getRotationYaw();
         float pitchDiff = stateHandler.getRealPitch() - stateHandler.getRotationPitch();
 
         interpolateRotation(yawDiff, pitchDiff);
@@ -192,6 +195,8 @@ public class RotationTickHandler {
         boolean backReached = Math.abs(yawDiff) <= rotationThreshold && Math.abs(pitchDiff) <= rotationThreshold;
         if (backReached) {
             returning = false;
+            stateHandler.updateRealRotation(targetYaw, stateHandler.getRealPitch());
+            MC.player.setYaw(targetYaw);
             stateHandler.setRotationYaw(stateHandler.getRealYaw());
             stateHandler.setRotationPitch(stateHandler.getRealPitch());
             requestHandler.clearLastActiveId();
@@ -207,6 +212,42 @@ public class RotationTickHandler {
 
         float newYaw = stateHandler.getRotationYaw() + yawSpeed;
         float newPitch = stateHandler.getRotationPitch() + pitchSpeed;
+
+//        RotationManagerModule module = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
+//        if (module.mouseDeltaFix.get()) { // https://github.com/GrimAnticheat/Grim/blob/57a9f8f432800382d43c28df9e8409b4d7d80813/common/src/main/java/ac/grim/grimac/checks/impl/aim/AimModulo360.java#L31
+//            float lastServerYaw = stateHandler.getServerYaw();
+//            float lastServerDeltaYaw = stateHandler.getServerDeltaYaw();
+//
+//            float rawDiff = yawDifference(newYaw, lastServerYaw);
+//
+//            MODULE_MANAGER.getStorage().getByClass(Debug.class).debugDelta(Text.of(
+//                    "before wrap: newYaw=" + newYaw +
+//                            ", lastServerYaw=" + lastServerYaw +
+//                            ", lastServerDeltaYaw=" + lastServerDeltaYaw +
+//                            ", rawDiff=" + rawDiff
+//            ));
+//
+//            while (rawDiff > 360f) rawDiff -= 360f;
+//            while (rawDiff < -360f) rawDiff += 360f;
+//
+//            MODULE_MANAGER.getStorage().getByClass(Debug.class).debugDelta(Text.of(
+//                    "After wrap: rawDiff=" + rawDiff
+//            ));
+//
+//            if (Math.abs(rawDiff) > 320f && Math.abs(lastServerDeltaYaw) < 30f) {
+//                newYaw = lastServerYaw + Math.copySign(319f, rawDiff);
+//                MODULE_MANAGER.getStorage().getByClass(Debug.class).debugDelta(Text.of(
+//                        "clipping applied: newYaw before=" + newYaw +
+//                                ", newYaw after=" + newYaw +
+//                                ", clipSign=" + Math.copySign(1f, rawDiff)
+//                ));
+//            }
+//
+//
+//            MODULE_MANAGER.getStorage().getByClass(Debug.class).debugDelta(Text.of(
+//                    "Final newYaw=" + newYaw
+//            ));
+//        }
 
         stateHandler.setRotationYaw(newYaw);
         stateHandler.setRotationPitch(newPitch);
@@ -249,12 +290,12 @@ public class RotationTickHandler {
         currentPitchSpeed = 0f;
     }
 
-    private float wrapDegrees(float angle) {
-        angle %= 360f;
-        if (angle >= 180f) angle -= 360f;
-        if (angle < -180f) angle += 360f;
-        return angle;
-    }
+        private float wrapDegrees(float angle) {
+            angle %= 360f;
+            if (angle >= 180f) angle -= 360f;
+            if (angle < -180f) angle += 360f;
+            return angle;
+        }
 
     private void updateHeld(KeyBinding bind, int key, int scancode, int action, boolean mouse, java.util.function.Consumer<Boolean> setter) {
         if (!canMove())
@@ -287,6 +328,18 @@ public class RotationTickHandler {
         }
 
         return true;
+    }
+
+    private float yawDifference(float targetYaw, float currentYaw) {
+        float diff = (targetYaw - currentYaw) % 360f;
+        if (diff >= 180f) diff -= 360f;
+        if (diff < -180f) diff += 360f;
+        return diff;
+    }
+
+    private float alignYaw(float playerYaw, float currentYaw) {
+        int wraps = Math.round((currentYaw - playerYaw) / 360f);
+        return playerYaw + wraps * 360f;
     }
 
     private float lerp(float from, float to, float factor) {

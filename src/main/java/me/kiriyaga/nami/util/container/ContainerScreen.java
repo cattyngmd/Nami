@@ -19,7 +19,7 @@ import java.util.Deque;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static net.minecraft.client.gl.RenderPipelines.GUI_TEXTURED;
-
+ // TODO: unblock actions, and change the slot count, so people can see shulkers and manage inventory
 public class ContainerScreen extends ShulkerBoxScreen {
     private static final Identifier TEXTURE = Identifier.of("textures/gui/container/shulker_box.png");
     private final ItemStack[] contents;

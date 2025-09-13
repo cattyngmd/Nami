@@ -43,7 +43,7 @@ public class RotationRequestHandler {
                 .filter(r -> r.id.equals(id))
                 .findFirst()
                 .map(r -> {
-                    float yawDiff = wrapDegrees(r.targetYaw - stateHandler.getRotationYaw());
+                    float yawDiff = yawDifference(r.targetYaw, stateHandler.getRotationYaw());
                     float pitchDiff = r.targetPitch - stateHandler.getRotationPitch();
                     return Math.abs(yawDiff) <= threshold && Math.abs(pitchDiff) <= threshold;
                 }).orElse(false);
@@ -64,6 +64,13 @@ public class RotationRequestHandler {
         if (angle >= 180f) angle -= 360f;
         if (angle < -180f) angle += 360f;
         return angle;
+    }
+
+    private float yawDifference(float targetYaw, float currentYaw) {
+        float diff = (targetYaw - currentYaw) % 360f;
+        if (diff >= 180f) diff -= 360f;
+        if (diff < -180f) diff += 360f;
+        return diff;
     }
 
     public void clearLastActiveId() {
