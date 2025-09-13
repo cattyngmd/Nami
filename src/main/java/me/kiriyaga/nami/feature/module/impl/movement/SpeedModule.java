@@ -40,7 +40,7 @@ public class SpeedModule extends Module {
 
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
-            float pitch = 0;
+            float pitch = MC.player.getPitch();
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), 1, yaw, pitch));
 
             MODULE_MANAGER.getStorage().getByClass(Debug.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
