@@ -77,7 +77,7 @@ public abstract class MixinClientPlayerEntity {
         if (!ROTATION_MANAGER.getStateHandler().isRotating()) {
             ROTATION_MANAGER.getStateHandler().setServerYaw(MC.player.getYaw()); // we do update server rotations even tho no rotation is proceeded
             ROTATION_MANAGER.getStateHandler().setServerPitch(MC.player.getPitch());
-            ROTATION_MANAGER.getStateHandler().setServerDeltaYaw(120f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
+            ROTATION_MANAGER.getStateHandler().setServerDeltaYaw(0f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
             return;
         }
 
