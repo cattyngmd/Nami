@@ -24,6 +24,7 @@ public class AutoSheepModule extends Module {
 
     private final DoubleSetting shearRange = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
 
     private int swapCooldown = 0;
@@ -73,7 +74,7 @@ public class AutoSheepModule extends Module {
                 if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoSheepModule.class.getName())) return;
             }
 
-            interactWithEntity(entity, center, true);
+            interactWithEntity(entity, center, swing.get());
 
             swapCooldown = delay.get();
             break;

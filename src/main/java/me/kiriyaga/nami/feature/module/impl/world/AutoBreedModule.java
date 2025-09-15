@@ -26,6 +26,7 @@ public class AutoBreedModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
 
     private final Set<Integer> animalsFed = new HashSet<>();
@@ -87,7 +88,7 @@ public class AutoBreedModule extends Module {
                 if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoBreedModule.class.getName())) return;
             }
 
-            interactWithEntity(animal, center, true);
+            interactWithEntity(animal, center, swing.get());
 
             animalsFed.add(animal.getId());
             breedCooldown = delay.get();

@@ -27,6 +27,7 @@ public class AutoNametagModule extends Module {
     private final BoolSetting nametagged = addSetting(new BoolSetting("nametagged", false));
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
 
     private int swapCooldown = 0;
@@ -75,7 +76,7 @@ public class AutoNametagModule extends Module {
                 if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoNametagModule.class.getName())) return;
             }
 
-            interactWithEntity(entity, center, true);
+            interactWithEntity(entity, center, swing.get());
 
             swapCooldown = delay.get();
             break;

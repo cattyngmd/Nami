@@ -24,6 +24,7 @@ public class AutoCowModule extends Module {
 
     private final DoubleSetting milkRange = addSetting(new DoubleSetting("range", 2.5, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
 
     private int swapCooldown = 0;
@@ -73,7 +74,7 @@ public class AutoCowModule extends Module {
                 if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoCowModule.class.getName())) return;
             }
 
-            interactWithEntity(entity, center, true);
+            interactWithEntity(entity, center, swing.get());
             swapCooldown = delay.get();
             break;
         }

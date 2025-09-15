@@ -27,6 +27,7 @@ public class AutoFrameModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 4, 1.0, 6.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 0, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
 
     private int cooldown = 0;
@@ -85,7 +86,7 @@ public class AutoFrameModule extends Module {
                 if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoFrameModule.class.getName())) return;
             }
 
-            interactWithEntity(frame, center, true);
+            interactWithEntity(frame, center, swing.get());
 
             cooldown = delay.get();
             break;
