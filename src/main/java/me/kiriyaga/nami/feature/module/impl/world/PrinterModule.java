@@ -51,7 +51,6 @@ public class PrinterModule extends Module {
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
 
     private int cooldown = 0;
-    private int swapCooldown = 0;
     private BlockPos renderPos = null;
 
     public PrinterModule() {
@@ -61,7 +60,6 @@ public class PrinterModule extends Module {
     @Override
     public void onDisable() {
         cooldown = 0;
-        swapCooldown = 0;
         renderPos = null;
     }
 
@@ -78,8 +76,6 @@ public class PrinterModule extends Module {
             renderPos = null;
             return;
         }
-
-        if (swapCooldown > 0) swapCooldown--;
 
         List<TargetBlock> targets = new ArrayList<>();
         for (PrinterSchematic schematic : PrinterCommand.getLoadedSchematics()) {
@@ -137,14 +133,6 @@ public class PrinterModule extends Module {
                 continue;
             }
 
-            int currentSlot = MC.player.getInventory().getSelectedSlot();
-            if (currentSlot != slot && swapCooldown <= 0) {
-                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
-                swapCooldown = delay.get();
-                renderPos = t.pos;
-                return;
-            }
-
             if (rotate.get()) {
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                         LiquidFillModule.class.getName(),
@@ -155,6 +143,13 @@ public class PrinterModule extends Module {
             }
 
             if (!rotate.get() || ROTATION_MANAGER.getRequestHandler().isCompleted(LiquidFillModule.class.getName())) {
+
+                int currentSlot = MC.player.getInventory().getSelectedSlot();
+                if (currentSlot != slot) {
+                    INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+                    renderPos = t.pos;
+                }
+
                 if (grim.get()) {
                     MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
@@ -175,6 +170,9 @@ public class PrinterModule extends Module {
                             false));
                     MC.player.swingHand(Hand.MAIN_HAND);
                 }
+
+                if (currentSlot != MC.player.getInventory().getSelectedSlot())
+                    INVENTORY_MANAGER.getSlotHandler().attemptSwitch(currentSlot);
 
                 cooldown = delay.get();
                 renderPos = t.pos;
