@@ -47,6 +47,7 @@ public class PrinterModule extends Module {
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
     public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 20));
     private final IntSetting shiftTicks = addSetting(new IntSetting("shift ticks", 1, 1, 6));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
 
@@ -158,7 +159,8 @@ public class PrinterModule extends Module {
                             Direction.UP,
                             t.pos,
                             false));
-                    MC.player.swingHand(Hand.MAIN_HAND, false);
+                    if (swing.get())
+                        MC.player.swingHand(Hand.MAIN_HAND, false);
                     MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
                     MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
@@ -168,7 +170,8 @@ public class PrinterModule extends Module {
                             Direction.UP,
                             t.pos,
                             false));
-                    MC.player.swingHand(Hand.MAIN_HAND);
+                    if (swing.get())
+                        MC.player.swingHand(Hand.MAIN_HAND);
                 }
 
                 if (currentSlot != MC.player.getInventory().getSelectedSlot())
