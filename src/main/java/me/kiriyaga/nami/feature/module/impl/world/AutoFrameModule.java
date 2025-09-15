@@ -31,7 +31,6 @@ public class AutoFrameModule extends Module {
 
     private int cooldown = 0;
 
-    private final Set<Integer> clickedFrames = new HashSet<>();
 
     public AutoFrameModule() {
         super("auto frame", "Automatically puts a map in nearby item frames.", ModuleCategory.of("world"), "autoframe");
@@ -40,7 +39,6 @@ public class AutoFrameModule extends Module {
     @Override
     public void onDisable() {
         cooldown = 0;
-        clickedFrames.clear();
     }
 
     @SubscribeEvent
@@ -53,14 +51,18 @@ public class AutoFrameModule extends Module {
         }
 
         for (Entity entity : MC.world.getEntities()) {
-            if (!(entity instanceof ItemFrameEntity frame)) continue;
+            if (!(entity instanceof ItemFrameEntity frame))
+                continue;
 
-            if (clickedFrames.contains(frame.getId())) continue;
+            if (frame.getHeldItemStack() != null)
+                continue;
 
-            if (MC.player.squaredDistanceTo(frame) > range.get() * range.get()) continue;
+            if (MC.player.squaredDistanceTo(frame) > range.get() * range.get())
+                continue;
 
             int mapSlot = getMapSlot();
-            if (mapSlot == -1) continue;
+            if (mapSlot == -1)
+                continue;
 
             int currentSlot = MC.player.getInventory().getSelectedSlot();
             if (currentSlot != mapSlot) {
@@ -84,8 +86,6 @@ public class AutoFrameModule extends Module {
             }
 
             interactWithEntity(frame, center, true);
-
-            clickedFrames.add(frame.getId());
 
             cooldown = delay.get();
             break;
