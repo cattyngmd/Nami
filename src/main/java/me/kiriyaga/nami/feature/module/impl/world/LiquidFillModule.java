@@ -51,7 +51,6 @@ public class LiquidFillModule extends Module {
 
     private int cooldown = 0;
     private BlockPos renderPos = null;
-    private int swapCooldown = 0;
 
     public LiquidFillModule() {
         super("liquid fill", "Automatically fills nearby liquids with blocks.", ModuleCategory.of("world"), "liquidfill");
@@ -60,7 +59,6 @@ public class LiquidFillModule extends Module {
     @Override
     public void onDisable() {
         cooldown = 0;
-        swapCooldown = 0;
         renderPos = null;
     }
 
@@ -78,15 +76,6 @@ public class LiquidFillModule extends Module {
             renderPos = null;
             return;
         }
-
-        int currentSlot = MC.player.getInventory().getSelectedSlot();
-        if (currentSlot != blockSlot && swapCooldown <= 0) {
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(blockSlot);
-            swapCooldown = delay.get();
-            return;
-        }
-
-        if (swapCooldown > 0) swapCooldown--;
 
         int r = (int) Math.ceil(range.get());
         BlockPos playerPos = MC.player.getBlockPos();
@@ -129,6 +118,11 @@ public class LiquidFillModule extends Module {
             }
 
             if (!rotate.get() || ROTATION_MANAGER.getRequestHandler().isCompleted(LiquidFillModule.class.getName())) {
+
+                int currentSlot = MC.player.getInventory().getSelectedSlot();
+                if (currentSlot != blockSlot)
+                    INVENTORY_MANAGER.getSlotHandler().attemptSwitch(blockSlot);
+
                 if (grim.get()) {
                     MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
@@ -149,6 +143,9 @@ public class LiquidFillModule extends Module {
                             false));
                     MC.player.swingHand(Hand.MAIN_HAND);
                 }
+
+                if (currentSlot != MC.player.getInventory().getSelectedSlot())
+                    INVENTORY_MANAGER.getSlotHandler().attemptSwitch(currentSlot);
 
                 cooldown = delay.get();
                 placed = true;
