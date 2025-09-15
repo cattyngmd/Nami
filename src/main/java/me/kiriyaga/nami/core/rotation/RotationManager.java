@@ -9,6 +9,24 @@ package me.kiriyaga.nami.core.rotation;
  *     <li>{@link RotationRequestHandler} — as-is request handler;</li>
  *     <li>{@link RotationTickHandler} — rotation intorpolation, movement fix.</li>
  * </ul>
+ *
+ * How it works:
+ * <ul>
+ *   <li><b>PreTick (Priority: Low or higher)</b>
+ *   Rotation requests are submitted and prioritized</li>
+ *
+ *   <li><b>PreTick (Priority: Lowest)</b>
+ *   Rotations are interpolated and final values are applied.</li>
+ *
+ *   <li><b>Tick</b>
+ *   The rotation/movement packet is sent
+ *   (see {@code net.minecraft.client.network.ClientPlayerEntity:224}).</li>
+ *
+ *   <li><b>Next tick</b>
+ *   During PreTick the rotation is confirmed.
+ *   Note: interactions (attack/place/interact) are only possible during PreTick,
+ *   which always introduces at least a 1-tick delay.</li>
+ * </ul>
  */
 public class RotationManager {
 
