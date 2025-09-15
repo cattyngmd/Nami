@@ -5,10 +5,34 @@ import net.minecraft.util.math.MathHelper;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
 public class RotationStateHandler {
+    /**
+     * Real degrees
+     * we use it for returning
+     * Also we change real yaw, mc player yaw, if rotations was very long, since client side yaw pitch is always normalized
+     */
     private float realYaw, realPitch;
+    /**
+     * Current rotation degrees
+     * If not rotating, they are the same as realDegree
+     * If rotating, theese are used for spoofing degrees
+     * They are not accurate, used only for rotation manager
+     */
     private float rotationYaw, rotationPitch;
+    /**
+     * Render degrees
+     * Theese are separated from real rotations, they are always smooth = 50%
+     */
     private float renderYaw, renderPitch;
+    /**
+     * Server degrees
+     * These are degrees that really got sended on a server
+     * Any mc client should use mc.player.setYaw/pitch in packet send, so we, and also everyone else, know each other rotations
+     * Theese can be used for checking entities in raycast (pearl check entity for example) since theese are 100% accurate, sended data
+     */
     private float serverYaw, serverPitch;
+    /**
+     * Previus server yaw delta
+     */
     private float serverDeltaYaw;
 
     public void updateRealRotation(float yaw, float pitch) {

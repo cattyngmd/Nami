@@ -1,5 +1,15 @@
 package me.kiriyaga.nami.core.rotation;
 
+/**
+ * Rotation manager doc.
+ * <p>
+ * Manages motion rotations:
+ * <ul>
+ *     <li>{@link RotationStateHandler} — Stores current state of rotations, read docs;</li>
+ *     <li>{@link RotationRequestHandler} — as-is request handler;</li>
+ *     <li>{@link RotationTickHandler} — rotation intorpolation, movement fix.</li>
+ * </ul>
+ */
 public class RotationManager {
 
     private final RotationStateHandler stateHandler = new RotationStateHandler();
