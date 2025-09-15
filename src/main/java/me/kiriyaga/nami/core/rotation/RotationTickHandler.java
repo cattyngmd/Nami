@@ -28,8 +28,8 @@ public class RotationTickHandler {
     private float rotationEaseFactor;
     private float rotationThreshold;
     private int ticksBeforeRelease;
-    private float jitterAmount;
-    private float jitterSpeed;
+//    private float jitterAmount;
+//    private float jitterSpeed;
     private float currentYawSpeed = 0f, currentPitchSpeed = 0f;
     private int ticksHolding = 0;
     private boolean returning = false;
@@ -136,8 +136,6 @@ public class RotationTickHandler {
         rotationEaseFactor = module.rotationEaseFactor.get().floatValue();
         rotationThreshold = module.rotationThreshold.get().floatValue();
         ticksBeforeRelease = module.ticksBeforeRelease.get();
-        jitterAmount = module.jitterAmount.get().floatValue();
-        jitterSpeed = module.jitterSpeed.get().floatValue();
     }
 
     private void processRequest(RotationRequest request) {
@@ -169,10 +167,6 @@ public class RotationTickHandler {
         } else {
             ticksHolding = 0;
             interpolateRotation(yawDiff, pitchDiff);
-        }
-
-        if (ticksHolding > 0 && jitterAmount > 0) {
-            applyJitter();
         }
     }
 
@@ -272,14 +266,6 @@ public class RotationTickHandler {
     private float lerpAngle(float start, float end, float factor) {
         float delta = wrapDegrees(end - start);
         return start + delta * factor;
-    }
-
-    private void applyJitter() {
-        float yawOffset = jitterAmount * (float) Math.sin(tickCount * jitterSpeed);
-        float pitchOffset = jitterAmount * (float) Math.cos(tickCount * jitterSpeed);
-
-        stateHandler.setRotationYaw(stateHandler.getRotationYaw() + yawOffset);
-        stateHandler.setRotationPitch(stateHandler.getRotationPitch() + pitchOffset);
     }
 
     private void idleReset() {

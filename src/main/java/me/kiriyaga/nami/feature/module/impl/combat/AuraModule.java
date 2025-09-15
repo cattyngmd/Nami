@@ -287,6 +287,9 @@ public class AuraModule extends Module {
         double y = eyePos.y;
         double z = eyePos.z;
 
+        final double VEC = 1.0 / 16.0;
+        final double EPS = 1e-9;
+
         if (eyePos.x < box.minX) x = box.minX;
         else if (eyePos.x > box.maxX) x = box.maxX;
 
@@ -295,6 +298,19 @@ public class AuraModule extends Module {
 
         if (eyePos.z < box.minZ) z = box.minZ;
         else if (eyePos.z > box.maxZ) z = box.maxZ;
+
+        // somehow, minecraft aabb corner/sides does not intersects with raycast, so we need to move result vec inside of aabb
+        if (Math.abs(x - box.minX) < EPS) {
+            x = Math.min(box.minX + VEC, box.maxX - EPS);
+        } else if (Math.abs(x - box.maxX) < EPS) {
+            x = Math.max(box.maxX - VEC, box.minX + EPS);
+        }
+
+        if (Math.abs(z - box.minZ) < EPS) {
+            z = Math.min(box.minZ + VEC, box.maxZ - EPS);
+        } else if (Math.abs(z - box.maxZ) < EPS) {
+            z = Math.max(box.maxZ - VEC, box.minZ + EPS);
+        }
 
         return new Vec3d(x, y, z);
     }
