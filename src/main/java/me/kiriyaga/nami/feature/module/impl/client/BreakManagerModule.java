@@ -13,12 +13,15 @@ public class BreakManagerModule extends Module {
 
     public final DoubleSetting maxDistance = addSetting(new DoubleSetting("distance", 5, 0, 7));
     public final EnumSetting<BreakPriority> breakPriority = addSetting(new EnumSetting<>("priority", BreakPriority.CLOSEST));
+    public final BoolSetting swing = addSetting(new BoolSetting("swing", true));
+    public final BoolSetting grim = addSetting(new BoolSetting("grim", false));
     public final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
 
     public BreakManagerModule() {
         super("break", "Allows you to configure break manager.", ModuleCategory.of("client"), "breakmanager", "break");
         if (!this.isEnabled())
             this.toggle();
+        breakPriority.setShow(false);
     }
 
     @Override

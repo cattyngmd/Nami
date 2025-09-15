@@ -24,7 +24,6 @@ public class BreakTickHandler {
     private final BreakRequestHandler requestHandler;
     private BlockPos currentBreakingBlock = null;
     private long lastAttackBlockTime = 0;
-    private static final long ATTACK_BLOCK_COOLDOWN_MS = 250; // grim is wild
 
     public BreakTickHandler(BreakStateHandler stateHandler, BreakRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -118,11 +117,13 @@ public class BreakTickHandler {
             if (instant) {
                 currentBreakingBlock = null;
                 MC.interactionManager.attackBlock(pos, direction);
-                MC.player.swingHand(Hand.MAIN_HAND);
+                if (module.swing.get())
+                    MC.player.swingHand(Hand.MAIN_HAND);
                 stateHandler.confirmBreaking();
                 return true;
             } else {
-                if (now - lastAttackBlockTime >= ATTACK_BLOCK_COOLDOWN_MS) {
+                long attackCooldown = module.grim.get() ? 250 : 0; // grim speedmine checks also include block break delay, even tho we include check for it, breaking is still too fast without grim speedmine disabler
+                if (now - lastAttackBlockTime >= attackCooldown) {
                     currentBreakingBlock = pos;
                     MC.interactionManager.attackBlock(pos, direction);
                     lastAttackBlockTime = now;
@@ -137,7 +138,8 @@ public class BreakTickHandler {
         }
 
         stateHandler.confirmBreaking();
-        MC.player.swingHand(Hand.MAIN_HAND);
+        if (module.swing.get())
+            MC.player.swingHand(Hand.MAIN_HAND);
         return true;
     }
 
