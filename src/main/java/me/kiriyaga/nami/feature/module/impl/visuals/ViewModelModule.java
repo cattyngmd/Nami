@@ -9,9 +9,10 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 @RegisterModule
 public class ViewModelModule extends Module {
 
+    public final BoolSetting hand = addSetting(new BoolSetting("hand", false));
     public final BoolSetting eating = addSetting(new BoolSetting("eating", true));
     public final DoubleSetting eatingBob = addSetting(new DoubleSetting("eating bob", 1.00, 0.00, 1.00));
-    public final BoolSetting sway = addSetting(new BoolSetting("sway", false));
+    public final BoolSetting sway = addSetting(new BoolSetting("sway", true));
     public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1.0, 0.1, 2));
     public final DoubleSetting posX = addSetting(new DoubleSetting("posX", 0.0, -3, 3));
     public final DoubleSetting posY = addSetting(new DoubleSetting("posY", 0.0, -3, 3));

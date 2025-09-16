@@ -60,11 +60,14 @@ public abstract class MixinHeldItemRenderer {
     private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
                               float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
                               VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
-        if (vm != null && vm.isEnabled()) {
+        boolean isMainHand = hand == Hand.MAIN_HAND;
+
+        if (vm != null && vm.isEnabled() && !(isMainHand && item.isEmpty() && !vm.hand.get())) {
+
             matrices.push();
 
-            boolean isMainHand = hand == Hand.MAIN_HAND;
             float mirror = isMainHand ? 1.0f : -1.0f;
 
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(vm.rotX.get().floatValue()));
@@ -82,28 +85,30 @@ public abstract class MixinHeldItemRenderer {
         }
     }
 
-    @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem" +
-                    "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;" +
-                    "Lnet/minecraft/item/ItemDisplayContext;" +
-                    "Lnet/minecraft/client/util/math/MatrixStack;" +
-                    "Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
-    private void scaleItems(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
-                            float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
-                            VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
-        if (vm != null && vm.isEnabled()) {
-            float s = vm.scale.get().floatValue();
-            matrices.scale(s, s, s);
-        }
-    }
+//    @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE",
+//            target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem" +
+//                    "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;" +
+//                    "Lnet/minecraft/item/ItemDisplayContext;" +
+//                    "Lnet/minecraft/client/util/math/MatrixStack;" +
+//                    "Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
+//    private void scaleItems(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
+//                            float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
+//                            VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+//        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+//        if (vm != null && vm.isEnabled()) {
+//            float s = vm.scale.get().floatValue();
+//            matrices.scale(s, s, s);
+//        }
+//    }
 
     @Inject(method = "renderFirstPersonItem", at = @At("TAIL"))
     private void matricesPop(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
                              float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
                              VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
-        if (vm != null && vm.isEnabled()) {
+        boolean isMainHand = hand == Hand.MAIN_HAND;
+
+        if (vm != null && vm.isEnabled() && !(isMainHand && item.isEmpty() && !vm.hand.get())) {
             matrices.pop();
         }
     }
