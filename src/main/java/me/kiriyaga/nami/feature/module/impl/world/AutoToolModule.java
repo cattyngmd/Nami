@@ -82,9 +82,13 @@ public class AutoToolModule extends Module {
                 if (stack.isEmpty()) continue;
                 if (isBroken(stack)) continue;
 
-                float efficiencyLevel = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
-                float miningSpeed = stack.getMiningSpeedMultiplier(targetState);
-                float totalSpeed = efficiencyLevel + miningSpeed;
+                float totalSpeed = 1.0f;
+                if (stack.isSuitableFor(targetState)) {
+                    float efficiencyLevel = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
+                    float miningSpeed = stack.getMiningSpeedMultiplier(targetState);
+                    totalSpeed = miningSpeed * (1 + efficiencyLevel * 0.2f);
+                }
+
 
                 if (totalSpeed > bestSpeed) {
                     bestSpeed = totalSpeed;
