@@ -170,7 +170,14 @@ public class RotationTickHandler {
         }
     }
 
+    // in resetRotationToReal() returnToRealRotation() we need to set player yaw, clamped to closest to rotation yaw
+    // we need to do this between rotation requests change (highest priority appeared when old one not finished)
+    // and when rotation is ended
+    // this is made to prevent yaw jump
     private void resetRotationToReal() {
+        float targetYaw = alignYaw(stateHandler.getRealYaw(), stateHandler.getRotationYaw());
+        stateHandler.updateRealRotation(targetYaw, stateHandler.getRealPitch());
+        MC.player.setYaw(targetYaw);
         stateHandler.setRotationYaw(stateHandler.getRealYaw());
         stateHandler.setRotationPitch(stateHandler.getRealPitch());
         currentYawSpeed = 0f;
