@@ -31,6 +31,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
 public class AuraModule extends Module {
@@ -241,81 +242,6 @@ public class AuraModule extends Module {
         RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
     }
 
-    private static int getYawToVec(Entity from, Vec3d to) {
-        double dx = to.x - from.getX();
-        double dz = to.z - from.getZ();
-        return wrapDegrees((int) Math.round(Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
-    }
-
-    private static int getPitchToVec(Entity from, Vec3d to) {
-        Vec3d eyePos = from.getEyePos();
-        double dx = to.x - eyePos.x;
-        double dy = to.y - eyePos.y;
-        double dz = to.z - eyePos.z;
-        return (int) Math.round(-Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))));
-    }
-
-    private static int wrapDegrees(int angle) {
-        angle %= 360;
-        if (angle >= 180) angle -= 360;
-        if (angle < -180) angle += 360;
-        return angle;
-    }
-
-    private static Vec3d getEntityCenter(Entity entity) {
-        Box box = entity.getBoundingBox();
-        double centerX = box.minX + (box.getLengthX() / 2);
-        double centerY = box.minY + (box.getLengthY() / 2);
-        double centerZ = box.minZ + (box.getLengthZ() / 2);
-        return new Vec3d(centerX, centerY, centerZ);
-    }
-
-    private static double getClosestEyeDistance(Vec3d eyePos, Box box) {
-        Vec3d closest;
-
-        if (MC.player.isGliding()) {
-            closest = box.getCenter();
-        } else {
-            closest = getClosestPointToEye(eyePos, box);
-        }
-
-        return eyePos.distanceTo(closest);
-    }
-
-    private static Vec3d getClosestPointToEye(Vec3d eyePos, Box box) {
-        double x = eyePos.x;
-        double y = eyePos.y;
-        double z = eyePos.z;
-
-        final double VEC = 1.0 / 16.0;
-        final double EPS = 1e-9;
-
-        if (eyePos.x < box.minX) x = box.minX;
-        else if (eyePos.x > box.maxX) x = box.maxX;
-
-        if (eyePos.y < box.minY) y = box.minY;
-        else if (eyePos.y > box.maxY) y = box.maxY;
-
-        if (eyePos.z < box.minZ) z = box.minZ;
-        else if (eyePos.z > box.maxZ) z = box.maxZ;
-
-        // somehow, minecraft aabb corner/sides does not intersects with raycast, so we need to move result vec inside of aabb
-        if (Math.abs(x - box.minX) < EPS) {
-            x = Math.min(box.minX + VEC, box.maxX - EPS);
-        } else if (Math.abs(x - box.maxX) < EPS) {
-            x = Math.max(box.maxX - VEC, box.minX + EPS);
-        }
-
-        if (Math.abs(z - box.minZ) < EPS) {
-            z = Math.min(box.minZ + VEC, box.maxZ - EPS);
-        } else if (Math.abs(z - box.maxZ) < EPS) {
-            z = Math.max(box.maxZ - VEC, box.minZ + EPS);
-        }
-
-        return new Vec3d(x, y, z);
-    }
-
-
     private EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
         Vec3d eyePos = player.getCameraPosVec(1.0f);
         Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
@@ -328,17 +254,6 @@ public class AuraModule extends Module {
         }
 
         return null;
-    }
-
-    private static Vec3d getLookVectorFromYawPitch(float yaw, float pitch) {
-        float fYaw = (float) Math.toRadians(yaw);
-        float fPitch = (float) Math.toRadians(pitch);
-
-        double x = -Math.cos(fPitch) * Math.sin(fYaw);
-        double y = -Math.sin(fPitch);
-        double z = Math.cos(fPitch) * Math.cos(fYaw);
-
-        return new Vec3d(x, y, z).normalize();
     }
 
     private static float getBaseCooldownTicks(ItemStack stack, float tps) {

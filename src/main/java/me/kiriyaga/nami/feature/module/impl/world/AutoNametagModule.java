@@ -20,6 +20,7 @@ import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
+import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
 public class AutoNametagModule extends Module {
@@ -89,34 +90,5 @@ public class AutoNametagModule extends Module {
             if (stack.getItem() == Items.NAME_TAG) return i;
         }
         return -1;
-    }
-
-    private static Vec3d getEntityCenter(Entity entity) {
-        Box box = entity.getBoundingBox();
-        double centerX = box.minX + box.getLengthX() / 2;
-        double centerY = box.minY + box.getLengthY() / 2;
-        double centerZ = box.minZ + box.getLengthZ() / 2;
-        return new Vec3d(centerX, centerY, centerZ);
-    }
-
-    private static int getYawToVec(Entity from, Vec3d to) {
-        double dx = to.x - from.getX();
-        double dz = to.z - from.getZ();
-        return wrapDegrees((int) Math.round(Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
-    }
-
-    private static int getPitchToVec(Entity from, Vec3d to) {
-        Vec3d eyePos = from.getEyePos();
-        double dx = to.x - eyePos.x;
-        double dy = to.y - eyePos.y;
-        double dz = to.z - eyePos.z;
-        return (int) Math.round(-Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))));
-    }
-
-    private static int wrapDegrees(int angle) {
-        angle %= 360;
-        if (angle >= 180) angle -= 360;
-        if (angle < -180) angle += 360;
-        return angle;
     }
 }
