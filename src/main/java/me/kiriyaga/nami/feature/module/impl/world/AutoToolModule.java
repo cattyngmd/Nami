@@ -8,6 +8,8 @@ import me.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.block.BlockState;
@@ -23,6 +25,11 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoToolModule extends Module {
 
+    public enum EchestPriority {
+        FORTUNE, SILK
+    }
+
+    public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("echest", EchestPriority.SILK));
     private final IntSetting damageThreshold = addSetting(new IntSetting("durability", 3, 0, 15));
 
     public AutoToolModule() {
@@ -42,13 +49,38 @@ public class AutoToolModule extends Module {
             int bestSlot = -1;
             float bestSpeed = 1.0f;
 
+            int prioritySlot = -1;
+
             for (int slot = 0; slot < 9; slot++) {
                 ItemStack stack = MC.player.getInventory().getStack(slot);
-                if (stack.isEmpty())
-                    continue;
+                if (stack.isEmpty()) continue;
+                if (isBroken(stack)) continue;
 
-                if (isBroken(stack))
-                    continue;
+                boolean matchesPriority = false;
+                switch (echestPriority.get()) {
+                    case SILK:
+                        matchesPriority = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) > 0;
+                        break;
+                    case FORTUNE:
+                        matchesPriority = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.FORTUNE) > 0;
+                        break;
+                }
+
+                if (matchesPriority) {
+                    prioritySlot = slot;
+                    break;
+                }
+            }
+
+            if (prioritySlot != -1) {
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prioritySlot);
+                return;
+            }
+
+            for (int slot = 0; slot < 9; slot++) {
+                ItemStack stack = MC.player.getInventory().getStack(slot);
+                if (stack.isEmpty()) continue;
+                if (isBroken(stack)) continue;
 
                 float efficiencyLevel = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
                 float miningSpeed = stack.getMiningSpeedMultiplier(targetState);
@@ -62,7 +94,7 @@ public class AutoToolModule extends Module {
 
             if (bestSlot != -1)
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
-            }, 0, ExecutableEventType.PRE_TICK);
+        }, 0, ExecutableEventType.PRE_TICK);
     }
 
     private boolean isBroken(ItemStack stack) {
