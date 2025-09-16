@@ -5,15 +5,13 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.impl.client.Debug;
-import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
@@ -65,7 +63,7 @@ public class RotationTickHandler {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
-        RotationManagerModule module = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
+        RotationModule module = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
         loadSettings(module);
         stateHandler.updateRealRotation(MC.player.getYaw(), MC.player.getPitch());
         interpolateRenderRotation();
@@ -132,7 +130,7 @@ public class RotationTickHandler {
         }
     }
 
-    private void loadSettings(RotationManagerModule module) {
+    private void loadSettings(RotationModule module) {
         rotationSpeed = module.rotationSpeed.get().floatValue();
         rotationEaseFactor = module.rotationEaseFactor.get().floatValue();
         rotationThreshold = module.rotationThreshold.get().floatValue();

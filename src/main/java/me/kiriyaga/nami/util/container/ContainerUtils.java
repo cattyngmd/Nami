@@ -1,11 +1,9 @@
 package me.kiriyaga.nami.util.container;
 
-import me.kiriyaga.nami.feature.module.impl.client.Debug;
+import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import net.fabricmc.fabric.mixin.transfer.ContainerComponentAccessor;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
@@ -25,7 +23,7 @@ public class ContainerUtils {
 
     public static boolean openContainer(ItemStack stack) {
         if (!hasItems(stack)) {
-            MODULE_MANAGER.getStorage().getByClass(Debug.class).debugPeek(Text.of("peek not a container " + stack));
+            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugPeek(Text.of("peek not a container " + stack));
             return false;
         }
 
@@ -34,7 +32,7 @@ public class ContainerUtils {
 
         ContainerScreen.open(stack, contents);
 
-        MODULE_MANAGER.getStorage().getByClass(Debug.class).debugPeek(Text.of("peek opened container preview for " + stack));
+        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugPeek(Text.of("peek opened container preview for " + stack));
         return true;
     }
 
@@ -51,7 +49,7 @@ public class ContainerUtils {
                 items[i] = stacks.get(i);
             }
 
-            MODULE_MANAGER.getStorage().getByClass(Debug.class).debugPeek(Text.of("peek got " + stacks.size() + " items from container  " + itemStack));
+            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugPeek(Text.of("peek got " + stacks.size() + " items from container  " + itemStack));
         }
     }
 

@@ -7,7 +7,7 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 @RegisterModule
-public class PingManagerModule extends Module {
+public class FastLatencyModule extends Module {
 
     public enum FastLatencyMode {
         OLD,
@@ -20,8 +20,8 @@ public class PingManagerModule extends Module {
     public final IntSetting unstableConnectionTimeout = addSetting(new IntSetting("unstable", 3, 1, 60));
     public final IntSetting keepAliveInterval = addSetting(new IntSetting("interval", 900, 250, 2500));
 
-    public PingManagerModule() {
-        super("ping", "defines how ping should be received.", ModuleCategory.of("client"), "ping", "manager", "managr", "png");
+    public FastLatencyModule() {
+        super("fast latency", "Defines how ping should be received.", ModuleCategory.of("client"), "ping", "manager", "managr", "png");
 
         smoothingStrength.setShowCondition(() -> fastLatencyMode.get() == FastLatencyMode.OLD);
         unstableConnectionTimeout.setShowCondition(() -> fastLatencyMode.get() != FastLatencyMode.OFF);

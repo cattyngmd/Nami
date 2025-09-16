@@ -9,7 +9,7 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 @RegisterModule
-public class EntityManagerModule extends Module {
+public class TargetModule extends Module {
 
     public final IntSetting maxIdleTicks = addSetting(new IntSetting("max idle ticks", 500, 250, 750));
     public final DoubleSetting targetRange = addSetting(new DoubleSetting("target range", 5.0, 4.0, 16.0));
@@ -25,7 +25,7 @@ public class EntityManagerModule extends Module {
         DISTANCE, HEALTH, SMART
     }
 
-    public EntityManagerModule() {
+    public TargetModule() {
         super("target", "Allows you to configure target logic.", ModuleCategory.of("client"), "entity", "entitymanager", "enity");
         if (!this.isEnabled())
             this.toggle();

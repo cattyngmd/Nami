@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.core.rotation;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
-import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -72,7 +72,7 @@ public class RotationRequestHandler {
     public boolean isCompleted(String id) {
         return isCompleted(
                 id,
-                MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class)
+                MODULE_MANAGER.getStorage().getByClass(RotationModule.class)
                         .rotationThreshold.get().floatValue()
         );
     }

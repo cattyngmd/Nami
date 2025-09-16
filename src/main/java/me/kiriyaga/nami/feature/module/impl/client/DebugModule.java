@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 
 @RegisterModule
-public class Debug extends Module {
+public class DebugModule extends Module {
 
     private final BoolSetting aura = addSetting(new BoolSetting("aura", false));
     private final BoolSetting ping = addSetting(new BoolSetting("ping", false));
@@ -20,7 +20,7 @@ public class Debug extends Module {
 
     private Integer savedSyncId = null;
 
-    public Debug() {
+    public DebugModule() {
         super("debug", ".", ModuleCategory.of("client"), "debug");
     }
 

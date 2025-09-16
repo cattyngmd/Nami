@@ -3,14 +3,13 @@ package me.kiriyaga.nami.feature.module.impl.client;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 @RegisterModule
-public class RotationManagerModule extends Module {
+public class RotationModule extends Module {
 
     public enum RotationMode {
         MOTION
@@ -27,7 +26,7 @@ public class RotationManagerModule extends Module {
 //    public final DoubleSetting jitterMaxPitch = addSetting(new DoubleSetting("jitter horizontal", 2, 0, 5));
     public final BoolSetting moveFix = addSetting(new BoolSetting("move fix", true));
 
-    public RotationManagerModule() {
+    public RotationModule() {
         super("rotation", "Client rotations configuration.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager");
         if (!this.isEnabled())
             this.toggle();

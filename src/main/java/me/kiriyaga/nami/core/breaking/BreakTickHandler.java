@@ -5,9 +5,8 @@ import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.impl.client.BreakManagerModule;
+import me.kiriyaga.nami.feature.module.impl.client.BreakModule;
 import me.kiriyaga.nami.core.breaking.model.BreakTarget;
-import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +41,7 @@ public class BreakTickHandler {
         if (MC.player == null || MC.interactionManager == null || !requestHandler.hasTarget())
             return;
 
-        BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+        BreakModule module = MODULE_MANAGER.getStorage().getByClass(BreakModule.class);
         requestHandler.removeExpiredTargets(7000);
 
         BreakTarget target = getNextTarget(module);
@@ -80,7 +79,7 @@ public class BreakTickHandler {
         return stateHandler.isBreaking();
     }
 
-    private BreakTarget getNextTarget(BreakManagerModule module) {
+    private BreakTarget getNextTarget(BreakModule module) {
         return switch (module.breakPriority.get()) {
             case CLOSEST -> requestHandler.getTargets().stream()
                     .min(Comparator.comparingDouble(t -> t.getPos().getSquaredDistance(MC.player.getEyePos())))
@@ -95,7 +94,7 @@ public class BreakTickHandler {
             return false;
 
         Direction direction = Direction.UP;
-        BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+        BreakModule module = MODULE_MANAGER.getStorage().getByClass(BreakModule.class);
 
         if (module.rotate.get()) {
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(

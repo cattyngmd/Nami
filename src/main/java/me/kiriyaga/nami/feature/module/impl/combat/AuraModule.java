@@ -10,7 +10,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.Debug;
+import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
@@ -73,7 +73,7 @@ public class AuraModule extends Module {
 
         ItemStack stack = MC.player.getMainHandStack();
         Entity target = ENTITY_MANAGER.getTarget();
-        Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
+        DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
         if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem
                 || stack.isIn(ItemTags.SWORDS)

@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import me.kiriyaga.nami.feature.module.impl.client.Debug;
-import me.kiriyaga.nami.feature.module.impl.client.PingManagerModule;
+import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
+import me.kiriyaga.nami.feature.module.impl.client.FastLatencyModule;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
@@ -29,9 +29,9 @@ public class PingManager {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPacketReceive(PacketReceiveEvent packet) {
-        PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
+        FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
 
-        if (config.fastLatencyMode.get() != PingManagerModule.FastLatencyMode.OLD)
+        if (config.fastLatencyMode.get() != FastLatencyModule.FastLatencyMode.OLD)
             return;
 
         if (packet.getPacket() instanceof KeepAliveS2CPacket) {
@@ -57,7 +57,7 @@ public class PingManager {
                 count = Math.min(count + 1, smoothingStrength);
 
                 updatePing(averagePing());
-                Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
+                DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
                 debugModule.debugPing(Text.of("Interval=" + interval + "ms, Ping=" + ping + "ms, Average=" + lastPing + "ms"));
             }
@@ -75,7 +75,7 @@ public class PingManager {
     }
 
     public int getPing() {
-        PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
+        FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
         if (config == null) return lastPing;
 
         switch (config.fastLatencyMode.get()) {
@@ -104,10 +104,10 @@ public class PingManager {
     }
 
     public boolean isConnectionUnstable() {
-        PingManagerModule config = MODULE_MANAGER.getStorage().getByClass(PingManagerModule.class);
+        FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
         if (config == null) return false;
 
-        Debug debugModule = MODULE_MANAGER.getStorage().getByClass(Debug.class);
+        DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
 
         if (lastUpdated == -1) {

@@ -4,7 +4,7 @@ import me.kiriyaga.nami.Nami;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render2DEvent;
-import me.kiriyaga.nami.feature.module.impl.client.EntityManagerModule;
+import me.kiriyaga.nami.feature.module.impl.client.TargetModule;
 import me.kiriyaga.nami.util.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -16,7 +16,6 @@ import net.minecraft.entity.projectile.ShulkerBulletEntity;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -35,7 +34,7 @@ public class EntityManager {
     private List<ItemEntity> droppedItems = List.of();
     private List<Entity> endCrystals = List.of();
 
-    private EntityManagerModule entityManagerModule = null;
+    private TargetModule entityManagerModule = null;
 
     public void init() {
         Nami.EVENT_MANAGER.register(this);
@@ -173,9 +172,9 @@ public class EntityManager {
             return;
         }
 
-        entityManagerModule = MODULE_MANAGER.getStorage().getByClass(EntityManagerModule.class);
+        entityManagerModule = MODULE_MANAGER.getStorage().getByClass(TargetModule.class);
 
-        maxIdleTicks = MODULE_MANAGER.getStorage().getByClass(EntityManagerModule.class).maxIdleTicks.get();
+        maxIdleTicks = MODULE_MANAGER.getStorage().getByClass(TargetModule.class).maxIdleTicks.get();
 
         if (idleTicksCounter < maxIdleTicks) {
             updateAll();

@@ -2,8 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
-import me.kiriyaga.nami.feature.module.impl.client.Debug;
-import me.kiriyaga.nami.feature.module.impl.combat.ReachModule;
+import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.PortalGuiModule;
 import net.minecraft.client.MinecraftClient;
@@ -106,7 +105,7 @@ public abstract class MixinClientPlayerEntity {
         if (!ROTATION_MANAGER.getStateHandler().isRotating())
             return;
 
-        MODULE_MANAGER.getStorage().getByClass(Debug.class).debugRot(Text.of(
+        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugRot(Text.of(
                 "post yaw=" + MC.player.getYaw() + ", pitch=" + MC.player.getPitch() + "\n "
         ));
 

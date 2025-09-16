@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.Debug;
+import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.util.InputCache;
@@ -43,7 +43,7 @@ public class SpeedModule extends Module {
             float pitch = MC.player.getPitch();
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), 1, yaw, pitch));
 
-            MODULE_MANAGER.getStorage().getByClass(Debug.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
+            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
         }
     }
 
