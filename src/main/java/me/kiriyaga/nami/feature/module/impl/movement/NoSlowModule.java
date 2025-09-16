@@ -18,7 +18,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class NoSlowModule extends Module {
     public enum SlowMode {
-        VANILLA, PARTIAL, ACCEL
+        VANILLA, ACCEL
     }
 
     public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("mode", SlowMode.ACCEL));
@@ -50,13 +50,6 @@ public class NoSlowModule extends Module {
             //if (MC.player.age % 12 == 0) boost = false;
 
             if (boost){
-                ev.cancel();
-                return;
-            }
-        }
-
-        if (mode.get() == SlowMode.PARTIAL) {
-            if (MC.player.age % 2 == 0) {
                 ev.cancel();
                 return;
             }
