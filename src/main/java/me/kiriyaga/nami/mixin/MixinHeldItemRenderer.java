@@ -1,6 +1,8 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.kiriyaga.nami.feature.module.impl.visuals.OldAnimationsModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ViewModelModule;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -13,14 +15,12 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
-import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -56,29 +56,55 @@ public abstract class MixinHeldItemRenderer {
         return (skipAnimation ? modifiedValue : 0f) - equipProgressMainHand;
     }
 
-    @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", shift = At.Shift.BEFORE))
-    private void renderFirstPersonItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    @Inject(method = "renderFirstPersonItem", at = @At("HEAD"))
+    private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
+                              float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
+                              VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
         if (vm != null && vm.isEnabled()) {
-            boolean isOffhand = hand == Hand.OFF_HAND;
-            float mirror = isOffhand ? -1.0f : 1.0f;
+            matrices.push();
+
+            boolean isMainHand = hand == Hand.MAIN_HAND;
+            float mirror = isMainHand ? 1.0f : -1.0f;
+
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(vm.rotX.get().floatValue()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(vm.rotY.get().floatValue() * mirror));
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(vm.rotZ.get().floatValue() * mirror));
 
             matrices.translate(
-                    vm.posX.get() * mirror,
-                    vm.posY.get(),
-                    vm.posZ.get()
+                    vm.posX.get().floatValue() * mirror,
+                    vm.posY.get().floatValue(),
+                    vm.posZ.get().floatValue()
             );
-
-            float rx = vm.rotX.get().floatValue();
-            float ry = vm.rotY.get().floatValue() * mirror;
-            float rz = vm.rotZ.get().floatValue();
-
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rx));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(ry));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rz));
 
             float s = vm.scale.get().floatValue();
             matrices.scale(s, s, s);
+        }
+    }
+
+    @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem" +
+                    "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;" +
+                    "Lnet/minecraft/item/ItemDisplayContext;" +
+                    "Lnet/minecraft/client/util/math/MatrixStack;" +
+                    "Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
+    private void scaleItems(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
+                            float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
+                            VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        if (vm != null && vm.isEnabled()) {
+            float s = vm.scale.get().floatValue();
+            matrices.scale(s, s, s);
+        }
+    }
+
+    @Inject(method = "renderFirstPersonItem", at = @At("TAIL"))
+    private void matricesPop(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
+                             float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
+                             VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        if (vm != null && vm.isEnabled()) {
+            matrices.pop();
         }
     }
 
@@ -89,22 +115,27 @@ public abstract class MixinHeldItemRenderer {
             ci.cancel();
     }
 
-    @WrapWithCondition(
-            method = "applyEatOrDrinkTransformation(Lnet/minecraft/client/util/math/MatrixStack;FLnet/minecraft/util/Arm;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
-    private boolean applyEatOrDrinkTransformation2(MatrixStack matrixStack, float x, float y, float z) {
+    @WrapOperation(
+            method = "applyEatOrDrinkTransformation(Lnet/minecraft/client/util/math/MatrixStack;FLnet/minecraft/util/Arm;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
+    private void applyEatOrDrinkTransformation2(MatrixStack matrices, float x, float y, float z, Operation<Void> original) {
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
-        if (vm != null && vm.isEnabled() && vm.eating.get() && !vm.eatingBob.get() && x == 0.0F) {
-            return false;
+        if (vm != null && vm.isEnabled() && vm.eating.get()) {
+            if (x == 0.0F && z == 0.0F) {
+                double mul = vm.eatingBob.get();
+                original.call(matrices, x, (float) (y * mul), z);
+                return;
+            }
         }
-        return true;
+        original.call(matrices, x, y, z);
     }
-    @WrapWithCondition(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;multiply(Lorg/joml/Quaternionfc;)V"))
+
+    @WrapWithCondition(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;" +
+            "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;" +
+            "Lnet/minecraft/client/network/ClientPlayerEntity;I)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;multiply(Lorg/joml/Quaternionfc;)V"))
     private boolean renderItem(MatrixStack instance, Quaternionfc quaternion) {
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
-
-        if (vm != null && vm.isEnabled() && !vm.sway.get())
-            return false;
-
-        return true;
+        return vm == null || !vm.isEnabled() || vm.sway.get();
     }
 }
