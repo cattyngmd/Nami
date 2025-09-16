@@ -18,6 +18,7 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.core.rotation.RotationStateHandler.wrapDegrees;
 
 public class RotationTickHandler {
 
@@ -282,13 +283,6 @@ public class RotationTickHandler {
         currentYawSpeed = 0f;
         currentPitchSpeed = 0f;
     }
-
-        private float wrapDegrees(float angle) {
-            angle %= 360f;
-            if (angle >= 180f) angle -= 360f;
-            if (angle < -180f) angle += 360f;
-            return angle;
-        }
 
     private void updateHeld(KeyBinding bind, int key, int scancode, int action, boolean mouse, java.util.function.Consumer<Boolean> setter) {
         if (!canMove())
