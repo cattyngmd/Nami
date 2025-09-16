@@ -62,8 +62,8 @@ public class HudEditorScreen extends Screen {
             context.fill(0, 0, this.width, this.height, color);
         }
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(scale, scale);
+        context.getMatrices().push();
+        context.getMatrices().scale(scale, scale, 1.0f);
 
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
@@ -95,7 +95,7 @@ public class HudEditorScreen extends Screen {
                         //context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
                         FONT_MANAGER.drawText(context, Text.of(description), descX, descY, true);
                     }
-                    context.getMatrices().popMatrix();
+                    context.getMatrices().pop();
                     super.render(context, mouseX, mouseY, delta);
                     return;
                 }
@@ -107,7 +107,7 @@ public class HudEditorScreen extends Screen {
             }
         }
 
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
 
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
         int screenHeight = MC.getWindow().getScaledHeight();

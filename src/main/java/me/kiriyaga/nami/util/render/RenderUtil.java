@@ -298,6 +298,7 @@ public class RenderUtil {
         return matrices;
     }
 
+
     public static void drawText3D(MatrixStack matrices, Text text, Vec3d pos, float scale, boolean background, boolean border, float borderWidth) {
         Camera camera = MC.gameRenderer.getCamera();
 

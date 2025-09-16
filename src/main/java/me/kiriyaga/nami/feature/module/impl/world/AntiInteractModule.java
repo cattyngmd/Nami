@@ -51,7 +51,7 @@ public class AntiInteractModule extends Module {
 
         if (!spawnPoint.get()) return;
 
-        if (player.getWorld().getDimension().comp_648() && isBed(block)) {
+        if (player.getWorld().getDimension().bedWorks() && isBed(block)) {
             event.cancel();
             return;
         }
@@ -64,7 +64,7 @@ public class AntiInteractModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onPacketSendRespawn(PacketSendEvent ev) {
-        if (!packet.get()) return;
+        if (!packet.get() || !spawnPoint.get()) return;
 
         if (!(ev.getPacket() instanceof PlayerInteractBlockC2SPacket interactPacket)) return;
         if (MC.world == null) return;
