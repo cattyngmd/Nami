@@ -260,7 +260,7 @@ public class AuraModule extends Module {
         float baseTicks;
 
         if (stack.isIn(ItemTags.SWORDS)) baseTicks = 12f;
-        else if (stack.isIn(ItemTags.AXES)) baseTicks = 25f;
+        else if (stack.isIn(ItemTags.AXES)) baseTicks = 20f;
         else if (stack.getItem() instanceof TridentItem) baseTicks = 18f;
         else if (stack.getItem() instanceof MaceItem) baseTicks = 33f;
         else {
