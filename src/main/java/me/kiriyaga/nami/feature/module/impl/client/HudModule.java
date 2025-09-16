@@ -8,17 +8,15 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class HudModule extends Module {
@@ -33,7 +31,7 @@ public class HudModule extends Module {
     private boolean increasing = true;
 
     public HudModule() {
-        super("hud", "Main HUD module", ModuleCategory.of("client"));
+        super("hud", "Renders in-game hud.", ModuleCategory.of("client"));
         bounceIntensity.setShowCondition(() -> bounce.get());
         bounceSpeed.setShowCondition(() -> bounce.get());
     }
@@ -83,6 +81,9 @@ public class HudModule extends Module {
         int chatZoneTop = screenHeight - (screenHeight / 8);
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
 
+        if (MC.getDebugHud().shouldShowDebugHud())
+            return;
+
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
             if (module instanceof HudElementModule hudElement && hudElement.isEnabled()) {
                 int baseY = hudElement.getRenderY();
@@ -96,14 +97,16 @@ public class HudModule extends Module {
                         drawY -= chatAnimationOffset;
                     }
 
-                    event.getDrawContext().drawText(
-                            MC.textRenderer,
-                            element.text(),
-                            drawX,
-                            drawY,
-                            0xFFFFFFFF,
-                            shadow.get()
-                    );
+//                    event.getDrawContext().drawText(
+//                            MC.textRenderer,
+//                            element.text(),
+//                            drawX,
+//                            drawY,
+//                            0xFFFFFFFF,
+//                            shadow.get()
+//                    );
+
+                    FONT_MANAGER.drawText(event.getDrawContext(), element.text(), drawX, drawY, shadow.get());
                 }
 
                 hudElement.renderItems(event.getDrawContext());

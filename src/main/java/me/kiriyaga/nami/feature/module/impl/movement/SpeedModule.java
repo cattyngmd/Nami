@@ -6,14 +6,14 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.EnumSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
-import me.kiriyaga.nami.core.rotation.RotationRequest;
+import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.util.InputCache;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class SpeedModule extends Module {
@@ -23,11 +23,9 @@ public class SpeedModule extends Module {
     }
 
     private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.ROTATION));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotate", 1, 0, 10));
 
     public SpeedModule() {
         super("speed", "Increases movement speed.", ModuleCategory.of("movement"));
-        rotationPriority.setShowCondition(() -> mode.get() == Mode.ROTATION);
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -43,8 +41,9 @@ public class SpeedModule extends Module {
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
             float pitch = MC.player.getPitch();
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), 1, yaw, pitch));
 
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), rotationPriority.get(), yaw, pitch));
+            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
         }
     }
 
@@ -68,10 +67,17 @@ public class SpeedModule extends Module {
 
         if (inputX == 0 && inputZ == 0) return realYaw;
 
-        float moveAngle = (float) Math.toDegrees(Math.atan2(inputX, inputZ));
-        float movementYaw = realYaw + moveAngle;
+        if (inputZ > 0) return realYaw;
 
-        movementYaw = MathHelper.wrapDegrees(movementYaw);
-        return movementYaw;
+        if (inputZ < 0) return MathHelper.wrapDegrees(realYaw + 180);
+
+        if (inputX != 0 && inputZ == 0) return MathHelper.wrapDegrees(realYaw + (inputX > 0 ? 90 : -90));
+
+        if (inputZ > 0 && inputX != 0) return realYaw;
+
+        if (inputZ < 0 && inputX != 0) return MathHelper.wrapDegrees(realYaw + 180);
+
+        return realYaw;
     }
+
 }

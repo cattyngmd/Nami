@@ -10,7 +10,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.*;
 
-import me.kiriyaga.nami.setting.impl.*;
+import me.kiriyaga.nami.feature.setting.impl.*;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;

@@ -93,10 +93,10 @@ public class ClickGuiScreen extends Screen {
         int startY = this.height - 1;
         for (int i = statusMessages.size() - 1; i >= 0; i--) {
             Text message = statusMessages.get(i);
-            int textWidth = textRenderer.getWidth(message);
+            int textWidth = FONT_MANAGER.getWidth(message);
             int x = this.width - textWidth - 1;
-            int y = startY - textRenderer.fontHeight;
-            context.drawText(textRenderer, message, x, y, applyFade(0xFFFFFFFF), true);
+            int y = startY - FONT_MANAGER.getHeight();
+            FONT_MANAGER.drawText(context, message, x, y, applyFade(0xFFFFFFFF), true);
             startY = y;
         }
 
@@ -133,12 +133,12 @@ public class ClickGuiScreen extends Screen {
                         if (description != null && !description.isEmpty()) {
                             int descX = scaledMouseX + 5;
                             int descY = scaledMouseY;
-                            int textWidth = textRenderer.getWidth(description);
+                            int textWidth = FONT_MANAGER.getWidth(description);
                             int textHeight = 8;
 
                             context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2,
                                     0x7F000000);
-                            context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
+                            FONT_MANAGER.drawText(context, description, descX, descY, 0xFFFFFFFF, true);
                         }
                         context.getMatrices().pop();
                         return;
@@ -285,7 +285,7 @@ public class ClickGuiScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         draggingCategory = false;
         draggedModuleCategory = null;
-        SettingPanel.mouseReleased();
+        SettingPanel.mouseReleased(mouseX, mouseY, button);
         return super.mouseReleased(mouseX, mouseY, button);
     }
 

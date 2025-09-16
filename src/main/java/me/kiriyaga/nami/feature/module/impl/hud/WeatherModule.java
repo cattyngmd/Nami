@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -39,8 +39,8 @@ public class WeatherModule extends HudElementModule {
             text = "{bw}" + weather;
         }
 
-        width = MC.textRenderer.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(text);
     }

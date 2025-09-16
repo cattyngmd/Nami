@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -25,8 +25,8 @@ public class DurabilityModule extends HudElementModule {
 
         ItemStack stack = mc.player.getMainHandStack();
         if (stack.isEmpty() || !stack.isDamageable()) {
-            width = MC.textRenderer.getWidth("No item");
-            height = MC.textRenderer.fontHeight;
+            width = FONT_MANAGER.getWidth("No item");
+            height = FONT_MANAGER.getHeight();
             return CAT_FORMAT.format("{bg}No item");
         }
 
@@ -45,8 +45,8 @@ public class DurabilityModule extends HudElementModule {
             text = "{bw}" + durabilityText;
         }
 
-        width = MC.textRenderer.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(text);
     }

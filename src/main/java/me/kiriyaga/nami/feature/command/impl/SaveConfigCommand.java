@@ -14,7 +14,7 @@ public class SaveConfigCommand extends Command {
                 new CommandArgument[] {
                         new CommandArgument.StringArg("configName", 1, 32)
                 },
-                "savecfg", "scfg","ыфмусщташп");
+                "savecfg", "scfg");
     }
 
     @Override

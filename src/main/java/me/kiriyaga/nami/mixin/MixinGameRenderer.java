@@ -4,7 +4,9 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.kiriyaga.nami.feature.module.impl.combat.NoEntityTraceModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoBobModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoTiltModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -13,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import org.spongepowered.asm.mixin.Final;
@@ -176,13 +179,21 @@ public abstract class MixinGameRenderer {
         return null;
     }
 
-    private boolean isPickaxe(Item item) { //mojang is wild theres no more thing like toolitem or pickaxeitem
-        return item == Items.WOODEN_PICKAXE
-                || item == Items.STONE_PICKAXE
-                || item == Items.IRON_PICKAXE
-                || item == Items.GOLDEN_PICKAXE
-                || item == Items.DIAMOND_PICKAXE
-                || item == Items.NETHERITE_PICKAXE;
+    private boolean isPickaxe(Item item) {
+        return item.getDefaultStack().isIn(ItemTags.PICKAXES);
     }
 
+    @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
+    private void bobView(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoBobModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoBobModule.class).isEnabled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
+    private void tiltViewWhenHurt(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoTiltModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoTiltModule.class).isEnabled()) {
+            ci.cancel();
+        }
+    }
 }

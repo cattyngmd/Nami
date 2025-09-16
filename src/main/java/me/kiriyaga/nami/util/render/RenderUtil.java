@@ -7,6 +7,7 @@ package me.kiriyaga.nami.util.render;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.feature.module.impl.client.FontModule;
 import me.kiriyaga.nami.util.MatrixCache;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -47,6 +48,8 @@ import static me.kiriyaga.nami.Nami.*;
 import java.awt.*;
 
 public class RenderUtil {
+
+    // TODO: we shouldnt render fill if camera inside of the box
 
     public static void rect(DrawContext stack, float x1, float y1, float x2, float y2, int color) {
         rectFilled(stack, x1, y1, x2, y2, color);
@@ -295,29 +298,6 @@ public class RenderUtil {
         return matrices;
     }
 
-    public static void drawText2D(DrawContext drawContext, Text text, int x, int y, int color, boolean withBackground) {
-        if (withBackground) {
-            int padding = 2;
-            int textWidth = MC.textRenderer.getWidth(text);
-            int textHeight = MC.textRenderer.fontHeight;
-            int bgColor = (180 << 24) | 0x000000;
-            drawContext.fill(x - padding, y - padding, x + textWidth + padding, y + textHeight + padding, bgColor);
-        }
-        drawContext.drawText(MC.textRenderer, text, x, y, color, false);
-    }
-
-
-    public static void drawItem2D(DrawContext drawContext, ItemStack stack, int x, int y, float scale) {
-        MatrixStack matrices = drawContext.getMatrices();
-        matrices.pop();
-
-        matrices.translate(x, y, 1.0);
-        matrices.scale(scale, scale, 1.0f);
-
-        drawContext.drawItem(stack, -8, -8);
-
-        matrices.pop();
-    }
 
     public static void drawText3D(MatrixStack matrices, Text text, Vec3d pos, float scale, boolean background, boolean border, float borderWidth) {
         Camera camera = MC.gameRenderer.getCamera();
@@ -334,15 +314,15 @@ public class RenderUtil {
 
         matrices.scale(-scale, -scale, scale);
 
-        TextRenderer textRenderer = MC.textRenderer;
-        float textWidth = textRenderer.getWidth(text) / 2f;
+        TextRenderer textRenderer = FONT_MANAGER.rendererProvider.getRenderer();
+        float textWidth = FONT_MANAGER.getWidth(text) / 2f;
 
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         VertexConsumerProvider.Immediate provider = MC.getBufferBuilders().getEntityVertexConsumers();
 
         if (background) {
             float bgPadding = 1f;
-            float height = textRenderer.fontHeight;
+            float height = FONT_MANAGER.getHeight();
 
             float left = -textWidth - bgPadding;
             float right = textWidth + bgPadding;
@@ -363,7 +343,7 @@ public class RenderUtil {
         }
 
         textRenderer.draw(
-                text, -textWidth, 0, -1, true, matrix, provider, TextRenderer.TextLayerType.SEE_THROUGH, 0, 15728880
+                text, -textWidth, 0, -1, !MODULE_MANAGER.getStorage().getByClass(FontModule.class).isEnabled(), matrix, provider, TextRenderer.TextLayerType.SEE_THROUGH, 0, 15728880
         );
 
         provider.draw();

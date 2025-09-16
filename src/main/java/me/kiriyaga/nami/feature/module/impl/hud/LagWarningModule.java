@@ -2,7 +2,6 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
 import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -23,8 +22,8 @@ public class LagWarningModule extends HudElementModule {
         double roundedSeconds = Math.round(seconds * 100.0) / 100.0;
         String warningText = "Server is not responding in " + String.format("%.2f", roundedSeconds) + "s";
 
-        width = MC.textRenderer.getWidth(warningText);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(warningText);
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format("{bg}" + warningText);
     }

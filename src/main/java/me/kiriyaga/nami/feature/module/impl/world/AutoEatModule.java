@@ -1,26 +1,20 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.event.Event;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.PlaceBlockEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

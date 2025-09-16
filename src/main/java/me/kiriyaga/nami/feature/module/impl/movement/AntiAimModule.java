@@ -1,14 +1,13 @@
 package me.kiriyaga.nami.feature.module.impl.movement;
 
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.core.rotation.*;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
@@ -16,7 +15,6 @@ import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 @RegisterModule
 public class AntiAimModule extends Module {
 
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 1, 1, 10));
     private final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 5.0, 0.1, 50.0));
     private final DoubleSetting pitchSetting = addSetting(new DoubleSetting("pitch", 0.0, -90.0, 90.0));
 
@@ -45,7 +43,7 @@ public class AntiAimModule extends Module {
 
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                 AntiAimModule.class.getName(),
-                rotationPriority.get(),
+                0,
                 yaw,
                 pitch
         ));

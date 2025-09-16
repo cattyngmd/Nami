@@ -5,6 +5,7 @@
   "client": [
     "ChatHudAccessor",
     "ClientPlayerInteractionManagerAccessor",
+    "ClientWorldAccessor",
     "GameOptionsAccessor",
     "InputAccessor",
     "KeyBindingAccessor",

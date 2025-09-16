@@ -1,7 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
@@ -17,16 +16,12 @@ public abstract class MixinPlayerEntityRenderer {
 
     @Inject(method = "setupTransforms", at = @At("HEAD"))
     private void setupTransforms(PlayerEntityRenderState playerEntityRenderState, MatrixStack matrices, float f, float g, CallbackInfo ci) {
-        if (shouldSpoofRotation()) {
-            spoofRenderStateRotation(playerEntityRenderState);
+        if (ROTATION_MANAGER != null && ROTATION_MANAGER.getStateHandler() != null && ROTATION_MANAGER.getStateHandler().isRotating()) {
+            if (MinecraftClient.getInstance().player != null &&
+                    playerEntityRenderState.name != null &&
+                    playerEntityRenderState.name.equals(MinecraftClient.getInstance().player.getName().getString())) {
+                playerEntityRenderState.pitch = ROTATION_MANAGER.getStateHandler().getRenderPitch();
+            }
         }
-    }
-
-    private boolean shouldSpoofRotation() {
-        return ROTATION_MANAGER != null && ROTATION_MANAGER.getStateHandler() != null && ROTATION_MANAGER.getStateHandler().isRotating();
-    }
-
-    private void spoofRenderStateRotation(PlayerEntityRenderState renderState) {
-        renderState.pitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
     }
 }

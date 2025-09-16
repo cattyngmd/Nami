@@ -12,7 +12,7 @@ public class LoadCommand extends Command {
     public LoadCommand() {
         super("load",
                 new CommandArgument[] {},
-                "l", "laod", "lad", "lod", "дщфв");
+                "l", "laod", "lad", "lod");
     }
 
     @Override

@@ -16,8 +16,7 @@ import net.minecraft.text.Text;
 import java.awt.Point;
 import java.util.*;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class HudEditorScreen extends Screen {
     private final Set<ModuleCategory> expandedCategories = new HashSet<>();
@@ -89,11 +88,12 @@ public class HudEditorScreen extends Screen {
                     if (description != null && !description.isEmpty()) {
                         int descX = scaledMouseX + 5;
                         int descY = scaledMouseY;
-                        int textWidth = textRenderer.getWidth(description);
+                        int textWidth = FONT_MANAGER.getWidth(Text.of(description));
                         int textHeight = 8;
 
                         context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
-                        context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
+                        //context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
+                        FONT_MANAGER.drawText(context, Text.of(description), descX, descY, true);
                     }
                     context.getMatrices().pop();
                     super.render(context, mouseX, mouseY, delta);
@@ -136,7 +136,8 @@ public class HudEditorScreen extends Screen {
                 for (HudElementModule.TextElement element : new ArrayList<>(hud.getTextElements())) {
                     int drawX = hud.getRenderXForElement(element);
                     int drawY = renderY + element.offsetY();
-                    context.drawText(MC.textRenderer, element.text(), drawX, drawY, 0xFFFFFFFF, true);
+                    //context.drawText(MC.textRenderer, element.text(), drawX, drawY, 0xFFFFFFFF, true);
+                    FONT_MANAGER.drawText(context, element.text(), drawX, drawY, true);
                 }
             }
         }
@@ -314,7 +315,7 @@ public class HudEditorScreen extends Screen {
 
         if (button == 0) draggingElement = null;
 
-        SettingPanel.mouseReleased();
+        SettingPanel.mouseReleased(mouseX, mouseY, button);
         return super.mouseReleased(mouseX, mouseY, button);
     }
 

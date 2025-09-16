@@ -7,9 +7,9 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
@@ -35,6 +35,7 @@ public class AirPlaceModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 3.0, 2.0, 7.0));
     public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
     private final BoolSetting airOnly = addSetting(new BoolSetting("air only", false));
 
@@ -99,14 +100,16 @@ public class AirPlaceModule extends Module {
                     PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
 
             MC.interactionManager.interactBlock(MC.player, Hand.OFF_HAND, target);
-            MC.player.swingHand(Hand.MAIN_HAND, false);
+            if (swing.get())
+                MC.player.swingHand(Hand.MAIN_HAND, false);
 
             MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
             MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
         } else {
             MC.interactionManager.interactBlock(MC.player, Hand.MAIN_HAND, target);
-            MC.player.swingHand(Hand.MAIN_HAND);
+            if (swing.get())
+                MC.player.swingHand(Hand.MAIN_HAND);
         }
     }
 

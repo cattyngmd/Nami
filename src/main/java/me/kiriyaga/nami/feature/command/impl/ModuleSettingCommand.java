@@ -4,8 +4,8 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.setting.Setting;
-import me.kiriyaga.nami.setting.impl.*;
+import me.kiriyaga.nami.feature.setting.Setting;
+import me.kiriyaga.nami.feature.setting.impl.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -65,7 +65,7 @@ public class ModuleSettingCommand extends Command {
             if (valueRaw == null) {
                 boolSetting.set(!boolSetting.get());
                 CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format(
-                        "Bool setting {g}" + setting.getName() + "{reset} toggled to {g}" + boolSetting.get() + "{reset}."));
+                        "{g}" + setting.getName() + "{reset} toggled to {g}" + boolSetting.get() + "{reset}."));
             } else {
                 if (valueRaw.equalsIgnoreCase("true") || valueRaw.equalsIgnoreCase("on")) {
                     boolSetting.set(true);
@@ -78,7 +78,7 @@ public class ModuleSettingCommand extends Command {
                     return;
                 }
                 CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format(
-                        "Bool setting {g}" + setting.getName() + "{reset} set to {g}" + boolSetting.get() + "{reset}."));
+                        "{g}" + setting.getName() + "{reset} set to {g}" + boolSetting.get() + "{reset}."));
             }
         } else if (setting instanceof IntSetting intSetting) {
             if (valueRaw == null) {
@@ -88,7 +88,7 @@ public class ModuleSettingCommand extends Command {
             try {
                 int val = Integer.parseInt(valueRaw);
                 intSetting.set(val);
-                CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("Int setting {g}" + setting.getName() + "{reset} set to {g}" + val + "{reset}."));
+                CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to {g}" + val + "{reset}."));
             } catch (NumberFormatException e) {
                 CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("Invalid integer value {g}" + valueRaw + "{reset}."));
             }
@@ -100,7 +100,7 @@ public class ModuleSettingCommand extends Command {
             try {
                 double val = Double.parseDouble(valueRaw);
                 doubleSetting.set(val);
-                CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("Double setting {g}" + setting.getName() + "{reset} set to {g}" + val + "{reset}."));
+                CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to {g}" + val + "{reset}."));
             } catch (NumberFormatException e) {
                 CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("Invalid number value {g}" + valueRaw + "{reset}."));
             }
@@ -112,7 +112,7 @@ public class ModuleSettingCommand extends Command {
             try {
                 int keyCode = Integer.parseInt(valueRaw);
                 keyBindSetting.set(keyCode);
-                CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("KeyBind setting {g}" + setting.getName() + "{reset} set to key code {g}" + keyCode + "{reset}."));
+                CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to key code {g}" + keyCode + "{reset}."));
             } catch (NumberFormatException e) {
                 CHAT_MANAGER.sendPersistent("set", CAT_FORMAT.format("Invalid keybind value {g}" + valueRaw + "{reset}. Must be a key code integer."));
             }

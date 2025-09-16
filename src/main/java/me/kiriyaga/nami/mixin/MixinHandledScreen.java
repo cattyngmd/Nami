@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
+import static me.kiriyaga.nami.Nami.MC;
 
 @Mixin(HandledScreen.class)
 public class MixinHandledScreen {

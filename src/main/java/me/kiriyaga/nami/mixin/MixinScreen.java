@@ -24,6 +24,17 @@ public abstract class MixinScreen {
         }
     }
 
+    @Inject(method = "renderInGameBackground", at = @At("HEAD"), cancellable = true)
+    private void renderInGameBackground(DrawContext drawContext, CallbackInfo ci) {
+        if (MODULE_MANAGER.getStorage() == null) return;
+
+        NoRenderModule m = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+
+        if (m != null && m.isEnabled() && m.noBackground.get() && MC.world != null) {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "render", at = @At("TAIL"))
     public void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         EVENT_MANAGER.post(new RenderScreenEvent(context, null, mouseX, mouseY));

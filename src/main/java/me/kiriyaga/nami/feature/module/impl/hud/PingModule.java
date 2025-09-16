@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -27,8 +27,8 @@ public class PingModule extends HudElementModule {
             textStr = String.valueOf(ping);
         }
 
-        width = MC.textRenderer.getWidth(textStr);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(textStr);
+        height = FONT_MANAGER.getHeight();
 
         if (displayLabel.get()) {
             return CAT_FORMAT.format("{bg}Ping: {bw}" + ping);

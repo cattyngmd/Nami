@@ -4,7 +4,7 @@ import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.setting.impl.KeyBindSetting;
+import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import me.kiriyaga.nami.util.KeyUtils;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -21,7 +21,7 @@ public class BindCommand extends Command {
                         new CommandArgument.StringArg("module", 1, 25),
                         new CommandArgument.StringArg("key", 1, 10)
                 },
-                "b", "иштв"
+                "b"
         );
     }
 

@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.feature.module;
 
-import me.kiriyaga.nami.setting.Setting;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.KeyBindSetting;
+import me.kiriyaga.nami.feature.setting.Setting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;

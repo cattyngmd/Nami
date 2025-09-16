@@ -11,7 +11,7 @@ public class SaveCommand extends Command {
 
     public SaveCommand() {
         super("save",
-                new CommandArgument[0], "s", "save", "seva", "sv", "ыфму");
+                new CommandArgument[0], "s", "save", "seva", "sv");
     }
 
     @Override

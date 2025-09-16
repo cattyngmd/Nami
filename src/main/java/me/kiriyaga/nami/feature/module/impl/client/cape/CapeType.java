@@ -3,7 +3,8 @@ package me.kiriyaga.nami.feature.module.impl.client.cape;
 import net.minecraft.util.Identifier;
 
 public enum CapeType {
-    NAMI(Identifier.of("nami", "textures/cape/nami1.png"));
+    NAMI(Identifier.of("nami", "textures/cape/nami1.png")),
+    MUSLIM(Identifier.of("nami", "textures/cape/muslim.png"));
 
     private final Identifier texture;
 

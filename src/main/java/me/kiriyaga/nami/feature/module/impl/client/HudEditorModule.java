@@ -4,8 +4,8 @@ import me.kiriyaga.nami.feature.gui.screen.HudEditorScreen;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
 

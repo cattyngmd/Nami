@@ -2,17 +2,24 @@ name: build release
 
 on:
   workflow_dispatch:
+#  push:
+#    branches:
+#      - '**'
 
 jobs:
   build:
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [1.21.5, 1.21.8]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: true
+          ref: ${{ matrix.branch }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -33,32 +40,47 @@ jobs:
       - name: List files in build/libs
         run: ls -l build/libs/
 
+      - name: Set safe branch name
+        run: |
+          SAFE_BRANCH="${{ matrix.branch }}"
+          SAFE_BRANCH="${SAFE_BRANCH//./-}"
+          echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
+
+      - name: Rename JAR to include branch
+        run: |
+          for jar in build/libs/*.jar; do
+            BASENAME=$(basename "$jar")
+            mv "$jar" "build/libs/nami-${SAFE_BRANCH}-${BASENAME}"
+          done
+
       - name: Upload built JAR
         uses: actions/upload-artifact@v4
         with:
-          name: nami-client
+          name: nami-${{ env.SAFE_BRANCH }}
           path: build/libs/*.jar
 
   release:
     needs: build
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout repository for release
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
-      - name: Download artifact
+      - name: Set version for release
+        run: |
+          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
+          echo "VERSION=multi-branch-latest-${SHORT_SHA}" >> $GITHUB_ENV
+
+      - name: Download all branch artifacts
         uses: actions/download-artifact@v4
         with:
-          name: nami-client
           path: ./artifact
 
       - name: List downloaded files
         run: ls -l ./artifact
-
-      - name: Set version from short commit SHA
-        run: echo "VERSION=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -66,14 +88,21 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: Nami ${{ env.VERSION }}
           body: |
-            First release!
+            Multi-branch release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
-      - name: Upload JAR to Release
+      - name: Upload all JARs to Release
         run: |
-          JAR_FILE=$(ls ./artifact/*.jar | head -n 1)
-          echo "Uploading $JAR_FILE to release tag ${{ env.VERSION }}"
-          gh release upload ${{ env.VERSION }} "$JAR_FILE" --clobber
+          shopt -s nullglob
+          JAR_FILES=(./artifact/*/*.jar)
+          if [ ${#JAR_FILES[@]} -eq 0 ]; then
+            echo "No JAR files found, exiting"
+            exit 1
+          fi
+          for file in "${JAR_FILES[@]}"; do
+            echo "Uploading $file to release tag ${{ env.VERSION }}"
+            gh release upload ${{ env.VERSION }} "$file" --clobber
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

@@ -15,7 +15,7 @@ public class YawCommand extends Command {
                 new CommandArgument[] {
                         new CommandArgument.DoubleArg("value", -180, 180)
                 },
-                "y", "нфц"
+                "y"
         );
     }
 

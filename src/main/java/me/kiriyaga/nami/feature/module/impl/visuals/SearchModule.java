@@ -8,10 +8,9 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
-import me.kiriyaga.nami.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.BlockUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
@@ -36,11 +35,10 @@ import static me.kiriyaga.nami.Nami.*;
 public class SearchModule extends Module {
 
     private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));
-    private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 2, 1, 5));
-    private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 0, 0, 5));
-    private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name));
+    private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 4, 2, 5));
+    private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 1, 0, 2));
+    private final WhitelistSetting blockList = addSetting(new WhitelistSetting("blocklist", false, this.name));
     private final BoolSetting storages = addSetting(new BoolSetting("storages", true));
-    private final BoolSetting nonVanilla = addSetting(new BoolSetting("non-vanilla", false));
     private final BoolSetting notifier = addSetting(new BoolSetting("notifier", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("not at spawn", false));
 
@@ -54,9 +52,8 @@ public class SearchModule extends Module {
 
     public SearchModule() {
         super("search", "Search certain blocks on loaded chunks.", ModuleCategory.of("visuals"), "srcj", "blockesp", "serch");
-        whitelist.setOnChanged(this::reloadChunksAroundPlayer);
+        blockList.setOnChanged(this::reloadChunksAroundPlayer);
         storages.setOnChanged(this::reloadChunksAroundPlayer);
-        nonVanilla.setOnChanged(this::reloadChunksAroundPlayer);
         notAtSpawn.setOnChanged(this::reloadChunksAroundPlayer);
         notifier.setOnChanged(this::reloadChunksAroundPlayer); // i just want it dont blame me
 
@@ -72,14 +69,13 @@ public class SearchModule extends Module {
     private void updateCandidateBlocks() {
         Set<Block> blocks = new HashSet<>();
         if (storages.get()) blocks.addAll(BlockUtils.getStorage());
-        if (nonVanilla.get()) blocks.addAll(BlockUtils.getNonVanillaGeneratedBlocks());
 
         candidateBlockIds = blocks.stream()
                 .map(Registries.BLOCK::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        candidateBlockIds.addAll(whitelist.getWhitelist());
+        candidateBlockIds.addAll(blockList.getWhitelist());
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)

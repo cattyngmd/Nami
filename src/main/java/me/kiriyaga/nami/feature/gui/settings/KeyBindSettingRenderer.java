@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.gui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.setting.impl.KeyBindSetting;
+import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import me.kiriyaga.nami.util.KeyUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -10,8 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
@@ -39,16 +38,20 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
                     y - lineOffset,
                     x + 1,
                     y + HEIGHT,
-                    CLICK_GUI.applyFade(setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB())
+                    CLICK_GUI.applyFade(textCol.getRGB())
             );
         }
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(
-                textRenderer,
-                setting.getName().toLowerCase(),
+        String nameStr = hovered
+                ? (setting.isHoldMode() ? "hold" : "toggle")
+                : setting.getName().toLowerCase();
+
+        FONT_MANAGER.drawText(
+                context,
+                nameStr,
                 textX,
                 textY,
                 textColorInt,
@@ -61,16 +64,16 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         } else {
             String keyName = KeyUtils.getKeyName(setting.get());
             //valueStr = (setting.isHoldMode() ? "hold: " : "toggle: ") + keyName;
-            setting.setName(setting.isHoldMode() ? "hold" : "toggle"); // yes unfortunatelly
+            //setting.setName(setting.isHoldMode() ? "hold" : "toggle"); // yes unfortunatelly
             valueStr = keyName;
         }
 
         String renderStr = valueStr.toLowerCase(); // fuck ahaha
-        int textWidth = textRenderer.getWidth(renderStr);
+        int textWidth = FONT_MANAGER.getWidth(renderStr);
         int valueX = x + WIDTH - PADDING - textWidth;
 
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 renderStr,
                 valueX,
                 textY,

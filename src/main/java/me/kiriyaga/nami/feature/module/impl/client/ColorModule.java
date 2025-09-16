@@ -6,22 +6,19 @@ import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.ColorSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.ColorSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
 import java.awt.*;
 
 @RegisterModule
 public class ColorModule extends Module {
 
-    public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(255, 0, 0, 170), true));
-
-    public final DoubleSetting globalSaturation = addSetting(new DoubleSetting("saturation", 0.33, 0.0, 1.0));
-    public final DoubleSetting globalDarskness = addSetting(new DoubleSetting("darkness", 0.00, 0.0, 1.0));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(22, 22, 230, 170), true));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
-    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("rainbow speed", 0.4, 0.01, 5.0));
+    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("speed", 0.4, 0.01, 5.0));
 
     private int phase = 0;
 
@@ -39,7 +36,7 @@ public class ColorModule extends Module {
     }
 
     private int getAlpha255() {
-        return (int) (Math.max(0.0, Math.min(1.0, 0.45)) * 255);
+        return 130;
     }
 
     public Color applySaturation(Color base, double saturationFactor) {
@@ -105,10 +102,10 @@ public class ColorModule extends Module {
     }
 
     public Color getStyledGlobalColor() {
-        return getStyledColor(getEffectiveGlobalColor(), globalSaturation.get(), globalDarskness.get());
+        return getStyledColor(getEffectiveGlobalColor(), 1.00, 0.00);
     }
 
     public Color getStyledSecondColor() {
-        return applyDarkness(getStyledGlobalColor(), 0.5);
+        return applyDarkness(getStyledGlobalColor(), 0.35);
     }
 }

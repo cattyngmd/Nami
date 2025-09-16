@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.SearchModule;
-import me.kiriyaga.nami.setting.impl.EnumSetting;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.BlockState;
@@ -74,11 +74,11 @@ public class SearchListModule extends HudElementModule {
         for (String name : sortedNames) {
             int count = blockCounts.get(name);
             Text text = CAT_FORMAT.format("{bg}" + name + (count > 1 ? " {bw}(x" + count + ")" : ""));
-            int textWidth = MC.textRenderer.getWidth(text);
+            int textWidth = FONT_MANAGER.getWidth(text);
             elements.add(new TextElement(text, 0, yOffset));
 
             maxWidth = Math.max(maxWidth, textWidth);
-            yOffset += MC.textRenderer.fontHeight;
+            yOffset += FONT_MANAGER.getHeight();
         }
 
         this.width = maxWidth;
@@ -89,6 +89,6 @@ public class SearchListModule extends HudElementModule {
 
     private int getTextWidth(String name, int count) {
         Text text = CAT_FORMAT.format("{bg}" + name + (count > 1 ? " {bw}(x" + count + ")" : ""));
-        return MC.textRenderer.getWidth(text);
+        return FONT_MANAGER.getWidth(text);
     }
 }

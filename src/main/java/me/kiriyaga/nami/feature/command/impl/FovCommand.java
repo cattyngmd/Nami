@@ -16,7 +16,7 @@ public class FovCommand extends Command {
                 new CommandArgument[]{
                         new CommandArgument.IntArg("value", 0, 162)
                 },
-                "fav", "ащм", "fv"
+                "fav", "fv"
         );
     }
 

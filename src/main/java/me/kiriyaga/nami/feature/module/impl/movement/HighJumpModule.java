@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
 @RegisterModule
 public class HighJumpModule extends Module {

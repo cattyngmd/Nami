@@ -1,15 +1,12 @@
 package me.kiriyaga.nami.core.breaking;
 
-import me.kiriyaga.nami.core.rotation.RotationRequest;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.EventPriority;
-import me.kiriyaga.nami.event.impl.BreakBlockEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.impl.client.BreakManagerModule;
+import me.kiriyaga.nami.feature.module.impl.client.BreakModule;
 import me.kiriyaga.nami.core.breaking.model.BreakTarget;
-import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
-import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -19,6 +16,7 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Comparator;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.RotationUtils.*;
 
 public class BreakTickHandler {
 
@@ -26,7 +24,6 @@ public class BreakTickHandler {
     private final BreakRequestHandler requestHandler;
     private BlockPos currentBreakingBlock = null;
     private long lastAttackBlockTime = 0;
-    private static final long ATTACK_BLOCK_COOLDOWN_MS = 250; // grim is wild
 
     public BreakTickHandler(BreakStateHandler stateHandler, BreakRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -44,7 +41,7 @@ public class BreakTickHandler {
         if (MC.player == null || MC.interactionManager == null || !requestHandler.hasTarget())
             return;
 
-        BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+        BreakModule module = MODULE_MANAGER.getStorage().getByClass(BreakModule.class);
         requestHandler.removeExpiredTargets(7000);
 
         BreakTarget target = getNextTarget(module);
@@ -82,7 +79,7 @@ public class BreakTickHandler {
         return stateHandler.isBreaking();
     }
 
-    private BreakTarget getNextTarget(BreakManagerModule module) {
+    private BreakTarget getNextTarget(BreakModule module) {
         return switch (module.breakPriority.get()) {
             case CLOSEST -> requestHandler.getTargets().stream()
                     .min(Comparator.comparingDouble(t -> t.getPos().getSquaredDistance(MC.player.getEyePos())))
@@ -97,12 +94,12 @@ public class BreakTickHandler {
             return false;
 
         Direction direction = Direction.UP;
-        BreakManagerModule module = MODULE_MANAGER.getStorage().getByClass(BreakManagerModule.class);
+        BreakModule module = MODULE_MANAGER.getStorage().getByClass(BreakModule.class);
 
         if (module.rotate.get()) {
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                     BreakTickHandler.class.getName(),
-                    module.rotationPriority.get(),
+                    3,
                     (float) getYawToVec(MC.player, Vec3d.ofCenter(pos)),
                     (float) getPitchToVec(MC.player, Vec3d.ofCenter(pos))
             ));
@@ -120,11 +117,13 @@ public class BreakTickHandler {
             if (instant) {
                 currentBreakingBlock = null;
                 MC.interactionManager.attackBlock(pos, direction);
-                MC.player.swingHand(Hand.MAIN_HAND);
+                if (module.swing.get())
+                    MC.player.swingHand(Hand.MAIN_HAND);
                 stateHandler.confirmBreaking();
                 return true;
             } else {
-                if (now - lastAttackBlockTime >= ATTACK_BLOCK_COOLDOWN_MS) {
+                long attackCooldown = module.grim.get() ? 250 : 0; // grim speedmine checks also include block break delay, even tho we include check for it, breaking is still too fast without grim speedmine disabler
+                if (now - lastAttackBlockTime >= attackCooldown) {
                     currentBreakingBlock = pos;
                     MC.interactionManager.attackBlock(pos, direction);
                     lastAttackBlockTime = now;
@@ -139,7 +138,8 @@ public class BreakTickHandler {
         }
 
         stateHandler.confirmBreaking();
-        MC.player.swingHand(Hand.MAIN_HAND);
+        if (module.swing.get())
+            MC.player.swingHand(Hand.MAIN_HAND);
         return true;
     }
 
@@ -149,26 +149,5 @@ public class BreakTickHandler {
         }
         FluidState fluidState = MC.world.getFluidState(pos);
         return !fluidState.isEmpty();
-    }
-
-    private static int getYawToVec(Entity from, Vec3d to) {
-        double dx = to.x - from.getX();
-        double dz = to.z - from.getZ();
-        return wrapDegrees((int) Math.round(Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
-    }
-
-    private static int getPitchToVec(Entity from, Vec3d to) {
-        Vec3d eyePos = from.getEyePos();
-        double dx = to.x - eyePos.x;
-        double dy = to.y - eyePos.y;
-        double dz = to.z - eyePos.z;
-        return (int) Math.round(-Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))));
-    }
-
-    private static int wrapDegrees(int angle) {
-        angle %= 360;
-        if (angle >= 180) angle -= 360;
-        if (angle < -180) angle += 360;
-        return angle;
     }
 }

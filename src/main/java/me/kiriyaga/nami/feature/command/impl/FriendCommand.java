@@ -24,7 +24,7 @@ public class FriendCommand extends Command {
                             }
                         }
                 },
-                "f", "friends", "акшутв"
+                "f", "friends"
         );
     }
 
@@ -54,7 +54,7 @@ public class FriendCommand extends Command {
                         sb.append(friend);
                         if (++i < friends.size()) sb.append("{reset},{g} ");
                     }
-                    CHAT_MANAGER.sendPersistent(this.getName(),sb.toString());
+                    CHAT_MANAGER.sendPersistent(this.getName(),CAT_FORMAT.format(sb.toString()));
                 }
             }
         }

@@ -1,7 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.EntityPushEvent;
-import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
@@ -9,11 +8,9 @@ import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

@@ -4,10 +4,7 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import net.minecraft.text.Text;
 
-import static me.kiriyaga.nami.Nami.CAT_FORMAT;
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.DISPLAY_NAME;
-import static me.kiriyaga.nami.Nami.VERSION;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class WatermarkModule extends HudElementModule {
@@ -23,8 +20,8 @@ public class WatermarkModule extends HudElementModule {
             return CAT_FORMAT.format("{bg}NaN");
         }
 
-        width = MC.textRenderer.getWidth(watermarkStr);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(watermarkStr);
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format("{bg}" + DISPLAY_NAME +" "+ VERSION);
     }

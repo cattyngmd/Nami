@@ -8,8 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.Set;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class ModulePanel {
@@ -36,7 +35,7 @@ public class ModulePanel {
         boolean expanded = expandedModules.contains(module);
 
         Color primary = getColorModule().getStyledGlobalColor();
-        Color secondary = getColorModule().getStyledSecondColor();
+        Color secondary = getColorModule().getStyledColor(getColorModule().getStyledSecondColor(), 0.90, 0.40);
         Color textCol = new Color(155, 155, 155, 255);
         Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
@@ -54,23 +53,12 @@ public class ModulePanel {
         }
 
         context.fill(
-                expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()
-                        ? x + 1 : x,
+                x,
                 y,
                 x + WIDTH,
                 y + HEIGHT,
                 CLICK_GUI.applyFade(toRGBA(bgColor))
         );
-
-        if (expanded && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
-            context.fill(
-                    x,
-                    y,
-                    x + 1,
-                    y + HEIGHT,
-                    CLICK_GUI.applyFade(toRGBA(bgColor))
-            );
-        }
 
         if (!expanded) {
             context.fill(
@@ -84,8 +72,8 @@ public class ModulePanel {
 
         int textY = y + (HEIGHT - 8) / 2;
         int baseTextX = x + PADDING + (hovered ? 1 : 0);
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 module.getName(),
                 baseTextX,
                 textY,

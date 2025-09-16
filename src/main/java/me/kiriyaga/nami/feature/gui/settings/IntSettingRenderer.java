@@ -2,14 +2,13 @@ package me.kiriyaga.nami.feature.gui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class IntSettingRenderer implements SettingRenderer<IntSetting> {
@@ -33,7 +32,7 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, true);
+        FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);
 
         renderSlider(
                 context,
@@ -55,15 +54,15 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
                     x + 1,
                     y + HEIGHT,
                     CLICK_GUI.applyFade(
-                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                            textCol.getRGB()
                     )
             );
 
         String valStr = String.valueOf(setting.get());
-        context.drawText(
-                textRenderer,
+        FONT_MANAGER.drawText(
+                context,
                 valStr,
-                x + WIDTH - PADDING - textRenderer.getWidth(valStr),
+                x + WIDTH - PADDING - FONT_MANAGER.getWidth(valStr),
                 textY,
                 textColorInt,
                 true

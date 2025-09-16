@@ -1,14 +1,14 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.rotation.*;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.ItemStack;
@@ -20,21 +20,21 @@ import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
+import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
 public class AutoBreedModule extends Module {
 
     private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
     private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 3, 1, 10));
 
     private final Set<Integer> animalsFed = new HashSet<>();
     private int breedCooldown = 0;
 
     public AutoBreedModule() {
         super("auto breed", "Automatically breeds nearby animals.", ModuleCategory.of("world"), "autobreed");
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AutoBreedModule extends Module {
                 ROTATION_MANAGER.getRequestHandler().submit(
                         new RotationRequest(
                                 AutoBreedModule.class.getName(),
-                                rotationPriority.get(),
+                                2,
                                 (float) getYawToVec(MC.player, center),
                                 (float) getPitchToVec(MC.player, center)
                         )
@@ -89,7 +89,7 @@ public class AutoBreedModule extends Module {
                 if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoBreedModule.class.getName())) return;
             }
 
-            interactWithEntity(animal, center, true);
+            interactWithEntity(animal, center, swing.get());
 
             animalsFed.add(animal.getId());
             breedCooldown = delay.get();
@@ -105,34 +105,5 @@ public class AutoBreedModule extends Module {
             }
         }
         return -1;
-    }
-
-    private static Vec3d getEntityCenter(Entity entity) {
-        Box box = entity.getBoundingBox();
-        double centerX = box.minX + (box.getLengthX() / 2);
-        double centerY = box.minY + (box.getLengthY() / 2);
-        double centerZ = box.minZ + (box.getLengthZ() / 2);
-        return new Vec3d(centerX, centerY, centerZ);
-    }
-
-    private static int getYawToVec(Entity from, Vec3d to) {
-        double dx = to.x - from.getX();
-        double dz = to.z - from.getZ();
-        return wrapDegrees((int) Math.round(Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
-    }
-
-    private static int getPitchToVec(Entity from, Vec3d to) {
-        Vec3d eyePos = from.getEyePos();
-        double dx = to.x - eyePos.x;
-        double dy = to.y - eyePos.y;
-        double dz = to.z - eyePos.z;
-        return (int) Math.round(-Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))));
-    }
-
-    private static int wrapDegrees(int angle) {
-        angle %= 360;
-        if (angle >= 180) angle -= 360;
-        if (angle < -180) angle += 360;
-        return angle;
     }
 }

@@ -2,9 +2,9 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.EnumSetting;
-import me.kiriyaga.nami.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
+import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.Registries;
@@ -82,11 +82,11 @@ public class EntityListModule extends HudElementModule {
         for (String name : sortedNames) {
             int count = entityCounts.get(name);
             Text text = CAT_FORMAT.format("{bg}" + name + (count > 1 ? " {bw}(x" + count + ")" : ""));
-            int textWidth = MC.textRenderer.getWidth(text);
+            int textWidth = FONT_MANAGER.getWidth(text);
             elements.add(new TextElement(text, 0, yOffset));
 
             maxWidth = Math.max(maxWidth, textWidth);
-            yOffset += MC.textRenderer.fontHeight;
+            yOffset += FONT_MANAGER.getHeight();
         }
 
         this.width = maxWidth;
@@ -97,6 +97,6 @@ public class EntityListModule extends HudElementModule {
 
     private int getTextWidth(String name, int count) {
         Text text = CAT_FORMAT.format("{bg}" + name + (count > 1 ? " {bw}(x" + count + ")" : ""));
-        return MC.textRenderer.getWidth(text);
+        return FONT_MANAGER.getWidth(text);
     }
 }

@@ -2,8 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -103,8 +102,8 @@ public class GreetingModule extends HudElementModule {
 
         String formattedText = "{bg}" + currentGreeting;
 
-        width = MC.textRenderer.getWidth(currentGreeting);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(currentGreeting);
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(formattedText);
     }

@@ -15,7 +15,7 @@ public class HelpCommand extends Command {
     public HelpCommand() {
         super("help",
                 new CommandArgument[] {},
-                "h", "?", "hlp", "halp", "hilp", "heil", "рудз", "commands", "command");
+                "h", "?", "hlp", "halp", "hilp", "heil", "commands", "command");
     }
 
     @Override

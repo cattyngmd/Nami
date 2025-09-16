@@ -1,15 +1,13 @@
 package me.kiriyaga.nami.feature.gui.settings;
 
-import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.CLICK_GUI;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
@@ -39,7 +37,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
                     x + 1,
                     y + HEIGHT,
                     CLICK_GUI.applyFade(
-                            setting.getParentModule().isEnabled() ? primary.getRGB() : secondary.getRGB()
+                            textColActivated.getRGB()
                     )
             );
         }
@@ -47,7 +45,7 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
 
-        context.drawText(textRenderer, setting.getName(), textX, textY, textColorInt, true);
+        FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);
     }
 
     @Override

@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.PlayerInteractEntityC2SPacketAccessor;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
@@ -18,43 +18,43 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class SprintModule extends Module {
 
-    private final BoolSetting keepSprint = addSetting(new BoolSetting("keep sprint", true));
     private final BoolSetting inLiquid = addSetting(new BoolSetting("in liquid", true));
 
+    private int shouldSprintTicks = 0; // yes sorry
+
     public SprintModule() {
-        super("sprint", "Automatically makes you sprint while moving forward.", ModuleCategory.of("movement"));
+        super("sprint", "Automatically makes you sprint while moving.", ModuleCategory.of("movement"));
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void onUpdateEvent(PreTickEvent event) {
+    public void stopSprinting(int i) {
+        this.shouldSprintTicks = i;
+    }
+
+    private boolean shouldForceNoSprint() {
+        return shouldSprintTicks > 0;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onPreTickEvent(PreTickEvent event) {
         ClientPlayerEntity player = MC.player;
         if (player == null) return;
+
+        if (shouldSprintTicks > 0) {
+            shouldSprintTicks--;
+        }
 
         if (!inLiquid.get() && (player.isSubmergedInWater() || player.isTouchingWater()))
             return;
 
+        if (shouldForceNoSprint()) {
+            player.setSprinting(false);
+            return;
+        }
 
         if (player.forwardSpeed > 0 && !player.hasVehicle()) {
             player.setSprinting(true);
         } else {
             player.setSprinting(false);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void onPacketSend(PacketSendEvent event) {
-        if (!isEnabled()) return;
-        if (!(event.getPacket() instanceof PlayerInteractEntityC2SPacket packet)) return;
-
-        PlayerInteractEntityC2SPacket.InteractTypeHandler handler = ((PlayerInteractEntityC2SPacketAccessor) packet).getTypeHandler();
-        PlayerInteractEntityC2SPacket.InteractType type = handler.getType();
-
-        if (type != PlayerInteractEntityC2SPacket.InteractType.ATTACK) return;
-
-
-        if (!keepSprint.get()) {
-            MC.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-            MC.player.setSprinting(false);
         }
     }
 }

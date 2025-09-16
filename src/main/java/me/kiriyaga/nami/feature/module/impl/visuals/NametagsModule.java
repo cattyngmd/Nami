@@ -5,15 +5,17 @@ import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.EnumSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.NametagFormatter;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.Tameable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
@@ -135,12 +137,11 @@ public class NametagsModule extends Module {
         this.setDisplayInfo(String.valueOf(i));
     }
 
-    private void renderEntityNametag(net.minecraft.entity.Entity entity, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
+    private void renderEntityNametag(Entity entity, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
         renderEntityNametag(entity, entity.getName().getString(), tickDelta, matrices, scale, forcedColor);
     }
 
-    private void renderEntityNametag(net.minecraft.entity.Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
-
+    private void renderEntityNametag(Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
         Vec3d camPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
 
         double baseHeightOffset = entity.isSneaking() ? entity.getBoundingBox().getLengthY() : entity.getBoundingBox().getLengthY() + 0.3;
@@ -150,7 +151,6 @@ public class NametagsModule extends Module {
         double interpZ = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
 
         float distance = (float) camPos.distanceTo(new Vec3d(interpX, interpY, interpZ));
-
         double distanceYOffset = distance * 0.02;
 
         Vec3d pos = new Vec3d(
@@ -179,8 +179,10 @@ public class NametagsModule extends Module {
             if (showEntityId.get()) {
                 displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatEntityId(entity));
             }
-        } else if (entity.getClass().getSimpleName().equals("ItemEntity")) {
-            displayName = formatter.formatItem((net.minecraft.entity.ItemEntity) entity);
+        } else if (entity instanceof ItemEntity itemEntity) {
+            displayName = formatter.formatItem(itemEntity);
+        } else if (name != null) {
+            displayName = Text.literal(name);
         } else {
             displayName = formatter.formatEntity(entity);
         }

@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.client.cape;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.EnumSetting;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 
 @RegisterModule
 public class CapeModule extends Module {
@@ -11,6 +11,7 @@ public class CapeModule extends Module {
 
     public CapeModule() {
         super("cape", "Defines cape renderer logic.", ModuleCategory.of("client"), "customcape");
+        cape.setShow(false);//haha
     }
 
     public CapeType getSelectedCape() {

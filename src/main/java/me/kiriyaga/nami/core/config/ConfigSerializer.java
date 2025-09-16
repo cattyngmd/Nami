@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.setting.Setting;
+import me.kiriyaga.nami.feature.setting.Setting;
 
 import java.io.File;
 import java.io.FileReader;
@@ -33,6 +33,10 @@ public class ConfigSerializer {
 
             JsonObject settings = new JsonObject();
             for (Setting<?> s : m.getSettings()) {
+                if (s instanceof me.kiriyaga.nami.feature.setting.impl.KeyBindSetting ||
+                        s instanceof me.kiriyaga.nami.feature.setting.impl.ColorSetting) {
+                    continue;
+                }
                 settings.add(s.getName(), s.toJson());
             }
 
@@ -73,6 +77,10 @@ public class ConfigSerializer {
 
                 JsonObject settings = mod.getAsJsonObject("settings");
                 for (Setting<?> s : m.getSettings()) {
+                    if (s instanceof me.kiriyaga.nami.feature.setting.impl.KeyBindSetting ||
+                            s instanceof me.kiriyaga.nami.feature.setting.impl.ColorSetting) {
+                        continue;
+                    }
                     if (settings.has(s.getName())) {
                         s.fromJson(settings.get(s.getName()));
                     }

@@ -1,16 +1,14 @@
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
-import me.kiriyaga.nami.core.rotation.RotationRequest;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
-import net.minecraft.client.gui.screen.Screen;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
@@ -26,7 +24,6 @@ public class FreecamModule extends Module {
     private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 0.5, 0.1, 5.0));
     private final DoubleSetting accelerate = addSetting(new DoubleSetting("accelerate", 2.3, 1.0, 3.0));
     private final BoolSetting look = addSetting(new BoolSetting("look", true));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation", 1, 1, 10));
 
     private double currentFactor = 1.0;
     private long accelStartTime = -1;
@@ -134,7 +131,7 @@ public class FreecamModule extends Module {
                 double yawToTarget = Math.toDegrees(Math.atan2(diffZ, diffX)) - 90;
                 double pitchToTarget = -Math.toDegrees(Math.atan2(diffY, Math.sqrt(diffX * diffX + diffZ * diffZ)));
 
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(FreecamModule.class.getName() ,rotationPriority.get(), (float)yawToTarget, (float)pitchToTarget));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(FreecamModule.class.getName() ,3, (float)yawToTarget, (float)pitchToTarget));
             }
         }
     }

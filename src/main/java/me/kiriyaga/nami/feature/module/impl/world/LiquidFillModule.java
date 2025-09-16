@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.rotation.RotationRequest;
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
@@ -8,14 +8,15 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.setting.impl.EnumSetting;
-import me.kiriyaga.nami.setting.impl.IntSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
@@ -33,6 +34,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.*;
 import java.util.List;
+import static me.kiriyaga.nami.util.RotationUtils.*;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -43,26 +45,24 @@ public class LiquidFillModule extends Module {
         WATER, LAVA, BOTH
     }
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
+    // TODO: shift ticks
+    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 6.0));
     public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
+    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
     private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("liquid", LiquidType.BOTH));
     private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
-    private final IntSetting rotationPriority = addSetting(new IntSetting("rotation priority", 2, 1, 10));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;
-    private int swapCooldown = 0;
 
     public LiquidFillModule() {
         super("liquid fill", "Automatically fills nearby liquids with blocks.", ModuleCategory.of("world"), "liquidfill");
-        rotationPriority.setShowCondition(rotate::get);
     }
 
     @Override
     public void onDisable() {
         cooldown = 0;
-        swapCooldown = 0;
         renderPos = null;
     }
 
@@ -80,15 +80,6 @@ public class LiquidFillModule extends Module {
             renderPos = null;
             return;
         }
-
-        int currentSlot = MC.player.getInventory().getSelectedSlot();
-        if (currentSlot != blockSlot && swapCooldown <= 0) {
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(blockSlot);
-            swapCooldown = delay.get();
-            return;
-        }
-
-        if (swapCooldown > 0) swapCooldown--;
 
         int r = (int) Math.ceil(range.get());
         BlockPos playerPos = MC.player.getBlockPos();
@@ -112,9 +103,10 @@ public class LiquidFillModule extends Module {
             if (hasEntity(pos)) continue;
 
             boolean shouldPlace = switch (liquidType.get()) {
-                case WATER -> state.getBlock() == Blocks.WATER;
-                case LAVA -> state.getBlock() == Blocks.LAVA;
-                case BOTH -> state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.LAVA;
+                case WATER -> state.getBlock() == Blocks.WATER && state.get(FluidBlock.LEVEL) == 0;
+                case LAVA -> state.getBlock() == Blocks.LAVA && state.get(FluidBlock.LEVEL) == 0;
+                case BOTH -> (state.getBlock() == Blocks.WATER && state.get(FluidBlock.LEVEL) == 0)
+                        || (state.getBlock() == Blocks.LAVA && state.get(FluidBlock.LEVEL) == 0);
             };
 
             if (!shouldPlace) continue;
@@ -124,13 +116,18 @@ public class LiquidFillModule extends Module {
             if (rotate.get()) {
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                         LiquidFillModule.class.getName(),
-                        rotationPriority.get(),
+                        3,
                         (float) getYawToVec(MC.player, Vec3d.of(pos)),
                         (float) getPitchToVec(MC.player, Vec3d.of(pos))
                 ));
             }
 
             if (!rotate.get() || ROTATION_MANAGER.getRequestHandler().isCompleted(LiquidFillModule.class.getName())) {
+
+                int currentSlot = MC.player.getInventory().getSelectedSlot();
+                if (currentSlot != blockSlot)
+                    INVENTORY_MANAGER.getSlotHandler().attemptSwitch(blockSlot);
+
                 if (grim.get()) {
                     MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
@@ -139,7 +136,9 @@ public class LiquidFillModule extends Module {
                             Direction.UP,
                             pos,
                             false));
-                    MC.player.swingHand(Hand.MAIN_HAND, false);
+
+                    if (swing.get())
+                        MC.player.swingHand(Hand.MAIN_HAND, false);
                     MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
                     MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
@@ -149,8 +148,12 @@ public class LiquidFillModule extends Module {
                             Direction.UP,
                             pos,
                             false));
-                    MC.player.swingHand(Hand.MAIN_HAND);
+                    if (swing.get())
+                        MC.player.swingHand(Hand.MAIN_HAND);
                 }
+
+                if (currentSlot != MC.player.getInventory().getSelectedSlot())
+                    INVENTORY_MANAGER.getSlotHandler().attemptSwitch(currentSlot);
 
                 cooldown = delay.get();
                 placed = true;
@@ -191,34 +194,5 @@ public class LiquidFillModule extends Module {
             }
         }
         return -1;
-    }
-
-    private static Vec3d getEntityCenter(Entity entity) {
-        Box box = entity.getBoundingBox();
-        double centerX = box.minX + (box.getLengthX() / 2);
-        double centerY = box.minY + (box.getLengthY() / 2);
-        double centerZ = box.minZ + (box.getLengthZ() / 2);
-        return new Vec3d(centerX, centerY, centerZ);
-    }
-
-    private static int getYawToVec(Entity from, Vec3d to) {
-        double dx = to.x - from.getX();
-        double dz = to.z - from.getZ();
-        return wrapDegrees((int) Math.round(Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
-    }
-
-    private static int getPitchToVec(Entity from, Vec3d to) {
-        Vec3d eyePos = from.getEyePos();
-        double dx = to.x - eyePos.x;
-        double dy = to.y - eyePos.y;
-        double dz = to.z - eyePos.z;
-        return (int) Math.round(-Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))));
-    }
-
-    private static int wrapDegrees(int angle) {
-        angle %= 360;
-        if (angle >= 180) angle -= 360;
-        if (angle < -180) angle += 360;
-        return angle;
     }
 }

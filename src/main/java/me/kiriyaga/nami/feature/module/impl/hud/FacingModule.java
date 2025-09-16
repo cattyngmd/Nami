@@ -2,9 +2,8 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.client.MinecraftClient;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -22,8 +21,8 @@ public class FacingModule extends HudElementModule {
     public Text getDisplayText() {
         MinecraftClient mc = MC;
         if (mc.player == null) {
-            width = MC.textRenderer.getWidth("NaN");
-            height = MC.textRenderer.fontHeight;
+            width = FONT_MANAGER.getWidth("NaN");
+            height = FONT_MANAGER.getHeight();
             return CAT_FORMAT.format("{bg}NaN");
         }
 
@@ -62,8 +61,8 @@ public class FacingModule extends HudElementModule {
 
         String labelPart = displayLabel.get() ? "{bg}" + dir + " {bg}[" + axisPart + "{bg}]" : axisPart;
 
-        width = MC.textRenderer.getWidth(labelPart.replace("{bg}", "").replace("{bw}", "").replace("{gray}", ""));
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(labelPart.replace("{bg}", "").replace("{bw}", "").replace("{gray}", ""));
+        height = FONT_MANAGER.getHeight();
 
         return CAT_FORMAT.format(labelPart);
     }

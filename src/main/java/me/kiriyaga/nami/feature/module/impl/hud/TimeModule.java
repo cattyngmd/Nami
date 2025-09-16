@@ -2,8 +2,8 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
-import me.kiriyaga.nami.setting.impl.EnumSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
@@ -46,8 +46,8 @@ public class TimeModule extends HudElementModule {
             timeText = String.format("%02d:%02d", minecraftHour, minecraftMinute);
         }
 
-        width = MC.textRenderer.getWidth(timeText);
-        height = MC.textRenderer.fontHeight;
+        width = FONT_MANAGER.getWidth(timeText);
+        height = FONT_MANAGER.getHeight();
 
         if (!grey.get())
             return CAT_FORMAT.format("{bg}" + timeText);

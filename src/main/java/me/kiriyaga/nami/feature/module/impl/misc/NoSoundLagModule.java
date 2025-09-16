@@ -4,16 +4,24 @@ import com.google.common.collect.Sets;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
+import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class NoSoundLagModule extends Module {
@@ -58,13 +66,24 @@ public class NoSoundLagModule extends Module {
             SoundEvents.ENTITY_WITHER_SHOOT
     );
 
+    private final Set<SoundEvent> activeSounds = ConcurrentHashMap.newKeySet();
+
+    private long lastClearTime = System.currentTimeMillis();
+
     public NoSoundLagModule() {
-        super("no sound lag", "Prevents lag caused by stacked sounds.", ModuleCategory.of("misc"), "nosoundlag");
+        super("no sound lag", "Sound tweaks.", ModuleCategory.of("misc"), "nosoundlag");
+        elytra.setShowCondition(always::get );
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPacketReceive(PacketReceiveEvent event) {
         if (!isEnabled()) return;
+
+        long now = System.currentTimeMillis();
+        if (now - lastClearTime >= TimeUnit.SECONDS.toMillis(2)) {
+            activeSounds.clear();
+            lastClearTime = now;
+        }
 
         if (event.getPacket() instanceof PlaySoundS2CPacket packet) {
             SoundEvent sound = packet.getSound().value();
@@ -72,32 +91,34 @@ public class NoSoundLagModule extends Module {
             boolean cancel = false;
 
             if (always.get()) {
-                if (armor.get() && ARMOR_SOUNDS.contains(packet.getSound())) {
-                    cancel = true;
-                }
-                if (firework.get() && FIREWORK_SOUNDS.contains(sound)) {
-                    cancel = true;
-                }
-                if (elytra.get() && ELYTRA_SOUNDS.contains(sound)) {
-                    cancel = true;
-                }
-                if (withers.get() && WITHER_SOUNDS.contains(sound)) {
+                if ((armor.get() && ARMOR_SOUNDS.contains(packet.getSound())) ||
+                        (firework.get() && FIREWORK_SOUNDS.contains(sound)) ||
+                        (elytra.get() && ELYTRA_SOUNDS.contains(sound)) ||
+                        (withers.get() && WITHER_SOUNDS.contains(sound))) {
                     cancel = true;
                 }
             } else {
-                if (armor.get() && ARMOR_SOUNDS.contains(packet.getSound())) {
-                    cancel = true;
-                } else if (firework.get() && FIREWORK_SOUNDS.contains(sound)) {
-                    cancel = true;
-                } else if (elytra.get() && ELYTRA_SOUNDS.contains(sound)) {
-                    cancel = true;
-                } else if (withers.get() && WITHER_SOUNDS.contains(sound)) {
+                if (activeSounds.contains(sound)) {
                     cancel = true;
                 }
             }
 
             if (cancel) {
                 event.cancel();
+            } else {
+                activeSounds.add(sound);
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onPreTick(PreTickEvent event) {
+        if (!isEnabled() || !elytra.get()) return;
+
+        if (MC.player != null && MC.player.isGliding()) {
+            for (SoundEvent sound : ELYTRA_SOUNDS) {
+                Identifier id = Registries.SOUND_EVENT.getId(sound);
+                MC.getSoundManager().stopSounds(id, SoundCategory.PLAYERS);
             }
         }
     }

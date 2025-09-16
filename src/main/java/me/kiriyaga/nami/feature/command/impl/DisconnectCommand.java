@@ -15,7 +15,7 @@ public class DisconnectCommand extends Command {
         super(
                 "disconnect",
                 new CommandArgument[0],
-                "dis", "discnect", "dissconnect", "logout", "вшысщттусе"
+                "dis", "discnect", "dissconnect", "logout"
         );
     }
 

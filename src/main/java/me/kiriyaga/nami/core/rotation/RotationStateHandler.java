@@ -5,39 +5,73 @@ import net.minecraft.util.math.MathHelper;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
 public class RotationStateHandler {
+    /**
+     * Real degrees
+     * we use it for returning
+     * Also we change real yaw, mc player yaw, if rotations was very long, since client side yaw pitch is always normalized
+     */
     private float realYaw, realPitch;
+    /**
+     * Current rotation degrees
+     * If not rotating, they are the same as realDegree
+     * If rotating, theese are used for spoofing degrees
+     * They are not accurate, used only for rotation manager
+     */
     private float rotationYaw, rotationPitch;
+    /**
+     * Render degrees
+     * Theese are separated from real rotations, they are always smooth = 50%
+     */
+    private float renderYaw, renderPitch;
+    /**
+     * Server degrees
+     * These are degrees that really got sended on a server
+     * Any mc client should use mc.player.setYaw/pitch in packet send, so we, and also everyone else, know each other rotations
+     * Theese can be used for checking entities in raycast (pearl check entity for example) since theese are 100% accurate, sended data
+     */
+    private float serverYaw, serverPitch;
+    /**
+     * Previus server yaw delta
+     */
+    private float serverDeltaYaw;
 
     public void updateRealRotation(float yaw, float pitch) {
-        realYaw = wrapDegrees(yaw);
+        realYaw = yaw;
         realPitch = MathHelper.clamp(pitch, -90f, 90f);
+
+        if (!isRotating()) {
+            renderYaw = realYaw;
+            renderPitch = realPitch;
+        }
     }
 
-    public float getRealYaw() {
-        return realYaw;
-    }
+    public float getRealYaw() { return realYaw; }
+    public float getRealPitch() { return realPitch; }
 
-    public float getRealPitch() {
-        return realPitch;
-    }
+    public float getRotationYaw() { return rotationYaw; }
+    public float getRotationPitch() { return rotationPitch; }
 
-    public float getRotationYaw() {
-        return rotationYaw;
-    }
+    public void setRotationYaw(float yaw) {this.rotationYaw = yaw;}
 
-    public float getRotationPitch() {
-        return rotationPitch;
-    }
+    public void setRotationPitch(float pitch) {this.rotationPitch = MathHelper.clamp(pitch, -90f, 90f);}
 
-    public void setRotationYaw(float yaw) {
-        this.rotationYaw = wrapDegrees(yaw);
-    }
+    public float getRenderYaw() { return renderYaw; }
+    public float getRenderPitch() { return renderPitch; }
 
-    public void setRotationPitch(float pitch) {
-        this.rotationPitch = MathHelper.clamp(pitch, -90f, 90f);
-    }
+    // WE DO NOT WRAP/NORMALIZE SERVER ROTATIONS!!!
+    public void setRenderYaw(float yaw) { this.renderYaw = wrapDegrees(yaw); }
+    public void setRenderPitch(float pitch) { this.renderPitch = MathHelper.clamp(pitch, -90f, 90f); }
 
-    private float wrapDegrees(float angle) {
+    public float getServerYaw() {return serverYaw;}
+    public void setServerYaw(float yaw) {this.serverYaw = yaw;}
+
+    public float getServerPitch() {return serverPitch;}
+    public void setServerPitch(float pitch) {this.serverPitch = pitch;}
+
+    public float getServerDeltaYaw() {return serverDeltaYaw;}
+    public void setServerDeltaYaw(float deltaYaw) {this.serverDeltaYaw = deltaYaw;}
+
+    public static float wrapDegrees(float angle) {
         angle %= 360f;
         if (angle >= 180f) angle -= 360f;
         if (angle < -180f) angle += 360f;

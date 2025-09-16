@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import me.kiriyaga.nami.feature.module.impl.client.RotationManagerModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoJumpDelayModule;
@@ -12,14 +12,12 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -42,7 +40,7 @@ public abstract class MixinLivingEntity extends Entity {
     private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
         if (MODULE_MANAGER.getStorage() == null) return;
-        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
+        RotationModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
         if (rotationModule == null || !rotationModule.moveFix.get()) return;
         if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
@@ -62,33 +60,11 @@ public abstract class MixinLivingEntity extends Entity {
         if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
         if (MODULE_MANAGER.getStorage() == null) return;
-        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
+        RotationModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
         if (rotationModule == null || !rotationModule.moveFix.get()) return;
 
         this.setYaw(originalYaw);
         this.setPitch(originalPitch);
-    }
-
-    private Vec3d localToGlobal(Vec3d localVec, float yaw) {
-        double rad = Math.toRadians(yaw);
-        double cos = Math.cos(rad);
-        double sin = Math.sin(rad);
-
-        double x = localVec.x * cos - localVec.z * sin;
-        double z = localVec.x * sin + localVec.z * cos;
-
-        return new Vec3d(x, localVec.y, z);
-    }
-
-    private Vec3d globalToLocal(Vec3d globalVec, float yaw) {
-        double rad = Math.toRadians(yaw);
-        double cos = Math.cos(rad);
-        double sin = Math.sin(rad);
-
-        double x = globalVec.x * cos + globalVec.z * sin;
-        double z = -globalVec.x * sin + globalVec.z * cos;
-
-        return new Vec3d(x, globalVec.y, z);
     }
 
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))

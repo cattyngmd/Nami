@@ -16,7 +16,7 @@ public class ChangePrefixCommand extends Command {
                 new CommandArgument[] {
                         new CommandArgument.StringArg("char", 1, 1)
                 },
-                "changeprefix", "сз", "зкуашч"
+                "changeprefix"
         );
     }
 

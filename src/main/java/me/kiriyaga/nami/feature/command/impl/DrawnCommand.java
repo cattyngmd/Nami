@@ -15,7 +15,7 @@ public class DrawnCommand extends Command {
                 new CommandArgument[] {
                         new CommandArgument.StringArg("moduleName", 1, 25)
                 },
-                "draw", "drawmodule", "moduledraw", "вкфцт");
+                "draw", "drawmodule", "moduledraw");
     }
 
     @Override
