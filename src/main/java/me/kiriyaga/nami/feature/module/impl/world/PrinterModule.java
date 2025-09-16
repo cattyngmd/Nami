@@ -45,7 +45,7 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class PrinterModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
+    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 6.0));
     public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 20));
     private final IntSetting shiftTicks = addSetting(new IntSetting("shift ticks", 1, 1, 6));
     private final BoolSetting swing = addSetting(new BoolSetting("swing", true));

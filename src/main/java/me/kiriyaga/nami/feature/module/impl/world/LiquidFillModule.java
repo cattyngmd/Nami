@@ -16,6 +16,7 @@ import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
@@ -44,7 +45,8 @@ public class LiquidFillModule extends Module {
         WATER, LAVA, BOTH
     }
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
+    // TODO: shift ticks
+    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 6.0));
     public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
     private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
     private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
@@ -101,9 +103,10 @@ public class LiquidFillModule extends Module {
             if (hasEntity(pos)) continue;
 
             boolean shouldPlace = switch (liquidType.get()) {
-                case WATER -> state.getBlock() == Blocks.WATER;
-                case LAVA -> state.getBlock() == Blocks.LAVA;
-                case BOTH -> state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.LAVA;
+                case WATER -> state.getBlock() == Blocks.WATER && state.get(FluidBlock.LEVEL) == 0;
+                case LAVA -> state.getBlock() == Blocks.LAVA && state.get(FluidBlock.LEVEL) == 0;
+                case BOTH -> (state.getBlock() == Blocks.WATER && state.get(FluidBlock.LEVEL) == 0)
+                        || (state.getBlock() == Blocks.LAVA && state.get(FluidBlock.LEVEL) == 0);
             };
 
             if (!shouldPlace) continue;
