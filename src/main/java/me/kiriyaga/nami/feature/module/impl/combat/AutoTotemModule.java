@@ -4,6 +4,7 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PostTickEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
@@ -29,13 +30,12 @@ public class AutoTotemModule extends Module {
 
     private enum Offhand { CRYSTAL, GAPPLE, ITEMFRAME, MENDING}
 
+    private final IntSetting health = addSetting(new IntSetting("health", 12, 10, 36));
     private final BoolSetting offhandOverride = addSetting(new BoolSetting("override", false));
-    private final IntSetting overrideHealth = addSetting(new IntSetting("health", 16, 10, 36));
     private final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("item", Offhand.CRYSTAL));
     private final BoolSetting fastSwap = addSetting(new BoolSetting("alternative", false));
-    private final BoolSetting fastSwapHotbar = addSetting(new BoolSetting("safety", false));
-    private final IntSetting fastSlot = addSetting(new IntSetting("safety slot", 8, 0, 8));
-    private final BoolSetting cursorStack = addSetting(new BoolSetting("cursor stack", true));
+    private final BoolSetting mainhand = addSetting(new BoolSetting("mainhand", false));
+    private final IntSetting mainhandSlot = addSetting(new IntSetting("slot", 8, 0, 8));
     private final BoolSetting deathLog = addSetting(new BoolSetting("log", false));
 
     private final Map<String, String> deathReasons = new ConcurrentHashMap<>();
@@ -46,17 +46,12 @@ public class AutoTotemModule extends Module {
 
     public AutoTotemModule() {
         super("auto totem", "Automatically places totem in your hand.", ModuleCategory.of("combat"), "autototem");
-        fastSwapHotbar.setShowCondition(() -> fastSwap.get());
-        fastSlot.setShowCondition(() -> fastSwapHotbar.get());
-        fastSlot.setShowCondition(() -> (fastSwapHotbar.get()&&fastSwap.get()));
-        cursorStack.setShowCondition(() -> !(fastSwap.get()));
-
-        overrideHealth.setShowCondition(offhandOverride::get);
+        mainhandSlot.setShowCondition(mainhand::get);
         overrideItem.setShowCondition(offhandOverride::get);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPostTick(PostTickEvent event) {
+    public void onPreTick(PreTickEvent event) {
         if (MC.world == null || MC.player == null) return;
 
         int totemCount = 0;
@@ -95,7 +90,7 @@ public class AutoTotemModule extends Module {
 
         if (offhandOverride.get()) {
             int effectiveHealth = (int) (player.getHealth() + player.getAbsorptionAmount());
-            if (effectiveHealth >= overrideHealth.get()) {
+            if (effectiveHealth >= health.get()) {
                 targetStack = getOverrideStack();
                 if (targetStack != null) {
                     overrideActive = true;
@@ -108,37 +103,42 @@ public class AutoTotemModule extends Module {
             if (targetStack == null) return;
         }
 
-        if (offhandStack.getItem() == targetStack.getItem()) return;
-
-        int targetSlot = findInventorySlot(targetStack);
-        if (targetSlot == -1) return;
-
-        if (fastSwap.get()) {
-            int fastSlotIndex = fastSlot.get();
-            if (fastSlotIndex >= 0 && fastSlotIndex <= 8) {
-                ItemStack fastSlotStack = player.getInventory().getStack(fastSlotIndex);
-                boolean fastSlotHasTarget = fastSlotStack.getItem() == targetStack.getItem();
-
-                if (fastSwapHotbar.get()) {
-                    if (!fastSlotHasTarget && targetSlot != fastSlotIndex) {
-                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(targetSlot), fastSlotIndex);
+        if (mainhand.get()){
+            if (MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.TOTEM_OF_UNDYING){
+                int totem = findInventorySlot(new ItemStack(Items.TOTEM_OF_UNDYING), mainhandSlot.get());
+                if (totem != -1){
+                    if (fastSwap.get()) {
+                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totem), mainhandSlot.get());
                         lastAttemptTime = System.currentTimeMillis();
-                        fastSlotHasTarget = true;
-                    }
-                    offhandStack = player.getOffHandStack();
-                    if (offhandStack.getItem() != targetStack.getItem() && fastSlotHasTarget) {
-                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(fastSlotIndex), 40);
-                        lastAttemptTime = System.currentTimeMillis();
-                    }
-                } else {
-                    if (offhandStack.getItem() != targetStack.getItem()) {
-                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(targetSlot), 40);
+                    } else {
+                        clickSlot(totem, convertSlot(mainhandSlot.get()));
                         lastAttemptTime = System.currentTimeMillis();
                     }
                 }
             }
+
+            if (MC.player.getHealth() + MC.player.getAbsorptionAmount() <= health.get() && MC.player.getInventory().getStack(mainhandSlot.get()).getItem() == Items.TOTEM_OF_UNDYING)
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(mainhandSlot.get());
+        }
+
+        int targetSlot;
+
+        if (mainhand.get())
+            targetSlot = findInventorySlot(targetStack, mainhandSlot.get());
+        else
+            targetSlot = findInventorySlot(targetStack);
+
+        if (targetSlot == -1) return;
+
+        if (offhandStack.getItem() == targetStack.getItem()) return;
+
+        if (fastSwap.get()) {
+            if (offhandStack.getItem() != targetStack.getItem()) {
+                INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(targetSlot), 40);
+                lastAttemptTime = System.currentTimeMillis();
+            }
         } else {
-            swapToOffhand(targetSlot);
+            clickSlot(targetSlot, 45);
             lastAttemptTime = System.currentTimeMillis();
         }
 
@@ -185,34 +185,19 @@ public class AutoTotemModule extends Module {
         return null;
     }
 
-    private void swapToOffhand(int invSlot) {
+    private void clickSlot(int invSlot, int index) {
         int realSlot = convertSlot(invSlot);
 
-        if (cursorStack.get()) {
-            ItemStack cursor = MC.player.currentScreenHandler.getCursorStack();
+        ItemStack cursor = MC.player.currentScreenHandler.getCursorStack();
 
-            if (cursor.isEmpty()) {
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
-                cursor = MC.player.currentScreenHandler.getCursorStack();
-            }
-
-            if (!cursor.isEmpty()) {
-                INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
-            }
-        } else {
+        if (cursor.isEmpty()) {
             INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
-            INVENTORY_MANAGER.getClickHandler().pickupSlot(45);
+            cursor = MC.player.currentScreenHandler.getCursorStack();
         }
-    }
 
-    private int findTotemSlot() {
-        for (int i = 0; i < 36; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
-            if (stack != null && stack.getItem() == Items.TOTEM_OF_UNDYING) {
-                return i;
-            }
+        if (!cursor.isEmpty()) {
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(index);
         }
-        return -1;
     }
 
     private int countTotems() {
@@ -294,6 +279,17 @@ public class AutoTotemModule extends Module {
         }
         return -1;
     }
+
+    private int findInventorySlot(ItemStack stack, int excluded) {
+        for (int i = 0; i < 36; i++) {
+            if (i == excluded) continue;
+            if (MC.player.getInventory().getStack(i).getItem() == stack.getItem()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 
     private boolean hasMending(ItemStack stack) {
         return EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0;
