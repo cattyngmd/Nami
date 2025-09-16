@@ -8,6 +8,7 @@ import me.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -21,6 +22,8 @@ import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class AutoToolModule extends Module {
+
+    private final IntSetting damageThreshold = addSetting(new IntSetting("durability", 3, 0, 15));
 
     public AutoToolModule() {
         super("auto tool", "Auto selects the currently best mining tool from your hotbar.", ModuleCategory.of("world"), "autotool");
@@ -41,9 +44,11 @@ public class AutoToolModule extends Module {
 
             for (int slot = 0; slot < 9; slot++) {
                 ItemStack stack = MC.player.getInventory().getStack(slot);
-                if (stack.isEmpty()) {
+                if (stack.isEmpty())
                     continue;
-                }
+
+                if (isBroken(stack))
+                    continue;
 
                 float efficiencyLevel = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
                 float miningSpeed = stack.getMiningSpeedMultiplier(targetState);
@@ -58,5 +63,13 @@ public class AutoToolModule extends Module {
             if (bestSlot != -1)
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
             }, 0, ExecutableEventType.PRE_TICK);
+    }
+
+    private boolean isBroken(ItemStack stack) {
+        if (!stack.isDamageable()) return false;
+        int max = stack.getMaxDamage();
+        int damage = stack.getDamage();
+        int percentRemaining = (int) (((max - damage) / (float) max) * 100);
+        return percentRemaining <= damageThreshold.get();
     }
 }

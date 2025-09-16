@@ -28,7 +28,7 @@ public class AutoArmorModule extends Module {
     private enum HelmetPriority { BEST, TURTLE, GOLDEN, PUMPKIN, NONE }
 
     private final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("protection", ProtectionPriority.PROT));
-    private final IntSetting damageThreshold = addSetting(new IntSetting("damage", 3, 1, 15));
+    private final IntSetting damageThreshold = addSetting(new IntSetting("durability", 3, 1, 15));
     private final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("helmet", HelmetPriority.BEST));
     private final BoolSetting helmetSafety = addSetting(new BoolSetting("helmet safety", false));
     private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("boots", BootsPriority.BEST));
