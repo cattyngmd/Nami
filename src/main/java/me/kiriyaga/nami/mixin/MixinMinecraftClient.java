@@ -5,6 +5,7 @@ import me.kiriyaga.nami.core.macro.model.Macro;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
+import me.kiriyaga.nami.feature.module.impl.combat.AuraModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.world.AirPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.world.AutoEatModule;
@@ -14,6 +15,8 @@ import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -21,6 +24,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,9 +44,12 @@ public abstract class MixinMinecraftClient {
     @Shadow
     public int attackCooldown;
     @Shadow private int itemUseCooldown;
-
+    @Shadow @Nullable public ClientPlayerEntity player;
+    @Shadow @Final
+    public GameOptions options;
+    @Shadow @Nullable
+    public ClientPlayerInteractionManager interactionManager;
     private int holdTicks = 0;
-    @Shadow public ClientPlayerEntity player;
     @Shadow public ClientWorld world;
     private final Set<Integer> deadList = new HashSet<>();
 
@@ -208,5 +216,14 @@ public abstract class MixinMinecraftClient {
         if (MODULE_MANAGER.getStorage().getByClass(AutoEatModule.class).eating.get())
             return false;
         return original;
+    }
+
+    @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z", ordinal = 0, shift = At.Shift.BEFORE))
+    private void handleInputEvents3(CallbackInfo info) {
+        if (MODULE_MANAGER.getStorage().getByClass(AuraModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(AuraModule.class).multitask() && player != null && player.isUsingItem()) {
+            if (!options.useKey.isPressed()) {
+                interactionManager.stopUsingItem(player);
+            }
+        }
     }
 }

@@ -25,6 +25,7 @@ import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.util.hit.EntityHitResult;
 
@@ -192,7 +193,7 @@ public class AuraModule extends Module {
         if (!skipCooldown && attackCooldownTicks > 0f) return;
 
         MC.interactionManager.attackEntity(MC.player, target);
-        MC.player.swingHand(net.minecraft.util.Hand.MAIN_HAND);
+        MC.player.swingHand(Hand.MAIN_HAND);
 
         if (!skipCooldown) attackCooldownTicks = getBaseCooldownTicks(stack, tps);
 
@@ -269,5 +270,15 @@ public class AuraModule extends Module {
         }
 
         return baseTicks * (20f / tps);
+    }
+
+    public boolean multitask(){
+        if (!multiTask.get())
+            return false;
+
+        if (currentTarget == null)
+            return false;
+
+        return false;
     }
 }
