@@ -40,8 +40,19 @@ def getCommitsCount() {
     return stdout.toString().trim()
 }
 
-version = "2.4.3_${getCommitsCount()}.${getGitHash()}"
-//version = "2.4.3"
+def getGitBranch() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+        standardOutput = stdout
+        ignoreExitValue true
+    }
+    return stdout.toString().trim()
+}
+
+
+//version = "2.4.4_${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
+version = "2.4.4_${getGitBranch()}"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
