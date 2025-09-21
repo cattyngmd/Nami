@@ -42,11 +42,9 @@ public class CommandExecutor {
         String content = message.substring(prefix.length());
         if (content.isEmpty()) return;
 
-        // Split only the first word to get the command name/alias
         String[] parts = content.split("\\s+", 2);
         String commandName = parts[0];
 
-        // Find the command by its name or alias
         Command command = storage.getCommandByNameOrAlias(commandName);
 
         String commandToExecute;
@@ -59,8 +57,6 @@ public class CommandExecutor {
                 commandToExecute = mainCommandName;
             }
         } else {
-            // If no command or alias was found, execute the original content
-            // to let the dispatcher handle the "unknown command" error.
             commandToExecute = content;
         }
 

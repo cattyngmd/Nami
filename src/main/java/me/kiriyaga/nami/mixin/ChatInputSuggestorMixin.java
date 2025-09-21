@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mixin(value = ChatInputSuggestor.class, priority = 1500) // Give it a high, but not extreme, priority
+@Mixin(value = ChatInputSuggestor.class)
 public abstract class ChatInputSuggestorMixin {
     @Shadow @Final private MinecraftClient client;
     @Shadow @Final private TextFieldWidget textField;

@@ -29,5 +29,4 @@ public class CommandManager {
         return suggester;
     }
 
-    // No longer need a custom command source, we use the one from Minecraft
 }

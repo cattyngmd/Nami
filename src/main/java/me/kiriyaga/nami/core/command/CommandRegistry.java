@@ -8,7 +8,6 @@ import java.util.List;
 
 public class CommandRegistry {
 
-    // Restoring the full, manual list of all commands.
     private static final List<Class<? extends Command>> COMMAND_CLASSES = Arrays.asList(
         BindCommand.class,
         ChangePrefixCommand.class,
