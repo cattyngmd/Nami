@@ -5,7 +5,6 @@
 
 package me.kiriyaga.nami.util.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.impl.client.FontModule;
@@ -264,7 +263,7 @@ public class RenderUtil {
         Vec3d center = box.getCenter();
         double distance = camera.getPos().distanceTo(center);
 
-        double minThickness = 1;
+        double minThickness = 0.5;
         double maxThickness = lineWidth;
         double scaleFactor = 5.0;
 
@@ -279,6 +278,8 @@ public class RenderUtil {
 
         Layers.getGlobalLines(scaledLineWidth).draw(bufferBuilder.end());
     }
+
+
 
     public static void drawBox(MatrixStack stack, Vec3d vec, Color c, double lineWidth) {
         drawBox(stack, Box.from(vec), c, lineWidth);
@@ -397,38 +398,56 @@ public class RenderUtil {
         matrices.pop();
     }
 
-    public static void drawLine(MatrixStack stack, Vec3d pointA, Vec3d pointB, Color c, double lineWidth) {
-        Camera camera = MC.getEntityRenderDispatcher().camera;
+    public static void drawThickLine(MatrixStack matrix, Vec3d start, Vec3d end, float thickness, int color) {
+        Matrix4f mat = matrix.peek().getPositionMatrix();
+        Vec3d camPos = MatrixCache.camera.getPos();
 
-        float ax = (float) (pointA.x - camera.getPos().getX());
-        float ay = (float) (pointA.y - camera.getPos().getY());
-        float az = (float) (pointA.z - camera.getPos().getZ());
+        float r = (color >> 16 & 0xFF) / 255.0f;
+        float g = (color >> 8 & 0xFF) / 255.0f;
+        float b = (color & 0xFF) / 255.0f;
+        float a = (color >> 24 & 0xFF) / 255.0f;
 
-        float bx = (float) (pointB.x - camera.getPos().getX());
-        float by = (float) (pointB.y - camera.getPos().getY());
-        float bz = (float) (pointB.z - camera.getPos().getZ());
+        Vector3f from = new Vector3f((float)(start.x - end.x), (float)(start.y - end.y), (float)(start.z - end.z));
+        Vector3f dir = new Vector3f((float)(end.x - start.x), (float)(end.y - start.y), (float)(end.z - start.z));
+        dir.normalize();
 
-        Vec3d center = pointA.add(pointB).multiply(0.5);
-        double distance = camera.getPos().distanceTo(center);
+        Vector3f up = new Vector3f(0, 1, 0);
+        if (Math.abs(dir.dot(up)) > 0.99f) up = new Vector3f(1, 0, 0);
+        Vector3f side1 = dir.cross(up, new Vector3f());
+        Vector3f side2 = dir.cross(side1, new Vector3f());
 
-        double minThickness = 1;
-        double maxThickness = lineWidth;
-        double scaleFactor = 5.0;
+        side1.normalize().mul(thickness / 2f);
+        side2.normalize().mul(thickness / 2f);
 
-        double scaledLineWidth = maxThickness / (1.0 + (distance / scaleFactor));
-        scaledLineWidth = Math.max(scaledLineWidth, minThickness);
+        Vector3f[] verts = new Vector3f[8];
+        verts[0] = new Vector3f((float)(start.x - camPos.x), (float)(start.y - camPos.y), (float)(start.z - camPos.z)).add(side1).add(side2);
+        verts[1] = new Vector3f(verts[0]).sub(side1.mul(2f));
+        verts[2] = new Vector3f(verts[1]).sub(side2.mul(2f));
+        verts[3] = new Vector3f(verts[0]).sub(side2.mul(2f));
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance()
-                .begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL);
+        verts[4] = new Vector3f((float)(end.x - camPos.x), (float)(end.y - camPos.y), (float)(end.z - camPos.z)).add(side1).add(side2);
+        verts[5] = new Vector3f(verts[4]).sub(side1.mul(2f));
+        verts[6] = new Vector3f(verts[5]).sub(side2.mul(2f));
+        verts[7] = new Vector3f(verts[4]).sub(side2.mul(2f));
 
-        bufferBuilder.vertex(ax, ay, az)
-                .color(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f)
-                .normal(0, 1, 0);
+        BufferBuilder builder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(bx, by, bz)
-                .color(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f)
-                .normal(0, 1, 0);
+        int[][] quads = {
+                {0, 1, 5, 4}, // side
+                {1, 2, 6, 5}, // side
+                {2, 3, 7, 6}, // side
+                {3, 0, 4, 7}, // side
+                {0, 1, 2, 3}, // start cap
+                {4, 5, 6, 7}  // end cap
+        };
 
-        Layers.getGlobalLines(scaledLineWidth).draw(bufferBuilder.end());
+        for (int[] quad : quads) {
+            for (int idx : quad) {
+                Vector3f v = verts[idx];
+                builder.vertex(mat, v.x, v.y, v.z).color(r, g, b, a);
+            }
+        }
+
+        Layers.getGlobalQuads().draw(builder.end());
     }
 }

@@ -104,6 +104,10 @@ public abstract class CommandArgument {
                     .toArray(String[]::new);
         }
 
+        public String[] getAllowedValues() {
+            return allowedValues;
+        }
+
         @Override
         public Object parse(String input) {
             return getCanonical(input);

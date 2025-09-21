@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_20",
   "client": [
     "ChatHudAccessor",
+    "ChatInputSuggestorMixin",
     "ClientPlayerInteractionManagerAccessor",
     "ClientWorldAccessor",
     "GameOptionsAccessor",
@@ -13,7 +14,6 @@
     "MixinBossBarHud",
     "MixinCamera",
     "MixinChatHud",
-    "MixinChatScreen",
     "MixinChunkBorderDebugRenderer",
     "MixinClientPlayerEntity",
     "MixinClientPlayerInteractionManager",

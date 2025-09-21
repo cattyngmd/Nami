@@ -21,9 +21,8 @@ public class WhitelistSetting extends BoolSetting {
         this.moduleName = moduleName.toLowerCase();
         this.settingName = name.toLowerCase();
 
-        if (COMMAND_MANAGER.getStorage().getCommandByNameOrAlias(this.moduleName.replace(" ", "")) == null) {
-            COMMAND_MANAGER.getStorage().addCommand(new WhitelistCommand(this.moduleName));
-        }
+        // The WhitelistCommand is now registered centrally in CommandRegistry.
+        // This dynamic registration is removed to prevent duplicates and conflicts.
     }
 
     public Set<Identifier> getWhitelist() {
