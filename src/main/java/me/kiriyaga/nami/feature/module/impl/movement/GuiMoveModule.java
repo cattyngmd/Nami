@@ -36,7 +36,7 @@ public class GuiMoveModule extends Module {
     public final BoolSetting _2b2t = addSetting(new BoolSetting("2b2t", true));
 
     public GuiMoveModule() {
-        super("gui move", "Allows movement in most GUIs.", ModuleCategory.of("movement"), "guimove");
+        super("GuiMove", "Allows movement in most GUIs.", ModuleCategory.of("Movement"), "guimove");
     }
 
     @Override

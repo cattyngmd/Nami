@@ -34,23 +34,23 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class NametagsModule extends Module {
 
-    public final BoolSetting self = addSetting(new BoolSetting("self", false));
-    public final BoolSetting players = addSetting(new BoolSetting("players", true));
-    public final BoolSetting hostiles = addSetting(new BoolSetting("hostiles", false));
-    public final BoolSetting neutrals = addSetting(new BoolSetting("neutrals", false));
-    public final BoolSetting passives = addSetting(new BoolSetting("passives", false));
-    public final BoolSetting items = addSetting(new BoolSetting("items", false));
-    public final BoolSetting tamed = addSetting(new BoolSetting("tamed", false));
-    public final BoolSetting pearls = addSetting(new BoolSetting("pearls", false));
-    public final BoolSetting showItems = addSetting(new BoolSetting("equipment", true));
-    public final BoolSetting showHealth = addSetting(new BoolSetting("health", false));
-    public final BoolSetting showGameMode = addSetting(new BoolSetting("gamemode", false));
-    public final BoolSetting showPing = addSetting(new BoolSetting("ping", true));
-    public final BoolSetting showEntityId = addSetting(new BoolSetting("entityId", false));
-    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.NONE));
-    public final BoolSetting background = addSetting(new BoolSetting("background", false));
-    public final BoolSetting border = addSetting(new BoolSetting("border", true));
-    public final DoubleSetting borderWidth = addSetting(new DoubleSetting("border width", 0.25, 0.11, 1));
+    public final BoolSetting self = addSetting(new BoolSetting("Self", false));
+    public final BoolSetting players = addSetting(new BoolSetting("Players", true));
+    public final BoolSetting hostiles = addSetting(new BoolSetting("Hostiles", false));
+    public final BoolSetting neutrals = addSetting(new BoolSetting("Neutrals", false));
+    public final BoolSetting passives = addSetting(new BoolSetting("Passives", false));
+    public final BoolSetting items = addSetting(new BoolSetting("Items", false));
+    public final BoolSetting tamed = addSetting(new BoolSetting("Tamed", false));
+    public final BoolSetting pearls = addSetting(new BoolSetting("Pearls", false));
+    public final BoolSetting showItems = addSetting(new BoolSetting("Equipment", true));
+    public final BoolSetting showHealth = addSetting(new BoolSetting("Health", false));
+    public final BoolSetting showGameMode = addSetting(new BoolSetting("Gamemode", false));
+    public final BoolSetting showPing = addSetting(new BoolSetting("Ping", true));
+    public final BoolSetting showEntityId = addSetting(new BoolSetting("EntityId", false));
+    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("Format", TextFormat.NONE));
+    public final BoolSetting background = addSetting(new BoolSetting("Background", false));
+    public final BoolSetting border = addSetting(new BoolSetting("Border", true));
+    public final DoubleSetting borderWidth = addSetting(new DoubleSetting("Width", 0.25, 0.11, 1));
 
     private final NametagFormatter formatter = new NametagFormatter(this);
 
@@ -59,7 +59,7 @@ public class NametagsModule extends Module {
     }
 
     public NametagsModule() {
-        super("nametags", "Draws nametags above certain entities.", ModuleCategory.of("visuals"));
+        super("Nametags", "Draws nametags above certain entities.", ModuleCategory.of("Visuals"));
     }
 
     @SubscribeEvent

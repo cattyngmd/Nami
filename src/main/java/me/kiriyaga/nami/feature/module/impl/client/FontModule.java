@@ -13,11 +13,11 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class FontModule extends Module {
 
-    public final IntSetting glyphSize = addSetting(new IntSetting("size", 9, 8, 12));
-    public final IntSetting oversample = addSetting(new IntSetting("oversample", 2, 2, 8));
+    public final IntSetting glyphSize = addSetting(new IntSetting("Size", 9, 8, 12));
+    public final IntSetting oversample = addSetting(new IntSetting("Oversample", 2, 2, 8));
 
     public FontModule() {
-        super("font", "Custom font renderer.", ModuleCategory.of("client"), "f", "customfont");
+        super("Font", "Custom font renderer.", ModuleCategory.of("Client"), "f", "customfont");
         oversample.setShow(false);
     }
 }

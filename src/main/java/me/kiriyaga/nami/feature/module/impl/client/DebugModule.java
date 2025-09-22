@@ -11,17 +11,17 @@ import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 @RegisterModule
 public class DebugModule extends Module {
 
-    private final BoolSetting aura = addSetting(new BoolSetting("aura", false));
-    private final BoolSetting ping = addSetting(new BoolSetting("ping", false));
-    private final BoolSetting speedrot = addSetting(new BoolSetting("speedrot", false));
-    private final BoolSetting peek = addSetting(new BoolSetting("peek", false));
-    private final BoolSetting deltafix = addSetting(new BoolSetting("deltafix", false));
-    private final BoolSetting rotdata = addSetting(new BoolSetting("rot data", false));
+    private final BoolSetting aura = addSetting(new BoolSetting("Aura", false));
+    private final BoolSetting ping = addSetting(new BoolSetting("Ping", false));
+    private final BoolSetting speedrot = addSetting(new BoolSetting("Speedrot", false));
+    private final BoolSetting peek = addSetting(new BoolSetting("Peek", false));
+    private final BoolSetting deltafix = addSetting(new BoolSetting("Deltafix", false));
+    private final BoolSetting rotdata = addSetting(new BoolSetting("RotData", false));
 
     private Integer savedSyncId = null;
 
     public DebugModule() {
-        super("debug", ".", ModuleCategory.of("client"), "debug");
+        super("Debug", ".", ModuleCategory.of("Client"), "debug");
     }
 
     public boolean debugAura(Text text){

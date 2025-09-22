@@ -8,6 +8,6 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 public class NoHitDelayModule extends Module {
 
     public NoHitDelayModule() {
-        super("no hit delay", "Removes vanilla hit delay which increases hit speed.", ModuleCategory.of("world"), "nohitdelay");
+        super("NoHitDelay", "Removes vanilla hit delay which increases hit speed.", ModuleCategory.of("World"), "nohitdelay");
     }
 }

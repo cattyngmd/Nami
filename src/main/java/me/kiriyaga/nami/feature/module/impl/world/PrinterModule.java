@@ -45,18 +45,18 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class PrinterModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 6.0));
-    public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 20));
-    private final IntSetting shiftTicks = addSetting(new IntSetting("shift ticks", 1, 1, 6));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 20));
+    private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 6));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;
 
     public PrinterModule() {
-        super("printer", "Simplified printer module, it uses air place only.", ModuleCategory.of("world"));
+        super("Printer", "Simplified printer module, it uses air place only.", ModuleCategory.of("World"));
     }
 
     @Override

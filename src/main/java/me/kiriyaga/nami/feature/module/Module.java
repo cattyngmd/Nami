@@ -30,8 +30,8 @@ public abstract class Module {
         this.aliases = aliases;
         this.category = category;
 
-        this.keyBind = new KeyBindSetting("bind", KeyBindSetting.KEY_NONE);
-        this.drawn = new BoolSetting("drawn", false);
+        this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
+        this.drawn = new BoolSetting("Drawn", false);
         this.drawn.setShow(false);
         addSetting(keyBind);
         addSetting(drawn);

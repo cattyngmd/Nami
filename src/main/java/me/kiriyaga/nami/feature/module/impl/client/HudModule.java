@@ -21,17 +21,17 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class HudModule extends Module {
 
-    public final BoolSetting chatAnimation = addSetting(new BoolSetting("chat animation", true));
-    public final BoolSetting shadow = addSetting(new BoolSetting("shadow", true));
-    public final BoolSetting bounce = addSetting(new BoolSetting("bounce", false));
-    public final IntSetting bounceSpeed = addSetting(new IntSetting("bounce speed", 5, 1, 20));
-    public final IntSetting bounceIntensity = addSetting(new IntSetting("bounce intensity", 30, 10, 100));
+    public final BoolSetting chatAnimation = addSetting(new BoolSetting("ChatAnimation", true));
+    public final BoolSetting shadow = addSetting(new BoolSetting("Shadow", true));
+    public final BoolSetting bounce = addSetting(new BoolSetting("Bounce", false));
+    public final IntSetting bounceSpeed = addSetting(new IntSetting("Speed", 5, 1, 20));
+    public final IntSetting bounceIntensity = addSetting(new IntSetting("Intensity", 30, 10, 100));
 
     private float bounceProgress = 0f;
     private boolean increasing = true;
 
     public HudModule() {
-        super("hud", "Renders in-game hud.", ModuleCategory.of("client"));
+        super("HUD", "Renders in-game hud.", ModuleCategory.of("Client"));
         bounceIntensity.setShowCondition(() -> bounce.get());
         bounceSpeed.setShowCondition(() -> bounce.get());
     }

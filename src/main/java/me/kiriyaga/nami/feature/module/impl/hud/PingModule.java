@@ -10,10 +10,10 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class PingModule extends HudElementModule {
 
-    public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
+    public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
 
     public PingModule() {
-        super("ping", "Displays current Ping.", 0, 0, 50, 9);
+        super("Ping", "Displays current Ping.", 0, 0, 50, 9);
     }
 
     @Override

@@ -21,12 +21,12 @@
             GAMMA, POTION
         }
 
-        public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.GAMMA));
-        public final DoubleSetting amount = addSetting(new DoubleSetting("amount", 2, 1, 25));
+        public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.GAMMA));
+        public final DoubleSetting amount = addSetting(new DoubleSetting("Amount", 2, 1, 25));
 
 
         public FullbrightModule() {
-            super("fullbright", "Modifies your game brightness", ModuleCategory.of("visuals"), "autogamma", "gamma", "autogmam");
+            super("Fullbright", "Modifies your game brightness", ModuleCategory.of("Visuals"), "autogamma", "gamma", "autogmam");
             amount.setShowCondition(() -> mode.get() == Mode.GAMMA);
         }
 

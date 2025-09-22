@@ -21,9 +21,9 @@ import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
 @RegisterModule
 public class FreecamModule extends Module {
-    private final DoubleSetting speed = addSetting(new DoubleSetting("speed", 0.5, 0.1, 5.0));
-    private final DoubleSetting accelerate = addSetting(new DoubleSetting("accelerate", 2.3, 1.0, 3.0));
-    private final BoolSetting look = addSetting(new BoolSetting("look", true));
+    private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 0.5, 0.1, 5.0));
+    private final DoubleSetting accelerate = addSetting(new DoubleSetting("Accelerate", 2.3, 1.0, 3.0));
+    private final BoolSetting look = addSetting(new BoolSetting("Look", true));
 
     private double currentFactor = 1.0;
     private long accelStartTime = -1;
@@ -40,7 +40,7 @@ public class FreecamModule extends Module {
     private boolean forward, back, left, right, up, down;
 
     public FreecamModule() {
-        super("freecam", "Fly around freely without moving your player.", ModuleCategory.of("visuals"), "freecum");
+        super("Freecam", "Fly around freely without moving your player.", ModuleCategory.of("Visuals"), "freecum");
     }
 
     @Override

@@ -33,17 +33,17 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 @RegisterModule
 public class AirPlaceModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 3.0, 2.0, 7.0));
-    public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
-    private final BoolSetting airOnly = addSetting(new BoolSetting("air only", false));
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.0, 2.0, 7.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 10));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    private final BoolSetting airOnly = addSetting(new BoolSetting("AirOnly", false));
 
     public int cooldown = 0;
     private BlockPos renderPos = null;
 
     public AirPlaceModule() {
-        super("air place", "Allows placing blocks mid-air.", ModuleCategory.of("world"), "airplace");
+        super("AirPlace", "Allows placing blocks mid-air.", ModuleCategory.of("World"), "airplace");
     }
 
     @Override

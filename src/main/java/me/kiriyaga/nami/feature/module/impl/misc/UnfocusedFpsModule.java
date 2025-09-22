@@ -8,9 +8,9 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 @RegisterModule
 public class UnfocusedFpsModule extends Module {
 
-    public final IntSetting limit = addSetting(new IntSetting("limit", 15, 5, 30));
+    public final IntSetting limit = addSetting(new IntSetting("Limit", 15, 5, 30));
 
     public UnfocusedFpsModule() {
-        super("unfocused fps", "Limits your frame generation while unfocused.", ModuleCategory.of("misc"), "unfocusedcpu");
+        super("UnfocusedFPS", "Limits your frame generation while unfocused.", ModuleCategory.of("Misc"), "unfocusedcpu");
     }
 }

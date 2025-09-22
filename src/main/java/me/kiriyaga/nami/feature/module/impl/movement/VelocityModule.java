@@ -38,23 +38,22 @@ public class VelocityModule extends Module {
         WALLS
     }
 
-    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("mode", Mode.WALLS));
-    private final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("horizontal", 100.0, 0.0, 100.0));
-    private final DoubleSetting verticalPercent = addSetting(new DoubleSetting("vertical", 100.0, 0.0, 100.0));
-    private final BoolSetting handleKnockback = addSetting(new BoolSetting("knockback", true));
-    private final BoolSetting handleExplosions = addSetting(new BoolSetting("explosion", true));
-    private final BoolSetting concealMotion = addSetting(new BoolSetting("conceal", false));
-    private final BoolSetting requireGround = addSetting(new BoolSetting("ground only", false));
-    private final BoolSetting cancelEntityPush = addSetting(new BoolSetting("entity push", true));
-    private final BoolSetting cancelBlockPush = addSetting(new BoolSetting("block push", true));
-    private final BoolSetting cancelLiquidPush = addSetting(new BoolSetting("liquid push", true));
-    private final BoolSetting cancelFishHook = addSetting(new BoolSetting("rod push", false));
+    private final EnumSetting<Mode> modeSetting = addSetting(new EnumSetting<>("Mode", Mode.WALLS));
+    private final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("Horizontal", 100.0, 0.0, 100.0));
+    private final DoubleSetting verticalPercent = addSetting(new DoubleSetting("Vertical", 100.0, 0.0, 100.0));
+    private final BoolSetting handleKnockback = addSetting(new BoolSetting("Knockback", true));
+    private final BoolSetting handleExplosions = addSetting(new BoolSetting("Explosion", true));
+    private final BoolSetting concealMotion = addSetting(new BoolSetting("Conceal", false));
+    private final BoolSetting requireGround = addSetting(new BoolSetting("GroundOnly", false));
+    private final BoolSetting cancelEntityPush = addSetting(new BoolSetting("EntityPush", true));
+    private final BoolSetting cancelBlockPush = addSetting(new BoolSetting("BlockPush", true));
+    private final BoolSetting cancelLiquidPush = addSetting(new BoolSetting("LiquidPush", true));
+    private final BoolSetting cancelFishHook = addSetting(new BoolSetting("RodPush", false));
 
     private boolean pendingConcealment = false;
 
     public VelocityModule() {
-        super("velocity", "Reduces or modifies incoming velocity effects.", ModuleCategory.of("movement"),
-                "antiknockback", "мудщсшен");
+        super("Velocity", "Reduces or modifies incoming velocity effects.", ModuleCategory.of("Movement"), "antiknockback", "мудщсшен");
     }
 
     @Override

@@ -9,10 +9,10 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 @RegisterModule
 public class AutoReconnectModule extends Module {
 
-    public final BoolSetting hardHide = addSetting(new BoolSetting("hard hide", false));
-    public final IntSetting delay = addSetting(new IntSetting("delay", 5, 0, 25));
+    public final BoolSetting hardHide = addSetting(new BoolSetting("HideMenu", false));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 5, 0, 80));
 
     public AutoReconnectModule() {
-        super("auto reconnect", "Automatically reconnects to the specified server.", ModuleCategory.of("misc"), "autoreconnect");
+        super("AutoReconnect", "Automatically reconnects to the specified server.", ModuleCategory.of("Misc"), "autoreconnect");
     }
 }

@@ -37,19 +37,19 @@ public class SkinBlinkModule extends Module {
         }
     }
 
-    public final BoolSetting head = addSetting(new BoolSetting("head", true));
-    public final BoolSetting body = addSetting(new BoolSetting("body", false));
-    public final BoolSetting arms = addSetting(new BoolSetting("arms", false));
-    public final BoolSetting legs = addSetting(new BoolSetting("legs", false));
-    public final DoubleSetting speed = addSetting(new DoubleSetting("speed", 1.0, 0.1, 20.0));
-    public final BoolSetting random = addSetting(new BoolSetting("random", false));
+    public final BoolSetting head = addSetting(new BoolSetting("Head", true));
+    public final BoolSetting body = addSetting(new BoolSetting("Body", false));
+    public final BoolSetting arms = addSetting(new BoolSetting("Arms", false));
+    public final BoolSetting legs = addSetting(new BoolSetting("Legs", false));
+    public final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.0, 0.1, 20.0));
+    public final BoolSetting random = addSetting(new BoolSetting("Random", false));
 
     private Set<PlayerModelPart> enabledPlayerModelParts;
     private long lastBlinkTime = 0;
     private final Random randomizer = new Random();
 
     public SkinBlinkModule() {
-        super("skin blink", "Blinks player model layer parts.", ModuleCategory.of("misc"), "skinblink");
+        super("SkinBlink", "Blinks player model layer parts.", ModuleCategory.of("Misc"), "skinblink");
     }
 
     @Override

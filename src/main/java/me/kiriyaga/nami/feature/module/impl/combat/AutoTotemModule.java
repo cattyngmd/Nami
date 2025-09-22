@@ -31,13 +31,13 @@ public class AutoTotemModule extends Module {
 
     private enum Offhand { CRYSTAL, GAPPLE, ITEMFRAME, MENDING}
 
-    private final IntSetting health = addSetting(new IntSetting("health", 12, 10, 36));
-    private final BoolSetting offhandOverride = addSetting(new BoolSetting("override", false));
-    private final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("item", Offhand.CRYSTAL));
-    private final BoolSetting fastSwap = addSetting(new BoolSetting("alternative", false));
-    private final BoolSetting mainhand = addSetting(new BoolSetting("mainhand", false));
-    private final IntSetting mainhandSlot = addSetting(new IntSetting("slot", 8, 0, 8));
-    private final BoolSetting deathLog = addSetting(new BoolSetting("log", false));
+    private final IntSetting health = addSetting(new IntSetting("Health", 12, 10, 36));
+    private final BoolSetting offhandOverride = addSetting(new BoolSetting("Override", false));
+    private final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("Item", Offhand.CRYSTAL));
+    private final BoolSetting fastSwap = addSetting(new BoolSetting("Alternative", false));
+    private final BoolSetting mainhand = addSetting(new BoolSetting("Mainhand", false));
+    private final IntSetting mainhandSlot = addSetting(new IntSetting("Slot", 8, 0, 8));
+    private final BoolSetting deathLog = addSetting(new BoolSetting("Log", false));
 
     private final Map<String, String> deathReasons = new ConcurrentHashMap<>();
 
@@ -46,7 +46,7 @@ public class AutoTotemModule extends Module {
     private int totemCount = 0;
 
     public AutoTotemModule() {
-        super("auto totem", "Automatically places totem in your hand.", ModuleCategory.of("combat"), "autototem");
+        super("AutoTotem", "Automatically places totem in your hand.", ModuleCategory.of("Combat"), "autototem");
         mainhandSlot.setShowCondition(mainhand::get);
         overrideItem.setShowCondition(offhandOverride::get);
     }

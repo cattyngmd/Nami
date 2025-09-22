@@ -29,7 +29,7 @@
         private final double SIMILARITY_THRESHOLD = 0.85;
 
         public AntiSpamModule() {
-            super("anti spam", "Automatically combines repeated chat messages.", ModuleCategory.of("misc"), "antispam");
+            super("AntiSpam", "Automatically combines repeated chat messages.", ModuleCategory.of("Misc"), "antispam");
         }
 
         @SubscribeEvent(priority = EventPriority.LOWEST)

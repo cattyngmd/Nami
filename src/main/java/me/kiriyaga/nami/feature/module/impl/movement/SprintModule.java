@@ -18,12 +18,12 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class SprintModule extends Module {
 
-    private final BoolSetting inLiquid = addSetting(new BoolSetting("in liquid", true));
+    private final BoolSetting inLiquid = addSetting(new BoolSetting("InLiquid", true));
 
     private int shouldSprintTicks = 0; // yes sorry
 
     public SprintModule() {
-        super("sprint", "Automatically makes you sprint while moving.", ModuleCategory.of("movement"));
+        super("Sprint", "Automatically makes you sprint while moving.", ModuleCategory.of("Movement"));
     }
 
     public void stopSprinting(int i) {

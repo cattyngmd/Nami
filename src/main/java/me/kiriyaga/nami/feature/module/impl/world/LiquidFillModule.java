@@ -46,18 +46,18 @@ public class LiquidFillModule extends Module {
     }
 
     // TODO: shift ticks
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 6.0));
-    public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
-    private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("liquid", LiquidType.BOTH));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 10));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("Liquid", LiquidType.BOTH));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;
 
     public LiquidFillModule() {
-        super("liquid fill", "Automatically fills nearby liquids with blocks.", ModuleCategory.of("world"), "liquidfill");
+        super("LiquidFill", "Automatically fills nearby liquids with blocks.", ModuleCategory.of("World"), "liquidfill");
     }
 
     @Override

@@ -32,18 +32,18 @@ public class ESPModule extends Module {
         BOX
     }
 
-    public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));
-    public final BoolSetting showPeacefuls = addSetting(new BoolSetting("peacefuls", true));
-    public final BoolSetting showNeutrals = addSetting(new BoolSetting("neutrals", false));
-    public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", false));
-    public final BoolSetting showItems = addSetting(new BoolSetting("items", true));
-    public final BoolSetting itemBoundingBox = addSetting(new BoolSetting("itemBoundingBox", true));
-    public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("mode", RenderMode.OUTLINE));
-    public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("distance", 52, 15, 256));
-    public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth", true));
+    public final BoolSetting showPlayers = addSetting(new BoolSetting("Players", true));
+    public final BoolSetting showPeacefuls = addSetting(new BoolSetting("Peacefuls", true));
+    public final BoolSetting showNeutrals = addSetting(new BoolSetting("Neutrals", false));
+    public final BoolSetting showHostiles = addSetting(new BoolSetting("Hostiles", false));
+    public final BoolSetting showItems = addSetting(new BoolSetting("Items", true));
+    public final BoolSetting itemBoundingBox = addSetting(new BoolSetting("ItemBoundingBox", true));
+    public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("Mode", RenderMode.OUTLINE));
+    public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("Distance", 52, 15, 256));
+    public final BoolSetting smoothAppear = addSetting(new BoolSetting("Smooth", true));
 
     public ESPModule() {
-        super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "wh", "boxes");
+        super("ESP", "Highlights certain entities.", ModuleCategory.of("Visuals"), "esp", "wh", "boxes");
         smoothAppear.setShowCondition(() -> (renderMode.get() == RenderMode.BOX || showItems.get() && itemBoundingBox.get()));
         outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
         itemBoundingBox.setShowCondition(() -> showItems.get());

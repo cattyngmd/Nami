@@ -8,6 +8,6 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 public class NameProtectModule extends Module {
 
     public NameProtectModule() {
-        super("name protect", "Changes client name on all client side accessible sides.", ModuleCategory.of("misc"), "nameprotect");
+        super("NameProtect", "Changes client name on all client side accessible sides.", ModuleCategory.of("Misc"), "nameprotect");
     }
 }

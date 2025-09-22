@@ -19,9 +19,9 @@ public class SpeedometerModule extends HudElementModule {
         KMH, BPS
     }
 
-    public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
-    public final IntSetting samples = addSetting(new IntSetting("samples", 80, 10, 200));
-    public final EnumSetting<SpeedMode> mode = addSetting(new EnumSetting<>("mode", SpeedMode.KMH));
+    public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
+    public final IntSetting samples = addSetting(new IntSetting("Samples", 80, 10, 200));
+    public final EnumSetting<SpeedMode> mode = addSetting(new EnumSetting<>("Mode", SpeedMode.KMH));
 
     private double speed = 0;
     private double[] speedSamples;
@@ -32,7 +32,7 @@ public class SpeedometerModule extends HudElementModule {
     private double lastZ = 0;
 
     public SpeedometerModule() {
-        super("speedometer", "Displays current player speed.", 0, 0, 50, 9);
+        super("Speedometer", "Displays current player speed.", 0, 0, 50, 9);
 
         samples.setOnChanged(() -> {
             speedSamples = new double[samples.get()];

@@ -44,22 +44,22 @@ public class AuraModule extends Module {
     public enum Rotate { NORMAL, HOLD}
     public enum Sprint { NONE, MOTION, PACKET }
 
-    public final DoubleSetting attackRange = addSetting(new DoubleSetting("range", 3.00, 1.0, 6.0));
-    public final BoolSetting vanillaRange = addSetting(new BoolSetting("vanilla range", true));
-    public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
-    public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("tps", TpsMode.NONE));
-    public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
-    public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("sprinting", Sprint.NONE));
-    public final BoolSetting raycast = addSetting(new BoolSetting("raycast", true));
-    public final BoolSetting raycastConfirm = addSetting(new BoolSetting("raycast confirm", true));
-    public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("rotate", Rotate.NORMAL));
-    public final BoolSetting render = addSetting(new BoolSetting("render", true));
+    public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
+    public final BoolSetting vanillaRange = addSetting(new BoolSetting("VanillaRange", true));
+    public final BoolSetting swordOnly = addSetting(new BoolSetting("WeapOnly", false));
+    public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", false));
+    public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("Sprinting", Sprint.NONE));
+    public final BoolSetting raycast = addSetting(new BoolSetting("Raycast", true));
+    public final BoolSetting raycastConfirm = addSetting(new BoolSetting("Confirm", true));
+    public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("Rotate", Rotate.NORMAL));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     private Entity currentTarget = null;
     private float attackCooldownTicks = 0f;
 
     public AuraModule() {
-        super("aura", "Attacks certain targets automatically.", ModuleCategory.of("combat"), "killaura", "ara", "killara");
+        super("Aura", "Attacks certain targets automatically.", ModuleCategory.of("Combat"), "killaura", "ara", "killara");
     raycastConfirm.setShowCondition(raycast::get);
     }
 

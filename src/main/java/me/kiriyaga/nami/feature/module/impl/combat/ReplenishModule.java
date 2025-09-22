@@ -20,14 +20,14 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class ReplenishModule extends Module {
 
-    private final IntSetting percentage = addSetting(new IntSetting("percentage", 20, 10, 50));
-    private final BoolSetting inScreen = addSetting(new BoolSetting("in screen", false));
+    private final IntSetting percentage = addSetting(new IntSetting("Percentage", 20, 10, 50));
+    private final BoolSetting inScreen = addSetting(new BoolSetting("InScreen", false));
 
     private final Map<Integer, Integer> hotbarTicks = new HashMap<>();
     private final Map<Integer, Item> lastHotbarItems = new HashMap<>();
 
     public ReplenishModule() {
-        super("replenish", "Automatically refills items in hotbar.", ModuleCategory.of("combat"));
+        super("Replenish", "Automatically refills items in hotbar.", ModuleCategory.of("Combat"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

@@ -11,10 +11,10 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class FacingModule extends HudElementModule {
 
-    public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
+    public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
 
     public FacingModule() {
-        super("facing", "Displays player facing direction.", 0, 0, 50, 9);
+        super("Facing", "Displays player facing direction.", 0, 0, 50, 9);
     }
 
     @Override

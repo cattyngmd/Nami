@@ -29,11 +29,11 @@ public class ModuleListModule extends HudElementModule {
     private int cachedWidth = 0;
     private int cachedHeight = 0;
 
-    public final BoolSetting showDisplayName = addSetting(new BoolSetting("show display", true));
-    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.DESCENDING));
+    public final BoolSetting showDisplayName = addSetting(new BoolSetting("ShowDisplay", true));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
 
     public ModuleListModule() {
-        super("module list", "Shows enabled and drawn modules.", 0, 0, 50, 10);
+        super("ModuleList", "Shows enabled and drawn modules.", 0, 0, 50, 10);
     }
 
     private static class ModuleAnimationState {

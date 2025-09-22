@@ -24,12 +24,12 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class AntiInteractModule extends Module {
 
-    public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name, WhitelistSetting.Type.BLOCK));
-    public final BoolSetting spawnPoint = addSetting(new BoolSetting("spawn point", true));
-    public final BoolSetting packet = addSetting(new BoolSetting("packet", false));
+    public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, this.name, WhitelistSetting.Type.BLOCK));
+    public final BoolSetting spawnPoint = addSetting(new BoolSetting("SpawnPoint", true));
+    public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
 
     public AntiInteractModule() {
-        super("anti interact", "Prevents you from interacting with certain blocks.", ModuleCategory.of("world"), "antiinteract");
+        super("AntiInteract", "Prevents you from interacting with certain blocks.", ModuleCategory.of("World"), "antiinteract");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

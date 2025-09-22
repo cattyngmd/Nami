@@ -19,11 +19,11 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class ClickPearlModule extends Module {
 
-    public final BoolSetting glideFirework = addSetting(new BoolSetting("glide firework", true));
-    private final KeyBindSetting pearlKey = addSetting(new KeyBindSetting("use", KeyBindSetting.KEY_NONE));
+    public final BoolSetting glideFirework = addSetting(new BoolSetting("GlideFirework", true));
+    private final KeyBindSetting pearlKey = addSetting(new KeyBindSetting("Use", KeyBindSetting.KEY_NONE));
 
     public ClickPearlModule() {
-        super("click pearl", "Throws a pearl on activation.", ModuleCategory.of("combat"), "clickpearl");
+        super("ClickPearl", "Throws a pearl on activation.", ModuleCategory.of("Combat"), "clickpearl");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

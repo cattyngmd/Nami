@@ -11,11 +11,11 @@ import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class HudEditorModule extends Module {
-    public final BoolSetting background = addSetting(new BoolSetting("background", false));
-    public final IntSetting backgroundAlpha = addSetting(new IntSetting("alpha", 50, 0, 255));
+    public final BoolSetting background = addSetting(new BoolSetting("Background", false));
+    public final IntSetting backgroundAlpha = addSetting(new IntSetting("Alpha", 50, 0, 255));
 
     public HudEditorModule() {
-        super("hud editor", "Opens HUD editor screen.", ModuleCategory.of("client"), "hudeditor", "hudedit", "he");
+        super("HUDEditor", "Opens HUD editor screen.", ModuleCategory.of("Client"), "hudeditor", "hudedit", "he");
         backgroundAlpha.setShowCondition(background::get);
     }
 

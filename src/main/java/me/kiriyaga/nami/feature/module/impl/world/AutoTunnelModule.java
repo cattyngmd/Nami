@@ -30,12 +30,12 @@ public class AutoTunnelModule extends Module {
 
     // TODO: corners
 
-    public final EnumSetting<TunnelMode> mode = addSetting(new EnumSetting<>("mode", TunnelMode.ONE_BY_TWO));
+    public final EnumSetting<TunnelMode> mode = addSetting(new EnumSetting<>("Mode", TunnelMode.ONE_BY_TWO));
 
     private final Set<BlockPos> targets = new HashSet<>();
 
     public AutoTunnelModule() {
-        super("auto tunnel", "Automatically tunnels blocks in front of you.", ModuleCategory.of("world"));
+        super("AutoTunnel", "Automatically tunnels blocks in front of you.", ModuleCategory.of("World"));
     }
 
     @Override

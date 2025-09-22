@@ -8,10 +8,10 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 @RegisterModule
 public class ReachModule extends Module {
 
-    public final DoubleSetting block = addSetting(new DoubleSetting("block", 1.00,0.00, 3.00));
-    public final DoubleSetting entity = addSetting(new DoubleSetting("entity", 0.00,0.00, 3.00));
+    public final DoubleSetting block = addSetting(new DoubleSetting("Block", 1.00,0.00, 3.00));
+    public final DoubleSetting entity = addSetting(new DoubleSetting("Entity", 0.00,0.00, 3.00));
 
     public ReachModule() {
-        super("reach", "Extends player reach values.", ModuleCategory.of("combat"));
+        super("Reach", "Extends player reach values.", ModuleCategory.of("Combat"));
     }
 }

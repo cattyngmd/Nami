@@ -20,11 +20,11 @@ public class TimeModule extends HudElementModule {
         GAME
     }
 
-    public final EnumSetting<TimeMode> mode = addSetting(new EnumSetting<>("mode", TimeMode.REAL));
-    public final BoolSetting grey = addSetting(new BoolSetting("grey", true));
+    public final EnumSetting<TimeMode> mode = addSetting(new EnumSetting<>("Mode", TimeMode.REAL));
+    public final BoolSetting grey = addSetting(new BoolSetting("Grey", true));
 
     public TimeModule() {
-        super("time", "Displays real or game time.", 0, 0, 50, 9);
+        super("Time", "Displays real or game time.", 0, 0, 50, 9);
     }
 
     @Override

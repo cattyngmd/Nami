@@ -8,6 +8,6 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 public class NoJumpDelayModule extends Module {
 
     public NoJumpDelayModule() {
-        super("no jump delay", "Removes vanilla jump delay which increases movement speed.", ModuleCategory.of("movement"), "nojumpdelay");
+        super("NoJumpDelay", "Removes vanilla jump delay which increases movement speed.", ModuleCategory.of("Movement"), "nojumpdelay");
     }
 }

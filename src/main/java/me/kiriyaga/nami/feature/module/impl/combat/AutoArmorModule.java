@@ -27,13 +27,13 @@ public class AutoArmorModule extends Module {
     private enum BootsPriority { LEATHER, GOLDEN, BEST }
     private enum HelmetPriority { BEST, TURTLE, GOLDEN, PUMPKIN, NONE }
 
-    private final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("protection", ProtectionPriority.PROT));
-    private final IntSetting damageThreshold = addSetting(new IntSetting("durability", 3, 1, 15));
-    private final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("helmet", HelmetPriority.BEST));
-    private final BoolSetting helmetSafety = addSetting(new BoolSetting("helmet safety", false));
-    private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("boots", BootsPriority.BEST));
-    private final BoolSetting elytraPriority = addSetting(new BoolSetting("elytra priority", false));
-    private final BoolSetting mendingRepair = addSetting(new BoolSetting("mending repair", false));
+    private final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("Protection", ProtectionPriority.PROT));
+    private final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 1, 15));
+    private final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("Helmet", HelmetPriority.BEST));
+    private final BoolSetting helmetSafety = addSetting(new BoolSetting("Safety", false));
+    private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("Boots", BootsPriority.BEST));
+    private final BoolSetting elytraPriority = addSetting(new BoolSetting("ElytraPriority", false));
+    private final BoolSetting mendingRepair = addSetting(new BoolSetting("MendingRepair", false));
 
     private static final Set<Item> ARMOR_ITEMS_HEAD = Set.of(Items.LEATHER_HELMET, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET, Items.TURTLE_HELMET, Items.CARVED_PUMPKIN);
     private static final Set<Item> ARMOR_ITEMS_CHEST = Set.of(Items.LEATHER_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE, Items.ELYTRA);
@@ -41,7 +41,7 @@ public class AutoArmorModule extends Module {
     private static final Set<Item> ARMOR_ITEMS_FEET = Set.of(Items.LEATHER_BOOTS, Items.GOLDEN_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS);
 
     public AutoArmorModule() {
-        super("auto armor", "Automatically equips best armor.", ModuleCategory.of("combat"), "autoarmor");
+        super("AutoArmor", "Automatically equips best armor.", ModuleCategory.of("Combat"), "autoarmor");
         helmetSafety.setShowCondition(() -> helmetSetting.get() == HelmetPriority.NONE);
     }
 

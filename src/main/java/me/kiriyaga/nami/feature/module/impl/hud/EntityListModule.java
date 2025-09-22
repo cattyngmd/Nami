@@ -28,12 +28,12 @@ public class EntityListModule extends HudElementModule {
     private long lastUpdateTime = 0;
     private final long updateIntervalMs = 3000;
 
-    private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("whitelist", false, this.name, WhitelistSetting.Type.ENTITY));
-    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.descending));
-    public final BoolSetting onlyLiving = addSetting(new BoolSetting("only living", false));
+    private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("Whitelist", false, this.name, WhitelistSetting.Type.ENTITY));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.descending));
+    public final BoolSetting onlyLiving = addSetting(new BoolSetting("OnlyLiving", false));
 
     public EntityListModule() {
-        super("entity list", "Shows nearby entities", 0, 0, 50, 10);
+        super("EntityList", "Shows nearby entities", 0, 0, 50, 10);
     }
 
     @Override

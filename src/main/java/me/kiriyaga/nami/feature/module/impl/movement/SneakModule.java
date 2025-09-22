@@ -33,7 +33,7 @@ public class SneakModule extends Module {
 
     private final Map<BlockPos, Color> checkedBlocks = new HashMap<>();
 
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.always));
+    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.always));
     //private final BoolSetting render = addSetting(new BoolSetting("render", false));
     //private final DoubleSetting edgeThreshold = addSetting(new DoubleSetting("EDGE_THRESHOLD", 0.2, 0.2, 1.4));
 
@@ -41,7 +41,7 @@ public class SneakModule extends Module {
     private static final int CHECK_RADIUS = 1;
 
     public SneakModule() {
-        super("sneak", "Automatically makes you sneak.", ModuleCategory.of("movement"));
+        super("Sneak", "Automatically makes you sneak.", ModuleCategory.of("Movement"));
     }
 
     @Override

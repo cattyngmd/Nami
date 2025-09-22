@@ -34,13 +34,13 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class SearchModule extends Module {
 
-    private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));
-    private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 4, 2, 5));
-    private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 1, 0, 2));
-    private final WhitelistSetting blockList = addSetting(new WhitelistSetting("blocklist", false, this.name, WhitelistSetting.Type.BLOCK));
-    private final BoolSetting storages = addSetting(new BoolSetting("storages", true));
-    private final BoolSetting notifier = addSetting(new BoolSetting("notifier", false));
-    private final BoolSetting notAtSpawn = addSetting(new BoolSetting("not at spawn", false));
+    private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("LazyLoad", true));
+    private final IntSetting chunksPerTick = addSetting(new IntSetting("Count", 4, 2, 5));
+    private final IntSetting cooldownTicks = addSetting(new IntSetting("Delay", 1, 0, 2));
+    private final WhitelistSetting blockList = addSetting(new WhitelistSetting("BlockList", false, this.name, WhitelistSetting.Type.BLOCK));
+    private final BoolSetting storages = addSetting(new BoolSetting("Storages", true));
+    private final BoolSetting notifier = addSetting(new BoolSetting("Notifier", false));
+    private final BoolSetting notAtSpawn = addSetting(new BoolSetting("NotAtSpawn", false));
 
     private static final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
     private final Queue<Chunk> pendingChunks = new LinkedList<>();
@@ -51,7 +51,7 @@ public class SearchModule extends Module {
     private int tickCounter = 0;
 
     public SearchModule() {
-        super("search", "Search certain blocks on loaded chunks.", ModuleCategory.of("visuals"), "srcj", "blockesp", "serch");
+        super("Search", "Search certain blocks on loaded chunks.", ModuleCategory.of("Visuals"), "srcj", "blockesp", "serch");
         blockList.setOnChanged(this::reloadChunksAroundPlayer);
         storages.setOnChanged(this::reloadChunksAroundPlayer);
         notAtSpawn.setOnChanged(this::reloadChunksAroundPlayer);

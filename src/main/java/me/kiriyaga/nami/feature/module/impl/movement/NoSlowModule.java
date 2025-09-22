@@ -21,14 +21,14 @@ public class NoSlowModule extends Module {
         VANILLA, ACCEL
     }
 
-    public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("mode", SlowMode.ACCEL));
-    public final BoolSetting fastCrawl = addSetting(new BoolSetting("fast crawl", false));
+    public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("Mode", SlowMode.ACCEL));
+    public final BoolSetting fastCrawl = addSetting(new BoolSetting("FastCrawl", false));
     //private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
-    private final BoolSetting onlyOnGround = addSetting(new BoolSetting("only on ground", true));
+    private final BoolSetting onlyOnGround = addSetting(new BoolSetting("OnlyOnGround", true));
 
 
     public NoSlowModule() {
-        super("no slow", "Reduces slowdown effect caused on player.", ModuleCategory.of("movement"), "noslow");
+        super("NoSlow", "Reduces slowdown effect caused on player.", ModuleCategory.of("Movement"), "noslow");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

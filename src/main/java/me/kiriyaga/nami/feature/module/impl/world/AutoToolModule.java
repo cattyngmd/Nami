@@ -29,11 +29,11 @@ public class AutoToolModule extends Module {
         FORTUNE, SILK
     }
 
-    public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("echest", EchestPriority.SILK));
-    private final IntSetting damageThreshold = addSetting(new IntSetting("durability", 3, 0, 15));
+    public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
+    private final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
     public AutoToolModule() {
-        super("auto tool", "Auto selects the currently best mining tool from your hotbar.", ModuleCategory.of("world"), "autotool");
+        super("AutoTool", "Auto selects the currently best mining tool from your hotbar.", ModuleCategory.of("World"), "autotool");
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

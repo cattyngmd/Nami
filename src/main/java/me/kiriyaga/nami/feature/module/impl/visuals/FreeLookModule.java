@@ -15,11 +15,11 @@ public class FreeLookModule extends Module {
 
     private Perspective previousPerspective;
 
-    public DoubleSetting sensivity = addSetting(new DoubleSetting("sensivity", 5, 2, 15));
+    public DoubleSetting sensivity = addSetting(new DoubleSetting("Sensivity", 5, 2, 15));
 
 
     public FreeLookModule() {
-        super("free look", "Look around freely without moving your real yaw/pitch.", ModuleCategory.of("visuals"), "freelook", "freelok", "third");
+        super("FreeLook", "Look around freely without moving your real yaw/pitch.", ModuleCategory.of("Visuals"), "freelook", "freelok", "third");
     }
 
     @Override

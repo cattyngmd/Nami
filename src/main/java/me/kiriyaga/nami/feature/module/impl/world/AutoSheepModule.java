@@ -23,15 +23,15 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class AutoSheepModule extends Module {
 
-    private final DoubleSetting shearRange = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
-    private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
+    private final DoubleSetting shearRange = addSetting(new DoubleSetting("Range", 2, 1.0, 5.0));
+    private final IntSetting delay = addSetting(new IntSetting("Delay", 5, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
     private int swapCooldown = 0;
 
     public AutoSheepModule() {
-        super("auto sheep", "Automatically shears nearby sheep.", ModuleCategory.of("world"), "sheep", "autowool");
+        super("AutoSheep", "Automatically shears nearby sheep.", ModuleCategory.of("World"), "sheep", "autowool");
     }
 
     @SubscribeEvent

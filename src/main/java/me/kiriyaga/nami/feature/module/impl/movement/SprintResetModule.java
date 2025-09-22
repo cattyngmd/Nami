@@ -11,10 +11,10 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 @RegisterModule
 public class SprintResetModule extends Module {
 
-    private final IntSetting chance = addSetting(new IntSetting("chance", 100, 0, 100));
+    private final IntSetting chance = addSetting(new IntSetting("Chance", 100, 0, 100));
 
     public SprintResetModule() {
-        super("sprint reset", "Control how sprint resets after attacking.", ModuleCategory.of("movement"), "sprintreset");
+        super("SprintReset", "Control how sprint resets after attacking.", ModuleCategory.of("Movement"), "sprintreset");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

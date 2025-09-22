@@ -12,10 +12,10 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class DurabilityModule extends HudElementModule {
 
-    public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
+    public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
 
     public DurabilityModule() {
-        super("durability", "Displays item durability in main hand.", 0, 0, 50, 9);
+        super("Durability", "Displays item durability in main hand.", 0, 0, 50, 9);
     }
 
     @Override

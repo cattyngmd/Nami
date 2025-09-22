@@ -24,13 +24,13 @@ import java.util.concurrent.TimeUnit;
 import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
-public class NoSoundLagModule extends Module {
+public class NoSoundLagModule extends Module { // TODO whitelist sounds
 
-    public final BoolSetting always = addSetting(new BoolSetting("always", false));
-    public final BoolSetting armor = addSetting(new BoolSetting("armor", true));
-    public final BoolSetting withers = addSetting(new BoolSetting("withers", true));
-    public final BoolSetting firework = addSetting(new BoolSetting("firework", false));
-    public final BoolSetting elytra = addSetting(new BoolSetting("elytra", true));
+    public final BoolSetting always = addSetting(new BoolSetting("Always", false));
+    public final BoolSetting armor = addSetting(new BoolSetting("Armor", true));
+    public final BoolSetting withers = addSetting(new BoolSetting("Withers", true));
+    public final BoolSetting firework = addSetting(new BoolSetting("Firework", false));
+    public final BoolSetting elytra = addSetting(new BoolSetting("Elytra", true));
 
     private static final Set<RegistryEntry<SoundEvent>> ARMOR_SOUNDS = Sets.newHashSet(
             SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
@@ -71,7 +71,7 @@ public class NoSoundLagModule extends Module {
     private long lastClearTime = System.currentTimeMillis();
 
     public NoSoundLagModule() {
-        super("no sound lag", "Sound tweaks.", ModuleCategory.of("misc"), "nosoundlag");
+        super("NoSoundLag", "Sound tweaks.", ModuleCategory.of("Misc"), "nosoundlag");
         elytra.setShowCondition(always::get );
     }
 

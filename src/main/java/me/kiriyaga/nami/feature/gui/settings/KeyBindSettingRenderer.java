@@ -46,7 +46,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         int textY = y + (HEIGHT - 8) / 2;
 
         String nameStr = hovered
-                ? (setting.isHoldMode() ? "hold" : "toggle")
+                ? (setting.isHoldMode() ? "Hold" : "Toggle")
                 : setting.getName();
 
         FONT_MANAGER.drawText(
@@ -60,7 +60,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
         String valueStr;
         if (waitingForKeyBind == setting) {
-            valueStr = "listening...";
+            valueStr = "Listening...";
         } else {
             String keyName = KeyUtils.getKeyName(setting.get());
             //valueStr = (setting.isHoldMode() ? "hold: " : "toggle: ") + keyName;

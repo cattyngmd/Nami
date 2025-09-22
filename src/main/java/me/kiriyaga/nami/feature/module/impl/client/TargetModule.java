@@ -11,22 +11,22 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 @RegisterModule
 public class TargetModule extends Module {
 
-    public final IntSetting maxIdleTicks = addSetting(new IntSetting("max idle ticks", 500, 250, 750));
-    public final DoubleSetting targetRange = addSetting(new DoubleSetting("target range", 5.0, 4.0, 16.0));
-    public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("target age", 12, 0.0, 20.0));
-    public final BoolSetting targetPlayers = addSetting(new BoolSetting("target players", true));
-    public final BoolSetting targetHostiles = addSetting(new BoolSetting("target hostiles", true));
-    public final BoolSetting targetNeutrals = addSetting(new BoolSetting("target neutrals", false));
-    public final BoolSetting targetPassives = addSetting(new BoolSetting("target passives", false));
-    public final BoolSetting targetPrijectiles = addSetting(new BoolSetting("target projectiles", true));
-    public final EnumSetting<TargetPriority> priority = addSetting(new EnumSetting<>("priority", TargetPriority.SMART));
+    public final IntSetting maxIdleTicks = addSetting(new IntSetting("IdleTicks", 500, 250, 750));
+    public final DoubleSetting targetRange = addSetting(new DoubleSetting("Range", 5.0, 4.0, 16.0));
+    public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("Age", 12, 0.0, 20.0));
+    public final BoolSetting targetPlayers = addSetting(new BoolSetting("Players", true));
+    public final BoolSetting targetHostiles = addSetting(new BoolSetting("Hostiles", true));
+    public final BoolSetting targetNeutrals = addSetting(new BoolSetting("Neutrals", false));
+    public final BoolSetting targetPassives = addSetting(new BoolSetting("Passives", false));
+    public final BoolSetting targetPrijectiles = addSetting(new BoolSetting("Projectiles", true));
+    public final EnumSetting<TargetPriority> priority = addSetting(new EnumSetting<>("Priority", TargetPriority.SMART));
 
     public enum TargetPriority {
         DISTANCE, HEALTH, SMART
     }
 
     public TargetModule() {
-        super("target", "Allows you to configure target logic.", ModuleCategory.of("client"), "entity", "entitymanager", "enity");
+        super("Target", "Allows you to configure target logic.", ModuleCategory.of("Client"), "entity", "entitymanager", "enity");
         if (!this.isEnabled())
             this.toggle();
 

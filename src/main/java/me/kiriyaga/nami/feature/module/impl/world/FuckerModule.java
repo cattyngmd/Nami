@@ -25,13 +25,13 @@ public class FuckerModule extends Module {
         GRASS
     }
 
-    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.FARM));
-    public final IntSetting radius = addSetting(new IntSetting("radius", 3, 1, 6));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.FARM));
+    public final IntSetting radius = addSetting(new IntSetting("Radius", 3, 1, 6));
 
     private final Set<BlockPos> s = new HashSet<>();
 
     public FuckerModule() {
-        super("fucker", "Automatically breaks selected type of blocks around you.", ModuleCategory.of("world"));
+        super("Fucker", "Automatically breaks selected type of blocks around you.", ModuleCategory.of("World"));
     }
 
     @Override

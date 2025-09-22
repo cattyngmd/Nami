@@ -16,32 +16,32 @@ public class NoRenderModule extends Module {
 
 
 
-    public final BoolSetting noTilt = addSetting(new BoolSetting("no tilt", true));
-    public final BoolSetting noBob = addSetting(new BoolSetting("no bob", true));
-    public final BoolSetting portalGui = addSetting(new BoolSetting("portal gui", true));
-    public final BoolSetting noFire = addSetting(new BoolSetting("fire", true));
-    public final BoolSetting noBackground = addSetting(new BoolSetting("background", true));
-    public final BoolSetting noTotemParticle = addSetting(new BoolSetting("totem particle", false));
-    public final BoolSetting noPotionParticle = addSetting(new BoolSetting("potion particle", false));
-    public final BoolSetting noFirework = addSetting(new BoolSetting("firework", false));
-    public final BoolSetting noWaterParticle = addSetting(new BoolSetting("water particle", true));
-    public final BoolSetting noExplosion = addSetting(new BoolSetting("explosion particle", true));
-    public final BoolSetting noBlockBreak = addSetting(new BoolSetting("block break", false));
-    public final BoolSetting noLiguid = addSetting(new BoolSetting("liquid", false));
-    public final BoolSetting noWall = addSetting(new BoolSetting("wall", false));
-    public final BoolSetting noVignette = addSetting(new BoolSetting("vignette", true));
-    public final BoolSetting noTotem = addSetting(new BoolSetting("totem", true));
-    public final BoolSetting noBossBar = addSetting(new BoolSetting("boss", true));
-    public final BoolSetting noPortal = addSetting(new BoolSetting("portal", true));
-    public final BoolSetting noPotIcon = addSetting(new BoolSetting("potion icon", true));
-    public final BoolSetting noFog = addSetting(new BoolSetting("fog", true));
-    public final BoolSetting noArmor = addSetting(new BoolSetting("armor", true));
-    public final BoolSetting noNausea = addSetting(new BoolSetting("nausea", true));
-    public final BoolSetting noPumpkin = addSetting(new BoolSetting("pumpkin", false));
-    public final BoolSetting noPowderedSnow = addSetting(new BoolSetting("powdered snow", false));
+    public final BoolSetting noTilt = addSetting(new BoolSetting("NoTilt", true));
+    public final BoolSetting noBob = addSetting(new BoolSetting("NoBob", true));
+    public final BoolSetting portalGui = addSetting(new BoolSetting("PortalGui", true));
+    public final BoolSetting noFire = addSetting(new BoolSetting("NoFire", true));
+    public final BoolSetting noBackground = addSetting(new BoolSetting("NoBackground", true));
+    public final BoolSetting noTotemParticle = addSetting(new BoolSetting("NoPopParticle", false));
+    public final BoolSetting noPotionParticle = addSetting(new BoolSetting("NoPotParticle", false));
+    public final BoolSetting noFirework = addSetting(new BoolSetting("NoFirework", false));
+    public final BoolSetting noWaterParticle = addSetting(new BoolSetting("NoWaterParticle", true));
+    public final BoolSetting noExplosion = addSetting(new BoolSetting("NoExplosion", true));
+    public final BoolSetting noBlockBreak = addSetting(new BoolSetting("NoBreakParticle", false));
+    public final BoolSetting noLiguid = addSetting(new BoolSetting("NoLiquid", false));
+    public final BoolSetting noWall = addSetting(new BoolSetting("NoWall", false));
+    public final BoolSetting noVignette = addSetting(new BoolSetting("NoVignette", true));
+    public final BoolSetting noTotem = addSetting(new BoolSetting("NoTotem", true));
+    public final BoolSetting noBossBar = addSetting(new BoolSetting("NoBoss", true));
+    public final BoolSetting noPortal = addSetting(new BoolSetting("NoPortalGui", true));
+    public final BoolSetting noPotIcon = addSetting(new BoolSetting("NoPotIcon", true));
+    public final BoolSetting noFog = addSetting(new BoolSetting("NoFog", true));
+    public final BoolSetting noArmor = addSetting(new BoolSetting("NoArmor", true));
+    public final BoolSetting noNausea = addSetting(new BoolSetting("NoNausea", true));
+    public final BoolSetting noPumpkin = addSetting(new BoolSetting("NoPumpkin", false));
+    public final BoolSetting noPowderedSnow = addSetting(new BoolSetting("NoPowdered", false));
 
     public NoRenderModule() {
-        super("no render", "Prevent rendering certain overlays/effects.", ModuleCategory.of("visuals"), "norender");
+        super("NoRender", "Prevent rendering certain overlays/effects.", ModuleCategory.of("Visuals"), "norender");
         noFire.setOnChanged(this::reloadRenderer);
         noBackground.setOnChanged(this::reloadRenderer);
         noLiguid.setOnChanged(this::reloadRenderer);

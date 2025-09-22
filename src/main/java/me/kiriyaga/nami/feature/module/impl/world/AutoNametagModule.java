@@ -25,16 +25,16 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class AutoNametagModule extends Module {
 
-    private final BoolSetting nametagged = addSetting(new BoolSetting("nametagged", false));
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 10.0));
-    private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
+    private final BoolSetting nametagged = addSetting(new BoolSetting("Nametagged", false));
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 10.0));
+    private final IntSetting delay = addSetting(new IntSetting("Delay", 10, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
     private int swapCooldown = 0;
 
     public AutoNametagModule() {
-        super("auto nametag", "Automatically renames nearby entities with nametags.", ModuleCategory.of("world"), "nametag", "autoname", "autonametag");
+        super("AutoNametag", "Automatically renames nearby entities with nametags.", ModuleCategory.of("World"), "nametag", "autoname", "autonametag");
     }
 
     @SubscribeEvent

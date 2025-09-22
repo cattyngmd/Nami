@@ -7,6 +7,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.util.InputCache;
@@ -22,10 +23,11 @@ public class SpeedModule extends Module {
         ROTATION
     }
 
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.ROTATION));
+    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.ROTATION));
+    private final BoolSetting inLiquid = addSetting(new BoolSetting("InWater", true));
 
     public SpeedModule() {
-        super("speed", "Increases movement speed.", ModuleCategory.of("movement"));
+        super("Speed", "Increases movement speed.", ModuleCategory.of("Movement"));
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -35,6 +37,9 @@ public class SpeedModule extends Module {
         if (MC.player.isCrawling() || MC.player.isInSneakingPose() || MC.player.isSneaking() || MC.player.isGliding())
             return; // this fallback need due to sprinting not apply for theese states
         // also we do not need swimming because swimming do apply speed for sprinitng
+
+        if (!inLiquid.get() && MC.player.isTouchingWater())
+            return;
 
         this.setDisplayInfo(mode.get().toString());
 

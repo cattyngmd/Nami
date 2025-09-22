@@ -8,6 +8,6 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 public class NoBreakDelayModule extends Module {
 
     public NoBreakDelayModule() {
-        super("no break delay", "Removes vanilla break delay which increases break speed.", ModuleCategory.of("world"), "nobreakdelay");
+        super("NoBreakDelay", "Removes vanilla break delay which increases break speed.", ModuleCategory.of("World"), "nobreakdelay");
     }
 }

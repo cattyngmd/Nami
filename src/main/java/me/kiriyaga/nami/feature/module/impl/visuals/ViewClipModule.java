@@ -15,13 +15,13 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class ViewClipModule extends Module {
 
-    public final DoubleSetting distance = addSetting(new DoubleSetting("distance", 3.5, 1, 9));
-    public final BoolSetting animate = addSetting(new BoolSetting("animation", true));
+    public final DoubleSetting distance = addSetting(new DoubleSetting("Distance", 3.5, 1, 9));
+    public final BoolSetting animate = addSetting(new BoolSetting("Animation", true));
 
     private float currentDistance = 3.5f;
 
     public ViewClipModule() {
-        super("view clip", "Disables block clipping and extends camera distance.", ModuleCategory.of("visuals"), "viewclip");
+        super("ViewClip", "Disables block clipping and extends camera distance.", ModuleCategory.of("Visuals"), "viewclip");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

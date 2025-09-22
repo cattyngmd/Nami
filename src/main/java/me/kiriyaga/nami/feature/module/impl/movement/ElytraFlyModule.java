@@ -33,29 +33,29 @@ public class ElytraFlyModule extends Module {
         BOUNCE, CONTROL, GLIDE
     }
 
-    public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("mode", FlyMode.BOUNCE));
+    public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("Mode", FlyMode.BOUNCE));
 
     // GLIDE
-    private final IntSetting targetY = addSetting(new IntSetting("targetY", 180, 60, 600));
-    private final IntSetting vLow = addSetting(new IntSetting("min speed", 14, 6, 40));
-    private final IntSetting vHigh = addSetting(new IntSetting("max speed", 27, 10, 60));
-    private final IntSetting climbPitch = addSetting(new IntSetting("climb pitch", 40, 0, 60));
-    private final IntSetting divePitch = addSetting(new IntSetting("dive pitch", 38, 20, 60));
-    private final IntSetting cruiseMin = addSetting(new IntSetting("cruise min", 4, 0, 20));
-    private final IntSetting cruiseMax = addSetting(new IntSetting("cruise max", 12, 2, 25));
-    private final BoolSetting allowRockets = addSetting(new BoolSetting("allow rockets", true));
-    private final IntSetting rocketSpeed = addSetting(new IntSetting("rocket below", 9, 0, 30));
+    private final IntSetting targetY = addSetting(new IntSetting("TargetY", 180, 60, 600));
+    private final IntSetting vLow = addSetting(new IntSetting("MinSpeed", 14, 6, 40));
+    private final IntSetting vHigh = addSetting(new IntSetting("MaxSpeed", 27, 10, 60));
+    private final IntSetting climbPitch = addSetting(new IntSetting("ClimbPitch", 40, 0, 60));
+    private final IntSetting divePitch = addSetting(new IntSetting("DivePitch", 38, 20, 60));
+    private final IntSetting cruiseMin = addSetting(new IntSetting("CruiseMin", 4, 0, 20));
+    private final IntSetting cruiseMax = addSetting(new IntSetting("CruiseMax", 12, 2, 25));
+    private final BoolSetting allowRockets = addSetting(new BoolSetting("AllowRockets", true));
+    private final IntSetting rocketSpeed = addSetting(new IntSetting("RocketBelow", 9, 0, 30));
 
     //
     // CONTROL
     //private final BoolSetting midAirFreeze = addSetting(new BoolSetting("mid air freeze", false));
-    private final BoolSetting lockPitch = addSetting(new BoolSetting("lock pitch", true));
+    private final BoolSetting lockPitch = addSetting(new BoolSetting("LockPitch", true));
 
     // BOOST
-    private final BoolSetting boost = addSetting(new BoolSetting("boost", false));
-    private final BoolSetting newBoost = addSetting(new BoolSetting("new boost", false));
-    private final BoolSetting pitch = addSetting(new BoolSetting("pitch", true));
-    private final IntSetting pitchDegree = addSetting(new IntSetting("pitch", 75, 0, 90));
+    private final BoolSetting boost = addSetting(new BoolSetting("Boost", false));
+    private final BoolSetting newBoost = addSetting(new BoolSetting("NewBoost", false));
+    private final BoolSetting pitch = addSetting(new BoolSetting("Pitch", true));
+    private final IntSetting pitchDegree = addSetting(new IntSetting("Pitch", 75, 0, 90));
 
     private enum GlideState { DIVE, CRUISE, CLIMB }
     private GlideState glideState = GlideState.CRUISE;
@@ -71,7 +71,7 @@ public class ElytraFlyModule extends Module {
     private boolean climbingToTarget = false;
 
     public ElytraFlyModule() {
-        super("elytra fly", "Improves elytra flying.", ModuleCategory.of("movement"), "elytrafly");
+        super("ElytraFly", "Improves elytra flying.", ModuleCategory.of("Movement"), "elytrafly");
         boost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);

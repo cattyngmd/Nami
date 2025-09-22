@@ -18,7 +18,7 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class AutoSignModule extends Module {
 
-    private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
+    private final IntSetting delay = addSetting(new IntSetting("Delay", 5, 1, 20));
 
     private String[] cachedText = null;
     private AbstractSignEditScreen currentScreen = null;
@@ -28,7 +28,7 @@ public class AutoSignModule extends Module {
     private boolean isReplacingPacket = false;  // stackoverflow lol
 
     public AutoSignModule() {
-        super("auto sign", "Automatically fills signs.", ModuleCategory.of("world"), "sign", "autosign");
+        super("AutoSign", "Automatically fills signs.", ModuleCategory.of("World"), "sign", "autosign");
     }
 
     @Override

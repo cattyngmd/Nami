@@ -17,11 +17,11 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class JoinAnnounceModule extends Module {
 
-    public final BoolSetting everyone = addSetting(new BoolSetting("everyone", false));
-    public final BoolSetting friends = addSetting(new BoolSetting("friends", true));
+    public final BoolSetting everyone = addSetting(new BoolSetting("Everyone", false));
+    public final BoolSetting friends = addSetting(new BoolSetting("Friends", true));
 
     public JoinAnnounceModule() {
-        super("join announce", "Announces in chat when a certain player joins the server.", ModuleCategory.of("misc"), "joinannounce", "joins", "announce");
+        super("JoinAnnounce", "Announces in chat when a certain player joins the server.", ModuleCategory.of("Misc"), "joinannounce", "joins", "announce");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

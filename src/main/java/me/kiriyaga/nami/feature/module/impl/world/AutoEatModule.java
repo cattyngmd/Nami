@@ -24,17 +24,17 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class AutoEatModule extends Module {
 
-    private final IntSetting swapDelayTicksSetting = addSetting(new IntSetting("delay", 5, 1, 20));
-    private final DoubleSetting minHunger = addSetting(new DoubleSetting("hunger", 19.0, 0.0, 19.0));
-    private final DoubleSetting minHealth = addSetting(new DoubleSetting("health", 0.0, 0.0, 19.0));
-    private final BoolSetting allowGapples = addSetting(new BoolSetting("gapples", true));
-    private final BoolSetting allowPoisoned = addSetting(new BoolSetting("poisoned", false));
+    private final IntSetting swapDelayTicksSetting = addSetting(new IntSetting("Delay", 5, 1, 20));
+    private final DoubleSetting minHunger = addSetting(new DoubleSetting("Hunger", 19.0, 0.0, 19.0));
+    private final DoubleSetting minHealth = addSetting(new DoubleSetting("Health", 0.0, 0.0, 19.0));
+    private final BoolSetting allowGapples = addSetting(new BoolSetting("Gapples", true));
+    private final BoolSetting allowPoisoned = addSetting(new BoolSetting("Poisoned", false));
 
     public final AtomicBoolean eating = new AtomicBoolean(false);
     private volatile int swapCooldown = 0;
 
     public AutoEatModule() {
-        super("auto eat", "Automatically eats best food.", ModuleCategory.of("world"), "autoeat");
+        super("AutoEat", "Automatically eats best food.", ModuleCategory.of("World"), "autoeat");
     }
 
     @Override

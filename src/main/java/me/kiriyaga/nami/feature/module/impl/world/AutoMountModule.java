@@ -23,15 +23,15 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class AutoMountModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 10.0));
-    private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 2, 1.0, 10.0));
+    private final IntSetting delay = addSetting(new IntSetting("Delay", 10, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
 
     private int actionCooldown = 0;
 
     public AutoMountModule() {
-        super("auto mount", "Automatically mounts nearby entities.", ModuleCategory.of("world"), "mount", "automount");
+        super("auto mount", "Automatically mounts nearby entities.", ModuleCategory.of("World"), "mount", "automount");
     }
 
     @SubscribeEvent

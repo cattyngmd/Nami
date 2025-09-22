@@ -25,12 +25,12 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class BowAimModule extends Module {
 
-    public final BoolSetting render = addSetting(new BoolSetting("render", true));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     private Entity currentTarget = null;
 
     public BowAimModule() {
-        super("bow aim", "Aims at certain targets with bow/trident.", ModuleCategory.of("combat"), "bowbot", "aimbot", "bowaimbot");
+        super("BowAim", "Aims at certain targets with bow/trident.", ModuleCategory.of("Combat"), "bowbot", "aimbot", "bowaimbot");
     }
 
     @Override

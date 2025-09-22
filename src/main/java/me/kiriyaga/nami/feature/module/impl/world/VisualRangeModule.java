@@ -22,12 +22,12 @@ public class VisualRangeModule extends Module {
         BELL, EXP
     }
 
-    private final BoolSetting friends = addSetting(new BoolSetting("friends", false));
-    private final BoolSetting sound = addSetting(new BoolSetting("sound", false));
-    private final EnumSetting soundMode = addSetting(new EnumSetting("sound", EXP));
+    private final BoolSetting friends = addSetting(new BoolSetting("Friends", false));
+    private final BoolSetting sound = addSetting(new BoolSetting("Sound", false));
+    private final EnumSetting soundMode = addSetting(new EnumSetting("Sound", EXP));
 
     public VisualRangeModule() {
-        super("visual range", "Notifies you when players enter render distance.", ModuleCategory.of("world"), "visualrange");
+        super("VisualRange", "Notifies you when players enter render distance.", ModuleCategory.of("World"), "visualrange");
         soundMode.setShowCondition(() -> sound.get());
     }
 

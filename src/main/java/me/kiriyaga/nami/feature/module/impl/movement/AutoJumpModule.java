@@ -16,7 +16,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class AutoJumpModule extends Module {
 
     public AutoJumpModule() {
-        super("auto jump", "Automatically makes you jump.", ModuleCategory.of("movement"),"autojump");
+        super("AutoJump", "Automatically makes you jump.", ModuleCategory.of("Movement"),"autojump");
     }
 
     @Override
