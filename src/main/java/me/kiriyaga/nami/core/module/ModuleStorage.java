@@ -14,12 +14,14 @@ public class ModuleStorage {
     public void add(Module module) {
         modules.add(module);
         modulesByName.put(module.getName().toLowerCase(), module);
+        modulesByName.put(module.getName().toLowerCase().replace(" ", ""), module);
         modulesByClass.put(module.getClass(), module);
     }
 
     public void remove(Module module) {
         modules.remove(module);
         modulesByName.remove(module.getName().toLowerCase());
+        modulesByName.remove(module.getName().toLowerCase().replace(" ", ""));
         modulesByClass.remove(module.getClass());
         module.setEnabled(false);
     }
@@ -33,7 +35,11 @@ public class ModuleStorage {
     }
 
     public Module getByName(String name) {
-        return modulesByName.get(name.toLowerCase());
+        if (name == null) return null;
+        String lower = name.toLowerCase();
+        Module m = modulesByName.get(lower);
+        if (m != null) return m;
+        return modulesByName.get(lower.replace(" ", ""));
     }
 
     public List<Module> getByCategory(ModuleCategory category) {

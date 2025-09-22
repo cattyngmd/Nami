@@ -66,6 +66,7 @@ public class Nami implements ClientModInitializer {
     public void onInitializeClient() {
         COMMAND_MANAGER.init();
         MODULE_MANAGER.init();
+        COMMAND_MANAGER.getSuggester().updateDispatcher();
         //FONT_MANAGER.init();
         PING_MANAGER.init();
         TICK_MANAGER.init();

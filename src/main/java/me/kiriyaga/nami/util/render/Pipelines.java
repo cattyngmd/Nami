@@ -20,7 +20,7 @@ class Pipelines {
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .withBlend(BlendFunction.TRANSLUCENT)
-            .withDepthWrite(true)
+            .withDepthWrite(false)
             .withCull(false)
             .build();
 
@@ -28,7 +28,7 @@ class Pipelines {
             .withLocation("pipeline/global_lines_pipeline")
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .withBlend(BlendFunction.TRANSLUCENT)
-            .withDepthWrite(true)
+            .withDepthWrite(false)
             .withCull(false)
             .build();
 
@@ -37,7 +37,7 @@ class Pipelines {
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .withBlend(BlendFunction.TRANSLUCENT)
-            .withDepthWrite(true)
+            .withDepthWrite(false)
             .withCull(false)
             .build();
 }

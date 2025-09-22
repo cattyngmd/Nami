@@ -6,6 +6,8 @@ import me.kiriyaga.nami.feature.command.RegisterCommand;
 
 import java.util.Set;
 
+import static me.kiriyaga.nami.Nami.*;
+
 public class CommandRegistry {
 
     public static void registerAnnotatedCommands(CommandStorage storage) {
@@ -16,8 +18,7 @@ public class CommandRegistry {
                 Command command = clazz.getDeclaredConstructor().newInstance();
                 storage.addCommand(command);
             } catch (Exception e) {
-                System.err.println("Failed to instantiate command: " + clazz.getName());
-                e.printStackTrace();
+                LOGGER.error("Failed to instantiate command: " + clazz.getName(), e);
             }
         }
     }

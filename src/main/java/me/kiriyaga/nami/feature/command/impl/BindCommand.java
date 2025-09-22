@@ -18,7 +18,7 @@ public class BindCommand extends Command {
         super(
                 "bind",
                 new CommandArgument[] {
-                        new CommandArgument.StringArg("module", 1, 25),
+                        new CommandArgument.ModuleArg("module"),
                         new CommandArgument.StringArg("key", 1, 10)
                 },
                 "b"

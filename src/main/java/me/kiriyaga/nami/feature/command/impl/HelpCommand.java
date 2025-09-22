@@ -30,7 +30,9 @@ public class HelpCommand extends Command {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cmds.size(); i++) {
-            sb.append("{g}").append(cmds.get(i).getName()).append("{reset}");
+                        String name = cmds.get(i).getName();
+            String display = name == null ? "" : name.replace(" ", "");
+            sb.append("{g}").append(display).append("{reset}");
             if (i < cmds.size() - 1) sb.append(", ");
         }
         sb.append(".");

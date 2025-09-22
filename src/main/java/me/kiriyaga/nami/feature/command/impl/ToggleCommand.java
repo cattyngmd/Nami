@@ -13,7 +13,7 @@ public class ToggleCommand extends Command {
     public ToggleCommand() {
         super("toggle",
                 new CommandArgument[] {
-                        new CommandArgument.StringArg("moduleName", 1, 25)
+                        new CommandArgument.ModuleArg("moduleName")
                 },
                 "on", "off", "switch", "togle", "turnon", "turnoff", "tggle");
     }

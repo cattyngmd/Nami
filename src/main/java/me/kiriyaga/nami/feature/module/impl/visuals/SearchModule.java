@@ -37,7 +37,7 @@ public class SearchModule extends Module {
     private final BoolSetting lazyLoadEnabled = addSetting(new BoolSetting("lazy load", true));
     private final IntSetting chunksPerTick = addSetting(new IntSetting("count", 4, 2, 5));
     private final IntSetting cooldownTicks = addSetting(new IntSetting("delay", 1, 0, 2));
-    private final WhitelistSetting blockList = addSetting(new WhitelistSetting("blocklist", false, this.name));
+    private final WhitelistSetting blockList = addSetting(new WhitelistSetting("blocklist", false, this.name, WhitelistSetting.Type.BLOCK));
     private final BoolSetting storages = addSetting(new BoolSetting("storages", true));
     private final BoolSetting notifier = addSetting(new BoolSetting("notifier", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("not at spawn", false));
