@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
@@ -22,6 +23,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.*;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.text.Text;
@@ -39,13 +42,14 @@ public class AuraModule extends Module {
 
     public enum TpsMode { NONE, LATEST, AVERAGE }
     public enum Rotate { NORMAL, HOLD}
+    public enum Sprint { NONE, MOTION, PACKET }
 
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("range", 3.00, 1.0, 6.0));
     public final BoolSetting vanillaRange = addSetting(new BoolSetting("vanilla range", true));
     public final BoolSetting swordOnly = addSetting(new BoolSetting("weap only", false));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("tps", TpsMode.NONE));
-    public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false)); // TODO: fix this it resets eating
-    public final BoolSetting stopSprinting = addSetting(new BoolSetting("stop sprinting", true));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("multitask", false));
+    public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("sprinting", Sprint.NONE));
     public final BoolSetting raycast = addSetting(new BoolSetting("raycast", true));
     public final BoolSetting raycastConfirm = addSetting(new BoolSetting("raycast confirm", true));
     public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("rotate", Rotate.NORMAL));
@@ -159,10 +163,8 @@ public class AuraModule extends Module {
             ));
 
             SprintModule m = MODULE_MANAGER.getStorage().getByClass(SprintModule.class);
-            // This one done in rotation since its the most easy and stable as i see now, somehow people also 0-tick them but it doesnt for for us, and its either flags grim or doesnt work properly
-            // TODO: 1 tick them instead of rotation
-            if (stopSprinting.get() && m != null && m.isEnabled())
-                m.stopSprinting(1);
+            if (stopSprinting.get() == Sprint.MOTION && m != null && m.isEnabled())
+                m.stopSprinting(3);
         }
 
         if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && (!raycast.get() || !raycastConfirm.get()))
@@ -192,8 +194,20 @@ public class AuraModule extends Module {
         if (!canAttack) return;
         if (!skipCooldown && attackCooldownTicks > 0f) return;
 
+        boolean b = false;
+
+        if (stopSprinting.get() == Sprint.PACKET && !MC.player.isSneaking())
+            if (MC.player.isSprinting()){
+                MC.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                b = true;
+            }
+
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(Hand.MAIN_HAND);
+
+        if (stopSprinting.get() == Sprint.PACKET)
+            if (b)
+                MC.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
 
         if (!skipCooldown) attackCooldownTicks = getBaseCooldownTicks(stack, tps);
 
@@ -208,7 +222,7 @@ public class AuraModule extends Module {
         if (!(ev.getPacket() instanceof UpdateSelectedSlotC2SPacket)) return;
         if (MC.player == null || MC.world == null) return;
 
-        MC.execute(() -> {
+        EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
             ItemStack stack = MC.player.getMainHandStack();
             if (stack == null || stack.isEmpty()) return;
 
@@ -220,7 +234,7 @@ public class AuraModule extends Module {
             }
 
             attackCooldownTicks = getBaseCooldownTicks(stack, tps);
-        });
+        }, 0, ExecutableEventType.PRE_TICK);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

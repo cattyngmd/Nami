@@ -3,7 +3,6 @@ package me.kiriyaga.nami.mixin;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import me.kiriyaga.nami.feature.module.impl.visuals.OldAnimationsModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ViewModelModule;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -45,8 +44,8 @@ public abstract class MixinHeldItemRenderer {
 
     @ModifyArg(method = "updateHeldItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F", ordinal = 2), index = 0)
     private float modifyEquipProgressMainhand(float value) {
-        OldAnimationsModule oldAnimations = MODULE_MANAGER.getStorage().getByClass(OldAnimationsModule.class);
-        boolean isOldAnimationsEnabled = oldAnimations != null && oldAnimations.isEnabled();
+        ViewModelModule viewModelModule = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        boolean isOldAnimationsEnabled = viewModelModule != null && viewModelModule.isEnabled() && viewModelModule.oldAnimation.get();
 
         float attackCooldown = MC.player.getAttackCooldownProgress(1f);
         float modifiedValue = isOldAnimationsEnabled ? 1f : attackCooldown * attackCooldown * attackCooldown;
