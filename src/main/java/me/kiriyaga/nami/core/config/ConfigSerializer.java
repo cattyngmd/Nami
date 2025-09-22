@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.LOGGER;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
@@ -90,5 +93,15 @@ public class ConfigSerializer {
         } catch (Exception e) {
             LOGGER.error("Failed to load config " + configName, e);
         }
+    }
+    public List<String> listConfigs() {
+        File dir = dirs.getConfigSaveDir();
+        if (!dir.exists() || !dir.isDirectory()) {
+            return List.of();
+        }
+
+        return Arrays.stream(dir.listFiles((d, name) -> name.endsWith(".json")))
+                .map(f -> f.getName().replaceFirst("\\.json$", ""))
+                .collect(Collectors.toList());
     }
 }
