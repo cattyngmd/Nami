@@ -67,7 +67,6 @@ public class ClasspathScanner {
 
                 Class<?> cls = Class.forName(className);
 
-                // Ensure the class is a concrete implementation of the base class and has the annotation
                 if (base.isAssignableFrom(cls) && !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers()) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
                     result.add((Class<? extends T>) cls);
                 }
@@ -106,7 +105,6 @@ public class ClasspathScanner {
 
                 Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
 
-                // Ensure the class is a concrete implementation of the base class and has the annotation
                 if (base.isAssignableFrom(cls) && !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers()) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
                     result.add((Class<? extends T>) cls);
                 }
