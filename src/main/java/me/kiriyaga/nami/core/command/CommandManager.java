@@ -10,6 +10,7 @@ public class CommandManager {
 
     public void init() {
         CommandRegistry.registerAnnotatedCommands(storage);
+        CommandRegistry.registerModuleCommands(storage);
         suggester.updateDispatcher();
         EVENT_MANAGER.register(executor);
         LOGGER.info("Registered " + storage.size() + " commands.");

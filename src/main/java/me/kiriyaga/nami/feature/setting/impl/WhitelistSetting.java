@@ -3,7 +3,6 @@ package me.kiriyaga.nami.feature.setting.impl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.kiriyaga.nami.feature.command.impl.WhitelistCommand;
 import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
@@ -27,11 +26,11 @@ public class WhitelistSetting extends BoolSetting {
 
         this.allowedTypes.add(Type.ANY);
 
-        try {
-            if (COMMAND_MANAGER.getStorage().getCommandByNameOrAlias(this.moduleName) == null) {
-                COMMAND_MANAGER.addCommand(new WhitelistCommand(moduleName));
-            }
-        } catch (Exception ignored) {}
+//        try {
+//            if (COMMAND_MANAGER.getStorage().getCommandByNameOrAlias(this.moduleName) == null) {
+//                COMMAND_MANAGER.addCommand(new WhitelistCommand(moduleName));
+//            }
+//        } catch (Exception ignored) {}
     }
 
     public WhitelistSetting(String name, boolean defaultValue, String moduleName, Type... types) {
@@ -126,7 +125,6 @@ public class WhitelistSetting extends BoolSetting {
         JsonArray types = new JsonArray();
         for (Type t : allowedTypes) types.add(t.name());
         obj.add("types", types);
-        obj.add("items", items); // duplicate?
         return obj;
     }
 }
