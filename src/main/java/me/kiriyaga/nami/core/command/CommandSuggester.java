@@ -13,6 +13,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.BlockUtils;
+import me.kiriyaga.nami.util.KeyUtils;
 import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -86,20 +88,14 @@ public class CommandSuggester {
 
             // Key names
             keyNameCache.clear();
-            keyNameCache.addAll(Arrays.asList(
-                    "LCTRL", "RCTRL", "LSHIFT", "RSHIFT", "LALT", "RALT", "SPACE", "ENTER", "TAB", "ESC", "ESCAPE",
-                    "UP", "DOWN", "LEFT", "RIGHT", "BACKSPACE", "DELETE", "INSERT", "HOME", "END", "PAGEUP", "PAGEDOWN",
-                    "MOUSELEFT", "MOUSE_1", "MBUTTON1", "LEFTCLICK",
-                    "MOUSERIGHT", "MOUSE_2", "MBUTTON2", "RIGHTCLICK",
-                    "MOUSEMIDDLE", "MOUSE_3", "MBUTTON3", "MIDDLECLICK",
-                    "MOUSE4", "MOUSE5", "NONE"
-            ));
-            for (char c = 'A'; c <= 'Z'; c++) {
-                keyNameCache.add(String.valueOf(c));
-            }
-            for (char c = '0'; c <= '9'; c++) {
-                keyNameCache.add(String.valueOf(c));
-            }
+
+            // Dynamically get key names from KeyUtils by iterating through possible key codes
+            IntStream.range(-1, 350).forEach(keyCode -> {
+                String keyName = KeyUtils.getKeyName(keyCode);
+                if (keyName != null && !keyName.startsWith("KEY_")) {
+                    keyNameCache.add(keyName);
+                }
+            });
 
             // Config names
             configNameCache.clear();
