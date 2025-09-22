@@ -70,13 +70,13 @@ public class WhitelistSetting extends BoolSetting {
     }
 
     public boolean addToWhitelist(String idStr) {
-        Identifier id = Identifier.tryParse("minecraft:" + idStr);
+        Identifier id = Identifier.tryParse(idStr);
         if (id == null) return false;
         return whitelist.add(id);
     }
 
     public boolean removeFromWhitelist(String idStr) {
-        Identifier id = Identifier.tryParse("minecraft:" + idStr);
+        Identifier id = Identifier.tryParse(idStr);
         if (id == null) return false;
         return whitelist.remove(id);
     }

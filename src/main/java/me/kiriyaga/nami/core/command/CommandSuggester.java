@@ -32,6 +32,8 @@ public class CommandSuggester {
     private final List<String> itemIdCache = new ArrayList<>();
     private final List<String> blockIdCache = new ArrayList<>();
     private final List<String> generalIdCache = new ArrayList<>();
+    private final List<String> soundIdCache = new ArrayList<>();
+    private final List<String> particleIdCache = new ArrayList<>();
     private boolean identifierCacheBuilt = false;
     private static final int SUGGESTION_LIMIT = 200;
 
@@ -60,6 +62,22 @@ public class CommandSuggester {
                     String s = id.toString().toLowerCase(Locale.ROOT);
                     blockIdCache.add(s);
                     ids.add(s);
+                }
+            });
+
+            Registries.SOUND_EVENT.stream().forEach(snd -> {
+                Identifier id = Registries.SOUND_EVENT.getId(snd);
+                if (id != null) {
+                    soundIdCache.add(id.toString().toLowerCase(Locale.ROOT));
+                    ids.add(id.toString().toLowerCase(Locale.ROOT));
+                }
+            });
+
+            Registries.PARTICLE_TYPE.stream().forEach(p -> {
+                Identifier id = Registries.PARTICLE_TYPE.getId(p);
+                if (id != null) {
+                    particleIdCache.add(id.toString().toLowerCase(Locale.ROOT));
+                    ids.add(id.toString().toLowerCase(Locale.ROOT));
                 }
             });
 
@@ -236,10 +254,14 @@ public class CommandSuggester {
                                             primary = blockIdCache; secondary = null;
                                         } else if (types.contains(WhitelistSetting.Type.ITEM)) {
                                             primary = itemIdCache; secondary = null;
+                                        } else if (types.contains(WhitelistSetting.Type.SOUND)) {
+                                            primary = soundIdCache; secondary = null;
+                                        } else if (types.contains(WhitelistSetting.Type.PARTICLE)) {
+                                            primary = particleIdCache; secondary = null;
                                         } else {
                                             primary = generalIdCache; secondary = null;
                                         }
-                                    } else {
+                                    }else {
                                         if (idArg.getTarget() == CommandArgument.IdentifierArg.Target.BLOCK) { primary = blockIdCache; secondary = null; }
                                         else if (idArg.getTarget() == CommandArgument.IdentifierArg.Target.ITEM) { primary = itemIdCache; secondary = null; }
                                         else { primary = generalIdCache; secondary = null; }

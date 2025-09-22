@@ -145,7 +145,7 @@ public abstract class CommandArgument {
     }
 
     public static class IdentifierArg extends CommandArgument {
-        public enum Target { BLOCK, ITEM }
+        public enum Target { BLOCK, ITEM, SOUND, PARTICLE, ANY }
 
         private final Target target;
 
@@ -156,7 +156,7 @@ public abstract class CommandArgument {
 
         public IdentifierArg(String name) {
             super(name, true);
-            this.target = null;
+            this.target = Target.ANY;
         }
 
         public Target getTarget() {

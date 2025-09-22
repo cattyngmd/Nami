@@ -17,15 +17,46 @@ public class ModuleCommand extends Command {
     public ModuleCommand(Module module) {
         super(
                 module.getName().replace(" ", ""),
-                new CommandArgument[]{
-                        new CommandArgument.SettingArg("setting"),
-                        new CommandArgument.StringArg("value", 1, 256) {
-                            @Override
-                            public boolean isRequired() { return false; }
-                        }
-                }
+                buildArguments(module)
         );
         this.module = module;
+    }
+
+    private static CommandArgument[] buildArguments(Module module) {
+        CommandArgument[] defaults = new CommandArgument[]{
+                new CommandArgument.SettingArg("setting"),
+                new CommandArgument.StringArg("value", 1, 256) {
+                    @Override
+                    public boolean isRequired() { return false; }
+                }
+        };
+
+        for (Setting<?> s : module.getSettings()) { // god i hate command building
+            if (s instanceof WhitelistSetting wl) {
+                return new CommandArgument[]{
+                        new CommandArgument.SettingArg("setting"),
+                        new CommandArgument.ActionArg("action", "add", "del", "list"),
+                        new CommandArgument.IdentifierArg("id", toTarget(wl)) {
+                            @Override
+                            public boolean isRequired() {
+                                return false;
+                            }
+                        }
+                };
+            }
+        }
+
+        return defaults;
+    }
+
+    private static CommandArgument.IdentifierArg.Target toTarget(WhitelistSetting wl) {
+        var types = wl.getAllowedTypes();
+        if (types.contains(WhitelistSetting.Type.ANY) || types.size() > 1) return CommandArgument.IdentifierArg.Target.ANY;
+        if (types.contains(WhitelistSetting.Type.BLOCK)) return CommandArgument.IdentifierArg.Target.BLOCK;
+        if (types.contains(WhitelistSetting.Type.ITEM)) return CommandArgument.IdentifierArg.Target.ITEM;
+        if (types.contains(WhitelistSetting.Type.SOUND)) return CommandArgument.IdentifierArg.Target.SOUND;
+        if (types.contains(WhitelistSetting.Type.PARTICLE)) return CommandArgument.IdentifierArg.Target.PARTICLE;
+        return CommandArgument.IdentifierArg.Target.ANY;
     }
 
     @Override
@@ -51,7 +82,76 @@ public class ModuleCommand extends Command {
             return;
         }
 
-        if (setting instanceof BoolSetting boolSetting) {
+        if (setting instanceof WhitelistSetting wlSetting) {
+            String action = parsedArgs.length > 1 ? ((String) parsedArgs[1]).toLowerCase() : null;
+            String item = parsedArgs.length > 2 ? ((String) parsedArgs[2]) : null;
+
+            if (action == null) {
+                CHAT_MANAGER.sendPersistent(module.getName(),
+                        CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + module.getName() +
+                                " {g}" + setting.getName() + " add{reset}/{g}del{reset}/{g}list {g}[item]{reset}."));
+                return;
+            }
+
+            switch (action) {
+                case "add" -> {
+                    if (item == null || item.isEmpty()) {
+                        CHAT_MANAGER.sendPersistent(module.getName(),
+                                CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + module.getName() +
+                                        " {g}" + setting.getName() + " add {s}<{g}item{s}>{reset}."));
+                        return;
+                    }
+                    if (wlSetting.addToWhitelist(item)) {
+                        CHAT_MANAGER.sendPersistent(module.getName(),
+                                CAT_FORMAT.format("Added: {g}" + item + "{reset} to {g}" +
+                                        setting.getName() + "{reset}."));
+                    } else {
+                        CHAT_MANAGER.sendPersistent(module.getName(),
+                                CAT_FORMAT.format("Invalid item id or already added: {g}" +
+                                        item + "{reset}."));
+                    }
+                }
+                case "del" -> {
+                    if (item == null || item.isEmpty()) {
+                        CHAT_MANAGER.sendPersistent(module.getName(),
+                                CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + module.getName() +
+                                        " {g}" + setting.getName() + " del {s}<{g}item{s}>{reset}."));
+                        return;
+                    }
+                    if (wlSetting.removeFromWhitelist(item)) {
+                        CHAT_MANAGER.sendPersistent(module.getName(),
+                                CAT_FORMAT.format("Removed: {g}" + item + "{reset} from {g}" +
+                                        setting.getName() + "{reset}."));
+                    } else {
+                        CHAT_MANAGER.sendPersistent(module.getName(),
+                                CAT_FORMAT.format("Invalid or not in list: {g}" +
+                                        item + "{reset}."));
+                    }
+                }
+                case "list" -> {
+                    if (wlSetting.getWhitelist().isEmpty()) {
+                        CHAT_MANAGER.sendPersistent(module.getName(),
+                                CAT_FORMAT.format("List {g}" + setting.getName() + "{reset} is empty."));
+                        return;
+                    }
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("List {g}").append(setting.getName()).append("{reset} items: ");
+                    int i = 0;
+                    int size = wlSetting.getWhitelist().size();
+                    for (Identifier id : wlSetting.getWhitelist()) {
+                        builder.append("{g}").append(id.toString()).append("{reset}.");
+                        if (i < size - 1) builder.append("{s}, {reset}");
+                        i++;
+                    }
+                    CHAT_MANAGER.sendPersistent(module.getName(), CAT_FORMAT.format(builder.toString()));
+                }
+                default -> {
+                    CHAT_MANAGER.sendPersistent(module.getName(),
+                            CAT_FORMAT.format("Unknown action: {g}" + action +
+                                    "{reset}. Use {g}add/del/list{reset}."));
+                }
+            }
+        } else if (setting instanceof BoolSetting boolSetting) {
             if (valueRaw == null) {
                 boolSetting.set(!boolSetting.get());
                 CHAT_MANAGER.sendPersistent(module.getName(),
@@ -97,77 +197,7 @@ public class ModuleCommand extends Command {
                 CHAT_MANAGER.sendPersistent(module.getName(),
                         CAT_FORMAT.format("Invalid keybind {g}" + valueRaw + "{reset}. Must be int key code."));
             }
-        } else if (setting instanceof WhitelistSetting wlSetting) {
-            if (valueRaw == null) {
-                CHAT_MANAGER.sendPersistent(module.getName(),
-                        CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + module.getName() +
-                                " {g}" + setting.getName() + " add/del/list {s}[item]{reset}"));
-                return;
-            }
-
-            String[] parts = valueRaw.split("\\s+", 2);
-            String action = parts[0].toLowerCase();
-            String item = parts.length > 1 ? parts[1].toLowerCase().replace("minecraft:", "").trim() : null;
-
-            switch (action) {
-                case "add" -> {
-                    if (item == null || item.isEmpty()) {
-                        CHAT_MANAGER.sendPersistent(module.getName(),
-                                CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + module.getName() +
-                                        " {g}" + setting.getName() + " add {s}<{g}item{s}>{reset}"));
-                        return;
-                    }
-                    if (wlSetting.addToWhitelist(item)) {
-                        CHAT_MANAGER.sendPersistent(module.getName(),
-                                CAT_FORMAT.format("Added: {g}minecraft:" + item + "{reset} to {g}" +
-                                        setting.getName() + "{reset}."));
-                    } else {
-                        CHAT_MANAGER.sendPersistent(module.getName(),
-                                CAT_FORMAT.format("Invalid item id or already added: {g}minecraft:" +
-                                        item + "{reset}."));
-                    }
-                }
-                case "del" -> {
-                    if (item == null || item.isEmpty()) {
-                        CHAT_MANAGER.sendPersistent(module.getName(),
-                                CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + module.getName() +
-                                        " {g}" + setting.getName() + " del {s}<{g}item{s}>{reset}"));
-                        return;
-                    }
-                    if (wlSetting.removeFromWhitelist(item)) {
-                        CHAT_MANAGER.sendPersistent(module.getName(),
-                                CAT_FORMAT.format("Removed: {g}minecraft:" + item + "{reset} from {g}" +
-                                        setting.getName() + "{reset}."));
-                    } else {
-                        CHAT_MANAGER.sendPersistent(module.getName(),
-                                CAT_FORMAT.format("Invalid or not in list: {g}minecraft:" +
-                                        item + "{reset}."));
-                    }
-                }
-                case "list" -> {
-                    if (wlSetting.getWhitelist().isEmpty()) {
-                        CHAT_MANAGER.sendPersistent(module.getName(),
-                                CAT_FORMAT.format("List {g}" + setting.getName() + "{reset} is empty."));
-                        return;
-                    }
-                    StringBuilder builder = new StringBuilder();
-                    builder.append("List {g}").append(setting.getName()).append("{reset} items: ");
-                    int i = 0;
-                    int size = wlSetting.getWhitelist().size();
-                    for (Identifier id : wlSetting.getWhitelist()) {
-                        builder.append("{g}").append(id.toString()).append("{reset}");
-                        if (i < size - 1) builder.append("{s}, {reset}");
-                        i++;
-                    }
-                    CHAT_MANAGER.sendPersistent(module.getName(), CAT_FORMAT.format(builder.toString()));
-                }
-                default -> {
-                    CHAT_MANAGER.sendPersistent(module.getName(),
-                            CAT_FORMAT.format("Unknown action: {g}" + action +
-                                    "{reset}. Use {g}add/del/list{reset}."));
-                }
-            }
-        }else if (setting instanceof EnumSetting<?> enumSetting) {
+        } else if (setting instanceof EnumSetting<?> enumSetting) {
             if (valueRaw == null) {
                 CHAT_MANAGER.sendPersistent(module.getName(),
                         CAT_FORMAT.format("{g}" + setting.getName() + "{reset} is currently {g}" + enumSetting.get().name() + "{reset}. " +
