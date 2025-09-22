@@ -23,6 +23,7 @@ public abstract class MixinChatScreen extends Screen {
         super(title);
     }
 
+
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
     private void onFillBackground(Args args) {
         HudModule hud = MODULE_MANAGER.getStorage().getByClass(HudModule.class);
