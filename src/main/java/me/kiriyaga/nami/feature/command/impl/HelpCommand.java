@@ -30,7 +30,10 @@ public class HelpCommand extends Command {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cmds.size(); i++) {
-                        String name = cmds.get(i).getName();
+            if (cmds.get(i) instanceof ModuleCommand)
+                continue; // TODO: when addon impl, rewrite theese to dynamic
+
+            String name = cmds.get(i).getName();
             String display = name == null ? "" : name.replace(" ", "");
             sb.append("{g}").append(display).append("{reset}");
             if (i < cmds.size() - 1) sb.append(", ");
