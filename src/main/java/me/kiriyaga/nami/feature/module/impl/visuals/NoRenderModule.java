@@ -16,6 +16,9 @@ public class NoRenderModule extends Module {
 
 
 
+    public final BoolSetting noTilt = addSetting(new BoolSetting("no tilt", true));
+    public final BoolSetting noBob = addSetting(new BoolSetting("no bob", true));
+    public final BoolSetting portalGui = addSetting(new BoolSetting("portal gui", true));
     public final BoolSetting noFire = addSetting(new BoolSetting("fire", true));
     public final BoolSetting noBackground = addSetting(new BoolSetting("background", true));
     public final BoolSetting noTotemParticle = addSetting(new BoolSetting("totem particle", false));

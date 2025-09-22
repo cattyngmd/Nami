@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.PortalGuiModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -148,7 +148,7 @@ public abstract class MixinClientPlayerEntity {
         if (MODULE_MANAGER == null)
             return s;
 
-        if (MODULE_MANAGER.getStorage().getByClass(PortalGuiModule.class).isEnabled())
+        if (MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).portalGui.get())
             return null;
 
         return s;

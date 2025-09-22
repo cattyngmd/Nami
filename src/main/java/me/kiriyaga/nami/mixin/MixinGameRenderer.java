@@ -4,9 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.kiriyaga.nami.feature.module.impl.combat.NoEntityTraceModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoBobModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoTiltModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -185,14 +183,14 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobView(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoBobModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoBobModule.class).isEnabled()) {
+        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noBob.get()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
     private void tiltViewWhenHurt(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoTiltModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoTiltModule.class).isEnabled()) {
+        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noTilt.get()) {
             ci.cancel();
         }
     }

@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.NametagFormatter.*;
 
 @RegisterModule
 public class ESPModule extends Module {
@@ -40,11 +41,6 @@ public class ESPModule extends Module {
     public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("mode", RenderMode.OUTLINE));
     public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("distance", 52, 15, 256));
     public final BoolSetting smoothAppear = addSetting(new BoolSetting("smooth", true));
-
-    private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
-    private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
-    private static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
-    private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public ESPModule() {
         super("esp", "Highlights certain entities.", ModuleCategory.of("visuals"), "esp", "wh", "boxes");

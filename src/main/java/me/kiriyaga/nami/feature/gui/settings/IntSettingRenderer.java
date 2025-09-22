@@ -31,6 +31,19 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
+        int lineOffset = 1;
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
+            context.fill(
+                    x,
+                    y - lineOffset,
+                    x + 1,
+                    y + HEIGHT,
+                    CLICK_GUI.applyFade(
+                            textColorInt
+                    )
+            );
+        }
+
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
         FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);

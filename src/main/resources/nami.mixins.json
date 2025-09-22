@@ -26,6 +26,7 @@
     "MixinEntityRenderer",
     "MixinFogRenderer",
     "MixinGameMenuScreen",
+    "MixinGameOptions",
     "MixinGameRenderer",
     "MixinHandledScreen",
     "MixinHeadFeatureRenderer",
