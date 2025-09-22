@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
 import java.util.Arrays;
 
 import static me.kiriyaga.nami.Nami.*;
-
+// no god below anymore
 public class ModuleCommand extends Command {
     private final Module module;
 
