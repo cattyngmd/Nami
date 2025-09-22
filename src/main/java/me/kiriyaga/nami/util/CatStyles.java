@@ -12,12 +12,14 @@ public class CatStyles {
 
     @Style("g")
     Color global() {
-        return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+        Color gc = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+        return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
     @Style("s")
     Color secondary() {
-        return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor();
+        Color gs = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor();
+        return new Color(gs.getRed(), gs.getGreen(), gs.getBlue(), 255);
     }
 
     @Style("namiRed")
@@ -32,7 +34,8 @@ public class CatStyles {
 
     @Style("bg")
     Color bounceGlobal() {
-        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor());
+        Color gc = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
     }
 
     @Style("bw")
