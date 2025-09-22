@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
@@ -75,7 +76,7 @@ public class AutoTotemModule extends Module {
 
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
             if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 3 && deathLog.get()) {
-                MC.execute(this::logDeathData);
+                EXECUTABLE_MANAGER.getRequestHandler().submit(this::logDeathData, 20, ExecutableEventType.PRE_TICK);
             }
         }
     }

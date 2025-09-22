@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
@@ -221,7 +222,7 @@ public class AuraModule extends Module {
         if (!(ev.getPacket() instanceof UpdateSelectedSlotC2SPacket)) return;
         if (MC.player == null || MC.world == null) return;
 
-        MC.execute(() -> {
+        EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
             ItemStack stack = MC.player.getMainHandStack();
             if (stack == null || stack.isEmpty()) return;
 
@@ -233,7 +234,7 @@ public class AuraModule extends Module {
             }
 
             attackCooldownTicks = getBaseCooldownTicks(stack, tps);
-        });
+        }, 0, ExecutableEventType.PRE_TICK);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
