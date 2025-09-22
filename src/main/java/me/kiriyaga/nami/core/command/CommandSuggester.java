@@ -69,26 +69,26 @@ public class CommandSuggester {
                     Identifier id = Registries.ENTITY_TYPE.getId(e);
                     if (id != null) ids.add(id.toString().toLowerCase(Locale.ROOT));
                 });
-            } catch (Throwable ignored) {}
+                        } catch (Exception e) { e.printStackTrace(); }
 
             try {
                 Registries.SOUND_EVENT.stream().forEach(snd -> {
                     Identifier id = Registries.SOUND_EVENT.getId(snd);
                     if (id != null) ids.add(id.toString().toLowerCase(Locale.ROOT));
                 });
-            } catch (Throwable ignored) {}
+            } catch (Exception e) { e.printStackTrace(); }
 
             try {
                 Registries.PARTICLE_TYPE.stream().forEach(p -> {
                     Identifier id = Registries.PARTICLE_TYPE.getId(p);
                     if (id != null) ids.add(id.toString().toLowerCase(Locale.ROOT));
                 });
-            } catch (Throwable ignored) {}
+            } catch (Exception e) { e.printStackTrace(); }
 
             generalIdCache.clear();
             generalIdCache.addAll(ids);
 
-        } catch (Exception e) {
+                } catch (RuntimeException e) {
             LOGGER.warn("Failed to build identifier caches for suggestions", e);
         }
         identifierCacheBuilt = true;

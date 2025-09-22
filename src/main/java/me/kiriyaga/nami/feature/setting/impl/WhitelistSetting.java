@@ -126,7 +126,7 @@ public class WhitelistSetting extends BoolSetting {
         JsonArray types = new JsonArray();
         for (Type t : allowedTypes) types.add(t.name().toLowerCase());
         obj.add("types", types);
-        obj.add("items", items);
+        obj.add("items", items); // duplicate?
         return obj;
     }
 }
