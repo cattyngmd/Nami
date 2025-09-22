@@ -18,6 +18,7 @@ import net.minecraft.util.math.Vec3d;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.NametagFormatter.*;
 
 //@RegisterModule
 public class TracersModule extends Module {
@@ -28,11 +29,6 @@ public class TracersModule extends Module {
     public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", false));
     public final BoolSetting showItems = addSetting(new BoolSetting("items", false));
     public final DoubleSetting thickness = addSetting(new DoubleSetting("width", 1.5, 0.5, 2));
-
-    private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
-    private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
-    private static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
-    private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
 
     public TracersModule() {
         super("tracers", "Draws lines from the center of the screen to entities.", ModuleCategory.of("visuals"));
