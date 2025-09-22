@@ -90,12 +90,18 @@ public class ClickGuiScreen extends Screen {
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);
 
-        int startY = this.height - 1;
+        float scaledWidth = this.width / scale;
+        float scaledHeight = this.height / scale;
+
+        int startY = (int) (scaledHeight - 1);
         for (int i = statusMessages.size() - 1; i >= 0; i--) {
             Text message = statusMessages.get(i);
             int textWidth = FONT_MANAGER.getWidth(message);
-            int x = this.width - textWidth - 1;
-            int y = startY - FONT_MANAGER.getHeight();
+            int textHeight = FONT_MANAGER.getHeight();
+
+            int x = (int) (scaledWidth - textWidth - 1);
+            int y = startY - textHeight;
+
             FONT_MANAGER.drawText(context, message, x, y, applyFade(0xFFFFFFFF), true);
             startY = y;
         }
