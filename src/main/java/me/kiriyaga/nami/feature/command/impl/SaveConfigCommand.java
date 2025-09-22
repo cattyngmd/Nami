@@ -12,7 +12,7 @@ public class SaveConfigCommand extends Command {
     public SaveConfigCommand() {
         super("saveconfig",
                 new CommandArgument[] {
-                        new CommandArgument.StringArg("configName", 1, 32)
+                        new CommandArgument.ConfigNameArg("configName")
                 },
                 "savecfg", "scfg");
     }

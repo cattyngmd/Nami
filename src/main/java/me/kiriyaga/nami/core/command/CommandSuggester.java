@@ -18,13 +18,13 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static me.kiriyaga.nami.Nami.*;
-//TODO: KeyBind args suggestion
-//TODO: config name suggestion from folder
+
 public class CommandSuggester {
 
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
@@ -35,6 +35,8 @@ public class CommandSuggester {
     private final List<String> generalIdCache = new ArrayList<>();
     private final List<String> soundIdCache = new ArrayList<>();
     private final List<String> particleIdCache = new ArrayList<>();
+    private final List<String> keyNameCache = new ArrayList<>();
+    private final List<String> configNameCache = new ArrayList<>();
     private boolean identifierCacheBuilt = false;
     private static final int SUGGESTION_LIMIT = 200;
 
@@ -81,6 +83,31 @@ public class CommandSuggester {
                     ids.add(id.toString().toLowerCase(Locale.ROOT));
                 }
             });
+
+            // Key names
+            keyNameCache.clear();
+            keyNameCache.addAll(Arrays.asList(
+                    "LCTRL", "RCTRL", "LSHIFT", "RSHIFT", "LALT", "RALT", "SPACE", "ENTER", "TAB", "ESC", "ESCAPE",
+                    "UP", "DOWN", "LEFT", "RIGHT", "BACKSPACE", "DELETE", "INSERT", "HOME", "END", "PAGEUP", "PAGEDOWN",
+                    "MOUSELEFT", "MOUSE_1", "MBUTTON1", "LEFTCLICK",
+                    "MOUSERIGHT", "MOUSE_2", "MBUTTON2", "RIGHTCLICK",
+                    "MOUSEMIDDLE", "MOUSE_3", "MBUTTON3", "MIDDLECLICK",
+                    "MOUSE4", "MOUSE5", "NONE"
+            ));
+            for (char c = 'A'; c <= 'Z'; c++) {
+                keyNameCache.add(String.valueOf(c));
+            }
+            for (char c = '0'; c <= '9'; c++) {
+                keyNameCache.add(String.valueOf(c));
+            }
+
+            // Config names
+            configNameCache.clear();
+            try {
+                configNameCache.addAll(CONFIG_MANAGER.getConfigSerializer().listConfigs());
+            } catch (Exception e) {
+                LOGGER.warn("Failed to load config names for suggestions", e);
+            }
 
             // Other registries useful for whitelists
             try {
@@ -184,6 +211,30 @@ public class CommandSuggester {
                                 if (nameNoSpaces.toLowerCase(Locale.ROOT).startsWith(remaining)) {
                                     suggestionBuilder.suggest(nameNoSpaces);
                                     if (++count >= SUGGESTION_LIMIT) break;
+                                }
+                            }
+                            return suggestionBuilder.buildFuture();
+                        });
+                    }
+
+                    if (arg instanceof CommandArgument.KeyBindArg) {
+                        argBuilder.suggests((context, suggestionBuilder) -> {
+                            String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+                            for (String value : keyNameCache) {
+                                if (value.toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                    suggestionBuilder.suggest(value);
+                                }
+                            }
+                            return suggestionBuilder.buildFuture();
+                        });
+                    }
+
+                    if (arg instanceof CommandArgument.ConfigNameArg) {
+                        argBuilder.suggests((context, suggestionBuilder) -> {
+                            String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+                            for (String value : configNameCache) {
+                                if (value.toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                    suggestionBuilder.suggest(value);
                                 }
                             }
                             return suggestionBuilder.buildFuture();
@@ -319,6 +370,10 @@ public class CommandSuggester {
         } else if (arg instanceof CommandArgument.SettingArg) {
             return StringArgumentType.string();
         } else if (arg instanceof CommandArgument.IdentifierArg) {
+            return StringArgumentType.string();
+        } else if (arg instanceof CommandArgument.KeyBindArg) {
+            return StringArgumentType.string();
+        } else if (arg instanceof CommandArgument.ConfigNameArg) {
             return StringArgumentType.string();
         }
         return StringArgumentType.string();
