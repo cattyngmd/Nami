@@ -27,15 +27,25 @@ public class ModuleCommand extends Command {
                 new CommandArgument.SettingArg("setting"),
                 new CommandArgument.StringArg("value", 1, 256) {
                     @Override
-                    public boolean isRequired() { return false; }
+                    public boolean isRequired() { return false; } // it works very corny, you are unable to set value in module with whitelist setting, also auto correct tries to do whitelist args correct
                 }
         };
 
         for (Setting<?> s : module.getSettings()) { // god i hate command building
             if (s instanceof WhitelistSetting wl) {
                 return new CommandArgument[]{
-                        new CommandArgument.SettingArg("setting"),
-                        new CommandArgument.ActionArg("action", "add", "del", "list"),
+                        new CommandArgument.SettingArg("setting") {
+                            @Override
+                            public boolean isRequired() {
+                                return false;
+                            }
+                        },
+                        new CommandArgument.ActionArg("action", "add", "del", "list") {
+                            @Override
+                            public boolean isRequired() {
+                                return false;
+                            }
+                        },
                         new CommandArgument.IdentifierArg("id", toTarget(wl)) {
                             @Override
                             public boolean isRequired() {
