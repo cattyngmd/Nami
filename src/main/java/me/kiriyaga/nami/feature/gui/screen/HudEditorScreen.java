@@ -261,15 +261,15 @@ public class HudEditorScreen extends Screen {
 
             int newX;
             switch (draggingElement.alignment.get()) {
-                case left:
+                case LEFT:
                     newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
                     newX = newRenderX;
                     break;
-                case center:
+                case CENTER:
                     newRenderX = Math.max(draggingElement.width / 2, Math.min(newRenderX, screenWidth - draggingElement.width / 2));
                     newX = newRenderX + draggingElement.width / 2;
                     break;
-                case right:
+                case RIGHT:
                     newRenderX = Math.max(0, Math.min(newRenderX, screenWidth - draggingElement.width));
                     newX = newRenderX + draggingElement.width;
                     break;

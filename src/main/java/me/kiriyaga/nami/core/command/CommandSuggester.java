@@ -23,7 +23,8 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static me.kiriyaga.nami.Nami.*;
-
+//TODO: KeyBind args suggestion
+//TODO: config name suggestion from folder
 public class CommandSuggester {
 
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
@@ -161,47 +162,28 @@ public class CommandSuggester {
                     if (arg instanceof CommandArgument.SettingArg) {
                         argBuilder.suggests((context, suggestionBuilder) -> {
                             String input = context.getInput();
-                            String[] parts = input.split("\\s+");
                             String remaining = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
 
-                            java.util.function.UnaryOperator<String> stripQuotes = s -> {
-                                if (s == null) return null;
-                                s = s.trim();
-                                if ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'"))) {
-                                    return s.substring(1, s.length() - 1);
-                                }
-                                return s;
-                            };
+                            String[] parts = input.split("\\s+");
+                            if (parts.length < 1) return suggestionBuilder.buildFuture();
 
-                            String moduleName = null;
-                            if (parts.length >= 2) {
-                                moduleName = stripQuotes.apply(parts[1]);
-                            } else if (parts.length >= 1) {
-                                String first = parts[0];
-                                String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
-                                if (first.startsWith(prefix)) first = first.substring(prefix.length());
-                                moduleName = stripQuotes.apply(first);
-                            }
+                            String prefix = COMMAND_MANAGER.getExecutor().getPrefix();
+                            String moduleName = parts[0].startsWith(prefix) ? parts[0].substring(prefix.length()) : parts[0];
 
-                            Module module = null;
-                            if (moduleName != null) {
-                                module = MODULE_MANAGER.getStorage().getByName(moduleName);
-                                if (module == null) {
-                                    for (Module m : MODULE_MANAGER.getStorage().getAll()) {
-                                        if (m.matches(moduleName)) { module = m; break; }
-                                    }
+                            Module module = MODULE_MANAGER.getStorage().getByName(moduleName);
+                            if (module == null) {
+                                for (Module m : MODULE_MANAGER.getStorage().getAll()) {
+                                    if (m.matches(moduleName)) { module = m; break; }
                                 }
                             }
+                            if (module == null) return suggestionBuilder.buildFuture();
 
                             int count = 0;
-                            if (module != null) {
-                                for (Setting<?> s : module.getSettings()) {
-                                    String name = s.getName();
-                                    String nameNoSpaces = name == null ? "" : name.replaceAll("\\s", "");
-                                    if (nameNoSpaces.toLowerCase(Locale.ROOT).startsWith(remaining)) {
-                                        suggestionBuilder.suggest(nameNoSpaces);
-                                        if (++count >= SUGGESTION_LIMIT) break;
-                                    }
+                            for (Setting<?> s : module.getSettings()) {
+                                String nameNoSpaces = s.getName().replaceAll("\\s", "");
+                                if (nameNoSpaces.toLowerCase(Locale.ROOT).startsWith(remaining)) {
+                                    suggestionBuilder.suggest(nameNoSpaces);
+                                    if (++count >= SUGGESTION_LIMIT) break;
                                 }
                             }
                             return suggestionBuilder.buildFuture();

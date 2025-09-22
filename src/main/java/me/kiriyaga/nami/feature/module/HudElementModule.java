@@ -42,7 +42,7 @@ public abstract class HudElementModule extends Module {
         this.y.setShow(false);
         this.label = addSetting(new EnumSetting<LabelPosition>("label position", LabelPosition.TOP));
         this.label.setShow(false);
-        this.alignment = addSetting(new EnumSetting<>("alignment", HudAlignment.left));
+        this.alignment = addSetting(new EnumSetting<>("alignment", HudAlignment.LEFT));
     }
 
     public Text getDisplayText() {
@@ -117,9 +117,9 @@ public abstract class HudElementModule extends Module {
         int lineWidth = FONT_MANAGER.getWidth(element.text());
 
         return switch (alignment.get()) {
-            case left -> baseX + element.offsetX();
-            case center -> baseX + (width - lineWidth) / 2 + element.offsetX();
-            case right -> baseX + width - lineWidth - element.offsetX();
+            case LEFT -> baseX + element.offsetX();
+            case CENTER -> baseX + (width - lineWidth) / 2 + element.offsetX();
+            case RIGHT -> baseX + width - lineWidth - element.offsetX();
         };
     }
 
@@ -139,14 +139,14 @@ public abstract class HudElementModule extends Module {
         Rectangle bounds = getBoundingBox();
 
         switch (alignment.get()) {
-            case left:
+            case LEFT:
                 return Math.min(Math.max(posX, PADDING - bounds.x),
                         screenWidth - bounds.width - bounds.x - PADDING);
-            case center:
+            case CENTER:
                 int centerX = posX;
                 int actualX = centerX - (bounds.width / 2 + bounds.x);
                 return Math.min(Math.max(actualX, PADDING), screenWidth - bounds.width - PADDING);
-            case right:
+            case RIGHT:
                 int rightX = posX - (bounds.width + bounds.x);
                 return Math.min(Math.max(rightX, PADDING), screenWidth - bounds.width - PADDING);
             default:
