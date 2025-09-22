@@ -33,12 +33,12 @@ public class ModuleSettingCommand extends Command {
         String settingNameRaw = ((String) parsedArgs[1]);
         String valueRaw = parsedArgs.length > 2 ? (String) parsedArgs[2] : null;
 
-        String moduleName = moduleNameRaw.replace(" ", "").toLowerCase();
-        String settingName = settingNameRaw.replace(" ", "").toLowerCase();
+        String moduleName = moduleNameRaw.replace(" ", "");
+        String settingName = settingNameRaw.replace(" ", "");
 
         Module module = null;
         for (Module m : MODULE_MANAGER.getStorage().getAll()) {
-            if (m.getName().replace(" ", "").toLowerCase().equals(moduleName)) {
+            if (m.getName().replace(" ", "").equals(moduleName)) {
                 module = m;
                 break;
             }
@@ -50,7 +50,7 @@ public class ModuleSettingCommand extends Command {
 
         Setting<?> setting = null;
         for (Setting<?> s : module.getSettings()) {
-            if (s.getName().replace(" ", "").toLowerCase().equals(settingName)) {
+            if (s.getName().replace(" ", "").equals(settingName)) {
                 setting = s;
                 break;
             }

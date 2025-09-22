@@ -22,8 +22,8 @@ public class WhitelistSetting extends BoolSetting {
 
     public WhitelistSetting(String name, boolean defaultValue, String moduleName) {
         super(name, defaultValue);
-        this.moduleName = moduleName.toLowerCase();
-        this.settingName = name.toLowerCase();
+        this.moduleName = moduleName;
+        this.settingName = name;
 
         this.allowedTypes.add(Type.ANY);
 
@@ -124,7 +124,7 @@ public class WhitelistSetting extends BoolSetting {
         }
         obj.add("items", items);
         JsonArray types = new JsonArray();
-        for (Type t : allowedTypes) types.add(t.name().toLowerCase());
+        for (Type t : allowedTypes) types.add(t.name());
         obj.add("types", types);
         obj.add("items", items); // duplicate?
         return obj;

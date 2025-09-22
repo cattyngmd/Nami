@@ -27,7 +27,7 @@ public class BindCommand extends Command {
 
     @Override
     public void execute(Object[] parsedArgs) {
-        String moduleName = ((String) parsedArgs[0]).toLowerCase();
+        String moduleName = ((String) parsedArgs[0]);
         String keyName = ((String) parsedArgs[1]).toUpperCase();
 
         Module module = MODULE_MANAGER.getStorage().getAll().stream()

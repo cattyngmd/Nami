@@ -6,17 +6,17 @@ public class ModuleCategory {
     private static final Map<String, ModuleCategory> CATEGORIES = new LinkedHashMap<>();
 
     private static final List<String> FIXED_ORDER = List.of(
-            "combat", "movement", "misc", "visuals", "world", "hud", "client"
+            "Combat", "Movement", "Misc", "Visuals", "World", "HUD", "Client"
     );
 
     private final String name;
 
     private ModuleCategory(String name) {
-        this.name = name.toLowerCase();
+        this.name = name;
     }
 
     public static ModuleCategory of(String name) {
-        return CATEGORIES.computeIfAbsent(name.toLowerCase(), ModuleCategory::new);
+        return CATEGORIES.computeIfAbsent(name, ModuleCategory::new);
     }
 
     public static List<ModuleCategory> getAll() {

@@ -138,7 +138,7 @@ public abstract class Module {
     }
 
     public void setDisplayInfo(String info) {
-        this.displayInfo = info.toLowerCase();
+        this.displayInfo = info;
     }
 
     public String getDisplayInfo() {
