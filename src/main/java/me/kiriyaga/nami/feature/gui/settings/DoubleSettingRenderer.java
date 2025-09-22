@@ -36,6 +36,19 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
         lastSliderWidth = WIDTH - 2 * PADDING;
         lastSliderHeight = SLIDER_HEIGHT;
 
+        int lineOffset = 1;
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
+            context.fill(
+                    x,
+                    y - lineOffset,
+                    x + 1,
+                    y + HEIGHT,
+                    CLICK_GUI.applyFade(
+                            textColorInt
+                    )
+            );
+        }
+
         FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);
 
         renderSlider(context, lastSliderX, lastSliderY, lastSliderWidth, lastSliderHeight,
