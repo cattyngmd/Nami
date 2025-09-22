@@ -1,7 +1,5 @@
 package me.kiriyaga.nami.core.command;
 
-import net.minecraft.command.CommandSource;
-
 import static me.kiriyaga.nami.Nami.*;
 
 public class CommandManager {
@@ -12,7 +10,7 @@ public class CommandManager {
 
     public void init() {
         CommandRegistry.registerAnnotatedCommands(storage);
-        suggester.registerCommands();
+        suggester.updateDispatcher();
         EVENT_MANAGER.register(executor);
         LOGGER.info("Registered " + storage.size() + " commands.");
     }
@@ -27,6 +25,16 @@ public class CommandManager {
 
     public CommandSuggester getSuggester() {
         return suggester;
+    }
+
+    public void addCommand(me.kiriyaga.nami.feature.command.Command command) {
+        storage.addCommand(command);
+        suggester.updateDispatcher();
+    }
+
+    public void removeCommand(me.kiriyaga.nami.feature.command.Command command) {
+        storage.removeCommand(command);
+        suggester.updateDispatcher();
     }
 
 }

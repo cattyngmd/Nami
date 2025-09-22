@@ -14,8 +14,8 @@ public class ModuleSettingCommand extends Command {
 
     public ModuleSettingCommand() {
         super("set", new CommandArgument[] {
-                new CommandArgument.StringArg("module", 1, 64),
-                new CommandArgument.StringArg("setting", 1, 64),
+                new CommandArgument.ModuleArg("module"),
+                new CommandArgument.SettingArg("setting"),
                 new CommandArgument.StringArg("value", 1, 256) {
                     @Override
                     public boolean isRequired() {

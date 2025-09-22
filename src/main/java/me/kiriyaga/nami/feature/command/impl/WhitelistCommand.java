@@ -14,9 +14,9 @@ public class WhitelistCommand extends Command {
         super(
                 moduleName.replace(" ", ""),
                 new CommandArgument[] {
-                        new CommandArgument.StringArg("setting", 1, 64),
+                        new CommandArgument.SettingArg("setting"),
                         new CommandArgument.ActionArg("add/del/list", "add", "del", "list"),
-                        new CommandArgument.StringArg("item", 1, 64) {
+                        new CommandArgument.IdentifierArg("item", CommandArgument.IdentifierArg.Target.ITEM) {
                             @Override
                             public boolean isRequired() {
                                 return false;

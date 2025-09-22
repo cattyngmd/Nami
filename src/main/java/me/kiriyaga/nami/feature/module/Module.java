@@ -117,9 +117,20 @@ public abstract class Module {
     }
 
     public Setting<?> getSettingByName(String name) {
+        if (name == null) return null;
         String lower = name.toLowerCase();
         for (Setting<?> setting : settings) {
-            if (setting.getName().toLowerCase().equals(lower)) {
+            String sname = setting.getName();
+            if (sname == null) continue;
+            if (sname.toLowerCase().equals(lower)) {
+                return setting;
+            }
+        }
+        String compact = lower.replaceAll("\\s", "");
+        for (Setting<?> setting : settings) {
+            String sname = setting.getName();
+            if (sname == null) continue;
+            if (sname.toLowerCase().replaceAll("\\s", "").equals(compact)) {
                 return setting;
             }
         }

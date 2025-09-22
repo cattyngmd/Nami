@@ -13,7 +13,7 @@ public class DrawnCommand extends Command {
     public DrawnCommand() {
         super("drawn",
                 new CommandArgument[] {
-                        new CommandArgument.StringArg("moduleName", 1, 25)
+                        new CommandArgument.ModuleArg("moduleName")
                 },
                 "draw", "drawmodule", "moduledraw");
     }

@@ -121,4 +121,51 @@ public abstract class CommandArgument {
             throw new IllegalArgumentException("Invalid value for argument '" + getName() + "'. Allowed: " + String.join(", ", allowedValues));
         }
     }
+
+    public static class ModuleArg extends CommandArgument {
+        public ModuleArg(String name) {
+            super(name, true);
+        }
+
+        @Override
+        public Object parse(String input) {
+            return input;
+        }
+    }
+
+    public static class SettingArg extends CommandArgument {
+        public SettingArg(String name) {
+            super(name, true);
+        }
+
+        @Override
+        public Object parse(String input) {
+            return input;
+        }
+    }
+
+    public static class IdentifierArg extends CommandArgument {
+        public enum Target { BLOCK, ITEM }
+
+        private final Target target;
+
+        public IdentifierArg(String name, Target target) {
+            super(name, true);
+            this.target = target;
+        }
+
+        public IdentifierArg(String name) {
+            super(name, true);
+            this.target = null;
+        }
+
+        public Target getTarget() {
+            return target;
+        }
+
+        @Override
+        public Object parse(String input) {
+            return input;
+        }
+    }
 }

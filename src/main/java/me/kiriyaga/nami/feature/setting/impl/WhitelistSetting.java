@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Arrays;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -15,14 +16,50 @@ public class WhitelistSetting extends BoolSetting {
     private final Set<Identifier> whitelist = new HashSet<>();
     private final String moduleName;
     private final String settingName;
+    public enum Type { ANY, BLOCK, ITEM, ENTITY, SOUND, PARTICLE }
+
+    private final Set<Type> allowedTypes = new HashSet<>();
 
     public WhitelistSetting(String name, boolean defaultValue, String moduleName) {
         super(name, defaultValue);
         this.moduleName = moduleName.toLowerCase();
         this.settingName = name.toLowerCase();
 
-        // The WhitelistCommand is now registered centrally in CommandRegistry.
-        // This dynamic registration is removed to prevent duplicates and conflicts.
+        this.allowedTypes.add(Type.ANY);
+
+        try {
+            if (COMMAND_MANAGER.getStorage().getCommandByNameOrAlias(this.moduleName) == null) {
+                COMMAND_MANAGER.addCommand(new WhitelistCommand(moduleName));
+            }
+        } catch (Exception ignored) {}
+    }
+
+    public WhitelistSetting(String name, boolean defaultValue, String moduleName, Type... types) {
+        this(name, defaultValue, moduleName);
+        this.allowedTypes.clear();
+        if (types == null || types.length == 0) {
+            this.allowedTypes.add(Type.ANY);
+        } else {
+            this.allowedTypes.addAll(Arrays.asList(types));
+        }
+    }
+
+    public Set<Type> getAllowedTypes() {
+        return Set.copyOf(allowedTypes);
+    }
+
+    public void setAllowedTypes(Type... types) {
+        this.allowedTypes.clear();
+        if (types == null || types.length == 0) {
+            this.allowedTypes.add(Type.ANY);
+        } else {
+            this.allowedTypes.addAll(Arrays.asList(types));
+        }
+    }
+
+    public boolean allows(Type t) {
+        if (allowedTypes.contains(Type.ANY)) return true;
+        return allowedTypes.contains(t);
     }
 
     public Set<Identifier> getWhitelist() {
@@ -63,6 +100,18 @@ public class WhitelistSetting extends BoolSetting {
                 }
             }
         }
+        if (obj.has("types") && obj.get("types").isJsonArray()) {
+            this.allowedTypes.clear();
+            for (JsonElement e : obj.getAsJsonArray("types")) {
+                if (!e.isJsonPrimitive()) continue;
+                try {
+                    String s = e.getAsString();
+                    WhitelistSetting.Type t = WhitelistSetting.Type.valueOf(s.toUpperCase());
+                    this.allowedTypes.add(t);
+                } catch (Exception ignored) {}
+            }
+            if (this.allowedTypes.isEmpty()) this.allowedTypes.add(Type.ANY);
+        }
     }
 
     @Override
@@ -73,6 +122,10 @@ public class WhitelistSetting extends BoolSetting {
         for (Identifier id : whitelist) {
             items.add(id.toString());
         }
+        obj.add("items", items);
+        JsonArray types = new JsonArray();
+        for (Type t : allowedTypes) types.add(t.name().toLowerCase());
+        obj.add("types", types);
         obj.add("items", items);
         return obj;
     }
