@@ -13,18 +13,20 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.BlockUtils;
+import me.kiriyaga.nami.util.KeyUtils;
 import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static me.kiriyaga.nami.Nami.*;
-//TODO: KeyBind args suggestion
-//TODO: config name suggestion from folder
+
 public class CommandSuggester {
 
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
@@ -35,6 +37,8 @@ public class CommandSuggester {
     private final List<String> generalIdCache = new ArrayList<>();
     private final List<String> soundIdCache = new ArrayList<>();
     private final List<String> particleIdCache = new ArrayList<>();
+    private final List<String> keyNameCache = new ArrayList<>();
+    private final List<String> configNameCache = new ArrayList<>();
     private boolean identifierCacheBuilt = false;
     private static final int SUGGESTION_LIMIT = 200;
 
@@ -81,6 +85,25 @@ public class CommandSuggester {
                     ids.add(id.toString().toLowerCase(Locale.ROOT));
                 }
             });
+
+            // Key names
+            keyNameCache.clear();
+
+            // Dynamically get key names from KeyUtils by iterating through possible key codes
+            IntStream.range(-1, 350).forEach(keyCode -> {
+                String keyName = KeyUtils.getKeyName(keyCode);
+                if (keyName != null && !keyName.startsWith("KEY_")) {
+                    keyNameCache.add(keyName);
+                }
+            });
+
+            // Config names
+            configNameCache.clear();
+            try {
+                configNameCache.addAll(CONFIG_MANAGER.getConfigSerializer().listConfigs());
+            } catch (Exception e) {
+                LOGGER.warn("Failed to load config names for suggestions", e);
+            }
 
             // Other registries useful for whitelists
             try {
@@ -184,6 +207,30 @@ public class CommandSuggester {
                                 if (nameNoSpaces.toLowerCase(Locale.ROOT).startsWith(remaining)) {
                                     suggestionBuilder.suggest(nameNoSpaces);
                                     if (++count >= SUGGESTION_LIMIT) break;
+                                }
+                            }
+                            return suggestionBuilder.buildFuture();
+                        });
+                    }
+
+                    if (arg instanceof CommandArgument.KeyBindArg) {
+                        argBuilder.suggests((context, suggestionBuilder) -> {
+                            String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+                            for (String value : keyNameCache) {
+                                if (value.toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                    suggestionBuilder.suggest(value);
+                                }
+                            }
+                            return suggestionBuilder.buildFuture();
+                        });
+                    }
+
+                    if (arg instanceof CommandArgument.ConfigNameArg) {
+                        argBuilder.suggests((context, suggestionBuilder) -> {
+                            String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+                            for (String value : configNameCache) {
+                                if (value.toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                    suggestionBuilder.suggest(value);
                                 }
                             }
                             return suggestionBuilder.buildFuture();
@@ -319,6 +366,10 @@ public class CommandSuggester {
         } else if (arg instanceof CommandArgument.SettingArg) {
             return StringArgumentType.string();
         } else if (arg instanceof CommandArgument.IdentifierArg) {
+            return StringArgumentType.string();
+        } else if (arg instanceof CommandArgument.KeyBindArg) {
+            return StringArgumentType.string();
+        } else if (arg instanceof CommandArgument.ConfigNameArg) {
             return StringArgumentType.string();
         }
         return StringArgumentType.string();

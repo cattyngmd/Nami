@@ -144,6 +144,28 @@ public abstract class CommandArgument {
         }
     }
 
+    public static class KeyBindArg extends CommandArgument {
+        public KeyBindArg(String name) {
+            super(name, true);
+        }
+
+        @Override
+        public Object parse(String input) {
+            return input;
+        }
+    }
+
+    public static class ConfigNameArg extends CommandArgument {
+        public ConfigNameArg(String name) {
+            super(name, true);
+        }
+
+        @Override
+        public Object parse(String input) {
+            return input;
+        }
+    }
+
     public static class IdentifierArg extends CommandArgument {
         public enum Target { BLOCK, ITEM, SOUND, PARTICLE, ANY }
 

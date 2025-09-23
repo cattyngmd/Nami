@@ -19,7 +19,7 @@ public class BindCommand extends Command {
                 "bind",
                 new CommandArgument[] {
                         new CommandArgument.ModuleArg("module"),
-                        new CommandArgument.StringArg("key", 1, 10)
+                        new CommandArgument.KeyBindArg("key")
                 },
                 "b"
         );
