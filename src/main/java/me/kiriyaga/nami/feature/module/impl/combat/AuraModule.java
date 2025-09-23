@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import com.google.common.collect.Multimap;
 import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
@@ -17,10 +18,19 @@ import me.kiriyaga.nami.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
+import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentHolder;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.*;
@@ -34,6 +44,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.hit.EntityHitResult;
 
 import java.awt.*;
+import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.RotationUtils.*;
@@ -207,8 +218,24 @@ public class AuraModule extends Module {
                 b = true;
             }
 
+        int prev = -1;
+
+        if (swap.get() == Swap.NORMAL || swap.get() == Swap.SILENT) {
+            int slot = getWeapon();
+            if (slot != -1) {
+                prev = MC.player.getInventory().getSelectedSlot();
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+            }
+        }
+
         MC.interactionManager.attackEntity(MC.player, target);
         MC.player.swingHand(Hand.MAIN_HAND);
+
+        if (swap.get() == Swap.SILENT) {
+            if (prev != -1) {
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+            }
+        }
 
         if (stopSprinting.get() == Sprint.PACKET)
             if (b)
@@ -290,13 +317,14 @@ public class AuraModule extends Module {
         return null;
     }
 
-    private static float getBaseCooldownTicks(ItemStack stack, float tps) {
+    private float getBaseCooldownTicks(ItemStack stack, float tps) {
         float baseTicks;
 
-        if (stack.isIn(ItemTags.SWORDS)) baseTicks = 12f;
-        else if (stack.isIn(ItemTags.AXES)) baseTicks = 20f;
-        else if (stack.getItem() instanceof TridentItem) baseTicks = 18f;
-        else if (stack.getItem() instanceof MaceItem) baseTicks = 33f;
+        ItemStack currentStack = ((swap.get() == Swap.SILENT || swap.get() == Swap.NORMAL) && getWeapon() != -1) ? MC.player.getInventory().getStack(getWeapon()) : stack;
+        if (currentStack.isIn(ItemTags.SWORDS)) baseTicks = 13f;
+        else if (currentStack.isIn(ItemTags.AXES)) baseTicks = 21f;
+        else if (currentStack.getItem() instanceof TridentItem) baseTicks = 19f;
+        else if (currentStack.getItem() instanceof MaceItem) baseTicks = 34f;
         else {
             float attackSpeed = 6f; // 2b2t allows from 4 to 6
             baseTicks = 20f / attackSpeed;
@@ -313,5 +341,52 @@ public class AuraModule extends Module {
             return false;
 
         return false;
+    }
+
+    public static int getWeapon() {
+        int bestSlot = -1;
+        float bestDamage = -1f;
+
+        boolean prioritizeMace = !MC.player.getAbilities().flying && !MC.player.isOnGround();
+
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack held = MC.player.getInventory().getStack(slot);
+            if (held.isEmpty()) continue;
+
+            boolean isSword = held.isIn(ItemTags.SWORDS);
+            boolean isAxe = held.isIn(ItemTags.AXES);
+            boolean isTrident = held.getItem() instanceof TridentItem;
+            boolean isMace = held.getItem() instanceof MaceItem;
+
+            if (!isSword && !isAxe && !isTrident && !isMace) continue;
+
+            if (isMace && prioritizeMace) return slot;
+
+            float attackDamage = 0f;
+
+            if (held.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
+                AttributeModifiersComponent modifiers = held.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+                for (var entry : modifiers.comp_2393()) {
+                    if (entry.comp_2395().matches(EntityAttributes.ATTACK_DAMAGE)) {
+                        attackDamage += (float) entry.comp_2396().value();
+                    }
+                }
+            }
+
+            if (isSword) attackDamage += 5f;
+
+            int sharpness = EnchantmentUtils.getEnchantmentLevel(held, Enchantments.SHARPNESS);
+            int smite = EnchantmentUtils.getEnchantmentLevel(held, Enchantments.SMITE);
+            int bane = EnchantmentUtils.getEnchantmentLevel(held, Enchantments.BANE_OF_ARTHROPODS);
+
+            attackDamage += sharpness * 1.25f + smite * 2.5f + bane * 2.5f;
+
+            if (attackDamage > bestDamage) {
+                bestDamage = attackDamage;
+                bestSlot = slot;
+            }
+        }
+
+        return bestSlot;
     }
 }
