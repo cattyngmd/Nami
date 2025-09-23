@@ -12,7 +12,7 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 public class RotationModule extends Module {
 
     public enum RotationMode {
-        MOTION
+        MOTION, SILENT
     }
 
     public final EnumSetting<RotationMode> rotation = addSetting(new EnumSetting<>("Rotation",RotationMode.MOTION));
