@@ -71,7 +71,7 @@ public class RotationTickHandler {
 
         RotationRequest active = requestHandler.getActiveRequest();
         if (module.rotation.get() == RotationModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
-            performSilent(active);
+            performSilent(active); // actually this can be skipped if we somehow simulate client rotation packet sending idk
             stateHandler.setSilentSyncRequired(false);
             resetRotationToReal();
             return;

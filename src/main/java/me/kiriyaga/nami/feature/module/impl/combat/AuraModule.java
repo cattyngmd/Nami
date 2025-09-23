@@ -42,11 +42,12 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 public class AuraModule extends Module {
 
     public enum TpsMode { NONE, LATEST, AVERAGE }
-    public enum Rotate { NORMAL, HOLD}
+    public enum Rotate { NORMAL, HOLD, NONE}
     public enum Sprint { NONE, MOTION, PACKET }
+    public enum Swap { NONE, REQUIRE, NORMAL, SILENT }
 
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
-    public final BoolSetting swordOnly = addSetting(new BoolSetting("WeapOnly", false));
+    public final EnumSetting<Swap> swap = addSetting(new EnumSetting<>("Swap", Swap.REQUIRE));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
     public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", false));
     public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("Sprinting", Sprint.NONE));
@@ -69,6 +70,19 @@ public class AuraModule extends Module {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) return;
+
+        float tps;
+        switch (tpsMode.get()) {
+            case LATEST -> tps = TICK_MANAGER.getLatestTPS();
+            case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
+            default -> tps = 20f;
+        }
+
+        attackCooldownTicks -= 1f * (tps / 20f);
+        if (attackCooldownTicks < 0f) attackCooldownTicks = 0f;
+
+        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugAura(Text.of("cooldown ticks is : "+attackCooldownTicks));
+
         if (!multiTask.get() && MC.player.isUsingItem()) return;
 
         long startTime = System.nanoTime();
@@ -77,7 +91,7 @@ public class AuraModule extends Module {
         Entity target = ENTITY_MANAGER.getTarget();
         DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
-        if (target == null || (swordOnly.get() && !(stack.getItem() instanceof AxeItem
+        if (target == null || (swap.get() == Swap.REQUIRE && !(stack.getItem() instanceof AxeItem
                 || stack.isIn(ItemTags.SWORDS)
                 || stack.getItem() instanceof TridentItem
                 || stack.getItem() instanceof MaceItem))) {
@@ -90,20 +104,10 @@ public class AuraModule extends Module {
         this.setDisplayInfo(target.getName().getString());
         long auraLogicStart = System.nanoTime();
 
-        float tps;
-        switch (tpsMode.get()) {
-            case LATEST -> tps = TICK_MANAGER.getLatestTPS();
-            case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
-            default -> tps = 20f;
-        }
-
 //        if (!ItemStack.areEqual(stack, lastHeldStack)) {
 //            lastHeldStack = stack;
 //            attackCooldownTicks = getBaseCooldownTicks(stack, tps);
 //        }
-
-        attackCooldownTicks -= 1f * (tps / 20f);
-        if (attackCooldownTicks < 0f) attackCooldownTicks = 0f;
 
         boolean skipCooldown = false;
 
@@ -163,22 +167,25 @@ public class AuraModule extends Module {
 
             if (!insideBox && distanceCheck == null) return; // out because throretical distance recieved by raycast is too big
             boolean canAttack = false;
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
-                    AuraModule.class.getName(),
-                    5,
-                    idealYaw,
-                    idealPitch
-            ));
 
-            EntityHitResult serverCheck = raycastTarget(
-                    MC.player,
-                    target,
-                    attackRange.get(),
-                    ROTATION_MANAGER.getStateHandler().getServerYaw(),
-                    ROTATION_MANAGER.getStateHandler().getServerPitch()
-            );
+            if (rotate.get() != Rotate.NONE) {
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+                        AuraModule.class.getName(),
+                        5,
+                        idealYaw,
+                        idealPitch
+                ));
 
-            canAttack = serverCheck != null;
+                EntityHitResult serverCheck = raycastTarget(
+                        MC.player,
+                        target,
+                        attackRange.get(),
+                        ROTATION_MANAGER.getStateHandler().getServerYaw(),
+                        ROTATION_MANAGER.getStateHandler().getServerPitch()
+                );
+
+                canAttack = serverCheck != null;
+            }
 
             if (insideBox)
                 canAttack = true;
