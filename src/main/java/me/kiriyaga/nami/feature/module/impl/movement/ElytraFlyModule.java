@@ -8,6 +8,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
@@ -133,7 +134,7 @@ public class ElytraFlyModule extends Module {
             }
 
             if (pitch.get())
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYaw(), pitchDegree.get().floatValue()));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYaw(), pitchDegree.get().floatValue(), RotationModule.RotationMode.MOTION));
 
             MC.player.networkHandler.sendPacket(
                     new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
@@ -183,7 +184,7 @@ public class ElytraFlyModule extends Module {
                 }
 
                 ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(this.getName(), 1, finalYaw, finalPitch)
+                        new RotationRequest(this.getName(), 1, finalYaw, finalPitch, RotationModule.RotationMode.MOTION)
                 );
 
                 setJumpHeld(true);
@@ -247,7 +248,7 @@ public class ElytraFlyModule extends Module {
 
             //TODO yaw smooth n
             ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(this.getName(), 1, MC.player.getYaw(), smoothPitch)
+                    new RotationRequest(this.getName(), 1, MC.player.getYaw(), smoothPitch, RotationModule.RotationMode.MOTION)
             );
         }
     }

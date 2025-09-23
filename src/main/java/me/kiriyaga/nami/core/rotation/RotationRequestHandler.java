@@ -45,8 +45,13 @@ public class RotationRequestHandler {
      * USE STATIC REQUEST AND UPDATE DATA ON ANY PRE-TICK EVENT HIGHER THEN LOWEST
      */
     public void submit(RotationRequest request) {
-        if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT)
+//        RotationModule.RotationMode mode = MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get();
+
+        if (request.rotationMode == RotationModule.RotationMode.SILENT) {
             performSilent(request);
+            stateHandler.setSilentSyncRequired(true);
+            return;
+        }
 
         requests.removeIf(r -> Objects.equals(r.id, request.id));
         requests.add(request);
@@ -89,6 +94,8 @@ public class RotationRequestHandler {
      * @return {@code true}, if yaw pitch is close enough to target
      */
     public boolean isCompleted(String id, float threshold) {
+        if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired())
+            return true; // TODO: find better solution
         return requests.stream()
                 .filter(r -> r.id.equals(id))
                 .findFirst()
@@ -148,8 +155,8 @@ public class RotationRequestHandler {
         float targetYaw = req.targetYaw;
         float targetPitch = req.targetPitch;
 
-        ROTATION_MANAGER.getStateHandler().setRotationYaw(targetYaw);
-        ROTATION_MANAGER.getStateHandler().setRotationPitch(targetPitch);
+//        ROTATION_MANAGER.getStateHandler().setRotationYaw(targetYaw);
+//        ROTATION_MANAGER.getStateHandler().setRotationPitch(targetPitch);
         ROTATION_MANAGER.getStateHandler().setServerYaw(targetYaw);
         ROTATION_MANAGER.getStateHandler().setServerPitch(targetPitch);
 
