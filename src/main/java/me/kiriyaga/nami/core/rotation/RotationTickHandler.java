@@ -73,6 +73,8 @@ public class RotationTickHandler {
         if (module.rotation.get() == RotationModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
             performSilent(active);
             stateHandler.setSilentSyncRequired(false);
+            resetRotationToReal();
+            return;
         }
 
         if (active != null) {
