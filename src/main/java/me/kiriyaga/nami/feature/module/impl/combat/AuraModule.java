@@ -12,6 +12,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
@@ -45,13 +46,10 @@ public class AuraModule extends Module {
     public enum Sprint { NONE, MOTION, PACKET }
 
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
-    public final BoolSetting vanillaRange = addSetting(new BoolSetting("VanillaRange", true));
     public final BoolSetting swordOnly = addSetting(new BoolSetting("WeapOnly", false));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
     public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", false));
     public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("Sprinting", Sprint.NONE));
-    public final BoolSetting raycast = addSetting(new BoolSetting("Raycast", true));
-    public final BoolSetting raycastConfirm = addSetting(new BoolSetting("Confirm", true));
     public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("Rotate", Rotate.NORMAL));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
@@ -60,7 +58,6 @@ public class AuraModule extends Module {
 
     public AuraModule() {
         super("Aura", "Attacks certain targets automatically.", ModuleCategory.of("Combat"), "killaura", "ara", "killara");
-    raycastConfirm.setShowCondition(raycast::get);
     }
 
     @Override
@@ -136,8 +133,6 @@ public class AuraModule extends Module {
         //        if (MC.player.isGliding() && eyeDist >= 2.601) // yes
         //            return;
 
-        double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), target.getBoundingBox());
-
         double preRotate;
 
         switch (rotate.get()) { // yes
@@ -146,52 +141,55 @@ public class AuraModule extends Module {
             default -> preRotate = 0.10;
         }
 
-        if (eyeDist <= attackRange.get()+0.10 && (skipCooldown || attackCooldownTicks <= preRotate * tps)) {
-            Vec3d rotationTarget;
-            if (raycast.get()) {
-                Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
-                rotationTarget = getClosestPointToEye(eyePos, target.getBoundingBox());
-            } else {
-                rotationTarget = getEntityCenter(target);
-            }
+        if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT)
+            preRotate = 0.00; // rotation silent are instant and do not require pre rotate to reduce attack delay
 
+        // RayCast as main distance check
+        if ((skipCooldown || attackCooldownTicks <= preRotate * tps)) {
+            Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+            Vec3d closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
+            float idealYaw = (float) getYawToVec(MC.player, closestPoint);
+            float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
+
+            EntityHitResult distanceCheck = raycastTarget(
+                    MC.player,
+                    target,
+                    attackRange.get() + (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION ? 0.10 : 0.00),
+                    idealYaw,
+                    idealPitch
+            );
+
+            boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePos());
+
+            if (!insideBox && distanceCheck == null) return; // out because throretical distance recieved by raycast is too big
+            boolean canAttack = false;
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                     AuraModule.class.getName(),
                     5,
-                    (float) getYawToVec(MC.player, rotationTarget),
-                    (float) getPitchToVec(MC.player, rotationTarget)
+                    idealYaw,
+                    idealPitch
             ));
+
+            EntityHitResult serverCheck = raycastTarget(
+                    MC.player,
+                    target,
+                    attackRange.get(),
+                    ROTATION_MANAGER.getStateHandler().getServerYaw(),
+                    ROTATION_MANAGER.getStateHandler().getServerPitch()
+            );
+
+            canAttack = serverCheck != null;
+
+            if (insideBox)
+                canAttack = true;
+
+            if (!canAttack) return;
 
             SprintModule m = MODULE_MANAGER.getStorage().getByClass(SprintModule.class);
             if (stopSprinting.get() == Sprint.MOTION && m != null && m.isEnabled())
                 m.stopSprinting(3);
         }
 
-        if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AuraModule.class.getName()) && (!raycast.get() || !raycastConfirm.get()))
-            return;
-
-        boolean canAttack;
-        if (raycast.get()) {
-            EntityHitResult attackHit;
-            if (raycastConfirm.get()) {
-                attackHit = raycastTarget(MC.player, target, attackRange.get(),
-                        ROTATION_MANAGER.getStateHandler().getServerYaw(),
-                        ROTATION_MANAGER.getStateHandler().getServerPitch());
-            } else {
-                Vec3d eyePos = MC.player.getEyePos();
-                Vec3d closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
-                float idealYaw = (float) getYawToVec(MC.player, closestPoint);
-                float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
-                attackHit = raycastTarget(MC.player, target, attackRange.get(), idealYaw, idealPitch);
-            }
-            boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePos()); // i dont fucking know why raycast doesnt apply while inside AABB, i thought mc aabb fixes it
-            canAttack = insideBox || (attackHit != null && attackHit.getEntity() == target);
-        } else {
-            double dist = MC.player.getPos().distanceTo(getEntityCenter(target));
-            canAttack = dist <= attackRange.get();
-        }
-
-        if (!canAttack) return;
         if (!skipCooldown && attackCooldownTicks > 0f) return;
 
         boolean b = false;
@@ -241,9 +239,23 @@ public class AuraModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (!render.get() || currentTarget == null) return;
 
-        double eyeDist = getClosestEyeDistance(MC.player.getEyePos(), currentTarget.getBoundingBox());
+        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+        Vec3d closestPoint = getClosestPointToEye(eyePos, currentTarget.getBoundingBox());
+        float idealYaw = (float) getYawToVec(MC.player, closestPoint);
+        float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
 
-        if (eyeDist > attackRange.get()+0.10) return;
+        EntityHitResult distanceCheck = raycastTarget(
+                MC.player,
+                currentTarget,
+                attackRange.get() + (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION ? 0.10 : 0.00),
+                idealYaw,
+                idealPitch
+        );
+
+        boolean insideBox = currentTarget.getBoundingBox().contains(MC.player.getEyePos());
+
+        if (!insideBox && distanceCheck == null) return; // out because throretical distance recieved by raycast is too big
+
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
@@ -260,7 +272,7 @@ public class AuraModule extends Module {
     private EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
         Vec3d eyePos = player.getCameraPosVec(1.0f);
         Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3d reachEnd = eyePos.add(look.multiply(vanillaRange.get() ? 3.00 : reach));
+        Vec3d reachEnd = eyePos.add(look.multiply(reach));
 
         Box targetBox = target.getBoundingBox();
 
