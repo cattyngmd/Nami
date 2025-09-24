@@ -1,14 +1,12 @@
-    package me.kiriyaga.nami.feature.module.impl.misc;
+    package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
     import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
     import me.kiriyaga.nami.event.EventPriority;
     import me.kiriyaga.nami.event.SubscribeEvent;
     import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
-    import me.kiriyaga.nami.event.impl.PreTickEvent;
     import me.kiriyaga.nami.feature.module.Module;
     import me.kiriyaga.nami.feature.module.ModuleCategory;
     import me.kiriyaga.nami.feature.module.RegisterModule;
-    import me.kiriyaga.nami.feature.setting.impl.IntSetting;
     import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
     import net.minecraft.text.Text;
 
@@ -29,7 +27,7 @@
         private final double SIMILARITY_THRESHOLD = 0.85;
 
         public AntiSpamModule() {
-            super("AntiSpam", "Automatically combines repeated chat messages.", ModuleCategory.of("Misc"), "antispam");
+            super("AntiSpam", "Automatically combines repeated chat messages.", ModuleCategory.of("Miscellaneous"), "antispam");
         }
 
         @SubscribeEvent(priority = EventPriority.LOWEST)

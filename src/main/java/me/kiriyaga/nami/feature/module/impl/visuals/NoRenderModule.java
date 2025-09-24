@@ -43,7 +43,7 @@ public class NoRenderModule extends Module {
     public final BoolSetting noPowderedSnow = addSetting(new BoolSetting("NoPowdered", false));
 
     public NoRenderModule() {
-        super("NoRender", "Prevent rendering certain overlays/effects.", ModuleCategory.of("Visuals"), "norender");
+        super("NoRender", "Prevent rendering certain overlays/effects.", ModuleCategory.of("Render"), "norender");
         noFire.setOnChanged(this::reloadRenderer);
         noBackground.setOnChanged(this::reloadRenderer);
         noLiguid.setOnChanged(this::reloadRenderer);

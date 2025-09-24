@@ -2,7 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.kiriyaga.nami.feature.module.impl.misc.ReachModule;
+import me.kiriyaga.nami.feature.module.impl.miscellaneous.ReachModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.MinecraftClient;

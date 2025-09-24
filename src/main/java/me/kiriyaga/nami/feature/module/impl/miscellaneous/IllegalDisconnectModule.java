@@ -1,21 +1,14 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.DissconectEvent;
-import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import me.kiriyaga.nami.event.impl.PacketSendEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.encryption.NetworkEncryptionUtils;
 import net.minecraft.network.message.LastSeenMessageList;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.QueryEntityNbtC2SPacket;
-import net.minecraft.util.Identifier;
 
 import java.time.Instant;
 import java.util.BitSet;
@@ -26,7 +19,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class IllegalDisconnectModule extends Module {
 
     public IllegalDisconnectModule() {
-        super("IllegalDisconnect", "Cancels disconnects and sends invalid packets to force close connection.", ModuleCategory.of("Misc"), "illegaldisconnect");
+        super("IllegalDisconnect", "Cancels disconnects and sends invalid packets to force close connection.", ModuleCategory.of("Miscellaneous"), "illegaldisconnect");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

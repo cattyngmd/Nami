@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
@@ -7,19 +7,14 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
-import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
@@ -27,7 +22,7 @@ public class EndermanAgro extends Module {
 
 
     public EndermanAgro() {
-        super("EndermanAgro", "Automatically looks into nearby enderman eyes.", ModuleCategory.of("Misc"), "autoenderman");
+        super("EndermanAgro", "Automatically looks into nearby enderman eyes.", ModuleCategory.of("Miscellaneous"), "autoenderman");
     }
 
     @SubscribeEvent

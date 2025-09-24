@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
@@ -49,7 +49,7 @@ public class SkinBlinkModule extends Module {
     private final Random randomizer = new Random();
 
     public SkinBlinkModule() {
-        super("SkinBlink", "Blinks player model layer parts.", ModuleCategory.of("Misc"), "skinblink");
+        super("SkinBlink", "Blinks player model layer parts.", ModuleCategory.of("Miscellaneous"), "skinblink");
     }
 
     @Override

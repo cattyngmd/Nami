@@ -1,6 +1,5 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
-import it.unimi.dsi.fastutil.doubles.DoubleSet;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
@@ -19,6 +18,6 @@ public class BetterTabModule extends Module {
     public final BoolSetting highlighFriends = addSetting(new BoolSetting("Highlight", true));
 
     public BetterTabModule() {
-        super("BetterTab", "Extends tab limits and tweaks.", ModuleCategory.of("Misc"), "bettertab");
+        super("BetterTab", "Extends tab limits and tweaks.", ModuleCategory.of("Miscellaneous"), "bettertab");
     }
 }

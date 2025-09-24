@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
 import me.kiriyaga.nami.event.EventPriority;
@@ -21,7 +21,7 @@ public class RespawnModule extends Module {
     public final BoolSetting autoRespawn = addSetting(new BoolSetting("AutoRespawn", false));
 
     public RespawnModule() {
-        super("Respawn", "Death screen tweaks.", ModuleCategory.of("Misc"), "autorespawn");
+        super("Respawn", "Death screen tweaks.", ModuleCategory.of("Miscellaneous"), "autorespawn");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

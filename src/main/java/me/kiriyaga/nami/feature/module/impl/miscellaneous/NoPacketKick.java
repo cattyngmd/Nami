@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -9,6 +9,6 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 public class NoPacketKick extends Module {
 
     public NoPacketKick() {
-        super("NoPacketKick", "Prevents from kicking because of netty exceptions.", ModuleCategory.of("Misc"), "npacketkick", "antipacketkick");
+        super("NoPacketKick", "Prevents from kicking because of netty exceptions.", ModuleCategory.of("Miscellaneous"), "npacketkick", "antipacketkick");
     }
 }

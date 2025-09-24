@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -18,7 +18,7 @@ public class ReachModule extends Module {
 
 
     public ReachModule() {
-        super("Reach", "Extends player reach values.", ModuleCategory.of("Misc"));
+        super("Reach", "Extends player reach values.", ModuleCategory.of("Miscellaneous"));
         playerOnly.setShowCondition(noEntityTrace::get);
         pickaxeOnly.setShowCondition(noEntityTrace::get);
     }

@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import com.google.common.collect.Sets;
 import me.kiriyaga.nami.event.EventPriority;
@@ -71,7 +71,7 @@ public class NoSoundLagModule extends Module { // TODO whitelist sounds
     private long lastClearTime = System.currentTimeMillis();
 
     public NoSoundLagModule() {
-        super("NoSoundLag", "Sound tweaks.", ModuleCategory.of("Misc"), "nosoundlag");
+        super("NoSoundLag", "Sound tweaks.", ModuleCategory.of("Miscellaneous"), "nosoundlag");
         elytra.setShowCondition(always::get );
     }
 

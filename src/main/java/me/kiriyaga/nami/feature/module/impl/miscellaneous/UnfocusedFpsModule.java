@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -11,6 +11,6 @@ public class UnfocusedFpsModule extends Module {
     public final IntSetting limit = addSetting(new IntSetting("Limit", 15, 5, 30));
 
     public UnfocusedFpsModule() {
-        super("UnfocusedFPS", "Limits your frame generation while unfocused.", ModuleCategory.of("Misc"), "unfocusedcpu");
+        super("UnfocusedFPS", "Limits your frame generation while unfocused.", ModuleCategory.of("Miscellaneous"), "unfocusedcpu");
     }
 }

@@ -55,7 +55,7 @@ public class ESPModule extends Module {
     public final BoolSetting smoothAppear = addSetting(new BoolSetting("Smooth", true));
 
     public ESPModule() {
-        super("ESP", "Highlights certain entities.", ModuleCategory.of("Visuals"), "esp", "wh", "boxes");
+        super("ESP", "Highlights certain entities.", ModuleCategory.of("Render"), "esp", "wh", "boxes");
         smoothAppear.setShowCondition(() -> (renderMode.get() == RenderMode.BOX || showItems.get() && itemBoundingBox.get()));
         outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
         itemBoundingBox.setShowCondition(() -> showItems.get());

@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -13,6 +13,6 @@ public class AutoReconnectModule extends Module {
     public final IntSetting delay = addSetting(new IntSetting("Delay", 5, 0, 80));
 
     public AutoReconnectModule() {
-        super("AutoReconnect", "Automatically reconnects to the specified server.", ModuleCategory.of("Misc"), "autoreconnect");
+        super("AutoReconnect", "Automatically reconnects to the specified server.", ModuleCategory.of("Miscellaneous"), "autoreconnect");
     }
 }

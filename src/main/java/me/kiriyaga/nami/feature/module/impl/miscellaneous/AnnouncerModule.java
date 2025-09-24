@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.module.impl.misc;
+package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
@@ -31,7 +31,7 @@ public class AnnouncerModule extends Module {
     private final EnumSetting<VisualRangeMode> soundMode = addSetting(new EnumSetting<>("Sound", VisualRangeMode.NONE));
 
     public AnnouncerModule() {
-        super("Announcer", "Announces in chat when a certain action happened.", ModuleCategory.of("Misc"), "joinannounce", "joins", "announce", "visualrange");
+        super("Announcer", "Announces in chat when a certain action happened.", ModuleCategory.of("Miscellaneous"), "joinannounce", "joins", "announce", "visualrange");
     soundMode.setShowCondition(visualRange::get);
     }
 
