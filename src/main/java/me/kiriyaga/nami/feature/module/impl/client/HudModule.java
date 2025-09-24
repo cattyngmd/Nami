@@ -4,6 +4,7 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render2DEvent;
+import me.kiriyaga.nami.feature.gui.screen.HudEditorScreen;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -21,6 +22,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class HudModule extends Module {
 
+    public final BoolSetting HUDEditor = addSetting(new BoolSetting("HUDEditor", false));
     public final BoolSetting chatAnimation = addSetting(new BoolSetting("ChatAnimation", true));
     public final BoolSetting shadow = addSetting(new BoolSetting("Shadow", true));
     public final BoolSetting bounce = addSetting(new BoolSetting("Bounce", false));
@@ -38,6 +40,12 @@ public class HudModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdate(PreTickEvent event) {
+
+        if (MC != null && MC.mouse != null && HUDEditor.get()){
+            MC.setScreen(new HudEditorScreen());
+            HUDEditor.toggle();
+        }
+
         if (bounce.get()) {
             float step = bounceSpeed.get() / 100f;
             if (increasing) {
