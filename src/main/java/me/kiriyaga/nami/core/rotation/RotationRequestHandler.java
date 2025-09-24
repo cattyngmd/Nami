@@ -116,6 +116,11 @@ public class RotationRequestHandler {
         }
     }
 
+    public void clear() {
+        requests.clear();
+        lastActiveRequestId = null;
+    }
+
     /**
      * Normalizing, in case
      * In client-side we normalize degree for easier target yaw controlling
