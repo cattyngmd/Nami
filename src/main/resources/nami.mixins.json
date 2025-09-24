@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "me.kiriyaga.nami.mixin",
+  "plugin": "me.kiriyaga.nami.mixin.MixinPlugin",
   "compatibilityLevel": "JAVA_20",
   "client": [
     "ChatHudAccessor",

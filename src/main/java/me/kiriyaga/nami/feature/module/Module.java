@@ -47,6 +47,7 @@ public abstract class Module {
     }
 
     public void setEnabled(boolean state) {
+        if (MC.world == null) return;
         if (this.enabled == state) return;
 
         this.enabled = state;
