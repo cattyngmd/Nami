@@ -199,7 +199,6 @@ public class NametagsModule extends Module {
                 i++;
                 renderEntityNametag(entity, "Owned by " + ownerName, event.getTickDelta(), matrices, 30, null);
             }
-        }
     }
 
 
