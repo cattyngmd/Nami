@@ -6,7 +6,6 @@ import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
@@ -28,9 +27,8 @@ import static me.kiriyaga.nami.Nami.*;
 public abstract class MixinClientPlayerEntity {
 
     @Shadow public abstract void move(MovementType type, Vec3d movement);
-    @Shadow private float lastPitchClient;
 
-    private float originalLstPitch;
+    private float originalSilentPitch;
     private float originalYaw, originalPitch;
 
     @Inject(method = "tick", at = @At("HEAD"))
@@ -120,9 +118,8 @@ public abstract class MixinClientPlayerEntity {
     private void sendMovementPackets1(CallbackInfo ci) {
         if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT
         && ROTATION_MANAGER.getStateHandler().getSilentSyncRequired()) {
-            this.originalLstPitch = this.lastPitchClient;
-            MC.player.setPitch(this.originalLstPitch + 0.001f);
-            this.lastPitchClient = 999f;
+            this.originalSilentPitch = MC.player.getPitch();
+            MC.player.setPitch(this.originalSilentPitch + 0.001f);
         }
     }
 
@@ -130,8 +127,7 @@ public abstract class MixinClientPlayerEntity {
     private void sendMovementPackets2(CallbackInfo ci) {
         if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT
                 && ROTATION_MANAGER.getStateHandler().getSilentSyncRequired()) {
-            this.lastPitchClient = this.originalLstPitch;
-            MC.player.setPitch(this.originalLstPitch);
+            MC.player.setPitch(this.originalSilentPitch);
             ROTATION_MANAGER.getStateHandler().setSilentSyncRequired(false);
         }
     }
