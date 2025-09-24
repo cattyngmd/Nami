@@ -9,27 +9,34 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.mixin.StrippableBlockRegistryAccessor;
+import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.item.HoneycombItem;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionTypes;
 
 import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
-public class AntiInteractModule extends Module {
+public class NoInteractModule extends Module {
 
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, this.name, WhitelistSetting.Type.BLOCK));
     public final BoolSetting spawnPoint = addSetting(new BoolSetting("SpawnPoint", true));
+    public final BoolSetting strip = addSetting(new BoolSetting("Strip", false));
     public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
 
-    public AntiInteractModule() {
-        super("AntiInteract", "Prevents you from interacting with certain blocks.", ModuleCategory.of("World"), "antiinteract");
+    public NoInteractModule() {
+        super("NoInteract", "Prevents you from interacting with certain blocks.", ModuleCategory.of("World"), "antiinteract");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -49,15 +56,27 @@ public class AntiInteractModule extends Module {
             return;
         }
 
-        if (!spawnPoint.get()) return;
+        if (spawnPoint.get()) {
+            if (player.getWorld().getDimension().comp_648() && isBed(block)) {
+                event.cancel();
+                return;
+            }
 
-        if (player.getWorld().getDimension().comp_648() && isBed(block)) {
-            event.cancel();
-            return;
+            if (block == Blocks.RESPAWN_ANCHOR && dimension.contains("nether")) {
+                event.cancel();
+                return;
+            }
         }
 
-        if (block == Blocks.RESPAWN_ANCHOR && dimension.contains("nether")) {
-            event.cancel();
+        if (strip.get()) {
+            boolean isMain = MC.player.getMainHandStack().isIn(ItemTags.AXES) && event.getHand() == Hand.MAIN_HAND;
+            boolean isOff = MC.player.getOffHandStack().isIn(ItemTags.AXES) && event.getHand() == Hand.OFF_HAND;
+            if (isMain || isOff) {
+                if (StrippableBlockRegistryAccessor.getRegistry().containsKey(block)) {
+                    event.cancel();
+                    return;
+                }
+            }
         }
     }
 
@@ -80,16 +99,30 @@ public class AntiInteractModule extends Module {
 
         if (whitelist.get() && whitelist.isWhitelisted(blockId)) {
             ev.cancel();
+            return;
         }
 
-        if (!spawnPoint.get()) return;
+        if (spawnPoint.get()) {
+            if (isBed(block) && dimension.equals("overworld")) {
+                ev.cancel();
+                return;
+            }
 
-        if (isBed(block) && dimension.equals("overworld")) {
-            ev.cancel();
+            if (block == Blocks.RESPAWN_ANCHOR && dimension.equals("nether")) {
+                ev.cancel();
+                return;
+            }
         }
 
-        if (block == Blocks.RESPAWN_ANCHOR && dimension.equals("nether")) {
-            ev.cancel();
+        if (strip.get()) {
+            boolean isMain = MC.player.getMainHandStack().isIn(ItemTags.AXES) && interactPacket.getHand() == Hand.MAIN_HAND;
+            boolean isOff = MC.player.getOffHandStack().isIn(ItemTags.AXES) && interactPacket.getHand() == Hand.OFF_HAND;
+            if (isMain || isOff) {
+                if (StrippableBlockRegistryAccessor.getRegistry().containsKey(block)) {
+                    ev.cancel();
+                    return;
+                }
+            }
         }
     }
 
