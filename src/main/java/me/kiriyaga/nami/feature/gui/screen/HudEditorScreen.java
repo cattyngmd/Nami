@@ -7,7 +7,6 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.module.impl.client.HudEditorModule;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -36,8 +35,8 @@ public class HudEditorScreen extends Screen {
         expandedCategories.add(ModuleCategory.of("hud"));
     }
 
-    private HudEditorModule getHudEditorModule() {
-        return MODULE_MANAGER.getStorage().getByClass(HudEditorModule.class);
+    private ClickGuiModule getClickGuiModule() {
+        return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
     private void syncCategoryPositions() {
@@ -49,13 +48,16 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(DrawContext context, int i, int j, float f) {}
+    public void renderBackground(DrawContext context, int i, int j, float f) {
+        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+            this.applyBlur(context);
+    }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         syncCategoryPositions();
 
-        HudEditorModule hudEditorModule = getHudEditorModule();
+        ClickGuiModule hudEditorModule = getClickGuiModule();
         if (hudEditorModule != null && hudEditorModule.background.get()) {
             int alpha = (hudEditorModule.backgroundAlpha.get() & 0xFF) << 24;
             int color = alpha | 0x101010;
@@ -328,7 +330,7 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == MODULE_MANAGER.getStorage().getByClass(HudEditorModule.class).getKeyBind().get() && MC.world != null) {
+        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
             MC.setScreen(null);
             return true;
         }

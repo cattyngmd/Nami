@@ -21,6 +21,7 @@ public class ClickGuiModule extends Module {
     public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 50, 0, 255));
     public final BoolSetting fade = addSetting(new BoolSetting("Fade", true));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
+    public final BoolSetting blur = addSetting(new BoolSetting("Blur", true));
     public final IntSetting backgroundAlpha = addSetting(new IntSetting("Alpha", 75, 0, 255));
 
     public ClickGuiModule() {
