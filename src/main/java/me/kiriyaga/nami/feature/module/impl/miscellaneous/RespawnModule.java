@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
-import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
@@ -34,7 +34,7 @@ public class RespawnModule extends Module {
                 Vec3d pos = MC.player.getPos();
                 String coords = String.format("X: %d Y: %d Z: %d", Math.round(pos.x), Math.round(pos.y), Math.round(pos.z));
                 CHAT_MANAGER.sendPersistent(RespawnModule.class.getName(), CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}."));
-            }, 10, ExecutableEventType.PRE_TICK);
+            }, 10, ExecutableThreadType.PRE_TICK);
         }
 
         if (autoRespawn.get()) {

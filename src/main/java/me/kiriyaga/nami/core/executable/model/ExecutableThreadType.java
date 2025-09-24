@@ -1,7 +1,8 @@
 package me.kiriyaga.nami.core.executable.model;
 
-public enum ExecutableEventType {
+public enum ExecutableThreadType {
     PRE_TICK,
     POST_TICK,
-    RENDER_2D
+    RENDER_2D,
+    ASYNC
 }

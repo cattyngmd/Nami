@@ -1,6 +1,6 @@
     package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
-    import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
+    import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
     import me.kiriyaga.nami.event.EventPriority;
     import me.kiriyaga.nami.event.SubscribeEvent;
     import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
@@ -77,7 +77,7 @@
                             CHAT_MANAGER.sendPersistent(text, newText, false);
                         }
                     }
-                }, 0, ExecutableEventType.PRE_TICK);
+                }, 0, ExecutableThreadType.PRE_TICK);
             }
         }
 

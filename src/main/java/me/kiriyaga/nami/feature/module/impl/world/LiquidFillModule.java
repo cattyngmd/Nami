@@ -45,7 +45,7 @@ public class LiquidFillModule extends Module {
         WATER, LAVA, BOTH
     }
 
-    // TODO: shift ticks
+    // TODO: shift ticks, or maybe not?
     private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 10));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));

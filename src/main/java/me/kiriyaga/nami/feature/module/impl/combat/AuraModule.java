@@ -1,7 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
-import com.google.common.collect.Multimap;
-import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
@@ -21,21 +20,16 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.text.Text;
@@ -44,7 +38,6 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.hit.EntityHitResult;
 
 import java.awt.*;
-import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.RotationUtils.*;
@@ -266,7 +259,7 @@ public class AuraModule extends Module {
             }
 
             attackCooldownTicks = getBaseCooldownTicks(stack, tps);
-        }, 0, ExecutableEventType.PRE_TICK);
+        }, 0, ExecutableThreadType.PRE_TICK);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

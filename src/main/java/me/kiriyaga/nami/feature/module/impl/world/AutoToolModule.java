@@ -1,22 +1,18 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.executable.model.ExecutableEventType;
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.BreakBlockEvent;
 import me.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.block.BlockState;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 
@@ -98,7 +94,7 @@ public class AutoToolModule extends Module {
 
             if (bestSlot != -1)
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
-        }, 0, ExecutableEventType.PRE_TICK);
+        }, 0, ExecutableThreadType.PRE_TICK);
     }
 
     private boolean isBroken(ItemStack stack) {
