@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.components;
 
+import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -24,6 +25,7 @@ public class CategoryPanel {
     private final ModuleCategory moduleCategory;
     private final Set<ModuleCategory> expandedCategories;
     private final Set<Module> expandedModules;
+    private final PanelRenderer renderer = new PanelRenderer();
 
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
@@ -40,17 +42,8 @@ public class CategoryPanel {
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
-        boolean hovered = isHeaderHovered(mouseX, mouseY, x, y);
         boolean expanded = expandedCategories.contains(moduleCategory);
 
-        ColorModule colorModule = getColorModule();
-        Color primary = colorModule.getStyledGlobalColor();
-        Color secondary = colorModule.getStyledSecondColor();
-        Color textCol = MODULE_MANAGER.getStorage()
-                .getByClass(ClickGuiModule.class)
-                .moduleFill.get()
-                ? new Color(255, 255, 255, 255)
-                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
         int totalHeight = HEADER_HEIGHT + BOTTOM_MARGIN + MODULE_SPACING;
         List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
@@ -64,54 +57,14 @@ public class CategoryPanel {
             totalHeight += BOTTOM_MARGIN;
         }
 
-        int bgColor = CLICK_GUI.applyFade(
-                toRGBA(new Color(30, 30, 30, getClickGuiModule().guiAlpha.get()))
-        );
-        context.fill(x, y, x + WIDTH, y + totalHeight, bgColor);
-
-        if (getClickGuiModule() != null && getClickGuiModule().lines.get()) {
-            int lineColor = CLICK_GUI.applyFade(primary.getRGB());
-            context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, lineColor);
-            context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, lineColor);
-            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, lineColor);
-            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, lineColor);
-        } else if (!getClickGuiModule().lines.get()){
-            int lineColor = CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB());
-            context.fill(x, y + HEADER_HEIGHT, x + WIDTH, y + HEADER_HEIGHT + 1, lineColor);
-            context.fill(x, y + totalHeight - 1, x + WIDTH, y + totalHeight, lineColor);
-            context.fill(x, y + HEADER_HEIGHT + 1, x + 1, y + totalHeight - 1, lineColor);
-            context.fill(x + WIDTH - 1, y + HEADER_HEIGHT + 1, x + WIDTH, y + totalHeight - 1, lineColor);
-        }
-
-        context.fill(x + 1, y + HEADER_HEIGHT + 1, x + 2, y + totalHeight - 1, CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
-        context.fill(x + WIDTH - 2, y + HEADER_HEIGHT + 1, x + WIDTH - 1, y + totalHeight - 1, CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
-
-        context.fill(x, y, x + WIDTH, y + HEADER_HEIGHT, CLICK_GUI.applyFade(toRGBA(primary)));
-
-        context.fill(
-                x + 2,
-                y + HEADER_HEIGHT + 1,
-                x + WIDTH - 2,
-                y + HEADER_HEIGHT + 2,
-                CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB())
-        );
-
-        int textY = y + (HEADER_HEIGHT - textRenderer.fontHeight) / 2;
-//        context.drawText(
-//                textRenderer,
-//                moduleCategory.getName(),
-//                x + PADDING,
-//                textY + 1,
-//                CLICK_GUI.applyFade(toRGBA(textCol)),
-//                true
-//        );
-
-        FONT_MANAGER.drawText(context, moduleCategory.getName(), x + PADDING, textY + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);
+        renderer.renderPanel(context, x, y, WIDTH, totalHeight, HEADER_HEIGHT);
+        renderer.renderHeaderText(context, textRenderer, moduleCategory.getName(), x, y, HEADER_HEIGHT, PADDING);
 
         if (expanded) {
             int moduleY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;
             for (int i = 0; i < modules.size(); i++) {
                 Module module = modules.get(i);
+
 
                 ModulePanel modulePanel = new ModulePanel(module, expandedModules);
                 modulePanel.render(context, textRenderer,
@@ -119,11 +72,13 @@ public class CategoryPanel {
                         moduleY, mouseX, mouseY);
                 moduleY += ModulePanel.HEIGHT;
 
+
                 if (expandedModules.contains(module)) {
                     moduleY += SettingPanel.renderSettings(context, textRenderer, module,
                             x + BORDER_WIDTH + SettingPanel.INNER_PADDING,
                             moduleY, mouseX, mouseY);
                 }
+
 
                 if (i < modules.size() - 1) {
                     moduleY += MODULE_SPACING;
