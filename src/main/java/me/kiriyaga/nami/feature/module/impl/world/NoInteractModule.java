@@ -9,7 +9,6 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
-import me.kiriyaga.nami.mixin.StrippableBlockRegistryAccessor;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -24,6 +23,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionTypes;
+
+import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -72,7 +73,13 @@ public class NoInteractModule extends Module {
             boolean isMain = MC.player.getMainHandStack().isIn(ItemTags.AXES) && event.getHand() == Hand.MAIN_HAND;
             boolean isOff = MC.player.getOffHandStack().isIn(ItemTags.AXES) && event.getHand() == Hand.OFF_HAND;
             if (isMain || isOff) {
-                if (StrippableBlockRegistryAccessor.getRegistry().containsKey(block)) {
+
+                Map<Block, Block> strippables = net.fabricmc.fabric.impl.content.registry.util.ImmutableCollectionUtils.getAsMutableMap(
+                        () -> net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor.getStrippedBlocks(),
+                        map -> net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor.setStrippedBlocks(map)
+                );
+
+                if (strippables.containsKey(block)) {
                     event.cancel();
                     return;
                 }
@@ -117,13 +124,20 @@ public class NoInteractModule extends Module {
         if (strip.get()) {
             boolean isMain = MC.player.getMainHandStack().isIn(ItemTags.AXES) && interactPacket.getHand() == Hand.MAIN_HAND;
             boolean isOff = MC.player.getOffHandStack().isIn(ItemTags.AXES) && interactPacket.getHand() == Hand.OFF_HAND;
-            if (isMain || isOff) {
-                if (StrippableBlockRegistryAccessor.getRegistry().containsKey(block)) {
+
+            if (isMain || isOff) { // this is fucking shizo
+                Map<Block, Block> strippables = net.fabricmc.fabric.impl.content.registry.util.ImmutableCollectionUtils.getAsMutableMap(
+                        () -> net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor.getStrippedBlocks(),
+                        map -> net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor.setStrippedBlocks(map)
+                );
+
+                if (strippables.containsKey(block)) {
                     ev.cancel();
                     return;
                 }
             }
         }
+
     }
 
     public boolean isBed(Block block) {

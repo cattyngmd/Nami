@@ -64,7 +64,6 @@
     "MixinTextVisitFactory",
     "PlayerInteractEntityC2SPacketAccessor",
     "PlayerPositionAccessor",
-    "ScreenHandlerAccessor",
-    "StrippableBlockRegistryAccessor"
+    "ScreenHandlerAccessor"
   ]
 }
