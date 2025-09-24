@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.mixin;
+package me.kiriyaga.nami.mixin.sodium;
 
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer;
@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
+@Pseudo
 @Mixin(SodiumWorldRenderer.class)
 public class MixinSodiumWorldRenderer {
     @ModifyVariable(method = "setupTerrain", at = @At("HEAD"), argsOnly = true)

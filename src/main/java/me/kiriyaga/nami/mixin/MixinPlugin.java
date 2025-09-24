@@ -8,12 +8,19 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
-import static me.kiriyaga.nami.Nami.LOGGER;
 public class MixinPlugin implements IMixinConfigPlugin {
+    private static final String MIXIN_PACKAGE = "me.kiriyaga.nami.mixin";
+
+    private static boolean loaded = false;
+    public static boolean isSodiumPresent;
 
     @Override
     public void onLoad(String mixinPackage) {
-        LOGGER.info("Plugin loaded for package: {}", mixinPackage);
+        if (loaded) return;
+
+        isSodiumPresent = FabricLoader.getInstance().isModLoaded("sodium");
+
+        loaded = true;
     }
 
     @Override
@@ -23,9 +30,14 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.endsWith("MixinSodiumWorldRenderer")) {
-            return FabricLoader.getInstance().isModLoaded("sodium");
+        if (!mixinClassName.startsWith(MIXIN_PACKAGE)) {
+            throw new RuntimeException("Mixin " + mixinClassName + " is not in the mixin package");
         }
+
+        if (mixinClassName.endsWith("MixinSodiumWorldRenderer")) {
+            return isSodiumPresent;
+        }
+
         return true;
     }
 
@@ -39,10 +51,10 @@ public class MixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void preApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
+    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
     }
 
     @Override
-    public void postApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
+    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
     }
 }

@@ -1,8 +1,7 @@
 {
   "required": true,
   "package": "me.kiriyaga.nami.mixin",
-  "plugin": "me.kiriyaga.nami.mixin.MixinPlugin",
-  "compatibilityLevel": "JAVA_20",
+  "compatibilityLevel": "JAVA_21",
   "client": [
     "ChatHudAccessor",
     "ChatInputSuggestorMixin",
@@ -60,7 +59,6 @@
     "MixinLivingEntity",
     "MixinPlayerEntity",
     "MixinPlayerInteractEntityC2SPacket",
-    "MixinSodiumWorldRenderer",
     "MixinTextVisitFactory",
     "PlayerInteractEntityC2SPacketAccessor",
     "PlayerPositionAccessor",
