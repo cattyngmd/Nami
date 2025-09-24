@@ -59,6 +59,9 @@ public class CategoryPanel {
 
         renderer.renderPanel(context, x, y, WIDTH, totalHeight, HEADER_HEIGHT);
         renderer.renderHeaderText(context, textRenderer, moduleCategory.getName(), x, y, HEADER_HEIGHT, PADDING);
+        int innerShade = CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB());
+        context.fill(x + 1, y + HEADER_HEIGHT + 1, x + 2, y + totalHeight - 1, innerShade);
+        context.fill(x + WIDTH - 2, y + HEADER_HEIGHT + 1, x + WIDTH - 1, y + totalHeight - 1, innerShade);
 
         if (expanded) {
             int moduleY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;

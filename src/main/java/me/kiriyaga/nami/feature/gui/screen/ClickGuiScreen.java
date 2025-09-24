@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.feature.gui.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.gui.components.ModulePanel;
+import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
 import me.kiriyaga.nami.feature.gui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -89,10 +89,15 @@ public class ClickGuiScreen extends Screen {
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);
 
-        float scaledWidth = this.width / scale;
-        float scaledHeight = this.height / scale;
+        int scaledWidth = (int) ( this.width / scale);
+        int scaledHeight = (int) (this.height / scale);
 
-        int startY = (int) (scaledHeight - 1);
+        int panelWidth = NAVIGATE_PANEL.calcWidth();
+        int navigateX = (scaledWidth - panelWidth) / 2;
+        int navigateY = 1;
+        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, navigateY, mouseX, mouseY);
+
+        int startY = (scaledHeight - 1);
         for (int i = statusMessages.size() - 1; i >= 0; i--) {
             Text message = statusMessages.get(i);
             int textWidth = FONT_MANAGER.getWidth(message);
@@ -174,6 +179,10 @@ public class ClickGuiScreen extends Screen {
 
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
+
+        int navX = (int) ((this.width / scale - NAVIGATE_PANEL.calcWidth()) / 2);
+        int navY = 1;
+        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
@@ -343,6 +352,9 @@ public class ClickGuiScreen extends Screen {
 
     public int applyFade(int argb) {
         if (!MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).fade.get())
+            return argb;
+
+        if (previousScreen == HUD_EDITOR)
             return argb;
 
         int a = (argb >>> 24) & 0xFF;

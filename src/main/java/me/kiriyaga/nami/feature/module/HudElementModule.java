@@ -40,9 +40,9 @@ public abstract class HudElementModule extends Module {
         this.x.setShow(false);
         this.y = addSetting(new DoubleSetting("y", defaultY, 0, 1));
         this.y.setShow(false);
-        this.label = addSetting(new EnumSetting<LabelPosition>("label position", LabelPosition.TOP));
+        this.label = addSetting(new EnumSetting<LabelPosition>("Label", LabelPosition.TOP));
         this.label.setShow(false);
-        this.alignment = addSetting(new EnumSetting<>("alignment", HudAlignment.LEFT));
+        this.alignment = addSetting(new EnumSetting<>("Alignment", HudAlignment.LEFT));
     }
 
     public Text getDisplayText() {

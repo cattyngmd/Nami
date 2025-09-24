@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.gui.screen;
 
 import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.gui.components.ModulePanel;
+import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
 import me.kiriyaga.nami.feature.gui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -69,6 +70,11 @@ public class HudEditorScreen extends Screen {
 
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
+
+        int panelWidth = NAVIGATE_PANEL.calcWidth();
+        int navigateX = (this.width - panelWidth) / 2;
+        int navigateY = 1;
+        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, navigateY, mouseX, mouseY);
 
         ModuleCategory hudCategory = ModuleCategory.of("hud");
         Point pos = categoryPositions.get(hudCategory);
@@ -153,6 +159,11 @@ public class HudEditorScreen extends Screen {
 
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
+
+        int navX = (int) ((this.width / scale - NAVIGATE_PANEL.calcWidth()) / 2);
+        int navY = 1;
+        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
+
 
         ModuleCategory hudCategory = ModuleCategory.of("hud");
         Point pos = categoryPositions.get(hudCategory);
