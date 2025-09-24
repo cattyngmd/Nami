@@ -19,7 +19,7 @@ public class NoRenderModule extends Module {
 
     public final BoolSetting noTilt = addSetting(new BoolSetting("NoTilt", true));
     public final BoolSetting noBob = addSetting(new BoolSetting("NoBob", true));
-    public final IntSetting tileEntity = addSetting(new IntSetting("TileEntity", 15, 0, 75));
+    public final IntSetting tileEntity = addSetting(new IntSetting("TileEntity", 0, 0, 75));
     public final BoolSetting portalGui = addSetting(new BoolSetting("PortalGui", true));
     public final BoolSetting noFire = addSetting(new BoolSetting("NoFire", true));
     public final BoolSetting noBackground = addSetting(new BoolSetting("NoBackground", true));
