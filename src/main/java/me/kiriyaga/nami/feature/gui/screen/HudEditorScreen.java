@@ -32,7 +32,7 @@ public class HudEditorScreen extends Screen {
     public HudEditorScreen() {
         super(Text.literal("NamiHudEditor"));
         syncCategoryPositions();
-        expandedCategories.add(ModuleCategory.of("hud"));
+        expandedCategories.add(ModuleCategory.of("HUD"));
     }
 
     private ClickGuiModule getClickGuiModule() {
@@ -42,7 +42,7 @@ public class HudEditorScreen extends Screen {
     private void syncCategoryPositions() {
         int x = 20;
         int y = 20;
-        ModuleCategory hud = ModuleCategory.of("hud");
+        ModuleCategory hud = ModuleCategory.of("HUD");
         categoryPositions.putIfAbsent(hud, new Point(x, y));
         categoryPositions.keySet().removeIf(cat -> !cat.equals(hud));
     }
@@ -78,7 +78,7 @@ public class HudEditorScreen extends Screen {
         int navigateY = 1;
         NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, navigateY, mouseX, mouseY);
 
-        ModuleCategory hudCategory = ModuleCategory.of("hud");
+        ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
         if (pos != null) {
             CategoryPanel panel = new CategoryPanel(hudCategory, expandedCategories, expandedModules);
@@ -123,7 +123,7 @@ public class HudEditorScreen extends Screen {
         int screenHeight = MC.getWindow().getScaledHeight();
         int chatZoneTop = screenHeight - (screenHeight / 8);
 
-        for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("hud"))) {
+        for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
             if (module instanceof HudElementModule hud && hud.isEnabled()) {
                 int y = hud.getRenderY();
 
@@ -167,7 +167,7 @@ public class HudEditorScreen extends Screen {
         NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
 
 
-        ModuleCategory hudCategory = ModuleCategory.of("hud");
+        ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
 
         if (pos != null && CategoryPanel.isHeaderHovered(scaledMouseX, scaledMouseY, pos.x, pos.y + scrollOffset)) {
@@ -229,7 +229,7 @@ public class HudEditorScreen extends Screen {
         int screenHeight = MC.getWindow().getScaledHeight();
         int chatZoneTop = screenHeight - (screenHeight / 8);
 
-        for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("hud"))) {
+        for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
             if (module instanceof HudElementModule hud && hud.isEnabled()) {
                 int x = hud.getRenderX();
                 int y = hud.getRenderY();
@@ -295,7 +295,7 @@ public class HudEditorScreen extends Screen {
             }
 
             boolean intersects = false;
-            for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("hud"))) {
+            for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
                 if (module instanceof HudElementModule other && other.isEnabled() && other != draggingElement) {
                     int ox = other.getRenderX();
                     int oy = other.getRenderY();
