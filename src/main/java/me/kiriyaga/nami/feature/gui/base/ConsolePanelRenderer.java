@@ -47,8 +47,9 @@ public class ConsolePanelRenderer {
         this.onClick = onClick;
 
         this.enterButton = new ButtonWidget("Enter",
-                x + width - 60, y + height - inputHeight + 2,
-                50, inputHeight - 4, true,
+                x + width - 2 - 50,
+                y + height - 2 - inputHeight,
+                50, inputHeight, true,
                 () -> {
                     String text = inputBuffer.toString().trim();
                     if (!text.isEmpty() && onAdd != null) {
@@ -82,12 +83,16 @@ public class ConsolePanelRenderer {
             drawY += lineHeight;
         }
 
-        int inputY = y + height - inputHeight;
+        int inputY = y + height - inputHeight - 2;
+        int inputX = x + 2;
         int inputBg = inputFocused ? 0x80202020 : 0x80101010;
-        context.fill(x, inputY, x + width - 60, inputY + inputHeight, inputBg);
+
+        int inputWidth = enterButton.getX() - inputX - 1;
+
+        context.fill(inputX, inputY, inputX + inputWidth, inputY + inputHeight, inputBg);
 
         String inputStr = inputBuffer.toString() + (inputFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "_" : "");
-        FONT_MANAGER.drawText(context, inputStr, x + 4, inputY + 4, 0xFFFFFFFF, false);
+        FONT_MANAGER.drawText(context, inputStr, inputX + 2, inputY + 4, 0xFFFFFFFF, false);
 
         enterButton.render(context, textRenderer, mouseX, mouseY);
     }
@@ -128,7 +133,7 @@ public class ConsolePanelRenderer {
             x = (int) (mouseX - dragOffsetX);
             y = (int) (mouseY - dragOffsetY);
 
-            enterButton.setPosition(x + width - 60, y + height - inputHeight + 2);
+            enterButton.setPosition(x + width - 2 - enterButton.getWidth(), y + height - 2 - enterButton.getHeight());
             return true;
         }
         return false;
