@@ -86,8 +86,11 @@ public class HudEditorScreen extends Screen {
         }
 
         if (hudPanel != null && hudEditorModule != null && hudEditorModule.descriptions.get() && pos != null) {
+            double scrollOffset = hudPanel.getScrollOffset();
             List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(hudCategory);
-            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
+
+            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN
+                    - (int) scrollOffset;
 
             for (Module module : modules) {
                 int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
@@ -171,8 +174,11 @@ public class HudEditorScreen extends Screen {
         }
 
         if (!draggingCategory && pos != null && hudPanel != null) {
+            double scrollOffset = hudPanel.getScrollOffset();
             List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(hudCategory);
-            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
+
+            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN
+                    - (int) scrollOffset;
 
             for (Module module : modules) {
                 int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;

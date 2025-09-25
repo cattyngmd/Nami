@@ -74,7 +74,6 @@ public class CategoryPanel {
         if (scrollOffset > maxScroll) scrollOffset = maxScroll;
 
 
-        LOGGER.info("[RENDER DEBUG] adjusted scrollOffset={}, maxScroll={}", scrollOffset, maxScroll);
 
         ScissorUtil.enable(context, x, contentY, x + WIDTH, contentY + visibleHeight);
 
@@ -126,5 +125,9 @@ public class CategoryPanel {
 
     public static boolean isHeaderHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEADER_HEIGHT;
+    }
+
+    public double getScrollOffset() {
+        return scrollOffset;
     }
 }

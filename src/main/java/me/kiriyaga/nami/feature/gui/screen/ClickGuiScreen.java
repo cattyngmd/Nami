@@ -137,8 +137,14 @@ public class ClickGuiScreen extends Screen {
                 Point pos = categoryPositions.get(moduleCategory);
                 if (pos == null) continue;
 
+                CategoryPanel panel = categoryPanels.get(moduleCategory);
+                if (panel == null) continue;
+
+                double scrollOffset = panel.getScrollOffset();
+
                 List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
-                int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
+                int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN
+                        - (int) scrollOffset;
 
                 for (Module module : modules) {
                     int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
@@ -209,42 +215,48 @@ public class ClickGuiScreen extends Screen {
             for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
                 if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
 
-                    Point pos = categoryPositions.get(moduleCategory);
-                    if (pos == null) continue;
+                Point pos = categoryPositions.get(moduleCategory);
+                if (pos == null) continue;
 
-                    List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
-                    int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
+                CategoryPanel panel = categoryPanels.get(moduleCategory);
+                if (panel == null) continue;
 
-                    for (Module module : modules) {
-                        int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
+                double scrollOffset = panel.getScrollOffset();
 
-                        if (ModulePanel.isHovered(scaledMouseX, scaledMouseY, modX, curY)) {
-                            if (button == 0) {
-                                playClickSound();
-                                module.toggle();
-                            } else if (button == 1) {
-                                if (expandedModules.contains(module)) {
-                                    expandedModules.remove(module);
-                                } else {
-                                    expandedModules.add(module);
-                                }
-                                playClickSound();
-                            } else if (button == 2) {
-                                playClickSound();
-                                module.setDrawn(!module.isDrawn());
+                List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
+
+                int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN
+                        - (int) scrollOffset;
+
+                for (Module module : modules) {
+                    int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
+
+                    if (ModulePanel.isHovered(scaledMouseX, scaledMouseY, modX, curY)) {
+                        if (button == 0) {
+                            playClickSound();
+                            module.toggle();
+                        } else if (button == 1) {
+                            if (expandedModules.contains(module)) {
+                                expandedModules.remove(module);
+                            } else {
+                                expandedModules.add(module);
                             }
+                            playClickSound();
+                        } else if (button == 2) {
+                            playClickSound();
+                            module.setDrawn(!module.isDrawn());
+                        }
+                        return true;
+                    }
+
+                    curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
+
+                    if (expandedModules.contains(module)) {
+                        if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) {
                             return true;
                         }
-
-
-                        curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-
-                        if (expandedModules.contains(module)) {
-                            if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) {
-                                return true;
-                            }
-                            curY += SettingPanel.getSettingsHeight(module);
-                        }
+                        curY += SettingPanel.getSettingsHeight(module);
+                    }
                 }
             }
         }
