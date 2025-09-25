@@ -70,8 +70,11 @@ public class HudEditorScreen extends Screen {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
+        int scaledWidth = (int) ( this.width / CLICK_GUI.scale);
+        int scaledHeight = (int) (this.height / CLICK_GUI.scale);
+
         int panelWidth = NAVIGATE_PANEL.calcWidth();
-        int navigateX = (this.width - panelWidth) / 2;
+        int navigateX = (scaledWidth - panelWidth) / 2;
         int navigateY = 1;
         NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, navigateY, mouseX, mouseY);
 

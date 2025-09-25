@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.components;
+package me.kiriyaga.nami.feature.gui.base;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
@@ -14,6 +14,7 @@ import static me.kiriyaga.nami.feature.gui.base.GuiConstants.toRGBA;
 public class ButtonWidget {
     private final String label;
     private final Runnable onClick;
+    private final PanelRenderer panelRenderer = new PanelRenderer();
 
     private int x, y, width, height;
     private boolean active;
@@ -30,20 +31,13 @@ public class ButtonWidget {
 
     public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
         int bgColor = 0xAA000000;
-        context.fill(x, y, x + width, y + height, bgColor);
+        panelRenderer.renderPanel(context, x, y, width, height, 0, false);
 
-        if (isHovered(mouseX, mouseY)) {
-            context.fill(x, y, x + width, y + height, 0x40FFFFFF);
-        }
 
         ClickGuiModule clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
         Color primary = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
         Color textOff = new Color(155, 155, 155, 255);
-        Color textCol = active
-                ? (clickGuiModule.moduleFill.get()
-                ? new Color(255, 255, 255, 255)
-                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255))
-                : textOff;
+        Color textCol = active ? (clickGuiModule.moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255)) : textOff;
 
         int textWidth = textRenderer.getWidth(label);
         int textX = x + (width - textWidth) / 2;
@@ -68,4 +62,14 @@ public class ButtonWidget {
         return mouseX >= x && mouseX <= x + width
                 && mouseY >= y && mouseY <= y + height;
     }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
 }

@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.gui.base;
 
-import me.kiriyaga.nami.feature.gui.components.ButtonWidget;
+import me.kiriyaga.nami.feature.gui.base.ButtonWidget;
 import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -24,11 +24,18 @@ public class ConsolePanelRenderer {
     private StringBuilder inputBuffer = new StringBuilder();
     private int scrollOffset = 0;
 
-    private final int x, y, width, height;
+    private int x;
+    private int y;
+    private final int width;
+    private final int height;
     private final int headerHeight = 20;
     private final int inputHeight = 20;
 
     private ButtonWidget enterButton;
+
+    private boolean dragging = false;
+    private int dragOffsetX = 0;
+    private int dragOffsetY = 0;
 
     public ConsolePanelRenderer(int x, int y, int width, int height, Consumer<String> onAdd, Consumer<String> onRemove, Consumer<String> onClick) {
         this.x = x;
@@ -86,6 +93,16 @@ public class ConsolePanelRenderer {
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int mouseXInt = (int) mouseX;
+        int mouseYInt = (int) mouseY;
+
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isHeaderHovered(mouseXInt, mouseYInt)) {
+            dragging = true;
+            dragOffsetX = mouseXInt - x;
+            dragOffsetY = mouseYInt - y;
+            return true;
+        }
+
         int inputY = y + height - inputHeight;
         boolean insideInput = mouseX >= x && mouseX <= x + width - 60 && mouseY >= inputY && mouseY <= inputY + inputHeight;
 
@@ -94,7 +111,7 @@ public class ConsolePanelRenderer {
             return true;
         }
 
-        if (enterButton.mouseClicked((int) mouseX, (int) mouseY, button)) {
+        if (enterButton.mouseClicked(mouseXInt, mouseYInt, button)) {
             inputFocused = false;
             return true;
         }
@@ -102,7 +119,23 @@ public class ConsolePanelRenderer {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && !insideInput) {
             inputFocused = false;
         }
+
         return false;
+    }
+
+    public boolean mouseDragged(double mouseX, double mouseY, double deltaX, double deltaY) {
+        if (dragging) {
+            x = (int) (mouseX - dragOffsetX);
+            y = (int) (mouseY - dragOffsetY);
+
+            enterButton.setPosition(x + width - 60, y + height - inputHeight + 2);
+            return true;
+        }
+        return false;
+    }
+
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        dragging = false;
     }
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -140,5 +173,13 @@ public class ConsolePanelRenderer {
             return true;
         }
         return false;
+    }
+
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public void setPosition(int x, int y) { this.x = x; this.y = y; }
+
+    public boolean isHeaderHovered(int mouseX, int mouseY) {
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + headerHeight;
     }
 }

@@ -58,7 +58,6 @@ public class FriendScreen extends Screen {
                 .map(f -> {
                     boolean online = isOnline(f);
                     String status = online ? "Online" : "Offline";
-                    int color = online ? 0x00FF00 : 0xFF0000;
                     return f + " [" + status + "]";
                 })
                 .collect(Collectors.toList());
@@ -74,16 +73,18 @@ public class FriendScreen extends Screen {
             context.fill(0, 0, this.width, this.height, color);
         }
 
-        console.render(context, this.textRenderer, mouseX, mouseY);
-
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+        int scaledWidth = (int) ( this.width / CLICK_GUI.scale);
+        int scaledHeight = (int) (this.height / CLICK_GUI.scale);
 
         int panelWidth = NAVIGATE_PANEL.calcWidth();
-        int navX = (this.width - panelWidth) / 2;
+        int navX = (scaledWidth - panelWidth) / 2;
         int navY = 1;
+        console.render(context, this.textRenderer, scaledMouseX, scaledMouseY);
         NAVIGATE_PANEL.render(context, this.textRenderer, navX, navY, scaledMouseX, scaledMouseY);
 
         context.getMatrices().popMatrix();
@@ -91,15 +92,34 @@ public class FriendScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (console.mouseClicked(mouseX, mouseY, button)) return true;
 
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+
         int navX = (int) ((this.width / CLICK_GUI.scale - NAVIGATE_PANEL.calcWidth()) / 2);
         int navY = 1;
         NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        if (console.mouseClicked(scaledMouseX, scaledMouseY, button)) return true;
+        return super.mouseClicked(scaledMouseX, scaledMouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+
+        if (console.mouseDragged(scaledMouseX, scaledMouseY, deltaX, deltaY)) return true;
+        return super.mouseDragged(scaledMouseX, scaledMouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+
+        console.mouseReleased(scaledMouseX, mouseY, button);
+        return super.mouseReleased(scaledMouseX, mouseY, button);
     }
 
     @Override
