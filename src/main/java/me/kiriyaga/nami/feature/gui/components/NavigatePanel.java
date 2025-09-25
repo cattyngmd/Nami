@@ -32,6 +32,7 @@ public class NavigatePanel {
     public NavigatePanel() {
         addScreen("ClickGui", CLICK_GUI);
         addScreen("HudEditor", HUD_EDITOR);
+        addScreen("Friends", FRIEND);
         this.colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         this.clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
         if (!screens.isEmpty()) {

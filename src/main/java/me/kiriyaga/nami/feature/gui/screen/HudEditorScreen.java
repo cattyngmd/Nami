@@ -25,7 +25,6 @@ public class HudEditorScreen extends Screen {
     private int scrollOffset = 0;
     private boolean draggingCategory = false;
     private ModuleCategory draggedModuleCategory = null;
-    public float scale = 1;
 
     private HudElementModule draggingElement = null;
     private int dragOffsetX, dragOffsetY;
@@ -66,10 +65,10 @@ public class HudEditorScreen extends Screen {
         }
 
         context.getMatrices().pushMatrix();
-        context.getMatrices().scale(scale, scale);
+        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
 
-        int scaledMouseX = (int) (mouseX / scale);
-        int scaledMouseY = (int) (mouseY / scale);
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
         int panelWidth = NAVIGATE_PANEL.calcWidth();
         int navigateX = (this.width - panelWidth) / 2;
@@ -157,10 +156,10 @@ public class HudEditorScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         syncCategoryPositions();
 
-        int scaledMouseX = (int) (mouseX / scale);
-        int scaledMouseY = (int) (mouseY / scale);
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
-        int navX = (int) ((this.width / scale - NAVIGATE_PANEL.calcWidth()) / 2);
+        int navX = (int) ((this.width / CLICK_GUI.scale - NAVIGATE_PANEL.calcWidth()) / 2);
         int navY = 1;
         NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
 
@@ -248,10 +247,10 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        int scaledMouseX = (int) (mouseX / scale);
-        int scaledMouseY = (int) (mouseY / scale);
-        int scaledDeltaX = (int) (deltaX / scale);
-        int scaledDeltaY = (int) (deltaY / scale);
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+        int scaledDeltaX = (int) (deltaX / CLICK_GUI.scale);
+        int scaledDeltaY = (int) (deltaY / CLICK_GUI.scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point currentPos = categoryPositions.get(draggedModuleCategory);

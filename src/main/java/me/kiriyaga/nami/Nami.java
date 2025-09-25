@@ -13,6 +13,7 @@ import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
 import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
+import me.kiriyaga.nami.feature.gui.screen.FriendScreen;
 import me.kiriyaga.nami.feature.gui.screen.HudEditorScreen;
 import me.kiriyaga.nami.util.CatStyles;
 import net.fabricmc.api.ClientModInitializer;
@@ -62,6 +63,7 @@ public class Nami implements ClientModInitializer {
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
     public static ClickGuiScreen CLICK_GUI;
     public static HudEditorScreen HUD_EDITOR;
+    public static FriendScreen FRIEND;
     public static NavigatePanel NAVIGATE_PANEL;
 
 
@@ -85,6 +87,7 @@ public class Nami implements ClientModInitializer {
 
         CLICK_GUI = new ClickGuiScreen();
         HUD_EDITOR = new HudEditorScreen();
+        FRIEND = new FriendScreen();
         NAVIGATE_PANEL = new NavigatePanel();
 
         FRIEND_MANAGER.load();
