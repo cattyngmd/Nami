@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.base;
 
+import me.kiriyaga.nami.feature.gui.components.ButtonWidget;
 import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +14,6 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class ConsolePanelRenderer {
     private final PanelRenderer panelRenderer = new PanelRenderer();
-
     private final List<String> entries = new ArrayList<>();
 
     private final Consumer<String> onAdd;
@@ -22,17 +22,15 @@ public class ConsolePanelRenderer {
 
     private boolean inputFocused = false;
     private StringBuilder inputBuffer = new StringBuilder();
-
     private int scrollOffset = 0;
 
     private final int x, y, width, height;
-    private final int headerHeight = 14;
-    private final int inputHeight = 14;
+    private final int headerHeight = 20;
+    private final int inputHeight = 20;
 
-    public ConsolePanelRenderer(int x, int y, int width, int height,
-                                    Consumer<String> onAdd,
-                                    Consumer<String> onRemove,
-                                    Consumer<String> onClick) {
+    private ButtonWidget enterButton;
+
+    public ConsolePanelRenderer(int x, int y, int width, int height, Consumer<String> onAdd, Consumer<String> onRemove, Consumer<String> onClick) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -40,6 +38,17 @@ public class ConsolePanelRenderer {
         this.onAdd = onAdd;
         this.onRemove = onRemove;
         this.onClick = onClick;
+
+        this.enterButton = new ButtonWidget("Enter",
+                x + width - 60, y + height - inputHeight + 2,
+                50, inputHeight - 4, true,
+                () -> {
+                    String text = inputBuffer.toString().trim();
+                    if (!text.isEmpty() && onAdd != null) {
+                        onAdd.accept(text);
+                        inputBuffer.setLength(0);
+                    }
+                });
     }
 
     public void setEntries(List<String> items) {
@@ -49,11 +58,10 @@ public class ConsolePanelRenderer {
 
     public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
         panelRenderer.renderPanel(context, x, y, width, height, headerHeight);
-        panelRenderer.renderHeaderText(context, textRenderer, "Manager", x, y, headerHeight, 4);
+        panelRenderer.renderHeaderText(context, textRenderer, "Console", x, y, headerHeight, 4);
 
-        int contentY = y + headerHeight + 2;
-        int contentHeight = height - headerHeight - inputHeight - 2;
-
+        int contentY = y + headerHeight + 4;
+        int contentHeight = height - headerHeight - inputHeight - 8;
         int lineHeight = textRenderer.fontHeight + 4;
         int maxVisible = contentHeight / lineHeight;
 
@@ -63,78 +71,35 @@ public class ConsolePanelRenderer {
         int drawY = contentY;
         for (int i = start; i < end; i++) {
             String entry = entries.get(i);
-
             FONT_MANAGER.drawText(context, entry, x + 4, drawY, 0xFFFFFFFF, false);
-            int btnW = 20, btnH = lineHeight - 2;
-            int btnX = x + width - btnW - 4;
-            context.fill(btnX, drawY, btnX + btnW, drawY + btnH, 0x80AA0000);
-            FONT_MANAGER.drawText(context, "X", btnX + 6, drawY + 2, 0xFFFFFFFF, false);
-
             drawY += lineHeight;
         }
 
-        int btnX = x + width - 20;
-        int btnWidth = 16;
-        int btnHeight = 10;
-
-        context.fill(btnX, contentY, btnX + btnWidth, contentY + btnHeight, 0x80000000);
-        FONT_MANAGER.drawText(context, "UP", btnX + 2, contentY + 1, 0xFFFFFFFF, false);
-
-        context.fill(btnX, contentY + contentHeight - btnHeight, btnX + btnWidth, contentY + contentHeight, 0x80000000);
-        FONT_MANAGER.drawText(context, "DN", btnX + 2, contentY + contentHeight - btnHeight + 1, 0xFFFFFFFF, false);
-
         int inputY = y + height - inputHeight;
         int inputBg = inputFocused ? 0x80202020 : 0x80101010;
-        context.fill(x, inputY, x + width, inputY + inputHeight, inputBg);
+        context.fill(x, inputY, x + width - 60, inputY + inputHeight, inputBg);
 
         String inputStr = inputBuffer.toString() + (inputFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "_" : "");
-        FONT_MANAGER.drawText(context, inputStr, x + 4, inputY + 3, 0xFFFFFFFF, false);
+        FONT_MANAGER.drawText(context, inputStr, x + 4, inputY + 4, 0xFFFFFFFF, false);
+
+        enterButton.render(context, textRenderer, mouseX, mouseY);
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int inputY = y + height - inputHeight;
-        boolean insideInput = mouseX >= x && mouseX <= x + width && mouseY >= inputY && mouseY <= inputY + inputHeight;
+        boolean insideInput = mouseX >= x && mouseX <= x + width - 60 && mouseY >= inputY && mouseY <= inputY + inputHeight;
 
         if (insideInput && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             inputFocused = true;
             return true;
         }
 
-        int contentY = y + headerHeight + 2;
-        int lineHeight = 12 + 4;
-        int contentHeight = height - headerHeight - inputHeight - 2;
-        int maxVisible = contentHeight / lineHeight;
-
-        int start = Math.max(0, entries.size() - maxVisible - scrollOffset);
-        int end = Math.min(entries.size(), start + maxVisible);
-
-        int drawY = contentY;
-        for (int i = start; i < end; i++) {
-            int btnW = 20, btnH = lineHeight - 2;
-            int btnX = x + width - btnW - 4;
-
-            if (mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= drawY && mouseY <= drawY + btnH) {
-                if (onRemove != null) onRemove.accept(entries.get(i));
-                return true;
-            }
-            drawY += lineHeight;
+        if (enterButton.mouseClicked((int) mouseX, (int) mouseY, button)) {
+            inputFocused = false;
+            return true;
         }
 
-        int btnX = x + width - 20;
-        int btnWidth = 16;
-        int btnHeight = 10;
-        if (mouseX >= btnX && mouseX <= btnX + btnWidth) {
-            if (mouseY >= contentY && mouseY <= contentY + btnHeight) {
-                if (scrollOffset < entries.size()) scrollOffset++;
-                return true;
-            }
-            if (mouseY >= contentY + contentHeight - btnHeight && mouseY <= contentY + contentHeight) {
-                if (scrollOffset > 0) scrollOffset--;
-                return true;
-            }
-        }
-
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && !insideInput) {
             inputFocused = false;
         }
         return false;
@@ -145,10 +110,10 @@ public class ConsolePanelRenderer {
 
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
             String text = inputBuffer.toString().trim();
-            if (!text.isEmpty()) {
-                if (onAdd != null) onAdd.accept(text);
+            if (!text.isEmpty() && onAdd != null) {
+                onAdd.accept(text);
+                inputBuffer.setLength(0);
             }
-            inputBuffer.setLength(0);
             inputFocused = false;
             return true;
         }
@@ -159,12 +124,11 @@ public class ConsolePanelRenderer {
             return true;
         }
 
-        if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
-            if (inputBuffer.length() > 0) {
-                inputBuffer.deleteCharAt(inputBuffer.length() - 1);
-            }
+        if (keyCode == GLFW.GLFW_KEY_BACKSPACE && inputBuffer.length() > 0) {
+            inputBuffer.deleteCharAt(inputBuffer.length() - 1);
             return true;
         }
+
         return false;
     }
 

@@ -1,23 +1,19 @@
 package me.kiriyaga.nami.feature.gui.screen;
 
-import me.kiriyaga.nami.core.FriendManager;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.gui.base.ConsolePanelRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.*;
 
 public class FriendScreen extends Screen {
-    private final List<ButtonWidget> removeButtons = new ArrayList<>();
-    private TextFieldWidget addFriendField;
-    private ButtonWidget addFriendButton;
+    private ConsolePanelRenderer console;
 
     public FriendScreen() {
         super(Text.literal("NamiFriends"));
@@ -31,69 +27,91 @@ public class FriendScreen extends Screen {
     protected void init() {
         super.init();
 
-        this.clearChildren();
-        this.removeButtons.clear();
+        int panelWidth = 300;
+        int panelHeight = 200;
+        int panelX = 20;
+        int panelY = 20;
 
-        int y = 40;
-        int index = 0;
-        for (String friend : FRIEND_MANAGER.getFriends()) {
-            final String friendName = friend;
+        console = new ConsolePanelRenderer(
+                panelX,
+                panelY,
+                panelWidth,
+                panelHeight,
+                name -> {
+                    if (!name.isEmpty()) {
+                        FRIEND_MANAGER.addFriend(name);
+                        updateEntries();
+                    }
+                },
+                name -> {
+                    FRIEND_MANAGER.removeFriend(name);
+                    updateEntries();
+                },
+                name -> {}
+        );
 
-            ButtonWidget removeBtn = ButtonWidget.builder(Text.literal("Remove"), btn -> {
-                FRIEND_MANAGER.removeFriend(friendName);
-                this.init();
-            }).dimensions(this.width - 90, y - 4, 70, 16).build();
+        updateEntries();
+    }
 
-            this.addDrawableChild(removeBtn);
-            removeButtons.add(removeBtn);
-
-            y += 20;
-            index++;
-        }
-
-        addFriendField = new TextFieldWidget(this.textRenderer,
-                this.width / 2 - 100, this.height - 30, 150, 20,
-                Text.literal("Enter friend name"));
-        this.addDrawableChild(addFriendField);
-
-        addFriendButton = ButtonWidget.builder(Text.literal("Add"), btn -> {
-            String input = addFriendField.getText().trim();
-            if (!input.isEmpty()) {
-                FRIEND_MANAGER.addFriend(input);
-                addFriendField.setText("");
-                this.init();// fucking shitcode but yeah
-            }
-        }).dimensions(this.width / 2 + 60, this.height - 30, 40, 20).build();
-        this.addDrawableChild(addFriendButton);
+    private void updateEntries() {
+        List<String> friends = FRIEND_MANAGER.getFriends().stream()
+                .map(f -> {
+                    boolean online = isOnline(f);
+                    String status = online ? "Online" : "Offline";
+                    int color = online ? 0x00FF00 : 0xFF0000;
+                    return f + " [" + status + "]";
+                })
+                .collect(Collectors.toList());
+        console.setEntries(friends);
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-
-        ClickGuiModule hudEditorModule = getClickGuiModule();
-        if (hudEditorModule != null && hudEditorModule.background.get()) {
-            int alpha = (hudEditorModule.backgroundAlpha.get() & 0xFF) << 24;
+        ClickGuiModule clickGui = getClickGuiModule();
+        if (clickGui != null && clickGui.background.get()) {
+            int alpha = (clickGui.backgroundAlpha.get() & 0xFF) << 24;
             int color = alpha | 0x101010;
             context.fill(0, 0, this.width, this.height, color);
         }
 
-        int y = 40;
-        for (String friend : FRIEND_MANAGER.getFriends()) {
-            boolean online = isOnline(friend);
+        console.render(context, this.textRenderer, mouseX, mouseY);
 
-            int color = online ? 0x00FF00 : 0xFF0000;
-            String status = online ? "Online" : "Offline";
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
-            context.drawTextWithShadow(this.textRenderer,
-                    friend, 20, y, 0xFFFFFF);
+        int panelWidth = NAVIGATE_PANEL.calcWidth();
+        int navX = (this.width - panelWidth) / 2;
+        int navY = 1;
+        NAVIGATE_PANEL.render(context, this.textRenderer, navX, navY, scaledMouseX, scaledMouseY);
 
-            context.drawTextWithShadow(this.textRenderer,
-                    status, 140, y, color);
+        context.getMatrices().popMatrix();
+    }
 
-            y += 20;
-        }
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (console.mouseClicked(mouseX, mouseY, button)) return true;
 
-        super.render(context, mouseX, mouseY, delta);
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+        int navX = (int) ((this.width / CLICK_GUI.scale - NAVIGATE_PANEL.calcWidth()) / 2);
+        int navY = 1;
+        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (console.keyPressed(keyCode, scanCode, modifiers)) return true;
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        if (console.charTyped(chr, modifiers)) return true;
+        return super.charTyped(chr, modifiers);
     }
 
     private boolean isOnline(String name) {
@@ -113,7 +131,8 @@ public class FriendScreen extends Screen {
 
     @Override
     public void renderBackground(DrawContext context, int i, int j, float f) {
-        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get()) {
             this.applyBlur(context);
+        }
     }
 }

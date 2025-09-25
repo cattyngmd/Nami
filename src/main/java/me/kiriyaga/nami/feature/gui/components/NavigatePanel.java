@@ -58,8 +58,8 @@ public class NavigatePanel {
             Color textOff = new Color(155, 155, 155, 255);
             Color textCol = active ? clickGuiModule.moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255) : textOff;
 
-            int textWidth = textRenderer.getWidth(name);
-            FONT_MANAGER.drawText(context, name, offsetX, (y + (HEIGHT - textRenderer.fontHeight) / 2) + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);
+            int textWidth = FONT_MANAGER.getWidth(name);
+            FONT_MANAGER.drawText(context, name, offsetX, (y + (HEIGHT - FONT_MANAGER.getHeight()) / 2) + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);
 
             offsetX += textWidth + PADDING * 2;
         }
@@ -71,7 +71,7 @@ public class NavigatePanel {
         for (Map.Entry<String, Screen> entry : screens.entrySet()) {
             String name = entry.getKey();
             Screen screen = entry.getValue();
-            int textWidth = textRenderer.getWidth(name);
+            int textWidth = FONT_MANAGER.getWidth(name);
 
             int startX = offsetX;
             int endX = offsetX + textWidth + PADDING * 2;

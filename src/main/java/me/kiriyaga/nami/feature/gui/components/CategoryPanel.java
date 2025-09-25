@@ -62,6 +62,7 @@ public class CategoryPanel {
         int innerShade = CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB());
         context.fill(x + 1, y + HEADER_HEIGHT + 1, x + 2, y + totalHeight - 1, innerShade);
         context.fill(x + WIDTH - 2, y + HEADER_HEIGHT + 1, x + WIDTH - 1, y + totalHeight - 1, innerShade);
+        context.fill(x + 2, y + HEADER_HEIGHT + 1, x + WIDTH - 2, y + HEADER_HEIGHT + 2, CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
 
         if (expanded) {
             int moduleY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;

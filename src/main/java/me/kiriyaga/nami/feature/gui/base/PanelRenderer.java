@@ -53,8 +53,6 @@ public class PanelRenderer {
 
         if (renderHeader && headerHeight > 0) {
             context.fill(x, y, x + width, y + headerHeight, CLICK_GUI.applyFade(toRGBA(primary)));
-            context.fill(x + 2, y + headerHeight + 1, x + width - 2, y + headerHeight + 2,
-                    CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
         }
     }
 
