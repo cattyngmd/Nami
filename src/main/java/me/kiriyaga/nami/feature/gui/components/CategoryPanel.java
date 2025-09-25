@@ -68,7 +68,7 @@ public class CategoryPanel {
                 scrollableHeight += SettingPanel.getSettingsHeight(module);
             }
         }
-        scrollOffset += (targetScrollOffset - scrollOffset) * 0.3;
+        scrollOffset += (targetScrollOffset - scrollOffset) * 0.1;
         double maxScroll = Math.max(0, scrollableHeight - visibleHeight);
         if (scrollOffset < 0) scrollOffset = 0;
         if (scrollOffset > maxScroll) scrollOffset = maxScroll;
@@ -109,7 +109,7 @@ public class CategoryPanel {
         if (mouseX >= x && mouseX <= x + WIDTH &&
                 mouseY >= contentY && mouseY <= contentY + visibleHeight) {
 
-            targetScrollOffset -= scrollDelta * 30;
+            targetScrollOffset -= scrollDelta * 45;
 
             double maxScroll = Math.max(0, scrollableHeight - visibleHeight);
             if (targetScrollOffset < 0) targetScrollOffset = 0;

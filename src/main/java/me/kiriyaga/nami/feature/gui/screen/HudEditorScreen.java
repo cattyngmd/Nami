@@ -12,6 +12,7 @@ import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.apache.commons.compress.archivers.sevenz.CLI;
 
 import java.awt.Point;
 import java.util.*;
@@ -298,6 +299,26 @@ public class HudEditorScreen extends Screen {
             draggingElement.x.set(newX / (double) screenWidth);
             draggingElement.y.set(newRenderY / (double) screenHeight);
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+
+        for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
+            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+
+            Point pos = categoryPositions.get(moduleCategory);
+            if (pos == null) continue;
+
+            CategoryPanel panel = categoryPanels.get(moduleCategory);
+            if (panel != null && panel.mouseScrolled(scaledMouseX, scaledMouseY, verticalAmount, pos.x, pos.y, this.height)) {
+                return true;
+            }
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
