@@ -31,7 +31,7 @@ public abstract class HudElementModule extends Module {
     public record ItemElement(ItemStack stack, int offsetX, int offsetY) {}
 
     public HudElementModule(String name, String description, int defaultX, int defaultY, int width, int height) {
-        super(name, description, ModuleCategory.of("hud"));
+        super(name, description, ModuleCategory.of("HUD"));
 
         this.width = width;
         this.height = height;
