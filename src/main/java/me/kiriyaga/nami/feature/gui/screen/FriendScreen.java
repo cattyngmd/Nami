@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.*;
-//TODO: scissors scrolling
 public class FriendScreen extends Screen {
     private ConsolePanelRenderer console;
 
@@ -110,6 +109,16 @@ public class FriendScreen extends Screen {
 
         if (console.mouseDragged(scaledMouseX, scaledMouseY, deltaX, deltaY)) return true;
         return super.mouseDragged(scaledMouseX, scaledMouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+
+        if (console.mouseScrolled(scaledMouseX, scaledMouseY, verticalAmount)) return true;
+
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override

@@ -2,6 +2,7 @@ package me.kiriyaga.nami.feature.gui.base;
 
 import me.kiriyaga.nami.feature.gui.base.ButtonWidget;
 import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
+import me.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -10,12 +11,14 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+//TODO: scissors scrolling
 
 import static me.kiriyaga.nami.Nami.*;
 
 public class ConsolePanelRenderer {
     private final PanelRenderer panelRenderer = new PanelRenderer();
     private final List<Text> entries = new ArrayList<>();
+    private double targetScrollOffset = 0;
 
     private final Consumer<String> onAdd;
     private final Consumer<String> onRemove;
@@ -23,7 +26,7 @@ public class ConsolePanelRenderer {
 
     private boolean inputFocused = false;
     private StringBuilder inputBuffer = new StringBuilder();
-    private int scrollOffset = 0;
+    private double scrollOffset = 0;
     private final List<ButtonWidget> deleteButtons = new ArrayList<>();
 
     private int x;
@@ -66,37 +69,63 @@ public class ConsolePanelRenderer {
         entries.addAll(items);
     }
 
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
+        int contentY = y + headerHeight + 4;
+        int contentHeight = height - headerHeight - inputHeight - 8;
+
+        if (mouseX >= x && mouseX <= x + width && mouseY >= contentY && mouseY <= contentY + contentHeight) {
+            int lineHeight = FONT_MANAGER.getHeight() + 4;
+            int maxVisible = contentHeight / lineHeight;
+            double maxScroll = Math.max(0, entries.size() - maxVisible);
+
+            targetScrollOffset -= scrollDelta * 1.5;
+            if (targetScrollOffset < 0) targetScrollOffset = 0;
+            if (targetScrollOffset > maxScroll) targetScrollOffset = maxScroll;
+
+            return true;
+        }
+        return false;
+    }
+
     public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
         panelRenderer.renderPanel(context, x, y, width, height, headerHeight);
         panelRenderer.renderHeaderText(context, textRenderer, "Console", x, y, headerHeight, 4);
 
         int contentY = y + headerHeight + 4;
-        int contentHeight = height - headerHeight - inputHeight - 8;
         int lineHeight = textRenderer.fontHeight + 4;
+        int contentHeight = height - headerHeight - inputHeight - 8;
         int maxVisible = contentHeight / lineHeight;
 
-        int start = Math.max(0, entries.size() - maxVisible - scrollOffset);
-        int end = Math.min(entries.size(), start + maxVisible);
+        scrollOffset += (targetScrollOffset - scrollOffset) * 0.3;
 
-        int drawY = contentY;
-        for (int i = start; i < end; i++) {
+        double maxScroll = Math.max(0, entries.size() - maxVisible);
+        if (scrollOffset < 0) scrollOffset = 0;
+        if (scrollOffset > maxScroll) scrollOffset = maxScroll;
+
+        int start = (int) Math.floor(scrollOffset);
+        double partialOffset = scrollOffset - start;
+
+        ScissorUtil.enable(context, x, contentY, x + width, contentY + contentHeight);
+
+        int drawY = contentY - (int)(partialOffset * lineHeight);
+
+        for (int i = start; i < Math.min(entries.size(), start + maxVisible + 1); i++) {
             Text entry = entries.get(i);
             FONT_MANAGER.drawText(context, entry, x + 4, drawY, 0xFFFFFFFF, false);
             drawY += lineHeight;
         }
 
         updateDeleteButtons(textRenderer);
-
         for (ButtonWidget button : deleteButtons) {
             button.render(context, textRenderer, mouseX, mouseY);
         }
 
+        ScissorUtil.disable(context);
+
         int inputY = y + height - inputHeight - 2;
         int inputX = x + 2;
         int inputBg = inputFocused ? 0x80202020 : 0x80101010;
-
         int inputWidth = enterButton.getX() - inputX - 1;
-
         context.fill(inputX, inputY, inputX + inputWidth, inputY + inputHeight, inputBg);
 
         String inputStr = inputBuffer.toString() + (inputFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "_" : "");
@@ -204,14 +233,20 @@ public class ConsolePanelRenderer {
 
     private void updateDeleteButtons(TextRenderer textRenderer) {
         deleteButtons.clear();
+
         int contentY = y + headerHeight + 4;
         int lineHeight = textRenderer.fontHeight + 4;
-        int start = Math.max(0, entries.size() - (height - headerHeight - inputHeight - 8) / lineHeight - scrollOffset);
-        int end = Math.min(entries.size(), start + (height - headerHeight - inputHeight - 8) / lineHeight);
+        int contentHeight = height - headerHeight - inputHeight - 8;
+        int maxVisible = contentHeight / lineHeight;
+
+        int start = (int) Math.floor(scrollOffset);
+        double partialOffset = scrollOffset - start;
+        int end = Math.min(entries.size(), start + maxVisible + 1);
 
         for (int i = start; i < end; i++) {
             Text entry = entries.get(i);
-            int drawY = contentY + (i - start) * lineHeight;
+
+            int drawY = contentY + (int)((i - start - partialOffset) * lineHeight);
 
             int buttonWidth = 30;
             int buttonHeight = textRenderer.fontHeight;
