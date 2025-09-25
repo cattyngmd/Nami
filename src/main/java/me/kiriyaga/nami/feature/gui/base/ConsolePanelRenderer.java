@@ -4,6 +4,7 @@ import me.kiriyaga.nami.feature.gui.base.ButtonWidget;
 import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class ConsolePanelRenderer {
     private final PanelRenderer panelRenderer = new PanelRenderer();
-    private final List<String> entries = new ArrayList<>();
+    private final List<Text> entries = new ArrayList<>();
 
     private final Consumer<String> onAdd;
     private final Consumer<String> onRemove;
@@ -23,6 +24,7 @@ public class ConsolePanelRenderer {
     private boolean inputFocused = false;
     private StringBuilder inputBuffer = new StringBuilder();
     private int scrollOffset = 0;
+    private final List<ButtonWidget> deleteButtons = new ArrayList<>();
 
     private int x;
     private int y;
@@ -59,7 +61,7 @@ public class ConsolePanelRenderer {
                 });
     }
 
-    public void setEntries(List<String> items) {
+    public void setEntries(List<Text> items) {
         entries.clear();
         entries.addAll(items);
     }
@@ -78,9 +80,15 @@ public class ConsolePanelRenderer {
 
         int drawY = contentY;
         for (int i = start; i < end; i++) {
-            String entry = entries.get(i);
+            Text entry = entries.get(i);
             FONT_MANAGER.drawText(context, entry, x + 4, drawY, 0xFFFFFFFF, false);
             drawY += lineHeight;
+        }
+
+        updateDeleteButtons(textRenderer);
+
+        for (ButtonWidget button : deleteButtons) {
+            button.render(context, textRenderer, mouseX, mouseY);
         }
 
         int inputY = y + height - inputHeight - 2;
@@ -92,7 +100,7 @@ public class ConsolePanelRenderer {
         context.fill(inputX, inputY, inputX + inputWidth, inputY + inputHeight, inputBg);
 
         String inputStr = inputBuffer.toString() + (inputFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "_" : "");
-        FONT_MANAGER.drawText(context, inputStr, inputX + 2, inputY + 4, 0xFFFFFFFF, false);
+        FONT_MANAGER.drawText(context, inputStr, inputX + 2, inputY + 4, 0xFFFFFFFF, true);
 
         enterButton.render(context, textRenderer, mouseX, mouseY);
     }
@@ -100,6 +108,12 @@ public class ConsolePanelRenderer {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int mouseXInt = (int) mouseX;
         int mouseYInt = (int) mouseY;
+
+        for (ButtonWidget widget : deleteButtons) {
+            if (widget.mouseClicked(mouseXInt, mouseYInt, button)) {
+                return true;
+            }
+        }
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isHeaderHovered(mouseXInt, mouseYInt)) {
             dragging = true;
@@ -186,5 +200,29 @@ public class ConsolePanelRenderer {
 
     public boolean isHeaderHovered(int mouseX, int mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + headerHeight;
+    }
+
+    private void updateDeleteButtons(TextRenderer textRenderer) {
+        deleteButtons.clear();
+        int contentY = y + headerHeight + 4;
+        int lineHeight = textRenderer.fontHeight + 4;
+        int start = Math.max(0, entries.size() - (height - headerHeight - inputHeight - 8) / lineHeight - scrollOffset);
+        int end = Math.min(entries.size(), start + (height - headerHeight - inputHeight - 8) / lineHeight);
+
+        for (int i = start; i < end; i++) {
+            Text entry = entries.get(i);
+            int drawY = contentY + (i - start) * lineHeight;
+
+            int buttonWidth = 30;
+            int buttonHeight = textRenderer.fontHeight;
+            int buttonX = x + width - 2 - buttonWidth;
+            int buttonY = drawY;
+
+            final String friendName = entry.getString().split(" ")[0];
+            deleteButtons.add(new ButtonWidget("X", buttonX, buttonY, buttonWidth, buttonHeight, true,
+                    () -> {
+                        if (onRemove != null) onRemove.accept(friendName);
+                    }));
+        }
     }
 }
