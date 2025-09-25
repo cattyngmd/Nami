@@ -19,10 +19,11 @@ import java.util.*;
 import static me.kiriyaga.nami.Nami.*;
 
 public class HudEditorScreen extends Screen {
-    private final Set<ModuleCategory> expandedCategories = new HashSet<>();
+
     private final Set<Module> expandedModules = new HashSet<>();
     private final Map<ModuleCategory, Point> categoryPositions = new HashMap<>();
-    private int scrollOffset = 0;
+    private final Map<ModuleCategory, CategoryPanel> categoryPanels = new HashMap<>();
+
     private boolean draggingCategory = false;
     private ModuleCategory draggedModuleCategory = null;
 
@@ -31,31 +32,35 @@ public class HudEditorScreen extends Screen {
 
     public HudEditorScreen() {
         super(Text.literal("NamiHudEditor"));
-        syncCategoryPositions();
-        expandedCategories.add(ModuleCategory.of("HUD"));
+        initPanels();
     }
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
-    private void syncCategoryPositions() {
-        int x = 20;
-        int y = 20;
-        ModuleCategory hud = ModuleCategory.of("HUD");
-        categoryPositions.putIfAbsent(hud, new Point(x, y));
-        categoryPositions.keySet().removeIf(cat -> !cat.equals(hud));
+    private void initPanels() {
+        ModuleCategory hudCategory = ModuleCategory.of("HUD");
+        Point pos = new Point(20, 20);
+        categoryPositions.put(hudCategory, pos);
+
+        if (!categoryPanels.containsKey(hudCategory)) {
+            categoryPanels.put(hudCategory, new CategoryPanel(hudCategory, expandedModules));
+        }
     }
 
     @Override
     public void renderBackground(DrawContext context, int i, int j, float f) {
-        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+        ClickGuiModule clickGui = getClickGuiModule();
+        if (MC.world != null && clickGui != null && clickGui.blur.get()) {
             this.applyBlur(context);
+        }
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        syncCategoryPositions();
+        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
         ClickGuiModule hudEditorModule = getClickGuiModule();
         if (hudEditorModule != null && hudEditorModule.background.get()) {
@@ -67,28 +72,22 @@ public class HudEditorScreen extends Screen {
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
 
-        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
-        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
-
-        int scaledWidth = (int) ( this.width / CLICK_GUI.scale);
-        int scaledHeight = (int) (this.height / CLICK_GUI.scale);
-
+        int scaledWidth = (int) (this.width / CLICK_GUI.scale);
         int panelWidth = NAVIGATE_PANEL.calcWidth();
         int navigateX = (scaledWidth - panelWidth) / 2;
-        int navigateY = 1;
-        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, navigateY, mouseX, mouseY);
+        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, 1, mouseX, mouseY);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
-        if (pos != null) {
-            CategoryPanel panel = new CategoryPanel(hudCategory, expandedCategories, expandedModules);
-            panel.render(context, this.textRenderer, pos.x, pos.y + scrollOffset, scaledMouseX, scaledMouseY, this.height);
+        CategoryPanel hudPanel = categoryPanels.get(hudCategory);
+
+        if (pos != null && hudPanel != null) {
+            hudPanel.render(context, this.textRenderer, pos.x, pos.y, scaledMouseX, scaledMouseY, this.height);
         }
 
-        ClickGuiModule clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
-        if (clickGuiModule != null && clickGuiModule.descriptions.get() && pos != null && expandedCategories.contains(hudCategory)) {
+        if (hudPanel != null && hudEditorModule != null && hudEditorModule.descriptions.get() && pos != null) {
             List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(hudCategory);
-            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
+            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
 
             for (Module module : modules) {
                 int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
@@ -102,7 +101,6 @@ public class HudEditorScreen extends Screen {
                         int textHeight = 8;
 
                         context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
-                        //context.drawText(textRenderer, description, descX, descY, 0xFFFFFFFF, true);
                         FONT_MANAGER.drawText(context, Text.of(description), descX, descY, true);
                     }
                     context.getMatrices().popMatrix();
@@ -119,6 +117,12 @@ public class HudEditorScreen extends Screen {
 
         context.getMatrices().popMatrix();
 
+        renderHudElements(context, mouseX, mouseY);
+
+        super.render(context, mouseX, mouseY, delta);
+    }
+
+    private void renderHudElements(DrawContext context, int mouseX, int mouseY) {
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
         int screenHeight = MC.getWindow().getScaledHeight();
         int chatZoneTop = screenHeight - (screenHeight / 8);
@@ -126,70 +130,49 @@ public class HudEditorScreen extends Screen {
         for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
             if (module instanceof HudElementModule hud && hud.isEnabled()) {
                 int y = hud.getRenderY();
-
-                boolean isInChatZone = (y + hud.height) >= chatZoneTop;
-                int renderY = isInChatZone ? y - chatAnimationOffset : y;
-
+                int renderY = (y + hud.height >= chatZoneTop) ? y - chatAnimationOffset : y;
                 int baseX = hud.getRenderX();
 
                 boolean hovered = mouseX >= baseX && mouseX <= baseX + hud.width &&
                         mouseY >= renderY && mouseY <= renderY + hud.height;
 
                 if (hovered) {
-                    context.fill(
-                            baseX - 1, renderY - 1,
-                            baseX + hud.width + 1, renderY + hud.height + 1,
-                            0x50FFFFFF
-                    );
+                    context.fill(baseX - 1, renderY - 1, baseX + hud.width + 1, renderY + hud.height + 1, 0x50FFFFFF);
                 }
 
                 for (HudElementModule.TextElement element : new ArrayList<>(hud.getTextElements())) {
                     int drawX = hud.getRenderXForElement(element);
                     int drawY = renderY + element.offsetY();
-                    //context.drawText(MC.textRenderer, element.text(), drawX, drawY, 0xFFFFFFFF, true);
                     FONT_MANAGER.drawText(context, element.text(), drawX, drawY, true);
                 }
             }
         }
-
-        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        syncCategoryPositions();
-
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
         int navX = (int) ((this.width / CLICK_GUI.scale - NAVIGATE_PANEL.calcWidth()) / 2);
-        int navY = 1;
-        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
-
+        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, 1, this.textRenderer);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
+        CategoryPanel hudPanel = categoryPanels.get(hudCategory);
 
-        if (pos != null && CategoryPanel.isHeaderHovered(scaledMouseX, scaledMouseY, pos.x, pos.y + scrollOffset)) {
+        if (pos != null && hudPanel != null && CategoryPanel.isHeaderHovered(scaledMouseX, scaledMouseY, pos.x, pos.y)) {
             if (button == 0) {
                 playClickSound();
                 draggingCategory = true;
                 draggedModuleCategory = hudCategory;
                 return true;
-            } else if (button == 1) {
-                if (expandedCategories.contains(hudCategory)) {
-                    expandedCategories.remove(hudCategory);
-                } else {
-                    expandedCategories.add(hudCategory);
-                }
-                playClickSound();
-                return true;
             }
         }
 
-        if (!draggingCategory && pos != null && expandedCategories.contains(hudCategory)) {
+        if (!draggingCategory && pos != null && hudPanel != null) {
             List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(hudCategory);
-            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + scrollOffset + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
+            int curY = pos.y + CategoryPanel.HEADER_HEIGHT + ModulePanel.MODULE_SPACING + CategoryPanel.BOTTOM_MARGIN;
 
             for (Module module : modules) {
                 int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
@@ -199,11 +182,8 @@ public class HudEditorScreen extends Screen {
                         playClickSound();
                         module.toggle();
                     } else if (button == 1) {
-                        if (expandedModules.contains(module)) {
-                            expandedModules.remove(module);
-                        } else {
-                            expandedModules.add(module);
-                        }
+                        if (expandedModules.contains(module)) expandedModules.remove(module);
+                        else expandedModules.add(module);
                         playClickSound();
                     } else if (button == 2) {
                         playClickSound();
@@ -213,34 +193,31 @@ public class HudEditorScreen extends Screen {
                 }
 
                 curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-
                 if (expandedModules.contains(module)) {
-                    if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) {
-                        return true;
-                    }
+                    if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) return true;
                     curY += SettingPanel.getSettingsHeight(module);
                 }
             }
         }
 
-        if (button != 0) return false;
+        if (button == 0) {
+            int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
+            int screenHeight = MC.getWindow().getScaledHeight();
+            int chatZoneTop = screenHeight - (screenHeight / 8);
 
-        int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
-        int screenHeight = MC.getWindow().getScaledHeight();
-        int chatZoneTop = screenHeight - (screenHeight / 8);
+            for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
+                if (module instanceof HudElementModule hud && hud.isEnabled()) {
+                    int x = hud.getRenderX();
+                    int y = hud.getRenderY();
+                    int renderY = (y + hud.height >= chatZoneTop) ? y - chatAnimationOffset : y;
 
-        for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
-            if (module instanceof HudElementModule hud && hud.isEnabled()) {
-                int x = hud.getRenderX();
-                int y = hud.getRenderY();
-                int renderY = (y + hud.height) >= chatZoneTop ? y - chatAnimationOffset : y;
-
-                if (mouseX >= x && mouseX <= x + hud.width &&
-                        mouseY >= renderY && mouseY <= renderY + hud.height) {
-                    draggingElement = hud;
-                    dragOffsetX = (int) mouseX - x;
-                    dragOffsetY = (int) mouseY - renderY;
-                    return true;
+                    if (mouseX >= x && mouseX <= x + hud.width &&
+                            mouseY >= renderY && mouseY <= renderY + hud.height) {
+                        draggingElement = hud;
+                        dragOffsetX = (int) mouseX - x;
+                        dragOffsetY = (int) mouseY - renderY;
+                        return true;
+                    }
                 }
             }
         }
@@ -256,71 +233,65 @@ public class HudEditorScreen extends Screen {
         int scaledDeltaY = (int) (deltaY / CLICK_GUI.scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
-            Point currentPos = categoryPositions.get(draggedModuleCategory);
-            if (currentPos != null) {
-                currentPos.translate(scaledDeltaX, scaledDeltaY);
+            Point pos = categoryPositions.get(draggedModuleCategory);
+            if (pos != null) {
+                pos.translate(scaledDeltaX, scaledDeltaY);
                 return true;
             }
         }
 
         if (button == 0 && draggingElement != null) {
-            int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
-
-            int newRenderX = (int) mouseX - dragOffsetX;
-            int newRenderY = (int) mouseY - dragOffsetY + chatAnimationOffset;
-
-            int screenWidth = MC.getWindow().getScaledWidth();
-            int screenHeight = MC.getWindow().getScaledHeight();
-
-            newRenderY = Math.max(1, Math.min(newRenderY, screenHeight - draggingElement.height - 1));
-
-            int newX;
-            switch (draggingElement.alignment.get()) {
-                case LEFT:
-                    newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
-                    newX = newRenderX;
-                    break;
-                case CENTER:
-                    newRenderX = Math.max(draggingElement.width / 2, Math.min(newRenderX, screenWidth - draggingElement.width / 2));
-                    newX = newRenderX + draggingElement.width / 2;
-                    break;
-                case RIGHT:
-                    newRenderX = Math.max(0, Math.min(newRenderX, screenWidth - draggingElement.width));
-                    newX = newRenderX + draggingElement.width;
-                    break;
-                default:
-                    newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
-                    newX = newRenderX;
-                    break;
-            }
-
-            boolean intersects = false;
-            for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
-                if (module instanceof HudElementModule other && other.isEnabled() && other != draggingElement) {
-                    int ox = other.getRenderX();
-                    int oy = other.getRenderY();
-                    int oWidth = other.width;
-                    int oHeight = other.height;
-
-                    boolean overlapX = newRenderX < ox + oWidth && newRenderX + draggingElement.width > ox;
-                    boolean overlapY = newRenderY < oy + oHeight && newRenderY + draggingElement.height > oy;
-
-                    if (overlapX && overlapY) {
-                        intersects = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!intersects) {
-                draggingElement.x.set(newX / (double) screenWidth);
-                draggingElement.y.set(newRenderY / (double) screenHeight);
-            }
+            dragHudElement(mouseX, mouseY);
             return true;
         }
 
         SettingPanel.mouseDragged(scaledMouseX, scaledMouseY);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    private void dragHudElement(double mouseX, double mouseY) {
+        int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
+        int newRenderX = (int) mouseX - dragOffsetX;
+        int newRenderY = (int) (mouseY - dragOffsetY + chatAnimationOffset);
+
+        int screenWidth = MC.getWindow().getScaledWidth();
+        int screenHeight = MC.getWindow().getScaledHeight();
+
+        newRenderY = Math.max(1, Math.min(newRenderY, screenHeight - draggingElement.height - 1));
+
+        int newX;
+        switch (draggingElement.alignment.get()) {
+            case LEFT -> {
+                newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
+                newX = newRenderX;
+            }
+            case CENTER -> {
+                newRenderX = Math.max(draggingElement.width / 2, Math.min(newRenderX, screenWidth - draggingElement.width / 2));
+                newX = newRenderX + draggingElement.width / 2;
+            }
+            case RIGHT -> {
+                newRenderX = Math.max(0, Math.min(newRenderX, screenWidth - draggingElement.width));
+                newX = newRenderX + draggingElement.width;
+            }
+            default -> newX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
+        }
+
+        boolean intersects = false;
+        for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
+            if (module instanceof HudElementModule other && other.isEnabled() && other != draggingElement) {
+                boolean overlapX = newRenderX < other.getRenderX() + other.width && newRenderX + draggingElement.width > other.getRenderX();
+                boolean overlapY = newRenderY < other.getRenderY() + other.height && newRenderY + draggingElement.height > other.getRenderY();
+                if (overlapX && overlapY) {
+                    intersects = true;
+                    break;
+                }
+            }
+        }
+
+        if (!intersects) {
+            draggingElement.x.set(newX / (double) screenWidth);
+            draggingElement.y.set(newRenderY / (double) screenHeight);
+        }
     }
 
     @Override
@@ -335,21 +306,12 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        scrollOffset += verticalAmount * 20;
-        scrollOffset = Math.min(scrollOffset, 0);
-        return true;
-    }
-
-    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
             MC.setScreen(null);
             return true;
         }
-        if (SettingPanel.keyPressed(keyCode)) {
-            return true;
-        }
+        if (SettingPanel.keyPressed(keyCode)) return true;
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
