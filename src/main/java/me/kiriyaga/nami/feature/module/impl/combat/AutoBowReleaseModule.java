@@ -20,7 +20,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class AutoBowReleaseModule extends Module {
     public enum TpsMode {NONE, LATEST, AVERAGE}
 
-    private final IntSetting ticks = addSetting(new IntSetting("Delay", 3, 1, 21));
+    private final IntSetting ticks = addSetting(new IntSetting("Delay", 4, 4, 21));
     private final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
 
     private float ticker = 0f;

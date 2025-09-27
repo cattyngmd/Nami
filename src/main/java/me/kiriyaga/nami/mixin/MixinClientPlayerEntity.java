@@ -119,7 +119,8 @@ public abstract class MixinClientPlayerEntity {
         if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT
         && ROTATION_MANAGER.getStateHandler().getSilentSyncRequired()) {
             this.originalSilentPitch = MC.player.getPitch();
-            MC.player.setPitch(this.originalSilentPitch + 0.001f);
+            this.lastPitchClient = -9999;
+            MC.player.setPitch(this.originalSilentPitch + 1f);
         }
     }
 
@@ -150,6 +151,8 @@ public abstract class MixinClientPlayerEntity {
     private static Vec2f applyDirectionalMovementSpeedFactors(Vec2f vec2f) {
         throw new AssertionError();
     }
+
+    @Shadow private float lastPitchClient;
 
     @Inject(method = "shouldSlowDown", at = @At("HEAD"), cancellable = true)
     private void shouldSlowDown(CallbackInfoReturnable<Boolean> info) {
