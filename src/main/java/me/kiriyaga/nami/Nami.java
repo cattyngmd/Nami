@@ -58,6 +58,7 @@ public class Nami implements ClientModInitializer {
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static final BreakManager BREAK_MANAGER = new BreakManager();
+    public static final FlagManager FLAG_MANAGER = new FlagManager();
     public static final ExecutableManager EXECUTABLE_MANAGER = new ExecutableManager();
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
@@ -81,6 +82,7 @@ public class Nami implements ClientModInitializer {
         INVENTORY_MANAGER.init();
         BREAK_MANAGER.init();
         EXECUTABLE_MANAGER.init();
+        FLAG_MANAGER.init();
         CHAT_MANAGER.init();
 
         CAT_FORMAT.add(new CatStyles());
