@@ -146,7 +146,7 @@ public class FuckerModule extends Module {
 
         if (block instanceof NetherWartBlock) {
             Integer age = state.get(NetherWartBlock.AGE);
-            return age != null && age >= 3;  // it should be 3 but im not sure TODO: check this
+            return age != null && age >= 3;  // it's 3 for a fully grown netherwart
         }
 
         return false;

@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.module.Module;
@@ -338,6 +339,49 @@ public class CommandSuggester {
                         });
                     }
 
+                    if (arg instanceof CommandArgument.OnlinePlayerArg) {
+                        argBuilder.suggests((context, suggestionBuilder) -> {
+                            String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+                            if (MC.getNetworkHandler() == null) return suggestionBuilder.buildFuture();
+                            MC.getNetworkHandler().getPlayerList().forEach(p -> {
+                                if (p.getProfile().getName().toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                    suggestionBuilder.suggest(p.getProfile().getName());
+                                }
+                            });
+                            return suggestionBuilder.buildFuture();
+                        });
+                    }
+
+                    if (arg instanceof CommandArgument.FriendArg) {
+                        argBuilder.suggests((context, suggestionBuilder) -> {
+                            suggestFriends(suggestionBuilder);
+                            return suggestionBuilder.buildFuture();
+                        });
+                    }
+
+                    if (arg instanceof CommandArgument.FriendNameArg) {
+                        argBuilder.suggests((context, suggestionBuilder) -> {
+                            String input = context.getInput();
+                            String[] parts = input.split("\\s+");
+                            String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+
+                            if (parts.length > 1) {
+                                String action = parts[1].toLowerCase(Locale.ROOT);
+                                if (action.equals("add")) {
+                                    if (MC.getNetworkHandler() == null) return suggestionBuilder.buildFuture();
+                                    MC.getNetworkHandler().getPlayerList().forEach(p -> {
+                                        if (p.getProfile().getName().toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                            suggestionBuilder.suggest(p.getProfile().getName());
+                                        }
+                                    });
+                                } else if (action.equals("del")) {
+                                    suggestFriends(suggestionBuilder);
+                                }
+                            }
+                            return suggestionBuilder.buildFuture();
+                        });
+                    }
+
                     if (argumentChain == null) {
                         argBuilder.executes(context -> 1);
                     } else {
@@ -350,6 +394,15 @@ public class CommandSuggester {
 
             dispatcher.register(builder);
         }
+    }
+
+    private void suggestFriends(SuggestionsBuilder suggestionBuilder) {
+        String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+        FRIEND_MANAGER.getFriends().forEach(f -> {
+            if (f.toLowerCase(Locale.ROOT).startsWith(rem)) {
+                suggestionBuilder.suggest(f);
+            }
+        });
     }
 
     private ArgumentType<?> toBrigadierArgument(CommandArgument arg, boolean isLast) {
