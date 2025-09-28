@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.*;
 
-@RegisterModule
+//@RegisterModule
 public class FeetTrapModule extends Module {
 
     private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
