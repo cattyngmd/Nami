@@ -8,13 +8,13 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
-import me.kiriyaga.nami.util.InteractionUtils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Arrays;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.placeBlock;
@@ -51,14 +51,11 @@ public class ScaffoldModule extends Module {
         }
         BlockPos[] corners = getPlacements();
         int blocksPlaced = 0;
-        int slot = getBlockSlot();
+        int slot = getSelectedSlot();
         if (slot == -1) return;
 
         for (BlockPos pos : corners) {
             BlockPos targetPos = pos.down();
-            BlockState targetState = MC.world.getBlockState(targetPos);
-
-            if (!targetState.isAir()) continue;
 
             if (placeBlock(targetPos, slot, rotate.get(), strictDirection.get(), simulate.get(), swing.get()))
                 blocksPlaced++;
@@ -69,8 +66,18 @@ public class ScaffoldModule extends Module {
         if (blocksPlaced > 0) cooldown = delay.get();
     }
 
-    private int getBlockSlot() {
-        boolean useWhitelist = whitelist.get();
+    private int getSelectedSlot() {
+        int selectedSlot = MC.player.getInventory().getSelectedSlot();
+
+        if (!MC.player.getInventory().getStack(selectedSlot).isEmpty()) {
+            Block block = Block.getBlockFromItem(MC.player.getInventory().getStack(selectedSlot).getItem());
+            if (block != Blocks.AIR) {
+                Identifier blockId = Registries.BLOCK.getId(block);
+                if (!whitelist.get() || whitelist.isWhitelisted(blockId)) {
+                    return selectedSlot;
+                }
+            }
+        }
 
         for (int i = 0; i < 9; i++) {
             if (MC.player.getInventory().getStack(i).isEmpty()) continue;
@@ -79,7 +86,7 @@ public class ScaffoldModule extends Module {
             if (block == Blocks.AIR) continue;
 
             Identifier blockId = Registries.BLOCK.getId(block);
-            if (useWhitelist && !whitelist.isWhitelisted(blockId)) continue;
+            if (whitelist.get() && !whitelist.isWhitelisted(blockId)) continue;
 
             return i;
         }
@@ -94,11 +101,11 @@ public class ScaffoldModule extends Module {
         double maxZ = MC.player.getBoundingBox().maxZ;
         int y = (int) Math.floor(MC.player.getY());
 
-        return new BlockPos[] {
-                new BlockPos((int) Math.floor(minX), y, (int) Math.floor(minZ)),
-                new BlockPos((int) Math.floor(minX), y, (int) Math.floor(maxZ)),
-                new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(minZ)),
-                new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(maxZ))
-        };
+        BlockPos[] possiblePositions = new BlockPos[] {new BlockPos((int) Math.floor(minX), y, (int) Math.floor(minZ)), new BlockPos((int) Math.floor(minX), y, (int) Math.floor(maxZ)), new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(minZ)), new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(maxZ))};
+
+        return Arrays.stream(possiblePositions)
+                .filter(pos -> MC.world.getBlockState(pos.down()).isAir()) // yes i know its cringe sorry
+                .toArray(BlockPos[]::new);
     }
+
 }
