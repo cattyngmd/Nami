@@ -52,7 +52,7 @@ public class InteractionUtils {
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos, int slot, boolean rotate, boolean strictDirection, boolean swing) {
+    public static boolean placeBlock(BlockPos pos, int slot, boolean rotate, boolean strictDirection, boolean simulate, boolean swing) {
         Direction direction = getDirection(pos);
         if (direction == null) {
             if (strictDirection)
@@ -83,8 +83,10 @@ public class InteractionUtils {
             int prev = MC.player.getInventory().getSelectedSlot();
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
 
-            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(MAIN_HAND, hitResult, id));
-            //MC.interactionManager.interactBlock(MC.player, MAIN_HAND, hitResult);
+            if (simulate)
+                MC.interactionManager.interactBlock(MC.player, MAIN_HAND, hitResult);
+            else
+                sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(MAIN_HAND, hitResult, id));
 
             if (swing)
                 MC.player.swingHand(MAIN_HAND);

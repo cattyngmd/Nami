@@ -23,9 +23,10 @@ import static me.kiriyaga.nami.util.InteractionUtils.placeBlock;
 public class ScaffoldModule extends Module {
 
     private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
-    private final IntSetting blocksPerTick = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
+    private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
 
@@ -48,20 +49,21 @@ public class ScaffoldModule extends Module {
             cooldown--;
             return;
         }
-
-        BlockPos feetPos = MC.player.getBlockPos().down();
-
+        BlockPos[] corners = getPlacements();
         int blocksPlaced = 0;
         int slot = getBlockSlot();
         if (slot == -1) return;
 
-        BlockPos targetPos = feetPos;
-        BlockState targetState = MC.world.getBlockState(targetPos);
+        for (BlockPos pos : corners) {
+            BlockPos targetPos = pos.down();
+            BlockState targetState = MC.world.getBlockState(targetPos);
 
-        if (!targetState.isAir()) return;
+            if (!targetState.isAir()) continue;
 
-        if (placeBlock(targetPos, slot, rotate.get(), strictDirection.get(), swing.get())) {
-            blocksPlaced++;
+            if (placeBlock(targetPos, slot, rotate.get(), strictDirection.get(), simulate.get(), swing.get()))
+                blocksPlaced++;
+
+            if (blocksPlaced >= shiftTicks.get()) break;
         }
 
         if (blocksPlaced > 0) cooldown = delay.get();
@@ -72,8 +74,10 @@ public class ScaffoldModule extends Module {
 
         for (int i = 0; i < 9; i++) {
             if (MC.player.getInventory().getStack(i).isEmpty()) continue;
+
             Block block = Block.getBlockFromItem(MC.player.getInventory().getStack(i).getItem());
             if (block == Blocks.AIR) continue;
+
             Identifier blockId = Registries.BLOCK.getId(block);
             if (useWhitelist && !whitelist.isWhitelisted(blockId)) continue;
 
@@ -81,5 +85,20 @@ public class ScaffoldModule extends Module {
         }
 
         return -1;
+    }
+
+    private BlockPos[] getPlacements() {
+        double minX = MC.player.getBoundingBox().minX;
+        double maxX = MC.player.getBoundingBox().maxX;
+        double minZ = MC.player.getBoundingBox().minZ;
+        double maxZ = MC.player.getBoundingBox().maxZ;
+        int y = (int) Math.floor(MC.player.getY());
+
+        return new BlockPos[] {
+                new BlockPos((int) Math.floor(minX), y, (int) Math.floor(minZ)),
+                new BlockPos((int) Math.floor(minX), y, (int) Math.floor(maxZ)),
+                new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(minZ)),
+                new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(maxZ))
+        };
     }
 }
