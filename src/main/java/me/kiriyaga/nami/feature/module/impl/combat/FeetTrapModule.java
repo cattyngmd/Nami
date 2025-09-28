@@ -33,7 +33,7 @@ public class FeetTrapModule extends Module {
     };
 
     public FeetTrapModule() {
-        super("FeetTrap", "Places blocks around your feet to trap yourself.", ModuleCategory.of("World"), "feettrap");
+        super("FeetTrap", "Places blocks around your feet to trap yourself.", ModuleCategory.of("Combat"), "feettrap");
     }
 
     @Override

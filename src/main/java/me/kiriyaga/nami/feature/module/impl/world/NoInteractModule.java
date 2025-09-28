@@ -31,7 +31,7 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class NoInteractModule extends Module {
 
-    public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, this.name, WhitelistSetting.Type.BLOCK));
+    public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
     public final BoolSetting spawnPoint = addSetting(new BoolSetting("SpawnPoint", true));
     public final BoolSetting strip = addSetting(new BoolSetting("Strip", false));
     public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
