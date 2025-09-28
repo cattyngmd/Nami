@@ -20,7 +20,8 @@ public class FeetTrapModule extends Module {
     private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
 
     private int cooldown = 0;
 
@@ -60,7 +61,7 @@ public class FeetTrapModule extends Module {
             int blockSlot = getBlockSlot();
             if (blockSlot == -1) continue;
 
-            if (InteractionUtils.placeBlock(targetPos, blockSlot, swing.get(), rotate.get())) {
+            if (InteractionUtils.placeBlock(targetPos, blockSlot, rotate.get(), strictDirection.get(), swing.get())) {
                 blocksPlaced++;
             }
 

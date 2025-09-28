@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.util;
 
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -12,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
@@ -50,14 +52,19 @@ public class InteractionUtils {
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos,int slot, boolean swing, boolean rotate) {
+    public static boolean placeBlock(BlockPos pos, int slot, boolean rotate, boolean strictDirection, boolean swing) {
         Direction direction = getDirection(pos);
-        if (direction == null)
-            return false;
+        if (direction == null) {
+            if (strictDirection)
+                return false;
+            else
+                direction = Direction.DOWN;
+        }
 
-        Vec3d hitVec = pos.toCenterPos().add(new Vec3d(direction.getUnitVector()).multiply(0.5));
-        BlockHitResult hitResult = new BlockHitResult(hitVec, direction, pos, false);
-
+        BlockPos neighbor = pos.offset(direction.getOpposite());
+        Direction clickFace = direction;
+        Vec3d hitVec = Vec3d.ofCenter(neighbor).add(Vec3d.of(clickFace.getVector()).multiply(0.5));
+        BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, neighbor, false);
         boolean canPlace = true;
 
         if (rotate) {
@@ -65,18 +72,11 @@ public class InteractionUtils {
             float yaw = (float) RotationUtils.getYawToVec(MC.player, hitVec);
             float pitch = (float) RotationUtils.getPitchToVec(MC.player, hitVec);
 
-            ROTATION_MANAGER.getRequestHandler().submit(
-                    new me.kiriyaga.nami.core.rotation.model.RotationRequest(
-                            rotationId,
-                            10,
-                            yaw,
-                            pitch
-                    )
-            );
+
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 10, yaw, pitch));
 
             canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
         }
-
 
         boolean result = false;
         if (canPlace) {
@@ -84,8 +84,11 @@ public class InteractionUtils {
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
 
             sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(MAIN_HAND, hitResult, id));
+            //MC.interactionManager.interactBlock(MC.player, MAIN_HAND, hitResult);
+
             if (swing)
                 MC.player.swingHand(MAIN_HAND);
+
             result = true;
 
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
@@ -94,14 +97,16 @@ public class InteractionUtils {
         return result;
     }
 
-    public static Direction getDirection(BlockPos blockPos) { // https://github.com/GrimAnticheat/Grim/blob/293f6ea8b1b99c1ca61bbfa5507d6ee637d69276/common/src/main/java/ac/grim/grimac/checks/impl/scaffolding/AirLiquidPlace.java#L58
-        for (Direction direction : Direction.values()) {
-            BlockPos neighbor = blockPos.offset(direction);
-            BlockState state = MC.world.getBlockState(neighbor);
+    public static Direction getDirection(BlockPos blockPos) {
+        for (final Direction direction : Direction.values()) {
+            final BlockState state = MC.world.getBlockState(blockPos.offset(direction));
+            if (state.isAir() || !state.getFluidState().isEmpty()) {
+                continue;
+            }
 
-            if (state.isAir() || !state.getFluidState().isEmpty()) continue;
+            Direction opposite = direction.getOpposite();
 
-            return direction;
+            return opposite;
         }
         return null;
     }
