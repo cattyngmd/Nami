@@ -51,7 +51,7 @@ public class ScaffoldModule extends Module {
         }
         BlockPos[] corners = getPlacements();
         int blocksPlaced = 0;
-        int slot = getSelectedSlot();
+        int slot = getSlot();
         if (slot == -1) return;
 
         for (BlockPos pos : corners) {
@@ -66,7 +66,7 @@ public class ScaffoldModule extends Module {
         if (blocksPlaced > 0) cooldown = delay.get();
     }
 
-    private int getSelectedSlot() {
+    private int getSlot() {
         int selectedSlot = MC.player.getInventory().getSelectedSlot();
 
         if (!MC.player.getInventory().getStack(selectedSlot).isEmpty()) {
