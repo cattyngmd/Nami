@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.feature.module.impl.movement;
 
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.setting.impl.*;
 import me.kiriyaga.nami.mixin.*;
 
@@ -252,11 +254,7 @@ public class VelocityModule extends Module {
         float yaw = ROTATION_MANAGER.getStateHandler().getServerYaw();
         float pitch = ROTATION_MANAGER.getStateHandler().getServerPitch();
 
-        MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
-                MC.player.getX(), MC.player.getY(), MC.player.getZ(),
-                yaw, pitch, MC.player.isOnGround(), true
-        ));
-
+        ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.name, 0, yaw, pitch, RotationModule.RotationMode.SILENT));
         MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
                 MC.player.isCrawling() ? MC.player.getBlockPos() : MC.player.getBlockPos().up(),
