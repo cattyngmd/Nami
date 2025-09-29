@@ -37,20 +37,20 @@ public class InvCleanerModule extends Module {
         if (++i < delay.get()) return;
         i = 0;
 
-        for (int i = 0; i < MC.player.getInventory().size(); i++) {
+        for (int i = 9; i < MC.player.getInventory().size(); i++) {
             ItemStack stack = MC.player.getInventory().getStack(i);
             if (stack.isEmpty()) continue;
 
             Identifier id = Registries.ITEM.getId(stack.getItem());
 
-            if (blacklist.get() && blacklist.allows(WhitelistSetting.Type.ITEM)) {
+            if (blacklist.get()) {
                 if (blacklist.isWhitelisted(id)) {
                     INVENTORY_MANAGER.getClickHandler().throwSlot(i);
                     return;
                 }
             }
 
-            if (whitelist.get() && whitelist.allows(WhitelistSetting.Type.ITEM)) {
+            if (whitelist.get()) {
                 if (!whitelist.isWhitelisted(id)) {
                     INVENTORY_MANAGER.getClickHandler().throwSlot(i);
                     return;
