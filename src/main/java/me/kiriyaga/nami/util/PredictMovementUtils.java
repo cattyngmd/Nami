@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.util;
 
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.Vec3d;
 import java.util.function.IntFunction;
 
 public final class PredictMovementUtils {
 
-    private PredictMovementUtils() {}
+    private PredictMovementUtils() {} // elytra is fucked up here
 
     public static class PredictedEntity {
         public Vec3d pos;
@@ -44,6 +46,37 @@ public final class PredictMovementUtils {
         public Vec3d getEyePos() {
             return pos.add(0, standingEyeHeight, 0);
         }
+    }
+
+    public static PredictedEntity toPredicted(net.minecraft.entity.LivingEntity entity) {
+        PredictedEntity p = new PredictedEntity(
+                entity.getPos(),
+                entity.getVelocity(),
+                entity.getYaw(),
+                entity.getPitch(),
+                entity.isOnGround(),
+                entity.getStandingEyeHeight()
+        );
+
+        p.isGliding = entity.isGliding();
+        p.isClimbing = entity.isClimbing();
+        p.horizontalCollision = entity.horizontalCollision;
+        p.wasInPowderSnow = entity.wasInPowderSnow;
+
+        p.hasLevitation = entity.hasStatusEffect(StatusEffects.LEVITATION);
+        p.levitationAmplifier = entity.hasStatusEffect(StatusEffects.LEVITATION) ? entity.getStatusEffect(StatusEffects.LEVITATION).getAmplifier() : 0;
+        p.hasSlowFalling = entity.hasStatusEffect(StatusEffects.SLOW_FALLING);
+
+        p.isSprinting = entity.isSprinting();
+        p.touchingWater = entity.isTouchingWater();
+        p.inLava = entity.isInLava();
+
+        p.movementSpeed = entity.getMovementSpeed();
+        p.waterMovementEfficiency = (float) entity.getAttributeValue(EntityAttributes.WATER_MOVEMENT_EFFICIENCY);
+        p.finalGravity = entity.getFinalGravity();
+        p.swimHeight = entity.getSwimHeight();
+
+        return p;
     }
 
     public static PredictedEntity predict(PredictedEntity entity, int ticks, IntFunction<Vec3d> inputProvider) {

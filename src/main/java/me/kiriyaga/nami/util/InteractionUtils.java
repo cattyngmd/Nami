@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.util;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -92,7 +93,11 @@ public class InteractionUtils {
             float yaw = (float) RotationUtils.getYawToVec(MC.player, hitVec);
             float pitch = (float) RotationUtils.getPitchToVec(MC.player, hitVec);
 
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 10, yaw, pitch));
+            if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 10, yaw, pitch));
+            else
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 10, MC.player, hitVec));
+
             canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
         }
 
@@ -129,5 +134,10 @@ public class InteractionUtils {
             return opposite;
         }
         return null;
+    }
+
+    private static RotationModule.RotationMode getDefaultRotationMode() {
+        RotationModule module = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
+        return module != null ? module.rotation.get() : RotationModule.RotationMode.MOTION;
     }
 }

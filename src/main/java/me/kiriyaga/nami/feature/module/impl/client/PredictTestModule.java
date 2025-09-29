@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static me.kiriyaga.nami.Nami.*;
 
-@RegisterModule
+//@RegisterModule
 public class PredictTestModule extends Module {
 
     public final IntSetting ticks = addSetting(new IntSetting("Ticks", 3, 1, 20));
