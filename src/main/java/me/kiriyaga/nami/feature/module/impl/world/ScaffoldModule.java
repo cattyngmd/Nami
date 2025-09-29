@@ -2,18 +2,25 @@ package me.kiriyaga.nami.feature.module.impl.world;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 
+import java.awt.*;
 import java.util.Arrays;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -29,8 +36,10 @@ public class ScaffoldModule extends Module {
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
+    private final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
     private int cooldown = 0;
+    private BlockPos renderPos = null;
 
     public ScaffoldModule() {
         super("Scaffold", "Automatically scaffolds using specified blocks.", ModuleCategory.of("World"));
@@ -39,23 +48,37 @@ public class ScaffoldModule extends Module {
     @Override
     public void onDisable() {
         cooldown = 0;
+        renderPos = null;
     }
 
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.world == null) {
+            cooldown = 0;
+            renderPos = null;
+            return;
+        }
 
         if (cooldown > 0) {
             cooldown--;
+            renderPos = null;
             return;
         }
         BlockPos[] corners = getPlacements();
         int blocksPlaced = 0;
         int slot = getSlot();
-        if (slot == -1) return;
+        if (slot == -1) {
+            renderPos = null;
+            return;
+        }
 
         for (BlockPos pos : corners) {
             BlockPos targetPos = pos.down();
+
+            if (hasEntity(targetPos))
+                continue;
+            
+            renderPos = targetPos;
 
             if (placeBlock(targetPos, slot, rotate.get(), strictDirection.get(), simulate.get(), swing.get()))
                 blocksPlaced++;
@@ -64,6 +87,21 @@ public class ScaffoldModule extends Module {
         }
 
         if (blocksPlaced > 0) cooldown = delay.get();
+    }
+
+    @SubscribeEvent
+    public void onRender(Render3DEvent event) {
+        if (MC.player == null || MC.world == null || renderPos == null) return;
+
+        MatrixStack matrices = event.getMatrices();
+
+        ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
+        Color color = colorModule.getStyledGlobalColor();
+        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
+
+        Box box = new Box(renderPos);
+
+        RenderUtil.drawBox(matrices, box, fillColor, color, 1.5f, true, true);
     }
 
     private int getSlot() {
@@ -108,4 +146,14 @@ public class ScaffoldModule extends Module {
                 .toArray(BlockPos[]::new);
     }
 
+    private boolean hasEntity(BlockPos pos) {
+        for (Entity entity : MC.world.getEntities()) {
+            if (entity.squaredDistanceTo(MC.player) > 100) continue;
+
+            if (entity.getBoundingBox().intersects(new Box(pos))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
