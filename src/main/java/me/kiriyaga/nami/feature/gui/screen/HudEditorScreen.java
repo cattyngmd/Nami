@@ -307,7 +307,7 @@ public class HudEditorScreen extends Screen {
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
-            if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
+            if (!"hud".equalsIgnoreCase(moduleCategory.getName())) continue;
 
             Point pos = categoryPositions.get(moduleCategory);
             if (pos == null) continue;

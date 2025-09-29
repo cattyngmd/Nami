@@ -7,7 +7,6 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
-import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,15 +21,15 @@ import static me.kiriyaga.nami.Nami.*;
 public class AutoTunnelModule extends Module {
 
     public enum TunnelMode {
-        ONE_BY_ONE,
-        ONE_BY_TWO,
-        ONE_BY_THREE,
-        THREE_BY_THREE
+        P1x1,
+        P1x2,
+        P1x3,
+        P3x3
     }
 
     // TODO: corners
 
-    public final EnumSetting<TunnelMode> mode = addSetting(new EnumSetting<>("Mode", TunnelMode.ONE_BY_TWO));
+    public final EnumSetting<TunnelMode> mode = addSetting(new EnumSetting<>("Mode", TunnelMode.P1x2));
 
     private final Set<BlockPos> targets = new HashSet<>();
 
@@ -55,17 +54,17 @@ public class AutoTunnelModule extends Module {
             BlockPos forward = playerPos.offset(MC.player.getHorizontalFacing(), d);
 
             switch (mode.get()) {
-                case ONE_BY_ONE -> addBlockIfBreakable(validTargets, forward);
-                case ONE_BY_TWO -> {
+                case P1x1 -> addBlockIfBreakable(validTargets, forward);
+                case P1x2 -> {
                     addBlockIfBreakable(validTargets, forward);
                     addBlockIfBreakable(validTargets, forward.up());
                 }
-                case ONE_BY_THREE -> {
+                case P1x3 -> {
                     addBlockIfBreakable(validTargets, forward);
                     addBlockIfBreakable(validTargets, forward.up());
                     addBlockIfBreakable(validTargets, forward.up(2));
                 }
-                case THREE_BY_THREE -> {
+                case P3x3 -> {
                     for (int x = -1; x <= 1; x++) {
                         for (int y = 0; y <= 2; y++) {
                             for (int z = -1; z <= 1; z++) {
