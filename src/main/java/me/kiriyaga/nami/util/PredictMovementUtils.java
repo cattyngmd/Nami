@@ -58,13 +58,35 @@ public final class PredictMovementUtils {
     }
 
     private static void travel(PredictedEntity e, Vec3d input) {
-        if ((e.touchingWater || e.inLava)) {
+        if (e.onGround) {
+            travelOnGround(e, input);
+        } else if (e.touchingWater || e.inLava) {
             travelInFluid(e, input);
         } else if (e.isGliding) {
             travelGliding(e, input);
         } else {
             travelMidAir(e, input);
         }
+    }
+
+    private static void travelOnGround(PredictedEntity e, Vec3d input) {
+        float friction = 0.91F; // TODO fix this
+        float speed = (float) e.movementSpeed;
+
+        Vec3d move = input.multiply(speed, 0, speed);
+
+        double velX = e.velocity.x * friction + move.x;
+        double velZ = e.velocity.z * friction + move.z;
+
+        double velY = e.velocity.y;
+        if (!e.onGround) {
+            velY -= getEffectiveGravity(e);
+        } else {
+            velY = 0;
+        }
+
+        e.velocity = new Vec3d(velX, velY, velZ);
+        e.pos = e.pos.add(e.velocity);
     }
 
     private static void travelMidAir(PredictedEntity e, Vec3d input) {
