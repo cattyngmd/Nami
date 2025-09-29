@@ -6,6 +6,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -139,5 +141,24 @@ public class InteractionUtils {
     private static RotationModule.RotationMode getDefaultRotationMode() {
         RotationModule module = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
         return module != null ? module.rotation.get() : RotationModule.RotationMode.MOTION;
+    }
+
+    public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {
+        if (grim) {
+            MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+
+            MC.interactionManager.interactBlock(MC.player, Hand.OFF_HAND, target);
+            if (swing)
+                MC.player.swingHand(Hand.MAIN_HAND, false);
+
+            MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
+            MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+        } else {
+            MC.interactionManager.interactBlock(MC.player, Hand.MAIN_HAND, target);
+            if (swing)
+                MC.player.swingHand(Hand.MAIN_HAND);
+        }
     }
 }

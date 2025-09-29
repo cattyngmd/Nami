@@ -52,7 +52,7 @@ public class ScaffoldModule extends Module {
     }
 
     @SubscribeEvent
-    public void onTick(PreTickEvent event) {
+    public void onPreTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) {
             cooldown = 0;
             renderPos = null;
