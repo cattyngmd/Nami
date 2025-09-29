@@ -54,21 +54,27 @@ public class PredictTestModule extends Module {
     }
 
     private void renderPredictionForEntity(Entity entity, MatrixStack matrices) {
-        Optional<PredictMovementUtils.PredictedState> predictedOpt = PredictMovementUtils.predict(entity, ticks.get(), Vec3d.ZERO); // actually we can use input for client player, but im not sure if its really gonna change something since mostly it is for one sided movements or elytras
+        PredictMovementUtils.PredictedEntity initial = new PredictMovementUtils.PredictedEntity(
+                entity.getPos(),
+                entity.getVelocity(),
+                entity.getYaw(),
+                entity.getPitch(),
+                entity.isOnGround(),
+                entity.getStandingEyeHeight()
+        );
 
-        if (predictedOpt.isEmpty()) {
-            return;
-        }
-        PredictMovementUtils.PredictedState predicted = predictedOpt.get();
+        PredictMovementUtils.PredictedEntity predicted = PredictMovementUtils.predict(initial, ticks.get(), t -> Vec3d.ZERO);
+
+        if (predicted == null) return;
 
         if (showBox.get()) {
-            Box box = entity.getBoundingBox().offset(predicted.pos().subtract(entity.getPos()));
+            Box box = entity.getBoundingBox().offset(predicted.pos.subtract(entity.getPos()));
             RenderUtil.drawBoxFilled(matrices, box, new Color(0, 255, 0, 40));
             RenderUtil.drawBox(matrices, box, new Color(0, 255, 0, 200), 1.5f);
         }
 
         if (showEye.get()) {
-            Vec3d eye = predicted.eyePos();
+            Vec3d eye = predicted.getEyePos();
             double size = 0.1;
             Box eyeBox = new Box(eye.x - size, eye.y - size, eye.z - size, eye.x + size, eye.y + size, eye.z + size);
             RenderUtil.drawBoxFilled(matrices, eyeBox, new Color(255, 0, 0, 150));

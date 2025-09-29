@@ -1,84 +1,125 @@
 package me.kiriyaga.nami.util;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Optional;
 import java.util.function.IntFunction;
 
 public final class PredictMovementUtils {
 
     private PredictMovementUtils() {}
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("PredictMovementUtils");
+    public static class PredictedEntity {
+        public Vec3d pos;
+        public Vec3d velocity;
+        public float yaw, pitch;
+        public boolean onGround;
+        public float standingEyeHeight;
 
-    public record PredictedState(Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, Vec3d eyePos) {}
+        public boolean isGliding;
+        public boolean isClimbing;
+        public boolean horizontalCollision;
+        public boolean wasInPowderSnow;
 
-    public static Optional<PredictedState> predict(Entity original, int ticks, IntFunction<Vec3d> inputProvider) {
-        if (original == null || original.getWorld() == null) {
-            return Optional.empty();
+        public boolean hasLevitation;
+        public int levitationAmplifier;
+        public boolean hasSlowFalling;
+
+        public boolean isSprinting;
+        public boolean touchingWater;
+        public boolean inLava;
+
+        public double movementSpeed;
+        public double waterMovementEfficiency;
+        public double finalGravity;
+        public double swimHeight;
+
+        public PredictedEntity(Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, float eyeHeight) {
+            this.pos = pos;
+            this.velocity = velocity;
+            this.yaw = yaw;
+            this.pitch = pitch;
+            this.onGround = onGround;
+            this.standingEyeHeight = eyeHeight;
         }
 
-        Entity e;
-        if (original instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) original;
-            e = new PlayerEntity(player.getWorld(), player.getX(), player.getY(), player.getZ());
-            ((PlayerEntity) e).setHealth(player.getHealth());
-        } else {
-            e = original.getType().create(original.getWorld(), SpawnReason.CHUNK_GENERATION);
+        public Vec3d getEyePos() {
+            return pos.add(0, standingEyeHeight, 0);
         }
+    }
 
-        if (e == null) return Optional.empty();
-
-        e.setPos(original.getX(), original.getY(), original.getZ());
-        e.setVelocity(original.getVelocity());
-        e.setYaw(original.getYaw());
-        e.setPitch(original.getPitch());
-        e.setHeadYaw(original.getYaw());
-        try { e.setOnGround(original.isOnGround()); } catch (Throwable ignored) {}
-        if (original instanceof LivingEntity origL && e instanceof LivingEntity cloneL) {
-            cloneL.setHealth(origL.getHealth());
-        }
+    public static PredictedEntity predict(PredictedEntity entity, int ticks, IntFunction<Vec3d> inputProvider) {
+        PredictedEntity fake = copy(entity);
 
         for (int t = 0; t < ticks; t++) {
             Vec3d input = inputProvider != null ? inputProvider.apply(t) : Vec3d.ZERO;
-            try {
-                if (e instanceof LivingEntity living) {
-                    living.travel(input);
-                }
-            } catch (Throwable ex) {
-                break;
-            }
+            travel(fake, input);
         }
 
-        Vec3d pos = e.getPos();
-        Vec3d vel = e.getVelocity();
-        float yaw = e.getYaw();
-        float pitch = e.getPitch();
-        boolean onGround = e.isOnGround();
-        Vec3d eyePos;
-        try {
-            eyePos = e.getEyePos();
-        } catch (Throwable ex) {
-            eyePos = pos.add(0, e.getStandingEyeHeight(), 0);
+        return fake;
+    }
+
+    private static void travel(PredictedEntity e, Vec3d input) {
+        if ((e.touchingWater || e.inLava)) {
+            travelInFluid(e, input);
+        } else if (e.isGliding) {
+            travelGliding(e, input);
+        } else {
+            travelMidAir(e, input);
+        }
+    }
+
+    private static void travelMidAir(PredictedEntity e, Vec3d input) {
+        Vec3d move = input.multiply(e.movementSpeed, 1, e.movementSpeed);
+
+        double yVel = e.velocity.y;
+
+        if (e.hasLevitation) {
+            yVel += 0.05 * (e.levitationAmplifier + 1);
+        } else if (!e.onGround) {
+            yVel -= getEffectiveGravity(e);
         }
 
-        PredictedState result = new PredictedState(pos, vel, yaw, pitch, onGround, eyePos);
-        return Optional.of(result);
+        e.velocity = new Vec3d(move.x, yVel, move.z);
+        e.pos = e.pos.add(e.velocity);
     }
 
-    public static Optional<PredictedState> predict(Entity original, int ticks, Vec3d constantInput) {
-        return predict(original, ticks, i -> constantInput == null ? Vec3d.ZERO : constantInput);
+    private static void travelInFluid(PredictedEntity e, Vec3d input) {
+        float speedMultiplier = e.touchingWater ? 0.8f : 0.5f;
+        Vec3d move = input.multiply(speedMultiplier, 0.8, speedMultiplier);
+        double yVel = e.velocity.y - (getEffectiveGravity(e) / 4.0);
+
+        e.velocity = new Vec3d(move.x, yVel, move.z);
+        e.pos = e.pos.add(e.velocity);
     }
 
-    public static Optional<PredictedState> predictOneTick(Entity original, Vec3d inputThisTick) {
-        return predict(original, 1, i -> inputThisTick);
+    private static void travelGliding(PredictedEntity e, Vec3d input) {
+        double pitchRad = e.pitch * 0.017453292;
+        double horizontalSpeed = Math.sqrt(e.velocity.x * e.velocity.x + e.velocity.z * e.velocity.z);
+
+        double glideY = -getEffectiveGravity(e) + horizontalSpeed * -Math.sin(pitchRad) * 0.04;
+        e.velocity = new Vec3d(e.velocity.x + input.x, glideY, e.velocity.z + input.z);
+        e.pos = e.pos.add(e.velocity.multiply(0.99, 0.98, 0.99));
+    }
+
+    private static double getEffectiveGravity(PredictedEntity e) {
+        return (e.hasSlowFalling ? Math.min(e.finalGravity, 0.01) : e.finalGravity);
+    }
+
+    private static PredictedEntity copy(PredictedEntity e) {
+        PredictedEntity c = new PredictedEntity(e.pos, e.velocity, e.yaw, e.pitch, e.onGround, e.standingEyeHeight);
+        c.isGliding = e.isGliding;
+        c.isClimbing = e.isClimbing;
+        c.horizontalCollision = e.horizontalCollision;
+        c.wasInPowderSnow = e.wasInPowderSnow;
+        c.hasLevitation = e.hasLevitation;
+        c.levitationAmplifier = e.levitationAmplifier;
+        c.hasSlowFalling = e.hasSlowFalling;
+        c.isSprinting = e.isSprinting;
+        c.touchingWater = e.touchingWater;
+        c.inLava = e.inLava;
+        c.movementSpeed = e.movementSpeed;
+        c.waterMovementEfficiency = e.waterMovementEfficiency;
+        c.finalGravity = e.finalGravity;
+        c.swimHeight = e.swimHeight;
+        return c;
     }
 }
