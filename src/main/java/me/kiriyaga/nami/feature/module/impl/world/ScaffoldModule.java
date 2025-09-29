@@ -72,12 +72,13 @@ public class ScaffoldModule extends Module {
             return;
         }
 
+        renderPos = null;
         for (BlockPos pos : corners) {
             BlockPos targetPos = pos.down();
 
             if (hasEntity(targetPos))
                 continue;
-            
+
             renderPos = targetPos;
 
             if (placeBlock(targetPos, slot, rotate.get(), strictDirection.get(), simulate.get(), swing.get()))
