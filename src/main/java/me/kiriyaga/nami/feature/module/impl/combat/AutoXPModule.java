@@ -7,10 +7,13 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -51,20 +54,21 @@ public class AutoXPModule extends Module {
         if (onlyPhased.get() && !isPhased())
             return;
 
+        int xpSlot = getSlotInHotbar(Items.EXPERIENCE_BOTTLE);
+        if (xpSlot == -1) return;
+
         if (!shouldRepair()) return;
 
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                 this.name,
                 6,
                 MC.player.getYaw(),
-                90.0f
+                90.0f,
+                RotationModule.RotationMode.MOTION // only motion here sorry
                 )
         );
 
         if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
-
-        int xpSlot = getSlotInHotbar(Items.EXPERIENCE_BOTTLE);
-        if (xpSlot == -1) return;
 
         int prevSlot = MC.player.getInventory().getSelectedSlot();
 
@@ -84,6 +88,9 @@ public class AutoXPModule extends Module {
     private boolean shouldRepair() {
         for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
             ItemStack stack = MC.player.getEquippedStack(slot);
+            if (!hasMending(stack))
+                continue;
+            
             if (isBelow(stack)) return true;
         }
         return false;
@@ -146,5 +153,9 @@ public class AutoXPModule extends Module {
             }
         }
         return false;
+    }
+
+    private boolean hasMending(ItemStack stack) {
+        return EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0;
     }
 }
