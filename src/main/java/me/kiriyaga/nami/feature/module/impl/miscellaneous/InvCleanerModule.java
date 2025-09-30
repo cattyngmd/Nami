@@ -32,7 +32,7 @@ public class InvCleanerModule extends Module {
     }
 
     @SubscribeEvent
-    public void onTick(PreTickEvent event) {
+    public void onPreTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) return;
         if (++i < delay.get()) return;
         i = 0;

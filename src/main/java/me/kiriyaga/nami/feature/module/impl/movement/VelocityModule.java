@@ -17,7 +17,6 @@ import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
@@ -164,7 +163,7 @@ public class VelocityModule extends Module {
     }
 
     private void processVelocityWalls(PacketReceiveEvent event, EntityVelocityUpdateS2CPacket packet) {
-        if (!isPlayerPhased() || (requireGround.get() && !MC.player.isOnGround())) return;
+        if (!isPhased() || (requireGround.get() && !MC.player.isOnGround())) return;
         processVelocityVanilla(event, packet);
     }
 
@@ -183,7 +182,7 @@ public class VelocityModule extends Module {
     }
 
     private void processExplosionWalls(PacketReceiveEvent event, ExplosionS2CPacket packet) {
-        if (!isPlayerPhased()) return;
+        if (!isPhased()) return;
         processExplosionVanilla(event, packet);
     }
 
@@ -200,7 +199,7 @@ public class VelocityModule extends Module {
                 else return;
             }
             case WALLS -> {
-                if (!isPlayerPhased()) { filtered.add(packet); return; }
+                if (!isPhased()) { filtered.add(packet); return; }
                 if (!isNoVelocityConfigured()) scaleExplosionPacket(packet);
                 else return;
             }
@@ -225,7 +224,7 @@ public class VelocityModule extends Module {
                 else return;
             }
             case WALLS -> {
-                if (!isPlayerPhased() || (requireGround.get() && !MC.player.isOnGround())) {
+                if (!isPhased() || (requireGround.get() && !MC.player.isOnGround())) {
                     filtered.add(packet);
                     return;
                 }
@@ -270,7 +269,7 @@ public class VelocityModule extends Module {
         return horizontalPercent.get() == 0 && verticalPercent.get() == 0;
     }
 
-    private boolean isPlayerPhased() {
+    private boolean isPhased() {
         ClientPlayerEntity player = MC.player;
         if (player == null || MC.world == null) return false;
 
