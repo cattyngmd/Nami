@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.util.Timer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -36,12 +37,24 @@ public class AutoPotModule extends Module {
     private final EnumSetting<Pot> potEffect = addSetting(new EnumSetting<>("Effect", Pot.RESISTANCE));
     private final EnumSetting<ThrowMode> throwMode = addSetting(new EnumSetting<>("Throw", ThrowMode.UNDER));
     private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
-    private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
+    private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
     private final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
     private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
 
+    private final Timer throwTimer = new Timer();
+
     public AutoPotModule() {
         super("AutoPot", "Throws specified splash potion under/above you.", ModuleCategory.of("Combat"), "autopot");
+    }
+
+    @Override
+    public void onDisable () {
+        throwTimer.reset();
+    }
+
+    @Override
+    public void onEnable() {
+        throwTimer.reset();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -74,6 +87,8 @@ public class AutoPotModule extends Module {
             return;
         }
 
+        if (!throwTimer.hasElapsed(5000)) return;
+
         float pitch = 90.00f;
 
         switch (throwMode.get()) {
@@ -93,6 +108,7 @@ public class AutoPotModule extends Module {
         if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
 
         int prevSlot = MC.player.getInventory().getSelectedSlot();
+        throwTimer.reset();
 
         switch (swapMode.get()) {
             case NORMAL -> {
