@@ -34,6 +34,7 @@ public class AutoXPModule extends Module {
     private final IntSetting durabilitz = addSetting(new IntSetting("Durability", 80, 70, 99));
     private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
     private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
+    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
     private final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
     private final BoolSetting is1_12 = addSetting(new BoolSetting("1.12", false));
 
@@ -45,19 +46,37 @@ public class AutoXPModule extends Module {
     private void onPreTickEvent(PreTickEvent ev) {
         if (!isEnabled() || MC.player == null || MC.world == null) return;
 
-        if (is1_12.get() && anyAboveThreshold()) // old minecraft versions does not have mending bugfix
+        if (is1_12.get() && anyAboveThreshold()) { // old minecraft versions does not have mending bugfix
+            if (selfToggle.get())
+                toggle();
             return;
+        }
 
-        if (whenNoTarget.get() && ENTITY_MANAGER.getTarget() != null)
+        if (whenNoTarget.get() && ENTITY_MANAGER.getTarget() != null) {
+            if (selfToggle.get())
+                toggle();
             return;
+        }
 
-        if (onlyPhased.get() && !isPhased())
+        if (onlyPhased.get() && !isPhased()) {
+            if (selfToggle.get())
+                toggle();
+
             return;
+        }
 
         int xpSlot = getSlotInHotbar(Items.EXPERIENCE_BOTTLE);
-        if (xpSlot == -1) return;
+        if (xpSlot == -1) {
+            if (selfToggle.get())
+                toggle();
+            return;
+        }
 
-        if (!shouldRepair()) return;
+        if (!shouldRepair()) {
+            if (selfToggle.get())
+                toggle();
+            return;
+        }
 
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                 this.name,
@@ -90,7 +109,7 @@ public class AutoXPModule extends Module {
             ItemStack stack = MC.player.getEquippedStack(slot);
             if (!hasMending(stack))
                 continue;
-            
+
             if (isBelow(stack)) return true;
         }
         return false;
