@@ -189,6 +189,9 @@ public class AuraModule extends Module {
                 );
 
                 canAttack = serverCheck != null;
+
+                if (rotate.get() == Rotate.NONE)
+                    canAttack = true;
             }
 
             if (insideBox)
