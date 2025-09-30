@@ -64,7 +64,10 @@ public class AutoTrapModule extends Module {
         if (MC.player == null || MC.world == null) return;
 
         Entity target = ENTITY_MANAGER.getTarget();
-        if (target == null) return;
+        if (target == null) {
+            surroundPositions.clear();
+            return;
+        }
 
         this.setDisplayInfo(surroundPositions.size()+"");
         if (cooldown > 0) {
@@ -183,7 +186,7 @@ public class AutoTrapModule extends Module {
         for (BlockPos pos : positions) {
             Box blockBox = new Box(pos);
             for (Entity e : MC.world.getEntities()) {
-                if (e.squaredDistanceTo(entity) > 10) continue;
+                if (e.squaredDistanceTo(entity) > 50) continue;
                 if (e instanceof EndCrystalEntity) continue;
                 if (e instanceof ItemEntity) continue;
 
@@ -205,7 +208,7 @@ public class AutoTrapModule extends Module {
     private boolean hasEntity(BlockPos pos) {
         Box blockBox = new Box(pos);
         for (Entity entity : MC.world.getEntities()) {
-            if (entity.squaredDistanceTo(MC.player) > 10) continue;
+            if (entity.squaredDistanceTo(MC.player) > 50) continue;
             if (entity instanceof EndCrystalEntity) continue;
             if (entity instanceof ItemEntity) continue;
 
