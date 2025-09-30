@@ -40,11 +40,26 @@ public class CommandSuggester {
     private final List<String> particleIdCache = new ArrayList<>();
     private final List<String> keyNameCache = new ArrayList<>();
     private final List<String> configNameCache = new ArrayList<>();
+    private final List<String> playerListCache = new java.util.concurrent.CopyOnWriteArrayList<>();
     private boolean identifierCacheBuilt = false;
     private static final int SUGGESTION_LIMIT = 200;
 
     public CommandSuggester(CommandStorage storage) {
         this.storage = storage;
+        EXECUTABLE_MANAGER.getRequestHandler().submitRepeating(() -> {
+            if (MC.getNetworkHandler() == null) {
+                if (!playerListCache.isEmpty()) playerListCache.clear();
+                return;
+            }
+            List<String> currentNames = MC.getNetworkHandler().getPlayerList()
+                    .stream()
+                    .map(p -> p.getProfile().getName())
+                    .toList();
+            if (!playerListCache.equals(currentNames)) {
+                playerListCache.clear();
+                playerListCache.addAll(currentNames);
+            }
+        }, 20, me.kiriyaga.nami.core.executable.model.ExecutableThreadType.PRE_TICK);
     }
 
     private synchronized void ensureIdentifierCache() {
@@ -342,12 +357,11 @@ public class CommandSuggester {
                     if (arg instanceof CommandArgument.OnlinePlayerArg) {
                         argBuilder.suggests((context, suggestionBuilder) -> {
                             String rem = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
-                            if (MC.getNetworkHandler() == null) return suggestionBuilder.buildFuture();
-                            MC.getNetworkHandler().getPlayerList().forEach(p -> {
-                                if (p.getProfile().getName().toLowerCase(Locale.ROOT).startsWith(rem)) {
-                                    suggestionBuilder.suggest(p.getProfile().getName());
+                            for (String name : playerListCache) {
+                                if (name.toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                    suggestionBuilder.suggest(name);
                                 }
-                            });
+                            }
                             return suggestionBuilder.buildFuture();
                         });
                     }
@@ -368,12 +382,11 @@ public class CommandSuggester {
                             if (parts.length > 1) {
                                 String action = parts[1].toLowerCase(Locale.ROOT);
                                 if (action.equals("add")) {
-                                    if (MC.getNetworkHandler() == null) return suggestionBuilder.buildFuture();
-                                    MC.getNetworkHandler().getPlayerList().forEach(p -> {
-                                        if (p.getProfile().getName().toLowerCase(Locale.ROOT).startsWith(rem)) {
-                                            suggestionBuilder.suggest(p.getProfile().getName());
+                                    for (String name : playerListCache) {
+                                        if (name.toLowerCase(Locale.ROOT).startsWith(rem)) {
+                                            suggestionBuilder.suggest(name);
                                         }
-                                    });
+                                    }
                                 } else if (action.equals("del")) {
                                     suggestFriends(suggestionBuilder);
                                 }
