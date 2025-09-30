@@ -47,16 +47,6 @@ public class AutoPotModule extends Module {
         super("AutoPot", "Throws specified splash potion under/above you.", ModuleCategory.of("Combat"), "autopot");
     }
 
-    @Override
-    public void onDisable () {
-        throwTimer.reset();
-    }
-
-    @Override
-    public void onEnable() {
-        throwTimer.reset();
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onPreTick(PreTickEvent ev) {
         if (!isEnabled() || MC.player == null || MC.world == null) return;
