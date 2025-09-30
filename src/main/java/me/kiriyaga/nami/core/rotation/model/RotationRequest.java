@@ -1,10 +1,13 @@
 package me.kiriyaga.nami.core.rotation.model;
 
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.function.Supplier;
 
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.util.RotationUtils.*;
 
 /**
  * Rotation request. Used for prioritizing, and controlling motion rotations
@@ -135,6 +138,29 @@ public class RotationRequest {
         this.pitchSupplier = pitchSupplier;
         this.rotationMode = rotationMode;
         updateTarget();
+    }
+
+    /**
+     * 1 tick predicted from player eye pos, for motion rotations
+     *
+     * @param id  Identifier
+     * @param priority   Priority
+     * @param player Player BEFORE motion predict
+     * @param pos  Pos to look at
+     */
+    public RotationRequest(String id, int priority, LivingEntity player, Vec3d pos) {
+        this.id = id;
+        this.priority = priority;
+        this.rotationMode = RotationModule.RotationMode.MOTION;
+
+        Vec3d predictedEye = predictMotion(player);
+
+        this.targetYaw = getYawToVec(predictedEye, pos);
+        this.targetPitch = getPitchToVec(predictedEye, pos);
+
+        this.yawSupplier = null;
+        this.pitchSupplier = null;
+        dynamic = false;
     }
 
     public boolean shouldUpdate() {

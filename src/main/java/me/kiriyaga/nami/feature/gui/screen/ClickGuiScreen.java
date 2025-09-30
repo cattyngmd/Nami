@@ -374,7 +374,7 @@ public class ClickGuiScreen extends Screen {
         if (!MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).fade.get())
             return argb;
 
-        if (previousScreen == HUD_EDITOR || previousScreen == FRIEND)
+        if ((previousScreen == HUD_EDITOR || previousScreen == FRIEND) && MC.currentScreen != CLICK_GUI)
             return argb;
 
         int a = (argb >>> 24) & 0xFF;
