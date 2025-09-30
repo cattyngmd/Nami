@@ -32,9 +32,10 @@ import java.util.Set;
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
-public class FeetTrapModule extends Module {
+public class SelfTrapModule extends Module {
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
+    private final BoolSetting face = addSetting(new BoolSetting("Face", true));
     private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
@@ -43,13 +44,13 @@ public class FeetTrapModule extends Module {
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     private final BoolSetting render = addSetting(new BoolSetting("Render", true));
     private final BoolSetting jumpDisable = addSetting(new BoolSetting("JumpDisable", false));
+    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", false));
 
     private int cooldown = 0;
-
     private List<BlockPos> surroundPositions = new ArrayList<>();
 
-    public FeetTrapModule() {
-        super("FeetTrap", "Places blocks around your feet.", ModuleCategory.of("Combat"), "feettrap");
+    public SelfTrapModule() {
+        super("SelfTrap", "Traps you to prevent damage.", ModuleCategory.of("Combat"), "selftrap");
     }
 
     @Override
@@ -73,14 +74,13 @@ public class FeetTrapModule extends Module {
             return;
         }
 
-        if (MODULE_MANAGER.getStorage().getByClass(SelfTrapModule.class).isEnabled()) {
-            surroundPositions.clear();
+        int blocksPlaced = 0;
+        surroundPositions = getSurround(MC.player);
+
+        if (surroundPositions.isEmpty() && selfToggle.get()) {
+            this.toggle();
             return;
         }
-
-        int blocksPlaced = 0;
-
-        surroundPositions = getSurround(MC.player);
 
         for (BlockPos pos : surroundPositions) {
             if (MC.world.getBlockState(pos).isReplaceable()) {
@@ -111,7 +111,6 @@ public class FeetTrapModule extends Module {
         if (MC.player == null || MC.world == null || surroundPositions.isEmpty() || !render.get()) return;
 
         MatrixStack matrices = event.getMatrices();
-
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
         Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
@@ -136,6 +135,18 @@ public class FeetTrapModule extends Module {
 
         for (BlockPos base : inside)
             addSurroundForBase(base, positions);
+
+        if (face.get() && !MC.player.isCrawling()) {
+            int yFace = yLegs + 1;
+            List<BlockPos> faceLevel = new ArrayList<>();
+            for (int x = (int) Math.floor(bb.minX); x < Math.ceil(bb.maxX); x++) {
+                for (int z = (int) Math.floor(bb.minZ); z < Math.ceil(bb.maxZ); z++) {
+                    faceLevel.add(new BlockPos(x, yFace, z));
+                }
+            }
+            for (BlockPos base : faceLevel)
+                addSurroundForBase(base, positions);
+        }
 
         expand(positions, player);
 
@@ -168,10 +179,8 @@ public class FeetTrapModule extends Module {
         }
     }
 
-
     private void expand(Set<BlockPos> positions, PlayerEntity player) {
         Set<BlockPos> extra = new HashSet<>();
-
         for (BlockPos pos : positions) {
             Box blockBox = new Box(pos);
             for (Entity entity : MC.world.getEntities()) {
@@ -191,7 +200,6 @@ public class FeetTrapModule extends Module {
                 }
             }
         }
-
         positions.addAll(extra);
     }
 
