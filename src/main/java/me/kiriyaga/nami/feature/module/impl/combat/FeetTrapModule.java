@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 import me.kiriyaga.nami.util.InteractionUtils;
@@ -17,6 +18,7 @@ import static me.kiriyaga.nami.util.InteractionUtils.*;
 //@RegisterModule
 public class FeetTrapModule extends Module {
 
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
     private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
@@ -62,7 +64,7 @@ public class FeetTrapModule extends Module {
             int blockSlot = getBlockSlot();
             if (blockSlot == -1) continue;
 
-            if (InteractionUtils.placeBlock(targetPos, blockSlot, rotate.get(), strictDirection.get(),simulate.get(), swing.get())) {
+            if (InteractionUtils.placeBlock(targetPos, blockSlot, range.get(), rotate.get(), strictDirection.get(),simulate.get(), swing.get())) {
                 blocksPlaced++;
             }
 

@@ -31,7 +31,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class ElytraFlyModule extends Module {
 
     public enum FlyMode {
-        BOUNCE, CONTROL, GLIDE
+        BOUNCE, ROTATION, GLIDE
     }
 
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("Mode", FlyMode.BOUNCE));
@@ -77,7 +77,7 @@ public class ElytraFlyModule extends Module {
         newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE && pitch.get());
-        lockPitch.setShowCondition(() -> mode.get() == FlyMode.CONTROL);
+        lockPitch.setShowCondition(() -> mode.get() == FlyMode.ROTATION);
         vLow.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         vHigh.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
         climbPitch.setShowCondition(() -> mode.get() == FlyMode.GLIDE);
@@ -140,7 +140,7 @@ public class ElytraFlyModule extends Module {
                     new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
             );
         } else
-        if (mode.get() == FlyMode.CONTROL) {
+        if (mode.get() == FlyMode.ROTATION) {
             if (!MC.player.isGliding()) return;
 
             Vec3d dir = getControlDirection();

@@ -8,13 +8,16 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +32,7 @@ import static me.kiriyaga.nami.util.InteractionUtils.placeBlock;
 @RegisterModule
 public class ScaffoldModule extends Module {
 
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
     private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
@@ -81,7 +85,7 @@ public class ScaffoldModule extends Module {
 
             renderPos = targetPos;
 
-            if (placeBlock(targetPos, slot, rotate.get(), strictDirection.get(), simulate.get(), swing.get()))
+            if (placeBlock(targetPos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get()))
                 blocksPlaced++;
 
             if (blocksPlaced >= shiftTicks.get()) break;

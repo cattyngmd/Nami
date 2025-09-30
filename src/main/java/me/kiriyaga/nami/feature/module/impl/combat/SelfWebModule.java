@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
@@ -25,6 +26,7 @@ public class SelfWebModule extends Module {
 
     public enum PlaceMode { LEGS, HEAD, BOTH }
 
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
     private final EnumSetting<PlaceMode> placeMode = addSetting(new EnumSetting<>("PlaceMode", PlaceMode.LEGS));
     private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
     private final BoolSetting onlyTarget = addSetting(new BoolSetting("OnlyTarget", false));
@@ -60,7 +62,7 @@ public class SelfWebModule extends Module {
 
         for (BlockPos pos : positions) {
             if (MC.world.getBlockState(pos).isAir()) {
-                InteractionUtils.placeBlock(pos, slot, rotate.get(), strictDirection.get(), simulate.get(), swing.get());
+                InteractionUtils.placeBlock(pos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get());
                 placed++;
                 if (placed >= shiftTicks.get()) break;
             }

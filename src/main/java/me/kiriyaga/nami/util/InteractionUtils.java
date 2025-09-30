@@ -22,6 +22,7 @@ import org.joml.Vector3f;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
+import static me.kiriyaga.nami.util.RotationUtils.getClosestPointToEye;
 import static net.minecraft.util.Hand.MAIN_HAND;
 
 public class InteractionUtils {
@@ -57,7 +58,7 @@ public class InteractionUtils {
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos, int slot, boolean rotate, boolean strictDirection, boolean simulate, boolean swing) {
+    public static boolean placeBlock(BlockPos pos, int slot,double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing) {
         Direction direction = getDirection(pos);
         if (direction == null) {
             return false;
@@ -86,6 +87,14 @@ public class InteractionUtils {
                 return false;
             }
         }
+
+        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+        Box blockBox = new Box(neighbor);
+        Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
+        Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
+
+        if (blockBox.raycast(eyePos, reachEnd).isEmpty())
+            return false;
 
         BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, neighbor, false);
         boolean canPlace = true;
