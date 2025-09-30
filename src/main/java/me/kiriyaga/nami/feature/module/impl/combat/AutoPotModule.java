@@ -34,7 +34,7 @@ public class AutoPotModule extends Module {
     public enum ThrowMode { ABOVE, UNDER }
 
     private final EnumSetting<Pot> potEffect = addSetting(new EnumSetting<>("Effect", Pot.RESISTANCE));
-    private final EnumSetting<ThrowMode> throwMode = addSetting(new EnumSetting<>("Effect", ThrowMode.UNDER));
+    private final EnumSetting<ThrowMode> throwMode = addSetting(new EnumSetting<>("Throw", ThrowMode.UNDER));
     private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
     private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
     private final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
