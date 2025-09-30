@@ -50,6 +50,7 @@ public class Nami implements ClientModInitializer {
     public static final ModuleManager MODULE_MANAGER = new ModuleManager();
     public static final FontManager FONT_MANAGER = new FontManager();
     public static final EntityManager ENTITY_MANAGER = new EntityManager();
+    public static final ExecutableManager EXECUTABLE_MANAGER = new ExecutableManager();
     public static final CommandManager COMMAND_MANAGER = new CommandManager();
     public static final ChatManager CHAT_MANAGER = new ChatManager();
     public static final FriendManager FRIEND_MANAGER = new FriendManager(CONFIG_MANAGER);
@@ -59,7 +60,7 @@ public class Nami implements ClientModInitializer {
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static final BreakManager BREAK_MANAGER = new BreakManager();
     public static final FlagManager FLAG_MANAGER = new FlagManager();
-    public static final ExecutableManager EXECUTABLE_MANAGER = new ExecutableManager();
+
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
     public static ClickGuiScreen CLICK_GUI;
