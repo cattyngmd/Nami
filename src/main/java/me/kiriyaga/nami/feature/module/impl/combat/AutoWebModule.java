@@ -2,25 +2,30 @@ package me.kiriyaga.nami.feature.module.impl.combat;
 
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
+import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.kiriyaga.nami.Nami.ENTITY_MANAGER;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class AutoWebModule extends Module {
@@ -36,8 +41,10 @@ public class AutoWebModule extends Module {
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
+    private final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
     private int cooldown = 0;
+    private BlockPos renderPos = null;
 
     public AutoWebModule() {
         super("AutoWeb", "Automatically places webs around target.", ModuleCategory.of("Combat"));
@@ -53,16 +60,23 @@ public class AutoWebModule extends Module {
         }
 
         Entity target = ENTITY_MANAGER.getTarget();
-        if (target == null) return;
+        if (target == null) {
+            renderPos = null;
+            return;
+        }
 
         int slot = findSlot();
-        if (slot == -1) return;
+        if (slot == -1) {
+            renderPos = null;
+            return;
+        }
 
         List<BlockPos> positions = getPositions(target);
         int placed = 0;
 
         for (BlockPos pos : positions) {
             if (MC.world.getBlockState(pos).isAir()) {
+                renderPos = pos;
                 InteractionUtils.placeBlock(pos, slot,range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get());
                 placed++;
                 if (placed >= shiftTicks.get()) break;
@@ -74,6 +88,21 @@ public class AutoWebModule extends Module {
         } else if (selfToggle.get()) {
             toggle();
         }
+    }
+
+    @SubscribeEvent
+    public void onRender(Render3DEvent event) {
+        if (MC.player == null || MC.world == null || renderPos == null || !render.get()) return;
+
+        MatrixStack matrices = event.getMatrices();
+
+        ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
+        Color color = colorModule.getStyledGlobalColor();
+        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
+
+        Box box = new Box(renderPos);
+
+        RenderUtil.drawBox(matrices, box, fillColor, color, 1.5f, true, true);
     }
 
     private int findSlot() {

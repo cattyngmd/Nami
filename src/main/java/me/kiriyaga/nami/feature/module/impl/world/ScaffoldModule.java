@@ -96,7 +96,7 @@ public class ScaffoldModule extends Module {
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MC.player == null || MC.world == null || renderPos == null) return;
+        if (MC.player == null || MC.world == null || renderPos == null || !render.get()) return;
 
         MatrixStack matrices = event.getMatrices();
 
