@@ -85,7 +85,7 @@ public class ScaffoldModule extends Module {
 
             renderPos = targetPos;
 
-            if (placeBlock(targetPos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get()))
+            if (placeBlock(targetPos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name))
                 blocksPlaced++;
 
             if (blocksPlaced >= shiftTicks.get()) break;

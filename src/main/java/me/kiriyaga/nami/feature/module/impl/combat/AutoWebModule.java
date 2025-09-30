@@ -77,7 +77,7 @@ public class AutoWebModule extends Module {
         for (BlockPos pos : positions) {
             if (MC.world.getBlockState(pos).isAir()) {
                 renderPos = pos;
-                InteractionUtils.placeBlock(pos, slot,range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get());
+                InteractionUtils.placeBlock(pos, slot,range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
                 placed++;
                 if (placed >= shiftTicks.get()) break;
             }

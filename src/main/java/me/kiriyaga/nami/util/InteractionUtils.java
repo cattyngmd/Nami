@@ -58,7 +58,10 @@ public class InteractionUtils {
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos, int slot,double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing) {
+    public static boolean placeBlock(BlockPos pos, int slot,double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
+        if (!MC.world.getBlockState(pos).isReplaceable())
+            return false;
+
         Direction direction = getDirection(pos);
         if (direction == null) {
             return false;
@@ -100,14 +103,13 @@ public class InteractionUtils {
         boolean canPlace = true;
 
         if (rotate) {
-            String rotationId = pos.toString();
             float yaw = (float) RotationUtils.getYawToVec(MC.player, hitVec);
             float pitch = (float) RotationUtils.getPitchToVec(MC.player, hitVec);
 
             if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 10, yaw, pitch));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
             else
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 10, MC.player, hitVec));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
 
             canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
         }
