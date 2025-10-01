@@ -54,10 +54,15 @@ public class AutoMineModule extends Module {
 
 
     private BlockBreakingTask currentTask;
+    private BlockBreakingTask doubleMineTask;
+
+    private int shouldSwapBack = -1;
 
     // Thats first packet mine i made like in my whole life, its bad, and there is issues, im gonna finish it, and maybe rewrite from scratch later
     public AutoMineModule() {
         super("AutoMine", "Automatically mines specified blocks for easier mining.", ModuleCategory.of("World"));
+        echestPriority.setShowCondition(()-> swap.get() != Swap.NONE);
+        damageThreshold.setShowCondition(()-> swap.get() != Swap.NONE);
     }
 
     @Override
@@ -66,12 +71,25 @@ public class AutoMineModule extends Module {
             abortMining(currentTask);
         }
         currentTask = null;
+        doubleMineTask = null;
+        shouldSwapBack = -1;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onTick(PreTickEvent event) {
-        if (currentTask == null) return;
-        handleMiningTick(currentTask);
+        if (MC.world == null || MC.player == null)
+            return;
+
+        if (shouldSwapBack != -1)
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(shouldSwapBack);
+
+        shouldSwapBack = -1;
+
+        if (currentTask != null)
+            handleMiningTick(currentTask);
+
+        if (doubleMineTask != null)
+            handleDoubleMine(doubleMineTask);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -89,6 +107,11 @@ public class AutoMineModule extends Module {
 
         if (currentTask != null) {
             if (currentTask.getBlockPos().equals(event.blockPos)) return;
+
+            if (doubleMineTask == null) {
+                doubleMineTask = new BlockBreakingTask(currentTask.getBlockPos(), currentTask.getFacing(), 1.0f);
+                doubleMineTask.setProgress(currentTask.getProgress());
+            }
             abortMining(currentTask);
         }
 
@@ -98,10 +121,16 @@ public class AutoMineModule extends Module {
 
     @SubscribeEvent
     public void onRender3DEvent(Render3DEvent event) {
-        if (currentTask == null) return;
+        if (currentTask != null)
+            renderProgress(event,currentTask);
 
-        BlockPos pos = currentTask.getBlockPos();
-        VoxelShape shape = currentTask.isInstantRemine() ? VoxelShapes.fullCube() : currentTask.getBlockState().getOutlineShape(MC.world, pos);
+        if (doubleMineTask != null)
+            renderProgress(event,doubleMineTask);
+    }
+
+    private void renderProgress(Render3DEvent event, BlockBreakingTask task) {
+        BlockPos pos = task.getBlockPos();
+        VoxelShape shape = task.isInstantRemine() ? VoxelShapes.fullCube() : task.getBlockState().getOutlineShape(MC.world, pos);
 
         if (shape.isEmpty()) shape = VoxelShapes.fullCube();
 
@@ -114,11 +143,11 @@ public class AutoMineModule extends Module {
         Vec3d center = worldBox.getCenter();
 
         float partialTicks = event.getTickDelta();
-        float currentProgress = currentTask.getProgress();
-        float previousProgress = currentTask.getPreviousProgress();
+        float currentProgress = task.getProgress();
+        float previousProgress = task.getPreviousProgress();
         float interpolatedProgress = previousProgress + (currentProgress - previousProgress) * partialTicks;
 
-        float scale = MathHelper.clamp(interpolatedProgress / currentTask.getTargetSpeed(), 0, 1.0f);
+        float scale = MathHelper.clamp(interpolatedProgress / task.getTargetSpeed(), 0, 1.0f);
 
         double dx = (bb.maxX - bb.minX) / 2.0;
         double dy = (bb.maxY - bb.minY) / 2.0;
@@ -172,17 +201,37 @@ public class AutoMineModule extends Module {
         }
     }
 
+    private void handleDoubleMine(BlockBreakingTask task) {
+        Vec3d eyePos = MC.player.getEyePos();
+        Box blockBox = new Box(task.getBlockPos());
+        Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
+        Vec3d reachEnd = eyePos.add(lookDir.multiply(range.get()));
+
+        if (blockBox.raycast(eyePos, reachEnd).isEmpty()) {
+            doubleMineTask = null;
+            return;
+        }
+
+        if (task.getBlockState().isAir()) {
+            doubleMineTask = null;
+            return;
+        }
+
+        float damageDelta = calculateBlockDamage(task.getBlockState(), MC.world, task.getBlockPos());
+        if (task.incrementProgress(damageDelta) >= task.getTargetSpeed()) {
+            if (swap.get() == Swap.SILENT) {
+                int slot = getSlot(task.getBlockState());
+                shouldSwapBack = MC.player.getInventory().getSelectedSlot();
+                INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+            }
+        }
+    }
+
     private void startMining(BlockBreakingTask task) {
         if (task.getBlockState().isAir()) return;
 
         if (swap.get() == Swap.NORMAL)
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(getSlot(task.getBlockState()));
-
-        int prev = MC.player.getInventory().getSelectedSlot();
-        if (swap.get() == Swap.SILENT) {
-            int slot = getSlot(task.getBlockState());
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
-        }
 
         if (grim.get())
             sendDestroyPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, task);
@@ -191,10 +240,6 @@ public class AutoMineModule extends Module {
         sendDestroyPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, task);
 
         task.markStarted();
-
-        if (swap.get() == Swap.SILENT) {
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
-        }
     }
 
     private void abortMining(BlockBreakingTask task) {
@@ -223,9 +268,9 @@ public class AutoMineModule extends Module {
         if (rotate.get() == Rotate.NORMAL && !ROTATION_MANAGER.getRequestHandler().isCompleted(this.name))
             return;
 
-        int prev = MC.player.getInventory().getSelectedSlot();
         if (swap.get() == Swap.SILENT) {
             int slot = getSlot(task.getBlockState());
+            shouldSwapBack = MC.player.getInventory().getSelectedSlot();
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
         }
 
@@ -238,10 +283,6 @@ public class AutoMineModule extends Module {
         sendDestroyPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, task);
 
         task.markBroken();
-
-        if (swap.get() == Swap.SILENT) {
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
-        }
     }
 
     private void sendDestroyPacket(PlayerActionC2SPacket.Action action, BlockBreakingTask task) {
