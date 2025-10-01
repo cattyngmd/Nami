@@ -17,13 +17,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InventoryUtils.isBroken;
 
 @RegisterModule
 public class AutoToolModule extends Module {
 
-    public enum EchestPriority {
-        FORTUNE, SILK
-    }
+    public enum EchestPriority {FORTUNE, SILK}
 
     public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
     private final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
@@ -33,7 +32,7 @@ public class AutoToolModule extends Module {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    private void onBlockAttack(StartBreakingBlockEvent event) {
+    private void onStartBreakingBlockEvent(StartBreakingBlockEvent event) {
         if (MC.player == null || MC.world == null || MC.player.getGameMode() != GameMode.SURVIVAL) {
             return;
         }
@@ -50,7 +49,7 @@ public class AutoToolModule extends Module {
             for (int slot = 0; slot < 9; slot++) {
                 ItemStack stack = MC.player.getInventory().getStack(slot);
                 if (stack.isEmpty()) continue;
-                if (isBroken(stack)) continue;
+                if (isBroken(stack, damageThreshold.get())) continue;
 
                 boolean matchesPriority = false;
                 switch (echestPriority.get()) {
@@ -76,7 +75,7 @@ public class AutoToolModule extends Module {
             for (int slot = 0; slot < 9; slot++) {
                 ItemStack stack = MC.player.getInventory().getStack(slot);
                 if (stack.isEmpty()) continue;
-                if (isBroken(stack)) continue;
+                if (isBroken(stack, damageThreshold.get())) continue;
 
                 float totalSpeed = 1.0f;
                 if (stack.isSuitableFor(targetState)) {
@@ -95,13 +94,5 @@ public class AutoToolModule extends Module {
             if (bestSlot != -1)
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(bestSlot);
         }, 0, ExecutableThreadType.PRE_TICK);
-    }
-
-    private boolean isBroken(ItemStack stack) {
-        if (!stack.isDamageable()) return false;
-        int max = stack.getMaxDamage();
-        int damage = stack.getDamage();
-        int percentRemaining = (int) (((max - damage) / (float) max) * 100);
-        return percentRemaining <= damageThreshold.get();
     }
 }

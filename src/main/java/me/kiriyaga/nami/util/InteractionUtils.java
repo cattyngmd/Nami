@@ -95,7 +95,7 @@ public class InteractionUtils {
             }
         }
 
-        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+        Vec3d eyePos = MC.player.getEyePos();
         Box blockBox = new Box(neighbor);
         Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
         Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
@@ -188,7 +188,7 @@ public class InteractionUtils {
             return false;
         }
 
-        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+        Vec3d eyePos = MC.player.getEyePos();
         Box blockBox = new Box(pos);
         Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
         Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
