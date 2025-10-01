@@ -117,6 +117,10 @@ public class AutoMineModule extends Module {
 
         currentTask = new BlockBreakingTask(event.blockPos, event.direction, speed.get().floatValue());
         startMining(currentTask);
+
+        float damageDelta = calculateBlockDamage(currentTask.getBlockState(), MC.world, currentTask.getBlockPos());
+        if (damageDelta >= 0.100f)
+            finishMining(currentTask);
     }
 
     @SubscribeEvent
