@@ -1,6 +1,5 @@
 package me.kiriyaga.nami;
 
-import me.kiriyaga.nami.core.breaking.BreakManager;
 import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
@@ -58,7 +57,6 @@ public class Nami implements ClientModInitializer {
     public static final TickRateManager TICK_MANAGER = new TickRateManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
-    public static final BreakManager BREAK_MANAGER = new BreakManager();
     public static final FlagManager FLAG_MANAGER = new FlagManager();
 
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
@@ -81,7 +79,6 @@ public class Nami implements ClientModInitializer {
         ROTATION_MANAGER.init();
         ENTITY_MANAGER.init();
         INVENTORY_MANAGER.init();
-        BREAK_MANAGER.init();
         EXECUTABLE_MANAGER.init();
         FLAG_MANAGER.init();
         CHAT_MANAGER.init();

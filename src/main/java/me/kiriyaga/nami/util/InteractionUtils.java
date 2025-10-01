@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -22,10 +23,13 @@ import org.joml.Vector3f;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
-import static me.kiriyaga.nami.util.RotationUtils.getClosestPointToEye;
+import static me.kiriyaga.nami.util.RotationUtils.*;
 import static net.minecraft.util.Hand.MAIN_HAND;
 
 public class InteractionUtils {
+
+    private static BlockPos currentBreakingBlock = null;
+    private static long lastAttackBlockTime = 0;
 
     public static boolean interactWithEntity(Entity entity, Vec3d hitVec, boolean swing) {
         if (MC.player == null || MC.interactionManager == null) return false;
@@ -103,8 +107,8 @@ public class InteractionUtils {
         boolean canPlace = true;
 
         if (rotate) {
-            float yaw = (float) RotationUtils.getYawToVec(MC.player, hitVec);
-            float pitch = (float) RotationUtils.getPitchToVec(MC.player, hitVec);
+            float yaw = (float) getYawToVec(MC.player, hitVec);
+            float pitch = (float) getPitchToVec(MC.player, hitVec);
 
             if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
@@ -171,5 +175,77 @@ public class InteractionUtils {
             if (swing)
                 MC.player.swingHand(Hand.MAIN_HAND);
         }
+    }
+
+    public static boolean breakBlock(BlockPos pos, double range, boolean rotate, boolean swing, boolean grim, String rotationId) {
+        if (MC.player == null || MC.interactionManager == null)
+            return false;
+
+        if (isBlockAirOrFluid(pos)) {
+            if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
+                currentBreakingBlock = null;
+            }
+            return false;
+        }
+
+        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+        Box blockBox = new Box(pos);
+        Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
+        Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
+
+        if (blockBox.raycast(eyePos, reachEnd).isEmpty())
+            return false;
+
+        Direction direction = Direction.UP;
+
+        if (rotate) {
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+                    rotationId,
+                    3,
+                    (float) getYawToVec(MC.player, Vec3d.ofCenter(pos)),
+                    (float) getPitchToVec(MC.player, Vec3d.ofCenter(pos))
+            ));
+
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId)) {
+                return false;
+            }
+        }
+
+        long now = System.currentTimeMillis();
+
+        if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
+            boolean instant = MC.world.getBlockState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos) >= 1.0f;
+
+            if (instant) {
+                currentBreakingBlock = null;
+                MC.interactionManager.attackBlock(pos, direction);
+                if (swing) MC.player.swingHand(Hand.MAIN_HAND);
+                return true;
+            } else {
+                long attackCooldown = grim ? 250 : 0;
+                if (now - lastAttackBlockTime >= attackCooldown) {
+                    currentBreakingBlock = pos;
+                    MC.interactionManager.attackBlock(pos, direction);
+                    lastAttackBlockTime = now;
+                }
+            }
+        } else {
+            boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
+            if (!success) {
+                currentBreakingBlock = null;
+                return false;
+            }
+        }
+
+        if (swing) MC.player.swingHand(Hand.MAIN_HAND);
+        return true;
+    }
+
+    private static boolean isBlockAirOrFluid(BlockPos pos) {
+        if (MC.world.getBlockState(pos).isAir()) {
+            return true;
+        }
+        FluidState fluidState = MC.world.getFluidState(pos);
+        return !fluidState.isEmpty();
     }
 }
