@@ -118,14 +118,14 @@ public abstract class MixinPlayerListHud {
         if (betterTab != null && betterTab.isEnabled()) {
             float scale = betterTab.scale.get().floatValue();
 
-            drawContext.getMatrices().pushMatrix();
+            drawContext.getMatrices().push();
 
             float centerX = width / 2f;
             float centerY = 10f;
 
-            drawContext.getMatrices().translate(centerX, centerY);
-            drawContext.getMatrices().scale(scale, scale);
-            drawContext.getMatrices().translate(-centerX, -centerY);
+            drawContext.getMatrices().translate(centerX, centerY, 1.0f);
+            drawContext.getMatrices().scale(scale, scale, 1.0f);
+            drawContext.getMatrices().translate(-centerX, -centerY, 1.0f);
         }
     }
 
@@ -133,7 +133,7 @@ public abstract class MixinPlayerListHud {
     private void render2(DrawContext drawContext, int width, Scoreboard scoreboard, @Nullable ScoreboardObjective objective, CallbackInfo ci) {
         BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
         if (betterTab != null && betterTab.isEnabled()) {
-            drawContext.getMatrices().popMatrix();
+            drawContext.getMatrices().pop();
         }
     }
 }

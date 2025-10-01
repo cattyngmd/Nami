@@ -71,8 +71,8 @@ public class FriendScreen extends Screen {
             context.fill(0, 0, this.width, this.height, color);
         }
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+        context.getMatrices().push();
+        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale, 1.0f);
 
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
@@ -85,7 +85,7 @@ public class FriendScreen extends Screen {
         console.render(context, this.textRenderer, scaledMouseX, scaledMouseY);
         NAVIGATE_PANEL.render(context, this.textRenderer, navX, navY, scaledMouseX, scaledMouseY);
 
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
     }
 
     @Override
@@ -159,8 +159,8 @@ public class FriendScreen extends Screen {
 
     @Override
     public void renderBackground(DrawContext context, int i, int j, float f) {
-        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get()) {
-            this.applyBlur(context);
-        }
+     //   if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get()) {
+      //      this.applyBlur();
+       // }
     }
 }

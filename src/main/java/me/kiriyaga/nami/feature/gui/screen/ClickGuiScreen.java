@@ -180,8 +180,8 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public void renderBackground(DrawContext context, int i, int j, float f) {
-        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
-            this.applyBlur(context);
+        //if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+            //this.applyBlur();
     }
 
     @Override
