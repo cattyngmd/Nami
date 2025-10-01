@@ -53,9 +53,9 @@ public class HudEditorScreen extends Screen {
     @Override
     public void renderBackground(DrawContext context, int i, int j, float f) {
         ClickGuiModule clickGui = getClickGuiModule();
-        if (MC.world != null && clickGui != null && clickGui.blur.get()) {
-            this.applyBlur(context);
-        }
+        //if (MC.world != null && clickGui != null && clickGui.blur.get()) {
+            //this.applyBlur();
+        //}
     }
 
     @Override
@@ -70,8 +70,8 @@ public class HudEditorScreen extends Screen {
             context.fill(0, 0, this.width, this.height, color);
         }
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+        context.getMatrices().push();
+        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale, 1.0f);
 
         int scaledWidth = (int) (this.width / CLICK_GUI.scale);
         int panelWidth = NAVIGATE_PANEL.calcWidth();
@@ -107,7 +107,7 @@ public class HudEditorScreen extends Screen {
                         context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
                         FONT_MANAGER.drawText(context, Text.of(description), descX, descY, true);
                     }
-                    context.getMatrices().popMatrix();
+                    context.getMatrices().pop();
                     super.render(context, mouseX, mouseY, delta);
                     return;
                 }
@@ -119,7 +119,7 @@ public class HudEditorScreen extends Screen {
             }
         }
 
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
 
         renderHudElements(context, mouseX, mouseY);
 

@@ -92,8 +92,8 @@ public class ClickGuiScreen extends Screen {
             context.fill(0, 0, this.width, this.height, color);
         }
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(scale, scale);
+        context.getMatrices().push();
+        context.getMatrices().scale(scale, scale, 1.0f);
 
         int scaledWidth = (int) (this.width / scale);
         int scaledHeight = (int) (this.height / scale);
@@ -162,7 +162,7 @@ public class ClickGuiScreen extends Screen {
                                     0x7F000000);
                             FONT_MANAGER.drawText(context, description, descX, descY, 0xFFFFFFFF, true);
                         }
-                        context.getMatrices().popMatrix();
+                        context.getMatrices().pop();
                         return;
                     }
 
@@ -174,14 +174,14 @@ public class ClickGuiScreen extends Screen {
             }
         }
 
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
         super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
     public void renderBackground(DrawContext context, int i, int j, float f) {
-        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
-            this.applyBlur(context);
+        //if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+            //this.applyBlur();
     }
 
     @Override

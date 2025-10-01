@@ -8,6 +8,7 @@ import me.kiriyaga.nami.event.impl.PacketSendEvent;
 import me.kiriyaga.nami.feature.module.impl.miscellaneous.NoPacketKick;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
+import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +41,7 @@ public class MixinClientConnection {
     }
 
     @Inject(method = "sendImmediately", at = @At("HEAD"), cancellable = true)
-    private void onPacketSend(Packet<?> packet, ChannelFutureListener listener, boolean flush, CallbackInfo ci) {
+    private void onPacketSend(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
         PacketSendEvent event = new PacketSendEvent(packet);
         EVENT_MANAGER.post(event);
         if (event.isCancelled()) {
