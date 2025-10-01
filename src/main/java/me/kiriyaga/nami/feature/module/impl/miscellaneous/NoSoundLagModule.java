@@ -86,7 +86,7 @@ public class NoSoundLagModule extends Module { // TODO whitelist sounds
         }
 
         if (event.getPacket() instanceof PlaySoundS2CPacket packet) {
-            SoundEvent sound = packet.getSound().comp_349();
+            SoundEvent sound = packet.getSound().value();
 
             boolean cancel = false;
 

@@ -54,7 +54,7 @@ public class AnnouncerModule extends Module {
                 }
             }
         } else if (event.getPacket() instanceof PlayerRemoveS2CPacket leavePacket) {
-            for (var playerInfo : leavePacket.comp_1105()) {
+            for (var playerInfo : leavePacket.profileIds()) {
                 var info = MC.getNetworkHandler().getPlayerListEntry(playerInfo);
                 if (info == null) continue;
 
