@@ -117,8 +117,8 @@ public class AutoEatModule extends Module {
         }
 
         FoodComponent food = item.getComponents().get(DataComponentTypes.FOOD);
-        float nutrition = food.nutrition();
-        float saturation = food.saturation();
+        float nutrition = food.comp_2491();
+        float saturation = food.comp_2492();
         float totalValue = nutrition + saturation;
 
         if (isGapple(item)) {

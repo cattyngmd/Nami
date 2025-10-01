@@ -86,8 +86,8 @@ public class ShulkerViewModule extends Module {
         startX = edgePadding;
         float scale = this.scale.get().floatValue();
 
-        context.getMatrices().push();
-        context.getMatrices().scale(scale, scale, 1.0f);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(scale, scale);
 
         for (ShulkerInfo info : shulkerList) {
             int rows = info.rows();
@@ -141,7 +141,7 @@ public class ShulkerViewModule extends Module {
             currentY += height + MARGIN;
         }
 
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
         totalHeight = currentY - offset;
     }
 

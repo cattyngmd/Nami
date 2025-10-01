@@ -362,9 +362,9 @@ public class AuraModule extends Module {
 
             if (held.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
                 AttributeModifiersComponent modifiers = held.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-                for (var entry : modifiers.modifiers()) {
-                    if (entry.attribute().matches(EntityAttributes.ATTACK_DAMAGE)) {
-                        attackDamage += (float) entry.modifier().value();
+                for (var entry : modifiers.comp_2393()) {
+                    if (entry.comp_2395().matches(EntityAttributes.ATTACK_DAMAGE)) {
+                        attackDamage += (float) entry.comp_2396().value();
                     }
                 }
             }

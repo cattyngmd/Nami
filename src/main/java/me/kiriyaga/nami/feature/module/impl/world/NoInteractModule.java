@@ -58,7 +58,7 @@ public class NoInteractModule extends Module {
         }
 
         if (spawnPoint.get()) {
-            if (player.getWorld().getDimension().bedWorks() && isBed(block)) {
+            if (player.getWorld().getDimension().comp_648() && isBed(block)) {
                 event.cancel();
                 return;
             }

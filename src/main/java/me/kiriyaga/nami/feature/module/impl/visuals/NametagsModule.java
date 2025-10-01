@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
+import static net.caffeinemc.mods.sodium.client.util.FlawlessFrames.isActive;
 
 @RegisterModule
 public class NametagsModule extends Module {
@@ -149,6 +150,7 @@ public class NametagsModule extends Module {
 
                     EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
 
+                        if (isActive()) {
                             try {
                                 String urlStr = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "");
                                 URL url = new URL(urlStr);
@@ -189,6 +191,8 @@ public class NametagsModule extends Module {
                             } catch (Exception e) {
                                 NametagsModule.uuid.put(uuid, "Failed to get name");
                             }
+                        } else {
+                        }
                     }, 0, ExecutableThreadType.ASYNC);
                 }
 

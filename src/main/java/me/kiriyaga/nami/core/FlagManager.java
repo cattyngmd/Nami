@@ -32,7 +32,7 @@ public class FlagManager {
             pendingTransactions[transactionIndex] = packet.getParameter();
             transactionIndex++;
         } else if (event.getPacket() instanceof PlayerPositionLookS2CPacket packet) {
-            lastSetbackPosition = packet.change().position();
+            lastSetbackPosition = packet.comp_3228().comp_3148();
             lastSetbackTime = System.currentTimeMillis();
             lastTeleportId = packet.teleportId();
         }

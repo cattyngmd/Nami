@@ -163,12 +163,12 @@ public class ChatManager {
         ChatHud hud = MC.inGameHud.getChatHud();
         ChatHudAccessor accessor = (ChatHudAccessor) hud;
 
-        accessor.getMessages().removeIf(line -> signature.equals(line.signature()));
+        accessor.getMessages().removeIf(line -> signature.equals(line.comp_915()));
 
         accessor.getVisibleMessages().removeIf(visible -> {
             for (ChatHudLine line : accessor.getMessages()) {
-                if (signature.equals(line.signature())) {
-                    return visible.content().equals(line.content());
+                if (signature.equals(line.comp_915())) {
+                    return visible.comp_896().equals(line.comp_893());
                 }
             }
             return false;
@@ -193,9 +193,9 @@ public class ChatManager {
         ChatHud hud = getChatHud();
         ChatHudAccessor accessor = (ChatHudAccessor) hud;
 
-        accessor.getMessages().removeIf(line -> line.content().getString().equals(text));
+        accessor.getMessages().removeIf(line -> line.comp_893().getString().equals(text));
 
-        accessor.getVisibleMessages().removeIf(visible -> visible.content().toString().equals(text));
+        accessor.getVisibleMessages().removeIf(visible -> visible.comp_896().toString().equals(text));
 
         allMessages.removeIf(t -> t.getString().equals(text));
     }
@@ -209,10 +209,10 @@ public class ChatManager {
 
         allMessages.clear();
         for (ChatHudLine line : accessor.getMessages()) {
-            Text text = line.content();
+            Text text = line.comp_893();
 
-            if (persistentMessages.containsValue(line.signature())) continue;
-            if (transientSignature != null && transientSignature.equals(line.signature())) continue;
+            if (persistentMessages.containsValue(line.comp_915())) continue;
+            if (transientSignature != null && transientSignature.equals(line.comp_915())) continue;
 
             allMessages.add(text);
         }

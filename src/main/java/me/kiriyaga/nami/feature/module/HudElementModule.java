@@ -234,12 +234,12 @@ public abstract class HudElementModule extends Module {
 
             float scale = (float) element.scale;
 
-            context.getMatrices().push();
-            context.getMatrices().translate(labelX, labelY, 1.0);
-            context.getMatrices().scale(scale, scale, 1.0f);
-            FONT_MANAGER.drawText(context, label, 0, 0, MODULE_MANAGER.getStorage().getByClass(HudModule.class).shadow.get());
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate(labelX, labelY);
+            context.getMatrices().scale(scale, scale);
 
-            context.getMatrices().pop();
+            FONT_MANAGER.drawText(context, label, 0, 0, MODULE_MANAGER.getStorage().getByClass(HudModule.class).shadow.get());
+            context.getMatrices().popMatrix();
         }
     }
 

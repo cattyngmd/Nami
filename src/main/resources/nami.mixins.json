@@ -27,6 +27,7 @@
     "MixinDebugHud",
     "MixinDisconnectedScreen",
     "MixinEntityRenderer",
+    "MixinFogRenderer",
     "MixinGameMenuScreen",
     "MixinGameOptions",
     "MixinGameRenderer",

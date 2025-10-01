@@ -35,12 +35,12 @@ public class MixinPlayerListEntry {
                 SkinTextures orig = cir.getReturnValue();
 
                 SkinTextures custom = new SkinTextures(
-                        orig.texture(), // identifier
-                        orig.textureUrl(), // url
+                        orig.comp_1626(), // identifier
+                        orig.comp_1911(), // url
                         capeTex, // cape
-                        orig.elytraTexture(), // ely
-                        orig.model(), // body type
-                        orig.secure()  // idk
+                        orig.comp_1628(), // ely
+                        orig.comp_1629(), // body type
+                        orig.comp_1630()  // idk
                 );
 
                 cir.setReturnValue(custom);
