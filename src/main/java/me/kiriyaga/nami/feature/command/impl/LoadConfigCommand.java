@@ -13,7 +13,7 @@ public class LoadConfigCommand extends Command {
         super(
                 "loadconfig",
                 new CommandArgument[] {
-                        new CommandArgument.StringArg("configName", 1, 32)
+                        new CommandArgument.ConfigNameArg("configName")
                 },
                 "loadcfg", "lcfg"
         );

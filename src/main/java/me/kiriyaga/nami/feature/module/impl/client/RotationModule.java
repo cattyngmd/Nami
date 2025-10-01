@@ -12,22 +12,22 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 public class RotationModule extends Module {
 
     public enum RotationMode {
-        MOTION
+        MOTION, SILENT
     }
 
-    public final EnumSetting<RotationMode> rotation = addSetting(new EnumSetting<>("rotation",RotationMode.MOTION));
-    public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("speed", 360, 25, 360));
-    public final DoubleSetting rotationEaseFactor = addSetting(new DoubleSetting("ease", 1, 0.5, 1));
-    public final DoubleSetting rotationThreshold = addSetting(new DoubleSetting("threshold", 5, 0, 15));
-    public final IntSetting ticksBeforeRelease = addSetting(new IntSetting("hold", 1, 00, 30));
+    public final EnumSetting<RotationMode> rotation = addSetting(new EnumSetting<>("Rotation",RotationMode.MOTION));
+    public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("Speed", 360, 25, 360));
+    public final DoubleSetting rotationEaseFactor = addSetting(new DoubleSetting("Ease", 1, 0.5, 1));
+    public final DoubleSetting rotationThreshold = addSetting(new DoubleSetting("Threshold", 5, 0, 15));
+    public final IntSetting ticksBeforeRelease = addSetting(new IntSetting("Hold", 5, 00, 30));
 //    public final DoubleSetting jitterAmount = addSetting(new DoubleSetting("jitter amount", 0, 0, 3));
 //    public final DoubleSetting jitterSpeed = addSetting(new DoubleSetting("jitter speed", 1, 0.015, 1));
 //    public final DoubleSetting jitterMaxYaw = addSetting(new DoubleSetting("jitter horizontal", 1, 0, 3));
 //    public final DoubleSetting jitterMaxPitch = addSetting(new DoubleSetting("jitter horizontal", 2, 0, 5));
-    public final BoolSetting moveFix = addSetting(new BoolSetting("move fix", true));
+    public final BoolSetting moveFix = addSetting(new BoolSetting("MoveFix", true));
 
     public RotationModule() {
-        super("rotation", "Client rotations configuration.", ModuleCategory.of("client"), "rotate", "rotationmanager", "roate", "toationmanager");
+        super("Rotation", "Client rotations configuration.", ModuleCategory.of("Client"), "rotate", "rotationmanager", "roate", "toationmanager");
         if (!this.isEnabled())
             this.toggle();
 //        jitterSpeed.setShowCondition(() -> jitterAmount.get()>0);

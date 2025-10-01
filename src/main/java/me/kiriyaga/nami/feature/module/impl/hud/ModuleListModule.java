@@ -29,11 +29,11 @@ public class ModuleListModule extends HudElementModule {
     private int cachedWidth = 0;
     private int cachedHeight = 0;
 
-    public final BoolSetting showDisplayName = addSetting(new BoolSetting("show display", true));
-    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.DESCENDING));
+    public final BoolSetting showDisplayName = addSetting(new BoolSetting("ShowDisplay", true));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
 
     public ModuleListModule() {
-        super("module list", "Shows enabled and drawn modules.", 0, 0, 50, 10);
+        super("ModuleList", "Shows enabled and drawn modules.", 0, 0, 50, 10);
     }
 
     private static class ModuleAnimationState {
@@ -156,13 +156,13 @@ public class ModuleListModule extends HudElementModule {
 
             int animatedOffsetX = 0;
             switch (alignment.get()) {
-                case left:
+                case LEFT:
                     animatedOffsetX = (int) ((state.progress - 1) * state.textWidth);
                     break;
-                case center:
+                case CENTER:
                     animatedOffsetX = (int) ((1 - state.progress) * -state.textWidth);
                     break;
-                case right:
+                case RIGHT:
                     animatedOffsetX = (int) ((state.progress - 1) * state.textWidth);
                     break;
             }
@@ -181,9 +181,9 @@ public class ModuleListModule extends HudElementModule {
         int lineWidth = FONT_MANAGER.getWidth(element.text());
 
         return switch (alignment.get()) {
-            case left -> baseX + element.offsetX();
-            case center -> baseX + (width - lineWidth) / 2 + element.offsetX();
-            case right -> baseX + width - lineWidth - element.offsetX();
+            case LEFT -> baseX + element.offsetX();
+            case CENTER -> baseX + (width - lineWidth) / 2 + element.offsetX();
+            case RIGHT -> baseX + width - lineWidth - element.offsetX();
         };
     }
 

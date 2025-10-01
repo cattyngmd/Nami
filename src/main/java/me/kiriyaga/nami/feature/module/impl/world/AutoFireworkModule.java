@@ -19,14 +19,14 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class AutoFireworkModule extends Module {
 
-    public final DoubleSetting delaySeconds = addSetting(new DoubleSetting("delay", 4.5, 0.1, 25.0));
-    public final IntSetting onLevel = addSetting(new IntSetting("on level", -64, -64, 360));
+    public final DoubleSetting delaySeconds = addSetting(new DoubleSetting("Delay", 4.5, 0.1, 25.0));
+    public final IntSetting onLevel = addSetting(new IntSetting("OnLevel", -64, -64, 360));
 
     private int tickDelay;
     private int lastUseTick = 0;
 
     public AutoFireworkModule() {
-        super("auto firework", "Automatically fires fireworks.", ModuleCategory.of("world"), "autofirework");
+        super("AutoFirework", "Automatically fires fireworks.", ModuleCategory.of("World"), "autofirework");
     }
 
     @Override

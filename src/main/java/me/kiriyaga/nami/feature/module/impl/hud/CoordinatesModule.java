@@ -19,12 +19,12 @@ public class CoordinatesModule extends HudElementModule {
         HORIZONTAL, VERTICAL
     }
 
-    public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
-    public final BoolSetting altCords = addSetting(new BoolSetting("alt coordinates", true));
-    public final EnumSetting<LayoutMode> layout = addSetting(new EnumSetting<>("layout", LayoutMode.HORIZONTAL));
+    public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
+    public final BoolSetting altCords = addSetting(new BoolSetting("AltCoordinates", true));
+    public final EnumSetting<LayoutMode> layout = addSetting(new EnumSetting<>("Layout", LayoutMode.HORIZONTAL));
 
     public CoordinatesModule() {
-        super("coordinates", "Displays player coordinates.", 0, 0, 100, 30);
+        super("Coordinates", "Displays player coordinates.", 0, 0, 100, 30);
     }
 
     @Override

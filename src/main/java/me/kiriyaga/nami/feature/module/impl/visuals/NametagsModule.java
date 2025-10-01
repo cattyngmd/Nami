@@ -1,5 +1,8 @@
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -13,44 +16,48 @@ import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.Tameable;
+import net.minecraft.entity.*;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL32C;
 
 import java.awt.*;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
+import static net.caffeinemc.mods.sodium.client.util.FlawlessFrames.isActive;
 
 @RegisterModule
 public class NametagsModule extends Module {
 
-    public final BoolSetting self = addSetting(new BoolSetting("self", false));
-    public final BoolSetting players = addSetting(new BoolSetting("players", true));
-    public final BoolSetting hostiles = addSetting(new BoolSetting("hostiles", false));
-    public final BoolSetting neutrals = addSetting(new BoolSetting("neutrals", false));
-    public final BoolSetting passives = addSetting(new BoolSetting("passives", false));
-    public final BoolSetting items = addSetting(new BoolSetting("items", false));
-    public final BoolSetting tamed = addSetting(new BoolSetting("tamed", false));
-    public final BoolSetting pearls = addSetting(new BoolSetting("pearls", false));
-    public final BoolSetting showItems = addSetting(new BoolSetting("equipment", true));
-    public final BoolSetting showHealth = addSetting(new BoolSetting("health", false));
-    public final BoolSetting showGameMode = addSetting(new BoolSetting("gamemode", false));
-    public final BoolSetting showPing = addSetting(new BoolSetting("ping", true));
-    public final BoolSetting showEntityId = addSetting(new BoolSetting("entityId", false));
-    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("format", TextFormat.NONE));
-    public final BoolSetting background = addSetting(new BoolSetting("background", false));
-    public final BoolSetting border = addSetting(new BoolSetting("border", true));
-    public final DoubleSetting borderWidth = addSetting(new DoubleSetting("border width", 0.25, 0.11, 1));
+    public final BoolSetting self = addSetting(new BoolSetting("Self", false));
+    public final BoolSetting players = addSetting(new BoolSetting("Players", true));
+    public final BoolSetting hostiles = addSetting(new BoolSetting("Hostiles", false));
+    public final BoolSetting neutrals = addSetting(new BoolSetting("Neutrals", false));
+    public final BoolSetting passives = addSetting(new BoolSetting("Passives", false));
+    public final BoolSetting items = addSetting(new BoolSetting("Items", false));
+    public final BoolSetting tamed = addSetting(new BoolSetting("Tamed", false));
+    public final BoolSetting pearls = addSetting(new BoolSetting("Pearls", false));
+    public final BoolSetting showItems = addSetting(new BoolSetting("Equipment", true));
+    public final BoolSetting showHealth = addSetting(new BoolSetting("Health", false));
+    public final BoolSetting showGameMode = addSetting(new BoolSetting("Gamemode", false));
+    public final BoolSetting showPing = addSetting(new BoolSetting("Ping", true));
+    public final BoolSetting showEntityId = addSetting(new BoolSetting("EntityId", false));
+    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("Format", TextFormat.NONE));
+    public final BoolSetting background = addSetting(new BoolSetting("Background", false));
+    public final BoolSetting border = addSetting(new BoolSetting("Border", true));
+    public final DoubleSetting borderWidth = addSetting(new DoubleSetting("Width", 0.25, 0.11, 1));
 
     private final NametagFormatter formatter = new NametagFormatter(this);
 
@@ -58,8 +65,10 @@ public class NametagsModule extends Module {
         NONE, BOLD, ITALIC, BOTH
     }
 
+    private static final Map<UUID, String> uuid = new HashMap<>();
+
     public NametagsModule() {
-        super("nametags", "Draws nametags above certain entities.", ModuleCategory.of("visuals"));
+        super("Nametags", "Draws nametags above certain entities.", ModuleCategory.of("Render"));
     }
 
     @SubscribeEvent
@@ -116,15 +125,82 @@ public class NametagsModule extends Module {
         }
 
         if (tamed.get()) {
-            for (var entity : ENTITY_MANAGER.getAllEntities()) {
-                if (entity instanceof Tameable tameable){
-                    if (tameable.getOwner() == null) continue;
-                    i++;
-                    renderEntityNametag(entity, tameable.getOwner().getName().getString(), event.getTickDelta(), matrices, 30, null);
 
+            for (var entity : ENTITY_MANAGER.getAllEntities()) {
+
+                @Nullable LazyEntityReference<LivingEntity> owner;
+
+                if (entity instanceof TameableEntity tameable) {
+                    owner = tameable.getOwnerReference();
+                } else {
+                    continue;
                 }
+
+                if (owner == null)
+                    return;
+
+                UUID uuid = owner.getUuid();
+
+                String ownerName;
+
+                if (NametagsModule.uuid.containsKey(uuid)) {
+                    ownerName = NametagsModule.uuid.get(uuid);
+                } else {
+                    ownerName = "Owned by ";
+
+                    EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
+
+                        if (isActive()) {
+                            try {
+                                String urlStr = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "");
+                                URL url = new URL(urlStr);
+                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                connection.setRequestMethod("GET");
+                                connection.setConnectTimeout(5000);
+                                connection.setReadTimeout(5000);
+
+                                int status = connection.getResponseCode();
+
+                                if (status == 200) {
+                                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                                    StringBuilder responseBuilder = new StringBuilder();
+                                    String line;
+                                    while ((line = reader.readLine()) != null) {
+                                        responseBuilder.append(line);
+                                    }
+                                    reader.close();
+
+                                    String response = responseBuilder.toString();
+
+                                    if (response != null && !response.isEmpty()) {
+                                        JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+                                        if (json.has("name")) {
+                                            String name = json.get("name").getAsString();
+                                            NametagsModule.uuid.put(uuid, name);
+                                        } else {
+                                            NametagsModule.uuid.put(uuid, "Failed to get name");
+                                        }
+                                    } else {
+                                        NametagsModule.uuid.put(uuid, "Failed to get name");
+                                    }
+                                } else {
+                                    NametagsModule.uuid.put(uuid, "Failed to get name");
+                                }
+
+                                connection.disconnect();
+                            } catch (Exception e) {
+                                NametagsModule.uuid.put(uuid, "Failed to get name");
+                            }
+                        } else {
+                        }
+                    }, 0, ExecutableThreadType.ASYNC);
+                }
+
+                i++;
+                renderEntityNametag(entity, "Owned by " + ownerName, event.getTickDelta(), matrices, 30, null);
             }
-        }
+    }
+
 
         if (pearls.get()) {
             for (var entity : ENTITY_MANAGER.getAllEntities()) {

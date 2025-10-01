@@ -20,11 +20,11 @@ public class ArmorHudModule extends HudElementModule {
         HORIZONTAL, VERTICAL
     }
 
-    public final EnumSetting<Orientation> orientation = addSetting(new EnumSetting<>("orientation", Orientation.HORIZONTAL));
-    public final BoolSetting showDurability = addSetting(new BoolSetting("showDurability", true));
+    public final EnumSetting<Orientation> orientation = addSetting(new EnumSetting<>("Orientation", Orientation.HORIZONTAL));
+    public final BoolSetting showDurability = addSetting(new BoolSetting("ShowDurability", true));
 
     public ArmorHudModule() {
-        super("armor hud", "Displays equipped armor.", 0, 0, 64, 16);
+        super("ArmorHud", "Displays equipped armor.", 0, 0, 64, 16);
         this.label.setShow(true);
     }
 

@@ -11,7 +11,7 @@ public class LagWarningModule extends HudElementModule {
 
 
     public LagWarningModule() {
-        super("lag warning", "Displays lag warning if connection unstable.", 0, 0, 100, 9);
+        super("LagWarning", "Displays lag warning if connection unstable.", 0, 0, 100, 9);
     }
 
     @Override

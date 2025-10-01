@@ -7,6 +7,8 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.util.InputCache;
@@ -22,10 +24,11 @@ public class SpeedModule extends Module {
         ROTATION
     }
 
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("mode", Mode.ROTATION));
+    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.ROTATION));
+    private final BoolSetting inLiquid = addSetting(new BoolSetting("InWater", true));
 
     public SpeedModule() {
-        super("speed", "Increases movement speed.", ModuleCategory.of("movement"));
+        super("Speed", "Increases movement speed.", ModuleCategory.of("Movement"));
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -36,12 +39,15 @@ public class SpeedModule extends Module {
             return; // this fallback need due to sprinting not apply for theese states
         // also we do not need swimming because swimming do apply speed for sprinitng
 
+        if (!inLiquid.get() && MC.player.isTouchingWater())
+            return;
+
         this.setDisplayInfo(mode.get().toString());
 
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
             float pitch = MC.player.getPitch();
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), 1, yaw, pitch));
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), 1, yaw, pitch, RotationModule.RotationMode.MOTION));
 
             MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
         }

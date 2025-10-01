@@ -14,10 +14,10 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class YawModule extends Module {
 
-    private final IntSetting directions = addSetting(new IntSetting("directions", 8, 4, 16));
+    private final IntSetting directions = addSetting(new IntSetting("Directions", 8, 4, 16));
 
     public YawModule() {
-        super("yaw", "Snap player yaw to nearest fixed angle.", ModuleCategory.of("movement"));
+        super("Yaw", "Snap player yaw to nearest fixed angle.", ModuleCategory.of("Movement"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

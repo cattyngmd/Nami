@@ -30,8 +30,8 @@ public abstract class Module {
         this.aliases = aliases;
         this.category = category;
 
-        this.keyBind = new KeyBindSetting("bind", KeyBindSetting.KEY_NONE);
-        this.drawn = new BoolSetting("drawn", false);
+        this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
+        this.drawn = new BoolSetting("Drawn", false);
         this.drawn.setShow(false);
         addSetting(keyBind);
         addSetting(drawn);
@@ -55,15 +55,18 @@ public abstract class Module {
             EVENT_MANAGER.register(this);
             onEnable();
 
-            Text message = CAT_FORMAT.format("{s}[{g}+{s}] {reset}" + name);
-            CHAT_MANAGER.sendTransient(message, false);
-
+            if (MC.world != null) {
+                Text message = CAT_FORMAT.format("{s}[{g}+{s}] {reset}" + name);
+                CHAT_MANAGER.sendTransient(message, false);
+            }
         } else {
             EVENT_MANAGER.unregister(this);
             onDisable();
 
-            Text message = CAT_FORMAT.format("{namiDarkRed}[{namiRed}-{namiDarkRed}] {reset}" + name);
-            CHAT_MANAGER.sendTransient(message, false);
+            if (MC.world != null) {
+                Text message = CAT_FORMAT.format("{namiDarkRed}[{namiRed}-{namiDarkRed}] {reset}" + name);
+                CHAT_MANAGER.sendTransient(message, false);
+            }
         }
     }
 
@@ -117,9 +120,20 @@ public abstract class Module {
     }
 
     public Setting<?> getSettingByName(String name) {
+        if (name == null) return null;
         String lower = name.toLowerCase();
         for (Setting<?> setting : settings) {
-            if (setting.getName().toLowerCase().equals(lower)) {
+            String sname = setting.getName();
+            if (sname == null) continue;
+            if (sname.toLowerCase().equals(lower)) {
+                return setting;
+            }
+        }
+        String compact = lower.replaceAll("\\s", "");
+        for (Setting<?> setting : settings) {
+            String sname = setting.getName();
+            if (sname == null) continue;
+            if (sname.toLowerCase().replaceAll("\\s", "").equals(compact)) {
                 return setting;
             }
         }
@@ -127,7 +141,7 @@ public abstract class Module {
     }
 
     public void setDisplayInfo(String info) {
-        this.displayInfo = info.toLowerCase();
+        this.displayInfo = info;
     }
 
     public String getDisplayInfo() {

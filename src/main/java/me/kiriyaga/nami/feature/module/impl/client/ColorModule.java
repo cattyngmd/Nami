@@ -15,15 +15,15 @@ import java.awt.*;
 @RegisterModule
 public class ColorModule extends Module {
 
-    public final ColorSetting globalColor = addSetting(new ColorSetting("global", new Color(22, 22, 230, 170), true));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(22, 22, 230, 170), true));
 
-    public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("rainbow", false));
-    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("speed", 0.4, 0.01, 5.0));
+    public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("Rainbow", false));
+    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.4, 0.01, 5.0));
 
     private int phase = 0;
 
     public ColorModule() {
-        super("color", "Customizes color scheme.", ModuleCategory.of("client"), "colr", "c", "colors", "clitor");
+        super("Color", "Customizes color scheme.", ModuleCategory.of("Client"), "colr", "c", "colors", "clitor");
         if (!this.isEnabled())
             this.toggle();
         rainbowSpeed.setShowCondition(() -> rainbowEnabled.get());

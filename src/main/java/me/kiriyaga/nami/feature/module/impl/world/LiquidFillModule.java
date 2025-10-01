@@ -34,6 +34,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.*;
 import java.util.List;
+
+import static me.kiriyaga.nami.util.InteractionUtils.airPlace;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -45,19 +47,19 @@ public class LiquidFillModule extends Module {
         WATER, LAVA, BOTH
     }
 
-    // TODO: shift ticks
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 5.0, 1.0, 6.0));
-    public final IntSetting delay = addSetting(new IntSetting("delay", 4, 1, 10));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting grim = addSetting(new BoolSetting("grim", false));
-    private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("liquid", LiquidType.BOTH));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", true));
+    // TODO: shift ticks, or maybe not?
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 10));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("Liquid", LiquidType.BOTH));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;
 
     public LiquidFillModule() {
-        super("liquid fill", "Automatically fills nearby liquids with blocks.", ModuleCategory.of("world"), "liquidfill");
+        super("LiquidFill", "Automatically fills nearby liquids with blocks.", ModuleCategory.of("World"), "liquidfill");
     }
 
     @Override
@@ -128,29 +130,9 @@ public class LiquidFillModule extends Module {
                 if (currentSlot != blockSlot)
                     INVENTORY_MANAGER.getSlotHandler().attemptSwitch(blockSlot);
 
-                if (grim.get()) {
-                    MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                    MC.interactionManager.interactBlock(MC.player, Hand.OFF_HAND, new BlockHitResult(
-                            Vec3d.of(pos).add(0.5,0.5,0.5),
-                            Direction.UP,
-                            pos,
-                            false));
+                BlockHitResult hit = new BlockHitResult(Vec3d.of(pos).add(0.5,0.5,0.5), Direction.UP, pos, false);
 
-                    if (swing.get())
-                        MC.player.swingHand(Hand.MAIN_HAND, false);
-                    MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
-                    MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                } else {
-                    MC.interactionManager.interactBlock(MC.player, Hand.MAIN_HAND, new BlockHitResult(
-                            Vec3d.of(pos).add(0.5,0.5,0.5),
-                            Direction.UP,
-                            pos,
-                            false));
-                    if (swing.get())
-                        MC.player.swingHand(Hand.MAIN_HAND);
-                }
+                airPlace(hit, grim.get(), swing.get());
 
                 if (currentSlot != MC.player.getInventory().getSelectedSlot())
                     INVENTORY_MANAGER.getSlotHandler().attemptSwitch(currentSlot);

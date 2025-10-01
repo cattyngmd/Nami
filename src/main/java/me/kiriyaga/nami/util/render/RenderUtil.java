@@ -49,8 +49,6 @@ import java.awt.*;
 
 public class RenderUtil {
 
-    // TODO: we shouldnt render fill if camera inside of the box
-
     public static void rect(DrawContext stack, float x1, float y1, float x2, float y2, int color) {
         rectFilled(stack, x1, y1, x2, y2, color);
     }
@@ -161,6 +159,7 @@ public class RenderUtil {
 
     // 3d
     public static void drawBoxFilled(MatrixStack stack, Box box, Color c) {
+        if (box.contains(MC.getEntityRenderDispatcher().camera.getPos())) return;
         float minX = (float) (box.minX - MC.getEntityRenderDispatcher().camera.getPos().getX());
         float minY = (float) (box.minY - MC.getEntityRenderDispatcher().camera.getPos().getY());
         float minZ = (float) (box.minZ - MC.getEntityRenderDispatcher().camera.getPos().getZ());

@@ -38,8 +38,8 @@ This project started as a clean, open-source alternative aiming to be transparen
 <details>
 <summary>View screenshots</summary>
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/200e7c2a-bfd0-4c2f-b7f1-f976a4e110f0" />
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/815adf88-c8fd-44f0-8f8d-f169a9d52b8b" />
+<img width="1920" height="1080" alt="ClickGUI" src="Assets/clickgui.png" />
+<img width="1920" height="1080" alt="HudEditor" src="Assets/hudeditor.png" />
 
 </details>
 

@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.DissconectEvent;
@@ -8,9 +9,9 @@ import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.impl.misc.AutoReconnectModule;
+import me.kiriyaga.nami.feature.module.impl.miscellaneous.AutoReconnectModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.misc.IllegalDisconnectModule;
+import me.kiriyaga.nami.feature.module.impl.miscellaneous.IllegalDisconnectModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EntityUtils;
@@ -24,18 +25,18 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class AutoLogModule extends Module {
 
-    private final IntSetting health = addSetting(new IntSetting("on health", 12, 0, 36));
-    private final BoolSetting onRender = addSetting(new BoolSetting("on render", false));
-    private final BoolSetting packet = addSetting(new BoolSetting("packet", false));
-    private final BoolSetting onPop = addSetting(new BoolSetting("on pop", false));
-    private final IntSetting onLevel = addSetting(new IntSetting("on level", 0, 0, 15000));
-    private final BoolSetting selfToggle = addSetting(new BoolSetting("self toggle", true));
-    private final BoolSetting reconnectToggle = addSetting(new BoolSetting("reconnect toggle", true));
+    private final IntSetting health = addSetting(new IntSetting("OnHealth", 12, 0, 36));
+    private final BoolSetting onRender = addSetting(new BoolSetting("OnRender", false));
+    private final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
+    private final BoolSetting onPop = addSetting(new BoolSetting("OnPop", false));
+    private final IntSetting onLevel = addSetting(new IntSetting("OnLevel", 0, 0, 15000));
+    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
+    private final BoolSetting reconnectToggle = addSetting(new BoolSetting("ReconnectToggle", true));
 
     private boolean triggeredLevel = false;
 
     public AutoLogModule() {
-        super("auto log", "Automatically logs out in certain conditions.", ModuleCategory.of("combat"), "autolog", "panic", "logout");
+        super("AutoLog", "Automatically logs out in certain conditions.", ModuleCategory.of("Combat"), "autolog", "panic", "logout");
         packet.setShowCondition(() -> onRender.get());
     }
 
@@ -81,7 +82,7 @@ public class AutoLogModule extends Module {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
             if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 35 && onPop.get()) {
-                MC.execute(() -> logOut("AutoLog: totem got popped."));
+                EXECUTABLE_MANAGER.getRequestHandler().submit(() -> logOut("AutoLog: totem got popped."), 0, ExecutableThreadType.PRE_TICK);
             }
         }
     }

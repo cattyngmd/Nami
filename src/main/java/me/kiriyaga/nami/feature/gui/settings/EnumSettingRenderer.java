@@ -52,7 +52,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
                 true
         );
 
-        String valueStr = setting.get().toString().toLowerCase();
+        String valueStr = setting.get().toString();
         FONT_MANAGER.drawText(
                 context,
                 valueStr,

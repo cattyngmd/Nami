@@ -10,7 +10,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class WatermarkModule extends HudElementModule {
 
     public WatermarkModule() {
-        super("watermark", "Displays client watermark.", 0, 0, 50, 9);
+        super("Watermark", "Displays client watermark.", 0, 0, 50, 9);
     }
 
     @Override

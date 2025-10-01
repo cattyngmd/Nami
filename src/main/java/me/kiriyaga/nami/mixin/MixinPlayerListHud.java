@@ -1,18 +1,23 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.misc.BetterTabModule;
+import me.kiriyaga.nami.feature.module.impl.miscellaneous.BetterTabModule;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
@@ -104,6 +109,31 @@ public abstract class MixinPlayerListHud {
             }
 
             info.setReturnValue(applyGameModeFormatting(entry, formattedName));
+        }
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void render(DrawContext drawContext, int width, Scoreboard scoreboard, @Nullable ScoreboardObjective objective, CallbackInfo ci) {
+        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
+        if (betterTab != null && betterTab.isEnabled()) {
+            float scale = betterTab.scale.get().floatValue();
+
+            drawContext.getMatrices().pushMatrix();
+
+            float centerX = width / 2f;
+            float centerY = 10f;
+
+            drawContext.getMatrices().translate(centerX, centerY);
+            drawContext.getMatrices().scale(scale, scale);
+            drawContext.getMatrices().translate(-centerX, -centerY);
+        }
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    private void render2(DrawContext drawContext, int width, Scoreboard scoreboard, @Nullable ScoreboardObjective objective, CallbackInfo ci) {
+        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
+        if (betterTab != null && betterTab.isEnabled()) {
+            drawContext.getMatrices().popMatrix();
         }
     }
 }

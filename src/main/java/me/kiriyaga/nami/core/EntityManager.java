@@ -111,7 +111,6 @@ public class EntityManager {
 
                 List<Entity> others = candidates.stream()
                         .filter(e -> !(e instanceof PlayerEntity)
-                                && !(e instanceof CreeperEntity)
                                 && !(e instanceof ShulkerBulletEntity)
                                 && !(e instanceof FireballEntity))
                         .toList();

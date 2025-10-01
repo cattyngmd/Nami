@@ -23,15 +23,15 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class AutoCowModule extends Module {
 
-    private final DoubleSetting milkRange = addSetting(new DoubleSetting("range", 2.5, 1.0, 5.0));
-    private final IntSetting delay = addSetting(new IntSetting("delay", 5, 1, 20));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
+    private final DoubleSetting milkRange = addSetting(new DoubleSetting("Range", 2.5, 1.0, 5.0));
+    private final IntSetting delay = addSetting(new IntSetting("Delay", 5, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
 
     private int swapCooldown = 0;
 
     public AutoCowModule() {
-        super("auto cow", "Automatically milks nearby cows.", ModuleCategory.of("world"), "cow", "milk", "autocow");
+        super("AutoCow", "Automatically milks nearby cows.", ModuleCategory.of("World"), "cow", "milk", "autocow");
     }
 
     @SubscribeEvent

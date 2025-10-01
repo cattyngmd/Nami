@@ -25,10 +25,10 @@ public class SearchListModule extends HudElementModule {
 
     private final List<TextElement> elements = new ArrayList<>();
 
-    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("sort", SortMode.DESCENDING));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
 
     public SearchListModule() {
-        super("search list", "Shows nearby blocks found by search.", 0, 0, 50, 10);
+        super("SearchList", "Shows nearby blocks found by search.", 0, 0, 50, 10);
     }
 
     @Override

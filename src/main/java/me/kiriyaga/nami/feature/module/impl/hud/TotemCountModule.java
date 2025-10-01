@@ -14,10 +14,10 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class TotemCountModule extends HudElementModule {
 
-    public final BoolSetting white = addSetting(new BoolSetting("white", true));
+    public final BoolSetting white = addSetting(new BoolSetting("White", true));
 
     public TotemCountModule() {
-        super("totem count", "Displays number of totems in inventory.", 0, 0, 20, 20);
+        super("TotemCount", "Displays number of totems in inventory.", 0, 0, 20, 20);
         this.label.setShow(true);
     }
 

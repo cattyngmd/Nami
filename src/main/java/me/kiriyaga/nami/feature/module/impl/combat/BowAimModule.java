@@ -9,6 +9,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -25,12 +26,12 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class BowAimModule extends Module {
 
-    public final BoolSetting render = addSetting(new BoolSetting("render", true));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     private Entity currentTarget = null;
 
     public BowAimModule() {
-        super("bow aim", "Aims at certain targets with bow/trident.", ModuleCategory.of("combat"), "bowbot", "aimbot", "bowaimbot");
+        super("BowAim", "Aims at certain targets with bow/trident.", ModuleCategory.of("Combat"), "bowbot", "aimbot", "bowaimbot");
     }
 
     @Override
@@ -58,7 +59,8 @@ public class BowAimModule extends Module {
                 BowAimModule.class.getName(),
                 6,
                 (float) getYawToVec(MC.player, aimPos),
-                (float) getPitchToVec(MC.player, aimPos)
+                (float) getPitchToVec(MC.player, aimPos),
+                RotationModule.RotationMode.MOTION
         ));
     }
 

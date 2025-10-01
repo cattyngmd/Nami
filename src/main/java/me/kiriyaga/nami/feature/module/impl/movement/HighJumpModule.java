@@ -8,9 +8,9 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 @RegisterModule
 public class HighJumpModule extends Module {
 
-    public final DoubleSetting height = addSetting(new DoubleSetting("height", 0.42, 0.00, 1.0));
+    public final DoubleSetting height = addSetting(new DoubleSetting("Height", 0.42, 0.00, 1.0));
 
     public HighJumpModule() {
-        super("high jump", "Modifies jump strength.", ModuleCategory.of("movement"), "highjump");
+        super("HighJump", "Modifies jump strength.", ModuleCategory.of("Movement"), "highjump");
     }
 }

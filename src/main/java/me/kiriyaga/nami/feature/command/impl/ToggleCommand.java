@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.command.impl;
 
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
 import me.kiriyaga.nami.feature.command.CommandArgument;
@@ -13,7 +14,7 @@ public class ToggleCommand extends Command {
     public ToggleCommand() {
         super("toggle",
                 new CommandArgument[] {
-                        new CommandArgument.StringArg("moduleName", 1, 25)
+                        new CommandArgument.ModuleArg("name")
                 },
                 "on", "off", "switch", "togle", "turnon", "turnoff", "tggle");
     }
@@ -36,6 +37,6 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        found.toggle();
+        EXECUTABLE_MANAGER.getRequestHandler().submit(found::toggle, 2, ExecutableThreadType.PRE_TICK);
     }
 }

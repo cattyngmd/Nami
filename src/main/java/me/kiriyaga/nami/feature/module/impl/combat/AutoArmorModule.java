@@ -19,6 +19,7 @@ import net.minecraft.item.*;
 import java.util.*;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InventoryUtils.isBroken;
 
 @RegisterModule
 public class AutoArmorModule extends Module {
@@ -27,13 +28,13 @@ public class AutoArmorModule extends Module {
     private enum BootsPriority { LEATHER, GOLDEN, BEST }
     private enum HelmetPriority { BEST, TURTLE, GOLDEN, PUMPKIN, NONE }
 
-    private final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("protection", ProtectionPriority.PROT));
-    private final IntSetting damageThreshold = addSetting(new IntSetting("durability", 3, 1, 15));
-    private final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("helmet", HelmetPriority.BEST));
-    private final BoolSetting helmetSafety = addSetting(new BoolSetting("helmet safety", false));
-    private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("boots", BootsPriority.BEST));
-    private final BoolSetting elytraPriority = addSetting(new BoolSetting("elytra priority", false));
-    private final BoolSetting mendingRepair = addSetting(new BoolSetting("mending repair", false));
+    private final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("Protection", ProtectionPriority.PROT));
+    private final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 1, 15));
+    private final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("Helmet", HelmetPriority.BEST));
+    private final BoolSetting helmetSafety = addSetting(new BoolSetting("Safety", false));
+    private final EnumSetting<BootsPriority> bootsPriority = addSetting(new EnumSetting<>("Boots", BootsPriority.BEST));
+    private final BoolSetting elytraPriority = addSetting(new BoolSetting("ElytraPriority", false));
+    private final BoolSetting mendingRepair = addSetting(new BoolSetting("MendingRepair", false));
 
     private static final Set<Item> ARMOR_ITEMS_HEAD = Set.of(Items.LEATHER_HELMET, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET, Items.TURTLE_HELMET, Items.CARVED_PUMPKIN);
     private static final Set<Item> ARMOR_ITEMS_CHEST = Set.of(Items.LEATHER_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE, Items.ELYTRA);
@@ -41,7 +42,7 @@ public class AutoArmorModule extends Module {
     private static final Set<Item> ARMOR_ITEMS_FEET = Set.of(Items.LEATHER_BOOTS, Items.GOLDEN_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS);
 
     public AutoArmorModule() {
-        super("auto armor", "Automatically equips best armor.", ModuleCategory.of("combat"), "autoarmor");
+        super("AutoArmor", "Automatically equips best armor.", ModuleCategory.of("Combat"), "autoarmor");
         helmetSafety.setShowCondition(() -> helmetSetting.get() == HelmetPriority.NONE);
     }
 
@@ -205,10 +206,10 @@ public class AutoArmorModule extends Module {
     private ItemStack findBestArmor(EquipmentSlot slot, ItemStack current) {
         List<ItemStack> candidates = findCandidatesForSlot(slot, false);
         if (slot == EquipmentSlot.CHEST && elytraPriority.get()) {
-            boolean wearingElytra = current.getItem() == Items.ELYTRA && !isBroken(current);
+            boolean wearingElytra = current.getItem() == Items.ELYTRA && !isBroken(current, damageThreshold.get());
             if (wearingElytra) return null;
             for (ItemStack stack : candidates) {
-                if (stack.getItem() == Items.ELYTRA && !isBroken(stack) && !hasCurse(stack)) return stack;
+                if (stack.getItem() == Items.ELYTRA && !isBroken(stack, damageThreshold.get()) && !hasCurse(stack)) return stack;
             }
         }
         return chooseBest(candidates, current);
@@ -302,13 +303,5 @@ public class AutoArmorModule extends Module {
         if (item == Items.GOLDEN_HELMET || item == Items.GOLDEN_CHESTPLATE || item == Items.GOLDEN_LEGGINGS || item == Items.GOLDEN_BOOTS) return 2;
         if (item == Items.LEATHER_HELMET || item == Items.LEATHER_CHESTPLATE || item == Items.LEATHER_LEGGINGS || item == Items.LEATHER_BOOTS) return 1;
         return 0;
-    }
-
-    private boolean isBroken(ItemStack stack) {
-        if (!stack.isDamageable()) return false;
-        int max = stack.getMaxDamage();
-        int damage = stack.getDamage();
-        int percentRemaining = (int) (((max - damage) / (float) max) * 100);
-        return percentRemaining <= damageThreshold.get();
     }
 }

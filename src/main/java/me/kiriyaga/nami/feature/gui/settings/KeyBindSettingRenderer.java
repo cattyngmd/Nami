@@ -46,8 +46,8 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         int textY = y + (HEIGHT - 8) / 2;
 
         String nameStr = hovered
-                ? (setting.isHoldMode() ? "hold" : "toggle")
-                : setting.getName().toLowerCase();
+                ? (setting.isHoldMode() ? "Hold" : "Toggle")
+                : setting.getName();
 
         FONT_MANAGER.drawText(
                 context,
@@ -60,7 +60,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
 
         String valueStr;
         if (waitingForKeyBind == setting) {
-            valueStr = "listening...";
+            valueStr = "Listening...";
         } else {
             String keyName = KeyUtils.getKeyName(setting.get());
             //valueStr = (setting.isHoldMode() ? "hold: " : "toggle: ") + keyName;
@@ -68,7 +68,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
             valueStr = keyName;
         }
 
-        String renderStr = valueStr.toLowerCase(); // fuck ahaha
+        String renderStr = valueStr;
         int textWidth = FONT_MANAGER.getWidth(renderStr);
         int valueX = x + WIDTH - PADDING - textWidth;
 

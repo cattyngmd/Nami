@@ -38,13 +38,13 @@ import static me.kiriyaga.nami.util.container.ContainerUtils.openContainer;
 @RegisterModule
 public class ShulkerViewModule extends Module {
 
-    public final BoolSetting tooltip = addSetting(new BoolSetting("tooltip", true));
-    public final BoolSetting compact = addSetting(new BoolSetting("compact", true));
-    public final BoolSetting bothSides = addSetting(new BoolSetting("both sides", true));
-    public final BoolSetting borders = addSetting(new BoolSetting("borders", true));
-    public final BoolSetting middleOpen = addSetting(new BoolSetting("middleclick open", false));
-    public final DoubleSetting scale = addSetting(new DoubleSetting("scale", 1, 0.5, 1.5));
-    public final DoubleSetting scrollsensitivity = addSetting(new DoubleSetting("sensitivity", 1, 0.5, 3));
+    public final BoolSetting tooltip = addSetting(new BoolSetting("Tooltip", true));
+    public final BoolSetting compact = addSetting(new BoolSetting("Compact", true));
+    public final BoolSetting bothSides = addSetting(new BoolSetting("BothSides", true));
+    public final BoolSetting borders = addSetting(new BoolSetting("Borders", true));
+    public final BoolSetting middleOpen = addSetting(new BoolSetting("MiddleclickOpen", false));
+    public final DoubleSetting scale = addSetting(new DoubleSetting("Scale", 1, 0.5, 1.5));
+    public final DoubleSetting scrollsensitivity = addSetting(new DoubleSetting("Sensitivity", 1, 0.5, 3));
 
     private final List<ShulkerInfo> shulkerList = new ArrayList<>();
     private final int GRID_WIDTH = 20;
@@ -60,7 +60,7 @@ public class ShulkerViewModule extends Module {
     private int button = -1;
 
     public ShulkerViewModule() {
-        super("shulker view", "Improves shulker managment. Author @cattyngmd", ModuleCategory.of("visuals"),"shulkerview");
+        super("ShulkerView", "Improves shulker management.", ModuleCategory.of("Render"),"shulkerview");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

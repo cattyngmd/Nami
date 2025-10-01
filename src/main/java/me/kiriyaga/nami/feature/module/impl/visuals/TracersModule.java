@@ -18,24 +18,20 @@ import org.joml.*;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.NametagFormatter.*;
 
 //@RegisterModule
 public class TracersModule extends Module {
 
-    public final BoolSetting showPlayers = addSetting(new BoolSetting("players", true));
-    public final BoolSetting showPeacefuls = addSetting(new BoolSetting("peacefuls", false));
-    public final BoolSetting showNeutrals = addSetting(new BoolSetting("neutrals", false));
-    public final BoolSetting showHostiles = addSetting(new BoolSetting("hostiles", false));
-    public final BoolSetting showItems = addSetting(new BoolSetting("items", false));
-    public final DoubleSetting thickness = addSetting(new DoubleSetting("thickness", 0.002, 0.0005, 0.002));
-
-    private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
-    private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
-    private static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
-    private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
+    public final BoolSetting showPlayers = addSetting(new BoolSetting("Players", true));
+    public final BoolSetting showPeacefuls = addSetting(new BoolSetting("Peacefuls", false));
+    public final BoolSetting showNeutrals = addSetting(new BoolSetting("Neutrals", false));
+    public final BoolSetting showHostiles = addSetting(new BoolSetting("Hostiles", false));
+    public final BoolSetting showItems = addSetting(new BoolSetting("Items", false));
+    public final DoubleSetting thickness = addSetting(new DoubleSetting("Thickness", 0.002, 0.0005, 0.002));
 
     public TracersModule() {
-        super("tracers", "Draws lines from the center of the screen to entities.", ModuleCategory.of("visuals"));
+        super("Tracers", "Draws lines from the center of the screen to entities.", ModuleCategory.of("Render"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

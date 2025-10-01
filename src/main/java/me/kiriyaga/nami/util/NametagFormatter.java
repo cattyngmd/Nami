@@ -20,10 +20,12 @@ public class NametagFormatter {
     private final NametagsModule module;
     private final DecimalFormat df = new DecimalFormat("##");
 
-    private static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
-    private static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
-    private static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
-    private static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
+    public static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
+    public static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
+    public static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
+    public static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
+    public static final Color COLOR_FRIEND = new Color(0, 170, 170, 255);
+    public static final Color COLOR_SNEAK = new Color(255, 165, 0, 255);
 
     public NametagFormatter(NametagsModule module) {
         this.module = module;
@@ -118,9 +120,9 @@ public class NametagFormatter {
         if (color == null && entity != null) {
             if (entity instanceof PlayerEntity player) {
                 if (player.isSneaking()) {
-                    color = new Color(255, 165, 0);
+                    color = COLOR_SNEAK;
                 } else if (FRIEND_MANAGER.isFriend(player.getName().getString())) {
-                    color = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+                    color = COLOR_FRIEND;
                 } else {
                     color = Color.WHITE;
                 }

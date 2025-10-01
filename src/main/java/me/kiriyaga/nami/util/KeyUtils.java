@@ -103,7 +103,7 @@ public class KeyUtils {
         }
 
         if (keyCode == -1)
-            return "none";
+            return "NONE";
 
         return "KEY_" + keyCode;
     }

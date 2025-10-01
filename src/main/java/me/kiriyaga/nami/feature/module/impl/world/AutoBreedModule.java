@@ -25,16 +25,16 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class AutoBreedModule extends Module {
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("range", 2, 1.0, 5.0));
-    private final IntSetting delay = addSetting(new IntSetting("delay", 10, 1, 20));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
-    private final BoolSetting rotate = addSetting(new BoolSetting("rotate", false));
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 2, 1.0, 5.0));
+    private final IntSetting delay = addSetting(new IntSetting("Delay", 10, 1, 20));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
 
     private final Set<Integer> animalsFed = new HashSet<>();
     private int breedCooldown = 0;
 
     public AutoBreedModule() {
-        super("auto breed", "Automatically breeds nearby animals.", ModuleCategory.of("world"), "autobreed");
+        super("AutoBreed", "Automatically breeds nearby animals.", ModuleCategory.of("World"), "autobreed");
     }
 
     @Override

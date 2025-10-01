@@ -2,11 +2,9 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.kiriyaga.nami.feature.module.impl.combat.NoEntityTraceModule;
+import me.kiriyaga.nami.feature.module.impl.miscellaneous.ReachModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoBobModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoTiltModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -127,14 +125,14 @@ public abstract class MixinGameRenderer {
 
     @ModifyReturnValue(method = "findCrosshairTarget", at = @At("RETURN"))
     private HitResult findCrosshairTarget(HitResult original, @Local HitResult hitResult) {
-        NoEntityTraceModule noEntityTraceModule = MODULE_MANAGER.getStorage().getByClass(NoEntityTraceModule.class);
-        if (noEntityTraceModule == null || !noEntityTraceModule.isEnabled()) {
+        ReachModule reachModule = MODULE_MANAGER.getStorage().getByClass(ReachModule.class);
+        if (reachModule == null || !reachModule.isEnabled() || !reachModule.noEntityTrace.get()) {
             return original;
         }
 
         if (hitResult.getType() == HitResult.Type.BLOCK) {
-            boolean playerOnly = noEntityTraceModule.playerOnly.get();
-            boolean pickaxeOnly = noEntityTraceModule.pickaxeOnly.get();
+            boolean playerOnly = reachModule.playerOnly.get();
+            boolean pickaxeOnly = reachModule.pickaxeOnly.get();
 
             var targetEntity = getTargetedEntity();
             var mainHandItem = MC.player.getMainHandStack().getItem();
@@ -185,14 +183,14 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobView(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoBobModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoBobModule.class).isEnabled()) {
+        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noBob.get()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
     private void tiltViewWhenHurt(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoTiltModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoTiltModule.class).isEnabled()) {
+        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noTilt.get()) {
             ci.cancel();
         }
     }

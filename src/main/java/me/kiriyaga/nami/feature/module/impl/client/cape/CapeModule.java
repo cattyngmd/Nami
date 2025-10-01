@@ -7,10 +7,10 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 
 @RegisterModule
 public class CapeModule extends Module {
-    public final EnumSetting<CapeType> cape = addSetting(new EnumSetting<>("texture", CapeType.NAMI));
+    public final EnumSetting<CapeType> cape = addSetting(new EnumSetting<>("Texture", CapeType.NAMI));
 
     public CapeModule() {
-        super("cape", "Defines cape renderer logic.", ModuleCategory.of("client"), "customcape");
+        super("Cape", "Defines cape renderer logic.", ModuleCategory.of("Client"), "customcape");
         cape.setShow(false);//haha
     }
 

@@ -24,10 +24,17 @@ public class CommandStorage {
 
     public Command getCommandByNameOrAlias(String name) {
         String lowerName = name.toLowerCase();
+        String lowerNoSpaces = lowerName.replace(" ", "");
         for (Command cmd : commands) {
-            if (cmd.getName().equalsIgnoreCase(lowerName)) return cmd;
+            String cmdName = cmd.getName();
+            if (cmdName != null) {
+                String cmdNameLower = cmdName.toLowerCase();
+                if (cmdNameLower.equals(lowerName) || cmdNameLower.equals(lowerNoSpaces) || cmdNameLower.replace(" ", "").equals(lowerName)) return cmd;
+            }
             for (String alias : cmd.getAliases()) {
-                if (alias.equalsIgnoreCase(lowerName)) return cmd;
+                if (alias == null) continue;
+                String aliasLower = alias.toLowerCase();
+                if (aliasLower.equals(lowerName) || aliasLower.equals(lowerNoSpaces) || aliasLower.replace(" ", "").equals(lowerName)) return cmd;
             }
         }
         return null;

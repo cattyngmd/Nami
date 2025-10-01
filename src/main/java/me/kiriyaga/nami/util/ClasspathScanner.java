@@ -5,6 +5,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
@@ -18,38 +19,34 @@ public class ClasspathScanner {
         Set<Class<? extends T>> result = new HashSet<>();
 
         try {
-            String resourcePath;
-
-            if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-                resourcePath = ""; // ide
-            } else {
-                resourcePath = "me/kiriyaga/nami"; //prod
-            }
-
-            //TODO fucking fix this
-
+            // Always scan within our own package. Scanning the entire classpath is slow and error-prone.
+            String resourcePath = "me/kiriyaga/nami";
             Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(resourcePath);
-
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
-                String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
-
-                if (filePath.startsWith("file:") && filePath.contains("!")) {
-                    String[] split = filePath.split("!");
-                    try (JarFile jar = new JarFile(split[0].substring("file:".length()))) {
-                        result.addAll(scanJar(jar, baseClass, annotation));
-                    }
-                } else {
-                    File dir = new File(filePath);
+                String protocol = url.getProtocol();
+                if ("file".equals(protocol)) {
+                    File dir = new File(url.toURI());
                     if (dir.exists() && dir.isDirectory()) {
-                        result.addAll(scanDirectory(dir, "", baseClass, annotation));
+                        result.addAll(scanDirectory(dir, "me.kiriyaga.nami", baseClass, annotation));
+                    }
+                } else if ("jar".equals(protocol)) {
+                    String path = url.getPath();
+                    int bangIndex = path.indexOf("!");
+                    if (bangIndex != -1) {
+                        String jarFile = path.substring(0, bangIndex);
+                        if (jarFile.startsWith("file:")) {
+                            jarFile = new File(new URL(jarFile).toURI()).getAbsolutePath();
+                        }
+                        try (JarFile jar = new JarFile(jarFile)) {
+                            result.addAll(scanJar(jar, baseClass, annotation));
+                        }
                     }
                 }
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
         return result;
     }
 
@@ -57,11 +54,10 @@ public class ClasspathScanner {
         Set<Class<? extends T>> result = new HashSet<>();
 
         for (File file : Objects.requireNonNull(dir.listFiles())) {
-            String fullPkg = pkg.isEmpty() ? "" : pkg + ".";
             if (file.isDirectory()) {
-                result.addAll(scanDirectory(file, fullPkg + file.getName(), base, annotation));
+                result.addAll(scanDirectory(file, pkg + "." + file.getName(), base, annotation));
             } else if (file.getName().endsWith(".class")) {
-                String className = fullPkg + file.getName().replace(".class", "");
+                String className = pkg + "." + file.getName().replace(".class", "");
 
                 if (file.getName().equals("module-info.class")) {
                     continue;
@@ -73,7 +69,7 @@ public class ClasspathScanner {
 
                 Class<?> cls = Class.forName(className);
 
-                if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
+                if (base.isAssignableFrom(cls) && !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers()) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
                     result.add((Class<? extends T>) cls);
                 }
             }
@@ -111,7 +107,7 @@ public class ClasspathScanner {
 
                 Class<?> cls = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
 
-                if (base.isAssignableFrom(cls) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
+                if (base.isAssignableFrom(cls) && !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers()) && cls.isAnnotationPresent((Class<? extends Annotation>) annotation)) {
                     result.add((Class<? extends T>) cls);
                 }
             }

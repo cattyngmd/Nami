@@ -15,7 +15,7 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class NoGlitchItemsModule extends Module {
     public NoGlitchItemsModule() {
-        super("no glitch items", "Prevents ghost items in inventory.", ModuleCategory.of("world"), "noglitchitems");
+        super("NoGlitchItems", "Prevents ghost items in inventory.", ModuleCategory.of("World"), "noglitchitems");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

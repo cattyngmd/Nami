@@ -10,10 +10,10 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class FpsModule extends HudElementModule {
 
-    public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
+    public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
 
     public FpsModule() {
-        super("fps", "Displays current FPS.", 0, 0, 50, 9);
+        super("FPS", "Displays current FPS.", 0, 0, 50, 9);
     }
 
     @Override

@@ -12,10 +12,10 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class TpsModule extends HudElementModule {
 
-    public final BoolSetting displayLabel = addSetting(new BoolSetting("display label", true));
+    public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
 
     public TpsModule() {
-        super("tps", "Displays server TPS.", 0, 0, 50, 9);
+        super("TPS", "Displays server TPS.", 0, 0, 50, 9);
     }
 
     @Override

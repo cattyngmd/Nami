@@ -16,7 +16,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class NoRotateModule extends Module {
 
     public NoRotateModule() {
-        super("no rotate", "Prevents you from receiving forced server rotate packets.", ModuleCategory.of("movement"), "norotate", "antirotate");
+        super("NoRotate", "Prevents you from receiving forced server rotate packets.", ModuleCategory.of("Movement"), "norotate", "antirotate");
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

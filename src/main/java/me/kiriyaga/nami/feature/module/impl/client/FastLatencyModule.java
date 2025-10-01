@@ -15,13 +15,13 @@ public class FastLatencyModule extends Module {
         OFF
     }
 
-    public final EnumSetting<FastLatencyMode> fastLatencyMode = addSetting(new EnumSetting<>("fast latency", FastLatencyMode.NEW));
-    public final IntSetting smoothingStrength = addSetting(new IntSetting("smoothing", 10, 1, 50));
-    public final IntSetting unstableConnectionTimeout = addSetting(new IntSetting("unstable", 3, 1, 60));
-    public final IntSetting keepAliveInterval = addSetting(new IntSetting("interval", 900, 250, 2500));
+    public final EnumSetting<FastLatencyMode> fastLatencyMode = addSetting(new EnumSetting<>("Mode", FastLatencyMode.NEW));
+    public final IntSetting smoothingStrength = addSetting(new IntSetting("Smooth", 10, 1, 50));
+    public final IntSetting unstableConnectionTimeout = addSetting(new IntSetting("Unstable", 3, 1, 60));
+    public final IntSetting keepAliveInterval = addSetting(new IntSetting("Interval", 900, 250, 2500));
 
     public FastLatencyModule() {
-        super("fast latency", "Defines how ping should be received.", ModuleCategory.of("client"), "ping", "manager", "managr", "png");
+        super("FastLatency", "Defines how ping should be received.", ModuleCategory.of("Client"), "ping", "manager", "managr", "png");
 
         smoothingStrength.setShowCondition(() -> fastLatencyMode.get() == FastLatencyMode.OLD);
         unstableConnectionTimeout.setShowCondition(() -> fastLatencyMode.get() != FastLatencyMode.OFF);
