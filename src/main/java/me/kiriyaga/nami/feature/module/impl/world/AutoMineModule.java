@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.world;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
@@ -22,6 +23,7 @@ import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
@@ -176,8 +178,9 @@ public class AutoMineModule extends Module {
         Box blockBox = new Box(task.getBlockPos());
         Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
         Vec3d reachEnd = eyePos.add(lookDir.multiply(range.get()));
+        boolean insideBox = blockBox.contains(eyePos);
 
-        if (blockBox.raycast(eyePos, reachEnd).isEmpty()) {
+        if (!insideBox && blockBox.raycast(eyePos, reachEnd).isEmpty()) {
             abortMining(task);
             currentTask = null;
             return;
@@ -210,8 +213,9 @@ public class AutoMineModule extends Module {
         Box blockBox = new Box(task.getBlockPos());
         Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
         Vec3d reachEnd = eyePos.add(lookDir.multiply(range.get()));
+        boolean insideBox = blockBox.contains(eyePos);
 
-        if (blockBox.raycast(eyePos, reachEnd).isEmpty()) {
+        if (!insideBox && blockBox.raycast(eyePos, reachEnd).isEmpty()) {
             doubleMineTask = null;
             return;
         }
@@ -265,9 +269,11 @@ public class AutoMineModule extends Module {
     private void finishMining(BlockBreakingTask task) {
         if (!task.isStarted() || task.getBlockState().isAir()) return;
 
+        if (currentTask.lastBrokenCount == currentTask.brokenCount)
+            return;
+
         Vec3d eyePos = MC.player.getEyePos();
         Box blockBox = new Box(task.getBlockPos());
-        Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
 
         if (rotate.get() == Rotate.NORMAL)
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.name, 8, getYawToVec(MC.player, getClosestPointToEye(eyePos, blockBox)), getPitchToVec(MC.player, getClosestPointToEye(eyePos, blockBox))));
@@ -291,8 +297,23 @@ public class AutoMineModule extends Module {
 
         sendDestroyPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, task);
 
-        task.markBroken();
+        currentTask.markLastBroken();
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    private void onPacketReceiveEvent(PacketReceiveEvent event) {
+        if (currentTask == null) return;
+
+        if (event.getPacket() instanceof BlockUpdateS2CPacket blockPacket) {
+            BlockPos pos = blockPacket.getPos();
+
+            if (pos.equals(currentTask.getBlockPos())) {
+                currentTask.markBroken();
+            }
+        }
+    }
+
+
 
     private void sendDestroyPacket(PlayerActionC2SPacket.Action action, BlockBreakingTask task) {
         sendSequencedPacket(id -> new PlayerActionC2SPacket(action, task.getBlockPos(), task.getFacing(), id));
@@ -407,11 +428,14 @@ public class AutoMineModule extends Module {
         private boolean instantRemine;
         private boolean started;
         private int brokenCount;
+        private int lastBrokenCount;
 
         public BlockBreakingTask(BlockPos pos, Direction face, float speed) {
             this.blockPos = pos;
             this.facing = face;
             this.targetSpeed = speed;
+            brokenCount = 0;
+            lastBrokenCount = -1;
         }
 
         public BlockPos getBlockPos() { return blockPos; }
@@ -444,5 +468,9 @@ public class AutoMineModule extends Module {
 
         public int getBrokenCount() { return brokenCount; }
         public void markBroken() { brokenCount++; }
+
+        public int getLastBrokenCount() { return lastBrokenCount; }
+        public void markLastBroken() { lastBrokenCount = brokenCount; }
+
     }
 }
