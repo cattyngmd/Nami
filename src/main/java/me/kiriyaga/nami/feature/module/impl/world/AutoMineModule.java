@@ -281,9 +281,11 @@ public class AutoMineModule extends Module {
         if (rotate.get() == Rotate.NORMAL && !ROTATION_MANAGER.getRequestHandler().isCompleted(this.name))
             return;
 
+        int prev = MC.player.getInventory().getSelectedSlot();
         if (swap.get() == Swap.SILENT) {
             int slot = getSlot(task.getBlockState());
             if (slot != MC.player.getInventory().getSelectedSlot()) {
+                if (currentTask.brokenCount < 2 || !currentTask.isInstantRemine())
                 shouldSwapBack = MC.player.getInventory().getSelectedSlot();
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
             }
@@ -297,6 +299,10 @@ public class AutoMineModule extends Module {
 
         sendDestroyPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, task);
 
+        if (swap.get() == Swap.SILENT && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) {
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+
+        }
         currentTask.markLastBroken();
     }
 
