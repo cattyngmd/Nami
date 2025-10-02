@@ -51,6 +51,7 @@ public class AutoMineModule extends Module {
     private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
     private final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    private final BoolSetting async = addSetting(new BoolSetting("Async", true));
     public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
     private final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
@@ -269,7 +270,7 @@ public class AutoMineModule extends Module {
     private void finishMining(BlockBreakingTask task) {
         if (!task.isStarted() || task.getBlockState().isAir()) return;
 
-        if (currentTask.lastBrokenCount == currentTask.brokenCount)
+        if (currentTask.lastBrokenCount == currentTask.brokenCount && !async.get())
             return;
 
         Vec3d eyePos = MC.player.getEyePos();
@@ -286,7 +287,7 @@ public class AutoMineModule extends Module {
             int slot = getSlot(task.getBlockState());
             if (slot != MC.player.getInventory().getSelectedSlot()) {
                 if (currentTask.brokenCount < 2 || !currentTask.isInstantRemine())
-                shouldSwapBack = MC.player.getInventory().getSelectedSlot();
+                    shouldSwapBack = MC.player.getInventory().getSelectedSlot();
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
             }
         }
