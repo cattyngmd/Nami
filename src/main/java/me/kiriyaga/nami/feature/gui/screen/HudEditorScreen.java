@@ -108,6 +108,9 @@ public class HudEditorScreen extends Screen {
                         FONT_MANAGER.drawText(context, Text.of(description), descX, descY, true);
                     }
                     context.getMatrices().popMatrix();
+
+                    renderHudElements(context, mouseX, mouseY);
+
                     super.render(context, mouseX, mouseY, delta);
                     return;
                 }
