@@ -29,6 +29,7 @@ public class HelpCommand extends Command {
             return;
         }
 
+        // TODO: when addon impl, rewrite theese to dynamic
         String displayText = cmds.stream()
                 .filter(c -> !(c instanceof ModuleCommand))
                 .filter(c -> c.getName() != null)
