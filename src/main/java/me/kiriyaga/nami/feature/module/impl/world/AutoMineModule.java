@@ -41,7 +41,7 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 @RegisterModule
 public class AutoMineModule extends Module {
     public enum Rotate { NORMAL, HOLD, NONE}
-    public enum Swap { NONE, NORMAL, SILENT }
+    public enum Swap { NONE, NORMAL, SILENT121, SILENT}
     public enum EchestPriority {FORTUNE, SILK}
 
     private final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.5, 2.0, 7.0));
@@ -228,7 +228,7 @@ public class AutoMineModule extends Module {
 
         float damageDelta = calculateBlockDamage(task.getBlockState(), MC.world, task.getBlockPos());
         if (task.incrementProgress(damageDelta) >= task.getTargetSpeed()) {
-            if (swap.get() == Swap.SILENT) {
+            if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
                 int slot = getSlot(task.getBlockState());
                 if (slot == MC.player.getInventory().getSelectedSlot())
                     return;
@@ -283,7 +283,7 @@ public class AutoMineModule extends Module {
             return;
 
         int prev = MC.player.getInventory().getSelectedSlot();
-        if (swap.get() == Swap.SILENT) {
+        if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
             int slot = getSlot(task.getBlockState());
             if (slot != MC.player.getInventory().getSelectedSlot()) {
                 if (currentTask.brokenCount < 2 || !currentTask.isInstantRemine())
@@ -300,11 +300,16 @@ public class AutoMineModule extends Module {
 
         sendDestroyPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, task);
 
-        if (swap.get() == Swap.SILENT && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) {
+        if (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) {
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
 
         }
-        currentTask.markLastBroken();
+
+        if (swap.get() == Swap.SILENT) {
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+            shouldSwapBack = -1;
+        }
+            currentTask.markLastBroken();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -337,7 +342,7 @@ public class AutoMineModule extends Module {
     private boolean canHarvest(BlockState state) {
         if (state.isToolRequired()) {
             ItemStack held = MC.player.getMainHandStack();
-            if (swap.get() == Swap.SILENT) {
+            if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
                 held = MC.player.getInventory().getStack(getSlot(state));
             }
                 return held.isSuitableFor(state);
@@ -385,7 +390,7 @@ public class AutoMineModule extends Module {
     private float getMiningSpeed(BlockState state) {
         ItemStack stack = MC.player.getMainHandStack();
 
-        if (swap.get() == Swap.SILENT)
+        if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT)
             stack = MC.player.getInventory().getStack(getSlot(state));
 
         float speed = stack.getMiningSpeedMultiplier(state);
