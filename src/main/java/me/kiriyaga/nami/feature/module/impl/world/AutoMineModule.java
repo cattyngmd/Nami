@@ -227,6 +227,8 @@ public class AutoMineModule extends Module {
         }
 
         float damageDelta = calculateBlockDamage(task.getBlockState(), MC.world, task.getBlockPos());
+        int prev = MC.player.getInventory().getSelectedSlot();
+
         if (task.incrementProgress(damageDelta) >= task.getTargetSpeed()) {
             if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
                 int slot = getSlot(task.getBlockState());
@@ -236,6 +238,11 @@ public class AutoMineModule extends Module {
                 shouldSwapBack = MC.player.getInventory().getSelectedSlot();
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
             }
+        }
+
+        if (swap.get() == Swap.SILENT) {
+            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+            shouldSwapBack = -1;
         }
     }
 
