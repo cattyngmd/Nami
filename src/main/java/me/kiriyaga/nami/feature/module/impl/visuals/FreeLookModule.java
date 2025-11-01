@@ -37,8 +37,11 @@ public class FreeLookModule extends Module {
 
     @Override
     public void onDisable() {
-        if (MC.options.getPerspective() != previousPerspective) {
+        if (previousPerspective != null && MC.options.getPerspective() != previousPerspective) {
             MC.options.setPerspective(previousPerspective);
+        }
+        if (previousPerspective == null) {
+            MC.options.setPerspective(Perspective.FIRST_PERSON);
         }
     }
 }
