@@ -27,6 +27,8 @@ public class HudEditorScreen extends Screen {
 
     private boolean draggingCategory = false;
     private ModuleCategory draggedModuleCategory = null;
+    private int dragStartX, dragStartY;
+    private int initialCategoryX, initialCategoryY;
 
     private HudElementModule draggingElement = null;
     private int dragOffsetX, dragOffsetY;
@@ -173,6 +175,10 @@ public class HudEditorScreen extends Screen {
                 playClickSound();
                 draggingCategory = true;
                 draggedModuleCategory = hudCategory;
+                dragStartX = scaledMouseX;
+                dragStartY = scaledMouseY;
+                initialCategoryX = pos.x;
+                initialCategoryY = pos.y;
                 return true;
             }
         }
@@ -239,13 +245,12 @@ public class HudEditorScreen extends Screen {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
-        int scaledDeltaX = (int) (deltaX / CLICK_GUI.scale);
-        int scaledDeltaY = (int) (deltaY / CLICK_GUI.scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point pos = categoryPositions.get(draggedModuleCategory);
             if (pos != null) {
-                pos.translate(scaledDeltaX, scaledDeltaY);
+                pos.x = initialCategoryX + (scaledMouseX - dragStartX);
+                pos.y = initialCategoryY + (scaledMouseY - dragStartY);
                 return true;
             }
         }

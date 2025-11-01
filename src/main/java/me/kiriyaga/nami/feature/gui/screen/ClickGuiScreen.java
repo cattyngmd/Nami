@@ -26,6 +26,8 @@ public class ClickGuiScreen extends Screen {
     private final Map<ModuleCategory, CategoryPanel> categoryPanels = new HashMap<>();
     private boolean draggingCategory = false;
     private ModuleCategory draggedModuleCategory = null;
+    private int dragStartX, dragStartY;
+    private int initialCategoryX, initialCategoryY;
     public float scale = 1;
     private Screen previousScreen = null;
     private static final long FADE_DURATION_MS = 122L;
@@ -206,6 +208,10 @@ public class ClickGuiScreen extends Screen {
                     playClickSound();
                     draggingCategory = true;
                     draggedModuleCategory = moduleCategory;
+                    dragStartX = scaledMouseX;
+                    dragStartY = scaledMouseY;
+                    initialCategoryX = pos.x;
+                    initialCategoryY = pos.y;
                     return true;
                 }
             }
@@ -289,13 +295,12 @@ public class ClickGuiScreen extends Screen {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
-        int scaledDeltaX = (int) (deltaX / scale);
-        int scaledDeltaY = (int) (deltaY / scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point currentPos = categoryPositions.get(draggedModuleCategory);
             if (currentPos != null) {
-                currentPos.translate(scaledDeltaX, scaledDeltaY);
+                currentPos.x = initialCategoryX + (scaledMouseX - dragStartX);
+                currentPos.y = initialCategoryY + (scaledMouseY - dragStartY);
                 return true;
             }
         }
