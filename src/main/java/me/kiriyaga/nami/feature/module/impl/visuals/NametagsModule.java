@@ -69,6 +69,8 @@ public class NametagsModule extends Module {
 
     public NametagsModule() {
         super("Nametags", "Draws nametags above certain entities.", ModuleCategory.of("Render"));
+        border.setShowCondition(background::get);
+        borderWidth.setShowCondition(() -> background.get() && border.get());
     }
 
     @SubscribeEvent
