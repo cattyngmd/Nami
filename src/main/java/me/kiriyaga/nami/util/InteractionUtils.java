@@ -34,19 +34,50 @@ public class InteractionUtils {
     private static BlockPos currentBreakingBlock = null;
     private static long lastAttackBlockTime = 0;
 
-    public static boolean interactWithEntity(Entity entity, Vec3d hitVec, boolean swing) {
-        if (MC.player == null || MC.interactionManager == null) return false;
+    public static boolean interactWithEntity(Entity entity, double range, boolean swing, boolean rotate, String rotationId) {
+        if (MC.player == null || MC.interactionManager == null || entity == null) return false;
 
-        EntityHitResult hitResult = new EntityHitResult(entity, hitVec);
-        ClientPlayerInteractionManager im = MC.interactionManager;
+        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
+        Vec3d closestPoint = getClosestPointToEye(eyePos, entity.getBoundingBox());
+        float idealYaw = (float) getYawToVec(MC.player, closestPoint);
+        float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
 
-        im.interactEntityAtLocation(MC.player, entity, hitResult, MAIN_HAND);
-        im.interactEntity(MC.player, entity, MAIN_HAND);
+        boolean insideBox = entity.getBoundingBox().contains(MC.player.getEyePos());
+        EntityHitResult hitResult = raycastTarget(MC.player, entity, range, idealYaw, idealPitch);
+        if (!insideBox && hitResult == null) {
+            return false;
+        }
+
+        if (rotate)
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 4, idealYaw, idealPitch));
+
+        boolean completed = !rotate || ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+
+        if (!completed)
+            return false;
+
+        MC.interactionManager.interactEntityAtLocation(MC.player, entity, hitResult, MAIN_HAND);
+        MC.interactionManager.interactEntity(MC.player, entity, MAIN_HAND);
 
         if (swing)
             MC.player.swingHand(MAIN_HAND);
 
         return true;
+    }
+
+
+    public static EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
+        Vec3d eyePos = player.getCameraPosVec(1.0f);
+        Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
+        Vec3d reachEnd = eyePos.add(look.multiply(reach));
+
+        Box targetBox = target.getBoundingBox();
+
+        if (targetBox.raycast(eyePos, reachEnd).isPresent()) {
+            return new EntityHitResult(target);
+        }
+
+        return null;
     }
 
     public static void startUsingItem() {

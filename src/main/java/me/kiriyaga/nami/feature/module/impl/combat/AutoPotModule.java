@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.Timer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
@@ -57,7 +58,7 @@ public class AutoPotModule extends Module {
             return;
         }
 
-        if (whenNoTarget.get() && ENTITY_MANAGER.getTarget() != null) {
+        if (whenNoTarget.get() && EntityUtils.getTarget() != null) {
             if (selfToggle.get())
                 toggle();
             return;

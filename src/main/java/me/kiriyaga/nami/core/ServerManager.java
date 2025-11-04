@@ -1,34 +1,81 @@
 package me.kiriyaga.nami.core;
 
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.client.FastLatencyModule;
-import me.kiriyaga.nami.event.EventPriority;
-import me.kiriyaga.nami.event.SubscribeEvent;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.MultiValueDebugSampleLogImpl;
+
+import java.util.Arrays;
 
 import static me.kiriyaga.nami.Nami.*;
 
-// since theres is only S2C speaking, and no C2S response for us, all we can do it count between S2C requests
-// The idea is, to calculate the S2C request, and based on that - recieve the ms delay
-public class PingManager {
+public class ServerManager {
+
+    private final float[] tickRates = new float[20];
+    private int nextIndex = 0;
+    private int countTick = 0;
+    private long lastTimeUpdate = -1;
+
+    private Vec3d lastSetbackPosition;
+    private long lastSetbackTime;
+    private int lastTeleportId;
+    private final int[] pendingTransactions = new int[4];
+    private int transactionIndex;
+
     private volatile long lastReceiveTime = -1;
     private volatile int lastPing = -1;
-
     private int[] pingHistory = new int[10];
     private int index = 0;
-    private int count = 0;
+    private int countPing = 0;
     private volatile long lastUpdated = -1;
 
     public void init() {
         EVENT_MANAGER.register(this);
-        LOGGER.info("Ping Manager loaded");
+        LOGGER.info("Server Manager loaded");
+        Arrays.fill(pendingTransactions, -1);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPacketReceive(PacketReceiveEvent event) {
+        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket) {
+            long now = System.currentTimeMillis();
+
+            if (lastTimeUpdate != -1) {
+                float elapsed = (now - lastTimeUpdate) / 1000.0f;
+                float tps = 20.0f / elapsed;
+                tickRates[nextIndex % tickRates.length] = Math.min(Math.max(tps, 0.0f), 20.0f);
+                nextIndex++;
+                countTick = Math.min(countTick + 1, tickRates.length);
+            }
+
+            lastTimeUpdate = now;
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onPacketReceive2(PacketReceiveEvent event) {
+        if (event.getPacket() instanceof CommonPingS2CPacket packet) {
+            if (transactionIndex > 3) return;
+
+            pendingTransactions[transactionIndex] = packet.getParameter();
+            transactionIndex++;
+        } else if (event.getPacket() instanceof PlayerPositionLookS2CPacket packet) {
+            lastSetbackPosition = packet.comp_3228().comp_3148();
+            lastSetbackTime = System.currentTimeMillis();
+            lastTeleportId = packet.teleportId();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onPacketReceive(PacketReceiveEvent packet) {
+    public void onPacketReceive3(PacketReceiveEvent packet) {
         FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
 
         if (config.fastLatencyMode.get() != FastLatencyModule.FastLatencyMode.OLD)
@@ -45,16 +92,16 @@ public class PingManager {
                 int smoothingStrength = config != null ? config.smoothingStrength.get() : 10;
                 if (pingHistory.length != smoothingStrength) {
                     int[] newHistory = new int[smoothingStrength];
-                    for (int i = 0; i < Math.min(count, smoothingStrength); i++) {
-                        newHistory[i] = pingHistory[(index - count + i + pingHistory.length) % pingHistory.length];
+                    for (int i = 0; i < Math.min(countPing, smoothingStrength); i++) {
+                        newHistory[i] = pingHistory[(index - countPing + i + pingHistory.length) % pingHistory.length];
                     }
                     pingHistory = newHistory;
-                    count = Math.min(count, smoothingStrength);
-                    index = count % smoothingStrength;
+                    countPing = Math.min(countPing, smoothingStrength);
+                    index = countPing % smoothingStrength;
                 }
 
                 pingHistory[index++ % smoothingStrength] = ping;
-                count = Math.min(count + 1, smoothingStrength);
+                countPing = Math.min(countPing + 1, smoothingStrength);
 
                 updatePing(averagePing());
                 DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
@@ -66,12 +113,63 @@ public class PingManager {
         }
     }
 
+    public float getAverageTPS() {
+        if (countTick == 0) return 20.0f;
+
+        float sum = 0.0f;
+        int valid = 0;
+        for (int i = 0; i < countTick; i++) {
+            float t = tickRates[i];
+            if (t > 0.0f) {
+                sum += t;
+                valid++;
+            }
+        }
+        return valid == 0 ? 20.0f : Math.min(Math.max(sum / valid, 0.0f), 20.0f);
+    }
+
+    public float getMinTPS() {
+        if (countTick == 0) return 20.0f;
+
+        float min = 20.0f;
+        for (int i = 0; i < countTick; i++) {
+            float t = tickRates[i];
+            if (t > 0.0f && t < min) {
+                min = t;
+            }
+        }
+        return Math.min(Math.max(min, 0.0f), 20.0f);
+    }
+
+    public float getLatestTPS() {
+        if (countTick == 0) return 20.0f;
+
+        int last = (nextIndex - 1 + tickRates.length) % tickRates.length;
+        return Math.min(Math.max(tickRates[last], 0.0f), 20.0f);
+    }
+
+    public boolean hasElapsedSinceSetback(long milliseconds) {
+        return lastSetbackPosition != null && (System.currentTimeMillis() - lastSetbackTime) >= milliseconds;
+    }
+
+    public Vec3d getLastSetbackPosition() {
+        return lastSetbackPosition;
+    }
+
+    public long getLastSetbackTime() {
+        return lastSetbackTime;
+    }
+
+    public int getLastTeleportId() {
+        return lastTeleportId;
+    }
+
     private int averagePing() {
         int sum = 0;
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < countPing; i++) {
             sum += pingHistory[i];
         }
-        return count == 0 ? -1 : sum / count;
+        return countPing == 0 ? -1 : sum / countPing;
     }
 
     public int getPing() {
@@ -100,7 +198,8 @@ public class PingManager {
                     }
                 } catch (Exception ignored) {
                 }
-        }   return -1;
+        }
+        return -1;
     }
 
     public boolean isConnectionUnstable() {
@@ -111,7 +210,6 @@ public class PingManager {
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
 
         if (lastUpdated == -1) {
-
             debugModule.debugPing(Text.of("Connection unstable: no ping data yet"));
             return true;
         }

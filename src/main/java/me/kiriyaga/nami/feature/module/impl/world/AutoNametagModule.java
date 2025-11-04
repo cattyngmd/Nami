@@ -51,9 +51,6 @@ public class AutoNametagModule extends Module {
             if (entity.getCustomName() != null && !nametagged.get()) continue;
             if (entity instanceof VillagerEntity || entity instanceof EnderPearlEntity || entity instanceof EnderDragonEntity) continue;
 
-            double distance = MC.player.squaredDistanceTo(entity);
-            if (distance > range.get() * range.get()) continue;
-
             int nameTagSlot = getNameTagSlot();
             if (nameTagSlot == -1) continue;
 
@@ -64,20 +61,7 @@ public class AutoNametagModule extends Module {
                 return;
             }
 
-            Vec3d center = getEntityCenter(entity);
-
-            if (rotate.get()) {
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
-                        AutoNametagModule.class.getName(),
-                        2,
-                        (float) getYawToVec(MC.player, center),
-                        (float) getPitchToVec(MC.player, center)
-                ));
-
-                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoNametagModule.class.getName())) return;
-            }
-
-            interactWithEntity(entity, center, swing.get());
+            interactWithEntity(entity, range.get(), swing.get(), rotate.get(), this.name);
 
             swapCooldown = delay.get();
             break;

@@ -231,7 +231,7 @@ public class AutoTotemModule extends Module {
         ClientPlayerEntity player = MC.player;
         if (player == null) return;
 
-        int ping = PING_MANAGER.getPing();
+        int ping = SERVER_MANAGER.getPing();
         boolean hasTotem = totemCount > 0;
         long timeSinceLastSwap = System.currentTimeMillis() - lastAttemptTime;
 

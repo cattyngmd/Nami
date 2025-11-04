@@ -18,6 +18,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.DataComponentTypes;
@@ -40,6 +41,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InteractionUtils.raycastTarget;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
@@ -51,6 +53,7 @@ public class AuraModule extends Module {
     public enum Swap { NONE, REQUIRE, NORMAL, SILENT }
 
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
+    public final DoubleSetting delay = addSetting(new DoubleSetting("Delay", 0.89, 0.00, 1.00));
     public final EnumSetting<Swap> swap = addSetting(new EnumSetting<>("Swap", Swap.REQUIRE));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
     public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", false));
@@ -77,8 +80,8 @@ public class AuraModule extends Module {
 
         float tps;
         switch (tpsMode.get()) {
-            case LATEST -> tps = TICK_MANAGER.getLatestTPS();
-            case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
+            case LATEST -> tps = SERVER_MANAGER.getLatestTPS();
+            case AVERAGE -> tps = SERVER_MANAGER.getAverageTPS();
             default -> tps = 20f;
         }
 
@@ -92,7 +95,7 @@ public class AuraModule extends Module {
         long startTime = System.nanoTime();
 
         ItemStack stack = MC.player.getMainHandStack();
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = EntityUtils.getTarget();
         DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
         if (target == null || (swap.get() == Swap.REQUIRE && !(stack.getItem() instanceof AxeItem
@@ -256,8 +259,8 @@ public class AuraModule extends Module {
 
             float tps;
             switch (tpsMode.get()) {
-                case LATEST -> tps = TICK_MANAGER.getLatestTPS();
-                case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
+                case LATEST -> tps = SERVER_MANAGER.getLatestTPS();
+                case AVERAGE -> tps = SERVER_MANAGER.getAverageTPS();
                 default -> tps = 20f;
             }
 
@@ -299,20 +302,6 @@ public class AuraModule extends Module {
         RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
     }
 
-    private EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
-        Vec3d eyePos = player.getCameraPosVec(1.0f);
-        Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3d reachEnd = eyePos.add(look.multiply(reach));
-
-        Box targetBox = target.getBoundingBox();
-
-        if (targetBox.raycast(eyePos, reachEnd).isPresent()) {
-            return new EntityHitResult(target);
-        }
-
-        return null;
-    }
-
     private float getBaseCooldownTicks(ItemStack stack, float tps) {
         float baseTicks;
 
@@ -326,7 +315,7 @@ public class AuraModule extends Module {
             baseTicks = 20f / attackSpeed;
         }
 
-        return baseTicks * (20f / tps);
+        return (baseTicks * (20f / tps)) * delay.get().floatValue();
     }
 
     public boolean multitask(){

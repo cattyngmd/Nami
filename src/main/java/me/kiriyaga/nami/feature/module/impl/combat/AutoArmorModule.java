@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
+import me.kiriyaga.nami.util.EntityUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -49,7 +50,7 @@ public class AutoArmorModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = EntityUtils.getTarget();
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (!isArmorSlot(slot)) continue;

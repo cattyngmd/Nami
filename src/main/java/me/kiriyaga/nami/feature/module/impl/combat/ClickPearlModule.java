@@ -1,11 +1,13 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
@@ -40,14 +42,22 @@ public class ClickPearlModule extends Module {
         super("ClickPearl", "Uses configured item when pressing key.", ModuleCategory.of("Combat"), "clickpearl");
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    private boolean recall;
+
+    @Override
+    public void onEnable() {
+        useKey.setWasPressedLastTick(false);
+        recall = false;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
     private void onTick(PreTickEvent ev) {
-        if (!isEnabled()) return;
         if (MC.world == null || MC.player == null) return;
 
         boolean pressed = useKey.isPressed();
 
-        if (pressed && !useKey.wasPressedLastTick()) {
+        if (pressed && !useKey.wasPressedLastTick() || recall) {
+            recall = false;
             if (MC.player.isGliding()) {
                 useGlide();
             } else {
@@ -96,6 +106,8 @@ public class ClickPearlModule extends Module {
     }
 
     private void useItem(Item item) {
+        CHAT_MANAGER.sendRaw("call");
+
         int hotbarSlot = getSlotInHotbar(item);
 
         if (hotbarSlot != -1) {
@@ -106,16 +118,19 @@ public class ClickPearlModule extends Module {
             return;
         }
 
+       // NoSlowModule noSlow = MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class);
+
         int invSlot = getSlotInInventory(item);
         if (invSlot != -1) {
             int selectedHotbarIndex = MC.player.getInventory().getSelectedSlot(); // 0–8
             int containerInvSlot = convertSlot(invSlot);
 
-            INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
+            if (INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex)) {
+                MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
 
-            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
-
-            INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
+                INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
+                CHAT_MANAGER.sendRaw("true");
+            } else recall = true;
         }
     }
 
@@ -134,12 +149,6 @@ public class ClickPearlModule extends Module {
                 return false;
         }
         return true;
-    }
-
-
-    @Override
-    public void onEnable() {
-        useKey.setWasPressedLastTick(false);
     }
 
     private int getSlotInHotbar(Item item) {

@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.InteractionUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Blocks;
@@ -60,7 +61,7 @@ public class SelfWebModule extends Module {
             return;
         }
 
-        if (onlyTarget.get() && ENTITY_MANAGER.getTarget() == null) {
+        if (onlyTarget.get() && EntityUtils.getTarget() == null) {
             renderPos = null;
             return;
         }

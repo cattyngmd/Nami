@@ -44,8 +44,8 @@ public class AutoBowReleaseModule extends Module {
         if (usedItem != Items.BOW && usedItem != Items.TRIDENT) return;
 
         float tps = switch (tpsMode.get()) {
-            case LATEST -> TICK_MANAGER.getLatestTPS();
-            case AVERAGE -> TICK_MANAGER.getAverageTPS();
+            case LATEST -> SERVER_MANAGER.getLatestTPS();
+            case AVERAGE -> SERVER_MANAGER.getAverageTPS();
             default -> 20.0f;
         };
 

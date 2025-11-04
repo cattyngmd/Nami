@@ -168,7 +168,7 @@ public class VelocityModule extends Module {
     }
 
     private void processVelocityGrim(PacketReceiveEvent event) {
-        if (!FLAG_MANAGER.hasElapsedSinceSetback(100)) return;
+        if (!SERVER_MANAGER.hasElapsedSinceSetback(100)) return;
         event.cancel();
         pendingVelocity = true;
     }
@@ -187,7 +187,7 @@ public class VelocityModule extends Module {
     }
 
     private void processExplosionGrim(PacketReceiveEvent event) {
-        if (!FLAG_MANAGER.hasElapsedSinceSetback(100)) return;
+        if (!SERVER_MANAGER.hasElapsedSinceSetback(100)) return;
         event.cancel();
         pendingVelocity = true;
     }
@@ -204,7 +204,7 @@ public class VelocityModule extends Module {
                 else return;
             }
             case GRIM -> {
-                if (!FLAG_MANAGER.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
+                if (!SERVER_MANAGER.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
                 pendingVelocity = true;
                 return;
             }
@@ -232,7 +232,7 @@ public class VelocityModule extends Module {
                 else return;
             }
             case GRIM -> {
-                if (!FLAG_MANAGER.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
+                if (!SERVER_MANAGER.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
                 pendingVelocity = true;
                 return;
             }

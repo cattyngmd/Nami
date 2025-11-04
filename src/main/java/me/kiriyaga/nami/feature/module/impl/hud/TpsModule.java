@@ -20,8 +20,8 @@ public class TpsModule extends HudElementModule {
 
     @Override
     public Text getDisplayText() {
-        float avgTps = TICK_MANAGER.getAverageTPS();
-        float latestTps = TICK_MANAGER.getLatestTPS();
+        float avgTps = SERVER_MANAGER.getAverageTPS();
+        float latestTps = SERVER_MANAGER.getLatestTPS();
         String tpsText = String.format(Locale.US, "%.2f {bg}[{bw}%.2f{bg}]", avgTps, latestTps); // locale is wild
         String text = displayLabel.get() ? "{bg}TPS: {bw}" + tpsText : "{bw}" + tpsText;
 

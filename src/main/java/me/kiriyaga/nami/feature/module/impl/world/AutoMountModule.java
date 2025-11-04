@@ -52,25 +52,7 @@ public class AutoMountModule extends Module {
                     entity instanceof LlamaEntity || entity instanceof DonkeyEntity ||
                     entity instanceof BoatEntity || entity instanceof MinecartEntity)) continue;
 
-            double distSq = MC.player.squaredDistanceTo(entity);
-            if (distSq > range.get() * range.get()) continue;
-
-            Vec3d center = getEntityCenter(entity);
-
-            if (rotate.get()) {
-                ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(
-                                AutoMountModule.class.getName(),
-                                2,
-                                (float) getYawToVec(MC.player, center),
-                                (float) getPitchToVec(MC.player, center)
-                        )
-                );
-
-                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoMountModule.class.getName())) return;
-            }
-
-            interactWithEntity(entity, center, swing.get());
+            interactWithEntity(entity, range.get(), swing.get(), rotate.get(), this.name);
 
             actionCooldown = delay.get();
             break;

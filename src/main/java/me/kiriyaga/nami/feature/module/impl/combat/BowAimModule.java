@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -45,7 +46,7 @@ public class BowAimModule extends Module {
 
         ItemStack stack = MC.player.getMainHandStack();
 
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = EntityUtils.getTarget();
         if (target == null || !(stack.getItem() instanceof BowItem || stack.getItem() instanceof TridentItem) || !MC.player.isUsingItem()) {
             currentTarget = null;
             return;

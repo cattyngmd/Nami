@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.InteractionUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
@@ -17,7 +18,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -65,7 +65,7 @@ public class AutoTrapModule extends Module {
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) return;
 
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = EntityUtils.getTarget();
         if (target == null) {
             surroundPositions.clear();
             return;
