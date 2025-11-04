@@ -18,7 +18,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class NoSlowModule extends Module {
     public enum SlowMode {
-        VANILLA, GRIMV3
+        NONE, VANILLA, GRIMV3
     }
 
     public enum InvMove {
