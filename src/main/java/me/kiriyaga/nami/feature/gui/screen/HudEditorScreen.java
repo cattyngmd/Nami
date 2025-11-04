@@ -152,6 +152,8 @@ public class HudEditorScreen extends Screen {
                     int drawY = renderY + element.offsetY();
                     FONT_MANAGER.drawText(context, element.text(), drawX, drawY, true);
                 }
+
+                hud.renderItems(context);
             }
         }
     }
