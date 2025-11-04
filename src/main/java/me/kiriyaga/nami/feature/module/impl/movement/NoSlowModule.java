@@ -22,11 +22,11 @@ public class NoSlowModule extends Module {
     }
 
     public enum InvMove {
-        NONE, GRIMSTRICT
+        NONE, WAIT
     }
 
     public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("Mode", SlowMode.VANILLA));
-    public final EnumSetting<InvMove> invMove = addSetting(new EnumSetting<>("InvMove", InvMove.NONE));
+    public final EnumSetting<InvMove> invMove = addSetting(new EnumSetting<>("MultiAction", InvMove.NONE));
     public final BoolSetting fastCrawl = addSetting(new BoolSetting("FastCrawl", false));
     //private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
     private final BoolSetting onlyOnGround = addSetting(new BoolSetting("OnlyOnGround", true));

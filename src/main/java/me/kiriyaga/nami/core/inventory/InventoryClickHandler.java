@@ -2,7 +2,6 @@ package me.kiriyaga.nami.core.inventory;
 
 import me.kiriyaga.nami.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
-import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
@@ -60,7 +59,7 @@ public class InventoryClickHandler {
 
         NoSlowModule noSlow = MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class);
 
-        if (noSlow != null && noSlow.isEnabled() && noSlow.invMove.get() == NoSlowModule.InvMove.GRIMSTRICT && INPUT_MANAGER.hasAnyInput()){
+        if (noSlow != null && noSlow.isEnabled() && noSlow.invMove.get() == NoSlowModule.InvMove.WAIT && INPUT_MANAGER.hasAnyInput()){
             MODULE_MANAGER.getStorage().getByClass(AutoTotemModule.class).addDeathReason("invmove", "Inventory Move not allowed by configuration");
             return;
         }
