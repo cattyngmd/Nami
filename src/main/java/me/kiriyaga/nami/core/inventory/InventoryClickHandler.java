@@ -14,8 +14,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class InventoryClickHandler {
 
@@ -61,8 +60,10 @@ public class InventoryClickHandler {
 
         NoSlowModule noSlow = MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class);
 
-        if (noSlow != null && noSlow.isEnabled() && noSlow.invMove.get() == NoSlowModule.InvMove.GRIMSTRICT)
-            if ()
+        if (noSlow != null && noSlow.isEnabled() && noSlow.invMove.get() == NoSlowModule.InvMove.GRIMSTRICT && INPUT_MANAGER.hasAnyInput()){
+            MODULE_MANAGER.getStorage().getByClass(AutoTotemModule.class).addDeathReason("invmove", "Inventory Move not allowed by configuration");
+            return;
+        }
 
         if (MC.currentScreen instanceof ShulkerBoxScreen
                 || MC.currentScreen instanceof AnvilScreen
