@@ -42,7 +42,7 @@ public class SettingPanel {
             int settingHeight = renderer.getHeight(setting);
             height += settingHeight + SettingRenderer.MODULE_SPACING;
         }
-        return height + SettingRenderer.MODULE_SPACING;
+        return height;
     }
 
     public static int renderSettings(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY) {

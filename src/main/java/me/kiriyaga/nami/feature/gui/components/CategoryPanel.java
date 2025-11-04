@@ -56,8 +56,10 @@ public class CategoryPanel {
         int visibleHeight = Math.min(basePanelHeight - HEADER_HEIGHT - MODULE_SPACING - BOTTOM_MARGIN,
                 screenHeight - contentY - 10);
 
-        if (!expandedModules.isEmpty()) {
-            visibleHeight -= 2;
+        boolean b = expandedModules.stream().anyMatch(module -> module.getCategory() == moduleCategory);
+
+        if (b) {
+            visibleHeight -= 1;
             if (visibleHeight < 0) visibleHeight = 0;
         }
 
