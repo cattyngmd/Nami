@@ -8,6 +8,7 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -261,6 +262,7 @@ public class InteractionUtils {
             if (entity.squaredDistanceTo(MC.player) > distance) continue;
             if (entity instanceof EndCrystalEntity) continue;
             if (entity instanceof ItemEntity) continue;
+            if (entity instanceof ArrowEntity) continue;
 
             if (entity.getBoundingBox().intersects(blockBox)) {
                 return true;
