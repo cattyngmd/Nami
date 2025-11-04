@@ -80,8 +80,8 @@ public class AuraModule extends Module {
 
         float tps;
         switch (tpsMode.get()) {
-            case LATEST -> tps = TICK_MANAGER.getLatestTPS();
-            case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
+            case LATEST -> tps = SERVER_MANAGER.getLatestTPS();
+            case AVERAGE -> tps = SERVER_MANAGER.getAverageTPS();
             default -> tps = 20f;
         }
 
@@ -259,8 +259,8 @@ public class AuraModule extends Module {
 
             float tps;
             switch (tpsMode.get()) {
-                case LATEST -> tps = TICK_MANAGER.getLatestTPS();
-                case AVERAGE -> tps = TICK_MANAGER.getAverageTPS();
+                case LATEST -> tps = SERVER_MANAGER.getLatestTPS();
+                case AVERAGE -> tps = SERVER_MANAGER.getAverageTPS();
                 default -> tps = 20f;
             }
 

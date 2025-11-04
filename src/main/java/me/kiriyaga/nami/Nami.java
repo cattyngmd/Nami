@@ -52,11 +52,9 @@ public class Nami implements ClientModInitializer {
     public static final CommandManager COMMAND_MANAGER = new CommandManager();
     public static final ChatManager CHAT_MANAGER = new ChatManager();
     public static final FriendManager FRIEND_MANAGER = new FriendManager(CONFIG_MANAGER);
-    public static final PingManager PING_MANAGER = new PingManager();
-    public static final TickRateManager TICK_MANAGER = new TickRateManager();
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
-    public static final FlagManager FLAG_MANAGER = new FlagManager();
+    public static final ServerManager SERVER_MANAGER = new ServerManager();
     public static final InputManager INPUT_MANAGER = new InputManager();
 
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
@@ -74,12 +72,10 @@ public class Nami implements ClientModInitializer {
         COMMAND_MANAGER.init();
         COMMAND_MANAGER.getSuggester().updateDispatcher();
         //FONT_MANAGER.init();
-        PING_MANAGER.init();
-        TICK_MANAGER.init();
         ROTATION_MANAGER.init();
         INVENTORY_MANAGER.init();
         EXECUTABLE_MANAGER.init();
-        FLAG_MANAGER.init();
+        SERVER_MANAGER.init();
         CHAT_MANAGER.init();
         INPUT_MANAGER.init();
 

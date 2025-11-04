@@ -16,9 +16,9 @@ public class LagWarningModule extends HudElementModule {
 
     @Override
     public Text getDisplayText() {
-        if (!PING_MANAGER.isConnectionUnstable() || MC.isInSingleplayer()) return Text.empty();
+        if (!SERVER_MANAGER.isConnectionUnstable() || MC.isInSingleplayer()) return Text.empty();
 
-        double seconds = PING_MANAGER.getConnectionUnstableTimeSeconds();
+        double seconds = SERVER_MANAGER.getConnectionUnstableTimeSeconds();
         double roundedSeconds = Math.round(seconds * 100.0) / 100.0;
         String warningText = "Server is not responding in " + String.format("%.2f", roundedSeconds) + "s";
 

@@ -18,7 +18,7 @@ public class PingModule extends HudElementModule {
 
     @Override
     public Text getDisplayText() {
-        int ping = PING_MANAGER.getPing();
+        int ping = SERVER_MANAGER.getPing();
         String textStr;
 
         if (displayLabel.get()) {
