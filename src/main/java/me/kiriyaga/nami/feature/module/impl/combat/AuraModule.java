@@ -51,6 +51,7 @@ public class AuraModule extends Module {
     public enum Swap { NONE, REQUIRE, NORMAL, SILENT }
 
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
+    public final DoubleSetting delay = addSetting(new DoubleSetting("Delay", 0.89, 0.00, 1.00));
     public final EnumSetting<Swap> swap = addSetting(new EnumSetting<>("Swap", Swap.REQUIRE));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
     public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", false));
@@ -326,7 +327,7 @@ public class AuraModule extends Module {
             baseTicks = 20f / attackSpeed;
         }
 
-        return baseTicks * (20f / tps);
+        return (baseTicks * (20f / tps)) * delay.get().floatValue();
     }
 
     public boolean multitask(){
