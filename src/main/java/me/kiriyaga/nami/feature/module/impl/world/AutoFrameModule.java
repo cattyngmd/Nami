@@ -59,9 +59,6 @@ public class AutoFrameModule extends Module {
             if (frame.getHeldItemStack() != null)
                 continue;
 
-            if (MC.player.squaredDistanceTo(frame) > range.get() * range.get())
-                continue;
-
             int mapSlot = getMapSlot();
             if (mapSlot == -1)
                 continue;
@@ -73,21 +70,7 @@ public class AutoFrameModule extends Module {
                 return;
             }
 
-            Vec3d center = getEntityCenter(frame);
-
-            if (rotate.get()) {
-                ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(
-                                AutoFrameModule.class.getName(),
-                                2,
-                                (float) getYawToVec(MC.player, center),
-                                (float) getPitchToVec(MC.player, center)
-                        )
-                );
-                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoFrameModule.class.getName())) return;
-            }
-
-            interactWithEntity(frame, center, swing.get());
+            interactWithEntity(frame, range.get(), swing.get(), rotate.get(), this.name);
 
             cooldown = delay.get();
             break;

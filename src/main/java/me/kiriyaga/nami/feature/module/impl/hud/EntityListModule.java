@@ -5,6 +5,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.Registries;
@@ -47,7 +48,7 @@ public class EntityListModule extends HudElementModule {
         elements.clear();
         Map<String, Integer> entityCounts = new HashMap<>();
 
-        for (Entity entity : ENTITY_MANAGER.getAllEntities()) {
+        for (Entity entity : EntityUtils.getAllEntities()) {
             if (entity == MC.player) continue;
             if (onlyLiving.get() && !(entity instanceof LivingEntity)) continue;
 

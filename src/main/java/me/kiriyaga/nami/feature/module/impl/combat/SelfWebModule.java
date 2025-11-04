@@ -60,7 +60,7 @@ public class SelfWebModule extends Module {
             return;
         }
 
-        if (onlyTarget.get() && ENTITY_MANAGER.getTarget() == null) {
+        if (onlyTarget.get() && TARGET_MANAGER.getTarget() == null) {
             renderPos = null;
             return;
         }

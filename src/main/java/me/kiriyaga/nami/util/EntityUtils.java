@@ -2,20 +2,22 @@ package me.kiriyaga.nami.util;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.*;
+import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -30,37 +32,50 @@ public class EntityUtils {
         HOSTILE,
         NEUTRAL,
         PASSIVE,
+        PROJECTILES,
         DROPPED_ITEMS,
         END_CRYSTALS
     }
 
     public static List<Entity> getEntities(EntityTypeCategory category) {
+        return getEntities(category, Double.MAX_VALUE, false, null);
+    }
+
+    public static List<Entity> getEntities(EntityTypeCategory category, double range) {
+        return getEntities(category, range, false, null);
+    }
+
+    public static List<Entity> getEntities(EntityTypeCategory category, double range, boolean sortByDistance) {
+        return getEntities(category, range, sortByDistance, null);
+    }
+
+    public static List<Entity> getEntities(EntityTypeCategory category, double range, boolean sortByDistance, Predicate<Entity> extraFilter) {
+        if (MC.player == null || MC.world == null) return List.of();
+
+        Vec3d playerPos = MC.player.getPos();
+        List<Entity> all = getEntitiesBase(category);
+
+        return all.stream()
+                .filter(e -> e != MC.player)
+                .filter(e -> e.squaredDistanceTo(playerPos) <= range * range)
+                .filter(e -> extraFilter == null || extraFilter.test(e))
+                .sorted(sortByDistance ? Comparator.comparingDouble(e -> e.squaredDistanceTo(playerPos)) : (a, b) -> 0)
+                .collect(Collectors.toList());
+    }
+
+    private static List<Entity> getEntitiesBase(EntityTypeCategory category) {
         return switch (category) {
             case ALL -> getAllEntities();
-            case PLAYERS -> getPlayers().stream().map(p -> (Entity)p).collect(Collectors.toList());
-            case OTHER_PLAYERS -> getOtherPlayers().stream().map(p -> (Entity)p).collect(Collectors.toList());
-            case HOSTILE -> getAllEntities().stream().filter(EntityUtils::isHostile).collect(Collectors.toList());
-            case NEUTRAL -> getAllEntities().stream().filter(EntityUtils::isNeutral).collect(Collectors.toList());
-            case PASSIVE -> getAllEntities().stream().filter(EntityUtils::isPassive).collect(Collectors.toList());
-            case DROPPED_ITEMS -> getAllEntities().stream().filter(e -> e instanceof ItemEntity).collect(Collectors.toList());
-            case END_CRYSTALS -> getAllEntities().stream().filter(e -> e instanceof EndCrystalEntity).collect(Collectors.toList());
+            case PLAYERS -> getPlayers().stream().map(p -> (Entity) p).toList();
+            case OTHER_PLAYERS -> getOtherPlayers().stream().map(p -> (Entity) p).toList();
+            case HOSTILE -> getAllEntities().stream().filter(EntityUtils::isHostile).toList();
+            case NEUTRAL -> getAllEntities().stream().filter(EntityUtils::isNeutral).toList();
+            case PASSIVE -> getAllEntities().stream().filter(EntityUtils::isPassive).toList();
+            case PROJECTILES -> getAllEntities().stream().filter(EntityUtils::isProjectile).toList();
+            case DROPPED_ITEMS -> getAllEntities().stream().filter(e -> e instanceof ItemEntity).toList();
+            case END_CRYSTALS -> getAllEntities().stream().filter(e -> e instanceof EndCrystalEntity).toList();
         };
     }
-
-    public static List<ItemStack> getDroppedItemStacks() {
-        return getAllEntities().stream()
-                .filter(e -> e instanceof ItemEntity)
-                .map(e -> ((ItemEntity) e).getStack())
-                .collect(Collectors.toList());
-    }
-
-    public static List<ItemEntity> getDroppedItems() {
-        return getAllEntities().stream()
-                .filter(e -> e instanceof ItemEntity)
-                .map(e -> (ItemEntity) e)
-                .collect(Collectors.toList());
-    }
-
 
     public static List<Entity> getAllEntities() {
         ClientWorld world = MC.world;
@@ -86,53 +101,56 @@ public class EntityUtils {
                 .collect(Collectors.toList());
     }
 
-    /*
-    Since 1.21.5 data about mod target`s is not accessible (also it wasnt accessible on some engine forrks)
-    so its the easiest way to select them
-    but its still bad, since its bases on agro, not on target
+    public static boolean isProjectile(Entity e) {
+        return e instanceof ShulkerBulletEntity
+                || e instanceof FireballEntity
+                || e instanceof WitherSkullEntity
+                || e instanceof ArrowEntity
+                || e instanceof TridentEntity
+                || e instanceof ThrownEntity;
+    }
 
-    TODO: someday write some logic from mc core, and track all mobs and actions with them, so we can 100% accurate track agro
-     */
     public static boolean isHostile(Entity e) {
-        if (e instanceof CreeperEntity ||
-                e instanceof SkeletonEntity ||
-                e instanceof StrayEntity ||
-                e instanceof WitherSkeletonEntity ||
-                (e.getClass() == ZombieEntity.class) ||
-                e instanceof HuskEntity ||
-                e instanceof DrownedEntity ||
-                e instanceof VindicatorEntity ||
-                e instanceof BoggedEntity ||
-                e instanceof EvokerEntity ||
-                e instanceof PillagerEntity ||
-                e instanceof RavagerEntity ||
-                e instanceof BlazeEntity ||
-                e instanceof WitherEntity ||
-                e instanceof EnderDragonEntity ||
-                e instanceof ShulkerEntity ||
-                e instanceof GuardianEntity ||
-                e instanceof ElderGuardianEntity ||
-                e instanceof GhastEntity ||
-                e instanceof HoglinEntity ||
-                e instanceof ZombieVillagerEntity ||
-                e instanceof MagmaCubeEntity ||
-                e instanceof SilverfishEntity ||
-                e instanceof SlimeEntity ||
-                e instanceof PhantomEntity ||
-                e instanceof IllusionerEntity ||
-                e instanceof WitchEntity) {
+        if (e instanceof CreeperEntity
+                || e instanceof SkeletonEntity
+                || e instanceof StrayEntity
+                || e instanceof WitherSkeletonEntity
+                || e instanceof ZombieEntity
+                || e instanceof HuskEntity
+                || e instanceof DrownedEntity
+                || e instanceof VindicatorEntity
+                || e instanceof BoggedEntity
+                || e instanceof EvokerEntity
+                || e instanceof PillagerEntity
+                || e instanceof RavagerEntity
+                || e instanceof BlazeEntity
+                || e instanceof WitherEntity
+                || e instanceof EnderDragonEntity
+                || e instanceof ShulkerEntity
+                || e instanceof GuardianEntity
+                || e instanceof ElderGuardianEntity
+                || e instanceof GhastEntity
+                || e instanceof HoglinEntity
+                || e instanceof ZombieVillagerEntity
+                || e instanceof MagmaCubeEntity
+                || e instanceof SilverfishEntity
+                || e instanceof SlimeEntity
+                || e instanceof PhantomEntity
+                || e instanceof IllusionerEntity
+                || e instanceof WitchEntity) {
             return true;
         }
 
-        if (isNeutralEntityType(e) && isAggressiveNow(e)) {
-            return true;
-        }
-
-        return false;
+        return isNeutralEntityType(e) && isAggressiveNow(e);
     }
 
     public static boolean isNeutral(Entity e) {
         return isNeutralEntityType(e) && !isAggressiveNow(e);
+    }
+
+    public static boolean isPassive(Entity e) {
+        return e instanceof PassiveEntity ||
+                (e instanceof IronGolemEntity golem && golem.isPlayerCreated());
     }
 
     private static boolean isNeutralEntityType(Entity e) {
@@ -142,15 +160,10 @@ public class EntityUtils {
                 e instanceof SpiderEntity ||
                 e instanceof CaveSpiderEntity ||
                 e instanceof PolarBearEntity ||
-                (e instanceof WolfEntity && !((WolfEntity) e).isTamed()) ||
+                (e instanceof WolfEntity w && !w.isTamed()) ||
                 e instanceof BeeEntity ||
                 e instanceof GoatEntity ||
-                (e instanceof IronGolemEntity && !((IronGolemEntity) e).isPlayerCreated());
-    }
-
-    public static boolean isPassive(Entity e) {
-        return e instanceof PassiveEntity ||
-                (e instanceof IronGolemEntity && ((IronGolemEntity) e).isPlayerCreated());
+                (e instanceof IronGolemEntity g && !g.isPlayerCreated());
     }
 
     public static boolean isAggressiveNow(Entity e) {
@@ -162,9 +175,7 @@ public class EntityUtils {
 
         if (e instanceof EndermanEntity enderman) return enderman.isAngry();
         if (e instanceof ZombifiedPiglinEntity piglin) return piglin.isAttacking();
-        if (e instanceof PiglinEntity piglin) {
-            return !isPlayerWearingGold(player) || (isPlayerWearingGold(player) && piglin.isAttacking());
-        }
+        if (e instanceof PiglinEntity piglin) return !isPlayerWearingGold(player) || piglin.isAttacking();
         if (e instanceof SpiderEntity spider) return spider.isAttacking() || isNight;
         if (e instanceof CaveSpiderEntity) return true;
         if (e instanceof PolarBearEntity bear) return bear.isAttacking();
@@ -175,10 +186,10 @@ public class EntityUtils {
     }
 
     private static boolean isPlayerWearingGold(ClientPlayerEntity player) {
-        return isGoldArmor(player.getEquippedStack(EquipmentSlot.HEAD)) ||
-                isGoldArmor(player.getEquippedStack(EquipmentSlot.CHEST)) ||
-                isGoldArmor(player.getEquippedStack(EquipmentSlot.LEGS)) ||
-                isGoldArmor(player.getEquippedStack(EquipmentSlot.FEET));
+        return Arrays.stream(EquipmentSlot.values())
+                .filter(EquipmentSlot::isArmorSlot)
+                .map(player::getEquippedStack)
+                .anyMatch(EntityUtils::isGoldArmor);
     }
 
     private static boolean isGoldArmor(ItemStack stack) {

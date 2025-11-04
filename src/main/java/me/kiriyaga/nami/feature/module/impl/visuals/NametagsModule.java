@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.NametagFormatter;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.MinecraftClient;
@@ -82,8 +83,7 @@ public class NametagsModule extends Module {
         MatrixStack matrices = event.getMatrices();
 
         if (players.get()) {
-            for (PlayerEntity player : ENTITY_MANAGER.getPlayers()) {
-                if (player == MC.player) continue;
+            for (PlayerEntity player : EntityUtils.getOtherPlayers()) {
                 i++;
                 renderEntityNametag(player, event.getTickDelta(), matrices, 30, null);
             }
@@ -95,31 +95,28 @@ public class NametagsModule extends Module {
         }
 
         if (hostiles.get()) {
-            for (var entity : ENTITY_MANAGER.getHostile()) {
-                if (entity.isInvisible()) continue;
+            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE)) {
                 i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
 
         if (neutrals.get()) {
-            for (var entity : ENTITY_MANAGER.getNeutral()) {
-                if (entity.isInvisible()) continue;
+            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL)) {
                 i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
 
         if (passives.get()) {
-            for (var entity : ENTITY_MANAGER.getPassive()) {
-                if (entity.isInvisible()) continue;
+            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE)) {
                 i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
             }
         }
 
         if (items.get()) {
-            for (var entity : ENTITY_MANAGER.getDroppedItems()) {
+            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
                 if (entity.isInvisible()) continue;
                 i++;
                 renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
@@ -128,7 +125,7 @@ public class NametagsModule extends Module {
 
         if (tamed.get()) {
 
-            for (var entity : ENTITY_MANAGER.getAllEntities()) {
+            for (var entity : EntityUtils.getAllEntities()) {
 
                 @Nullable LazyEntityReference<LivingEntity> owner;
 
@@ -205,7 +202,7 @@ public class NametagsModule extends Module {
 
 
         if (pearls.get()) {
-            for (var entity : ENTITY_MANAGER.getAllEntities()) {
+            for (var entity : EntityUtils.getAllEntities()) {
                 if (!(entity instanceof EnderPearlEntity pearl)) continue;
                 if (pearl.getOwner() == null) continue;
                 i++;

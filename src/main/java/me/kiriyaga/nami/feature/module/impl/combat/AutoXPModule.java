@@ -57,7 +57,7 @@ public class AutoXPModule extends Module {
             return;
         }
 
-        if (whenNoTarget.get() && ENTITY_MANAGER.getTarget() != null) {
+        if (whenNoTarget.get() && TARGET_MANAGER.getTarget() != null) {
             if (selfToggle.get())
                 toggle();
             return;

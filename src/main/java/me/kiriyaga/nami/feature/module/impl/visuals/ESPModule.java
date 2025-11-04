@@ -11,11 +11,11 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.SlabType;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -100,11 +100,11 @@ public class ESPModule extends Module {
     private Set<Entity> getEntitiesToRender() {
         Set<Entity> entities = new HashSet<>();
 
-        if (showPlayers.get()) entities.addAll(ENTITY_MANAGER.getOtherPlayers());
-        if (showPeacefuls.get()) entities.addAll(ENTITY_MANAGER.getPassive());
-        if (showNeutrals.get()) entities.addAll(ENTITY_MANAGER.getNeutral());
-        if (showHostiles.get()) entities.addAll(ENTITY_MANAGER.getHostile());
-        if (showItems.get()) entities.addAll(ENTITY_MANAGER.getDroppedItems());
+        if (showPlayers.get()) entities.addAll(EntityUtils.getOtherPlayers());
+        if (showPeacefuls.get()) entities.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE));
+        if (showNeutrals.get()) entities.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL));
+        if (showHostiles.get()) entities.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE));
+        if (showItems.get()) entities.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS));
 
         if (renderMode.get() == RenderMode.OUTLINE) {
             double maxDistSq = outlineDistance.get() * outlineDistance.get();
@@ -117,11 +117,11 @@ public class ESPModule extends Module {
     private Color getColorForEntity(Entity entity, ColorModule colorModule) {
         if (entity instanceof PlayerEntity) {
             return colorModule.getStyledGlobalColor();
-        } else if (ENTITY_MANAGER.getPassive().contains(entity)) {
+        } else if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) {
             return COLOR_PASSIVE;
-        } else if (ENTITY_MANAGER.getNeutral().contains(entity)) {
+        } else if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL).contains(entity)) {
             return COLOR_NEUTRAL;
-        } else if (ENTITY_MANAGER.getHostile().contains(entity)) {
+        } else if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE).contains(entity)) {
             return COLOR_HOSTILE;
         } else if (entity instanceof ItemEntity) {
             return COLOR_ITEM;
@@ -133,7 +133,7 @@ public class ESPModule extends Module {
         MatrixStack matrices = event.getMatrices();
         float partialTicks = event.getTickDelta();
 
-        for (Entity entity : ENTITY_MANAGER.getDroppedItems()) {
+        for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
             if (!showItems.get() || entity.isRemoved() || !entity.isAlive()) continue;
 
             Color color = COLOR_ITEM;
@@ -175,9 +175,9 @@ public class ESPModule extends Module {
             return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
         }
 
-        if (esp.showPeacefuls.get() && ENTITY_MANAGER.getPassive().contains(entity)) return COLOR_PASSIVE;
-        if (esp.showNeutrals.get() && ENTITY_MANAGER.getNeutral().contains(entity)) return COLOR_NEUTRAL;
-        if (esp.showHostiles.get() && ENTITY_MANAGER.getHostile().contains(entity)) return COLOR_HOSTILE;
+        if (esp.showPeacefuls.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) return COLOR_PASSIVE;
+        if (esp.showNeutrals.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL).contains(entity)) return COLOR_NEUTRAL;
+        if (esp.showHostiles.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE).contains(entity)) return COLOR_HOSTILE;
         if (entity instanceof ItemEntity) {
             if (!esp.showItems.get()) return null;
             if (esp.itemBoundingBox.get()) return null;

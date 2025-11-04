@@ -7,6 +7,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.util.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.EndermanEntity;
@@ -36,7 +37,7 @@ public class EndermanAgro extends Module {
         EndermanEntity closest = null;
         double closestDistance = Double.MAX_VALUE;
 
-        for (Entity entity : ENTITY_MANAGER.getNeutral()) {
+        for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL, 999, true)) {
             if (!(entity instanceof EndermanEntity enderman)) continue;
 
             double distance = MC.player.squaredDistanceTo(enderman);

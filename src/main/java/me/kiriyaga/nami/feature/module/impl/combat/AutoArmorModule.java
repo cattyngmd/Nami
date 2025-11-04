@@ -49,7 +49,7 @@ public class AutoArmorModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = TARGET_MANAGER.getTarget();
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (!isArmorSlot(slot)) continue;

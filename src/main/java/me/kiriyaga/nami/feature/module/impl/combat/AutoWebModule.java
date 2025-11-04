@@ -16,7 +16,6 @@ import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -59,7 +58,7 @@ public class AutoWebModule extends Module {
             return;
         }
 
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = TARGET_MANAGER.getTarget();
         if (target == null) {
             renderPos = null;
             return;

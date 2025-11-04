@@ -45,7 +45,7 @@ public class BowAimModule extends Module {
 
         ItemStack stack = MC.player.getMainHandStack();
 
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = TARGET_MANAGER.getTarget();
         if (target == null || !(stack.getItem() instanceof BowItem || stack.getItem() instanceof TridentItem) || !MC.player.isUsingItem()) {
             currentTarget = null;
             return;

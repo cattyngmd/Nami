@@ -48,7 +48,7 @@ public class Nami implements ClientModInitializer {
     public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
     public static final ModuleManager MODULE_MANAGER = new ModuleManager();
     public static final FontManager FONT_MANAGER = new FontManager();
-    public static final EntityManager ENTITY_MANAGER = new EntityManager();
+    public static final TargetManager TARGET_MANAGER = new TargetManager();
     public static final ExecutableManager EXECUTABLE_MANAGER = new ExecutableManager();
     public static final CommandManager COMMAND_MANAGER = new CommandManager();
     public static final ChatManager CHAT_MANAGER = new ChatManager();
@@ -78,7 +78,6 @@ public class Nami implements ClientModInitializer {
         PING_MANAGER.init();
         TICK_MANAGER.init();
         ROTATION_MANAGER.init();
-        ENTITY_MANAGER.init();
         INVENTORY_MANAGER.init();
         EXECUTABLE_MANAGER.init();
         FLAG_MANAGER.init();

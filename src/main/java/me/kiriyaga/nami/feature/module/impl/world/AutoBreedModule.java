@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
-import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
@@ -9,18 +8,16 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
-import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
 public class AutoBreedModule extends Module {
@@ -57,13 +54,10 @@ public class AutoBreedModule extends Module {
             return;
         }
 
-        for (Entity entity : ENTITY_MANAGER.getPassive()) {
+        for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE, 10, true)) {
             if (!(entity instanceof AnimalEntity animal)) continue;
             if (!animal.isAlive() || animal.isBaby() || animal.isInLove() || !animal.canEat()) continue;
             if (animalsFed.contains(animal.getId())) continue;
-
-            double distance = MC.player.squaredDistanceTo(animal);
-            if (distance > range.get() * range.get()) continue;
 
             int foodSlot = getBreedingItemSlot(animal);
             if (foodSlot == -1) continue;
@@ -75,21 +69,8 @@ public class AutoBreedModule extends Module {
                 return;
             }
 
-            Vec3d center = getEntityCenter(animal);
 
-            if (rotate.get()) {
-                ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(
-                                AutoBreedModule.class.getName(),
-                                2,
-                                (float) getYawToVec(MC.player, center),
-                                (float) getPitchToVec(MC.player, center)
-                        )
-                );
-                if (!ROTATION_MANAGER.getRequestHandler().isCompleted(AutoBreedModule.class.getName())) return;
-            }
-
-            interactWithEntity(animal, center, swing.get());
+            interactWithEntity(animal, range.get(), swing.get(), rotate.get(), this.name);
 
             animalsFed.add(animal.getId());
             breedCooldown = delay.get();

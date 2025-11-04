@@ -5,9 +5,9 @@ import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
-import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.PredictMovementUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -18,7 +18,6 @@ import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Optional;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -45,7 +44,7 @@ public class PredictTestModule extends Module {
             renderPredictionForEntity(MC.player, matrices);
 
         if (predictOthers.get()) {
-            List<PlayerEntity> others = ENTITY_MANAGER.getOtherPlayers();
+            List<PlayerEntity> others = EntityUtils.getOtherPlayers();
             for (PlayerEntity other : others) {
                 if (other.isRemoved()) continue;
                 renderPredictionForEntity(other, matrices);

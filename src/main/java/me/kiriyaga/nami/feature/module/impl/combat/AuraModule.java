@@ -40,6 +40,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InteractionUtils.raycastTarget;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
@@ -93,7 +94,7 @@ public class AuraModule extends Module {
         long startTime = System.nanoTime();
 
         ItemStack stack = MC.player.getMainHandStack();
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = TARGET_MANAGER.getTarget();
         DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
         if (target == null || (swap.get() == Swap.REQUIRE && !(stack.getItem() instanceof AxeItem
@@ -298,20 +299,6 @@ public class AuraModule extends Module {
         double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
         Box box = entity.getBoundingBox().offset(interpX - entity.getX(), interpY - entity.getY(), interpZ - entity.getZ());
         RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
-    }
-
-    private EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
-        Vec3d eyePos = player.getCameraPosVec(1.0f);
-        Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3d reachEnd = eyePos.add(look.multiply(reach));
-
-        Box targetBox = target.getBoundingBox();
-
-        if (targetBox.raycast(eyePos, reachEnd).isPresent()) {
-            return new EntityHitResult(target);
-        }
-
-        return null;
     }
 
     private float getBaseCooldownTicks(ItemStack stack, float tps) {

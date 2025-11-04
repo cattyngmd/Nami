@@ -17,7 +17,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -65,7 +64,7 @@ public class AutoTrapModule extends Module {
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) return;
 
-        Entity target = ENTITY_MANAGER.getTarget();
+        Entity target = TARGET_MANAGER.getTarget();
         if (target == null) {
             surroundPositions.clear();
             return;
