@@ -44,17 +44,17 @@ public class ExecutableTickHandler {
         return asyncExecutor;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onPreTick(PreTickEvent event) {
         execute(ExecutableThreadType.PRE_TICK);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onPostTick(PostTickEvent event) {
         execute(ExecutableThreadType.POST_TICK);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender2D(Render2DEvent event) {
         execute(ExecutableThreadType.RENDER_2D);
     }
@@ -63,6 +63,9 @@ public class ExecutableTickHandler {
         for (ExecutableRequest req : stateHandler.getActiveRequests()) {
             if (req.ticksDelay > 0) {
                 req.ticksDelay--;
+            }
+
+            if (req.ticksDelay > 0) {
                 continue;
             }
 

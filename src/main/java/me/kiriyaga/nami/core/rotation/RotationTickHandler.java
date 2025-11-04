@@ -34,10 +34,6 @@ public class RotationTickHandler {
     private int ticksHolding = 0;
     private boolean returning = false;
     private int tickCount = 0;
-    private boolean forwardPressed = false;
-    private boolean leftPressed = false;
-    private boolean backPressed = false;
-    private boolean rightPressed = false;
 
     public RotationTickHandler(RotationStateHandler stateHandler, RotationRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -46,18 +42,6 @@ public class RotationTickHandler {
 
     public void init() {
         EVENT_MANAGER.register(this);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onKeyInput(KeyInputEvent event) {
-        int key = event.key;
-        int action = event.action;
-        int scancode = event.scancode;
-
-        updateHeld(MC.options.forwardKey, key, scancode, action, false, v -> forwardPressed = v);
-        updateHeld(MC.options.leftKey,    key, scancode, action, false, v -> leftPressed = v);
-        updateHeld(MC.options.backKey,    key, scancode, action, false, v -> backPressed = v);
-        updateHeld(MC.options.rightKey,   key, scancode, action, false, v -> rightPressed = v);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -94,17 +78,17 @@ public class RotationTickHandler {
     }
 
     private void fixMovementForSpoof() {
-        if (MC.player == null) return;
+        if (MC.player == null || INPUT_MANAGER.isFrozen()) return;
 
         float realYaw = MC.player.getYaw();
         float spoofYaw = stateHandler.getRotationYaw();
         float delta = MathHelper.wrapDegrees(realYaw - spoofYaw);
 
         // theese are tick thread and render thread
-        boolean forward = forwardPressed;
-        boolean back = backPressed;
-        boolean left = leftPressed;
-        boolean right = rightPressed;
+        boolean forward = INPUT_MANAGER.isForwardPressed();
+        boolean back = INPUT_MANAGER.isBackPressed();
+        boolean left = INPUT_MANAGER.isLeftPressed();
+        boolean right = INPUT_MANAGER.isRightPressed();
 
         InputCache.update(
                 forward,

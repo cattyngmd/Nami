@@ -2,48 +2,105 @@ package me.kiriyaga.nami.core;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PacketSendEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.PlayerInput;
+import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.*;
 
-// This is mostly for grim, for min-maxing grim checks
-// this is the way grim detects our movement input
 public class InputManager {
 
-    private boolean forward;
-    private boolean backward;
-    private boolean left;
-    private boolean right;
-    private boolean jumping;
-    private boolean sneaking;
-    private boolean sprinting;
+    private boolean forward, backward, left, right, jumping, sneaking, sprinting;
+    private boolean forwardPressed, backPressed, leftPressed, rightPressed;
+    private boolean frozen = false;
+    private int freezeTicks = 0;
+    private boolean savedForward, savedBack, savedLeft, savedRight;
+    private boolean savedJump, savedSneak, savedSprint;
+
     public void init() {
         EVENT_MANAGER.register(this);
         LOGGER.info("Input Manager loaded");
     }
-    @SubscribeEvent(priority = EventPriority.HIGHEST) // should be always first!
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onKeyInput(KeyInputEvent event) {
+        int key = event.key;
+        int action = event.action;
+        int scancode = event.scancode;
+
+        if (!canMove()) return;
+
+        updateHeld(MC.options.forwardKey, key, scancode, action, v -> forwardPressed = v);
+        updateHeld(MC.options.leftKey,    key, scancode, action, v -> leftPressed = v);
+        updateHeld(MC.options.backKey,    key, scancode, action, v -> backPressed = v);
+        updateHeld(MC.options.rightKey,   key, scancode, action, v -> rightPressed = v);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacket() instanceof PlayerInputC2SPacket packet) {
             PlayerInput input = packet.comp_3139();
 
-            this.forward = input.comp_3159();// forward
-            this.backward = input.comp_3160(); // backward
-            this.left = input.comp_3161(); // left
-            this.right = input.comp_3162(); // right
-            this.jumping = input.comp_3163();// jum
-            this.sneaking = input.sneak(); // sneak
-            this.sprinting = input.comp_3165(); // sprint
-
-        } else if (event.getPacket() instanceof VehicleMoveC2SPacket veh) {
-            // TODO: finish this after i will do deobf for packets
-        } else if (event.getPacket() instanceof PlayerMoveC2SPacket move) {
-
+            this.forward = input.comp_3159();
+            this.backward = input.comp_3160();
+            this.left = input.comp_3161();
+            this.right = input.comp_3162();
+            this.jumping = input.comp_3163();
+            this.sneaking = input.sneak();
+            this.sprinting = input.comp_3165();
+        } else if (event.getPacket() instanceof VehicleMoveC2SPacket) {
+            // TODO: finish this
+        } else if (event.getPacket() instanceof PlayerMoveC2SPacket) {
         }
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onPreTick(PreTickEvent event) {
+        if (freezeTicks > 0) {
+            freezeTicks--;
+
+            if (freezeTicks == 2) {
+                disableAllKeys();
+            } else if (freezeTicks == 0) {
+                restoreKeys();
+                frozen = false;
+            }
+        }
+    }
+
+    public void freezeInputNow() {
+        if (frozen) return;
+        frozen = true;
+        freezeTicks = 2;
+
+        saveKeys();
+        disableAllKeys();
+    }
+
+    public boolean isFrozen() {
+        return frozen;
+    }
+
+    public int getFrozenTicks() {
+        return freezeTicks;
+    }
+
+    public boolean isForwardPressed() { return forwardPressed; }
+    public boolean isBackPressed() { return backPressed; }
+    public boolean isLeftPressed() { return leftPressed; }
+    public boolean isRightPressed() { return rightPressed; }
 
     public boolean hasAnyInput() {
         return forward || backward || left || right || jumping || sneaking || sprinting;
@@ -53,31 +110,61 @@ public class InputManager {
         return forward || backward || left || right;
     }
 
-    public boolean isForward() {
-        return forward;
+    private void saveKeys() {
+        GameOptions opt = MC.options;
+        savedForward = opt.forwardKey.isPressed();
+        savedBack = opt.backKey.isPressed();
+        savedLeft = opt.leftKey.isPressed();
+        savedRight = opt.rightKey.isPressed();
+        savedJump = opt.jumpKey.isPressed();
+        savedSneak = opt.sneakKey.isPressed();
+        savedSprint = opt.sprintKey.isPressed();
     }
 
-    public boolean isBackward() {
-        return backward;
+    private void disableAllKeys() {
+        GameOptions opt = MC.options;
+        setPressed(opt.forwardKey, false);
+        setPressed(opt.backKey, false);
+        setPressed(opt.leftKey, false);
+        setPressed(opt.rightKey, false);
+        setPressed(opt.jumpKey, false);
+        setPressed(opt.sneakKey, false);
+        setPressed(opt.sprintKey, false);
     }
 
-    public boolean isLeft() {
-        return left;
+    private void restoreKeys() {
+        GameOptions opt = MC.options;
+        setPressed(opt.forwardKey, savedForward);
+        setPressed(opt.backKey, savedBack);
+        setPressed(opt.leftKey, savedLeft);
+        setPressed(opt.rightKey, savedRight);
+        setPressed(opt.jumpKey, savedJump);
+        setPressed(opt.sneakKey, savedSneak);
+        setPressed(opt.sprintKey, savedSprint);
     }
 
-    public boolean isRight() {
-        return right;
+    private void setPressed(KeyBinding key, boolean pressed) {
+        key.setPressed(pressed);
     }
 
-    public boolean isJumping() {
-        return jumping;
+    private void updateHeld(KeyBinding bind, int key, int scancode, int action, java.util.function.Consumer<Boolean> setter) {
+        if (!bind.matchesKey(key, scancode)) return;
+        setter.accept(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT);
+        if (action == GLFW.GLFW_RELEASE) setter.accept(false);
     }
 
-    public boolean isSneaking() {
-        return sneaking;
-    }
-
-    public boolean isSprinting() {
-        return sprinting;
+    private boolean canMove() {
+        if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return false;
+        if (MC.currentScreen == null) return true;
+        if (MC.currentScreen != null && !MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class).isEnabled()) return false;
+        if (MC.currentScreen instanceof ChatScreen
+                || MC.currentScreen instanceof SignEditScreen
+                || MC.currentScreen instanceof AnvilScreen
+                || MC.currentScreen instanceof AbstractCommandBlockScreen
+                || MC.currentScreen instanceof StructureBlockScreen
+                || MC.currentScreen instanceof CreativeInventoryScreen) {
+            return false;
+        }
+        return true;
     }
 }

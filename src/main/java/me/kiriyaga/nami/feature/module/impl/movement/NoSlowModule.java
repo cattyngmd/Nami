@@ -22,7 +22,7 @@ public class NoSlowModule extends Module {
     }
 
     public enum InvMove {
-        NONE, WAIT
+        NONE, WAIT, STOP
     }
 
     public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("Mode", SlowMode.VANILLA));
