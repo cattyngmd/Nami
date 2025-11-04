@@ -18,6 +18,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -25,13 +26,16 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
 
 @RegisterModule
 public class AutoXPModule extends Module {
 
     public enum SwapMode {NORMAL, SILENT }
 
-    private final IntSetting durabilitz = addSetting(new IntSetting("Durability", 80, 70, 99));
+    private final IntSetting durability = addSetting(new IntSetting("Durability", 80, 70, 99));
+    private final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
+    private final IntSetting packetShift = addSetting(new IntSetting("ShiftTicks", 3, 1, 6));
     private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
     private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
     private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
@@ -40,6 +44,7 @@ public class AutoXPModule extends Module {
 
     public AutoXPModule() {
         super("AutoXP", "Automatically repair armor with XP bottles.", ModuleCategory.of("Combat"), "autoxp");
+        packetShift.setShowCondition(packet::get);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -95,10 +100,24 @@ public class AutoXPModule extends Module {
             case NORMAL -> {
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(xpSlot);
                 MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+
+                if (packet.get()) {
+                    for (int l = 0; l < packetShift.get(); l++) {
+                      sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
+                        }
+                }
+
             }
             case SILENT -> {
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(xpSlot);
                 MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+
+                if (packet.get()) {
+                    for (int l = 0; l < packetShift.get(); l++) {
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
+                    }
+                }
+
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
             }
         }
@@ -129,7 +148,7 @@ public class AutoXPModule extends Module {
         int max = stack.getMaxDamage();
         int damage = stack.getDamage();
         int percentRemaining = (int) (((max - damage) / (float) max) * 100);
-        return percentRemaining <= durabilitz.get();
+        return percentRemaining <= durability.get();
     }
 
     private boolean isAbove(ItemStack stack) {
@@ -137,7 +156,7 @@ public class AutoXPModule extends Module {
         int max = stack.getMaxDamage();
         int damage = stack.getDamage();
         int percentRemaining = (int) (((max - damage) / (float) max) * 100);
-        return percentRemaining > durabilitz.get();
+        return percentRemaining > durability.get();
     }
 
     private int getSlotInHotbar(Item item) {
