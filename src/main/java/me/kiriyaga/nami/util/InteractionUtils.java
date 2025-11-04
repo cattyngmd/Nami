@@ -6,6 +6,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -247,5 +250,28 @@ public class InteractionUtils {
         }
         FluidState fluidState = MC.world.getFluidState(pos);
         return !fluidState.isEmpty();
+    }
+
+    public static boolean interruptedByEntity(BlockPos pos) {
+        return interruptedByEntity(pos, 10);
+    }
+
+    public static boolean interruptedByEntity(BlockPos pos, int distance) {
+        Box blockBox = new Box(pos);
+        for (Entity entity : MC.world.getEntities()) {
+            if (entity.squaredDistanceTo(MC.player) > distance) continue;
+            if (entity instanceof EndCrystalEntity) continue;
+            if (entity instanceof ItemEntity) continue;
+            if (entity instanceof ArrowEntity) continue;
+
+            if (entity.getBoundingBox().intersects(blockBox)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isReplaceable(BlockPos pos) {
+        return MC.world.getBlockState(pos).isReplaceable();
     }
 }
