@@ -71,7 +71,7 @@ public class InputManager {
         if (freezeTicks > 0) {
             freezeTicks--;
 
-            if (freezeTicks == 2) {
+            if (freezeTicks == 1) {
                 disableAllKeys();
             } else if (freezeTicks == 0) {
                 restoreKeys();
@@ -83,7 +83,7 @@ public class InputManager {
     public void freezeInputNow() {
         if (frozen) return;
         frozen = true;
-        freezeTicks = 2;
+        freezeTicks = 1;
 
         saveKeys();
         disableAllKeys();

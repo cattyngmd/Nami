@@ -66,7 +66,7 @@ public class InventoryClickHandler {
             }
 
             if (noSlow.invMove.get() == NoSlowModule.InvMove.STOP) {
-                if (INPUT_MANAGER.getFrozenTicks() == 2) return false; // if one stop call existed this tick, we cannot use any other click actions, since it will apply net tick only
+                if (INPUT_MANAGER.getFrozenTicks() == 1) return false; // if one stop call existed this tick, we cannot use any other click actions, since it will apply net tick only
 
                 if (!INPUT_MANAGER.isFrozen() && INPUT_MANAGER.hasAnyInput()) {
                     INPUT_MANAGER.freezeInputNow();
