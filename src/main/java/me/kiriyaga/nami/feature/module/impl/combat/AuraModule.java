@@ -18,6 +18,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.DataComponentTypes;
@@ -94,7 +95,7 @@ public class AuraModule extends Module {
         long startTime = System.nanoTime();
 
         ItemStack stack = MC.player.getMainHandStack();
-        Entity target = TARGET_MANAGER.getTarget();
+        Entity target = EntityUtils.getTarget();
         DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
         if (target == null || (swap.get() == Swap.REQUIRE && !(stack.getItem() instanceof AxeItem

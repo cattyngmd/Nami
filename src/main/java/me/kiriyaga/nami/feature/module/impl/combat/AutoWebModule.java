@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.EntityUtils;
 import me.kiriyaga.nami.util.InteractionUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Blocks;
@@ -58,7 +59,7 @@ public class AutoWebModule extends Module {
             return;
         }
 
-        Entity target = TARGET_MANAGER.getTarget();
+        Entity target = EntityUtils.getTarget();
         if (target == null) {
             renderPos = null;
             return;
