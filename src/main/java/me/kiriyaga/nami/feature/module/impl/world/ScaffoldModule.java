@@ -27,7 +27,7 @@ import java.awt.*;
 import java.util.Arrays;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InteractionUtils.placeBlock;
+import static me.kiriyaga.nami.util.InteractionUtils.*;
 
 @RegisterModule
 public class ScaffoldModule extends Module {
@@ -80,7 +80,7 @@ public class ScaffoldModule extends Module {
         for (BlockPos pos : corners) {
             BlockPos targetPos = pos.down();
 
-            if (hasEntity(targetPos))
+            if (interruptedByEntity(targetPos) || !isReplaceable(targetPos))
                 continue;
 
             renderPos = targetPos;
@@ -149,16 +149,5 @@ public class ScaffoldModule extends Module {
         return Arrays.stream(possiblePositions)
                 .filter(pos -> MC.world.getBlockState(pos.down()).isAir()) // yes i know its cringe sorry
                 .toArray(BlockPos[]::new);
-    }
-
-    private boolean hasEntity(BlockPos pos) {
-        for (Entity entity : MC.world.getEntities()) {
-            if (entity.squaredDistanceTo(MC.player) > 100) continue;
-
-            if (entity.getBoundingBox().intersects(new Box(pos))) {
-                return true;
-            }
-        }
-        return false;
     }
 }

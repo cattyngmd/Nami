@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.InteractionUtils.interruptedByEntity;
+import static me.kiriyaga.nami.util.InteractionUtils.isReplaceable;
 
 @RegisterModule
 public class AutoTrapModule extends Module {
@@ -154,7 +156,7 @@ public class AutoTrapModule extends Module {
 
         List<BlockPos> result = new ArrayList<>();
         for (BlockPos pos : positions)
-            if (!hasEntity(pos))
+            if (!interruptedByEntity(pos))
                 result.add(pos);
 
         return result;
@@ -203,24 +205,6 @@ public class AutoTrapModule extends Module {
             }
         }
         positions.addAll(extra);
-    }
-
-    private boolean hasEntity(BlockPos pos) {
-        Box blockBox = new Box(pos);
-        for (Entity entity : MC.world.getEntities()) {
-            if (entity.squaredDistanceTo(MC.player) > 50) continue;
-            if (entity instanceof EndCrystalEntity) continue;
-            if (entity instanceof ItemEntity) continue;
-
-            if (entity.getBoundingBox().intersects(blockBox)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isReplaceable(BlockPos pos) {
-        return MC.world.getBlockState(pos).isReplaceable();
     }
 
     private int getSlot() {
