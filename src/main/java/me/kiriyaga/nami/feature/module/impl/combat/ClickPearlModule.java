@@ -42,13 +42,22 @@ public class ClickPearlModule extends Module {
         super("ClickPearl", "Uses configured item when pressing key.", ModuleCategory.of("Combat"), "clickpearl");
     }
 
+    private boolean recall;
+
+    @Override
+    public void onEnable() {
+        useKey.setWasPressedLastTick(false);
+        recall = false;
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onTick(PreTickEvent ev) {
         if (MC.world == null || MC.player == null) return;
 
         boolean pressed = useKey.isPressed();
 
-        if (pressed && !useKey.wasPressedLastTick()) {
+        if (pressed && !useKey.wasPressedLastTick() || recall) {
+            recall = false;
             if (MC.player.isGliding()) {
                 useGlide();
             } else {
@@ -97,6 +106,8 @@ public class ClickPearlModule extends Module {
     }
 
     private void useItem(Item item) {
+        CHAT_MANAGER.sendRaw("call");
+
         int hotbarSlot = getSlotInHotbar(item);
 
         if (hotbarSlot != -1) {
@@ -118,7 +129,8 @@ public class ClickPearlModule extends Module {
                 MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
 
                 INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
-            } else
+                CHAT_MANAGER.sendRaw("true");
+            } else recall = true;
         }
     }
 
@@ -137,12 +149,6 @@ public class ClickPearlModule extends Module {
                 return false;
         }
         return true;
-    }
-
-
-    @Override
-    public void onEnable() {
-        useKey.setWasPressedLastTick(false);
     }
 
     private int getSlotInHotbar(Item item) {
