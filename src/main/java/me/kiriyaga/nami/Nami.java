@@ -58,6 +58,7 @@ public class Nami implements ClientModInitializer {
     public static final RotationManager ROTATION_MANAGER = new RotationManager();
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static final FlagManager FLAG_MANAGER = new FlagManager();
+    public static final InputManager INPUT_MANAGER = new InputManager();
 
     public static Pair<ServerAddress, ServerInfo> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
@@ -82,6 +83,7 @@ public class Nami implements ClientModInitializer {
         EXECUTABLE_MANAGER.init();
         FLAG_MANAGER.init();
         CHAT_MANAGER.init();
+        INPUT_MANAGER.init();
 
         CAT_FORMAT.add(new CatStyles());
 
@@ -92,7 +94,7 @@ public class Nami implements ClientModInitializer {
 
         FRIEND_MANAGER.load();
 
-        LOGGER.info(NAME + " " + VERSION + " has been initialized");
+        LOGGER.info(NAME + "\n " + VERSION + " has been initialized\n");
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             FONT_MANAGER.init(); // font is making glyph textures, it should be after game loaded not on initialize

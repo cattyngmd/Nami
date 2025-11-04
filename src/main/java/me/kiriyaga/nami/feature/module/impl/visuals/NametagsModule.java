@@ -148,7 +148,7 @@ public class NametagsModule extends Module {
                 if (NametagsModule.uuid.containsKey(uuid)) {
                     ownerName = NametagsModule.uuid.get(uuid);
                 } else {
-                    ownerName = "Owned by ";
+                    ownerName = "";
 
                     EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
 

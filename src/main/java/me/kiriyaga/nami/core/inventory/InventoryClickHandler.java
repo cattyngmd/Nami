@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.core.inventory;
 
 import me.kiriyaga.nami.feature.module.impl.combat.AutoTotemModule;
+import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.item.ItemStack;
@@ -57,6 +58,11 @@ public class InventoryClickHandler {
 
     private void click(int slot, int button, SlotActionType type, boolean skipGeneric) {
         if (slot < 0) return;
+
+        NoSlowModule noSlow = MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class);
+
+        if (noSlow != null && noSlow.isEnabled() && noSlow.invMove.get() == NoSlowModule.InvMove.GRIMSTRICT)
+            if ()
 
         if (MC.currentScreen instanceof ShulkerBoxScreen
                 || MC.currentScreen instanceof AnvilScreen
