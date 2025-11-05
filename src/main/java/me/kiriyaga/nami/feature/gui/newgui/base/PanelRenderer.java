@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.base;
+package me.kiriyaga.nami.feature.newgui.base;
 
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;

@@ -2,7 +2,6 @@ package me.kiriyaga.nami.feature.gui.screen;
 
 import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.gui.components.ModulePanel;
-import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
 import me.kiriyaga.nami.feature.gui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -79,6 +78,8 @@ public class ClickGuiScreen extends Screen {
         checkClose();
         syncCategoryPositions();
 
+        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
+
         if (previousScreen instanceof TitleScreen
                 || previousScreen instanceof DisconnectedScreen
                 || previousScreen instanceof MultiplayerScreen) {
@@ -97,11 +98,6 @@ public class ClickGuiScreen extends Screen {
 
         int scaledWidth = (int) (this.width / scale);
         int scaledHeight = (int) (this.height / scale);
-
-        int panelWidth = NAVIGATE_PANEL.calcWidth();
-        int navigateX = (scaledWidth - panelWidth) / 2;
-        int navigateY = 1;
-        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, navigateY, mouseX, mouseY);
 
         int startY = (scaledHeight - 1);
         for (int i = statusMessages.size() - 1; i >= 0; i--) {
@@ -191,9 +187,7 @@ public class ClickGuiScreen extends Screen {
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
 
-        int navX = (int) ((this.width / scale - NAVIGATE_PANEL.calcWidth()) / 2);
-        int navY = 1;
-        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(mouseX, mouseY, this.textRenderer);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;

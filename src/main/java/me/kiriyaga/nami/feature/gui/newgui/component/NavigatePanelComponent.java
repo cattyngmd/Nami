@@ -1,9 +1,9 @@
-package me.kiriyaga.nami.feature.gui.components;
+package me.kiriyaga.nami.feature.newgui.component;
 
 import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
+import me.kiriyaga.nami.feature.newgui.base.PanelRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,9 +15,10 @@ import java.util.Map;
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.feature.gui.base.GuiConstants.toRGBA;
 
-public class NavigatePanel {
+public class NavigatePanelComponent {
     private static final int HEIGHT = 14;
     private static final int PADDING = 6;
+    private static final int TOP_OFFSET = 1;
 
     private final PanelRenderer renderer = new PanelRenderer();
     private final Map<String, Screen> screens = new LinkedHashMap<>();
@@ -26,7 +27,7 @@ public class NavigatePanel {
     private final ClickGuiModule clickGuiModule;
     private String activeKey;
 
-    public NavigatePanel() {
+    public NavigatePanelComponent() {
         addScreen("ClickGui", CLICK_GUI);
         addScreen("HudEditor", HUD_EDITOR);
         addScreen("Friends", FRIEND);
@@ -39,8 +40,14 @@ public class NavigatePanel {
         screens.put(name, screen);
     }
 
-    public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
+    public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+
+        int scaledWidth = (int) (MC.getWindow().getScaledWidth() / CLICK_GUI.scale);
         int totalWidth = calcWidth();
+        int x = (scaledWidth - totalWidth) / 2;
+        int y = TOP_OFFSET;
 
         renderer.renderPanel(context, x, y, totalWidth, HEIGHT, 0, false);
 
@@ -51,18 +58,38 @@ public class NavigatePanel {
 
             Color primary = colorModule.getStyledGlobalColor();
             Color textOff = new Color(155, 155, 155, 255);
-            Color textCol = active ? clickGuiModule.moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255) : textOff;
+            Color textCol = active
+                    ? (clickGuiModule.moduleFill.get()
+                    ? Color.WHITE
+                    : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255))
+                    : textOff;
 
             int textWidth = FONT_MANAGER.getWidth(name);
-            FONT_MANAGER.drawText(context, name, offsetX, (y + (HEIGHT - FONT_MANAGER.getHeight()) / 2) + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);
+            FONT_MANAGER.drawText(
+                    context,
+                    name,
+                    offsetX,
+                    (y + (HEIGHT - FONT_MANAGER.getHeight()) / 2) + 1,
+                    CLICK_GUI.applyFade(toRGBA(textCol)),
+                    true
+            );
 
             offsetX += textWidth + PADDING * 2;
         }
+
+        context.getMatrices().popMatrix();
     }
 
-    public void mouseClicked(int mouseX, int mouseY, int x, int y, TextRenderer textRenderer) {
-        int offsetX = x + PADDING;
+    public void mouseClicked(double mouseX, double mouseY, TextRenderer textRenderer) {
+        double scaledX = mouseX / CLICK_GUI.scale;
+        double scaledY = mouseY / CLICK_GUI.scale;
 
+        int scaledWidth = (int) (MC.getWindow().getScaledWidth() / CLICK_GUI.scale);
+        int totalWidth = calcWidth();
+        int x = (scaledWidth - totalWidth) / 2;
+        int y = TOP_OFFSET;
+
+        int offsetX = x + PADDING;
         for (Map.Entry<String, Screen> entry : screens.entrySet()) {
             String name = entry.getKey();
             Screen screen = entry.getValue();
@@ -71,12 +98,11 @@ public class NavigatePanel {
             int startX = offsetX;
             int endX = offsetX + textWidth + PADDING * 2;
 
-            if (mouseX >= startX && mouseX <= endX && mouseY >= y && mouseY <= y + HEIGHT) {
+            if (scaledX >= startX && scaledX <= endX && scaledY >= y && scaledY <= y + HEIGHT) {
                 if (!name.equals(activeKey)) {
                     activeKey = name;
                     if (screen instanceof ClickGuiScreen screen1)
                         screen1.setPreviousScreen(MC.currentScreen);
-
                     MC.setScreen(screen);
                 }
                 return;

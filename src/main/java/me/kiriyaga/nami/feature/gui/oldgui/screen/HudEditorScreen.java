@@ -2,7 +2,6 @@ package me.kiriyaga.nami.feature.gui.screen;
 
 import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.gui.components.ModulePanel;
-import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
 import me.kiriyaga.nami.feature.gui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
@@ -12,7 +11,6 @@ import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import org.apache.commons.compress.archivers.sevenz.CLI;
 
 import java.awt.Point;
 import java.util.*;
@@ -63,6 +61,8 @@ public class HudEditorScreen extends Screen {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
+        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
+
         ClickGuiModule hudEditorModule = getClickGuiModule();
         if (hudEditorModule != null && hudEditorModule.background.get()) {
             int alpha = (hudEditorModule.backgroundAlpha.get() & 0xFF) << 24;
@@ -72,11 +72,6 @@ public class HudEditorScreen extends Screen {
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
-
-        int scaledWidth = (int) (this.width / CLICK_GUI.scale);
-        int panelWidth = NAVIGATE_PANEL.calcWidth();
-        int navigateX = (scaledWidth - panelWidth) / 2;
-        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, 1, mouseX, mouseY);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
@@ -163,8 +158,7 @@ public class HudEditorScreen extends Screen {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
-        int navX = (int) ((this.width / CLICK_GUI.scale - NAVIGATE_PANEL.calcWidth()) / 2);
-        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, 1, this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(mouseX, mouseY, this.textRenderer);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);

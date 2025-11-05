@@ -1,10 +1,8 @@
 package me.kiriyaga.nami.feature.gui.components;
 
-import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
+import me.kiriyaga.nami.feature.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 import static me.kiriyaga.nami.feature.gui.components.ModulePanel.MODULE_SPACING;
 
 public class CategoryPanel {
