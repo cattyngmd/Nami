@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.gui.newgui.component;
 
 import me.kiriyaga.nami.feature.gui.newgui.base.DataPanelComponent;
+import me.kiriyaga.nami.feature.gui.newgui.entry.FriendEntry;
 import me.kiriyaga.nami.feature.gui.newgui.widget.ButtonWidget;
 import me.kiriyaga.nami.feature.gui.newgui.widget.TextBoxWidget;
 import net.minecraft.client.font.TextRenderer;
@@ -11,17 +12,17 @@ import java.util.function.Consumer;
 
 import static me.kiriyaga.nami.Nami.*;
 
-public class ConsolePanelComponent extends DataPanelComponent<Text> {
-    private final Consumer<Text> onAdd;
-    private final Consumer<Text> onRemove;
-    private final Consumer<Text> onClick;
+public class ConsolePanelComponent extends DataPanelComponent<FriendEntry> {
+    private final Consumer<FriendEntry> onAdd;
+    private final Consumer<FriendEntry> onRemove;
+    private final Consumer<FriendEntry> onClick;
 
     private final ButtonWidget enterButton;
     private final TextBoxWidget inputBox;
 
     public ConsolePanelComponent(String name, int x, int y, int width, int height,
-                                 Consumer<Text> onAdd, Consumer<Text> onRemove, Consumer<Text> onClick) {
-        super(name, x, y, width, height, t -> t);
+                                 Consumer<FriendEntry> onAdd, Consumer<FriendEntry> onRemove, Consumer<FriendEntry> onClick) {
+        super(name, x, y, width, height, FriendEntry::getDisplayText);
         this.onAdd = onAdd;
         this.onRemove = onRemove;
         this.onClick = onClick;
@@ -45,7 +46,8 @@ public class ConsolePanelComponent extends DataPanelComponent<Text> {
     private void submitInput() {
         String text = inputBox.getText().trim();
         if (!text.isEmpty() && onAdd != null) {
-            onAdd.accept(Text.literal(text));
+            FriendEntry entry = new FriendEntry(text);
+            onAdd.accept(entry);
             inputBox.clear();
         }
     }

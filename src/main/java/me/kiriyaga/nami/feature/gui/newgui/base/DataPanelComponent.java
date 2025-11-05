@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.newgui.base;
 
+import me.kiriyaga.nami.feature.gui.newgui.widget.ActionWidget;
 import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.font.TextRenderer;
@@ -17,6 +18,7 @@ public class DataPanelComponent<T> {
     protected final Function<T, Text> displayMapper;
 
     protected final PanelRenderer panelRenderer = new PanelRenderer();
+    protected final ActionWidget actionWidget = new ActionWidget();
 
     protected double scrollOffset = 0;
     protected double targetScrollOffset = 0;
@@ -83,6 +85,10 @@ public class DataPanelComponent<T> {
         }
 
         ScissorUtil.disable(context);
+
+        if (actionWidget.isVisible()) {
+            actionWidget.render(context, textRenderer, mouseX, mouseY);
+        }
     }
 
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
@@ -102,6 +108,8 @@ public class DataPanelComponent<T> {
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (actionWidget.isVisible() && actionWidget.mouseClicked(mouseX, mouseY, button)) return true;
+
         if (button == 0 && isHeaderHovered(mouseX, mouseY)) {
             dragging = true;
             dragOffsetX = (int) (mouseX - x);
@@ -127,4 +135,17 @@ public class DataPanelComponent<T> {
     protected boolean isHeaderHovered(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + headerHeight;
     }
+
+    public ActionWidget getActionWidget() {
+        return actionWidget;
+    }
+
+    public int getHeaderHeight() { return this.headerHeight; }
+    public int getInputHeight() { return this.inputHeight; }
+    public double getScrollOffset() { return this.scrollOffset; }
+    public List<T> getEntries() { return this.entries; }
+    public int getX() {return x;}
+    public int getY() {return y;}
+    public int getWidth() {return width;}
+    public int getHeight() {return height;}
 }
