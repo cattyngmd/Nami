@@ -1,96 +1,90 @@
 plugins {
     id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = "me.kiriyaga"
-archivesBaseName = "nami"
 
+// git functions
 def getGitHash() {
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-        ignoreExitValue true
-    }
-    return stdout.toString().trim()
+    def proc = "git rev-parse --short HEAD".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
 }
 
 def getLastTag() {
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags', '--abbrev=0'
-        standardOutput = stdout
-        ignoreExitValue true
-    }
-    return stdout.toString().trim()
+    def proc = "git describe --tags --abbrev=0".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
 }
 
 def getCommitsCount() {
     def tag = getLastTag()
     if (!tag) return "0"
-
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-list', '--count', "${tag}..HEAD"
-        standardOutput = stdout
-        ignoreExitValue true
-    }
-    return stdout.toString().trim()
+    def proc = "git rev-list --count ${tag}..HEAD".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
 }
 
 def getGitBranch() {
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
-        standardOutput = stdout
-        ignoreExitValue true
-    }
-    return stdout.toString().trim()
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
 }
 
-
-version = "2.4.5_mc${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
+// versions
 //version = "2.4.5_mc${getGitBranch()}"
+version = "2.4.5_${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
 
+// java version
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+// repository
 repositories {
-    maven { url = 'https://maven.fabricmc.net/' }
-    maven { url = 'https://repo.spongepowered.org/maven' }
+    maven { url = uri("https://maven.fabricmc.net/") }
+    maven { url = uri("https://repo.spongepowered.org/maven") }
     maven {
         url = uri("https://api.modrinth.com/maven")
         content {
             includeGroup("maven.modrinth")
         }
     }
-    maven { url "https://jitpack.io" }
+    maven { url = uri("https://jitpack.io") }
 }
 
+// config
 configurations {
-    shadowDeps
+    includeResolved {
+        canBeResolved = true
+        canBeConsumed = false
+        extendsFrom(configurations.include)
+    }
 }
 
+// dependency
 dependencies {
     minecraft "com.mojang:minecraft:1.21.8"
     mappings "net.fabricmc:yarn:1.21.8+build.1"
     modImplementation "net.fabricmc:fabric-loader:0.16.14"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.129.0+1.21.8"
-    modImplementation("maven.modrinth:sodium:mc1.21.6-0.6.13-fabric") { transitive = false }
-    modImplementation ("com.github.cattyngmd.catformat:catformat-core:2.1.0")
 
-    shadowDeps project.configurations.modImplementation.filter {
-        it.name.contains("catformat-core")
+    modImplementation("maven.modrinth:sodium:mc1.21.6-0.6.13-fabric") {
+        transitive = false
     }
+
+    modImplementation("com.github.cattyngmd.catformat:catformat-core:2.1.0")
+    include("com.github.cattyngmd.catformat:catformat-core:2.1.0")
 }
+
+// loom
 loom {
     accessWidenerPath = file("src/main/resources/META-INF/nami.accesswidener")
 }
 
+// process
 tasks.processResources {
     inputs.property("version", project.version)
     filesMatching("fabric.mod.json") {
@@ -98,21 +92,26 @@ tasks.processResources {
     }
 }
 
-shadowJar {
+// fat jar
+tasks.jar {
     archiveBaseName.set("nami-unremapped")
     archiveClassifier.set("")
     archiveVersion.set(project.version)
 
     from(sourceSets.main.output)
 
-    configurations = [project.configurations.shadowDeps]
+    from({
+        configurations.includeResolved.collect { zipTree(it) }
+    })
 }
 
+// remap
 tasks.build {
-    dependsOn tasks.shadowJar
+    dependsOn(tasks.jar)
 }
 
 tasks.named("remapJar") {
-    dependsOn tasks.named("shadowJar")
-    input.set(tasks.named("shadowJar").flatMap { it.archiveFile })
+    dependsOn(tasks.named("jar"))
+    inputFile.set(tasks.named("jar").get().archiveFile)
 }
+

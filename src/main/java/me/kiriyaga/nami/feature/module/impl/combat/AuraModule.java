@@ -43,6 +43,7 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.raycastTarget;
 import static me.kiriyaga.nami.util.RotationUtils.*;
+import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 
 @RegisterModule
 public class AuraModule extends Module {
@@ -62,6 +63,7 @@ public class AuraModule extends Module {
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     private Entity currentTarget = null;
+
     private float attackCooldownTicks = 0f;
 
     public AuraModule() {
@@ -90,7 +92,10 @@ public class AuraModule extends Module {
 
         MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugAura(Text.of("cooldown ticks is : "+attackCooldownTicks));
 
-        if (!multiTask.get() && MC.player.isUsingItem()) return;
+        if (!multiTask.get() && MC.player.isUsingItem()) {
+            currentTarget = null;
+            return;
+        }
 
         long startTime = System.nanoTime();
 
@@ -172,7 +177,10 @@ public class AuraModule extends Module {
 
             boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePos());
 
-            if (!insideBox && distanceCheck == null) return; // out because throretical distance recieved by raycast is too big
+            if (!insideBox && distanceCheck == null) {
+                currentTarget = null;
+                return;
+            }
             boolean canAttack = false;
 
             if (rotate.get() != Rotate.NONE) {
@@ -200,14 +208,20 @@ public class AuraModule extends Module {
             if (insideBox)
                 canAttack = true;
 
-            if (!canAttack) return;
+            if (!canAttack) {
+                //currentTarget = null;
+                return;
+            }
 
             SprintModule m = MODULE_MANAGER.getStorage().getByClass(SprintModule.class);
             if (stopSprinting.get() == Sprint.MOTION && m != null && m.isEnabled())
                 m.stopSprinting(3);
         }
 
-        if (!skipCooldown && attackCooldownTicks > 0f) return;
+        if (!skipCooldown && attackCooldownTicks > 0f) {
+            //currentTarget = null;
+            return;
+        }
 
         boolean b = false;
 
@@ -272,24 +286,6 @@ public class AuraModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (!render.get() || currentTarget == null) return;
 
-        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
-        Vec3d closestPoint = getClosestPointToEye(eyePos, currentTarget.getBoundingBox());
-        float idealYaw = (float) getYawToVec(MC.player, closestPoint);
-        float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
-
-        EntityHitResult distanceCheck = raycastTarget(
-                MC.player,
-                currentTarget,
-                attackRange.get() + (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION ? 0.10 : 0.00),
-                idealYaw,
-                idealPitch
-        );
-
-        boolean insideBox = currentTarget.getBoundingBox().contains(MC.player.getEyePos());
-
-        if (!insideBox && distanceCheck == null) return; // out because throretical distance recieved by raycast is too big
-
-
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
     }
@@ -299,7 +295,8 @@ public class AuraModule extends Module {
         double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
         double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
         Box box = entity.getBoundingBox().offset(interpX - entity.getX(), interpY - entity.getY(), interpZ - entity.getZ());
-        RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
+
+        drawBoxPreset(matrices, box, color);
     }
 
     private float getBaseCooldownTicks(ItemStack stack, float tps) {
@@ -322,7 +319,7 @@ public class AuraModule extends Module {
         if (!multiTask.get())
             return false;
 
-        if (currentTarget == null)
+        if (EntityUtils.getTarget() == null)
             return false;
 
         return false;

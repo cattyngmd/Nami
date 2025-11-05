@@ -52,11 +52,9 @@ public class ESPModule extends Module {
     public final IntSetting mobSpawnLightThreshold = addSetting(new IntSetting("SpawnLight", 7, 0, 15));
     public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("Mode", RenderMode.OUTLINE));
     public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("Distance", 52, 15, 256));
-    public final BoolSetting smoothAppear = addSetting(new BoolSetting("Smooth", true));
 
     public ESPModule() {
         super("ESP", "Highlights certain entities.", ModuleCategory.of("Render"), "esp", "wh", "boxes");
-        smoothAppear.setShowCondition(() -> (renderMode.get() == RenderMode.BOX || showItems.get() && itemBoundingBox.get()));
         outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
         itemBoundingBox.setShowCondition(() -> showItems.get());
         mobSpawnLightThreshold.setShowCondition(showMobSpawns::get);
@@ -152,11 +150,7 @@ public class ESPModule extends Module {
                 interpZ - entity.getZ()
         );
 
-        int alphaCoef = smoothAppear.get() ? Math.min(entity.age * 10, 255) : 255;
-
-        int filledAlpha = Math.min(alphaCoef, 75);
-        RenderUtil.drawBoxFilled(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), filledAlpha));
-        RenderUtil.drawBox(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaCoef), 1.5f);
+        RenderUtil.drawBoxPreset(matrices, box, color);
     }
 
     public static Color getESPColor(Entity entity) {

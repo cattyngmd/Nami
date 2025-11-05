@@ -32,6 +32,7 @@ import java.util.Set;
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interruptedByEntity;
 import static me.kiriyaga.nami.util.InteractionUtils.isReplaceable;
+import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 
 @RegisterModule
 public class AutoTrapModule extends Module {
@@ -116,11 +117,10 @@ public class AutoTrapModule extends Module {
         MatrixStack matrices = event.getMatrices();
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
-        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
 
         for (BlockPos pos : surroundPositions) {
             Box box = new Box(pos);
-            RenderUtil.drawBox(matrices, box, fillColor, color, 1.5f, true, true);
+            drawBoxPreset(matrices, box, color);
         }
     }
 
