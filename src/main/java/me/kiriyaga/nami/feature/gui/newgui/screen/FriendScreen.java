@@ -1,10 +1,9 @@
-package me.kiriyaga.nami.feature.newgui.screen;
+package me.kiriyaga.nami.feature.gui.newgui.screen;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.newgui.component.ConsolePanelComponent;
+import me.kiriyaga.nami.feature.gui.newgui.component.ConsolePanelComponent;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -73,6 +72,18 @@ public class FriendScreen extends Screen {
 
     @Override public boolean mouseScrolled(double x, double y, double h, double v) {
         return console.mouseScrolled(x / CLICK_GUI.scale, y / CLICK_GUI.scale, v) || super.mouseScrolled(x, y, h, v);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        return console.mouseDragged(mouseX / CLICK_GUI.scale, mouseY / CLICK_GUI.scale, deltaX, deltaY)
+                || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        console.mouseReleased(mouseX / CLICK_GUI.scale, mouseY / CLICK_GUI.scale, button);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override public boolean keyPressed(int k, int s, int m) {

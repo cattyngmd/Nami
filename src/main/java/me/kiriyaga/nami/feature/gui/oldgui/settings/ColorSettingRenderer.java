@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.settings;
+package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;

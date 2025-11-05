@@ -3,6 +3,7 @@ package me.kiriyaga.nami.core;
 import com.google.gson.*;
 import me.kiriyaga.nami.core.config.ConfigManager;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.text.Text;
 
 import java.io.File;
 import java.io.FileReader;
@@ -41,6 +42,16 @@ public class FriendManager {
         if (friends.remove(name.toLowerCase())) {
             configManager.saveFriends(friends);
         }
+    }
+
+    public void addFriend(Text name) {
+        if (name == null) return;
+        addFriend(name.getString());
+    }
+
+    public void removeFriend(Text name) {
+        if (name == null) return;
+        removeFriend(name.getString());
     }
 
     public boolean isFriend(String name) {

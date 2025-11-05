@@ -1,8 +1,8 @@
-package me.kiriyaga.nami.feature.gui.screen;
+package me.kiriyaga.nami.feature.gui.oldgui.screen;
 
-import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
-import me.kiriyaga.nami.feature.gui.components.ModulePanel;
-import me.kiriyaga.nami.feature.gui.components.SettingPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.CategoryPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.ModulePanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;

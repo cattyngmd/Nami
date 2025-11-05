@@ -1,6 +1,6 @@
-package me.kiriyaga.nami.feature.gui.components;
+package me.kiriyaga.nami.feature.gui.oldgui.components;
 
-import me.kiriyaga.nami.feature.gui.settings.*;
+import me.kiriyaga.nami.feature.gui.oldgui.settings.*;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.*;
@@ -8,7 +8,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.MC;

@@ -1,5 +1,6 @@
-package me.kiriyaga.nami.feature.gui.newgui.base;
+package me.kiriyaga.nami.feature.gui.newgui.widget;
 
+import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;

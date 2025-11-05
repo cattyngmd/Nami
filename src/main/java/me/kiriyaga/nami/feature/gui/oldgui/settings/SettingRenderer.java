@@ -1,7 +1,7 @@
-package me.kiriyaga.nami.feature.gui.settings;
+package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
-import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
-import me.kiriyaga.nami.feature.gui.components.SettingPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.CategoryPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.SettingPanel;
 import me.kiriyaga.nami.feature.setting.Setting;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;

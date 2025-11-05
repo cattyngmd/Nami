@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.settings;
+package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
@@ -8,7 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
+import static me.kiriyaga.nami.feature.gui.oldgui.base.GuiConstants.*;
 
 public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
 

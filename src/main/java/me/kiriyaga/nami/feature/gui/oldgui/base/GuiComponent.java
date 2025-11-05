@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.base;
+package me.kiriyaga.nami.feature.gui.oldgui.base;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.font.TextRenderer;

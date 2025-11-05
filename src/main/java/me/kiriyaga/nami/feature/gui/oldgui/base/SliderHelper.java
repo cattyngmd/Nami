@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.base;
+package me.kiriyaga.nami.feature.gui.oldgui.base;
 
 public class SliderHelper {
     public static double slideDouble(double oldValue, double deltaX, double step, double min, double max) {

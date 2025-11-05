@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.components;
+package me.kiriyaga.nami.feature.gui.oldgui.components;
 
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -9,7 +9,7 @@ import java.awt.*;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
+import static me.kiriyaga.nami.feature.gui.oldgui.base.GuiConstants.*;
 
 public class ModulePanel {
     public static final int WIDTH = 100 - CategoryPanel.BORDER_WIDTH * 2 - SettingPanel.INNER_PADDING * 2;

@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.base;
+package me.kiriyaga.nami.feature.gui.oldgui.base;
 
 public class NamiScreen {
 

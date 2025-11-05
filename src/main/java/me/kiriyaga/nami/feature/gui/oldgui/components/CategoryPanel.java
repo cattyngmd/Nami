@@ -1,6 +1,6 @@
-package me.kiriyaga.nami.feature.gui.components;
+package me.kiriyaga.nami.feature.gui.oldgui.components;
 
-import me.kiriyaga.nami.feature.newgui.base.PanelRenderer;
+import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.util.render.ScissorUtil;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.components.ModulePanel.MODULE_SPACING;
+import static me.kiriyaga.nami.feature.gui.oldgui.components.ModulePanel.MODULE_SPACING;
 
 public class CategoryPanel {
     public static final int WIDTH = 100;
