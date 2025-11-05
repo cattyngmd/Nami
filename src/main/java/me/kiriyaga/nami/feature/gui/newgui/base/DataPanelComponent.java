@@ -71,6 +71,17 @@ public class DataPanelComponent<T> {
             drawY += lineHeight;
         }
 
+        if (entries.size() > maxVisible) {
+            int barX = x + width - 3;
+            int barY = contentY;
+            int barHeight = contentHeight;
+            context.fill(barX, barY, barX + 1, barY + barHeight, 0xFF555555);
+            float ratio = (float) maxVisible / entries.size();
+            int whiteHeight = Math.max((int)(barHeight * ratio), 2);
+            int whiteY = barY + (int)(scrollOffset / (entries.size() - maxVisible) * (barHeight - whiteHeight));
+            context.fill(barX, whiteY, barX + 1, whiteY + whiteHeight, 0xFFFFFFFF);
+        }
+
         ScissorUtil.disable(context);
     }
 
