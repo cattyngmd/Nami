@@ -158,37 +158,75 @@ public class RenderUtil {
 
 
     // 3d
-    public static void drawBoxFilled(MatrixStack stack, Box box, Color color) {
+    public static void drawBoxFilled(MatrixStack stack, Box box, Color c) {
         if (box.contains(MC.getEntityRenderDispatcher().camera.getPos())) return;
 
         Camera camera = MC.getEntityRenderDispatcher().camera;
-        float minX = (float) (box.minX - camera.getPos().getX());
-        float minY = (float) (box.minY - camera.getPos().getY());
-        float minZ = (float) (box.minZ - camera.getPos().getZ());
-        float maxX = (float) (box.maxX - camera.getPos().getX());
-        float maxY = (float) (box.maxY - camera.getPos().getY());
-        float maxZ = (float) (box.maxZ - camera.getPos().getZ());
+        Vec3d camPos = camera.getPos();
 
-        BufferBuilder buffer = Tessellator.getInstance()
+        float minX = (float) (box.minX - camPos.x);
+        float minY = (float) (box.minY - camPos.y);
+        float minZ = (float) (box.minZ - camPos.z);
+        float maxX = (float) (box.maxX - camPos.x);
+        float maxY = (float) (box.maxY - camPos.y);
+        float maxZ = (float) (box.maxZ - camPos.z);
+
+        float epsilon = 1e-3f;
+
+        boolean drawNorth = camPos.z < box.minZ - epsilon;
+        boolean drawSouth = camPos.z > box.maxZ + epsilon;
+        boolean drawWest  = camPos.x < box.minX - epsilon;
+        boolean drawEast  = camPos.x > box.maxX + epsilon;
+        boolean drawDown  = camPos.y < box.minY - epsilon;
+        boolean drawUp    = camPos.y > box.maxY + epsilon;
+
+        BufferBuilder buf = Tessellator.getInstance()
                 .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        addQuad(buffer, stack, minX, minY, minZ, maxX, minY, maxZ, color); // bottom
-        addQuad(buffer, stack, minX, maxY, minZ, maxX, maxY, maxZ, color); // top
-        addQuad(buffer, stack, minX, minY, minZ, maxX, maxY, minZ, color); // north
-        addQuad(buffer, stack, maxX, minY, minZ, maxX, maxY, maxZ, color); // east
-        addQuad(buffer, stack, minX, minY, maxZ, maxX, maxY, maxZ, color); // south
-        addQuad(buffer, stack, minX, minY, minZ, minX, maxY, maxZ, color); // west
-
-        Layers.getGlobalQuads().draw(buffer.end());
-    }
-
-    private static void addQuad(BufferBuilder buffer, MatrixStack stack, float x1, float y1, float z1,
-                                float x2, float y2, float z2, Color color) {
         Matrix4f matrix = stack.peek().getPositionMatrix();
-        buffer.vertex(matrix, x1, y1, z1).color(color.getRGB());
-        buffer.vertex(matrix, x2, y1, z1).color(color.getRGB());
-        buffer.vertex(matrix, x2, y2, z2).color(color.getRGB());
-        buffer.vertex(matrix, x1, y2, z2).color(color.getRGB());
+
+        if (drawDown) {
+            buf.vertex(matrix, minX, minY, minZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, minY, minZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, minY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, minX, minY, maxZ).color(c.getRGB());
+        }
+
+        if (drawUp) {
+            buf.vertex(matrix, minX, maxY, minZ).color(c.getRGB());
+            buf.vertex(matrix, minX, maxY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, maxY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, maxY, minZ).color(c.getRGB());
+        }
+
+        if (drawNorth) {
+            buf.vertex(matrix, minX, minY, minZ).color(c.getRGB());
+            buf.vertex(matrix, minX, maxY, minZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, maxY, minZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, minY, minZ).color(c.getRGB());
+        }
+
+        if (drawSouth) {
+            buf.vertex(matrix, minX, minY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, minY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, maxY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, minX, maxY, maxZ).color(c.getRGB());
+        }
+
+        if (drawWest) {
+            buf.vertex(matrix, minX, minY, minZ).color(c.getRGB());
+            buf.vertex(matrix, minX, minY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, minX, maxY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, minX, maxY, minZ).color(c.getRGB());
+        }
+
+        if (drawEast) {
+            buf.vertex(matrix, maxX, minY, maxZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, minY, minZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, maxY, minZ).color(c.getRGB());
+            buf.vertex(matrix, maxX, maxY, maxZ).color(c.getRGB());
+        }
+
+        Layers.getGlobalQuads().draw(buf.end());
     }
 
     public static void drawBoxFilled(MatrixStack stack, Vec3d vec, Color color) {
@@ -232,6 +270,7 @@ public class RenderUtil {
     public static void drawBoxLines(MatrixStack stack, BlockPos pos, Color color, double lineWidth) {
         drawBoxLines(stack, new Box(pos), color, lineWidth);
     }
+
 
     public static void drawBox(MatrixStack stack, Box box, Color fillColor, Color lineColor,
                                double lineWidth, boolean filled, boolean outline) {
@@ -392,58 +431,5 @@ public class RenderUtil {
         MC.getBufferBuilders().getEntityVertexConsumers().draw();
 
         matrices.pop();
-    }
-
-    public static void drawThickLine(MatrixStack matrix, Vec3d start, Vec3d end, float thickness, int color) {
-        Matrix4f mat = matrix.peek().getPositionMatrix();
-        Vec3d camPos = MatrixCache.camera.getPos();
-
-        float r = (color >> 16 & 0xFF) / 255.0f;
-        float g = (color >> 8 & 0xFF) / 255.0f;
-        float b = (color & 0xFF) / 255.0f;
-        float a = (color >> 24 & 0xFF) / 255.0f;
-
-        Vector3f from = new Vector3f((float)(start.x - end.x), (float)(start.y - end.y), (float)(start.z - end.z));
-        Vector3f dir = new Vector3f((float)(end.x - start.x), (float)(end.y - start.y), (float)(end.z - start.z));
-        dir.normalize();
-
-        Vector3f up = new Vector3f(0, 1, 0);
-        if (Math.abs(dir.dot(up)) > 0.99f) up = new Vector3f(1, 0, 0);
-        Vector3f side1 = dir.cross(up, new Vector3f());
-        Vector3f side2 = dir.cross(side1, new Vector3f());
-
-        side1.normalize().mul(thickness / 2f);
-        side2.normalize().mul(thickness / 2f);
-
-        Vector3f[] verts = new Vector3f[8];
-        verts[0] = new Vector3f((float)(start.x - camPos.x), (float)(start.y - camPos.y), (float)(start.z - camPos.z)).add(side1).add(side2);
-        verts[1] = new Vector3f(verts[0]).sub(side1.mul(2f));
-        verts[2] = new Vector3f(verts[1]).sub(side2.mul(2f));
-        verts[3] = new Vector3f(verts[0]).sub(side2.mul(2f));
-
-        verts[4] = new Vector3f((float)(end.x - camPos.x), (float)(end.y - camPos.y), (float)(end.z - camPos.z)).add(side1).add(side2);
-        verts[5] = new Vector3f(verts[4]).sub(side1.mul(2f));
-        verts[6] = new Vector3f(verts[5]).sub(side2.mul(2f));
-        verts[7] = new Vector3f(verts[4]).sub(side2.mul(2f));
-
-        BufferBuilder builder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        int[][] quads = {
-                {0, 1, 5, 4}, // side
-                {1, 2, 6, 5}, // side
-                {2, 3, 7, 6}, // side
-                {3, 0, 4, 7}, // side
-                {0, 1, 2, 3}, // start cap
-                {4, 5, 6, 7}  // end cap
-        };
-
-        for (int[] quad : quads) {
-            for (int idx : quad) {
-                Vector3f v = verts[idx];
-                builder.vertex(mat, v.x, v.y, v.z).color(r, g, b, a);
-            }
-        }
-
-        Layers.getGlobalQuads().draw(builder.end());
     }
 }
