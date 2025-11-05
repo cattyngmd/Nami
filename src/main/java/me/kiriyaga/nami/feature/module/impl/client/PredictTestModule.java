@@ -5,6 +5,7 @@ import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
+import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EntityUtils;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
 
-//@RegisterModule
+@RegisterModule
 public class PredictTestModule extends Module {
 
     public final IntSetting ticks = addSetting(new IntSetting("Ticks", 3, 1, 20));
@@ -69,7 +70,7 @@ public class PredictTestModule extends Module {
         if (showBox.get()) {
             Box box = entity.getBoundingBox().offset(predicted.pos.subtract(entity.getPos()));
             RenderUtil.drawBoxFilled(matrices, box, new Color(0, 255, 0, 40));
-            RenderUtil.drawBox(matrices, box, new Color(0, 255, 0, 200), 1.5f);
+            RenderUtil.drawBoxPreset(matrices, box, new Color(0, 255, 0, 200));
         }
 
         if (showEye.get()) {
@@ -77,7 +78,7 @@ public class PredictTestModule extends Module {
             double size = 0.1;
             Box eyeBox = new Box(eye.x - size, eye.y - size, eye.z - size, eye.x + size, eye.y + size, eye.z + size);
             RenderUtil.drawBoxFilled(matrices, eyeBox, new Color(255, 0, 0, 150));
-            RenderUtil.drawBox(matrices, eyeBox, new Color(255, 0, 0, 255), 1.0f);
+            RenderUtil.drawBoxPreset(matrices, eyeBox, new Color(255, 0, 0, 255));
         }
     }
 }

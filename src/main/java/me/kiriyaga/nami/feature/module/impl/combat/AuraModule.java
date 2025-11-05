@@ -43,6 +43,7 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.raycastTarget;
 import static me.kiriyaga.nami.util.RotationUtils.*;
+import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 
 @RegisterModule
 public class AuraModule extends Module {
@@ -295,10 +296,7 @@ public class AuraModule extends Module {
         double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
         Box box = entity.getBoundingBox().offset(interpX - entity.getX(), interpY - entity.getY(), interpZ - entity.getZ());
 
-        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50);
-        Color lineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 90);
-
-        RenderUtil.drawBox(matrices, box, fillColor, lineColor, 1.5f, true, true);
+        drawBoxPreset(matrices, box, color);
     }
 
     private float getBaseCooldownTicks(ItemStack stack, float tps) {

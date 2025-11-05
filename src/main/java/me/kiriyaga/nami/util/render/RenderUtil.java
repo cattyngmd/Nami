@@ -158,100 +158,49 @@ public class RenderUtil {
 
 
     // 3d
-    public static void drawBoxFilled(MatrixStack stack, Box box, Color c) {
+    public static void drawBoxFilled(MatrixStack stack, Box box, Color color) {
         if (box.contains(MC.getEntityRenderDispatcher().camera.getPos())) return;
-        float minX = (float) (box.minX - MC.getEntityRenderDispatcher().camera.getPos().getX());
-        float minY = (float) (box.minY - MC.getEntityRenderDispatcher().camera.getPos().getY());
-        float minZ = (float) (box.minZ - MC.getEntityRenderDispatcher().camera.getPos().getZ());
-        float maxX = (float) (box.maxX - MC.getEntityRenderDispatcher().camera.getPos().getX());
-        float maxY = (float) (box.maxY - MC.getEntityRenderDispatcher().camera.getPos().getY());
-        float maxZ = (float) (box.maxZ - MC.getEntityRenderDispatcher().camera.getPos().getZ());
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance()
-                .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB());
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB());
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB());
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB());
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB());
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB());
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB());
-
-        Layers.getGlobalQuads().draw(bufferBuilder.end());
-    }
-
-    public static void drawBoxFilled(MatrixStack stack, Vec3d vec, Color c) {
-        drawBoxFilled(stack, Box.from(vec), c);
-    }
-
-    public static void drawBoxFilled(MatrixStack stack, BlockPos bp, Color c) {
-        drawBoxFilled(stack, new Box(bp), c);
-    }
-
-    public static void drawBox(MatrixStack stack, Box box, Color fillColor, Color lineColor, double lineWidth, boolean filled, boolean outline) {
-        if (filled) {
-            drawBoxFilled(stack, box, fillColor);
-        }
-        if (outline) {
-            drawBox(stack, box, lineColor, lineWidth);
-        }
-    }
-
-    public static void drawBlockShape(MatrixStack matrices, World world, BlockPos pos, BlockState state,
-                                      Color fillColor, Color lineColor, double lineWidth, boolean filled) {
-
-        VoxelShape shape = state.getOutlineShape(world, pos);
-
-        shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
-            Box box = new Box(
-                    pos.getX() + minX,
-                    pos.getY() + minY,
-                    pos.getZ() + minZ,
-                    pos.getX() + maxX,
-                    pos.getY() + maxY,
-                    pos.getZ() + maxZ
-            );
-
-            if (filled) {
-                drawBoxFilled(matrices, box, fillColor);
-            }
-            drawBox(matrices, box, lineColor, lineWidth);
-        });
-    }
-
-    public static Color getBlockColor(BlockState state, BlockRenderView world, BlockPos pos) {
-        BlockColors blockColors = MinecraftClient.getInstance().getBlockColors();
-        int colorInt = blockColors.getColor(state, world, pos, 0);
-
-        return new Color(colorInt, true);
-    }
-
-
-    public static void drawBox(MatrixStack stack, Box box, Color c, double lineWidth) {
         Camera camera = MC.getEntityRenderDispatcher().camera;
+        float minX = (float) (box.minX - camera.getPos().getX());
+        float minY = (float) (box.minY - camera.getPos().getY());
+        float minZ = (float) (box.minZ - camera.getPos().getZ());
+        float maxX = (float) (box.maxX - camera.getPos().getX());
+        float maxY = (float) (box.maxY - camera.getPos().getY());
+        float maxZ = (float) (box.maxZ - camera.getPos().getZ());
 
+        BufferBuilder buffer = Tessellator.getInstance()
+                .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        addQuad(buffer, stack, minX, minY, minZ, maxX, minY, maxZ, color); // bottom
+        addQuad(buffer, stack, minX, maxY, minZ, maxX, maxY, maxZ, color); // top
+        addQuad(buffer, stack, minX, minY, minZ, maxX, maxY, minZ, color); // north
+        addQuad(buffer, stack, maxX, minY, minZ, maxX, maxY, maxZ, color); // east
+        addQuad(buffer, stack, minX, minY, maxZ, maxX, maxY, maxZ, color); // south
+        addQuad(buffer, stack, minX, minY, minZ, minX, maxY, maxZ, color); // west
+
+        Layers.getGlobalQuads().draw(buffer.end());
+    }
+
+    private static void addQuad(BufferBuilder buffer, MatrixStack stack, float x1, float y1, float z1,
+                                float x2, float y2, float z2, Color color) {
+        Matrix4f matrix = stack.peek().getPositionMatrix();
+        buffer.vertex(matrix, x1, y1, z1).color(color.getRGB());
+        buffer.vertex(matrix, x2, y1, z1).color(color.getRGB());
+        buffer.vertex(matrix, x2, y2, z2).color(color.getRGB());
+        buffer.vertex(matrix, x1, y2, z2).color(color.getRGB());
+    }
+
+    public static void drawBoxFilled(MatrixStack stack, Vec3d vec, Color color) {
+        drawBoxFilled(stack, Box.from(vec), color);
+    }
+
+    public static void drawBoxFilled(MatrixStack stack, BlockPos pos, Color color) {
+        drawBoxFilled(stack, new Box(pos), color);
+    }
+
+    public static void drawBoxLines(MatrixStack stack, Box box, Color color, double lineWidth) {
+        Camera camera = MC.getEntityRenderDispatcher().camera;
         float minX = (float) (box.minX - camera.getPos().getX());
         float minY = (float) (box.minY - camera.getPos().getY());
         float minZ = (float) (box.minZ - camera.getPos().getZ());
@@ -265,27 +214,75 @@ public class RenderUtil {
         double minThickness = 0.5;
         double maxThickness = lineWidth;
         double scaleFactor = 5.0;
+        double scaledLineWidth = Math.max(maxThickness / (1.0 + (distance / scaleFactor)), minThickness);
 
-        double scaledLineWidth = maxThickness / (1.0 + (distance / scaleFactor));
-        scaledLineWidth = Math.max(scaledLineWidth, minThickness);
-
-        BufferBuilder bufferBuilder = Tessellator.getInstance()
+        BufferBuilder buffer = Tessellator.getInstance()
                 .begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL);
 
-        VertexRendering.drawBox(stack, bufferBuilder, minX, minY, minZ, maxX, maxY, maxZ,
-                c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
+        VertexRendering.drawBox(stack, buffer, minX, minY, minZ, maxX, maxY, maxZ,
+                color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
 
-        Layers.getGlobalLines(scaledLineWidth).draw(bufferBuilder.end());
+        Layers.getGlobalLines(scaledLineWidth).draw(buffer.end());
     }
 
-
-
-    public static void drawBox(MatrixStack stack, Vec3d vec, Color c, double lineWidth) {
-        drawBox(stack, Box.from(vec), c, lineWidth);
+    public static void drawBoxLines(MatrixStack stack, Vec3d vec, Color color, double lineWidth) {
+        drawBoxLines(stack, Box.from(vec), color, lineWidth);
     }
 
-    public static void drawBox(MatrixStack stack, BlockPos bp, Color c, double lineWidth) {
-        drawBox(stack, new Box(bp), c, lineWidth);
+    public static void drawBoxLines(MatrixStack stack, BlockPos pos, Color color, double lineWidth) {
+        drawBoxLines(stack, new Box(pos), color, lineWidth);
+    }
+
+    public static void drawBox(MatrixStack stack, Box box, Color fillColor, Color lineColor,
+                               double lineWidth, boolean filled, boolean outline) {
+        if (filled) drawBoxFilled(stack, box, fillColor);
+        if (outline) drawBoxLines(stack, box, lineColor, lineWidth);
+    }
+
+    public static void drawBox(MatrixStack stack, Vec3d vec, Color fillColor, Color lineColor,
+                               double lineWidth, boolean filled, boolean outline) {
+        drawBox(stack, Box.from(vec), fillColor, lineColor, lineWidth, filled, outline);
+    }
+
+    public static void drawBox(MatrixStack stack, BlockPos pos, Color fillColor, Color lineColor,
+                               double lineWidth, boolean filled, boolean outline) {
+        drawBox(stack, new Box(pos), fillColor, lineColor, lineWidth, filled, outline);
+    }
+
+    public static void drawBlockShape(MatrixStack matrices, World world, BlockPos pos, BlockState state,
+                                      Color fillColor, Color lineColor, double lineWidth, boolean filled) {
+
+        VoxelShape shape = state.getOutlineShape(world, pos);
+
+        shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
+            Box box = new Box(
+                    pos.getX() + minX, pos.getY() + minY, pos.getZ() + minZ,
+                    pos.getX() + maxX, pos.getY() + maxY, pos.getZ() + maxZ
+            );
+
+            if (filled) drawBoxFilled(matrices, box, fillColor);
+            drawBoxLines(matrices, box, lineColor, lineWidth);
+        });
+    }
+
+    public static Color getBlockColor(BlockState state, BlockRenderView world, BlockPos pos) {
+        BlockColors blockColors = MinecraftClient.getInstance().getBlockColors();
+        int colorInt = blockColors.getColor(state, world, pos, 0);
+        return new Color(colorInt, true);
+    }
+
+    public static void drawBoxPreset(MatrixStack stack, Box box, Color baseColor) {
+        Color fill = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 50);
+        Color outline = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 90);
+        drawBox(stack, box, fill, outline, 1.5, true, true);
+    }
+
+    public static void drawBoxPreset(MatrixStack stack, Vec3d vec, Color baseColor) {
+        drawBoxPreset(stack, Box.from(vec), baseColor);
+    }
+
+    public static void drawBoxPreset(MatrixStack stack, BlockPos pos, Color baseColor) {
+        drawBoxPreset(stack, new Box(pos), baseColor);
     }
 
     public static MatrixStack matrixFrom(Vec3d pos) {

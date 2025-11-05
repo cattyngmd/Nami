@@ -102,11 +102,10 @@ public class ScaffoldModule extends Module {
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
-        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
 
         Box box = new Box(renderPos);
 
-        RenderUtil.drawBox(matrices, box, fillColor, color, 1.5f, true, true);
+        RenderUtil.drawBoxPreset(matrices, box, color);
     }
 
     private int getSlot() {

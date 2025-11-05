@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 
 @RegisterModule
 public class AutoWebModule extends Module {
@@ -98,11 +99,10 @@ public class AutoWebModule extends Module {
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
-        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
 
         Box box = new Box(renderPos);
 
-        RenderUtil.drawBox(matrices, box, fillColor, color, 1.5f, true, true);
+        drawBoxPreset(matrices, box, color);
     }
 
     private int findSlot() {
