@@ -5,6 +5,7 @@ import me.kiriyaga.nami.feature.gui.newgui.entry.FriendEntry;
 import me.kiriyaga.nami.feature.gui.newgui.widget.ActionItem;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.gui.newgui.component.ConsolePanelComponent;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -19,6 +20,10 @@ public class FriendScreen extends NamiScreen {
 
     public FriendScreen() {
         super(Text.literal("NamiFriends"));
+    }
+
+    private ClickGuiModule getClickGuiModule() {
+        return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
     @Override
@@ -44,6 +49,13 @@ public class FriendScreen extends NamiScreen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         ClickGuiModule clickGui = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
         updateEntries();
+
+        ClickGuiModule clickGuiModule = getClickGuiModule();
+        if (clickGuiModule != null && clickGuiModule.background.get()) {
+            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
+            int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
+            context.fill(0, 0, this.width, this.height, CLICK_GUI.applyFade(color));
+        }
 
         NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
 

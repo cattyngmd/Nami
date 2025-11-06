@@ -7,6 +7,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -62,14 +63,15 @@ public class HudEditorScreen extends Screen {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
+        ClickGuiModule clickGuiModule = getClickGuiModule();
+        if (clickGuiModule != null && clickGuiModule.background.get()) {
+            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
+            int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
+            context.fill(0, 0, this.width, this.height, CLICK_GUI.applyFade(color));
+        }
+
         NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
 
-        ClickGuiModule hudEditorModule = getClickGuiModule();
-        if (hudEditorModule != null && hudEditorModule.background.get()) {
-            int alpha = (hudEditorModule.backgroundAlpha.get() & 0xFF) << 24;
-            int color = alpha | 0x101010;
-            context.fill(0, 0, this.width, this.height, color);
-        }
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
@@ -82,7 +84,7 @@ public class HudEditorScreen extends Screen {
             hudPanel.render(context, this.textRenderer, pos.x, pos.y, scaledMouseX, scaledMouseY, this.height);
         }
 
-        if (hudPanel != null && hudEditorModule != null && hudEditorModule.descriptions.get() && pos != null) {
+        if (hudPanel != null && clickGuiModule != null && clickGuiModule.descriptions.get() && pos != null) {
             double scrollOffset = hudPanel.getScrollOffset();
             List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(hudCategory);
 

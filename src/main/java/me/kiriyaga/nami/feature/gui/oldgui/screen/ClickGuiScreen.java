@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.gui.oldgui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -79,8 +80,6 @@ public class ClickGuiScreen extends Screen {
         checkClose();
         syncCategoryPositions();
 
-        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
-
         if (previousScreen instanceof TitleScreen
                 || previousScreen instanceof DisconnectedScreen
                 || previousScreen instanceof MultiplayerScreen) {
@@ -90,9 +89,11 @@ public class ClickGuiScreen extends Screen {
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get()) {
             int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
-            int color = alpha | 0x101010;
-            context.fill(0, 0, this.width, this.height, color);
+            int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
+            context.fill(0, 0, this.width, this.height, applyFade(color));
         }
+
+        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);
