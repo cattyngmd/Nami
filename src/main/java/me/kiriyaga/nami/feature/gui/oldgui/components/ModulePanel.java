@@ -18,21 +18,19 @@ public class ModulePanel {
     public static final int MODULE_SPACING = 1;
 
     private final Module module;
-    private final Set<Module> expandedModules;
 
     private ColorModule getColorModule() {
         return MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
     }
 
-    public ModulePanel(Module module, Set<Module> expandedModules) {
+    public ModulePanel(Module module) {
         this.module = module;
-        this.expandedModules = expandedModules;
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         boolean enabled = module.isEnabled();
-        boolean expanded = expandedModules.contains(module);
+        boolean expanded = module.isExpanded();
 
         Color primary = getColorModule().getStyledGlobalColor();
         Color secondary = getColorModule().getStyledColor(getColorModule().getStyledSecondColor(), 0.90, 0.40);

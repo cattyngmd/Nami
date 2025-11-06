@@ -19,7 +19,6 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class HudEditorScreen extends Screen {
 
-    private final Set<Module> expandedModules = new HashSet<>();
     private final Map<ModuleCategory, Point> categoryPositions = new HashMap<>();
     private final Map<ModuleCategory, CategoryPanel> categoryPanels = new HashMap<>();
 
@@ -46,7 +45,7 @@ public class HudEditorScreen extends Screen {
         categoryPositions.put(hudCategory, pos);
 
         if (!categoryPanels.containsKey(hudCategory)) {
-            categoryPanels.put(hudCategory, new CategoryPanel(hudCategory, expandedModules));
+            categoryPanels.put(hudCategory, new CategoryPanel(hudCategory));
         }
     }
 
@@ -113,7 +112,7 @@ public class HudEditorScreen extends Screen {
                 }
 
                 curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-                if (expandedModules.contains(module)) {
+                if (module.isExpanded()) {
                     curY += SettingPanel.getSettingsHeight(module);
                 }
             }
@@ -194,8 +193,9 @@ public class HudEditorScreen extends Screen {
                         playClickSound();
                         module.toggle();
                     } else if (button == 1) {
-                        if (expandedModules.contains(module)) expandedModules.remove(module);
-                        else expandedModules.add(module);
+                        if (module.isExpanded())
+                            module.setExpanded(false);
+                        else module.setExpanded(true);
                         playClickSound();
                     } else if (button == 2) {
                         playClickSound();
@@ -205,7 +205,7 @@ public class HudEditorScreen extends Screen {
                 }
 
                 curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-                if (expandedModules.contains(module)) {
+                if (module.isExpanded()) {
                     if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) return true;
                     curY += SettingPanel.getSettingsHeight(module);
                 }

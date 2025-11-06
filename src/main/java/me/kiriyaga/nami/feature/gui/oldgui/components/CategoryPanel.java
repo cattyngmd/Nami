@@ -22,15 +22,13 @@ public class CategoryPanel {
     public static final int BOTTOM_MARGIN = 1;
 
     private final ModuleCategory moduleCategory;
-    private final Set<Module> expandedModules;
     private final PanelRenderer renderer = new PanelRenderer();
 
     private double scrollOffset = 0;
     private double targetScrollOffset = 0;
 
-    public CategoryPanel(ModuleCategory moduleCategory, Set<Module> expandedModules) {
+    public CategoryPanel(ModuleCategory moduleCategory) {
         this.moduleCategory = moduleCategory;
-        this.expandedModules = expandedModules;
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
@@ -53,7 +51,9 @@ public class CategoryPanel {
         int visibleHeight = Math.min(basePanelHeight - HEADER_HEIGHT - MODULE_SPACING - BOTTOM_MARGIN,
                 screenHeight - contentY - 10);
 
-        boolean b = expandedModules.stream().anyMatch(module -> module.getCategory() == moduleCategory);
+        boolean b = MODULE_MANAGER.getStorage().getByCategory(moduleCategory)
+                .stream()
+                .anyMatch(Module::isExpanded);
 
         if (b) {
             visibleHeight -= 1;
@@ -63,7 +63,7 @@ public class CategoryPanel {
         int scrollableHeight = 0;
         for (Module module : modules) {
             scrollableHeight += ModulePanel.HEIGHT + MODULE_SPACING;
-            if (expandedModules.contains(module)) {
+            if (module.isExpanded()) {
                 scrollableHeight += SettingPanel.getSettingsHeight(module);
             }
         }
@@ -78,11 +78,11 @@ public class CategoryPanel {
 
         int moduleY = contentY - (int) scrollOffset;
         for (Module module : modules) {
-            ModulePanel modulePanel = new ModulePanel(module, expandedModules);
+            ModulePanel modulePanel = new ModulePanel(module);
             modulePanel.render(context, textRenderer, x + BORDER_WIDTH + SettingPanel.INNER_PADDING, moduleY, mouseX, mouseY);
             moduleY += ModulePanel.HEIGHT + MODULE_SPACING;
 
-            if (expandedModules.contains(module)) {
+            if (module.isExpanded()) {
                 moduleY += SettingPanel.renderSettings(context, textRenderer, module,
                         x + BORDER_WIDTH + SettingPanel.INNER_PADDING, moduleY, mouseX, mouseY);
             }
@@ -101,7 +101,7 @@ public class CategoryPanel {
         int scrollableHeight = 0;
         for (Module module : modules) {
             scrollableHeight += ModulePanel.HEIGHT + MODULE_SPACING;
-            if (expandedModules.contains(module)) {
+            if (module.isExpanded()) {
                 scrollableHeight += SettingPanel.getSettingsHeight(module);
             }
         }

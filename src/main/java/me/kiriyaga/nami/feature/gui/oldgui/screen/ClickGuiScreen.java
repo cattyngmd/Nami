@@ -20,7 +20,6 @@ import java.awt.Point;
 import static me.kiriyaga.nami.Nami.*;
 
 public class ClickGuiScreen extends Screen {
-    private final Set<Module> expandedModules = new HashSet<>();
     private final Map<ModuleCategory, Point> categoryPositions = new HashMap<>();
     private final Map<ModuleCategory, CategoryPanel> categoryPanels = new HashMap<>();
     private boolean draggingCategory = false;
@@ -63,7 +62,7 @@ public class ClickGuiScreen extends Screen {
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
             categoryPanels.putIfAbsent(moduleCategory,
-                    new CategoryPanel(moduleCategory, expandedModules));
+                    new CategoryPanel(moduleCategory));
         }
         categoryPanels.keySet().removeIf(cat -> !ModuleCategory.getAll().contains(cat));
     }
@@ -165,7 +164,7 @@ public class ClickGuiScreen extends Screen {
                     }
 
                     curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-                    if (expandedModules.contains(module)) {
+                    if (module.isExpanded()) {
                         curY += SettingPanel.getSettingsHeight(module);
                     }
                 }
@@ -236,10 +235,10 @@ public class ClickGuiScreen extends Screen {
                             playClickSound();
                             module.toggle();
                         } else if (button == 1) {
-                            if (expandedModules.contains(module)) {
-                                expandedModules.remove(module);
+                            if (module.isExpanded()) {
+                                module.setExpanded(false);
                             } else {
-                                expandedModules.add(module);
+                                module.setExpanded(true);
                             }
                             playClickSound();
                         } else if (button == 2) {
@@ -251,7 +250,7 @@ public class ClickGuiScreen extends Screen {
 
                     curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
 
-                    if (expandedModules.contains(module)) {
+                    if (module.isExpanded()) {
                         if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) {
                             return true;
                         }

@@ -23,12 +23,14 @@ public abstract class Module {
 
     protected final List<Setting<?>> settings = new ArrayList<>();
     protected final KeyBindSetting keyBind;
+    private boolean expanded = false;
 
     public Module(String name, String description, ModuleCategory category, String... aliases) {
         this.name = name;
         this.description = description;
         this.aliases = aliases;
         this.category = category;
+        expanded = false;
 
         this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
         this.drawn = new BoolSetting("Drawn", false);
@@ -82,6 +84,14 @@ public abstract class Module {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
     }
 
     public boolean isDrawn() {
