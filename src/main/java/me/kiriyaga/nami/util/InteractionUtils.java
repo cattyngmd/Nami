@@ -2,6 +2,8 @@ package me.kiriyaga.nami.util;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import net.minecraft.block.BedBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -304,5 +306,9 @@ public class InteractionUtils {
 
     public static boolean isReplaceable(BlockPos pos) {
         return MC.world.getBlockState(pos).isReplaceable();
+    }
+
+    public static boolean isBed(Block block) {
+        return block instanceof BedBlock;
     }
 }

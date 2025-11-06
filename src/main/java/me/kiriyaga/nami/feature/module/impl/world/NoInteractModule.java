@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
+import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -27,6 +28,7 @@ import net.minecraft.world.dimension.DimensionTypes;
 import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.util.InteractionUtils.isBed;
 
 @RegisterModule
 public class NoInteractModule extends Module {
@@ -138,9 +140,5 @@ public class NoInteractModule extends Module {
             }
         }
 
-    }
-
-    public boolean isBed(Block block) {
-        return block.toString().toLowerCase().contains("bed");
     }
 }
