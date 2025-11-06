@@ -34,7 +34,7 @@ public class PanelRenderer {
         if (clickGuiModule.lines.get()) {
             lineColor = CLICK_GUI.applyFade(primary.getRGB());
         } else {
-            lineColor = CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB());
+            lineColor = CLICK_GUI.applyFade(new Color(20, 20, 20, 0).getRGB());
         }
 
         if (!renderHeader) {

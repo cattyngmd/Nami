@@ -1,7 +1,6 @@
 package me.kiriyaga.nami.feature.gui.newgui.base;
 
 import me.kiriyaga.nami.feature.gui.newgui.widget.ActionWidget;
-import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +12,7 @@ import java.util.function.Function;
 
 import static me.kiriyaga.nami.Nami.*;
 
-public class DataPanelComponent<T> {
+public class DataPanel<T> {
     protected final List<T> entries = new ArrayList<>();
     protected final Function<T, Text> displayMapper;
 
@@ -33,7 +32,7 @@ public class DataPanelComponent<T> {
     protected int dragOffsetX = 0;
     protected int dragOffsetY = 0;
 
-    public DataPanelComponent(String name, int x, int y, int width, int height, Function<T, Text> displayMapper) {
+    public DataPanel(String name, int x, int y, int width, int height, Function<T, Text> displayMapper) {
         this.name = name;
         this.x = x;
         this.y = y;

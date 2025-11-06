@@ -1,18 +1,15 @@
 package me.kiriyaga.nami.feature.gui.newgui.component;
 
-import me.kiriyaga.nami.feature.gui.newgui.base.DataPanelComponent;
+import me.kiriyaga.nami.feature.gui.newgui.base.DataPanel;
 import me.kiriyaga.nami.feature.gui.newgui.entry.FriendEntry;
 import me.kiriyaga.nami.feature.gui.newgui.widget.ButtonWidget;
 import me.kiriyaga.nami.feature.gui.newgui.widget.TextBoxWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
 import java.util.function.Consumer;
 
-import static me.kiriyaga.nami.Nami.*;
-
-public class ConsolePanelComponent extends DataPanelComponent<FriendEntry> {
+public class ConsolePanelComponent extends DataPanel<FriendEntry> {
     private final Consumer<FriendEntry> onAdd;
     private final Consumer<FriendEntry> onRemove;
     private final Consumer<FriendEntry> onClick;
