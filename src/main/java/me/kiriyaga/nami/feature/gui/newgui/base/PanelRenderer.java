@@ -24,9 +24,10 @@ public class PanelRenderer {
 
     public void renderPanel(DrawContext context, int x, int y, int width, int height, int headerHeight, boolean renderHeader) {
         Color primary = colorModule.getStyledGlobalColor();
+        Color secondary = colorModule.getStyledSecondColor();
 
 
-        int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, clickGuiModule.guiAlpha.get())));
+        int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(secondary.getRed(), secondary.getGreen(), secondary.getBlue(), clickGuiModule.guiAlpha.get())));
         context.fill(x, y, x + width, y + height, bgColor);
 
 
