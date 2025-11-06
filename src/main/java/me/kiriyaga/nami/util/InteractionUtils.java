@@ -2,6 +2,7 @@ package me.kiriyaga.nami.util;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -34,7 +35,6 @@ import static net.minecraft.util.Hand.MAIN_HAND;
 public class InteractionUtils {
 
     private static BlockPos currentBreakingBlock = null;
-    private static long lastAttackBlockTime = 0;
 
     public static boolean interactWithEntity(Entity entity, double range, boolean swing, boolean rotate, String rotationId) {
         if (MC.player == null || MC.interactionManager == null || entity == null) return false;
@@ -217,6 +217,8 @@ public class InteractionUtils {
         if (MC.player == null || MC.interactionManager == null)
             return false;
 
+        CHAT_MANAGER.sendRaw(((ClientPlayerInteractionManagerAccessor) MC.interactionManager).getBlockBreakingCooldown()+"");
+
         if (isBlockAirOrFluid(pos)) {
             if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
                 currentBreakingBlock = null;
@@ -264,11 +266,17 @@ public class InteractionUtils {
 
 
         if (rotate) {
+            Vec3d center = Vec3d.ofCenter(pos).add(
+                    direction.getOffsetX() * 0.5,
+                    direction.getOffsetY() * 0.5,
+                    direction.getOffsetZ() * 0.5
+            );
+
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                     rotationId,
                     3,
-                    (float) getYawToVec(MC.player, Vec3d.ofCenter(pos)),
-                    (float) getPitchToVec(MC.player, Vec3d.ofCenter(pos))
+                    (float) getYawToVec(MC.player, center),
+                    (float) getPitchToVec(MC.player, center)
             ));
 
             if (!ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId)) {
@@ -276,33 +284,28 @@ public class InteractionUtils {
             }
         }
 
-        long now = System.currentTimeMillis();
+        boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
+        if (swing)
+            MC.player.swingHand(MAIN_HAND);
+
+        if (grim && ((ClientPlayerInteractionManagerAccessor) MC.interactionManager).getBlockBreakingCooldown() != 0) // https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/FastBreak.java#L28
+            return false;
+
+        if (isBlockAirOrFluid(pos)) {  // somehow it happens https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/AirLiquidBreak.java#L18
+            currentBreakingBlock = null;
+            return false;
+        }
 
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
-            boolean instant = MC.world.getBlockState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos) >= 1.0f;
-
-            if (instant) {
-                currentBreakingBlock = null;
-                MC.interactionManager.attackBlock(pos, direction);
-                if (swing) MC.player.swingHand(Hand.MAIN_HAND);
-                return true;
-            } else {
-                long attackCooldown = grim ? 275 : 0;
-                if (now - lastAttackBlockTime >= attackCooldown) {
-                    currentBreakingBlock = pos;
-                    MC.interactionManager.attackBlock(pos, direction);
-                    lastAttackBlockTime = now;
-                }
-            }
+            currentBreakingBlock = pos;
+            MC.interactionManager.attackBlock(pos, direction);
         } else {
-            boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
             if (!success) {
                 currentBreakingBlock = null;
                 return false;
             }
         }
 
-        if (swing) MC.player.swingHand(Hand.MAIN_HAND);
         return true;
     }
 
