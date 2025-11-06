@@ -217,7 +217,7 @@ public class InteractionUtils {
         if (MC.player == null || MC.interactionManager == null)
             return false;
 
-        CHAT_MANAGER.sendRaw(((ClientPlayerInteractionManagerAccessor) MC.interactionManager).getBlockBreakingCooldown()+"");
+        //CHAT_MANAGER.sendRaw(((ClientPlayerInteractionManagerAccessor) MC.interactionManager).getBlockBreakingCooldown()+"");
 
         if (isBlockAirOrFluid(pos)) {
             if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
