@@ -33,8 +33,7 @@ public class ModulePanel {
         boolean expanded = module.isExpanded();
 
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = new Color(155, 155, 155, 255);
-        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
+        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
@@ -52,23 +51,12 @@ public class ModulePanel {
                 module.getName(),
                 baseTextX,
                 textY,
-                CLICK_GUI.applyFade(toRGBA(enabled ? textColActivated : textCol)),
+                CLICK_GUI.applyFade(toRGBA(textCol)),
                 true
         );
     }
 
     public static boolean isHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEIGHT;
-    }
-
-    private float approach(float current, float target, float maxDelta) {
-        if (current < target) {
-            current += maxDelta;
-            if (current > target) current = target;
-        } else if (current > target) {
-            current -= maxDelta;
-            if (current < target) current = target;
-        }
-        return current;
     }
 }
