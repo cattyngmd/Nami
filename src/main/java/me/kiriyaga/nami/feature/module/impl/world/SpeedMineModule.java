@@ -39,7 +39,7 @@ import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
-public class AutoMineModule extends Module {
+public class SpeedMineModule extends Module {
     public enum Rotate { NORMAL, HOLD, NONE}
     public enum Swap { NONE, NORMAL, SILENT121, SILENT}
     public enum EchestPriority {FORTUNE, SILK}
@@ -49,6 +49,7 @@ public class AutoMineModule extends Module {
     public final EnumSetting<Swap> swap = addSetting(new EnumSetting<>("Swap", Swap.NORMAL));
     public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("Rotate", Rotate.NORMAL));
     private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    private final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
     private final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     private final BoolSetting async = addSetting(new BoolSetting("Async", true));
@@ -62,7 +63,7 @@ public class AutoMineModule extends Module {
     private int shouldSwapBack = -1;
 
     // Thats first packet mine i made like in my whole life, its bad, and there is issues, im gonna finish it, and maybe rewrite from scratch later
-    public AutoMineModule() {
+    public SpeedMineModule() {
         super("AutoMine", "Automatically mines specified blocks for easier mining.", ModuleCategory.of("World"));
         echestPriority.setShowCondition(()-> swap.get() != Swap.NONE);
         damageThreshold.setShowCondition(()-> swap.get() != Swap.NONE);
@@ -130,6 +131,9 @@ public class AutoMineModule extends Module {
     public void onRender3DEvent(Render3DEvent event) {
         if (currentTask != null)
             renderProgress(event,currentTask);
+
+        if (!doubleMine.get())
+            return;
 
         if (doubleMineTask != null)
             renderProgress(event,doubleMineTask);
@@ -210,6 +214,9 @@ public class AutoMineModule extends Module {
     }
 
     private void handleDoubleMine(BlockBreakingTask task) {
+        if (!doubleMine.get())
+            return;
+
         Vec3d eyePos = MC.player.getEyePos();
         Box blockBox = new Box(task.getBlockPos());
         Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
@@ -240,10 +247,10 @@ public class AutoMineModule extends Module {
             }
         }
 
-        if (swap.get() == Swap.SILENT) {
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
-            shouldSwapBack = -1;
-        }
+//        if (swap.get() == Swap.SILENT) {
+//            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+//            shouldSwapBack = -1;
+//        }
     }
 
     private void startMining(BlockBreakingTask task) {
@@ -294,7 +301,10 @@ public class AutoMineModule extends Module {
             int slot = getSlot(task.getBlockState());
             if (slot != MC.player.getInventory().getSelectedSlot()) {
                 if (currentTask.brokenCount < 2 || !currentTask.isInstantRemine())
-                    shouldSwapBack = MC.player.getInventory().getSelectedSlot();
+
+                    if (swap.get() != Swap.SILENT)
+                        shouldSwapBack = MC.player.getInventory().getSelectedSlot();
+
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
             }
         }
@@ -312,11 +322,10 @@ public class AutoMineModule extends Module {
 
         }
 
-        if (swap.get() == Swap.SILENT) {
+        if (swap.get() == Swap.SILENT && shouldSwapBack == -1)
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
-            shouldSwapBack = -1;
-        }
-            currentTask.markLastBroken();
+
+        currentTask.markLastBroken();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
