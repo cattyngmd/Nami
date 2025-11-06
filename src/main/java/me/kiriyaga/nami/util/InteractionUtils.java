@@ -213,7 +213,7 @@ public class InteractionUtils {
         }
     }
 
-    public static boolean breakBlock(BlockPos pos, double range, boolean rotate, boolean swing, boolean grim, String rotationId) {
+    public static boolean breakBlock(BlockPos pos, double range, boolean rotate, boolean swing, boolean grim, boolean strictDirection, String rotationId) {
         if (MC.player == null || MC.interactionManager == null)
             return false;
 
@@ -232,7 +232,36 @@ public class InteractionUtils {
         if (blockBox.raycast(eyePos, reachEnd).isEmpty())
             return false;
 
+        double dx = eyePos.x - blockBox.getCenter().x;
+        double dy = eyePos.y - blockBox.getCenter().y;
+        double dz = eyePos.z - blockBox.getCenter().z;
+        double absX = Math.abs(dx);
+        double absY = Math.abs(dy);
+        double absZ = Math.abs(dz);
+
         Direction direction = Direction.UP;
+
+        if (strictDirection) {
+
+            if (absY > absX && absY > absZ) direction = dy > 0 ? Direction.UP : Direction.DOWN;
+            else if (absX > absZ) direction = dx > 0 ? Direction.EAST : Direction.WEST;
+            else direction = dz > 0 ? Direction.SOUTH : Direction.NORTH;
+
+            boolean flag = switch (direction) {
+                case NORTH -> eyePos.z <= pos.getZ() + 1e-3;
+                case SOUTH -> eyePos.z >= pos.getZ() + 1 - 1e-3;
+                case WEST  -> eyePos.x <= pos.getX() + 1e-3;
+                case EAST  -> eyePos.x >= pos.getX() + 1 - 1e-3;
+                case DOWN  -> eyePos.y <= pos.getY() + 1e-3;
+                case UP    -> eyePos.y >= pos.getY() + 1 - 1e-3;
+                default -> false;
+            };
+
+            if (!flag) {
+                return false;
+            }
+        }
+
 
         if (rotate) {
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
@@ -258,7 +287,7 @@ public class InteractionUtils {
                 if (swing) MC.player.swingHand(Hand.MAIN_HAND);
                 return true;
             } else {
-                long attackCooldown = grim ? 250 : 0;
+                long attackCooldown = grim ? 275 : 0;
                 if (now - lastAttackBlockTime >= attackCooldown) {
                     currentBreakingBlock = pos;
                     MC.interactionManager.attackBlock(pos, direction);
