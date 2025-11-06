@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.oldgui.base.GuiConstants.toRGBA;
+import static me.kiriyaga.nami.util.ColorUtils.toRGBA;
 
 public class ButtonWidget {
     private final String label;

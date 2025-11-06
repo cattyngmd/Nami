@@ -9,7 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.oldgui.base.GuiConstants.*;
+import static me.kiriyaga.nami.util.ColorUtils.*;
 
 public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
 

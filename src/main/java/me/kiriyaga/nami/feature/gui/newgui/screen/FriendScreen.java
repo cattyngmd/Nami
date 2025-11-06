@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.newgui.screen;
 
+import me.kiriyaga.nami.feature.gui.newgui.base.NamiScreen;
 import me.kiriyaga.nami.feature.gui.newgui.entry.FriendEntry;
 import me.kiriyaga.nami.feature.gui.newgui.widget.ActionItem;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.*;
 
-public class FriendScreen extends Screen {
+public class FriendScreen extends NamiScreen {
     private ConsolePanelComponent console;
 
     public FriendScreen() {

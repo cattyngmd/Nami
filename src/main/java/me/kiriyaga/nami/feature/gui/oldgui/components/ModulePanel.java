@@ -9,7 +9,7 @@ import java.awt.*;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.oldgui.base.GuiConstants.*;
+import static me.kiriyaga.nami.util.ColorUtils.*;
 
 public class ModulePanel {
     public static final int WIDTH = 100 - CategoryPanel.BORDER_WIDTH * 2 - SettingPanel.INNER_PADDING * 2;

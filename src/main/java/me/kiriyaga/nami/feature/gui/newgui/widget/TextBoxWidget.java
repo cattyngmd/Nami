@@ -1,8 +1,6 @@
 package me.kiriyaga.nami.feature.gui.newgui.widget;
 
 import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -11,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.oldgui.base.GuiConstants.toRGBA;
+import static me.kiriyaga.nami.util.ColorUtils.toRGBA;
 
 public class TextBoxWidget {
     private final PanelRenderer panelRenderer = new PanelRenderer();

@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.oldgui.base.GuiConstants.toRGBA;
+import static me.kiriyaga.nami.util.ColorUtils.toRGBA;
 
 public class NavigatePanelComponent {
     private static final int HEIGHT = 14;
