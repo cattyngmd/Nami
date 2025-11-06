@@ -15,14 +15,9 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
     @Override
     public void render(DrawContext context, TextRenderer textRenderer, BoolSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        ColorModule colorModule = getColorModule();
-        Color primary = colorModule.getStyledGlobalColor();
-        Color secondary = colorModule.getStyledSecondColor();
         Color textCol = new Color(155, 155, 155, 255);
         Color bgColor = new Color(30, 30, 30, 0);
-        Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
-                ? new Color(255, 255, 255, 255)
-                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textColActivated = new Color(255, 255, 255, 255);
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
         int textColorInt = CLICK_GUI.applyFade(setting.get() ? toRGBA(textColActivated) : toRGBA(textCol));
@@ -30,17 +25,6 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
         int lineOffset = 1;
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
-            context.fill(
-                    x,
-                    y - lineOffset,
-                    x + 1,
-                    y + HEIGHT,
-                    CLICK_GUI.applyFade(
-                            textColActivated.getRGB()
-                    )
-            );
-        }
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;

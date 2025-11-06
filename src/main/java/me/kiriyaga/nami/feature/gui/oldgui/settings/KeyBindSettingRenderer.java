@@ -19,28 +19,13 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
     @Override
     public void render(DrawContext context, TextRenderer textRenderer, KeyBindSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color primary = getColorModule().getStyledGlobalColor();
-        Color secondary = getColorModule().getStyledSecondColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
-                ? new Color(255, 255, 255, 255)
-                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = new Color(255, 255, 255, 255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
         int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
-
-        int lineOffset = 1;
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
-            context.fill(
-                    x,
-                    y - lineOffset,
-                    x + 1,
-                    y + HEIGHT,
-                    CLICK_GUI.applyFade(textCol.getRGB())
-            );
-        }
 
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;

@@ -13,9 +13,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class ClickGuiModule extends Module {
 
     public final DoubleSetting scale = addSetting(new DoubleSetting("Scale", 1.00, 0.50, 1.50));
-    public final BoolSetting moduleFill = addSetting(new BoolSetting("ModuleFill", true));
     public final BoolSetting lines = addSetting(new BoolSetting("Lines", true));
-    public final BoolSetting expandedIdentifier = addSetting(new BoolSetting("Identifier", false));
     public final BoolSetting descriptions = addSetting(new BoolSetting("Descriptions", true));
     public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 50, 0, 255));
     public final BoolSetting fade = addSetting(new BoolSetting("Fade", true));

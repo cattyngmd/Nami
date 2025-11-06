@@ -59,9 +59,7 @@ public class NavigatePanelComponent {
             Color primary = colorModule.getStyledGlobalColor();
             Color textOff = new Color(155, 155, 155, 255);
             Color textCol = active
-                    ? (clickGuiModule.moduleFill.get()
                     ? Color.WHITE
-                    : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255))
                     : textOff;
 
             int textWidth = FONT_MANAGER.getWidth(name);

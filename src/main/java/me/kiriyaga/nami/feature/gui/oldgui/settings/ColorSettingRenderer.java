@@ -30,10 +30,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
                        int x, int y, int mouseX, int mouseY) {
 
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
-                ? Color.WHITE
-                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = Color.WHITE;
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, 0)));
         int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
@@ -43,17 +40,6 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         int textX = x + PADDING + (hovered ? 1 : 0);
         int textY = y + (HEIGHT - 8) / 2;
         FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);
-
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get())
-            context.fill(
-                    x,
-                    y - 1,
-                    x + 1,
-                    y + getHeight(this.getColorModule().globalColor),
-                    CLICK_GUI.applyFade(
-                            textCol.getRGB()
-                    )
-            );
 
         lastSvX = x + PADDING;
         lastSvY = y + HEIGHT;

@@ -29,19 +29,15 @@ public class ModulePanel {
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        boolean enabled = module.isEnabled();
-        boolean expanded = module.isExpanded();
 
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
-                ? new Color(255, 255, 255, 255)
-                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = new Color(255, 255, 255, 255);
 
         if (hovered) {
             primary = brighten(primary, 0.1f);
         }
 
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() && module.isEnabled())
+        if (module.isEnabled())
             context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI.applyFade(toRGBA(primary)));
 
         int textY = y + (HEIGHT - 8) / 2;
