@@ -33,40 +33,17 @@ public class ModulePanel {
         boolean expanded = module.isExpanded();
 
         Color primary = getColorModule().getStyledGlobalColor();
-        Color secondary = getColorModule().getStyledColor(getColorModule().getStyledSecondColor(), 0.90, 0.40);
         Color textCol = new Color(155, 155, 155, 255);
         Color textColActivated = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
                 ? new Color(255, 255, 255, 255)
                 : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
 
-        Color bgColor;
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()) {
-            bgColor = enabled ? primary : secondary;
-        } else {
-            bgColor = new Color(30, 30, 30, 0);
-        }
-
         if (hovered) {
-            bgColor = brighten(bgColor, 0.1f);
+            primary = brighten(primary, 0.1f);
         }
 
-        context.fill(
-                x,
-                y,
-                x + WIDTH,
-                y + HEIGHT,
-                CLICK_GUI.applyFade(toRGBA(bgColor))
-        );
-
-        if (!expanded) {
-            context.fill(
-                    x,
-                    y + HEIGHT,
-                    x + WIDTH,
-                    y + HEIGHT + 1,
-                    CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB())
-            );
-        }
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get() && module.isEnabled())
+            context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI.applyFade(toRGBA(primary)));
 
         int textY = y + (HEIGHT - 8) / 2;
         int baseTextX = x + PADDING + (hovered ? 1 : 0);
