@@ -106,8 +106,6 @@ public class ClickPearlModule extends Module {
     }
 
     private void useItem(Item item) {
-        CHAT_MANAGER.sendRaw("call");
-
         int hotbarSlot = getSlotInHotbar(item);
 
         if (hotbarSlot != -1) {
@@ -129,7 +127,6 @@ public class ClickPearlModule extends Module {
                 MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
 
                 INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
-                CHAT_MANAGER.sendRaw("true");
             } else recall = true;
         }
     }

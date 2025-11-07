@@ -11,8 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 @RegisterModule
 public class TargetModule extends Module {
 
-    public final IntSetting maxIdleTicks = addSetting(new IntSetting("IdleTicks", 500, 250, 750));
-    public final DoubleSetting targetRange = addSetting(new DoubleSetting("Range", 5.0, 4.0, 16.0));
+    public final DoubleSetting targetRange = addSetting(new DoubleSetting("Range", 8.0, 4.0, 16.0));
     public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("Age", 12, 0.0, 20.0));
     public final BoolSetting targetPlayers = addSetting(new BoolSetting("Players", true));
     public final BoolSetting targetHostiles = addSetting(new BoolSetting("Hostiles", true));
@@ -29,8 +28,6 @@ public class TargetModule extends Module {
         super("Target", "Allows you to configure target logic.", ModuleCategory.of("Client"), "entity", "entitymanager", "enity");
         if (!this.isEnabled())
             this.toggle();
-
-        maxIdleTicks.setShow(false);
     }
 
     @Override

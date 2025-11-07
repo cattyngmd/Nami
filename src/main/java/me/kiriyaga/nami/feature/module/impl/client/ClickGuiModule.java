@@ -15,11 +15,11 @@ public class ClickGuiModule extends Module {
     public final DoubleSetting scale = addSetting(new DoubleSetting("Scale", 1.00, 0.50, 1.50));
     public final BoolSetting lines = addSetting(new BoolSetting("Lines", true));
     public final BoolSetting descriptions = addSetting(new BoolSetting("Descriptions", true));
-    public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 50, 0, 255));
+    public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 70, 0, 255));
     public final BoolSetting fade = addSetting(new BoolSetting("Fade", true));
     public final BoolSetting blur = addSetting(new BoolSetting("Blur", true));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
-    public final IntSetting backgroundAlpha = addSetting(new IntSetting("Alpha", 75, 0, 255));
+    public final IntSetting backgroundAlpha = addSetting(new IntSetting("Alpha", 35, 0, 255));
 
     public ClickGuiModule() {
         super("ClickGui", "Opens client UI.", ModuleCategory.of("Client"), "clickgui","click", "gui", "menu", "clckgui");

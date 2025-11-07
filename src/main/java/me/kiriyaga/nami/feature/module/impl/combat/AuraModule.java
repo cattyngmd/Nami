@@ -57,7 +57,7 @@ public class AuraModule extends Module {
     public final DoubleSetting delay = addSetting(new DoubleSetting("Delay", 0.89, 0.00, 1.00));
     public final EnumSetting<Swap> swap = addSetting(new EnumSetting<>("Swap", Swap.REQUIRE));
     public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
-    public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", false));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", true));
     public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("Sprinting", Sprint.NONE));
     public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("Rotate", Rotate.NORMAL));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
@@ -181,7 +181,7 @@ public class AuraModule extends Module {
                 currentTarget = null;
                 return;
             }
-            boolean canAttack = false;
+            boolean canAttack = rotate.get() == Rotate.NONE;
 
             if (rotate.get() != Rotate.NONE) {
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
