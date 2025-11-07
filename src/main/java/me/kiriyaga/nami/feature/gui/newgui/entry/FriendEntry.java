@@ -27,13 +27,12 @@ public class FriendEntry {
     }
 
     public void refreshEntry() {
-        boolean nowOnline;
+        boolean nowOnline = false;
+        if (MC.getNetworkHandler() != null) {
+            Collection<PlayerListEntry> list = MC.getNetworkHandler().getPlayerList();
+            nowOnline = list.stream().anyMatch(entry -> entry.getProfile().getName().equalsIgnoreCase(name));
+        }
 
-        if (MC.getNetworkHandler() == null)
-            return;
-
-        Collection<PlayerListEntry> list = MC.getNetworkHandler().getPlayerList();
-        nowOnline = list.stream().anyMatch(entry -> entry.getProfile().getName().equalsIgnoreCase(name));
         if (nowOnline != online || displayText == null) {
             online = nowOnline;
             displayText = CAT_FORMAT.format(name + " [" + (online ? "{green}Online" : "{red}Offline") + "{reset}]");
