@@ -64,7 +64,7 @@ public class SpeedMineModule extends Module {
 
     // Thats first packet mine i made like in my whole life, its bad, and there is issues, im gonna finish it, and maybe rewrite from scratch later
     public SpeedMineModule() {
-        super("AutoMine", "Automatically mines specified blocks for easier mining.", ModuleCategory.of("World"));
+        super("SpeedMine", "Increases speed of mining.", ModuleCategory.of("World"));
         echestPriority.setShowCondition(()-> swap.get() != Swap.NONE);
         damageThreshold.setShowCondition(()-> swap.get() != Swap.NONE);
     }
