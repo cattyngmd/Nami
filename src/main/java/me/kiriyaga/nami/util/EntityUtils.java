@@ -195,7 +195,7 @@ public class EntityUtils {
                 || e instanceof SkeletonEntity
                 || e instanceof StrayEntity
                 || e instanceof WitherSkeletonEntity
-                || e instanceof ZombieEntity
+                || e instanceof ZombieEntity && !(e instanceof ZombifiedPiglinEntity) // yeah zombifiied piglin is inherited from zombie
                 || e instanceof HuskEntity
                 || e instanceof DrownedEntity
                 || e instanceof VindicatorEntity
