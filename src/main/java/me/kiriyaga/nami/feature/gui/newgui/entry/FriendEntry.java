@@ -1,26 +1,42 @@
 package me.kiriyaga.nami.feature.gui.newgui.entry;
 
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
+
+import java.util.Collection;
 
 import static me.kiriyaga.nami.Nami.CAT_FORMAT;
 import static me.kiriyaga.nami.Nami.MC;
 
 public class FriendEntry {
     private final String name;
-    private final Text displayText;
+    private boolean online;
+    private Text displayText;
 
     public FriendEntry(String name) {
         this.name = name;
-        this.displayText = CAT_FORMAT.format(name + " [" + (isOnline(name) ? "{green}Online" : "{red}Offline") + "{reset}]");
+        refreshEntry();
     }
 
-    public String getName() { return name; }
-    public Text getDisplayText() { return displayText; }
+    public String getName() {
+        return name;
+    }
 
-    private boolean isOnline(String name) {
-        if (MC.world == null) return false;
-        return MC.world.getPlayers().stream()
-                .map(p -> p.getGameProfile().getName())
-                .anyMatch(n -> n.equalsIgnoreCase(name));
+    public Text getDisplayText() {
+        return displayText;
+    }
+
+    public void refreshEntry() {
+        boolean nowOnline;
+
+        if (MC.getNetworkHandler() == null)
+            return;
+
+        Collection<PlayerListEntry> list = MC.getNetworkHandler().getPlayerList();
+        nowOnline = list.stream().anyMatch(entry -> entry.getProfile().getName().equalsIgnoreCase(name));
+        if (nowOnline != online || displayText == null) {
+            online = nowOnline;
+            displayText = CAT_FORMAT.format(name + " [" + (online ? "{green}Online" : "{red}Offline") + "{reset}]");
+        }
     }
 }
