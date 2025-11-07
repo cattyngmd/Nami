@@ -68,7 +68,7 @@ public class DataPanel<T> {
         for (int i = start; i < Math.min(entries.size(), start + maxVisible + 1); i++) {
             T item = entries.get(i);
             Text display = displayMapper.apply(item);
-            FONT_MANAGER.drawText(context, display, x + 4, drawY, 0xFFFFFFFF, false);
+            FONT_MANAGER.drawText(context, display, x + 4, drawY, 0xFFFFFFFF, true);
             drawY += lineHeight;
         }
 
