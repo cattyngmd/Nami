@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.gui.newgui.base;
 
 import me.kiriyaga.nami.feature.gui.newgui.widget.ActionWidget;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -76,11 +77,11 @@ public class DataPanel<T> {
             int barX = x + width - 3;
             int barY = contentY;
             int barHeight = contentHeight;
-            context.fill(barX, barY, barX + 1, barY + barHeight, 0xFF555555);
+            context.fill(barX, barY, barX + 1, barY + barHeight, MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor().getRGB());
             float ratio = (float) maxVisible / entries.size();
             int whiteHeight = Math.max((int)(barHeight * ratio), 2);
             int whiteY = barY + (int)(scrollOffset / (entries.size() - maxVisible) * (barHeight - whiteHeight));
-            context.fill(barX, whiteY, barX + 1, whiteY + whiteHeight, 0xFFFFFFFF);
+            context.fill(barX, whiteY, barX + 1, whiteY + whiteHeight, MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB());
         }
 
         ScissorUtil.disable(context);
