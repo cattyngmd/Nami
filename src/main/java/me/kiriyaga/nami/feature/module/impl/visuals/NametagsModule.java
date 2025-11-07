@@ -117,9 +117,10 @@ public class NametagsModule extends Module {
 
         if (items.get()) {
             for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
-                if (entity.isInvisible()) continue;
-                i++;
-                renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
+                if (entity instanceof ItemEntity item) {
+                    i++;
+                    renderEntityNametag(entity, item.getStack().getItem().getDefaultStack().getName().getString(), event.getTickDelta(), matrices, 30, null); // crazy shit
+                }
             }
         }
 
