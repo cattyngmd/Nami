@@ -14,7 +14,7 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.miscellaneous.IllegalDisconnectModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import me.kiriyaga.nami.util.EntityUtils;
+import me.kiriyaga.nami.util.entity.EntityUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
