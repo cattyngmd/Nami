@@ -34,6 +34,7 @@ public class FuckerModule extends Module {
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
     public final IntSetting radius = addSetting(new IntSetting("Radius", 3, 1, 6));
 
     private final Set<BlockPos> s = new HashSet<>();
@@ -109,6 +110,7 @@ public class FuckerModule extends Module {
                     rotate.get(),
                     swing.get(),
                     grim.get(),
+                    strictDirection.get(),
                     this.name
             );
         }

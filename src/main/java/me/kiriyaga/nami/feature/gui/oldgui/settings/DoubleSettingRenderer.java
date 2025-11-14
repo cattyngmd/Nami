@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.settings;
+package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
@@ -9,7 +9,6 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
 
 public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
     private boolean dragging = false;
@@ -19,9 +18,7 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
     public void render(DrawContext context, TextRenderer textRenderer, DoubleSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get()
-                ? Color.WHITE
-                : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol = Color.WHITE;
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, 0)));
         int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
@@ -35,19 +32,6 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
         lastSliderY = y + HEIGHT - 2;
         lastSliderWidth = WIDTH - 2 * PADDING;
         lastSliderHeight = SLIDER_HEIGHT;
-
-        int lineOffset = 1;
-        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).expandedIdentifier.get()) {
-            context.fill(
-                    x,
-                    y - lineOffset,
-                    x + 1,
-                    y + HEIGHT,
-                    CLICK_GUI.applyFade(
-                            textColorInt
-                    )
-            );
-        }
 
         FONT_MANAGER.drawText(context, setting.getName(), textX, textY, textColorInt, true);
 

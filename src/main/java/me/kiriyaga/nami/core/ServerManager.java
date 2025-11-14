@@ -3,6 +3,8 @@ package me.kiriyaga.nami.core;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.client.FastLatencyModule;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
@@ -29,6 +31,7 @@ public class ServerManager {
     private int lastTeleportId;
     private final int[] pendingTransactions = new int[4];
     private int transactionIndex;
+    private int ping = -1;
 
     private volatile long lastReceiveTime = -1;
     private volatile int lastPing = -1;
@@ -41,6 +44,14 @@ public class ServerManager {
         EVENT_MANAGER.register(this);
         LOGGER.info("Server Manager loaded");
         Arrays.fill(pendingTransactions, -1);
+    }
+
+    @SubscribeEvent
+    public void onTick(PreTickEvent event) {
+        if (MC.world == null ||  MC.getNetworkHandler() == null)
+            return;
+
+        updatePing();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -173,33 +184,37 @@ public class ServerManager {
     }
 
     public int getPing() {
+        return ping;
+    }
+
+    public void updatePing() {
         FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
-        if (config == null) return lastPing;
+        if (config == null) ping = lastPing;
 
         switch (config.fastLatencyMode.get()) {
             case OLD:
-                return lastPing;
+                ping = lastPing;
             case OFF:
                 if (MC.getNetworkHandler() != null && MC.player != null) {
-                    return MC.getNetworkHandler().getPlayerListEntry(MC.player.getUuid()).getLatency();
+                    ping = MC.getNetworkHandler().getPlayerListEntry(MC.player.getUuid()).getLatency();
                 } else {
-                    return -1;
+                    ping = -1;
                 }
             case NEW:
                 try {
                     if (MC.getDebugHud() != null && MC.getDebugHud().getPingLog() != null) {
                         MultiValueDebugSampleLogImpl pingLog = MC.getDebugHud().getPingLog();
                         int count = pingLog.getLength();
-                        if (count == 0) return -1;
+                        if (count == 0) ping = -1;
 
                         updatePing((int) pingLog.get(count - 1, 0));
 
-                        return (int) pingLog.get(count - 1, 0);
+                        ping = (int) pingLog.get(count - 1, 0);
                     }
                 } catch (Exception ignored) {
                 }
         }
-        return -1;
+        ping = -1;
     }
 
     public boolean isConnectionUnstable() {

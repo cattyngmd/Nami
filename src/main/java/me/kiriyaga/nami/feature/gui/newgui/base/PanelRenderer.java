@@ -1,4 +1,4 @@
-package me.kiriyaga.nami.feature.gui.base;
+package me.kiriyaga.nami.feature.gui.newgui.base;
 
 
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
@@ -11,7 +11,7 @@ import java.awt.*;
 
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.toRGBA;
+import static me.kiriyaga.nami.util.ColorUtils.toRGBA;
 
 
 public class PanelRenderer {
@@ -24,9 +24,10 @@ public class PanelRenderer {
 
     public void renderPanel(DrawContext context, int x, int y, int width, int height, int headerHeight, boolean renderHeader) {
         Color primary = colorModule.getStyledGlobalColor();
+        Color secondary = colorModule.getStyledSecondColor();
 
 
-        int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, clickGuiModule.guiAlpha.get())));
+        int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(secondary.getRed(), secondary.getGreen(), secondary.getBlue(), clickGuiModule.guiAlpha.get())));
         context.fill(x, y, x + width, y + height, bgColor);
 
 
@@ -34,7 +35,7 @@ public class PanelRenderer {
         if (clickGuiModule.lines.get()) {
             lineColor = CLICK_GUI.applyFade(primary.getRGB());
         } else {
-            lineColor = CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB());
+            lineColor = CLICK_GUI.applyFade(new Color(20, 20, 20, 0).getRGB());
         }
 
         if (!renderHeader) {
@@ -57,8 +58,7 @@ public class PanelRenderer {
     }
 
     public void renderHeaderText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int headerHeight, int padding) {
-        Color primary = colorModule.getStyledGlobalColor();
-        Color textCol = clickGuiModule.moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255);
+        Color textCol =  new Color(255, 255, 255, 255);
 
         int textY = y + (headerHeight - textRenderer.fontHeight) / 2;
         FONT_MANAGER.drawText(context, text, x + padding, textY + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);

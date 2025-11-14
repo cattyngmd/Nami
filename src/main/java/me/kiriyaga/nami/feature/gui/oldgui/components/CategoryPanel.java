@@ -1,10 +1,8 @@
-package me.kiriyaga.nami.feature.gui.components;
+package me.kiriyaga.nami.feature.gui.oldgui.components;
 
-import me.kiriyaga.nami.feature.gui.base.PanelRenderer;
+import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -14,8 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.*;
-import static me.kiriyaga.nami.feature.gui.components.ModulePanel.MODULE_SPACING;
+import static me.kiriyaga.nami.feature.gui.oldgui.components.ModulePanel.MODULE_SPACING;
 
 public class CategoryPanel {
     public static final int WIDTH = 100;
@@ -25,15 +22,13 @@ public class CategoryPanel {
     public static final int BOTTOM_MARGIN = 1;
 
     private final ModuleCategory moduleCategory;
-    private final Set<Module> expandedModules;
     private final PanelRenderer renderer = new PanelRenderer();
 
     private double scrollOffset = 0;
     private double targetScrollOffset = 0;
 
-    public CategoryPanel(ModuleCategory moduleCategory, Set<Module> expandedModules) {
+    public CategoryPanel(ModuleCategory moduleCategory) {
         this.moduleCategory = moduleCategory;
-        this.expandedModules = expandedModules;
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
@@ -45,18 +40,14 @@ public class CategoryPanel {
         renderer.renderPanel(context, x, y, WIDTH, basePanelHeight, HEADER_HEIGHT);
         renderer.renderHeaderText(context, textRenderer, moduleCategory.getName(), x, y, HEADER_HEIGHT, PADDING);
 
-        int innerShade = CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB());
-        context.fill(x + 1, y + HEADER_HEIGHT + 1, x + 2, y + basePanelHeight - 1, innerShade);
-        context.fill(x + WIDTH - 2, y + HEADER_HEIGHT + 1, x + WIDTH - 1, y + basePanelHeight - 1, innerShade);
-        context.fill(x + 2, y + HEADER_HEIGHT + 1, x + WIDTH - 2, y + HEADER_HEIGHT + 2,
-                CLICK_GUI.applyFade(new Color(20, 20, 20, 122).getRGB()));
-
         int contentY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;
 
         int visibleHeight = Math.min(basePanelHeight - HEADER_HEIGHT - MODULE_SPACING - BOTTOM_MARGIN,
                 screenHeight - contentY - 10);
 
-        boolean b = expandedModules.stream().anyMatch(module -> module.getCategory() == moduleCategory);
+        boolean b = MODULE_MANAGER.getStorage().getByCategory(moduleCategory)
+                .stream()
+                .anyMatch(Module::isExpanded);
 
         if (b) {
             visibleHeight -= 1;
@@ -66,7 +57,7 @@ public class CategoryPanel {
         int scrollableHeight = 0;
         for (Module module : modules) {
             scrollableHeight += ModulePanel.HEIGHT + MODULE_SPACING;
-            if (expandedModules.contains(module)) {
+            if (module.isExpanded()) {
                 scrollableHeight += SettingPanel.getSettingsHeight(module);
             }
         }
@@ -81,11 +72,11 @@ public class CategoryPanel {
 
         int moduleY = contentY - (int) scrollOffset;
         for (Module module : modules) {
-            ModulePanel modulePanel = new ModulePanel(module, expandedModules);
+            ModulePanel modulePanel = new ModulePanel(module);
             modulePanel.render(context, textRenderer, x + BORDER_WIDTH + SettingPanel.INNER_PADDING, moduleY, mouseX, mouseY);
             moduleY += ModulePanel.HEIGHT + MODULE_SPACING;
 
-            if (expandedModules.contains(module)) {
+            if (module.isExpanded()) {
                 moduleY += SettingPanel.renderSettings(context, textRenderer, module,
                         x + BORDER_WIDTH + SettingPanel.INNER_PADDING, moduleY, mouseX, mouseY);
             }
@@ -104,7 +95,7 @@ public class CategoryPanel {
         int scrollableHeight = 0;
         for (Module module : modules) {
             scrollableHeight += ModulePanel.HEIGHT + MODULE_SPACING;
-            if (expandedModules.contains(module)) {
+            if (module.isExpanded()) {
                 scrollableHeight += SettingPanel.getSettingsHeight(module);
             }
         }

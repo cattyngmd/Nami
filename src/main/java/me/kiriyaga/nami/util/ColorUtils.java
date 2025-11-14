@@ -1,8 +1,8 @@
-package me.kiriyaga.nami.feature.gui.base;
+package me.kiriyaga.nami.util;
 
 import java.awt.*;
 
-public class GuiConstants {
+public class ColorUtils {
     public static int toRGBA(Color color) {
         return (color.getAlpha() << 24) |
                 (color.getRed() << 16) |

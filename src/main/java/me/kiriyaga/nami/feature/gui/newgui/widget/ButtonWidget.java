@@ -1,5 +1,6 @@
-package me.kiriyaga.nami.feature.gui.base;
+package me.kiriyaga.nami.feature.gui.newgui.widget;
 
+import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
@@ -9,7 +10,7 @@ import net.minecraft.text.Text;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.feature.gui.base.GuiConstants.toRGBA;
+import static me.kiriyaga.nami.util.ColorUtils.toRGBA;
 
 public class ButtonWidget {
     private final String label;
@@ -34,10 +35,8 @@ public class ButtonWidget {
         panelRenderer.renderPanel(context, x, y, width, height, 0, false);
 
 
-        ClickGuiModule clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
-        Color primary = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
         Color textOff = new Color(155, 155, 155, 255);
-        Color textCol = active ? (clickGuiModule.moduleFill.get() ? new Color(255, 255, 255, 255) : new Color(primary.getRed(), primary.getGreen(), primary.getBlue(), 255)) : textOff;
+        Color textCol = active ?  new Color(255, 255, 255, 255)  : textOff;
 
         int textWidth = textRenderer.getWidth(label);
         int textX = x + (width - textWidth) / 2;

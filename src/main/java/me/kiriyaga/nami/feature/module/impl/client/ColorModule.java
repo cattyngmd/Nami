@@ -15,7 +15,7 @@ import java.awt.*;
 @RegisterModule
 public class ColorModule extends Module {
 
-    public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(22, 22, 230, 170), true));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(247, 234, 181, 255), true));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("Rainbow", false));
     public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.4, 0.01, 5.0));

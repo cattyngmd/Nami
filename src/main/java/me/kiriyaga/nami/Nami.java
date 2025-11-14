@@ -8,12 +8,12 @@ import me.kiriyaga.nami.core.font.FontManager;
 import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.core.rotation.RotationManager;
-import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
-import me.kiriyaga.nami.feature.gui.screen.ClickGuiScreen;
+import me.kiriyaga.nami.feature.gui.newgui.component.NavigatePanelComponent;
+import me.kiriyaga.nami.feature.gui.oldgui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
-import me.kiriyaga.nami.feature.gui.screen.FriendScreen;
-import me.kiriyaga.nami.feature.gui.screen.HudEditorScreen;
+import me.kiriyaga.nami.feature.gui.newgui.screen.FriendScreen;
+import me.kiriyaga.nami.feature.gui.oldgui.screen.HudEditorScreen;
 import me.kiriyaga.nami.util.CatStyles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -62,7 +62,7 @@ public class Nami implements ClientModInitializer {
     public static ClickGuiScreen CLICK_GUI;
     public static HudEditorScreen HUD_EDITOR;
     public static FriendScreen FRIEND;
-    public static NavigatePanel NAVIGATE_PANEL;
+    public static NavigatePanelComponent NAVIGATE_PANEL;
 
 
 
@@ -84,7 +84,7 @@ public class Nami implements ClientModInitializer {
         CLICK_GUI = new ClickGuiScreen();
         HUD_EDITOR = new HudEditorScreen();
         FRIEND = new FriendScreen();
-        NAVIGATE_PANEL = new NavigatePanel();
+        NAVIGATE_PANEL = new NavigatePanelComponent();
 
         FRIEND_MANAGER.load();
 

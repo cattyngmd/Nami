@@ -21,6 +21,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -117,9 +118,9 @@ public class NametagsModule extends Module {
 
         if (items.get()) {
             for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
-                if (entity.isInvisible()) continue;
-                i++;
-                renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
+                if (entity instanceof ItemEntity itemEntity) {
+                    renderEntityNametag(entity, Text.translatable(itemEntity.getStack().getItem().getTranslationKey()).getString(), event.getTickDelta(), matrices, 30, null);
+                }
             }
         }
 

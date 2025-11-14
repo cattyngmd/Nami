@@ -1,12 +1,12 @@
-package me.kiriyaga.nami.feature.gui.screen;
+package me.kiriyaga.nami.feature.gui.oldgui.screen;
 
-import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
-import me.kiriyaga.nami.feature.gui.components.ModulePanel;
-import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
-import me.kiriyaga.nami.feature.gui.components.SettingPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.CategoryPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.ModulePanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,7 +21,6 @@ import java.awt.Point;
 import static me.kiriyaga.nami.Nami.*;
 
 public class ClickGuiScreen extends Screen {
-    private final Set<Module> expandedModules = new HashSet<>();
     private final Map<ModuleCategory, Point> categoryPositions = new HashMap<>();
     private final Map<ModuleCategory, CategoryPanel> categoryPanels = new HashMap<>();
     private boolean draggingCategory = false;
@@ -64,7 +63,7 @@ public class ClickGuiScreen extends Screen {
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
             categoryPanels.putIfAbsent(moduleCategory,
-                    new CategoryPanel(moduleCategory, expandedModules));
+                    new CategoryPanel(moduleCategory));
         }
         categoryPanels.keySet().removeIf(cat -> !ModuleCategory.getAll().contains(cat));
     }
@@ -90,20 +89,17 @@ public class ClickGuiScreen extends Screen {
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get()) {
             int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
-            int color = alpha | 0x101010;
-            context.fill(0, 0, this.width, this.height, color);
+            int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
+            context.fill(0, 0, this.width, this.height, applyFade(color));
         }
+
+        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);
 
         int scaledWidth = (int) (this.width / scale);
         int scaledHeight = (int) (this.height / scale);
-
-        int panelWidth = NAVIGATE_PANEL.calcWidth();
-        int navigateX = (scaledWidth - panelWidth) / 2;
-        int navigateY = 1;
-        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, navigateY, mouseX, mouseY);
 
         int startY = (scaledHeight - 1);
         for (int i = statusMessages.size() - 1; i >= 0; i--) {
@@ -169,7 +165,7 @@ public class ClickGuiScreen extends Screen {
                     }
 
                     curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-                    if (expandedModules.contains(module)) {
+                    if (module.isExpanded()) {
                         curY += SettingPanel.getSettingsHeight(module);
                     }
                 }
@@ -193,9 +189,7 @@ public class ClickGuiScreen extends Screen {
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
 
-        int navX = (int) ((this.width / scale - NAVIGATE_PANEL.calcWidth()) / 2);
-        int navY = 1;
-        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, navY, this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(mouseX, mouseY, this.textRenderer);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
@@ -242,10 +236,10 @@ public class ClickGuiScreen extends Screen {
                             playClickSound();
                             module.toggle();
                         } else if (button == 1) {
-                            if (expandedModules.contains(module)) {
-                                expandedModules.remove(module);
+                            if (module.isExpanded()) {
+                                module.setExpanded(false);
                             } else {
-                                expandedModules.add(module);
+                                module.setExpanded(true);
                             }
                             playClickSound();
                         } else if (button == 2) {
@@ -257,7 +251,7 @@ public class ClickGuiScreen extends Screen {
 
                     curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
 
-                    if (expandedModules.contains(module)) {
+                    if (module.isExpanded()) {
                         if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) {
                             return true;
                         }

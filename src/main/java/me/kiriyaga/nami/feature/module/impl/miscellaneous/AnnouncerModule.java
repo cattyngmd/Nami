@@ -73,7 +73,7 @@ public class AnnouncerModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onEntitySpawn(EntitySpawnEvent event) {
-        if (MC.player == null || MC.world == null || visualRange.get()) return;
+        if (MC.player == null || MC.world == null || !visualRange.get()) return;
 
         if (event.getEntity() instanceof PlayerEntity player) {
 

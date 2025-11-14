@@ -73,6 +73,7 @@ public class EchestFarmerModule extends Module {
                     rotate.get(),
                     swing.get(),
                     grim.get(),
+                    strictDirection.get(), // oh god haha
                     this.name+"place"
             );
         }

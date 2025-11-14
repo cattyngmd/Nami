@@ -1,18 +1,17 @@
-package me.kiriyaga.nami.feature.gui.screen;
+package me.kiriyaga.nami.feature.gui.oldgui.screen;
 
-import me.kiriyaga.nami.feature.gui.components.CategoryPanel;
-import me.kiriyaga.nami.feature.gui.components.ModulePanel;
-import me.kiriyaga.nami.feature.gui.components.NavigatePanel;
-import me.kiriyaga.nami.feature.gui.components.SettingPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.CategoryPanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.ModulePanel;
+import me.kiriyaga.nami.feature.gui.oldgui.components.SettingPanel;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import org.apache.commons.compress.archivers.sevenz.CLI;
 
 import java.awt.Point;
 import java.util.*;
@@ -21,7 +20,6 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class HudEditorScreen extends Screen {
 
-    private final Set<Module> expandedModules = new HashSet<>();
     private final Map<ModuleCategory, Point> categoryPositions = new HashMap<>();
     private final Map<ModuleCategory, CategoryPanel> categoryPanels = new HashMap<>();
 
@@ -48,7 +46,7 @@ public class HudEditorScreen extends Screen {
         categoryPositions.put(hudCategory, pos);
 
         if (!categoryPanels.containsKey(hudCategory)) {
-            categoryPanels.put(hudCategory, new CategoryPanel(hudCategory, expandedModules));
+            categoryPanels.put(hudCategory, new CategoryPanel(hudCategory));
         }
     }
 
@@ -65,20 +63,18 @@ public class HudEditorScreen extends Screen {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
-        ClickGuiModule hudEditorModule = getClickGuiModule();
-        if (hudEditorModule != null && hudEditorModule.background.get()) {
-            int alpha = (hudEditorModule.backgroundAlpha.get() & 0xFF) << 24;
-            int color = alpha | 0x101010;
-            context.fill(0, 0, this.width, this.height, color);
+        ClickGuiModule clickGuiModule = getClickGuiModule();
+        if (clickGuiModule != null && clickGuiModule.background.get()) {
+            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
+            int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
+            context.fill(0, 0, this.width, this.height, CLICK_GUI.applyFade(color));
         }
+
+        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
+
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
-
-        int scaledWidth = (int) (this.width / CLICK_GUI.scale);
-        int panelWidth = NAVIGATE_PANEL.calcWidth();
-        int navigateX = (scaledWidth - panelWidth) / 2;
-        NAVIGATE_PANEL.render(context, this.textRenderer, navigateX, 1, mouseX, mouseY);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
@@ -88,7 +84,7 @@ public class HudEditorScreen extends Screen {
             hudPanel.render(context, this.textRenderer, pos.x, pos.y, scaledMouseX, scaledMouseY, this.height);
         }
 
-        if (hudPanel != null && hudEditorModule != null && hudEditorModule.descriptions.get() && pos != null) {
+        if (hudPanel != null && clickGuiModule != null && clickGuiModule.descriptions.get() && pos != null) {
             double scrollOffset = hudPanel.getScrollOffset();
             List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(hudCategory);
 
@@ -118,7 +114,7 @@ public class HudEditorScreen extends Screen {
                 }
 
                 curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-                if (expandedModules.contains(module)) {
+                if (module.isExpanded()) {
                     curY += SettingPanel.getSettingsHeight(module);
                 }
             }
@@ -165,8 +161,7 @@ public class HudEditorScreen extends Screen {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
-        int navX = (int) ((this.width / CLICK_GUI.scale - NAVIGATE_PANEL.calcWidth()) / 2);
-        NAVIGATE_PANEL.mouseClicked(scaledMouseX, scaledMouseY, navX, 1, this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(mouseX, mouseY, this.textRenderer);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
@@ -200,8 +195,9 @@ public class HudEditorScreen extends Screen {
                         playClickSound();
                         module.toggle();
                     } else if (button == 1) {
-                        if (expandedModules.contains(module)) expandedModules.remove(module);
-                        else expandedModules.add(module);
+                        if (module.isExpanded())
+                            module.setExpanded(false);
+                        else module.setExpanded(true);
                         playClickSound();
                     } else if (button == 2) {
                         playClickSound();
@@ -211,7 +207,7 @@ public class HudEditorScreen extends Screen {
                 }
 
                 curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
-                if (expandedModules.contains(module)) {
+                if (module.isExpanded()) {
                     if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) return true;
                     curY += SettingPanel.getSettingsHeight(module);
                 }
