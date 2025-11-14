@@ -24,7 +24,10 @@ public class FreeLookModule extends Module {
 
     @Override
     public void onEnable() {
-        if (MC.player == null) return;
+        if (MC.player == null || MC.world == null) {
+            toggle();
+            return;
+        }
 
         cameraYaw = MC.player.getYaw();
         cameraPitch = MC.player.getPitch();

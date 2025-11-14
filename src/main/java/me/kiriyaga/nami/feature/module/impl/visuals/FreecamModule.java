@@ -46,7 +46,8 @@ public class FreecamModule extends Module {
 
     @Override
     public void onEnable() {
-        if (MC.player == null) {
+        if (MC.player == null || MC.world == null) {
+            toggle();
             return;
         }
 
@@ -73,7 +74,7 @@ public class FreecamModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        if (cameraPos == null || MC.player == null) {
+        if (cameraPos == null || MC.player == null || MC.world == null) {
             this.toggle();
             return;
         }
