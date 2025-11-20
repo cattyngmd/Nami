@@ -10,6 +10,8 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.client.network.ClientPlayerEntity;
 
 import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.util.RotationUtils.alignYaw;
+import static me.kiriyaga.nami.util.RotationUtils.yawDifference;
 
 @RegisterModule
 public class YawModule extends Module {
@@ -24,21 +26,11 @@ public class YawModule extends Module {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null || MC.world == null) return;
 
-        ClientPlayerEntity player = MC.player;
+        float s = 360f / directions.get();
+        float targetYaw = Math.round(MC.player.getYaw() / s) * s;
 
-        float currentYaw = normalizeYaw(player.getYaw());
-        int dirCount = directions.get();
-        float sector = 360f / dirCount;
-
-        int nearestIndex = Math.round(currentYaw / sector);
-        float snappedYaw = normalizeYaw(nearestIndex * sector);
-
-        player.setYaw(snappedYaw);
+        targetYaw = alignYaw(targetYaw, MC.player.getYaw());
+        MC.player.setYaw(targetYaw);
     }
 
-    private float normalizeYaw(float yaw) {
-        yaw %= 360f;
-        if (yaw < 0) yaw += 360f;
-        return yaw;
-    }
 }

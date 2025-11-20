@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.RotationUtils.yawDifference;
 
 /**
  * Request handler.
@@ -119,29 +120,6 @@ public class RotationRequestHandler {
     public void clear() {
         requests.clear();
         lastActiveRequestId = null;
-    }
-
-    /**
-     * Normalizing, in case
-     * In client-side we normalize degree for easier target yaw controlling
-     * but server side yaw is never normalized, otherwise it will cause jumps 180 -180
-     */
-    private float wrapDegrees(float angle) {
-        angle %= 360f;
-        if (angle >= 180f) angle -= 360f;
-        if (angle < -180f) angle += 360f;
-        return angle;
-    }
-
-    /**
-     * difference between yaw, you can send normalized target yaw
-     * server-side
-     */
-    private float yawDifference(float targetYaw, float currentYaw) {
-        float diff = (targetYaw - currentYaw) % 360f;
-        if (diff >= 180f) diff -= 360f;
-        if (diff < -180f) diff += 360f;
-        return diff;
     }
 
     public void clearLastActiveId() {

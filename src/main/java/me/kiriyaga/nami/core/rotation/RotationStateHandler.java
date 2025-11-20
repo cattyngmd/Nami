@@ -3,6 +3,7 @@ package me.kiriyaga.nami.core.rotation;
 import net.minecraft.util.math.MathHelper;
 
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
+import static me.kiriyaga.nami.util.RotationUtils.wrapDegrees;
 
 public class RotationStateHandler {
     /**
@@ -78,13 +79,6 @@ public class RotationStateHandler {
 
     public boolean getSilentSyncRequired() { return silentSyncRequired; }
     public void setSilentSyncRequired(boolean silentSyncRequired) {this.silentSyncRequired = silentSyncRequired;}
-
-    public static float wrapDegrees(float angle) {
-        angle %= 360f;
-        if (angle >= 180f) angle -= 360f;
-        if (angle < -180f) angle += 360f;
-        return angle;
-    }
 
     public boolean isRotating() {
         return ROTATION_MANAGER.getTickHandler().isRotating();

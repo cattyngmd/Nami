@@ -18,6 +18,25 @@ public class RotationUtils {
         return angle;
     }
 
+    public static float wrapDegrees(float angle) {
+        angle %= 360f;
+        if (angle >= 180f) angle -= 360f;
+        if (angle < -180f) angle += 360f;
+        return angle;
+    }
+
+    public static float yawDifference(float targetYaw, float currentYaw) {
+        float diff = (targetYaw - currentYaw) % 360f;
+        if (diff >= 180f) diff -= 360f;
+        if (diff < -180f) diff += 360f;
+        return diff;
+    }
+
+    public static float alignYaw(float playerYaw, float currentYaw) {
+        int wraps = Math.round((currentYaw - playerYaw) / 360f);
+        return playerYaw + wraps * 360f;
+    }
+
     public static Vec3d getEntityCenter(Entity entity) {
         Box box = entity.getBoundingBox();
         double centerX = box.minX + (box.getLengthX() / 2);
