@@ -34,7 +34,7 @@ import net.minecraft.world.BlockView;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InventoryUtils.isBroken;
+import static me.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 

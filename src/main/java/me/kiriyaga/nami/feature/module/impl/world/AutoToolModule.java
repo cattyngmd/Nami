@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InventoryUtils.isBroken;
+import static me.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
 
 @RegisterModule
 public class AutoToolModule extends Module {

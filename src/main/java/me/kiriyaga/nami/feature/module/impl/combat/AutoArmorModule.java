@@ -20,7 +20,7 @@ import net.minecraft.item.*;
 import java.util.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InventoryUtils.isBroken;
+import static me.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
 
 @RegisterModule
 public class AutoArmorModule extends Module {
