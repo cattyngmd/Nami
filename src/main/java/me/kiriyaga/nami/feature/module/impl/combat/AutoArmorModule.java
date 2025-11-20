@@ -57,16 +57,19 @@ public class AutoArmorModule extends Module {
 
             ItemStack current = MC.player.getEquippedStack(slot);
 
-            if (mendingRepair.get() && shouldEquipMendingRepair(slot, current)) {
-                ItemStack mendingPiece = findDamagedMendingArmor(slot);
-                if (mendingPiece != null) {
-                    int invSlot = findInventorySlot(mendingPiece);
-                    if (invSlot != -1) {
-                        swap(slot, invSlot);
-                        return;
+            if (mendingRepair.get()) {
+                if (shouldEquipMendingRepair(slot, current)) {
+                    ItemStack mendingPiece = findDamagedMendingArmor(slot);
+                    if (mendingPiece != null) {
+                        int invSlot = findInventorySlot(mendingPiece);
+                        if (invSlot != -1) {
+                            swap(slot, invSlot);
+                            return;
+                        }
                     }
+                    continue;
                 }
-                continue;
+                return;
             }
 
             ItemStack best = findBestForSlot(slot, current, target);
