@@ -194,12 +194,14 @@ public class ServerManager {
         switch (config.fastLatencyMode.get()) {
             case OLD:
                 ping = lastPing;
+                break;
             case OFF:
                 if (MC.getNetworkHandler() != null && MC.player != null) {
                     ping = MC.getNetworkHandler().getPlayerListEntry(MC.player.getUuid()).getLatency();
                 } else {
                     ping = -1;
                 }
+                break;
             case NEW:
                 try {
                     if (MC.getDebugHud() != null && MC.getDebugHud().getPingLog() != null) {
@@ -213,8 +215,9 @@ public class ServerManager {
                     }
                 } catch (Exception ignored) {
                 }
+                break;
+            default: ping = -1;
         }
-        ping = -1;
     }
 
     public boolean isConnectionUnstable() {

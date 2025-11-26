@@ -10,7 +10,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
-import me.kiriyaga.nami.util.EntityUtils;
+import me.kiriyaga.nami.util.entity.TargetUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -20,7 +20,7 @@ import net.minecraft.item.*;
 import java.util.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InventoryUtils.isBroken;
+import static me.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
 
 @RegisterModule
 public class AutoArmorModule extends Module {
@@ -50,23 +50,26 @@ public class AutoArmorModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onTick(PostTickEvent event) {
         if (MC.world == null || MC.player == null) return;
-        Entity target = EntityUtils.getTarget();
+        Entity target = TargetUtils.getTarget();
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (!isArmorSlot(slot)) continue;
 
             ItemStack current = MC.player.getEquippedStack(slot);
 
-            if (mendingRepair.get() && shouldEquipMendingRepair(slot, current)) {
-                ItemStack mendingPiece = findDamagedMendingArmor(slot);
-                if (mendingPiece != null) {
-                    int invSlot = findInventorySlot(mendingPiece);
-                    if (invSlot != -1) {
-                        swap(slot, invSlot);
-                        return;
+            if (mendingRepair.get()) {
+                if (shouldEquipMendingRepair(slot, current)) {
+                    ItemStack mendingPiece = findDamagedMendingArmor(slot);
+                    if (mendingPiece != null) {
+                        int invSlot = findInventorySlot(mendingPiece);
+                        if (invSlot != -1) {
+                            swap(slot, invSlot);
+                            return;
+                        }
                     }
+                    continue;
                 }
-                continue;
+                return;
             }
 
             ItemStack best = findBestForSlot(slot, current, target);

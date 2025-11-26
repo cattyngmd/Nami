@@ -12,7 +12,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
-import me.kiriyaga.nami.util.EntityUtils;
+import me.kiriyaga.nami.util.entity.TargetUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
@@ -58,7 +58,7 @@ public class AutoXPModule extends Module {
             return;
         }
 
-        if (whenNoTarget.get() && EntityUtils.getTarget() != null) {
+        if (whenNoTarget.get() && TargetUtils.getTarget() != null) {
             if (selfToggle.get())
                 toggle();
             return;

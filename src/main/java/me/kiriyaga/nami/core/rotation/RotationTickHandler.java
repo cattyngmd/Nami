@@ -17,7 +17,9 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.core.rotation.RotationStateHandler.wrapDegrees;
+import static me.kiriyaga.nami.util.RotationUtils.alignYaw;
+import static me.kiriyaga.nami.util.RotationUtils.wrapDegrees;
+import static me.kiriyaga.nami.util.RotationUtils.yawDifference;
 
 public class RotationTickHandler {
 
@@ -325,18 +327,6 @@ public class RotationTickHandler {
 //        requestHandler.removeActiveRequest();
 
         MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(MC.player.getX(), MC.player.getY(), MC.player.getZ(), targetYaw, targetPitch, MC.player.isOnGround(), true));
-    }
-
-    private float yawDifference(float targetYaw, float currentYaw) {
-        float diff = (targetYaw - currentYaw) % 360f;
-        if (diff >= 180f) diff -= 360f;
-        if (diff < -180f) diff += 360f;
-        return diff;
-    }
-
-    private float alignYaw(float playerYaw, float currentYaw) {
-        int wraps = Math.round((currentYaw - playerYaw) / 360f);
-        return playerYaw + wraps * 360f;
     }
 
     private float lerp(float from, float to, float factor) {

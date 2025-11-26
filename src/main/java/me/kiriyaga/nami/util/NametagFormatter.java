@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.util;
 
-import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NametagsModule;
+import me.kiriyaga.nami.util.entity.HostileUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -128,11 +128,11 @@ public class NametagFormatter {
                 }
             } else if (entity instanceof ItemEntity) {
                 color = COLOR_ITEM;
-            } else if (EntityUtils.isHostile(entity)) {
+            } else if (HostileUtils.isHostile(entity)) {
                 color = COLOR_HOSTILE;
-            } else if (EntityUtils.isNeutral(entity)) {
+            } else if (HostileUtils.isNeutral(entity)) {
                 color = COLOR_NEUTRAL;
-            } else if (EntityUtils.isPassive(entity)) {
+            } else if (HostileUtils.isPassive(entity)) {
                 color = COLOR_PASSIVE;
             } else {
                 color = Color.WHITE;

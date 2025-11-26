@@ -22,7 +22,7 @@ public abstract class MixinBlockEntityRenderDispatcher {
 
         if (nr != null && nr.isEnabled() && nr.tileEntity.get() >= 2) {
             BlockPos bp = blockEntity.getPos();
-            BlockPos pp = MC.player.getBlockPos();
+            BlockPos pp = MC.getEntityRenderDispatcher().camera.getBlockPos();
 
             double distanceSquared = bp.getSquaredDistance(pp);
             double maxDistance = Math.pow(nr.tileEntity.get(), 2);
