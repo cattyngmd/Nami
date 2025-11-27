@@ -23,40 +23,57 @@ public class UptimeModule extends HudElementModule {
     @Override
     public Text getDisplayText() {
         long uptimeMillis = System.currentTimeMillis() - START_TIME;
-        long uptimeSec = uptimeMillis / 1000;
+        long totalSeconds = uptimeMillis / 1000;
 
-        long days = uptimeSec / 86400;
-        long hours = (uptimeSec % 86400) / 3600;
-        long minutes = (uptimeSec % 3600) / 60;
-        long seconds = uptimeSec % 60;
-
-        StringBuilder sb = new StringBuilder();
-
-        if (displayLabel.get())
-            sb.append("{bg}Uptime: {bw}");
-
-        boolean first = true;
+        long displayDays = 0, displayHours = 0, displayMinutes = 0, displaySeconds = 0;
 
         if (this.days.get()) {
-            sb.append(days).append(" ").append("days{bg},{bw}");
-            first = false;
+            displayDays = totalSeconds / 86400;
+            totalSeconds %= 86400;
         }
-
         if (this.hours.get()) {
-            if (!first) sb.append(" ");
-            sb.append(hours).append(" hours{bg},{bw}");
-            first = false;
+            displayHours = totalSeconds / 3600;
+            totalSeconds %= 3600;
+        } else if (!this.days.get()) {
+            displayHours = totalSeconds / 3600;
+            totalSeconds %= 3600;
+        } else {
+            totalSeconds += (totalSeconds / 3600) * 3600;
         }
 
         if (this.minutes.get()) {
-            if (!first) sb.append(" ");
-            sb.append(minutes).append(" minutes{bg},{bw}");
-            first = false;
+            displayMinutes = totalSeconds / 60;
+            totalSeconds %= 60;
+        } else {
+            totalSeconds += (totalSeconds / 60) * 60;
+        }
+        if (this.seconds.get()) {
+            displaySeconds = totalSeconds;
         }
 
-        if (this.seconds.get()) {
+        StringBuilder sb = new StringBuilder();
+
+        if (displayLabel.get()) sb.append("{bg}Uptime: {bw}");
+
+        boolean first = true;
+
+        if (this.days.get() && displayDays > 0) {
+            sb.append(displayDays).append(" days{bg},{bw}");
+            first = false;
+        }
+        if (this.hours.get() && displayHours > 0) {
             if (!first) sb.append(" ");
-            sb.append(seconds).append(" seconds");
+            sb.append(displayHours).append(" hours{bg},{bw}");
+            first = false;
+        }
+        if (this.minutes.get() && displayMinutes > 0) {
+            if (!first) sb.append(" ");
+            sb.append(displayMinutes).append(" minutes{bg},{bw}");
+            first = false;
+        }
+        if (this.seconds.get() && displaySeconds > 0) {
+            if (!first) sb.append(" ");
+            sb.append(displaySeconds).append(" seconds");
         }
 
         String formatted = sb.toString();
