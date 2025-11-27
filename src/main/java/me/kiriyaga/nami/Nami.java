@@ -29,6 +29,7 @@ import net.minecraft.util.Pair;
 public class Nami implements ClientModInitializer {
     public static String NAME = "nami";
     public static String DISPLAY_NAME = "Nami";
+    public static long START_TIME = 0;
     public static final String VERSION;
     static {
         ModContainer mod = FabricLoader.getInstance().getModContainer("nami").orElse(null);
@@ -93,6 +94,7 @@ public class Nami implements ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             FONT_MANAGER.init(); // font is making glyph textures, it should be after game loaded not on initialize
 
+            START_TIME = System.currentTimeMillis();
 
             CONFIG_MANAGER.loadModules();
             CONFIG_MANAGER.loadFriends();
