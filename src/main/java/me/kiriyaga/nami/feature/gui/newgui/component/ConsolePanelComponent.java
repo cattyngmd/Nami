@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.newgui.component;
 
+import me.kiriyaga.nami.feature.gui.newgui.base.BaseEntry;
 import me.kiriyaga.nami.feature.gui.newgui.base.DataPanel;
 import me.kiriyaga.nami.feature.gui.newgui.entry.FriendEntry;
 import me.kiriyaga.nami.feature.gui.newgui.widget.ButtonWidget;
@@ -8,21 +9,25 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-public class ConsolePanelComponent extends DataPanel<FriendEntry> {
-    private final Consumer<FriendEntry> onAdd;
-    private final Consumer<FriendEntry> onRemove;
-    private final Consumer<FriendEntry> onClick;
+public class ConsolePanelComponent<T extends BaseEntry> extends DataPanel<T> {
+    private final Consumer<T> onAdd;
+    private final Consumer<T> onRemove;
+    private final Consumer<T> onClick;
 
     private final ButtonWidget enterButton;
     private final TextBoxWidget inputBox;
+    private final Function<String, T> entryFactory;
 
     public ConsolePanelComponent(String name, int x, int y, int width, int height,
-                                 Consumer<FriendEntry> onAdd, Consumer<FriendEntry> onRemove, Consumer<FriendEntry> onClick) {
-        super(name, x, y, width, height, FriendEntry::getDisplayText);
+                                 Consumer<T> onAdd, Consumer<T> onRemove, Consumer<T> onClick,
+                                 Function<String, T> entryFactory) {
+        super(name, x, y, width, height, BaseEntry::getDisplayText);
         this.onAdd = onAdd;
         this.onRemove = onRemove;
         this.onClick = onClick;
+        this.entryFactory = entryFactory;
 
         int inputY = y + height - inputHeight - 2;
         int inputX = x + 2;
@@ -42,10 +47,20 @@ public class ConsolePanelComponent extends DataPanel<FriendEntry> {
 
     private void submitInput() {
         String text = inputBox.getText().trim();
-        if (!text.isEmpty() && onAdd != null) {
-            FriendEntry entry = new FriendEntry(text);
+        if (!text.isEmpty() && onAdd != null && entryFactory != null) {
+            T entry = entryFactory.apply(text);
             onAdd.accept(entry);
             inputBox.clear();
+        }
+    }
+
+    protected T createEntryFromText(String text) {
+        return null;
+    }
+
+    public void addEntry(T entry) {
+        if (entry != null) {
+            getEntries().add(entry);
         }
     }
 

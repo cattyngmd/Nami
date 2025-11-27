@@ -9,6 +9,7 @@ import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.core.rotation.RotationManager;
 import me.kiriyaga.nami.feature.gui.newgui.component.NavigatePanelComponent;
+import me.kiriyaga.nami.feature.gui.newgui.screen.LogScreen;
 import me.kiriyaga.nami.feature.gui.oldgui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
@@ -63,6 +64,7 @@ public class Nami implements ClientModInitializer {
     public static ClickGuiScreen CLICK_GUI;
     public static HudEditorScreen HUD_EDITOR;
     public static FriendScreen FRIEND;
+    public static LogScreen LOG;
     public static NavigatePanelComponent NAVIGATE_PANEL;
 
 
@@ -85,6 +87,7 @@ public class Nami implements ClientModInitializer {
         CLICK_GUI = new ClickGuiScreen();
         HUD_EDITOR = new HudEditorScreen();
         FRIEND = new FriendScreen();
+        LOG = new LogScreen();
         NAVIGATE_PANEL = new NavigatePanelComponent();
 
         FRIEND_MANAGER.load();

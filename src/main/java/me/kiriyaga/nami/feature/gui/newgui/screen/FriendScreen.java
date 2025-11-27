@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import static me.kiriyaga.nami.Nami.*;
 
 public class FriendScreen extends NamiScreen {
-    private ConsolePanelComponent console;
+    private ConsolePanelComponent<FriendEntry> console;
     private long lastOnlineUpdate;
 
     public FriendScreen() {
@@ -31,11 +31,13 @@ public class FriendScreen extends NamiScreen {
         super.init();
 
         if (console == null) {
-            console = new ConsolePanelComponent(
+            console = new ConsolePanelComponent<>(
                     "Friends", 20, 20, 300, 200,
                     entry -> { FRIEND_MANAGER.addFriend(entry.getName()); reloadEntry(); },
                     entry -> { FRIEND_MANAGER.removeFriend(entry.getName()); reloadEntry(); },
-                    entry -> {});
+                    entry -> {},
+                    FriendEntry::new
+            );
         }
         reloadEntry();
     }
