@@ -20,9 +20,9 @@ import static me.kiriyaga.nami.Nami.*;
 public class EntityListModule extends HudElementModule {
 
     public enum SortMode {
-        alphabetical,
-        descending,
-        ascending
+        ALPHABETICAL,
+        DESCENDING,
+        ASCENDING
     }
 
     private final List<TextElement> elements = new ArrayList<>();
@@ -30,7 +30,7 @@ public class EntityListModule extends HudElementModule {
     private final long updateIntervalMs = 3000;
 
     private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("Whitelist", false, WhitelistSetting.Type.ENTITY));
-    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.descending));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
     public final BoolSetting onlyLiving = addSetting(new BoolSetting("OnlyLiving", false));
 
     public EntityListModule() {
@@ -66,12 +66,12 @@ public class EntityListModule extends HudElementModule {
         List<String> sortedNames = new ArrayList<>(entityCounts.keySet());
 
         switch (sortMode.get()) {
-            case alphabetical -> sortedNames.sort(String::compareToIgnoreCase);
-            case descending -> sortedNames.sort((a, b) -> Integer.compare(
+            case ALPHABETICAL -> sortedNames.sort(String::compareToIgnoreCase);
+            case DESCENDING -> sortedNames.sort((a, b) -> Integer.compare(
                     getTextWidth(b, entityCounts.get(b)),
                     getTextWidth(a, entityCounts.get(a))
             ));
-            case ascending -> sortedNames.sort((a, b) -> Integer.compare(
+            case ASCENDING -> sortedNames.sort((a, b) -> Integer.compare(
                     getTextWidth(a, entityCounts.get(a)),
                     getTextWidth(b, entityCounts.get(b))
             ));
