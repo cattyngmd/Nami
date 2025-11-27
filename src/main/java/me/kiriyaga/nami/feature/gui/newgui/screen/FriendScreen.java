@@ -78,6 +78,12 @@ public class FriendScreen extends NamiScreen {
     }
 
     @Override
+    public void renderBackground(DrawContext context, int i, int j, float f) {
+        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+            this.applyBlur(context);
+    }
+
+    @Override
     public boolean mouseClicked(double x, double y, int button) {
         NAVIGATE_PANEL.mouseClicked(x, y, textRenderer);
 
