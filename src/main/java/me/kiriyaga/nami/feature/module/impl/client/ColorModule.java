@@ -15,10 +15,10 @@ import java.awt.*;
 @RegisterModule
 public class ColorModule extends Module {
 
-    public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(247, 234, 181, 255), true));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(181, 229, 247, 255), true));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("Rainbow", false));
-    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.4, 0.01, 5.0));
+    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.005, 0.001, 1.50));
 
     private int phase = 0;
 
@@ -66,35 +66,28 @@ public class ColorModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     private void onRender(Render2DEvent ev){
-        updateGlobalColor();
-    }
-
-    public void updateGlobalColor() {
         if (!rainbowEnabled.get()) return;
 
         Color current = globalColor.get();
-        int r = current.getRed();
-        int g = current.getGreen();
-        int b = current.getBlue();
-        int a = getAlpha255();
+
+        float[] hsb = Color.RGBtoHSB(current.getRed(), current.getGreen(), current.getBlue(), null);
+        float hue = hsb[0];
+        float sat = hsb[1];
+        float bri = hsb[2];
 
         int step = (int) Math.max(1, rainbowSpeed.get() * 4);
-
         switch (phase) {
-            case 0: g += step; if (g >= 255) { g = 255; phase = 1; } break;
-            case 1: r -= step; if (r <= 0)   { r = 0;   phase = 2; } break;
-            case 2: b += step; if (b >= 255) { b = 255; phase = 3; } break;
-            case 3: g -= step; if (g <= 0)   { g = 0;   phase = 4; } break;
-            case 4: r += step; if (r >= 255) { r = 255; phase = 5; } break;
-            case 5: b -= step; if (b <= 0)   { b = 0;   phase = 0; } break;
+            case 0: hue += step / 255f; if (hue >= 1f) { hue = 1f; phase = 1; } break;
+            case 1: hue -= step / 255f; if (hue <= 0f) { hue = 0f; phase = 2; } break;
+            case 2: hue += step / 255f; if (hue >= 1f) { hue = 1f; phase = 3; } break;
+            case 3: hue -= step / 255f; if (hue <= 0f) { hue = 0f; phase = 4; } break;
+            case 4: hue += step / 255f; if (hue >= 1f) { hue = 1f; phase = 5; } break;
+            case 5: hue -= step / 255f; if (hue <= 0f) { hue = 0f; phase = 0; } break;
         }
 
-        r = clamp(r); g = clamp(g); b = clamp(b);
-        globalColor.set(new Color(r, g, b, a));
-    }
-
-    private int clamp(int val) {
-        return Math.max(0, Math.min(255, val));
+        int rgb = Color.HSBtoRGB(hue, sat, bri);
+        Color c = new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, getAlpha255());
+        globalColor.set(c);
     }
 
     public Color getEffectiveGlobalColor() {
