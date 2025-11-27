@@ -90,14 +90,23 @@ public class MacroCommand extends Command {
                     return;
                 }
 
-                CHAT_MANAGER.sendPersistent(getClass().getName(),
-                        CAT_FORMAT.format("Macros:"));
+                StringBuilder builder = new StringBuilder();
+                builder.append("Macros:\n");
+
                 for (Macro macro : MACRO_MANAGER.getAll()) {
                     String key = KeyUtils.getKeyName(macro.getKeyCode());
                     String msg = macro.getMessage();
-                    CHAT_MANAGER.sendPersistent(getClass().getName(),
-                            CAT_FORMAT.format("  {g}" + key + " " + msg + "{reset},"));
+                    builder.append("  {g}")
+                            .append(key)
+                            .append(" ")
+                            .append(msg)
+                            .append("{reset}\n");
                 }
+
+                CHAT_MANAGER.sendPersistent(
+                        getClass().getName(),
+                        CAT_FORMAT.format(builder.toString())
+                );
             }
 
             default -> {

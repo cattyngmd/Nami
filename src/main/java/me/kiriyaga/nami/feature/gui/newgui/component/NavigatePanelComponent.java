@@ -31,6 +31,7 @@ public class NavigatePanelComponent {
         addScreen("ClickGui", CLICK_GUI);
         addScreen("HudEditor", HUD_EDITOR);
         addScreen("Friends", FRIEND);
+        addScreen("Logs", LOG);
         this.colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         this.clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
         resetActive();

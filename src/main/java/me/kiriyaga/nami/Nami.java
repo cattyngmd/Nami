@@ -9,6 +9,7 @@ import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.core.rotation.RotationManager;
 import me.kiriyaga.nami.feature.gui.newgui.component.NavigatePanelComponent;
+import me.kiriyaga.nami.feature.gui.newgui.screen.LogScreen;
 import me.kiriyaga.nami.feature.gui.oldgui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
@@ -29,6 +30,7 @@ import net.minecraft.util.Pair;
 public class Nami implements ClientModInitializer {
     public static String NAME = "nami";
     public static String DISPLAY_NAME = "Nami";
+    public static long START_TIME = 0;
     public static final String VERSION;
     static {
         ModContainer mod = FabricLoader.getInstance().getModContainer("nami").orElse(null);
@@ -62,6 +64,7 @@ public class Nami implements ClientModInitializer {
     public static ClickGuiScreen CLICK_GUI;
     public static HudEditorScreen HUD_EDITOR;
     public static FriendScreen FRIEND;
+    public static LogScreen LOG;
     public static NavigatePanelComponent NAVIGATE_PANEL;
 
 
@@ -84,6 +87,7 @@ public class Nami implements ClientModInitializer {
         CLICK_GUI = new ClickGuiScreen();
         HUD_EDITOR = new HudEditorScreen();
         FRIEND = new FriendScreen();
+        LOG = new LogScreen();
         NAVIGATE_PANEL = new NavigatePanelComponent();
 
         FRIEND_MANAGER.load();
@@ -93,6 +97,7 @@ public class Nami implements ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             FONT_MANAGER.init(); // font is making glyph textures, it should be after game loaded not on initialize
 
+            START_TIME = System.currentTimeMillis();
 
             CONFIG_MANAGER.loadModules();
             CONFIG_MANAGER.loadFriends();

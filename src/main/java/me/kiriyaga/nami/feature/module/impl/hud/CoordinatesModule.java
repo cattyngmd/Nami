@@ -21,6 +21,7 @@ public class CoordinatesModule extends HudElementModule {
 
     public final BoolSetting displayLabel = addSetting(new BoolSetting("Label", true));
     public final BoolSetting altCords = addSetting(new BoolSetting("AltCoordinates", true));
+    public final BoolSetting precise = addSetting(new BoolSetting("Precise", false));
     public final EnumSetting<LayoutMode> layout = addSetting(new EnumSetting<>("Layout", LayoutMode.HORIZONTAL));
 
     public CoordinatesModule() {
@@ -78,9 +79,9 @@ public class CoordinatesModule extends HudElementModule {
             return lines;
         }
 
-        double x = MC.player.getX();
-        double y = MC.player.getY();
-        double z = MC.player.getZ();
+        double x = MC.getCameraEntity().getX();
+        double y = MC.getCameraEntity().getY();
+        double z = MC.getCameraEntity().getZ();
 
         boolean isNether = MC.world.getRegistryKey() == World.NETHER;
         boolean isOverworld = MC.world.getRegistryKey() == World.OVERWORLD;
@@ -121,7 +122,6 @@ public class CoordinatesModule extends HudElementModule {
     }
 
     private String formatNumber(double val) {
-        double rounded = Math.round(val * 10.0) / 10.0;
-        return String.format("%.1f", rounded).replace(',', '.');
+        return String.format(precise.get() ? "%.3f" : "%.1f", val).replace(',', '.');
     }
 }

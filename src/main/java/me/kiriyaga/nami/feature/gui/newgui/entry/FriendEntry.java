@@ -1,31 +1,28 @@
 package me.kiriyaga.nami.feature.gui.newgui.entry;
 
+import me.kiriyaga.nami.feature.gui.newgui.base.BaseEntry;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 
 import java.util.Collection;
 
-import static me.kiriyaga.nami.Nami.CAT_FORMAT;
-import static me.kiriyaga.nami.Nami.MC;
+import static me.kiriyaga.nami.Nami.*;
 
-public class FriendEntry {
+public class FriendEntry extends BaseEntry {
     private final String name;
     private boolean online;
-    private Text displayText;
 
     public FriendEntry(String name) {
         this.name = name;
         refreshEntry();
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
-    public Text getDisplayText() {
-        return displayText;
-    }
+    @Override
+    public Text getDisplayText() { return displayText; }
 
+    @Override
     public void refreshEntry() {
         boolean nowOnline = false;
         if (MC.getNetworkHandler() != null) {

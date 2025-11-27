@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import static me.kiriyaga.nami.Nami.*;
 
-public class DataPanel<T> {
+public class DataPanel<T extends BaseEntry> {
     protected final List<T> entries = new ArrayList<>();
     protected final Function<T, Text> displayMapper;
 
