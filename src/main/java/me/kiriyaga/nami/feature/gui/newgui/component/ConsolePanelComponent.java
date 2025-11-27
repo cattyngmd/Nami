@@ -62,6 +62,10 @@ public class ConsolePanelComponent<T extends BaseEntry> extends DataPanel<T> {
         if (entry != null) {
             getEntries().add(entry);
         }
+
+        while (getEntries().size() > 250) {
+            getEntries().removeFirst();
+        }
     }
 
     @Override
