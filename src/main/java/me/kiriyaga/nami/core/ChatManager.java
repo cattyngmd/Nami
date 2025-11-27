@@ -64,7 +64,6 @@ public class ChatManager {
     public void sendRaw(Text message, boolean prefix) {
         if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
         Text text = prefix ? prefix().copy().append(message) : message;
-        LOG.addEntry(text.getString());
         getChatHud().addMessage(text);
     }
 
@@ -93,7 +92,6 @@ public class ChatManager {
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = indicator();
 
-        LOG.addEntry(text.getString());
         chatHud.addMessage(text, signature, indicator);
         persistentMessages.put(key, signature);
     }
@@ -124,7 +122,6 @@ public class ChatManager {
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = indicator();
 
-        LOG.addEntry(text.getString());
         chatHud.addMessage(text, signature, indicator);
         transientSignature = signature;
     }

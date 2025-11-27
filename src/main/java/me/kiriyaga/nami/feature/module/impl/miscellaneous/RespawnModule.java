@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -40,7 +41,9 @@ public class RespawnModule extends Module {
         if (sendCords.get()) {
             EXECUTABLE_MANAGER.getRequestHandler().submit(() ->{
                 String coords = String.format("X: %d Y: %d Z: %d", Math.round(last.x), Math.round(last.y), Math.round(last.z));
-                CHAT_MANAGER.sendPersistent(RespawnModule.class.getName(), CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}."));
+                Text reason = CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}.");
+                LOG.addEntry(this.name+": "+ reason.getString());
+                CHAT_MANAGER.sendPersistent(RespawnModule.class.getName(), "reason");
             }, 500, ExecutableThreadType.PRE_TICK);
         }
 
