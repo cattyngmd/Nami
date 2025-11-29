@@ -49,6 +49,7 @@ public class AnnouncerModule extends Module {
 
                     if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
                         Text message = CAT_FORMAT.format("{g}" + playerName + " {reset}joined the game.");
+                        LOG.addEntry(this.name + ": " + message.getString());
                         CHAT_MANAGER.sendPersistent(playerName, message);
                     }
                 }
@@ -65,6 +66,7 @@ public class AnnouncerModule extends Module {
 
                 if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
                     Text message = CAT_FORMAT.format("{g}" + playerName + " {reset}has left the game.");
+                    LOG.addEntry(this.name + ": " + message.getString());
                     CHAT_MANAGER.sendPersistent(playerName, message);
                 }
             }
@@ -89,8 +91,10 @@ public class AnnouncerModule extends Module {
                 return;
             }
 
-            CHAT_MANAGER.sendPersistent(player.getUuidAsString(),
-                    CAT_FORMAT.format("{g}" + player.getName().getString() + " {reset}has entered visual range."));
+            Text message = CAT_FORMAT.format("{g}" + player.getName().getString() + " {reset}has entered visual range.");
+
+            LOG.addEntry(this.name + ": " + message.getString());
+            CHAT_MANAGER.sendPersistent(player.getUuidAsString(), message);
 
             switch (soundMode.get()) {
                 case BELL -> MC.player.playSound(SoundEvents.BLOCK_BELL_USE, 1.0f, 1.0f);

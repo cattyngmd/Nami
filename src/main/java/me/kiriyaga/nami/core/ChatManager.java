@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.core;
 
+import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
@@ -62,11 +63,13 @@ public class ChatManager {
     }
 
     public void sendRaw(Text message, boolean prefix) {
-        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
-        Text text = prefix ? prefix().copy().append(message) : message;
-        LOG.addEntry(text.getString());
-        getChatHud().addMessage(text);
+        retry(() -> {
+            if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
+            Text text = prefix ? prefix().copy().append(message) : message;
+            getChatHud().addMessage(text);
+        });
     }
+
 
     public void sendPersistent(String key, String message) {
         sendPersistent(key, Text.literal(message), true);
@@ -81,6 +84,7 @@ public class ChatManager {
     }
 
     public void sendPersistent(String key, Text message, boolean prefix) {
+        retry(() -> {
         if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
         ChatHud chatHud = getChatHud();
@@ -93,9 +97,9 @@ public class ChatManager {
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = indicator();
 
-        LOG.addEntry(text.getString());
         chatHud.addMessage(text, signature, indicator);
         persistentMessages.put(key, signature);
+        });
     }
 
     public void sendTransient(String message) {
@@ -111,7 +115,8 @@ public class ChatManager {
     }
 
     public void sendTransient(Text message, boolean prefix) {
-        if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
+        retry(() -> {
+            if (MC == null || MC.inGameHud == null || getChatHud() == null) return;
 
         ChatHud chatHud = getChatHud();
 
@@ -124,9 +129,9 @@ public class ChatManager {
         MessageSignatureData signature = generateSignature();
         MessageIndicator indicator = indicator();
 
-        LOG.addEntry(text.getString());
         chatHud.addMessage(text, signature, indicator);
         transientSignature = signature;
+        });
     }
 
     public void removePersistent(String key) {
@@ -201,6 +206,17 @@ public class ChatManager {
         accessor.getVisibleMessages().removeIf(visible -> visible.comp_896().toString().equals(text));
 
         allMessages.removeIf(t -> t.getString().equals(text));
+    }
+
+    private void retry(Runnable task) {
+        boolean b =
+                MC == null || MC.world == null || MC.player == null || MC.player.isDead() || MC.currentScreen instanceof net.minecraft.client.gui.screen.DeathScreen;
+
+        if (b) {
+            EXECUTABLE_MANAGER.getRequestHandler().submit(() -> retry(task), 1, ExecutableThreadType.PRE_TICK);
+            return;
+        }
+        task.run();
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

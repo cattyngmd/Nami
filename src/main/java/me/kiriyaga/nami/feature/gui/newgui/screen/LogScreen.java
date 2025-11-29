@@ -38,6 +38,12 @@ public class LogScreen extends NamiScreen {
         }
     }
 
+    @Override
+    public void renderBackground(DrawContext context, int i, int j, float f) {
+        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+            this.applyBlur(context);
+    }
+
     public void addEntry(String text) {
         if (console != null) {
             console.addEntry(new LogEntry(text));

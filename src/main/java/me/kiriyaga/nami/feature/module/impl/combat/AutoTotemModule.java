@@ -268,6 +268,8 @@ public class AutoTotemModule extends Module {
                         "============================"
         );
 
+        LOG.addEntry(this.name + ": " + message);
+
         CHAT_MANAGER.sendPersistent(AutoTotemModule.class.getName(), message);
     }
 

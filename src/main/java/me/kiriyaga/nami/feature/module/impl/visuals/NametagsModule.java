@@ -254,8 +254,6 @@ public class NametagsModule extends Module {
             if (showEntityId.get()) {
                 displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatEntityId(entity));
             }
-        } else if (entity instanceof ItemEntity itemEntity) {
-            displayName = formatter.formatItem(itemEntity);
         } else if (name != null) {
             displayName = Text.literal(name);
         } else {

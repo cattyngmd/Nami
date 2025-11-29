@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -25,29 +26,35 @@ public class RespawnModule extends Module {
         super("Respawn", "Death screen tweaks.", ModuleCategory.of("Miscellaneous"), "autorespawn");
     }
 
-    private Vec3d last;
+    boolean b = false;
 
+    @Override
+    public void onEnable() {
+        b = false;
+    }
     @SubscribeEvent
     public void onTick(PreTickEvent ev) {
-        if (MC.player != null) last = MC.player.getPos();
+        if (MC.player == null || !MC.player.isDead() || b)
+            return;
+
+        b = true;
+        if (sendCords.get()) {
+                String coords = String.format("X: %d Y: %d Z: %d", Math.round(MC.player.getPos().x), Math.round(MC.player.getPos().y), Math.round(MC.player.getPos().z));
+                Text reason = CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}.");
+                LOG.addEntry(this.name+": "+ reason.getString());
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onOpenScreen(OpenScreenEvent event) {
         if (!(event.getScreen() instanceof DeathScreen)) return;
-        if (MC == null || last == null) return;
-
-        if (sendCords.get()) {
-            EXECUTABLE_MANAGER.getRequestHandler().submit(() ->{
-                String coords = String.format("X: %d Y: %d Z: %d", Math.round(last.x), Math.round(last.y), Math.round(last.z));
-                CHAT_MANAGER.sendPersistent(RespawnModule.class.getName(), CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}."));
-            }, 500, ExecutableThreadType.PRE_TICK);
-        }
+        if (MC == null) return;
 
         if (autoRespawn.get()) {
 
             MC.player.requestRespawn();
             event.cancel();
         }
+        b = false;
     }
 }
