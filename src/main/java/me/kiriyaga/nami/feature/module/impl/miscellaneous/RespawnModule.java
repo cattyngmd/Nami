@@ -44,7 +44,7 @@ public class RespawnModule extends Module {
                 Text reason = CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}.");
                 LOG.addEntry(this.name+": "+ reason.getString());
                 CHAT_MANAGER.sendPersistent(RespawnModule.class.getName(), "reason");
-            }, 500, ExecutableThreadType.PRE_TICK);
+            }, 1, ExecutableThreadType.PRE_TICK);
         }
 
         if (autoRespawn.get()) {
