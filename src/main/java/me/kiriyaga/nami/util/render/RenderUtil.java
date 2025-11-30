@@ -288,8 +288,10 @@ public class RenderUtil {
         drawBox(stack, new Box(pos), fillColor, lineColor, lineWidth, filled, outline);
     }
 
-    public static void drawBlockShape(MatrixStack matrices, World world, BlockPos pos, BlockState state,
-                                      Color fillColor, Color lineColor, double lineWidth, boolean filled) {
+    public static void drawBlockShape(MatrixStack matrices, World world, BlockPos pos, BlockState state, Color baseColor) {
+
+        Color fill = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 50);
+        Color outline = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 90);
 
         VoxelShape shape = state.getOutlineShape(world, pos);
 
@@ -299,10 +301,10 @@ public class RenderUtil {
                     pos.getX() + maxX, pos.getY() + maxY, pos.getZ() + maxZ
             );
 
-            if (filled) drawBoxFilled(matrices, box, fillColor);
-            drawBoxLines(matrices, box, lineColor, lineWidth);
+            drawBox(matrices, box, fill, outline, 1.5, true, true);
         });
     }
+
 
     public static Color getBlockColor(BlockState state, BlockRenderView world, BlockPos pos) {
         BlockColors blockColors = MinecraftClient.getInstance().getBlockColors();

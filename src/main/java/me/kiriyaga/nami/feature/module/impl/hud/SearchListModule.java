@@ -2,7 +2,7 @@ package me.kiriyaga.nami.feature.module.impl.hud;
 
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.SearchModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.blocksearch.BlockSearchModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -35,11 +35,11 @@ public class SearchListModule extends HudElementModule {
     public List<TextElement> getTextElements() {
         elements.clear();
 
-        var searchModule = MODULE_MANAGER.getStorage().getByClass(SearchModule.class);
+        var searchModule = MODULE_MANAGER.getStorage().getByClass(BlockSearchModule.class);
         if (searchModule == null) return elements;
 
-        ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = me.kiriyaga.nami.feature.module.impl.visuals.SearchModule.getChunkBlocks();
-        if (chunkBlocks == null || chunkBlocks.isEmpty()) return elements;
+        ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = BlockSearchModule.chunkBlocks;
+        if (chunkBlocks.isEmpty()) return elements;
 
         Map<String, Integer> blockCounts = new HashMap<>();
 
