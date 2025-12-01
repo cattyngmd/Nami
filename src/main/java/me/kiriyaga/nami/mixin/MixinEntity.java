@@ -76,7 +76,8 @@ public abstract class MixinEntity{
         if (pushEntityEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(at = @At("HEAD"), method = "Lnet/minecraft/entity/Entity;getPose()Lnet/minecraft/entity/EntityPose;", cancellable = true)
+    // this is like not needed?
+/*    @Inject(at = @At("HEAD"), method = "Lnet/minecraft/entity/Entity;getPose()Lnet/minecraft/entity/EntityPose;", cancellable = true)
     private void entityPose(CallbackInfoReturnable<EntityPose> cir) {
         ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class);
         if (elytraFlyModule != null && elytraFlyModule.isEnabled()
@@ -85,7 +86,7 @@ public abstract class MixinEntity{
                 && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             cir.setReturnValue(EntityPose.STANDING);
         }
-    }
+    }*/
 
     @Inject(method = "getRotationVector()Lnet/minecraft/util/math/Vec3d;", at = @At("HEAD"), cancellable = true)
     private void onGetRotationVector(CallbackInfoReturnable<Vec3d> cir) {

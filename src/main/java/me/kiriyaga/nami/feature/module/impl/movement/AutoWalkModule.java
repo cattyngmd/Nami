@@ -25,6 +25,9 @@ public class AutoWalkModule extends Module {
 
     @Override
     public void onDisable() {
+        if (MC.player == null || MC.world == null)
+            return;
+
         setWalkHeld(false);
     }
 
