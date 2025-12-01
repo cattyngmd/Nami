@@ -30,6 +30,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class BlockSearchModule extends Module {
 
     private final WhitelistSetting blockList = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.BLOCK));
+    //private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("NotAtSpawn", false));
 
     private Set<Identifier> candidateIds = new HashSet<>();
@@ -120,6 +121,9 @@ public class BlockSearchModule extends Module {
                 BlockState state = MC.world.getBlockState(pos);
 
                 RenderUtil.drawBlockShape(matrices, MC.world, pos, state, BlockUtils.getColorByBlockId(state));
+
+            //    if (tracers.get())
+                //    RenderUtil.drawLine(matrices, MC.player.getEyePos(), pos.toCenterPos(), BlockUtils.getColorByBlockId(state), 1.50);
             }
         }
     }
