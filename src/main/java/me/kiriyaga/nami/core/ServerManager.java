@@ -4,7 +4,6 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.client.FastLatencyModule;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
@@ -244,9 +243,15 @@ public class ServerManager {
         }
     }
 
-    public float getConnectionUnstableTimeSeconds() {
+    public float getUnstableTime() {
         if (lastUpdated == -1) return Float.POSITIVE_INFINITY;
         long deltaMillis = System.currentTimeMillis() - lastUpdated;
         return deltaMillis / 1000.0f;
+    }
+
+    public boolean getSetback(long mil) {
+        if (lastSetbackTime == 0) return false;
+
+        return System.currentTimeMillis() - lastSetbackTime <= mil;
     }
 }

@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.GlidingEvent;
 import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -46,6 +47,7 @@ public class ElytraFlyModule extends Module {
     private final IntSetting cruiseMax = addSetting(new IntSetting("CruiseMax", 12, 2, 25));
     private final BoolSetting allowRockets = addSetting(new BoolSetting("AllowRockets", true));
     private final IntSetting rocketSpeed = addSetting(new IntSetting("RocketBelow", 9, 0, 30));
+    private final BoolSetting setbackStop = addSetting(new BoolSetting("SetbackStop", true));
 
     //
     // CONTROL
@@ -53,8 +55,8 @@ public class ElytraFlyModule extends Module {
     private final BoolSetting lockPitch = addSetting(new BoolSetting("LockPitch", true));
 
     // BOOST
-    private final BoolSetting boost = addSetting(new BoolSetting("Boost", false));
-    private final BoolSetting newBoost = addSetting(new BoolSetting("NewBoost", false));
+    //private final BoolSetting boost = addSetting(new BoolSetting("Boost", false));
+    //private final BoolSetting newBoost = addSetting(new BoolSetting("NewBoost", false));
     private final BoolSetting pitch = addSetting(new BoolSetting("Pitch", true));
     private final IntSetting pitchDegree = addSetting(new IntSetting("Pitch", 75, 0, 90));
 
@@ -73,8 +75,8 @@ public class ElytraFlyModule extends Module {
 
     public ElytraFlyModule() {
         super("ElytraFly", "Improves elytra flying.", ModuleCategory.of("Movement"), "elytrafly");
-        boost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
-        newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
+        //boost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
+        //newBoost.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitch.setShowCondition(() -> mode.get() == FlyMode.BOUNCE);
         pitchDegree.setShowCondition(() -> mode.get() == FlyMode.BOUNCE && pitch.get());
         lockPitch.setShowCondition(() -> mode.get() == FlyMode.ROTATION);
@@ -105,33 +107,53 @@ public class ElytraFlyModule extends Module {
         baseY = 0;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+/*    @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onMove(MoveEvent event) {
-        ClientPlayerEntity player = MC.player;
-        if (player == null || mode.get() != FlyMode.BOUNCE) return;
+        if (MC.player == null || mode.get() != FlyMode.BOUNCE) return;
 
-        if (!player.isOnGround()) return;
+        if (!MC.player.isOnGround()) return;
 
-        if (player.isSprinting() && speed > 12.00 && newBoost.get()) {
+        if (MC.player.isSprinting() && speed > 12.00 && newBoost.get()) {
 
-            Vec3d velocity = player.getVelocity();
+            Vec3d velocity = MC.player.getVelocity();
             event.setMovement(new Vec3d(velocity.x, 0, velocity.z));
         }
+    }*/
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    private void onGliding(GlidingEvent event) {
+        if (MC.player == null)
+            return;
+
+        if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
+            return;
+
+        if (setbackStop.get() && SERVER_MANAGER.getSetback(5000))
+            return;
+
+        if (mode.get() == FlyMode.BOUNCE)
+            event.cancel();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onPreTick(PreTickEvent event) {
+        if (MC.player == null)
+            return;
+
         if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
+            return;
+
+        if (setbackStop.get() && SERVER_MANAGER.getSetback(5000))
             return;
 
         this.setDisplayInfo(mode.get().toString());
 
         if (mode.get() == FlyMode.BOUNCE) {
             setJumpHeld(true);
-
+/*
             if (boost.get()) {
                 MC.player.setVelocity(MC.player.getVelocity().x, 0.0, MC.player.getVelocity().z);
-            }
+            }*/
 
             if (pitch.get())
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYaw(), pitchDegree.get().floatValue(), RotationModule.RotationMode.MOTION));
