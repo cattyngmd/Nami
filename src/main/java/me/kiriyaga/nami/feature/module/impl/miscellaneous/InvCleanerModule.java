@@ -16,7 +16,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class InvCleanerModule extends Module {
 
-    private final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 10));
+    private final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 20));
     private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("Whitelist", false, WhitelistSetting.Type.ITEM));
     private final WhitelistSetting blacklist = addSetting(new WhitelistSetting("Blacklist", true, WhitelistSetting.Type.ITEM));
 
