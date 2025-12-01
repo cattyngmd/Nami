@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.GlidingEvent;
 import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
@@ -120,7 +121,25 @@ public class ElytraFlyModule extends Module {
     }*/
 
     @SubscribeEvent(priority = EventPriority.HIGH)
+    private void onGliding(GlidingEvent event) {
+        if (MC.player == null)
+            return;
+
+        if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
+            return;
+
+        if (setbackStop.get() && SERVER_MANAGER.getSetback(5000))
+            return;
+
+        if (mode.get() == FlyMode.BOUNCE)
+            event.cancel();
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
     private void onPreTick(PreTickEvent event) {
+        if (MC.player == null)
+            return;
+
         if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 

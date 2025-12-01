@@ -2,6 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import me.kiriyaga.nami.event.impl.GlidingEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
@@ -92,12 +93,12 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
-        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class) : null;
-        if (elytraFlyModule != null && MC.player != null && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.BOUNCE &&
-                (Object)this == MinecraftClient.getInstance().player && elytraFlyModule.isEnabled() &&
-                MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
+        GlidingEvent ev = new GlidingEvent();
+
+        EVENT_MANAGER.post(ev);
+
+        if (ev.isCancelled())
             cir.setReturnValue(true);
-        }
     }
 
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
