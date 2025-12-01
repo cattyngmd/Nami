@@ -248,10 +248,4 @@ public class ServerManager {
         long deltaMillis = System.currentTimeMillis() - lastUpdated;
         return deltaMillis / 1000.0f;
     }
-
-    public boolean getSetback(long mil) {
-        if (lastSetbackTime == 0) return false;
-
-        return System.currentTimeMillis() - lastSetbackTime <= mil;
-    }
 }
