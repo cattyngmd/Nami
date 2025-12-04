@@ -14,10 +14,7 @@ import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -80,7 +77,7 @@ public class ScaffoldModule extends Module {
         for (BlockPos pos : corners) {
             BlockPos targetPos = pos.down();
 
-            if (interruptedByEntity(targetPos) || !isReplaceable(targetPos))
+            if (isPlaceable(targetPos) || !isReplaceable(targetPos))
                 continue;
 
             renderPos = targetPos;

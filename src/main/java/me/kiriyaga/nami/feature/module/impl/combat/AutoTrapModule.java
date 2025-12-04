@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InteractionUtils.interruptedByEntity;
+import static me.kiriyaga.nami.util.InteractionUtils.isPlaceable;
 import static me.kiriyaga.nami.util.InteractionUtils.isReplaceable;
 import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 
@@ -155,7 +155,7 @@ public class AutoTrapModule extends Module {
 
         List<BlockPos> result = new ArrayList<>();
         for (BlockPos pos : positions)
-            if (!interruptedByEntity(pos))
+            if (!isPlaceable(pos))
                 result.add(pos);
 
         return result;
