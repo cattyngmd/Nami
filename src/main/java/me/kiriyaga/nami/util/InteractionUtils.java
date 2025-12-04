@@ -6,8 +6,6 @@ import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -19,13 +17,10 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import org.joml.Vector3f;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
@@ -175,6 +170,67 @@ public class InteractionUtils {
         return result;
     }
 
+    public static boolean interactBlockAt(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
+
+        Vec3d eyePos = MC.player.getEyePos();
+        Vec3d hitVec = Vec3d.ofCenter(pos);
+
+        Direction clickFace = Direction.getFacing(hitVec.x - eyePos.x, hitVec.y - eyePos.y, hitVec.z - eyePos.z);
+
+        if (strictDirection) {
+            boolean flag = switch (clickFace) {
+                case NORTH -> eyePos.z <= pos.getZ() + 1e-3;
+                case SOUTH -> eyePos.z >= pos.getZ() + 1 - 1e-3;
+                case WEST  -> eyePos.x <= pos.getX() + 1e-3;
+                case EAST  -> eyePos.x >= pos.getX() + 1 - 1e-3;
+                case DOWN  -> eyePos.y <= pos.getY() + 1e-3;
+                case UP    -> eyePos.y >= pos.getY() + 1 - 1e-3;
+            };
+            if (!flag)
+                return false;
+        }
+
+       Box box = new Box(pos);
+        Vec3d lookDir = getClosestPointToEye(eyePos, box).subtract(eyePos).normalize();
+        Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
+
+        if (box.raycast(eyePos, reachEnd).isEmpty())
+            return false;
+
+        BlockHitResult hit = new BlockHitResult(hitVec, clickFace, pos, false);
+
+        boolean canInteract = true;
+
+        if (rotate) {
+            float yaw = (float) getYawToVec(MC.player, hitVec);
+            float pitch = (float) getPitchToVec(MC.player, hitVec);
+
+            if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
+            else
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
+
+            canInteract = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+        }
+
+        if (!canInteract)
+            return false;
+
+        int prev = MC.player.getInventory().getSelectedSlot();
+        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+
+        if (simulate)
+            MC.interactionManager.interactBlock(MC.player, MAIN_HAND, hit);
+        else
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(MAIN_HAND, hit, id));
+
+        if (swing)
+            MC.player.swingHand(MAIN_HAND);
+
+        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+        return true;
+    }
+
     public static Direction getDirection(BlockPos blockPos) {
         for (final Direction direction : Direction.values()) {
             final BlockState state = MC.world.getBlockState(blockPos.offset(direction));
@@ -317,11 +373,11 @@ public class InteractionUtils {
         return !fluidState.isEmpty();
     }
 
-    public static boolean interruptedByEntity(BlockPos pos) {
-        return interruptedByEntity(pos, 10);
+    public static boolean isPlaceable(BlockPos pos) {
+        return isPlaceable(pos, 10);
     }
 
-    public static boolean interruptedByEntity(BlockPos pos, int distance) {
+    public static boolean isPlaceable(BlockPos pos, int distance) {
         Box blockBox = new Box(pos);
         for (Entity entity : MC.world.getEntities()) {
             if (entity.squaredDistanceTo(MC.player) > distance) continue;

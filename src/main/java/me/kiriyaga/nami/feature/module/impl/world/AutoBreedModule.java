@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
+import static me.kiriyaga.nami.util.entity.EntityUtils.canBreed;
 
 @RegisterModule
 public class AutoBreedModule extends Module {
@@ -46,7 +47,9 @@ public class AutoBreedModule extends Module {
 
         animalsFed.removeIf(id -> {
             Entity e = MC.world.getEntityById(id);
-            return e == null || !e.isAlive() || MC.player.squaredDistanceTo(e) > range.get() * range.get();
+            return e == null
+                    || !e.isAlive()
+                    || e instanceof AnimalEntity an && !canBreed(an);
         });
 
         if (breedCooldown > 0) {
@@ -56,10 +59,11 @@ public class AutoBreedModule extends Module {
 
         for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE, 10, true)) {
             if (!(entity instanceof AnimalEntity animal)) continue;
-            if (!animal.isAlive() || animal.isBaby() || animal.isInLove() || !animal.canEat()) continue;
             if (animalsFed.contains(animal.getId())) continue;
 
-            int foodSlot = getBreedingItemSlot(animal);
+            if (!canBreed(animal)) continue;
+
+            int foodSlot = getSlot(animal);
             if (foodSlot == -1) continue;
 
             int currentSlot = MC.player.getInventory().getSelectedSlot();
@@ -78,7 +82,7 @@ public class AutoBreedModule extends Module {
         }
     }
 
-    private int getBreedingItemSlot(AnimalEntity animal) {
+    private int getSlot(AnimalEntity animal) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getStack(i);
             if (!stack.isEmpty() && animal.isBreedingItem(stack)) {

@@ -16,7 +16,10 @@ public class LagWarningModule extends HudElementModule {
 
     @Override
     public Text getDisplayText() {
-        if (!SERVER_MANAGER.isConnectionUnstable() || MC.isInSingleplayer()) return Text.empty();
+        if (!SERVER_MANAGER.isConnectionUnstable())
+            return Text.empty();
+
+        if (MC.isInSingleplayer() || MC.world == null) return Text.of("LagWarning:");
 
         double seconds = SERVER_MANAGER.getUnstableTime();
         double roundedSeconds = Math.round(seconds * 100.0) / 100.0;

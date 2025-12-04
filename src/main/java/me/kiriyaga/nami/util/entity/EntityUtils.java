@@ -1,9 +1,12 @@
 package me.kiriyaga.nami.util.entity;
 
+import me.kiriyaga.nami.mixin.AnimalEntityAccessor;
+import me.kiriyaga.nami.mixin.PassiveEntityAccessor;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
@@ -92,4 +95,14 @@ public class EntityUtils {
                 .collect(Collectors.toList());
     }
 
+    public static boolean canBreed(AnimalEntity animal) {
+        PassiveEntityAccessor a = (PassiveEntityAccessor) animal;
+        AnimalEntityAccessor a1 = (AnimalEntityAccessor) animal;
+
+        if (animal.isBaby()) return false;
+        if (a.breedingAge() != 0) return false;
+        if (a1.loveTicks() > 0) return false;
+
+        return animal.canEat();
+    }
 }

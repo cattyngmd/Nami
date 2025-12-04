@@ -128,7 +128,7 @@ public class ElytraFlyModule extends Module {
         if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
-        if (setbackStop.get() && SERVER_MANAGER.getSetback(5000))
+        if (setbackStop.get() && SERVER_MANAGER.hasElapsedSinceSetback(5000))
             return;
 
         if (mode.get() == FlyMode.BOUNCE)
@@ -143,7 +143,7 @@ public class ElytraFlyModule extends Module {
         if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
-        if (setbackStop.get() && SERVER_MANAGER.getSetback(5000))
+        if (setbackStop.get() && SERVER_MANAGER.hasElapsedSinceSetback(5000))
             return;
 
         this.setDisplayInfo(mode.get().toString());
