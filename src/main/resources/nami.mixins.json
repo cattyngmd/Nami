@@ -3,7 +3,6 @@
   "package": "me.kiriyaga.nami.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "MixinBlockEntityRenderDispatcher",
     "ChatHudAccessor",
     "ChatInputSuggestorMixin",
     "ClientPlayerInteractionManagerAccessor",
@@ -52,6 +51,7 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "AnimalEntityAccessor",
     "BundlePacketAccessor",
     "EntityVelocityUpdateS2CPacketAccessor",
     "ExplosionS2CPacketAccessor",
@@ -62,6 +62,7 @@
     "MixinPlayerEntity",
     "MixinPlayerInteractEntityC2SPacket",
     "MixinTextVisitFactory",
+    "PassiveEntityAccessor",
     "PlayerInteractEntityC2SPacketAccessor",
     "PlayerPositionAccessor",
     "ScreenHandlerAccessor"
