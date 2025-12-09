@@ -9,7 +9,6 @@ import java.awt.*;
 
 public class WhitelistSettingRenderer implements SettingRenderer<WhitelistSetting> {
     private final BoolSettingRenderer boolRenderer = new BoolSettingRenderer();
-    private boolean showWhitelist = false;
 
     @Override
     public void render(DrawContext context, TextRenderer textRenderer, WhitelistSetting setting, int x, int y, int mouseX, int mouseY) {

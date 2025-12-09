@@ -17,9 +17,9 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class NoGlitchBlocksModule extends Module {
 
-    private final BoolSetting place = addSetting(new BoolSetting("place", true));
-    private final BoolSetting destroy = addSetting(new BoolSetting("destroy", true));
-    private final BoolSetting swing = addSetting(new BoolSetting("swing", true));
+    private final BoolSetting place = addSetting(new BoolSetting("Place", true));
+    private final BoolSetting destroy = addSetting(new BoolSetting("Destroy", true));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
 
     public NoGlitchBlocksModule() {
         super("NoGlitchBlocks", "Prevents ghost/place/destroy glitches.", ModuleCategory.of("World"), "noglitchblocks");
