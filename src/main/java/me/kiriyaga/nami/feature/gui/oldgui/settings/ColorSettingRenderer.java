@@ -30,7 +30,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
                        int x, int y, int mouseX, int mouseY) {
 
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color textCol = Color.WHITE;
+        Color textCol = getColorModule().getStyledGlobalColor(255);
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, 0)));
         int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));

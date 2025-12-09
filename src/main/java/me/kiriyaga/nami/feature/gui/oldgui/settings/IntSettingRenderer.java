@@ -21,9 +21,10 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
 
         Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = Color.WHITE;
+        Color text = getColorModule().getStyledGlobalColor(255);
+
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, 0)));
-        int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
+        int textColorInt = CLICK_GUI.applyFade(toRGBA(text));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 

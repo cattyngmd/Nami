@@ -31,12 +31,11 @@ public class ButtonWidget {
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
-        int bgColor = 0xAA000000;
         panelRenderer.renderPanel(context, x, y, width, height, 0, false);
 
 
-        Color textOff = new Color(155, 155, 155, 255);
-        Color textCol = active ?  new Color(255, 255, 255, 255)  : textOff;
+        Color textOff = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor(255);
+        Color textCol = active ?  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor(255)  : textOff;
 
         int textWidth = textRenderer.getWidth(label);
         int textX = x + (width - textWidth) / 2;

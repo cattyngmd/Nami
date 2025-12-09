@@ -15,9 +15,9 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
     @Override
     public void render(DrawContext context, TextRenderer textRenderer, BoolSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color textCol = new Color(155, 155, 155, 255);
+        Color textCol = getColorModule().getStyledSecondColor(255);
         Color bgColor = new Color(30, 30, 30, 0);
-        Color textColActivated = new Color(255, 255, 255, 255);
+        Color textColActivated = getColorModule().getStyledGlobalColor(255);
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
         int textColorInt = CLICK_GUI.applyFade(setting.get() ? toRGBA(textColActivated) : toRGBA(textCol));

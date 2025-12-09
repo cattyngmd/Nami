@@ -18,7 +18,7 @@ public class ColorModule extends Module {
     public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(181, 229, 247, 255), true));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("Rainbow", false));
-    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.005, 0.001, 1.50));
+    public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.005, 0.0001, 1.50));
 
     private int phase = 0;
 
@@ -100,5 +100,21 @@ public class ColorModule extends Module {
 
     public Color getStyledSecondColor() {
         return applyDarkness(getStyledGlobalColor(), 0.35);
+    }
+
+    public Color getStyledGlobalColor(int alpha) {
+        Color base = getStyledGlobalColor();
+        return new Color(base.getRed(), base.getGreen(), base.getBlue(), clampAlpha(alpha));
+    }
+
+    public Color getStyledSecondColor(int alpha) {
+        Color base = getStyledSecondColor();
+        return new Color(base.getRed(), base.getGreen(), base.getBlue(), clampAlpha(alpha));
+    }
+
+    private int clampAlpha(int alpha) {
+        if (alpha < 0) return 0;
+        if (alpha > 255) return 255;
+        return alpha;
     }
 }

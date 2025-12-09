@@ -30,17 +30,14 @@ public class ModulePanel {
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
 
-        Color primary = getColorModule().getStyledGlobalColor();
-        Color textCol = new Color(255, 255, 255, 255);
-
-        if (hovered) {
-            primary = brighten(primary, 0.1f);
-        }
+        Color primary = getColorModule().getStyledGlobalColor(255);
+        Color textCol = getColorModule().getStyledSecondColor(255);
 
         if (module.isEnabled())
-            context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI.applyFade(toRGBA(primary)));
+            //context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI.applyFade(toRGBA(primary)));
+            textCol = primary;
 
-        int textY = y + (HEIGHT - 8) / 2;
+        int textY = (y + (HEIGHT - 8) / 2 ) +1;
         int baseTextX = x + PADDING + (hovered ? 1 : 0);
         FONT_MANAGER.drawText(
                 context,

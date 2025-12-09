@@ -19,7 +19,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
     @Override
     public void render(DrawContext context, TextRenderer textRenderer, KeyBindSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color textCol = new Color(255, 255, 255, 255);
+        Color textCol = getColorModule().getStyledGlobalColor(255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));

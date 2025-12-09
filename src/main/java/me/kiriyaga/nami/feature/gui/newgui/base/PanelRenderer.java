@@ -22,14 +22,14 @@ public class PanelRenderer {
         this.clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
-    public void renderPanel(DrawContext context, int x, int y, int width, int height, int headerHeight, boolean renderHeader) {
+    public void renderPanel(DrawContext context, int x, int y, int width, int height, int headerHeight, boolean renderHeader, boolean renderBackground) {
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
 
-
-        int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(secondary.getRed(), secondary.getGreen(), secondary.getBlue(), clickGuiModule.guiAlpha.get())));
-        context.fill(x, y, x + width, y + height, bgColor);
-
+        if (renderBackground) {
+            int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(secondary.getRed(), secondary.getGreen(), secondary.getBlue(), clickGuiModule.guiAlpha.get())));
+            context.fill(x, y, x + width, y + height, bgColor);
+        }
 
         int lineColor;
         if (clickGuiModule.lines.get()) {
@@ -58,7 +58,7 @@ public class PanelRenderer {
     }
 
     public void renderHeaderText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int headerHeight, int padding) {
-        Color textCol =  new Color(255, 255, 255, 255);
+        Color textCol =  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor(255);
 
         int textY = y + (headerHeight - textRenderer.fontHeight) / 2;
         FONT_MANAGER.drawText(context, text, x + padding, textY + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);
@@ -66,6 +66,10 @@ public class PanelRenderer {
 
 
     public void renderPanel(DrawContext context, int x, int y, int width, int height, int headerHeight) {
-        renderPanel(context, x, y, width, height, headerHeight, true);
+        renderPanel(context, x, y, width, height, headerHeight, true, true);
+    }
+
+    public void renderPanel(DrawContext context, int x, int y, int width, int height, int headerHeight, boolean renderHeader) {
+        renderPanel(context, x, y, width, height, headerHeight, renderHeader, true);
     }
 }
