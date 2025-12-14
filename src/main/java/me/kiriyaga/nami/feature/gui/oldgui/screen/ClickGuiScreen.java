@@ -125,7 +125,7 @@ public class ClickGuiScreen extends Screen {
 
             CategoryPanel panel = categoryPanels.get(moduleCategory);
             if (panel != null)
-                panel.render(context, this.textRenderer, pos.x, pos.y, scaledMouseX, scaledMouseY, this.height);
+                panel.render(context, this.textRenderer, pos.x, pos.y, scaledMouseX, scaledMouseY, scaledHeight);
         }
 
         if (clickGuiModule != null && clickGuiModule.descriptions.get()) {
@@ -137,6 +137,10 @@ public class ClickGuiScreen extends Screen {
 
                 CategoryPanel panel = categoryPanels.get(moduleCategory);
                 if (panel == null) continue;
+
+                if (!panel.isMouseOverContent(scaledMouseX, scaledMouseY, pos.x, pos.y, scaledHeight)) {
+                    continue;
+                }
 
                 double scrollOffset = panel.getScrollOffset();
 
@@ -188,6 +192,7 @@ public class ClickGuiScreen extends Screen {
 
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
+        int scaledHeight = (int) (this.height / scale);
 
         NAVIGATE_PANEL.mouseClicked(mouseX, mouseY, this.textRenderer);
 
@@ -220,6 +225,10 @@ public class ClickGuiScreen extends Screen {
 
                 CategoryPanel panel = categoryPanels.get(moduleCategory);
                 if (panel == null) continue;
+
+                if (!panel.isMouseOverContent(scaledMouseX, scaledMouseY, pos.x, pos.y, scaledHeight)) {
+                    continue;
+                }
 
                 double scrollOffset = panel.getScrollOffset();
 
@@ -315,6 +324,7 @@ public class ClickGuiScreen extends Screen {
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         int scaledMouseX = (int) (mouseX / scale);
         int scaledMouseY = (int) (mouseY / scale);
+        int scaledHeight = (int) (this.height / scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
@@ -323,7 +333,7 @@ public class ClickGuiScreen extends Screen {
             if (pos == null) continue;
 
             CategoryPanel panel = categoryPanels.get(moduleCategory);
-            if (panel != null && panel.mouseScrolled(scaledMouseX, scaledMouseY, verticalAmount, pos.x, pos.y, this.height)) {
+            if (panel != null && panel.mouseScrolled(scaledMouseX, scaledMouseY, verticalAmount, pos.x, pos.y, scaledHeight)) {
                 return true;
             }
         }

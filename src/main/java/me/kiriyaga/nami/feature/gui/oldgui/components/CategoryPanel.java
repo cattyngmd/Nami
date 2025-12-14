@@ -116,34 +116,74 @@ public class CategoryPanel {
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta, int x, int y, int screenHeight) {
         List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
 
-        int contentY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;
-
-        int visibleHeight = Math.min(modules.size() * (ModulePanel.HEIGHT + MODULE_SPACING),
-                screenHeight - contentY - 10);
-
-        int scrollableHeight = 0;
+        int dynamicContentHeight = 0;
         for (Module module : modules) {
-            scrollableHeight += ModulePanel.HEIGHT + MODULE_SPACING;
+            dynamicContentHeight += ModulePanel.HEIGHT + MODULE_SPACING;
             if (module.isExpanded()) {
-                scrollableHeight += SettingPanel.getSettingsHeight(module);
+                dynamicContentHeight += SettingPanel.getSettingsHeight(module);
             }
         }
+
+        int fullUnclampedHeight = HEADER_HEIGHT + BOTTOM_MARGIN + MODULE_SPACING + dynamicContentHeight + MODULE_SPACING;
+        int maxAllowedHeight = screenHeight - y - 1;
+        int basePanelHeight = Math.min(fullUnclampedHeight, maxAllowedHeight);
+
+        int contentY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;
+
+        int visibleHeight = Math.min(basePanelHeight - HEADER_HEIGHT - MODULE_SPACING - BOTTOM_MARGIN,
+                screenHeight - contentY - 1);
+
+        boolean anyExpanded = modules.stream().anyMatch(Module::isExpanded);
+        if (anyExpanded) {
+            visibleHeight -= 1;
+            if (visibleHeight < 0) visibleHeight = 0;
+        }
+
         if (mouseX >= x && mouseX <= x + WIDTH &&
                 mouseY >= contentY && mouseY <= contentY + visibleHeight) {
 
             targetScrollOffset -= scrollDelta * 45;
 
-            double maxScroll = Math.max(0, scrollableHeight - visibleHeight);
+            double maxScroll = Math.max(0, dynamicContentHeight - visibleHeight);
             if (targetScrollOffset < 0) targetScrollOffset = 0;
             if (targetScrollOffset > maxScroll) targetScrollOffset = maxScroll;
 
             return true;
-        } else {
         }
 
         return false;
     }
 
+
+    public boolean isMouseOverContent(double mouseX, double mouseY, int x, int y, int screenHeight) {
+        List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
+
+        int dynamicContentHeight = 0;
+        for (Module module : modules) {
+            dynamicContentHeight += ModulePanel.HEIGHT + MODULE_SPACING;
+            if (module.isExpanded()) {
+                dynamicContentHeight += SettingPanel.getSettingsHeight(module);
+            }
+        }
+
+        int fullUnclampedHeight = HEADER_HEIGHT + BOTTOM_MARGIN + MODULE_SPACING + dynamicContentHeight + MODULE_SPACING;
+        int maxAllowedHeight = screenHeight - y - 1;
+        int basePanelHeight = Math.min(fullUnclampedHeight, maxAllowedHeight);
+
+        int contentY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;
+
+        int visibleHeight = Math.min(basePanelHeight - HEADER_HEIGHT - MODULE_SPACING - BOTTOM_MARGIN,
+                screenHeight - contentY - 1);
+
+        boolean anyExpanded = modules.stream().anyMatch(Module::isExpanded);
+        if (anyExpanded) {
+            visibleHeight -= 1;
+            if (visibleHeight < 0) visibleHeight = 0;
+        }
+
+        return mouseX >= x && mouseX <= x + WIDTH &&
+                mouseY >= contentY && mouseY <= contentY + visibleHeight;
+    }
 
     public static boolean isHeaderHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEADER_HEIGHT;
