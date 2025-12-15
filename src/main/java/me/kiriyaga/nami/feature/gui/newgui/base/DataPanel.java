@@ -52,7 +52,7 @@ public class DataPanel<T extends BaseEntry> {
         panelRenderer.renderHeaderText(context, textRenderer, name, x, y, headerHeight, 4);
 
         int contentY = y + headerHeight + 4;
-        int lineHeight = textRenderer.fontHeight + 4;
+        int lineHeight = FONT_MANAGER.getHeight() + 4;
         int contentHeight = height - headerHeight - inputHeight - 8;
         int maxVisible = contentHeight / lineHeight;
 
@@ -69,7 +69,9 @@ public class DataPanel<T extends BaseEntry> {
         for (int i = start; i < Math.min(entries.size(), start + maxVisible + 1); i++) {
             T item = entries.get(i);
             Text display = displayMapper.apply(item);
-            FONT_MANAGER.drawText(context, display, x + 4, drawY, 0xFFFFFFFF, true);
+            if (display != null) {
+                FONT_MANAGER.drawText(context, display, x + 4, drawY, 0xFFFFFFFF, true);
+            }
             drawY += lineHeight;
         }
 
