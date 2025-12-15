@@ -59,6 +59,7 @@ public class AuraModule extends Module {
     public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", true));
     public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("Sprinting", Sprint.NONE));
     public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("Rotate", Rotate.NORMAL));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     private Entity currentTarget = null;
@@ -241,7 +242,9 @@ public class AuraModule extends Module {
         }
 
         MC.interactionManager.attackEntity(MC.player, target);
-        MC.player.swingHand(Hand.MAIN_HAND);
+
+        if (swing.get())
+            MC.player.swingHand(Hand.MAIN_HAND);
 
         if (swap.get() == Swap.SILENT) {
             if (prev != -1) {

@@ -35,6 +35,7 @@ public class AutoTotemModule extends Module {
     private final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("Item", Offhand.CRYSTAL));
     private final BoolSetting fastSwap = addSetting(new BoolSetting("Alternative", false));
     private final BoolSetting mainhand = addSetting(new BoolSetting("Mainhand", false));
+    private final BoolSetting mainhandGapple = addSetting(new BoolSetting("MainhandGapple", false));
     private final IntSetting mainhandSlot = addSetting(new IntSetting("Slot", 8, 0, 8));
     private final BoolSetting deathLog = addSetting(new BoolSetting("Log", false));
 
@@ -103,19 +104,40 @@ public class AutoTotemModule extends Module {
             if (targetStack == null) return;
         }
 
-        if (mainhand.get()){
-            if (MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.TOTEM_OF_UNDYING){
-                int totem = findInventorySlot(new ItemStack(Items.TOTEM_OF_UNDYING), mainhandSlot.get());
-                if (totem != -1){
+        if (mainhand.get()) {
+            boolean useGapple = mainhandGapple.get() && MC.options.useKey.isPressed();
+
+            if (useGapple) {
+                int gappleSlot = findInventorySlot(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE), mainhandSlot.get());
+                if (gappleSlot == -1) {
+                    gappleSlot = findInventorySlot(new ItemStack(Items.GOLDEN_APPLE), mainhandSlot.get());
+                }
+
+                if (gappleSlot != -1 && MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.ENCHANTED_GOLDEN_APPLE
+                        && MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.GOLDEN_APPLE) {
                     if (fastSwap.get()) {
-                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totem), mainhandSlot.get());
+                        INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(gappleSlot), mainhandSlot.get());
                         lastAttemptTime = System.currentTimeMillis();
                     } else {
-                        clickSlot(totem, convertSlot(mainhandSlot.get()));
+                        clickSlot(gappleSlot, convertSlot(mainhandSlot.get()));
                         lastAttemptTime = System.currentTimeMillis();
                     }
                 }
+            } else {
+                if (MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.TOTEM_OF_UNDYING) {
+                    int totem = findInventorySlot(new ItemStack(Items.TOTEM_OF_UNDYING), mainhandSlot.get());
+                    if (totem != -1) {
+                        if (fastSwap.get()) {
+                            INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(totem), mainhandSlot.get());
+                            lastAttemptTime = System.currentTimeMillis();
+                        } else {
+                            clickSlot(totem, convertSlot(mainhandSlot.get()));
+                            lastAttemptTime = System.currentTimeMillis();
+                        }
+                    }
+                }
             }
+
 
             if (MC.player.getHealth() + MC.player.getAbsorptionAmount() <= health.get() && MC.player.getInventory().getStack(mainhandSlot.get()).getItem() == Items.TOTEM_OF_UNDYING)
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(mainhandSlot.get());
