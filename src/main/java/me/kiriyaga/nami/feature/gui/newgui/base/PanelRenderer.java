@@ -23,6 +23,7 @@ public class PanelRenderer {
     }
 
     public void renderPanel(DrawContext context, int x, int y, int width, int height, int headerHeight, boolean renderHeader, boolean renderBackground) {
+
         Color primary = colorModule.getStyledGlobalColor();
         Color secondary = colorModule.getStyledSecondColor();
 
@@ -58,6 +59,8 @@ public class PanelRenderer {
     }
 
     public void renderHeaderText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int headerHeight, int padding) {
+        if (text == null || textRenderer == null) return; // ???
+
         Color textCol =  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor(255);
 
         int textY = y + (headerHeight - textRenderer.fontHeight) / 2;

@@ -16,7 +16,7 @@ public class NoWeatherModule extends Module {
     public float cameraYaw;
     public float cameraPitch;
 
-    private Perspective previousPerspective;
+    private Perspective previousPerspective; // todo this shit broke
 
     public NoWeatherModule() {
         super("NoWeather", "Disables rendering of weather.", ModuleCategory.of("Render"), "noweather", "nowether", "nowather");

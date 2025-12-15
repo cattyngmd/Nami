@@ -2,6 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.core.macro.model.Macro;
+import me.kiriyaga.nami.event.impl.DissconectEvent;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
@@ -23,6 +24,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -52,6 +54,16 @@ public abstract class MixinMinecraftClient {
     private int holdTicks = 0;
     @Shadow public ClientWorld world;
     private final Set<Integer> deadList = new HashSet<>();
+
+    @Inject(method = "disconnect(Lnet/minecraft/text/Text;)V", at = @At("HEAD"), cancellable = true)
+    private void onDisconnect(Text reason, CallbackInfo ci) {
+        DissconectEvent ev = new DissconectEvent();
+        EVENT_MANAGER.post(ev);
+
+        if (ev.isCancelled()) {
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "handleInputEvents", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {

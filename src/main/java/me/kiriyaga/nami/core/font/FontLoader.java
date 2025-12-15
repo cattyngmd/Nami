@@ -1,10 +1,8 @@
 package me.kiriyaga.nami.core.font;
 
 import me.kiriyaga.nami.feature.module.impl.client.FontModule;
-import net.minecraft.client.font.Font;
-import net.minecraft.client.font.FontFilterType;
-import net.minecraft.client.font.FontStorage;
-import net.minecraft.client.font.TrueTypeFontLoader;
+import net.minecraft.client.font.*;
+import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -44,8 +42,13 @@ public class FontLoader {
         try {
             Font font = loader.build().orThrow().load(MC.getResourceManager());
 
-            storage = new FontStorage(MC.getTextureManager(),
-                    net.minecraft.util.Identifier.of("nami", FONT_NAME + "_storage"));
+            GlyphBaker glyphBaker = new GlyphBaker( // crazy shit
+                    MC.getTextureManager(),
+                    Identifier.of("nami", FONT_NAME + "_storage")
+            );
+
+            storage = new FontStorage(glyphBaker);
+
             storage.setFonts(List.of(new Font.FontFilterPair(font, FontFilterType.FilterMap.NO_FILTER)),
                     Collections.emptySet());
 

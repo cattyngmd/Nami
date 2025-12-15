@@ -7,6 +7,7 @@ import me.kiriyaga.nami.mixininterface.ICamera;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -39,7 +40,7 @@ public abstract class MixinCamera implements ICamera {
     }
 
     @Inject(method = "update", at = @At("HEAD"))
-    private void onUpdateHead(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
+    private void onUpdateHead(World world, Entity entity, boolean bl, boolean bl2, float f, CallbackInfo ci) {
         this.tickDelta = tickDelta;
     }
 

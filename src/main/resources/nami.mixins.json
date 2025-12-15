@@ -10,13 +10,11 @@
     "GameOptionsAccessor",
     "InputAccessor",
     "KeyBindingAccessor",
-    "MixinArmorFeatureRenderer",
-    "MixinBlockEntityRenderDispatcher",
     "MixinBossBarHud",
     "MixinCamera",
     "MixinChatHud",
     "MixinChatScreen",
-    "MixinChunkBorderDebugRenderer",
+    "MixinChestBlockEntityRenderer",
     "MixinClientPlayerEntity",
     "MixinClientPlayerInteractionManager",
     "MixinClientPlayNetworkHandler",
@@ -27,11 +25,9 @@
     "MixinDisconnectedScreen",
     "MixinEntityRenderer",
     "MixinFogRenderer",
-    "MixinGameMenuScreen",
     "MixinGameOptions",
     "MixinGameRenderer",
     "MixinHandledScreen",
-    "MixinHeadFeatureRenderer",
     "MixinHeldItemRenderer",
     "MixinInactivityFpsLimiter",
     "MixinInGameHud",
@@ -45,7 +41,8 @@
     "MixinScreen",
     "MixinSimpleOption",
     "MixinWorldRenderer",
-    "SignEditScreenAccessor"
+    "SignEditScreenAccessor",
+    "TextRendererAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -64,7 +61,7 @@
     "MixinTextVisitFactory",
     "PassiveEntityAccessor",
     "PlayerInteractEntityC2SPacketAccessor",
-    "PlayerPositionAccessor",
+    "PlayerPositionLookS2CPacketAcessor",
     "ScreenHandlerAccessor"
   ]
 }

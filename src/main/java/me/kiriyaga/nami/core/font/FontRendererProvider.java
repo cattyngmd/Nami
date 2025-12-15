@@ -1,7 +1,13 @@
 package me.kiriyaga.nami.core.font;
 
 import me.kiriyaga.nami.feature.module.impl.client.FontModule;
+import me.kiriyaga.nami.mixin.TextRendererAccessor;
+import net.minecraft.client.font.EffectGlyph;
+import net.minecraft.client.font.FontStorage;
+import net.minecraft.client.font.GlyphProvider;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.text.StyleSpriteSource;
+import net.minecraft.util.Identifier;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
@@ -24,22 +30,27 @@ public class FontRendererProvider {
             return MC.textRenderer;
         }
 
-        int newSize = fontModule.glyphSize.get();
-        int newOversample = fontModule.oversample.get();
+/*        int newSize = fontModule.glyphSize.get();
+        int newOversample = fontModule.oversample.get();*/
 
-        if (cachedRenderer == null || cachedSize != newSize || cachedOversample != newOversample) {
-            fontLoader.init();
+        EffectGlyph rectangle =
+                ((TextRendererAccessor) MC.textRenderer)
+                        .getFonts()
+                        .getRectangleGlyph();
 
-            if (fontLoader.getStorage() != null) {
-                cachedRenderer = new TextRenderer(id -> fontLoader.getStorage(), true);
-            } else {
-                cachedRenderer = MC.textRenderer;
+        cachedRenderer = new TextRenderer(new TextRenderer.GlyphsProvider() {
+
+            @Override
+            public GlyphProvider getGlyphs(StyleSpriteSource font) {
+                return fontLoader.getStorage().getGlyphs(true);
             }
 
-            cachedSize = newSize;
-            cachedOversample = newOversample;
-        }
+            @Override
+            public EffectGlyph getRectangleGlyph() {
+                return rectangle;
+            }
 
-        return cachedRenderer;
+        });
+        return MC.textRenderer;
     }
 }

@@ -6,7 +6,10 @@ import me.kiriyaga.nami.feature.gui.newgui.entry.LogEntry;
 import me.kiriyaga.nami.feature.gui.newgui.widget.ActionItem;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -89,13 +92,13 @@ public class LogScreen extends NamiScreen {
     }
 
     @Override
-    public boolean mouseClicked(double x, double y, int button) {
-        NAVIGATE_PANEL.mouseClicked(x, y, textRenderer);
+    public boolean mouseClicked(Click click, boolean bl) {
+        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), textRenderer);
 
-        double sx = x / CLICK_GUI.scale;
-        double sy = y / CLICK_GUI.scale;
+        double sx = click.comp_4798() / CLICK_GUI.scale;
+        double sy = click.comp_4799() / CLICK_GUI.scale;
 
-        if (button == 1) {
+        if (click.button() == 1) {
             LogEntry entry = getEntryAt(sx, sy);
             if (entry != null) {
                 console.getActionWidget().clearItems();
@@ -108,9 +111,9 @@ public class LogScreen extends NamiScreen {
         }
 
         if (console.getActionWidget().isVisible() &&
-                console.getActionWidget().mouseClicked(sx, sy, button)) return true;
+                console.getActionWidget().mouseClicked(sx, sy, click.button())) return true;
 
-        return console.mouseClicked(sx, sy, button) || super.mouseClicked(x, y, button);
+        return console.mouseClicked(sx, sy, click.button()) || super.mouseClicked(click, bl);
     }
 
     @Override
@@ -119,25 +122,32 @@ public class LogScreen extends NamiScreen {
     }
 
     @Override
-    public boolean mouseDragged(double x, double y, int button, double dx, double dy) {
-        return console.mouseDragged(x / CLICK_GUI.scale, y / CLICK_GUI.scale, dx, dy)
-                || super.mouseDragged(x, y, button, dx, dy);
+    public boolean mouseDragged(Click click, double d, double e) {
+        return console.mouseDragged(click.comp_4798() / CLICK_GUI.scale, click.comp_4799() / CLICK_GUI.scale, d, e)
+                || super.mouseDragged(click, d, e);
     }
 
     @Override
-    public boolean mouseReleased(double x, double y, int button) {
-        console.mouseReleased(x / CLICK_GUI.scale, y / CLICK_GUI.scale, button);
-        return super.mouseReleased(x, y, button);
+    public boolean mouseReleased(Click click) {
+        console.mouseReleased(click.comp_4798() / CLICK_GUI.scale, click.comp_4799() / CLICK_GUI.scale, click.button());
+        return super.mouseReleased(click);
     }
 
     @Override
-    public boolean keyPressed(int k, int s, int m) {
-        return console.keyPressed(k, s, m) || super.keyPressed(k, s, m);
+    public boolean keyPressed(KeyInput keyInput) {
+        int keycode = keyInput.getKeycode();
+        int scancode = keyInput.comp_4796();
+        int modifiers = keyInput.comp_4797();
+
+        return console.keyPressed(keycode, scancode, modifiers) || super.keyPressed(keyInput);
     }
 
     @Override
-    public boolean charTyped(char c, int m) {
-        return console.charTyped(c, m) || super.charTyped(c, m);
+    public boolean charTyped(CharInput charInput) {
+        String character = charInput.asString();
+        int modifiers = charInput.comp_4794();
+
+        return console.charTyped(character.charAt(0), modifiers) || super.charTyped(charInput);
     }
 
     @Override

@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.client.input.KeyInput;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,10 +22,10 @@ import static me.kiriyaga.nami.Nami.*;
 public abstract class MixinKeyboard {
 
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
-        public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        if (key == GLFW.GLFW_KEY_F3) return;
+        public void onKey(long l, int i, KeyInput keyInput, CallbackInfo ci) {
+        if (keyInput.getKeycode() == GLFW.GLFW_KEY_F3) return;
 
-        KeyInputEvent event = new KeyInputEvent(key, scancode, action, modifiers);
+        KeyInputEvent event = new KeyInputEvent(keyInput.getKeycode(), keyInput.comp_4796(), i, keyInput.comp_4797());
         EVENT_MANAGER.post(event);
 
         if (event.isCancelled()) {
@@ -33,9 +34,9 @@ public abstract class MixinKeyboard {
     }
 
     @Inject(method = "onKey", at = @At("HEAD"))
-    private void onKeyClickgui(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
+    private void onKeyClickgui(long l, int i, KeyInput keyInput, CallbackInfo ci) {
         if (MC == null) return;
-        if (action != GLFW.GLFW_PRESS) return;
+        if (i != GLFW.GLFW_PRESS) return;
 
         if (MODULE_MANAGER.getStorage() == null) return;
 
@@ -45,7 +46,7 @@ public abstract class MixinKeyboard {
         KeyBindSetting bind = clickGui.getKeyBind();
         if (bind == null) return;
 
-        if (bind.get() == key) {
+        if (bind.get() == keyInput.getKeycode()) {
             Screen screen = MC.currentScreen;
 
             if (screen instanceof TitleScreen

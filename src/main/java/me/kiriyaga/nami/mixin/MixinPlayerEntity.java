@@ -5,6 +5,7 @@ import me.kiriyaga.nami.event.impl.LedgeClipEvent;
 import me.kiriyaga.nami.event.impl.LiquidPushEvent;
 import me.kiriyaga.nami.event.impl.SprintResetEvent;
 import me.kiriyaga.nami.feature.module.impl.exploits.ReachModule;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -34,28 +36,17 @@ public abstract class MixinPlayerEntity extends LivingEntity {
         }
     }
 
-    @ModifyArg(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
-    private Vec3d attack(Vec3d original) {
-        if ((Object)this == MC.player) {
-            SprintResetEvent sprintResetEvent = new SprintResetEvent();
-            EVENT_MANAGER.post(sprintResetEvent);
-            if (!sprintResetEvent.isCancelled()) {
-                return original.multiply(0.6, 1.0, 0.6);
-            }
-        }
-        return original;
-    }
+    @Inject(method = "attack", at = @At("HEAD"))
+    private void onAttack(Entity target, CallbackInfo ci) {
+        if ((Object)this != MC.player) return;
 
-    @ModifyArg(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V"))
-    private boolean attack(boolean original) {
-        if ((Object)this == MC.player) {
-            SprintResetEvent sprintResetEvent = new SprintResetEvent();
-            EVENT_MANAGER.post(sprintResetEvent);
-            if (!sprintResetEvent.isCancelled()) {
-                return false;
-            }
+        SprintResetEvent sprintResetEvent = new SprintResetEvent();
+        EVENT_MANAGER.post(sprintResetEvent);
+
+        if (!sprintResetEvent.isCancelled()) {
+            this.setVelocity(this.getVelocity().multiply(0.6, 1.0, 0.6));
+            this.setSprinting(false);
         }
-        return original;
     }
 
     @Inject(method = "isPushedByFluids", at = @At("HEAD"), cancellable = true)

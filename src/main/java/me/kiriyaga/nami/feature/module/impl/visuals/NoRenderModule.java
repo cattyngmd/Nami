@@ -28,7 +28,7 @@ public class NoRenderModule extends Module {
     public final BoolSetting noFirework = addSetting(new BoolSetting("NoFirework", false));
     public final BoolSetting noWaterParticle = addSetting(new BoolSetting("NoWaterParticle", true));
     public final BoolSetting noExplosion = addSetting(new BoolSetting("NoExplosion", true));
-    public final BoolSetting noBlockBreak = addSetting(new BoolSetting("NoBreakParticle", false));
+    public final BoolSetting noBlockBreak = addSetting(new BoolSetting("NoBreakParticle", false)); // todo this shit broke
     public final BoolSetting noLiguid = addSetting(new BoolSetting("NoLiquid", false));
     public final BoolSetting noWall = addSetting(new BoolSetting("NoWall", false));
     public final BoolSetting noVignette = addSetting(new BoolSetting("NoVignette", true));
@@ -37,7 +37,7 @@ public class NoRenderModule extends Module {
     public final BoolSetting noPortal = addSetting(new BoolSetting("NoPortalGui", true));
     public final BoolSetting noPotIcon = addSetting(new BoolSetting("NoPotIcon", true));
     public final BoolSetting noFog = addSetting(new BoolSetting("NoFog", true));
-    public final BoolSetting noArmor = addSetting(new BoolSetting("NoArmor", true));
+    public final BoolSetting noArmor = addSetting(new BoolSetting("NoArmor", true)); // todo this shit broke
     public final BoolSetting noNausea = addSetting(new BoolSetting("NoNausea", true));
     public final BoolSetting noPumpkin = addSetting(new BoolSetting("NoPumpkin", false));
     public final BoolSetting noPowderedSnow = addSetting(new BoolSetting("NoPowdered", false));

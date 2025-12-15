@@ -17,7 +17,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class MixinInGameOverlayRenderer {
 
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
-    private static void onRenderFireOverlay(MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+    private static void onRenderFireOverlay(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Sprite sprite, CallbackInfo ci) {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);

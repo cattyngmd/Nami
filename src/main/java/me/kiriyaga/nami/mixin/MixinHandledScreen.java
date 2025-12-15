@@ -3,6 +3,7 @@ package me.kiriyaga.nami.mixin;
 import me.kiriyaga.nami.event.impl.MouseClickEvent;
 import me.kiriyaga.nami.event.impl.MouseScrollEvent;
 import me.kiriyaga.nami.event.impl.RenderScreenEvent;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,8 +19,8 @@ import static me.kiriyaga.nami.Nami.MC;
 public class MixinHandledScreen {
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        MouseClickEvent event = new MouseClickEvent(mouseX, mouseY, button);
+    private void onMouseClicked(Click click, boolean bl, CallbackInfoReturnable<Boolean> cir) {
+        MouseClickEvent event = new MouseClickEvent(click.comp_4798(), click.comp_4799(), click.button());
         EVENT_MANAGER.post(event);
     }
 

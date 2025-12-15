@@ -34,6 +34,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import org.joml.*;
 import net.minecraft.client.color.block.BlockColors;
@@ -159,10 +160,10 @@ public class RenderUtil {
 
     // 3d
     public static void drawBoxFilled(MatrixStack stack, Box box, Color c) {
-        if (box.contains(MC.getEntityRenderDispatcher().camera.getPos())) return;
+        if (box.contains(MC.getEntityRenderDispatcher().camera.getCameraPos())) return;
 
         Camera camera = MC.getEntityRenderDispatcher().camera;
-        Vec3d camPos = camera.getPos();
+        Vec3d camPos = camera.getCameraPos();
 
         float minX = (float) (box.minX - camPos.x);
         float minY = (float) (box.minY - camPos.y);
@@ -239,29 +240,30 @@ public class RenderUtil {
 
     public static void drawBoxLines(MatrixStack stack, Box box, Color color, double lineWidth) {
         Camera camera = MC.getEntityRenderDispatcher().camera;
-        float minX = (float) (box.minX - camera.getPos().getX());
-        float minY = (float) (box.minY - camera.getPos().getY());
-        float minZ = (float) (box.minZ - camera.getPos().getZ());
-        float maxX = (float) (box.maxX - camera.getPos().getX());
-        float maxY = (float) (box.maxY - camera.getPos().getY());
-        float maxZ = (float) (box.maxZ - camera.getPos().getZ());
+
+        double dx = -camera.getCameraPos().getX();
+        double dy = -camera.getCameraPos().getY();
+        double dz = -camera.getCameraPos().getZ();
+        VoxelShape shape = VoxelShapes.cuboid(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
+        int argb = ((color.getAlpha() & 0xFF) << 24) |
+                ((color.getRed() & 0xFF) << 16) |
+                ((color.getGreen() & 0xFF) << 8) |
+                (color.getBlue() & 0xFF);
 
         Vec3d center = box.getCenter();
-        double distance = camera.getPos().distanceTo(center);
+        double distance = camera.getCameraPos().distanceTo(center);
 
         double minThickness = 0.5;
         double maxThickness = lineWidth;
         double scaleFactor = 5.0;
-        double scaledLineWidth = Math.max(maxThickness / (1.0 + (distance / scaleFactor)), minThickness);
+        float scaledLineWidth = (float) Math.max(maxThickness / (1.0 + (distance / scaleFactor)), minThickness);
 
-        BufferBuilder buffer = Tessellator.getInstance()
-                .begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR_NORMAL);
+        RenderLayer layer = Layers.getGlobalLines(scaledLineWidth);
+        VertexConsumer buffer = MC.getBufferBuilders().getEntityVertexConsumers().getBuffer(layer);
 
-        VertexRendering.drawBox(stack, buffer, minX, minY, minZ, maxX, maxY, maxZ,
-                color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
-
-        Layers.getGlobalLines(scaledLineWidth).draw(buffer.end());
+        VertexRendering.drawOutline(stack, buffer, shape, dx, dy, dz, argb, scaledLineWidth);
     }
+
 
     public static void drawBoxLines(MatrixStack stack, Vec3d vec, Color color, double lineWidth) {
         drawBoxLines(stack, Box.from(vec), color, lineWidth);
@@ -331,7 +333,7 @@ public class RenderUtil {
         Camera camera = MC.gameRenderer.getCamera();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
-        matrices.translate(pos.getX() - camera.getPos().x, pos.getY() - camera.getPos().y, pos.getZ() - camera.getPos().z);
+        matrices.translate(pos.getX() - camera.getCameraPos().x, pos.getY() - camera.getCameraPos().y, pos.getZ() - camera.getCameraPos().z);
         return matrices;
     }
 
@@ -340,9 +342,9 @@ public class RenderUtil {
 
         matrices.push();
         matrices.translate(
-                pos.x - camera.getPos().x,
-                pos.y - camera.getPos().y,
-                pos.z - camera.getPos().z
+                pos.x - camera.getCameraPos().x,
+                pos.y - camera.getCameraPos().y,
+                pos.z - camera.getCameraPos().z
         );
 
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
@@ -393,7 +395,7 @@ public class RenderUtil {
 
         matrices.push();
 
-        Vec3d camPos = camera.getPos();
+        Vec3d camPos = camera.getCameraPos();
 
         matrices.translate((float)(pos.x - camPos.x), (float)(pos.y - camPos.y), (float)(pos.z - camPos.z));
 
@@ -419,7 +421,7 @@ public class RenderUtil {
         matrices.scale(s, s, s);
         matrices.scale(1.0f, 1.0f, 0.0001f);
 
-        itemRenderer.renderItem(
+/*        itemRenderer.renderItem(
                 stack,
                 ItemDisplayContext.FIXED,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,
@@ -428,7 +430,7 @@ public class RenderUtil {
                 MC.getBufferBuilders().getEntityVertexConsumers(),
                 MC.world,
                 0
-        );
+        );*/
 
         MC.getBufferBuilders().getEntityVertexConsumers().draw();
 

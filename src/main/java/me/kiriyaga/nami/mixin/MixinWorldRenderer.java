@@ -29,7 +29,7 @@ import static me.kiriyaga.nami.Nami.*;
 public class MixinWorldRenderer {
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void onRenderTail(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
+    private void onRenderTail(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean bl, Camera camera, Matrix4f matrix4f, Matrix4f matrix4f2, Matrix4f matrix4f3, GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl2, CallbackInfo ci) {
         float tickDelta = tickCounter.getTickProgress(true);
 
         MatrixStack matrices = new MatrixStack();
@@ -37,34 +37,21 @@ public class MixinWorldRenderer {
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
 
-        EVENT_MANAGER.post(new Render3DEvent(matrices, tickDelta, camera, positionMatrix, projectionMatrix));
+        EVENT_MANAGER.post(new Render3DEvent(
+                matrices,
+                tickCounter.getTickProgress(true),
+                camera,
+                matrix4f3,
+                matrix4f
+        ));
 
         matrices.pop();
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void captureMatrices(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
-        MatrixCache.positionMatrix = new Matrix4f(positionMatrix);
-        MatrixCache.projectionMatrix = new Matrix4f(projectionMatrix);
+    private void captureMatrices(ObjectAllocator objectAllocator, RenderTickCounter renderTickCounter, boolean bl, Camera camera, Matrix4f matrix4f, Matrix4f matrix4f2, Matrix4f matrix4f3, GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl2, CallbackInfo ci) {
+        MatrixCache.positionMatrix = new Matrix4f(matrix4f3);
+        MatrixCache.projectionMatrix = new Matrix4f(matrix4f);
         MatrixCache.camera = camera;
-    }
-
-    @WrapWithCondition(method = "method_62216", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WeatherRendering;renderPrecipitation(Lnet/minecraft/world/World;Lnet/minecraft/client/render/VertexConsumerProvider;IFLnet/minecraft/util/math/Vec3d;)V"))
-    private boolean shouldRenderPrecipitation(WeatherRendering instance, World world, VertexConsumerProvider vertexConsumers, int ticks, float tickProgress, Vec3d pos) {
-        NoWeatherModule noWeatherModule = MODULE_MANAGER.getStorage().getByClass(NoWeatherModule.class);
-        return noWeatherModule == null || !noWeatherModule.isEnabled();
-    }
-
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;setupTerrain(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;ZZ)V"), index = 3)
-    private boolean renderSetupTerrainModifyArg(boolean spectator) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
-        FreeLookModule freeLookModule = MODULE_MANAGER.getStorage().getByClass(FreeLookModule.class);
-        ViewClipModule viewClipModule = MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class);
-
-        boolean freecam = freecamModule != null && freecamModule.isEnabled();
-        boolean freelook = freeLookModule != null && freeLookModule.isEnabled();
-        boolean viewclip = viewClipModule != null && viewClipModule.isEnabled() && MC.options.getPerspective() != Perspective.FIRST_PERSON;
-
-        return freecam || spectator || freelook || viewclip;
     }
 }

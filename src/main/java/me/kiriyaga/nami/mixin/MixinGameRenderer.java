@@ -123,8 +123,8 @@ public abstract class MixinGameRenderer {
     }
 
 
-    @ModifyReturnValue(method = "findCrosshairTarget", at = @At("RETURN"))
-    private HitResult findCrosshairTarget(HitResult original, @Local HitResult hitResult) {
+/*    @ModifyReturnValue(method = "updateCrosshairTarget", at = @At("RETURN"))
+    private HitResult findCrosshairTarget(HitResult original, HitResult hitResult) {
         ReachModule reachModule = MODULE_MANAGER.getStorage().getByClass(ReachModule.class);
         if (reachModule == null || !reachModule.isEnabled() || !reachModule.noEntityTrace.get()) {
             return original;
@@ -168,7 +168,7 @@ public abstract class MixinGameRenderer {
         }
 
         return original;
-    }
+    }*/
 
     private Entity getTargetedEntity() {
         if (MC.crosshairTarget != null && MC.crosshairTarget.getType() == HitResult.Type.ENTITY) {

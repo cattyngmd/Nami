@@ -21,7 +21,7 @@ import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
 @RegisterModule
-public class FreecamModule extends Module {
+public class FreecamModule extends Module { // todo this shit broke
     private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 0.5, 0.1, 5.0));
     private final DoubleSetting accelerate = addSetting(new DoubleSetting("Accelerate", 2.3, 1.0, 3.0));
     private final BoolSetting look = addSetting(new BoolSetting("Look", true));

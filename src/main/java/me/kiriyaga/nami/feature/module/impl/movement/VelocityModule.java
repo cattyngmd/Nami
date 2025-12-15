@@ -221,7 +221,7 @@ public class VelocityModule extends Module {
 
         switch (mode.get()) {
             case VANILLA -> {
-                if (!isNoVelocityConfigured()) scaleVelocityPacket(packet);
+                if (!isNoVelocityConfigured()) scaleVelocityPacket(packet); // TODO this shit broke
                 else return;
             }
             case WALLS -> {
@@ -270,15 +270,19 @@ public class VelocityModule extends Module {
         return horizontalPercent.get() == 0 && verticalPercent.get() == 0;
     }
 
-    private void scaleVelocityPacket(EntityVelocityUpdateS2CPacket packet) {
-        int scaledX = (int) (packet.getVelocity().x * (horizontalPercent.get() / 100.0));
-        int scaledY = (int) (packet.getVelocity().y * (verticalPercent.get() / 100.0));
-        int scaledZ = (int) (packet.getVelocity().z * (horizontalPercent.get() / 100.0));
+    private EntityVelocityUpdateS2CPacket scaleVelocityPacket(EntityVelocityUpdateS2CPacket packet) {
+        Vec3d v = packet.getVelocity();
 
-        ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityX(scaledX);
-        ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityY(scaledY);
-        ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityZ(scaledZ);
+        Vec3d scaled = new Vec3d(
+                v.x * (horizontalPercent.get() / 100.0),
+                v.y * (verticalPercent.get() / 100.0),
+                v.z * (horizontalPercent.get() / 100.0)
+        );
+
+        EntityVelocityUpdateS2CPacket newPacket = EntityVelocityUpdateS2CPacketAccessor.create(packet.getEntityId(), scaled);
+        return newPacket;
     }
+
 
     private void scaleExplosionPacket(ExplosionS2CPacket packet) {
         ExplosionS2CPacketAccessor accessor = (ExplosionS2CPacketAccessor) (Object) packet;

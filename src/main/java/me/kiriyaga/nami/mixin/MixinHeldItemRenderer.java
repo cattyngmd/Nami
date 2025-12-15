@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.kiriyaga.nami.feature.module.impl.visuals.ViewModelModule;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,14 +57,12 @@ public abstract class MixinHeldItemRenderer {
     }
 
     @Inject(method = "renderFirstPersonItem", at = @At("HEAD"))
-    private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
-                              float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
-                              VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    private void onRenderItem(AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, Hand hand, float h, ItemStack itemStack, float i, MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, int j, CallbackInfo ci) {
 
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
         boolean isMainHand = hand == Hand.MAIN_HAND;
 
-        if (vm != null && vm.isEnabled() && !(isMainHand && item.isEmpty() && !vm.hand.get())) {
+        if (vm != null && vm.isEnabled() && !(isMainHand && itemStack.isEmpty() && !vm.hand.get())) {
 
             matrices.push();
 
@@ -101,9 +100,7 @@ public abstract class MixinHeldItemRenderer {
 //    }
 
     @Inject(method = "renderFirstPersonItem", at = @At("TAIL"))
-    private void matricesPop(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
-                             float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
-                             VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    private void matricesPop(AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, Hand hand, float h, ItemStack item, float i, MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, int j, CallbackInfo ci) {
         ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
         boolean isMainHand = hand == Hand.MAIN_HAND;
 
@@ -132,14 +129,5 @@ public abstract class MixinHeldItemRenderer {
             }
         }
         original.call(matrices, x, y, z);
-    }
-
-    @WrapWithCondition(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;" +
-            "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;" +
-            "Lnet/minecraft/client/network/ClientPlayerEntity;I)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;multiply(Lorg/joml/Quaternionfc;)V"))
-    private boolean renderItem(MatrixStack instance, Quaternionfc quaternion) {
-        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
-        return vm == null || !vm.isEnabled() || vm.sway.get();
     }
 }

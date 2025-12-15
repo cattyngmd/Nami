@@ -28,17 +28,4 @@ public abstract class MixinParticleManager {
         if (ev.isCancelled())
             ci.cancel();
     }
-
-    @Inject(method = "addBlockBreakParticles", at = @At("HEAD"), cancellable = true)
-    private void onAddBlockBreakParticles(BlockPos blockPos, BlockState state, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noBlockBreak.get())
-            ci.cancel();
-    }
-
-    @Inject(method = "addBlockBreakingParticles", at = @At("HEAD"), cancellable = true)
-    private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noBlockBreak.get())
-            ci.cancel();
-    }
-
 }
