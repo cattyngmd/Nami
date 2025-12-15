@@ -24,6 +24,7 @@ import net.minecraft.util.shape.VoxelShape;
 import java.util.*;
 
 import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.entity.PlayerUtils.isPhased;
 
 @RegisterModule
 public class VelocityModule extends Module {
@@ -163,7 +164,7 @@ public class VelocityModule extends Module {
     }
 
     private void processVelocityWalls(PacketReceiveEvent event, EntityVelocityUpdateS2CPacket packet) {
-        if (!isPhased() || (requireGround.get() && !MC.player.isOnGround())) return;
+        if (!isPhased(MC.player) || (requireGround.get() && !MC.player.isOnGround())) return;
         processVelocityVanilla(event, packet);
     }
 
@@ -182,7 +183,7 @@ public class VelocityModule extends Module {
     }
 
     private void processExplosionWalls(PacketReceiveEvent event, ExplosionS2CPacket packet) {
-        if (!isPhased()) return;
+        if (!isPhased(MC.player)) return;
         processExplosionVanilla(event, packet);
     }
 
@@ -199,7 +200,7 @@ public class VelocityModule extends Module {
                 else return;
             }
             case WALLS -> {
-                if (!isPhased()) { filtered.add(packet); return; }
+                if (!isPhased(MC.player)) { filtered.add(packet); return; }
                 if (!isNoVelocityConfigured()) scaleExplosionPacket(packet);
                 else return;
             }
@@ -224,7 +225,7 @@ public class VelocityModule extends Module {
                 else return;
             }
             case WALLS -> {
-                if (!isPhased() || (requireGround.get() && !MC.player.isOnGround())) {
+                if (!isPhased(MC.player) || (requireGround.get() && !MC.player.isOnGround())) {
                     filtered.add(packet);
                     return;
                 }
@@ -267,32 +268,6 @@ public class VelocityModule extends Module {
 
     private boolean isNoVelocityConfigured() {
         return horizontalPercent.get() == 0 && verticalPercent.get() == 0;
-    }
-
-    private boolean isPhased() {
-        ClientPlayerEntity player = MC.player;
-        if (player == null || MC.world == null) return false;
-
-        Box box = player.getBoundingBox();
-        int minX = MathHelper.floor(box.minX);
-        int maxX = MathHelper.ceil(box.maxX);
-        int minY = MathHelper.floor(box.minY);
-        int maxY = MathHelper.ceil(box.maxY);
-        int minZ = MathHelper.floor(box.minZ);
-        int maxZ = MathHelper.ceil(box.maxZ);
-
-        for (int x = minX; x < maxX; x++) {
-            for (int y = minY; y < maxY; y++) {
-                for (int z = minZ; z < maxZ; z++) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    VoxelShape shape = MC.world.getBlockState(pos).getCollisionShape(MC.world, pos);
-                    if (!shape.isEmpty() && shape.getBoundingBox().offset(pos).intersects(box)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     private void scaleVelocityPacket(EntityVelocityUpdateS2CPacket packet) {

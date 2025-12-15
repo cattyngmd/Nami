@@ -28,6 +28,7 @@ import net.minecraft.util.shape.VoxelShape;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
+import static me.kiriyaga.nami.util.entity.PlayerUtils.isPhased;
 
 @RegisterModule
 public class AutoXPModule extends Module {
@@ -64,7 +65,7 @@ public class AutoXPModule extends Module {
             return;
         }
 
-        if (onlyPhased.get() && !isPhased()) {
+        if (onlyPhased.get() && !isPhased(MC.player)) {
             if (selfToggle.get())
                 toggle();
 
@@ -166,32 +167,6 @@ public class AutoXPModule extends Module {
             if (!stack.isEmpty() && stack.getItem() == item) return i;
         }
         return -1;
-    }
-
-    private boolean isPhased() {
-        ClientPlayerEntity player = MC.player;
-        if (player == null || MC.world == null) return false;
-
-        Box box = player.getBoundingBox();
-        int minX = MathHelper.floor(box.minX);
-        int maxX = MathHelper.ceil(box.maxX);
-        int minY = MathHelper.floor(box.minY);
-        int maxY = MathHelper.ceil(box.maxY);
-        int minZ = MathHelper.floor(box.minZ);
-        int maxZ = MathHelper.ceil(box.maxZ);
-
-        for (int x = minX; x < maxX; x++) {
-            for (int y = minY; y < maxY; y++) {
-                for (int z = minZ; z < maxZ; z++) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    VoxelShape shape = MC.world.getBlockState(pos).getCollisionShape(MC.world, pos);
-                    if (!shape.isEmpty() && shape.getBoundingBox().offset(pos).intersects(box)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     private boolean hasMending(ItemStack stack) {
