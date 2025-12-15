@@ -278,39 +278,6 @@ public class RotationTickHandler {
         currentPitchSpeed = 0f;
     }
 
-    private void updateHeld(KeyBinding bind, int key, int scancode, int action, boolean mouse, java.util.function.Consumer<Boolean> setter) {
-        if (!canMove())
-            return;
-
-        if (!mouse && !bind.matchesKey(key, scancode)) return;
-        if (mouse && !bind.matchesMouse(key)) return;
-
-        setter.accept(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT);
-        if (action == GLFW.GLFW_RELEASE) {
-            setter.accept(false);
-        }
-    }
-
-    private boolean canMove() {
-        if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return false;
-        
-        if (MC.currentScreen == null) return true;
-
-        if (MC.currentScreen != null && !MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class).isEnabled())
-            return false;
-
-        if (MC.currentScreen instanceof ChatScreen
-                || MC.currentScreen instanceof SignEditScreen
-                || MC.currentScreen instanceof AnvilScreen
-                || MC.currentScreen instanceof AbstractCommandBlockScreen
-                || MC.currentScreen instanceof StructureBlockScreen
-                || MC.currentScreen instanceof CreativeInventoryScreen) {
-            return false;
-        }
-
-        return true;
-    }
-
     private void performSilent(RotationRequest req) {
         float targetYaw = MC.player.getYaw();
         float targetPitch = MC.player.getPitch();

@@ -216,7 +216,7 @@ public class ESPModule extends Module {
                         double renderX = pos.getX() + 0.5;
                         double renderY = pos.getY() + 1.0;
                         double renderZ = pos.getZ() + 0.5;
-                        Vec3d camPos = MC.gameRenderer.getCamera().getPos();
+                        Vec3d camPos = MC.gameRenderer.getCamera().getCameraPos();
 
                         float distance = (float) camPos.distanceTo(new Vec3d(renderX, renderY, renderZ));
                         int scale = 30;

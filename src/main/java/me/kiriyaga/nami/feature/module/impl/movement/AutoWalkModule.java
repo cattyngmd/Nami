@@ -46,7 +46,7 @@ public class AutoWalkModule extends Module {
         KeyBinding walkKey = MC.options.forwardKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) walkKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
         walkKey.setPressed(physicallyPressed || held);
     }
 }

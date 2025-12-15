@@ -47,10 +47,10 @@ public class NoInteractModule extends Module {
         ClientPlayerEntity player = event.getPlayer();
         BlockHitResult hitResult = event.getHitResult();
 
-        if (player.getWorld() == null) return;
+        if (player.getEntityWorld() == null) return;
 
-        Block block = player.getWorld().getBlockState(hitResult.getBlockPos()).getBlock();
-        String dimension = player.getWorld().getDimension().toString();
+        Block block = player.getEntityWorld().getBlockState(hitResult.getBlockPos()).getBlock();
+        String dimension = player.getEntityWorld().getDimension().toString();
 
         Identifier blockId = Registries.BLOCK.getId(block);
 
@@ -60,7 +60,7 @@ public class NoInteractModule extends Module {
         }
 
         if (spawnPoint.get()) {
-            if (player.getWorld().getDimension().comp_648() && isBed(block)) {
+            if (player.getEntityWorld().getDimension().comp_642() && isBed(block)) {
                 event.cancel();
                 return;
             }

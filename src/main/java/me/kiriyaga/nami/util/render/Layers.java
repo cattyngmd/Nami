@@ -6,7 +6,6 @@
 package me.kiriyaga.nami.util.render;
 
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;

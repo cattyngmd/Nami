@@ -42,7 +42,7 @@ public class AnnouncerModule extends Module {
         if (event.getPacket() instanceof PlayerListS2CPacket joinPacket) {
             if (joinPacket.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER)) {
                 for (var entry : joinPacket.getEntries()) {
-                    String playerName = entry.profile().getName();
+                    String playerName = entry.profile().name();
                     if (playerName == null) continue;
 
                     boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
@@ -59,7 +59,7 @@ public class AnnouncerModule extends Module {
                 var info = MC.getNetworkHandler().getPlayerListEntry(playerInfo);
                 if (info == null) continue;
 
-                String playerName = info.getProfile().getName();
+                String playerName = info.getProfile().name();
                 if (playerName == null) continue;
 
                 boolean isFriend = FRIEND_MANAGER.isFriend(playerName);

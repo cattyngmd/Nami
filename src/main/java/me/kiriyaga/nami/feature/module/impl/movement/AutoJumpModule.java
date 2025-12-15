@@ -33,7 +33,7 @@ public class AutoJumpModule extends Module {
         KeyBinding jumpKey = MC.options.jumpKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) jumpKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
         jumpKey.setPressed(physicallyPressed || held);
     }
 }

@@ -45,7 +45,7 @@ public class AutoKeyModule extends Module {
         for (KeyBinding key : trackedKeys) {
             InputUtil.Key boundKey = ((KeyBindingAccessor) key).getBoundKey();
             int keyCode = boundKey.getCode();
-            boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+            boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
             if (physicallyPressed) {
                 savedKeyStates.put(key, true);
             }

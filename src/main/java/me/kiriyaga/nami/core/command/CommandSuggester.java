@@ -53,7 +53,7 @@ public class CommandSuggester {
             }
             List<String> currentNames = MC.getNetworkHandler().getPlayerList()
                     .stream()
-                    .map(p -> p.getProfile().getName())
+                    .map(p -> p.getProfile().name())
                     .toList();
             if (!playerListCache.equals(currentNames)) {
                 playerListCache.clear();

@@ -3,7 +3,8 @@ package me.kiriyaga.nami.mixin;
 import me.kiriyaga.nami.feature.module.impl.client.cape.CapeModule;
 import me.kiriyaga.nami.feature.module.impl.client.cape.CapeType;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.util.SkinTextures;
+import net.minecraft.entity.player.SkinTextures;
+import net.minecraft.util.AssetInfo;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +23,7 @@ public class MixinPlayerListEntry {
 
             PlayerListEntry self = (PlayerListEntry) (Object) this;
 
-            if (!self.getProfile().getId().equals(MC.player.getUuid())) {
+            if (!self.getProfile().id().equals(MC.player.getUuid())) {
                 return;
             }
 
@@ -34,13 +35,14 @@ public class MixinPlayerListEntry {
 
                 SkinTextures orig = cir.getReturnValue();
 
+                AssetInfo.TextureAsset capeAsset = new AssetInfo.TextureAssetInfo(capeTex);
+
                 SkinTextures custom = new SkinTextures(
-                        orig.comp_1626(), // identifier
-                        orig.comp_1911(), // url
-                        capeTex, // cape
-                        orig.comp_1628(), // ely
-                        orig.comp_1629(), // body type
-                        orig.comp_1630()  // idk
+                        orig.comp_1626(),   // skin (TextureAsset)
+                        capeAsset,          // cape
+                        orig.comp_1628(),   // elytra (TextureAsset)
+                        orig.comp_1629(),   // PlayerSkinType
+                        orig.comp_1630()    // secure
                 );
 
                 cir.setReturnValue(custom);

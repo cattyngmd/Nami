@@ -217,7 +217,7 @@ public class NametagsModule extends Module {
     }
 
     private void renderEntityNametag(Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
-        Vec3d camPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
+        Vec3d camPos = MinecraftClient.getInstance().gameRenderer.getCamera().getCameraPos();
 
         double baseHeightOffset = entity.isSneaking() ? entity.getBoundingBox().getLengthY() : entity.getBoundingBox().getLengthY() + 0.3;
 
@@ -295,7 +295,7 @@ public class NametagsModule extends Module {
         double baseY = interpMaxY + (player.isSneaking() ? 0.0 : 0.3);
         double baseZ = (interpMinZ + interpMaxZ) / 2.0;
 
-        Vec3d camPos = MC.getEntityRenderDispatcher().camera.getPos();
+        Vec3d camPos = MC.getEntityRenderDispatcher().camera.getCameraPos();
         Camera camera = MC.gameRenderer.getCamera();
         float pitch = camera.getPitch();
         float yaw = camera.getYaw();

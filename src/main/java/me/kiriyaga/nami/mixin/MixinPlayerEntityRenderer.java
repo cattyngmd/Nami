@@ -18,8 +18,8 @@ public abstract class MixinPlayerEntityRenderer {
     private void setupTransforms(PlayerEntityRenderState playerEntityRenderState, MatrixStack matrices, float f, float g, CallbackInfo ci) {
         if (ROTATION_MANAGER != null && ROTATION_MANAGER.getStateHandler() != null && ROTATION_MANAGER.getStateHandler().isRotating()) {
             if (MinecraftClient.getInstance().player != null &&
-                    playerEntityRenderState.name != null &&
-                    playerEntityRenderState.name.equals(MinecraftClient.getInstance().player.getName().getString())) {
+                    playerEntityRenderState.playerName != null &&
+                    playerEntityRenderState.playerName.equals(MinecraftClient.getInstance().player.getName().getString())) {
                 playerEntityRenderState.pitch = ROTATION_MANAGER.getStateHandler().getRenderPitch();
             }
         }

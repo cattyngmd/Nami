@@ -55,7 +55,7 @@ public class PredictTestModule extends Module {
 
     private void renderPredictionForEntity(Entity entity, MatrixStack matrices) {
         PredictMovementUtils.PredictedEntity initial = new PredictMovementUtils.PredictedEntity(
-                entity.getPos(),
+                entity.getEntityPos(),
                 entity.getVelocity(),
                 entity.getYaw(),
                 entity.getPitch(),
@@ -68,7 +68,7 @@ public class PredictTestModule extends Module {
         if (predicted == null) return;
 
         if (showBox.get()) {
-            Box box = entity.getBoundingBox().offset(predicted.pos.subtract(entity.getPos()));
+            Box box = entity.getBoundingBox().offset(predicted.pos.subtract(entity.getEntityPos()));
             RenderUtil.drawBoxFilled(matrices, box, new Color(0, 255, 0, 40));
             RenderUtil.drawBoxPreset(matrices, box, new Color(0, 255, 0, 200));
         }

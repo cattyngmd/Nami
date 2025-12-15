@@ -174,7 +174,7 @@ public class GuiMoveModule extends Module {
     private void updateKeyWithHold(KeyBinding bind, boolean held) {
         InputUtil.Key boundKey = ((KeyBindingAccessor) bind).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
         bind.setPressed(physicallyPressed || held);
     }
 

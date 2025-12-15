@@ -46,7 +46,7 @@ public class EntityUtils {
     public static List<Entity> getEntities(EntityTypeCategory category, double range, boolean sortByDistance, Predicate<Entity> extraFilter) {
         if (MC.player == null || MC.world == null) return List.of();
 
-        Vec3d playerPos = MC.player.getPos();
+        Vec3d playerPos = MC.player.getEntityPos();
         List<Entity> all = getEntitiesBase(category);
 
         return all.stream()

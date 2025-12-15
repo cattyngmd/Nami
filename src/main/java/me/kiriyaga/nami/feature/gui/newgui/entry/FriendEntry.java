@@ -27,7 +27,7 @@ public class FriendEntry extends BaseEntry {
         boolean nowOnline = false;
         if (MC.getNetworkHandler() != null) {
             Collection<PlayerListEntry> list = MC.getNetworkHandler().getPlayerList();
-            nowOnline = list.stream().anyMatch(entry -> entry.getProfile().getName().equalsIgnoreCase(name));
+            nowOnline = list.stream().anyMatch(entry -> entry.getProfile().name().equalsIgnoreCase(name));
         }
 
         if (nowOnline != online || displayText == null) {

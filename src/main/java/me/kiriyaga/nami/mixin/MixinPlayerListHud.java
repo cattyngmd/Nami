@@ -61,7 +61,7 @@ public abstract class MixinPlayerListHud {
             result = new ArrayList<>(limit);
 
             for (PlayerListEntry entry : allEntries) {
-                String name = entry.getProfile().getName().toLowerCase();
+                String name = entry.getProfile().name().toLowerCase();
                 if (cachedFriends.contains(name)) {
                     result.add(entry);
                     if (result.size() >= limit) break;
@@ -86,7 +86,7 @@ public abstract class MixinPlayerListHud {
         if (betterTab == null || !betterTab.isEnabled()) return;
 
         boolean highlightFriends = betterTab.highlighFriends.get();
-        String playerName = entry.getProfile().getName();
+        String playerName = entry.getProfile().name();
         boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
 
         if (highlightFriends && isFriend) {

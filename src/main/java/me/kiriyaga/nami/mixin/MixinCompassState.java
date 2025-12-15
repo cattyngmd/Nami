@@ -1,11 +1,10 @@
 package me.kiriyaga.nami.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.item.property.numeric.CompassState;
-import net.minecraft.entity.Entity;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,22 +15,43 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 @Mixin(CompassState.class)
 public abstract class MixinCompassState {
-    @ModifyExpressionValue(method = "getBodyYaw", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getBodyYaw()F"))
-    private static float callLivingEntityGetYaw(float original) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
-        if (freecamModule != null && freecamModule.isEnabled() && MC != null && MC.gameRenderer != null && MC.gameRenderer.getCamera() != null) {
-            return MC.gameRenderer.getCamera().getYaw();
+
+    @ModifyReturnValue(
+            method = "getBodyYaw(Lnet/minecraft/util/HeldItemContext;)F",
+            at = @At("RETURN")
+    )
+    private static float nami$overrideBodyYaw(float original, HeldItemContext context) {
+        FreecamModule freecam = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        if (freecam != null && freecam.isEnabled()
+                && MC != null
+                && MC.gameRenderer != null
+                && MC.gameRenderer.getCamera() != null) {
+
+            return MC.gameRenderer.getCamera().getYaw() / 360.0F;
         }
+
         return original;
     }
 
-    @ModifyReturnValue(method = "getAngleTo(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;)D", at = @At("RETURN"))
-    private static double modifyGetAngleTo(double original, Entity entity, BlockPos pos) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
-        if (freecamModule != null && freecamModule.isEnabled() && MC != null && MC.gameRenderer != null && MC.gameRenderer.getCamera() != null) {
-            Vec3d vec3d = Vec3d.ofCenter(pos);
+    @ModifyReturnValue(
+            method = "getAngleTo(Lnet/minecraft/util/HeldItemContext;Lnet/minecraft/util/math/BlockPos;)D",
+            at = @At("RETURN")
+    )
+    private static double nami$overrideAngleTo(double original, HeldItemContext context, BlockPos pos) {
+        FreecamModule freecam = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        if (freecam != null && freecam.isEnabled()
+                && MC != null
+                && MC.gameRenderer != null
+                && MC.gameRenderer.getCamera() != null) {
+
             Camera camera = MC.gameRenderer.getCamera();
-            return Math.atan2(vec3d.getZ() - camera.getPos().z, vec3d.getX() - camera.getPos().x) / (float) (Math.PI * 2);
+            Vec3d target = Vec3d.ofCenter(pos);
+            Vec3d camPos = camera.getCameraPos();
+
+            return Math.atan2(
+                    target.z - camPos.z,
+                    target.x - camPos.x
+            ) / (Math.PI * 2.0);
         }
 
         return original;

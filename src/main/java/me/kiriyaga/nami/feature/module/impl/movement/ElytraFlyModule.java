@@ -330,17 +330,17 @@ public class ElytraFlyModule extends Module {
         KeyBinding jumpKey = MC.options.jumpKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) jumpKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
         jumpKey.setPressed(physicallyPressed || held);
     }
 
     private Vec3d getControlDirection() {
-        boolean forward = InputUtil.isKeyPressed(MC.getWindow().getHandle(), ((KeyBindingAccessor) MC.options.forwardKey).getBoundKey().getCode());
-        boolean back    = InputUtil.isKeyPressed(MC.getWindow().getHandle(), ((KeyBindingAccessor) MC.options.backKey).getBoundKey().getCode());
-        boolean left    = InputUtil.isKeyPressed(MC.getWindow().getHandle(), ((KeyBindingAccessor) MC.options.leftKey).getBoundKey().getCode());
-        boolean right   = InputUtil.isKeyPressed(MC.getWindow().getHandle(), ((KeyBindingAccessor) MC.options.rightKey).getBoundKey().getCode());
-        boolean up      = InputUtil.isKeyPressed(MC.getWindow().getHandle(), ((KeyBindingAccessor) MC.options.jumpKey).getBoundKey().getCode());
-        boolean down    = InputUtil.isKeyPressed(MC.getWindow().getHandle(), ((KeyBindingAccessor) MC.options.sneakKey).getBoundKey().getCode());
+        boolean forward = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.forwardKey).getBoundKey().getCode());
+        boolean back    = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.backKey).getBoundKey().getCode());
+        boolean left    = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.leftKey).getBoundKey().getCode());
+        boolean right   = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.rightKey).getBoundKey().getCode());
+        boolean up      = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.jumpKey).getBoundKey().getCode());
+        boolean down    = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.sneakKey).getBoundKey().getCode());
 
         if (!(forward || back || left || right || up || down)) return null;
 

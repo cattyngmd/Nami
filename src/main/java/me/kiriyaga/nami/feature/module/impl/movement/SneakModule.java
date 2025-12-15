@@ -78,7 +78,7 @@ public class SneakModule extends Module {
     }
 
     private boolean shouldSneakAtEdges(ClientPlayerEntity player) {
-        Vec3d pos = player.getPos();
+        Vec3d pos = player.getEntityPos();
         int blockY = (int) Math.floor(pos.y - 0.001);
 
         if (!MC.player.isOnGround())
@@ -168,7 +168,7 @@ public class SneakModule extends Module {
         KeyBinding sneakKey = MC.options.sneakKey;
         InputUtil.Key boundKey = ((KeyBindingAccessor) sneakKey).getBoundKey();
         int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow().getHandle(), keyCode);
+        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
         sneakKey.setPressed(physicallyPressed || held);
     }
 }

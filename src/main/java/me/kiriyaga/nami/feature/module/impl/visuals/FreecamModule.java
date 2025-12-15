@@ -124,7 +124,7 @@ public class FreecamModule extends Module {
             var hit = MC.crosshairTarget;
             if (hit != null && hit.getType() != net.minecraft.util.hit.HitResult.Type.MISS) {
                 Vec3d target = hit.getPos();
-                Vec3d from = MC.player.getPos().add(0, MC.player.getStandingEyeHeight(), 0);
+                Vec3d from = MC.player.getEntityPos().add(0, MC.player.getStandingEyeHeight(), 0);
 
                 double diffX = target.x - from.x;
                 double diffY = target.y - from.y;

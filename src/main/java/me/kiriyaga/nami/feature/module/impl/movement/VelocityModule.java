@@ -263,7 +263,7 @@ public class VelocityModule extends Module {
     }
 
     private boolean isZeroVelocity(EntityVelocityUpdateS2CPacket packet) {
-        return packet.getVelocityX() == 0 && packet.getVelocityY() == 0 && packet.getVelocityZ() == 0;
+        return packet.getVelocity().x == 0 && packet.getVelocity().y == 0 && packet.getVelocity().z == 0;
     }
 
     private boolean isNoVelocityConfigured() {
@@ -271,9 +271,9 @@ public class VelocityModule extends Module {
     }
 
     private void scaleVelocityPacket(EntityVelocityUpdateS2CPacket packet) {
-        int scaledX = (int) (packet.getVelocityX() * (horizontalPercent.get() / 100.0));
-        int scaledY = (int) (packet.getVelocityY() * (verticalPercent.get() / 100.0));
-        int scaledZ = (int) (packet.getVelocityZ() * (horizontalPercent.get() / 100.0));
+        int scaledX = (int) (packet.getVelocity().x * (horizontalPercent.get() / 100.0));
+        int scaledY = (int) (packet.getVelocity().y * (verticalPercent.get() / 100.0));
+        int scaledZ = (int) (packet.getVelocity().z * (horizontalPercent.get() / 100.0));
 
         ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityX(scaledX);
         ((EntityVelocityUpdateS2CPacketAccessor) packet).setVelocityY(scaledY);

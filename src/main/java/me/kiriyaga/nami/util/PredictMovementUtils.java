@@ -50,7 +50,7 @@ public final class PredictMovementUtils {
 
     public static PredictedEntity toPredicted(net.minecraft.entity.LivingEntity entity) {
         PredictedEntity p = new PredictedEntity(
-                entity.getPos(),
+                entity.getEntityPos(),
                 entity.getVelocity(),
                 entity.getYaw(),
                 entity.getPitch(),
