@@ -1,9 +1,11 @@
 package me.kiriyaga.nami.util.container;
 
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -65,23 +67,27 @@ public class ContainerScreen extends ShulkerBoxScreen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 1 || button == 0)
+    public boolean mouseClicked(Click click, boolean bl) {
+        if (click.button() == 1 || click.button() == 0)
              return false;
 
-        super.mouseClicked(mouseX, mouseY, button);
+        super.mouseClicked(click, bl);
         return true;
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        KeyBinding keyBindEscape = MC.options.inventoryKey;
-        int escKey = keyBindEscape.getDefaultKey().getCode();
+     @Override
+     public boolean keyPressed(KeyInput keyInput) {
+         KeyBinding keyBindEscape = MC.options.inventoryKey;
+         int escKey = keyBindEscape.getDefaultKey().getCode();
 
-        if (keyCode == escKey || keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            return super.keyPressed(keyCode, scanCode, modifiers);
-        }
+         int keyCode = keyInput.getKeycode();
+         int scanCode = keyInput.comp_4796();
+         int modifiers = keyInput.comp_4797();
 
-        return true;
-    }
+         if (keyCode == escKey || keyCode == GLFW.GLFW_KEY_ESCAPE) {
+             return super.keyPressed(keyInput);
+         }
+
+         return true;
+     }
 }

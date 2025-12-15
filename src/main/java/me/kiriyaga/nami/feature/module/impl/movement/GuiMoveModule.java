@@ -8,9 +8,12 @@ import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.mixin.KeyBindingAccessor;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.EditBox;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.gui.screen.Screen;
@@ -119,19 +122,27 @@ public class GuiMoveModule extends Module {
     public void onKeyInput(KeyInputEvent event) {
         if (!canMove()) return;
 
-        updateHeld(MC.options.forwardKey, event.key, event.action, false, v -> forwardHeld = v);
-        updateHeld(MC.options.backKey, event.key, event.action, false, v -> backHeld = v);
-        updateHeld(MC.options.leftKey, event.key, event.action, false, v -> leftHeld = v);
-        updateHeld(MC.options.rightKey, event.key, event.action, false, v -> rightHeld = v);
-        updateHeld(MC.options.jumpKey, event.key, event.action, false, v -> jumpHeld = v);
+        updateHeld(MC.options.forwardKey, event.key, event.scancode, event.action, event.modifiers, false, v -> forwardHeld = v);
+        updateHeld(MC.options.backKey, event.key, event.scancode, event.action, event.modifiers, false, v -> backHeld = v);
+        updateHeld(MC.options.leftKey, event.key, event.scancode, event.action, event.modifiers, false, v -> leftHeld = v);
+        updateHeld(MC.options.rightKey, event.key, event.scancode, event.action, event.modifiers, false, v -> rightHeld = v);
+        updateHeld(MC.options.jumpKey, event.key, event.scancode, event.action, event.modifiers, false, v -> jumpHeld = v);
     }
 
-    private void updateHeld(KeyBinding bind, int key, int action, boolean mouse, java.util.function.Consumer<Boolean> setter) {
-        if (!mouse && !bind.matchesKey(key, 0)) return;
-        if (mouse && !bind.matchesMouse(key)) return;
+    private void updateHeld(KeyBinding bind, int key, int scancode, int action, int modifiers, boolean mouse, java.util.function.Consumer<Boolean> setter) {
+        if (!mouse) {
+            KeyInput input = new KeyInput(key, scancode, modifiers);
+            if (!bind.matchesKey(input)) return;
+        } else {
+            MouseInput mouseInput = new MouseInput(key, 0);
+            Click click = new Click(0, 0, mouseInput);
+            if (!bind.matchesMouse(click)) return;
+        }
 
         setter.accept(action == GLFW.GLFW_PRESS);
     }
+
+
 
     @SubscribeEvent
     public void onRender3D(Render3DEvent event) {

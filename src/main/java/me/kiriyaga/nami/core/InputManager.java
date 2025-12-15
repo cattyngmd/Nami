@@ -10,6 +10,7 @@ import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
@@ -36,11 +37,11 @@ public class InputManager {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onKeyInput(KeyInputEvent event) {
-        int key = event.key;
-        int action = event.action;
-        int scancode = event.scancode;
-
         if (!canMove()) return;
+
+        int key = event.key;
+        int scancode = event.scancode;
+        int action = event.action;
 
         updateHeld(MC.options.forwardKey, key, scancode, action, v -> forwardPressed = v);
         updateHeld(MC.options.leftKey,    key, scancode, action, v -> leftPressed = v);
@@ -148,10 +149,15 @@ public class InputManager {
     }
 
     private void updateHeld(KeyBinding bind, int key, int scancode, int action, java.util.function.Consumer<Boolean> setter) {
-        if (!bind.matchesKey(key, scancode)) return;
-        setter.accept(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT);
-        if (action == GLFW.GLFW_RELEASE) setter.accept(false);
+        KeyInput input = new KeyInput(key, scancode, 0); // 0 = нет модификаторов, если нужны, передайте их сюда
+        if (!bind.matchesKey(input)) return;
+        boolean pressed = action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT;
+        setter.accept(pressed);
+        if (action == GLFW.GLFW_RELEASE) {
+            setter.accept(false);
+        }
     }
+
 
     private boolean canMove() {
         if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return false;

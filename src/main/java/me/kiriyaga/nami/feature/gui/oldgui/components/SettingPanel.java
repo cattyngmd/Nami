@@ -5,6 +5,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.*;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.HashMap;
@@ -97,13 +98,13 @@ public class SettingPanel {
             }
         }
 
-    public static void mouseReleased(double mouseX, double mouseY, int button) {
+    public static void mouseReleased(Click click) {
         if (draggedSetting != null) {
             SettingRenderer<?> renderer = renderers.get(draggedSetting);
             if (renderer != null) {
                 @SuppressWarnings("unchecked")
                 SettingRenderer<Setting<?>> generic = (SettingRenderer<Setting<?>>) renderer;
-                generic.mouseReleased(draggedSetting, mouseX, mouseY, button);
+                generic.mouseReleased(draggedSetting, click.comp_4798(), click.comp_4799(), click.button());
             }
         }
         draggedSetting = null;

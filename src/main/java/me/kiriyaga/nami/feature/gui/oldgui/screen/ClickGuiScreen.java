@@ -7,11 +7,13 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
@@ -187,14 +189,14 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean bl) {
         syncCategoryPositions();
 
-        int scaledMouseX = (int) (mouseX / scale);
-        int scaledMouseY = (int) (mouseY / scale);
+        int scaledMouseX = (int) (click.comp_4798() / scale);
+        int scaledMouseY = (int) (click.comp_4799() / scale);
         int scaledHeight = (int) (this.height / scale);
 
-        NAVIGATE_PANEL.mouseClicked(mouseX, mouseY, this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), this.textRenderer);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
@@ -203,7 +205,7 @@ public class ClickGuiScreen extends Screen {
             if (pos == null) continue;
 
             if (CategoryPanel.isHeaderHovered(scaledMouseX, scaledMouseY, pos.x, pos.y)) {
-                if (button == 0) {
+                if (click.button() == 0) {
                     playClickSound();
                     draggingCategory = true;
                     draggedModuleCategory = moduleCategory;
@@ -241,17 +243,17 @@ public class ClickGuiScreen extends Screen {
                     int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
 
                     if (ModulePanel.isHovered(scaledMouseX, scaledMouseY, modX, curY)) {
-                        if (button == 0) {
+                        if (click.button() == 0) {
                             playClickSound();
                             module.toggle();
-                        } else if (button == 1) {
+                        } else if (click.button() == 1) {
                             if (module.isExpanded()) {
                                 module.setExpanded(false);
                             } else {
                                 module.setExpanded(true);
                             }
                             playClickSound();
-                        } else if (button == 2) {
+                        } else if (click.button() == 2) {
                             playClickSound();
                             module.setDrawn(!module.isDrawn());
                         }
@@ -261,7 +263,7 @@ public class ClickGuiScreen extends Screen {
                     curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
 
                     if (module.isExpanded()) {
-                        if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) {
+                        if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, click.button(), modX, curY)) {
                             return true;
                         }
                         curY += SettingPanel.getSettingsHeight(module);
@@ -270,22 +272,22 @@ public class ClickGuiScreen extends Screen {
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, bl);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.currentScreen == CLICK_GUI && MC.world != null) {
+    public boolean keyPressed(KeyInput keyInput) {
+        if (keyInput.getKeycode() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.currentScreen == CLICK_GUI && MC.world != null) {
             beginClose();
             return true;
         }
-        if (keyCode == 256) {
+        if (keyInput.getKeycode() == 256) {
             beginClose();
             return true;
         }
 
-        if (SettingPanel.keyPressed(keyCode)) return true;
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        if (SettingPanel.keyPressed(keyInput.getKeycode())) return true;
+        return super.keyPressed(keyInput);
     }
 
     private void beginClose() {
@@ -295,9 +297,9 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        int scaledMouseX = (int) (mouseX / scale);
-        int scaledMouseY = (int) (mouseY / scale);
+    public boolean mouseDragged(Click click, double d, double e) {
+        int scaledMouseX = (int) (click.comp_4798() / scale);
+        int scaledMouseY = (int) (click.comp_4799() / scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point currentPos = categoryPositions.get(draggedModuleCategory);
@@ -309,15 +311,15 @@ public class ClickGuiScreen extends Screen {
         }
 
         SettingPanel.mouseDragged(scaledMouseX, scaledMouseY);
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(click,  d,  e);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(Click click) {
         draggingCategory = false;
         draggedModuleCategory = null;
-        SettingPanel.mouseReleased(mouseX, mouseY, button);
-        return super.mouseReleased(mouseX, mouseY, button);
+        SettingPanel.mouseReleased(click);
+        return super.mouseReleased(click);
     }
 
     @Override

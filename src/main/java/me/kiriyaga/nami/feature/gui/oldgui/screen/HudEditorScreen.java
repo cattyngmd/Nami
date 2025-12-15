@@ -9,8 +9,10 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 
 import java.awt.Point;
@@ -157,18 +159,18 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
-        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+    public boolean mouseClicked(Click click, boolean bl) {
+        int scaledMouseX = (int) (click.comp_4798() / CLICK_GUI.scale);
+        int scaledMouseY = (int) (click.comp_4799() / CLICK_GUI.scale);
 
-        NAVIGATE_PANEL.mouseClicked(mouseX, mouseY, this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), this.textRenderer);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
         CategoryPanel hudPanel = categoryPanels.get(hudCategory);
 
         if (pos != null && hudPanel != null && CategoryPanel.isHeaderHovered(scaledMouseX, scaledMouseY, pos.x, pos.y)) {
-            if (button == 0) {
+            if (click.button() == 0) {
                 playClickSound();
                 draggingCategory = true;
                 draggedModuleCategory = hudCategory;
@@ -191,15 +193,15 @@ public class HudEditorScreen extends Screen {
                 int modX = pos.x + CategoryPanel.BORDER_WIDTH + SettingPanel.INNER_PADDING;
 
                 if (ModulePanel.isHovered(scaledMouseX, scaledMouseY, modX, curY)) {
-                    if (button == 0) {
+                    if (click.button() == 0) {
                         playClickSound();
                         module.toggle();
-                    } else if (button == 1) {
+                    } else if (click.button() == 1) {
                         if (module.isExpanded())
                             module.setExpanded(false);
                         else module.setExpanded(true);
                         playClickSound();
-                    } else if (button == 2) {
+                    } else if (click.button() == 2) {
                         playClickSound();
                         module.setDrawn(!module.isDrawn());
                     }
@@ -208,13 +210,13 @@ public class HudEditorScreen extends Screen {
 
                 curY += ModulePanel.HEIGHT + ModulePanel.MODULE_SPACING;
                 if (module.isExpanded()) {
-                    if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, button, modX, curY)) return true;
+                    if (SettingPanel.mouseClicked(module, scaledMouseX, scaledMouseY, click.button(), modX, curY)) return true;
                     curY += SettingPanel.getSettingsHeight(module);
                 }
             }
         }
 
-        if (button == 0) {
+        if (click.button() == 0) {
             int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
             int screenHeight = MC.getWindow().getScaledHeight();
             int chatZoneTop = screenHeight - (screenHeight / 8);
@@ -225,11 +227,11 @@ public class HudEditorScreen extends Screen {
                     int y = hud.getRenderY();
                     int renderY = (y + hud.height >= chatZoneTop) ? y - chatAnimationOffset : y;
 
-                    if (mouseX >= x && mouseX <= x + hud.width &&
-                            mouseY >= renderY && mouseY <= renderY + hud.height) {
+                    if (click.comp_4798() >= x && click.comp_4798() <= x + hud.width &&
+                            click.comp_4799() >= renderY && click.comp_4799() <= renderY + hud.height) {
                         draggingElement = hud;
-                        dragOffsetX = (int) mouseX - x;
-                        dragOffsetY = (int) mouseY - renderY;
+                        dragOffsetX = (int) click.comp_4798() - x;
+                        dragOffsetY = (int) click.comp_4798() - renderY;
                         return true;
                     }
                 }
@@ -240,9 +242,9 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
-        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+    public boolean mouseDragged(Click click, double d, double e) {
+        int scaledMouseX = (int) (click.comp_4798() / CLICK_GUI.scale);
+        int scaledMouseY = (int) (click.comp_4799() / CLICK_GUI.scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point pos = categoryPositions.get(draggedModuleCategory);
@@ -253,13 +255,13 @@ public class HudEditorScreen extends Screen {
             }
         }
 
-        if (button == 0 && draggingElement != null) {
-            dragHudElement(mouseX, mouseY);
+        if (click.button() == 0 && draggingElement != null) {
+            dragHudElement(click.comp_4798(), click.comp_4799());
             return true;
         }
 
         SettingPanel.mouseDragged(scaledMouseX, scaledMouseY);
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(click, d, e);
     }
 
     private void dragHudElement(double mouseX, double mouseY) {
@@ -328,24 +330,24 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(Click click) {
         draggingCategory = false;
         draggedModuleCategory = null;
 
-        if (button == 0) draggingElement = null;
+        if (click.button() == 0) draggingElement = null;
 
-        SettingPanel.mouseReleased(mouseX, mouseY, button);
-        return super.mouseReleased(mouseX, mouseY, button);
+        SettingPanel.mouseReleased(click);
+        return super.mouseReleased(click);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
+    public boolean keyPressed(KeyInput keyInput) {
+        if (keyInput.getKeycode() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
             MC.setScreen(null);
             return true;
         }
-        if (SettingPanel.keyPressed(keyCode)) return true;
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        if (SettingPanel.keyPressed(keyInput.getKeycode())) return true;
+        return super.keyPressed(keyInput);
     }
 
     @Override

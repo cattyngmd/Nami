@@ -1,9 +1,9 @@
 package me.kiriyaga.nami.util.container;
 
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
-import net.fabricmc.fabric.mixin.transfer.ContainerComponentAccessor;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
@@ -42,14 +42,20 @@ public class ContainerUtils {
         ComponentMap components = itemStack.getComponents();
 
         if (components.contains(DataComponentTypes.CONTAINER)) {
-            ContainerComponentAccessor container = (ContainerComponentAccessor) (Object) components.get(DataComponentTypes.CONTAINER);
-            DefaultedList<ItemStack> stacks = container.fabric_getStacks();
+            Object comp = components.get(DataComponentTypes.CONTAINER);
 
-            for (int i = 0; i < stacks.size() && i < items.length; i++) {
-                items[i] = stacks.get(i);
+            if (comp instanceof ContainerComponent container) {
+                DefaultedList<ItemStack> stacks = DefaultedList.ofSize(items.length, ItemStack.EMPTY);
+                container.copyTo(stacks);
+
+                for (int i = 0; i < stacks.size() && i < items.length; i++) {
+                    items[i] = stacks.get(i);
+                }
+
+                MODULE_MANAGER.getStorage()
+                        .getByClass(DebugModule.class)
+                        .debugPeek(Text.of("peek got " + container.streamNonEmpty().count() + " items from container " + itemStack));
             }
-
-            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugPeek(Text.of("peek got " + stacks.size() + " items from container  " + itemStack));
         }
     }
 
