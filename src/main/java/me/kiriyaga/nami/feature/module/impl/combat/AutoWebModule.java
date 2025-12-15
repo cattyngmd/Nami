@@ -31,9 +31,11 @@ import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 public class AutoWebModule extends Module {
 
     public enum PlaceMode { LEGS, HEAD, BOTH }
+    public enum Item { COBWEB, SCAFFOLD }
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
     private final EnumSetting<PlaceMode> placeMode = addSetting(new EnumSetting<>("PlaceMode", PlaceMode.LEGS));
+    private final EnumSetting<Item> item = addSetting(new EnumSetting<>("Item", Item.COBWEB));
     private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
     private final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 5));
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
@@ -107,9 +109,16 @@ public class AutoWebModule extends Module {
     private int findSlot() {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getStack(i);
-            if (!stack.isEmpty() && stack.getItem() == Blocks.COBWEB.asItem()) {
+
+            if (item.get() == Item.COBWEB)
+                if (!stack.isEmpty() && stack.getItem() == Blocks.COBWEB.asItem()) {
                 return i;
             }
+
+            if (item.get() == Item.SCAFFOLD)
+                if (!stack.isEmpty() && stack.getItem() == Blocks.SCAFFOLDING.asItem()) {
+                    return i;
+                }
         }
         return -1;
     }
