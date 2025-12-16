@@ -76,7 +76,7 @@ public abstract class MixinLivingEntity extends Entity {
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float jumpFix(float originalYaw) {
         if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
-        return ROTATION_MANAGER != null ? ROTATION_MANAGER.getStateHandler().getRotationYaw() : originalYaw;
+        return ROTATION_MANAGER.getStateHandler().isRotating() ? ROTATION_MANAGER.getStateHandler().getRotationYaw() : originalYaw;
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
