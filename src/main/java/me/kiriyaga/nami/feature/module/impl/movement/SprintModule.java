@@ -19,8 +19,11 @@ import static me.kiriyaga.nami.Nami.MC;
 public class SprintModule extends Module {
 
     private final BoolSetting inLiquid = addSetting(new BoolSetting("InLiquid", true));
+    private final BoolSetting twobtwot = addSetting(new BoolSetting("2b2t", false));
+    private final BoolSetting forwardSpeed = addSetting(new BoolSetting("ForwardSpeed", false));
 
     private int shouldSprintTicks = 0; // yes sorry
+    private int noSprintTicks = 0;
 
     public SprintModule() {
         super("Sprint", "Automatically makes you sprint while moving.", ModuleCategory.of("Movement"));
@@ -51,8 +54,28 @@ public class SprintModule extends Module {
             return;
         }
 
-        if (player.forwardSpeed > 0 && !player.hasVehicle()) {
-            player.setSprinting(true);
+        if (twobtwot.get()) {
+            if (!player.isSprinting()) {
+                noSprintTicks++;
+            } else {
+                noSprintTicks = 0;
+            }
+        }
+
+        boolean canSprint = !forwardSpeed.get() || player.forwardSpeed > 0 && !player.hasVehicle();
+
+        if (canSprint) {
+            if (twobtwot.get()) {
+                if (!player.isSprinting()) {
+                    if (noSprintTicks >= 2) {
+                        player.setSprinting(true);
+                    }
+                } else {
+                    player.setSprinting(true);
+                }
+            } else {
+                player.setSprinting(true);
+            }
         } else {
             player.setSprinting(false);
         }
