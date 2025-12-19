@@ -69,26 +69,27 @@ public class InputManager {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTick(PreTickEvent event) {
-        if (freezeTicks > 0) {
-            freezeTicks--;
+        if (!frozen) return;
 
-            if (freezeTicks == 1) {
-                disableAllKeys();
-            } else if (freezeTicks == 0) {
-                restoreKeys();
-                frozen = false;
-            }
+        freezeTicks--;
+
+        if (freezeTicks <= 0) {
+            restoreKeys();
+            frozen = false;
+        } else {
+            disableAllKeys();
         }
     }
 
-    public void freezeInputNow() {
+    public void freezeInput(int i) {
         if (frozen) return;
         frozen = true;
-        freezeTicks = 1;
+        freezeTicks = i;
 
         saveKeys();
         disableAllKeys();
     }
+
 
     public boolean isFrozen() {
         return frozen;
