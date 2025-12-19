@@ -1,6 +1,6 @@
 # Nami
 
-1.21.8 and 1.21.5
+1.21.11 and 1.21.8
 
 <p align="left">
   <a href="https://github.com/NamiDevelopment/nami/releases">
