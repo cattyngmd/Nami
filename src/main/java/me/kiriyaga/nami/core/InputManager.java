@@ -19,7 +19,7 @@ import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.PlayerInput;
 import org.lwjgl.glfw.GLFW;
 
-import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.Nami.*; // TODO: 1.20.6 viafabric flags sprinting, since packet does not exists. The grim check, does not apply for input on theese versions, but do apply for sprinting
 
 public class InputManager {
 
