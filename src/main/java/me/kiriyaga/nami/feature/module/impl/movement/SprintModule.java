@@ -14,7 +14,7 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 
 import static me.kiriyaga.nami.Nami.MC;
-
+// some crazy shit happened here
 @RegisterModule
 public class SprintModule extends Module {
 

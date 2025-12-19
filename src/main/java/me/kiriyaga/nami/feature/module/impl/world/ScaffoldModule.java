@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.util.PredictMovementUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -19,6 +20,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -37,6 +39,7 @@ public class ScaffoldModule extends Module {
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
+    private final BoolSetting singleBlock = addSetting(new BoolSetting("SingleBlock", true));
     private final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
     private int cooldown = 0;
@@ -140,10 +143,33 @@ public class ScaffoldModule extends Module {
         double maxZ = MC.player.getBoundingBox().maxZ;
         int y = (int) Math.floor(MC.player.getY());
 
-        BlockPos[] possiblePositions = new BlockPos[] {new BlockPos((int) Math.floor(minX), y, (int) Math.floor(minZ)), new BlockPos((int) Math.floor(minX), y, (int) Math.floor(maxZ)), new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(minZ)), new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(maxZ))};
+        BlockPos[] valid = new BlockPos[]{
+                new BlockPos((int) Math.floor(minX), y, (int) Math.floor(minZ)),
+                new BlockPos((int) Math.floor(minX), y, (int) Math.floor(maxZ)),
+                new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(minZ)),
+                new BlockPos((int) Math.floor(maxX), y, (int) Math.floor(maxZ))
+        };
 
-        return Arrays.stream(possiblePositions)
-                .filter(pos -> MC.world.getBlockState(pos.down()).isAir()) // yes i know its cringe sorry
-                .toArray(BlockPos[]::new);
+        if (!singleBlock.get() || valid.length <= 1)
+            return valid;
+
+        PredictMovementUtils.PredictedEntity initial = new PredictMovementUtils.PredictedEntity(MC.player.getEntityPos(), MC.player.getVelocity(), MC.player.getYaw(), MC.player.getPitch(), MC.player.isOnGround(), MC.player.getStandingEyeHeight());
+
+        PredictMovementUtils.PredictedEntity predicted = PredictMovementUtils.predict(initial, 3, t -> Vec3d.ZERO);
+        Vec3d eyePos = predicted != null ? predicted.getEyePos() : MC.player.getEyePos();
+        BlockPos closest = null;
+        double bestDist = Double.MAX_VALUE;
+
+        for (BlockPos pos : valid) {
+            Vec3d center = Vec3d.ofCenter(pos);
+            double dist = center.squaredDistanceTo(eyePos);
+
+            if (dist < bestDist) {
+                bestDist = dist;
+                closest = pos;
+            }
+        }
+
+        return closest != null ? new BlockPos[]{closest} : valid;
     }
 }
