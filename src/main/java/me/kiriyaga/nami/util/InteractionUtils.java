@@ -17,10 +17,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
@@ -101,10 +98,37 @@ public class InteractionUtils {
         if (direction == null) {
             return false;
         }
-
         BlockPos neighbor = pos.offset(direction.getOpposite());
         Direction clickFace = direction;
-        Vec3d hitVec = Vec3d.ofCenter(neighbor).add(Vec3d.of(clickFace.getVector()).multiply(0.5));
+
+        Vec3d playerPos = MC.player.getEntityPos();
+        double offX = playerPos.x - Math.floor(playerPos.x);
+        double offY = playerPos.y - Math.floor(playerPos.y);
+        double offZ = playerPos.z - Math.floor(playerPos.z);
+        offX = MathHelper.clamp(offX, 0.2, 0.8);
+        offY = MathHelper.clamp(offY, 0.2, 0.8);
+        offZ = MathHelper.clamp(offZ, 0.2, 0.8);
+        Vec3d hitVec = Vec3d.ofCenter(neighbor);
+
+        switch (clickFace) { //todo: refactor this
+            case UP, DOWN -> hitVec = hitVec.add(
+                    offX - 0.5,
+                    clickFace == Direction.UP ? 0.5 : -0.5,
+                    offZ - 0.5
+            );
+
+            case NORTH, SOUTH -> hitVec = hitVec.add(
+                    offX - 0.5,
+                    offY - 0.5,
+                    clickFace == Direction.SOUTH ? 0.5 : -0.5
+            );
+
+            case EAST, WEST -> hitVec = hitVec.add(
+                    clickFace == Direction.EAST ? 0.5 : -0.5,
+                    offY - 0.5,
+                    offZ - 0.5
+            );
+        }
 
         // Simplified grim v2 PlacePosition check
         // we do not use all possible eye positions because its just unnecessary
