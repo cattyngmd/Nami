@@ -7,6 +7,7 @@ import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
+import me.kiriyaga.nami.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -196,6 +197,13 @@ public class RotationTickHandler {
             stateHandler.setRotationYaw(stateHandler.getRealYaw());
             stateHandler.setRotationPitch(stateHandler.getRealPitch());
             requestHandler.clearLastActiveId();
+
+            if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION) {
+                SprintModule sm = MODULE_MANAGER.getStorage().getByClass(SprintModule.class);
+
+                if (sm.twobtwot.get())
+                    sm.stopSprinting(2);
+            }
         }
     }
 
