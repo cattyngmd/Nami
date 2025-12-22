@@ -9,6 +9,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.ColorSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -26,6 +27,8 @@ public class HudModule extends Module {
     public final BoolSetting bounce = addSetting(new BoolSetting("Bounce", false));
     public final IntSetting bounceSpeed = addSetting(new IntSetting("Speed", 5, 1, 20));
     public final IntSetting bounceIntensity = addSetting(new IntSetting("Intensity", 30, 10, 100));
+    public final BoolSetting accent = addSetting(new BoolSetting("Accent", false));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("Color", new Color(170, 170, 170, 255), true));
 
     private float bounceProgress = 0f;
     private boolean increasing = true;
@@ -34,6 +37,7 @@ public class HudModule extends Module {
         super("HUD", "Renders in-game hud.", ModuleCategory.of("Client"));
         bounceIntensity.setShowCondition(() -> bounce.get());
         bounceSpeed.setShowCondition(() -> bounce.get());
+        globalColor.setShowCondition(accent::get);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

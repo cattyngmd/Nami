@@ -34,7 +34,8 @@ public class CatStyles {
 
     @Style("bg")
     Color bounceGlobal() {
-        Color gc = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+        Color gc = MODULE_MANAGER.getStorage().getByClass(HudModule.class).accent.get() ? MODULE_MANAGER.getStorage().getByClass(HudModule.class).globalColor.get() : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+
         return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
     }
 
