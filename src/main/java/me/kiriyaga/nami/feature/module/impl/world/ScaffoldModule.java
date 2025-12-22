@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.world;
 
+import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
@@ -7,6 +8,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
@@ -40,6 +42,7 @@ public class ScaffoldModule extends Module {
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
     private final BoolSetting singleBlock = addSetting(new BoolSetting("SingleBlock", true));
+    private final BoolSetting lookBack = addSetting(new BoolSetting("LookBack", true));
     private final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
     private int cooldown = 0;
@@ -90,6 +93,9 @@ public class ScaffoldModule extends Module {
 
             if (blocksPlaced >= shiftTicks.get()) break;
         }
+
+        if (lookBack.get() && INPUT_MANAGER.hasAnyInput() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION)
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.name+"hold", 3, INPUT_MANAGER.getDirection() - 180, 81));
 
         if (blocksPlaced > 0) cooldown = delay.get();
     }

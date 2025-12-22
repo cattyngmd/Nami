@@ -85,5 +85,4 @@ public class SpeedModule extends Module {
 
         return realYaw;
     }
-
 }

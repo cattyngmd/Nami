@@ -7,6 +7,7 @@ import me.kiriyaga.nami.event.impl.PacketSendEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
+import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.*;
@@ -17,6 +18,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.PlayerInput;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.*; // TODO: 1.20.6 viafabric flags sprinting, since packet does not exists. The grim check, does not apply for input on theese versions, but do apply for sprinting
@@ -159,6 +161,32 @@ public class InputManager {
         }
     }
 
+
+    public float getDirection() {
+        float realYaw = MC.player.getYaw();
+
+        boolean forward = InputCache.forward;
+        boolean back = InputCache.back;
+        boolean left = InputCache.left;
+        boolean right = InputCache.right;
+
+        int inputX = (right ? 1 : 0) - (left ? 1 : 0);
+        int inputZ = (forward ? 1 : 0) - (back ? 1 : 0);
+
+        if (inputX == 0 && inputZ == 0) return realYaw;
+
+        if (inputZ > 0) return realYaw;
+
+        if (inputZ < 0) return MathHelper.wrapDegrees(realYaw + 180);
+
+        if (inputX != 0 && inputZ == 0) return MathHelper.wrapDegrees(realYaw + (inputX > 0 ? 90 : -90));
+
+        if (inputZ > 0 && inputX != 0) return realYaw;
+
+        if (inputZ < 0 && inputX != 0) return MathHelper.wrapDegrees(realYaw + 180);
+
+        return realYaw;
+    }
 
     private boolean canMove() {
         if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return false;
