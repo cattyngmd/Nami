@@ -175,7 +175,7 @@ public class SpeedMineModule extends Module {
         Color fillColor = new Color(r, g, b, 60);
         Color outlineColor = new Color(r, g, b, 255);
 
-        RenderUtil.drawBox(event.getMatrices(), scaled, fillColor, outlineColor, 1.5, true, true);
+        RenderUtil.drawBoxPreset(event.getMatrices(), scaled, outlineColor);
     }
 
     private void handleMiningTick(BlockBreakingTask task) {

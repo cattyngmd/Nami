@@ -91,7 +91,7 @@ public class EchestFarmerModule extends Module {
 
         Box box = new Box(renderPos);
 
-        RenderUtil.drawBox(matrices, box, fillColor, color, 1.5f, true, true);
+        RenderUtil.drawBoxPreset(matrices, box, color);
     }
 
     private int findEchestInHotbar() {
