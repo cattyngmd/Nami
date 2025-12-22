@@ -86,9 +86,6 @@ public abstract class MixinClientPlayerEntity {
         MC.player.setYaw(newYaw);
         MC.player.setPitch(newPitch);
 
-        MC.player.setBodyYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
-        MC.player.setHeadYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
-
         float deltaYaw = newYaw - ROTATION_MANAGER.getStateHandler().getServerYaw();
         //float deltaPitch = newPitch - ROTATION_MANAGER.getStateHandler().getServerPitch();
 

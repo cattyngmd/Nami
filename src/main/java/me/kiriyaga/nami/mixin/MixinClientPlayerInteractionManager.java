@@ -48,8 +48,6 @@ public abstract class MixinClientPlayerInteractionManager implements IClientPlay
 
         player.setYaw(spoofYaw);
         player.setPitch(spoofPitch);
-        player.setHeadYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
-        player.setBodyYaw(ROTATION_MANAGER.getStateHandler().getRenderYaw());
     }
 
     @Inject(method = "interactItem", at = @At("RETURN"))

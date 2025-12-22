@@ -20,11 +20,6 @@ public class RotationStateHandler {
      */
     private float rotationYaw, rotationPitch;
     /**
-     * Render degrees
-     * Theese are separated from real rotations, they are always smooth = 50%
-     */
-    private float renderYaw, renderPitch;
-    /**
      * Server degrees
      * These are degrees that really got sended on a server
      * Any mc client should use mc.player.setYaw/pitch in packet send, so we, and also everyone else, know each other rotations
@@ -44,11 +39,6 @@ public class RotationStateHandler {
     public void updateRealRotation(float yaw, float pitch) {
         realYaw = yaw;
         realPitch = MathHelper.clamp(pitch, -90f, 90f);
-
-        if (!isRotating()) {
-            renderYaw = realYaw;
-            renderPitch = realPitch;
-        }
     }
 
     public float getRealYaw() { return realYaw; }
@@ -61,13 +51,7 @@ public class RotationStateHandler {
 
     public void setRotationPitch(float pitch) {this.rotationPitch = MathHelper.clamp(pitch, -90f, 90f);}
 
-    public float getRenderYaw() { return renderYaw; }
-    public float getRenderPitch() { return renderPitch; }
-
     // WE DO NOT WRAP/NORMALIZE SERVER ROTATIONS!!!
-    public void setRenderYaw(float yaw) { this.renderYaw = wrapDegrees(yaw); }
-    public void setRenderPitch(float pitch) { this.renderPitch = MathHelper.clamp(pitch, -90f, 90f); }
-
     public float getServerYaw() {return serverYaw;}
     public void setServerYaw(float yaw) {this.serverYaw = yaw;}
 

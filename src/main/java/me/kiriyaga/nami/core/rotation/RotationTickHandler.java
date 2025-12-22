@@ -54,7 +54,6 @@ public class RotationTickHandler {
         RotationModule module = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
         loadSettings(module);
         stateHandler.updateRealRotation(MC.player.getYaw(), MC.player.getPitch());
-        interpolateRenderRotation();
 
         RotationRequest active = requestHandler.getActiveRequest();
         if (module.rotation.get() == RotationModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
@@ -255,22 +254,6 @@ public class RotationTickHandler {
 
         stateHandler.setRotationYaw(newYaw);
         stateHandler.setRotationPitch(newPitch);
-    }
-
-    private void interpolateRenderRotation() {
-        float currentRenderYaw = stateHandler.getRenderYaw();
-        float currentRenderPitch = stateHandler.getRenderPitch();
-
-        float targetYaw = stateHandler.getRotationYaw();
-        float targetPitch = stateHandler.getRotationPitch();
-
-        float factor = 0.7f;
-
-        float newRenderYaw = lerpAngle(currentRenderYaw, targetYaw, factor);
-        float newRenderPitch = lerp(currentRenderPitch, targetPitch, factor);
-
-        stateHandler.setRenderYaw(newRenderYaw);
-        stateHandler.setRenderPitch(newRenderPitch);
     }
 
     private float lerpAngle(float start, float end, float factor) {
