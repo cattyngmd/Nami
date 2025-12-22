@@ -69,14 +69,15 @@ public class PredictTestModule extends Module {
 
         if (showBox.get()) {
             Box box = entity.getBoundingBox().offset(predicted.pos.subtract(entity.getEntityPos()));
-            RenderUtil.drawBoxPreset(matrices, box, new Color(0, 255, 0, 200));
+            RenderUtil.drawBoxLines(box, new Color(0, 255, 0, 200), true, true, 1.5f);
+
         }
 
         if (showEye.get()) {
             Vec3d eye = predicted.getEyePos();
             double size = 0.1;
             Box eyeBox = new Box(eye.x - size, eye.y - size, eye.z - size, eye.x + size, eye.y + size, eye.z + size);
-            RenderUtil.drawBoxPreset(matrices, eyeBox, new Color(255, 0, 0, 255));
+            RenderUtil.drawBoxLines(eyeBox, new Color(255, 0, 0, 255), true, true, 1.5f);
         }
     }
 }

@@ -149,8 +149,8 @@ public class ESPModule extends Module {
                 interpY - entity.getY(),
                 interpZ - entity.getZ()
         );
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
 
-        RenderUtil.drawBoxPreset(matrices, box, color);
     }
 
     public static Color getESPColor(Entity entity) {

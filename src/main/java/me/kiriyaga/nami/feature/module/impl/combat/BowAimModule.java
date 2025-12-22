@@ -87,6 +87,6 @@ public class BowAimModule extends Module {
         double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
         double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
         Box box = entity.getBoundingBox().offset(interpX - entity.getX(), interpY - entity.getY(), interpZ - entity.getZ());
-        RenderUtil.drawBoxPreset(matrices, box, new Color(color.getRed(), color.getGreen(), color.getBlue(), 75));
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 }

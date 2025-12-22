@@ -19,6 +19,7 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.entity.TargetUtils;
+import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
@@ -42,7 +43,7 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.raycastTarget;
 import static me.kiriyaga.nami.util.RotationUtils.*;
-import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
+import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxLines;
 
 @RegisterModule
 public class AuraModule extends Module {
@@ -298,7 +299,8 @@ public class AuraModule extends Module {
         double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
         Box box = entity.getBoundingBox().offset(interpX - entity.getX(), interpY - entity.getY(), interpZ - entity.getZ());
 
-        drawBoxPreset(matrices, box, color);
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
+
     }
 
     private float getBaseCooldownTicks(ItemStack stack, float tps) {

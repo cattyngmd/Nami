@@ -87,11 +87,10 @@ public class EchestFarmerModule extends Module {
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
-        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
 
         Box box = new Box(renderPos);
 
-        RenderUtil.drawBoxPreset(matrices, box, color);
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
     private int findEchestInHotbar() {

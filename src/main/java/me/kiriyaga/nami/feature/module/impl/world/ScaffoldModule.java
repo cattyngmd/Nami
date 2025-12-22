@@ -105,7 +105,8 @@ public class ScaffoldModule extends Module {
 
         Box box = new Box(renderPos);
 
-        RenderUtil.drawBoxPreset(matrices, box, color);
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
+
     }
 
     private int getSlot() {

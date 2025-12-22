@@ -36,6 +36,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
 import org.joml.*;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.util.math.BlockPos;
@@ -81,61 +82,78 @@ public class RenderUtil {
 
 
     // 3d
-    public static void drawBoxLines(MatrixStack stack, Box box, Color color, double lineWidth) {
-        Camera camera = MC.getEntityRenderDispatcher().camera;
-
-        double dx = -camera.getCameraPos().getX();
-        double dy = -camera.getCameraPos().getY();
-        double dz = -camera.getCameraPos().getZ();
-        VoxelShape shape = VoxelShapes.cuboid(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
-        int argb = ((color.getAlpha() & 0xFF) << 24) |
-                ((color.getRed() & 0xFF) << 16) |
-                ((color.getGreen() & 0xFF) << 8) |
-                (color.getBlue() & 0xFF);
-
-        Vec3d center = box.getCenter();
-        double distance = camera.getCameraPos().distanceTo(center);
-
-        double minThickness = 0.5;
-        double maxThickness = lineWidth;
-        double scaleFactor = 5.0;
-        float scaledLineWidth = (float) Math.max(maxThickness / (1.0 + (distance / scaleFactor)), minThickness);
-
-        RenderLayer layer = Layers.getGlobalLines(scaledLineWidth);
-        VertexConsumer buffer = MC.getBufferBuilders().getEntityVertexConsumers().getBuffer(layer);
-
-        VertexRendering.drawOutline(stack, buffer, shape, dx, dy, dz, argb, scaledLineWidth);
-    }
-
-    public static void drawBlockShape(MatrixStack matrices, World world, BlockPos pos, BlockState state, Color baseColor) {
-
-        Color fill = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 50);
-        Color outline = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 90);
-
+    //   net.minecraft.client.render.debug.ChunkBorderDebugRenderer
+    public static void drawBlockPosLines(World world, BlockPos pos, BlockState state, Color color, boolean filled, boolean outlined, float outlineWidth) {
         VoxelShape shape = state.getOutlineShape(world, pos);
+
+        int fillColor = ColorHelper.getArgb(
+                50,
+                color.getRed(),
+                color.getGreen(),
+                color.getBlue()
+        );
+
+        int outlineColor = ColorHelper.getArgb(
+                90,
+                color.getRed(),
+                color.getGreen(),
+                color.getBlue()
+        );
 
         shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
             Box box = new Box(
-                    pos.getX() + minX, pos.getY() + minY, pos.getZ() + minZ,
-                    pos.getX() + maxX, pos.getY() + maxY, pos.getZ() + maxZ
+                    pos.getX() + minX,
+                    pos.getY() + minY,
+                    pos.getZ() + minZ,
+                    pos.getX() + maxX,
+                    pos.getY() + maxY,
+                    pos.getZ() + maxZ
             );
 
-            drawBoxLines(matrices, box,outline, 1.5);
+            if (filled) {
+                GizmoDrawing.box(
+                        box,
+                        DrawStyle.filled(fillColor)
+                ).ignoreOcclusion();
+            }
+
+            if (outlined) {
+                GizmoDrawing.box(
+                        box,
+                        DrawStyle.stroked(outlineColor, outlineWidth)
+                ).ignoreOcclusion();
+            }
         });
     }
 
-    public static void drawBoxPreset(MatrixStack stack, Box box, Color baseColor) {
-        Color fill = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 50);
-        Color outline = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 90);
-        drawBoxLines(stack, box,outline, 1.5);
-    }
+    public static void drawBoxLines(Box box, Color color, boolean filled, boolean outlined, float outlineWidth) {
+        int fillColor = ColorHelper.getArgb(
+                50,
+                color.getRed(),
+                color.getGreen(),
+                color.getBlue()
+        );
 
-    public static void drawBoxPreset(MatrixStack stack, Vec3d vec, Color baseColor) {
-        drawBoxPreset(stack, Box.from(vec), baseColor);
-    }
+        int outlineColor = ColorHelper.getArgb(
+                90,
+                color.getRed(),
+                color.getGreen(),
+                color.getBlue()
+        );
 
-    public static void drawBoxPreset(MatrixStack stack, BlockPos pos, Color baseColor) {
-        drawBoxPreset(stack, new Box(pos), baseColor);
+        if (filled) {
+            GizmoDrawing.box(
+                    box,
+                    DrawStyle.filled(fillColor)
+            ).ignoreOcclusion();
+        }
+
+        if (outlined) {
+            GizmoDrawing.box(
+                    box,
+                    DrawStyle.stroked(outlineColor, outlineWidth)
+            ).ignoreOcclusion();
+        }
     }
 
     public static void drawText3D(MatrixStack matrices, Text text, Vec3d pos, float scale, boolean background, boolean border, float borderWidth) {
@@ -222,7 +240,7 @@ public class RenderUtil {
         matrices.scale(s, s, s);
         matrices.scale(1.0f, 1.0f, 0.0001f);
 
-/*        itemRenderer.renderItem(
+/*        itemRenderer.renderItem( // todo: fix this
                 stack,
                 ItemDisplayContext.FIXED,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,

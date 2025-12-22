@@ -13,6 +13,7 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
 import me.kiriyaga.nami.util.entity.TargetUtils;
+import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 
 @RegisterModule
 public class AutoWebModule extends Module {
@@ -96,14 +96,12 @@ public class AutoWebModule extends Module {
     public void onRender(Render3DEvent event) {
         if (MC.player == null || MC.world == null || renderPos == null || !render.get()) return;
 
-        MatrixStack matrices = event.getMatrices();
-
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
 
         Box box = new Box(renderPos);
 
-        drawBoxPreset(matrices, box, color);
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
     private int findSlot() {

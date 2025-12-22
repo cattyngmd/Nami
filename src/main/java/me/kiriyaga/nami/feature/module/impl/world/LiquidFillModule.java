@@ -150,11 +150,10 @@ public class LiquidFillModule extends Module {
     public void onRender(Render3DEvent event) {
         if (MC.player == null || MC.world == null || renderPos == null) return;
 
-        MatrixStack matrices = event.getMatrices();
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
         Box box = new Box(renderPos);
-        RenderUtil.drawBoxPreset(matrices, box, color);
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
     private boolean hasEntity(BlockPos pos) {

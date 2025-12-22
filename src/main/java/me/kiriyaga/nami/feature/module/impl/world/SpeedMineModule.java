@@ -164,7 +164,7 @@ public class SpeedMineModule extends Module {
         double dy = (bb.maxY - bb.minY) / 2.0;
         double dz = (bb.maxZ - bb.minZ) / 2.0;
 
-        Box scaled = new Box(center, center).expand(dx * scale, dy * scale, dz * scale);
+        Box box = new Box(center, center).expand(dx * scale, dy * scale, dz * scale);
 
         float t = MathHelper.clamp((scale - 0.5f) * 2f, 0f, 1f);
         int maxColor = 200;
@@ -172,10 +172,9 @@ public class SpeedMineModule extends Module {
         int g = (int) (maxColor * t);
         int b = 0;
 
-        Color fillColor = new Color(r, g, b, 60);
-        Color outlineColor = new Color(r, g, b, 255);
+        Color color = new Color(r, g, b, 255);
 
-        RenderUtil.drawBoxPreset(event.getMatrices(), scaled, outlineColor);
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
     private void handleMiningTick(BlockBreakingTask task) {

@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
+import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -31,7 +32,6 @@ import java.util.Set;
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.isPlaceable;
 import static me.kiriyaga.nami.util.InteractionUtils.isReplaceable;
-import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxPreset;
 
 @RegisterModule
 public class FeetTrapModule extends Module {
@@ -119,7 +119,7 @@ public class FeetTrapModule extends Module {
 
         for (BlockPos pos : surroundPositions) {
             Box box = new Box(pos);
-            drawBoxPreset(matrices, box, color);
+            RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
         }
     }
 

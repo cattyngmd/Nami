@@ -120,7 +120,7 @@ public class BlockSearchModule extends Module {
 
                 BlockState state = MC.world.getBlockState(pos);
 
-                RenderUtil.drawBlockShape(matrices, MC.world, pos, state, BlockUtils.getColorByBlockId(state));
+                RenderUtil.drawBlockPosLines(MC.world, pos, state, BlockUtils.getColorByBlockId(state),true,true, 1.5f);
 
             //    if (tracers.get())
                 //    RenderUtil.drawLine(matrices, MC.player.getEyePos(), pos.toCenterPos(), BlockUtils.getColorByBlockId(state), 1.50);
