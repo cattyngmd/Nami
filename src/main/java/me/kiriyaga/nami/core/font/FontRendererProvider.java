@@ -30,16 +30,13 @@ public class FontRendererProvider {
             return MC.textRenderer;
         }
 
-/*        int newSize = fontModule.glyphSize.get();
-        int newOversample = fontModule.oversample.get();*/
+        if (cachedRenderer != null && cachedSize == fontModule.glyphSize.get() && cachedOversample == fontModule.oversample.get()) {
+            return cachedRenderer;
+        }
 
-        EffectGlyph rectangle =
-                ((TextRendererAccessor) MC.textRenderer)
-                        .getFonts()
-                        .getRectangleGlyph();
+        EffectGlyph rectangle = ((TextRendererAccessor) MC.textRenderer).getFonts().getRectangleGlyph();
 
         cachedRenderer = new TextRenderer(new TextRenderer.GlyphsProvider() {
-
             @Override
             public GlyphProvider getGlyphs(StyleSpriteSource font) {
                 return fontLoader.getStorage().getGlyphs(true);
@@ -49,8 +46,11 @@ public class FontRendererProvider {
             public EffectGlyph getRectangleGlyph() {
                 return rectangle;
             }
-
         });
-        return MC.textRenderer;
+
+        cachedSize = fontModule.glyphSize.get();
+        cachedOversample = fontModule.oversample.get();
+
+        return cachedRenderer;
     }
 }

@@ -95,7 +95,7 @@ public class ClickGuiScreen extends Screen {
             context.fill(0, 0, this.width, this.height, applyFade(color));
         }
 
-        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
+        NAVIGATE_PANEL.render(context, FONT_MANAGER.rendererProvider.getRenderer(), mouseX, mouseY);
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(scale, scale);
@@ -127,7 +127,7 @@ public class ClickGuiScreen extends Screen {
 
             CategoryPanel panel = categoryPanels.get(moduleCategory);
             if (panel != null)
-                panel.render(context, this.textRenderer, pos.x, pos.y, scaledMouseX, scaledMouseY, scaledHeight);
+                panel.render(context, FONT_MANAGER.rendererProvider.getRenderer(), pos.x, pos.y, scaledMouseX, scaledMouseY, scaledHeight);
         }
 
         if (clickGuiModule != null && clickGuiModule.descriptions.get()) {
@@ -196,7 +196,7 @@ public class ClickGuiScreen extends Screen {
         int scaledMouseY = (int) (click.comp_4799() / scale);
         int scaledHeight = (int) (this.height / scale);
 
-        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), FONT_MANAGER.rendererProvider.getRenderer());
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;

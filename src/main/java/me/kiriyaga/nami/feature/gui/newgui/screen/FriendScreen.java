@@ -70,12 +70,12 @@ public class FriendScreen extends NamiScreen {
             context.fill(0, 0, width, height, CLICK_GUI.applyFade(color));
         }
 
-        NAVIGATE_PANEL.render(context, textRenderer, mouseX, mouseY);
+        NAVIGATE_PANEL.render(context, FONT_MANAGER.rendererProvider.getRenderer(), mouseX, mouseY);
 
         context.getMatrices().pushMatrix();
         context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
         updateOnlineStatuses();
-        console.render(context, textRenderer, (int) (mouseX / CLICK_GUI.scale), (int) (mouseY / CLICK_GUI.scale));
+        console.render(context, FONT_MANAGER.rendererProvider.getRenderer(), (int) (mouseX / CLICK_GUI.scale), (int) (mouseY / CLICK_GUI.scale));
 
         context.getMatrices().popMatrix();
     }
@@ -88,7 +88,7 @@ public class FriendScreen extends NamiScreen {
 
     @Override
     public boolean mouseClicked(Click click, boolean bl) {
-        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), textRenderer);
+        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), FONT_MANAGER.rendererProvider.getRenderer());
 
         double sx = click.comp_4798() / CLICK_GUI.scale;
         double sy = click.comp_4799() / CLICK_GUI.scale;
@@ -117,7 +117,7 @@ public class FriendScreen extends NamiScreen {
 
     private FriendEntry getFriendAt(double mouseX, double mouseY) { // oh god i need to rewrite it
         int contentY = console.getY() + console.getHeaderHeight() + 4;
-        int lineHeight = textRenderer.fontHeight + 4;
+        int lineHeight = FONT_MANAGER.getHeight() + 4;
         int contentHeight = console.getHeight() - console.getHeaderHeight() - console.getInputHeight() - 8;
         int maxVisible = contentHeight / lineHeight;
         double scroll = console.getScrollOffset();

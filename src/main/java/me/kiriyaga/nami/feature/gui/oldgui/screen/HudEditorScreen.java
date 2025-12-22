@@ -72,7 +72,7 @@ public class HudEditorScreen extends Screen {
             context.fill(0, 0, this.width, this.height, CLICK_GUI.applyFade(color));
         }
 
-        NAVIGATE_PANEL.render(context, this.textRenderer, mouseX, mouseY);
+        NAVIGATE_PANEL.render(context, FONT_MANAGER.rendererProvider.getRenderer(), mouseX, mouseY);
 
 
         context.getMatrices().pushMatrix();
@@ -83,7 +83,7 @@ public class HudEditorScreen extends Screen {
         CategoryPanel hudPanel = categoryPanels.get(hudCategory);
 
         if (pos != null && hudPanel != null) {
-            hudPanel.render(context, this.textRenderer, pos.x, pos.y, scaledMouseX, scaledMouseY, this.height);
+            hudPanel.render(context, FONT_MANAGER.rendererProvider.getRenderer(), pos.x, pos.y, scaledMouseX, scaledMouseY, this.height);
         }
 
         if (hudPanel != null && clickGuiModule != null && clickGuiModule.descriptions.get() && pos != null) {
@@ -163,7 +163,7 @@ public class HudEditorScreen extends Screen {
         int scaledMouseX = (int) (click.comp_4798() / CLICK_GUI.scale);
         int scaledMouseY = (int) (click.comp_4799() / CLICK_GUI.scale);
 
-        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), this.textRenderer);
+        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), FONT_MANAGER.rendererProvider.getRenderer());
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
@@ -231,7 +231,7 @@ public class HudEditorScreen extends Screen {
                             click.comp_4799() >= renderY && click.comp_4799() <= renderY + hud.height) {
                         draggingElement = hud;
                         dragOffsetX = (int) click.comp_4798() - x;
-                        dragOffsetY = (int) click.comp_4798() - renderY;
+                        dragOffsetY = (int) click.comp_4799() - renderY;
                         return true;
                     }
                 }
