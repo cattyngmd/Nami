@@ -19,7 +19,9 @@ import static me.kiriyaga.nami.Nami.MC;
 public class SprintModule extends Module {
 
     private final BoolSetting inLiquid = addSetting(new BoolSetting("InLiquid", true));
+/*
     public final BoolSetting twobtwot = addSetting(new BoolSetting("2b2t", false));
+*/
 
     private int shouldSprintTicks = 0; // yes sorry
 

@@ -198,12 +198,12 @@ public class RotationTickHandler {
             stateHandler.setRotationPitch(stateHandler.getRealPitch());
             requestHandler.clearLastActiveId();
 
-            if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION) {
+/*            if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION) {
                 SprintModule sm = MODULE_MANAGER.getStorage().getByClass(SprintModule.class);
 
                 if (sm.twobtwot.get())
                     sm.stopSprinting(2);
-            }
+            }*/
         }
     }
 
