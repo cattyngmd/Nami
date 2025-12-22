@@ -7,6 +7,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
 
 @RegisterModule
 public class RotationModule extends Module {
@@ -25,6 +26,7 @@ public class RotationModule extends Module {
 //    public final DoubleSetting jitterMaxYaw = addSetting(new DoubleSetting("jitter horizontal", 1, 0, 3));
 //    public final DoubleSetting jitterMaxPitch = addSetting(new DoubleSetting("jitter horizontal", 2, 0, 5));
     public final BoolSetting moveFix = addSetting(new BoolSetting("MoveFix", true));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     public RotationModule() {
         super("Rotation", "Client rotations configuration.", ModuleCategory.of("Client"), "rotate", "rotationmanager", "roate", "toationmanager");

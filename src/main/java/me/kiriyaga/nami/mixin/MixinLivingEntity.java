@@ -8,6 +8,7 @@ import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.exploits.NoJumpDelayModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoLevitation;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -36,6 +38,8 @@ public abstract class MixinLivingEntity extends Entity {
     private float originalYaw;
     @Shadow
     private int jumpingCooldown;
+    @Shadow
+    public float headYaw;
     private float originalPitch;
 
     public MixinLivingEntity(EntityType<?> type, World world) {
@@ -183,5 +187,29 @@ public abstract class MixinLivingEntity extends Entity {
 //                return null;
         }
         return original;
+    }
+
+    @ModifyVariable(method = "turnHead(F)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    private float turnHead(float f) {
+        LivingEntity self = (LivingEntity)(Object)this;
+
+        if (self instanceof ClientPlayerEntity player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
+            return ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        }
+        return f;
+    }
+
+    @Inject(method = "lerpHeadYaw", at = @At("HEAD"), cancellable = true)
+    private void lerpHeadYawInject(int i, double d, CallbackInfo ci) {
+        LivingEntity self = (LivingEntity)(Object)this;
+
+        if (self instanceof ClientPlayerEntity player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
+
+            double targetYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+
+            this.headYaw = (float)MathHelper.lerpAngleDegrees(1.0 / i, this.headYaw, targetYaw);
+
+            ci.cancel();
+        }
     }
 }
