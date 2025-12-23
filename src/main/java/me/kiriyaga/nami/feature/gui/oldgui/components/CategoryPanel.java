@@ -32,13 +32,12 @@ public class CategoryPanel {
     }
 
     public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
+
         List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
 
         int dynamicContentHeight = 0;
-
         for (Module module : modules) {
             dynamicContentHeight += ModulePanel.HEIGHT + MODULE_SPACING;
-
             if (module.isExpanded()) {
                 dynamicContentHeight += SettingPanel.getSettingsHeight(module);
             }
@@ -48,19 +47,14 @@ public class CategoryPanel {
 
         int maxAllowedHeight = screenHeight - y - 1;
         int basePanelHeight = Math.min(fullUnclampedHeight, maxAllowedHeight);
+
         renderer.renderPanel(context, x, y, WIDTH, basePanelHeight, HEADER_HEIGHT);
         renderer.renderHeaderText(context, textRenderer, moduleCategory.getName(), x, y, HEADER_HEIGHT, PADDING);
-
         int contentY = y + HEADER_HEIGHT + MODULE_SPACING + BOTTOM_MARGIN;
+        int visibleHeight = Math.min(basePanelHeight - HEADER_HEIGHT - MODULE_SPACING - BOTTOM_MARGIN, screenHeight - contentY - 1);
 
-        int visibleHeight = Math.min(basePanelHeight - HEADER_HEIGHT - MODULE_SPACING - BOTTOM_MARGIN,
-                screenHeight - contentY - 1);
-
-        boolean b = MODULE_MANAGER.getStorage().getByCategory(moduleCategory)
-                .stream()
-                .anyMatch(Module::isExpanded);
-
-        if (b) {
+        boolean anyExpanded = modules.stream().anyMatch(Module::isExpanded);
+        if (anyExpanded) {
             visibleHeight -= 1;
             if (visibleHeight < 0) visibleHeight = 0;
         }
@@ -72,47 +66,49 @@ public class CategoryPanel {
                 scrollableHeight += SettingPanel.getSettingsHeight(module);
             }
         }
+
         scrollOffset += (targetScrollOffset - scrollOffset) * 0.1;
         double maxScroll = Math.max(0, scrollableHeight - visibleHeight);
-        if (scrollOffset < 0) scrollOffset = 0;
-        if (scrollOffset > maxScroll) scrollOffset = maxScroll;
-
+        scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
 
         ScissorUtil.enable(context, x, contentY, x + WIDTH, contentY + visibleHeight);
 
         int moduleY = contentY - (int) scrollOffset;
+
         for (Module module : modules) {
+
             ModulePanel modulePanel = new ModulePanel(module);
 
             int moduleX = x + BORDER_WIDTH + SettingPanel.INNER_PADDING;
             int panelOffset = 1;
-
             int startY = moduleY;
-
-            modulePanel.render(context, textRenderer, moduleX, moduleY, mouseX, mouseY);
-            moduleY += ModulePanel.HEIGHT + MODULE_SPACING;
 
             int expandedHeight = 0;
             if (module.isExpanded()) {
-                expandedHeight = SettingPanel.renderSettings(context, textRenderer, module, moduleX, moduleY, mouseX, mouseY);
-                moduleY += expandedHeight;
+                expandedHeight = SettingPanel.getSettingsHeight(module);
             }
 
             if (module.isExpanded()) {
                 int panelX = moduleX - panelOffset + 1;
-                int headerHeight = ModulePanel.HEIGHT;
                 int panelY = startY - panelOffset + 2;
-                int fullHeight = headerHeight + expandedHeight + (panelOffset * 2);
+                int fullHeight = ModulePanel.HEIGHT + expandedHeight + (panelOffset * 2);
                 int panelHeight = fullHeight - 2;
-
                 int panelWidth = WIDTH - (BORDER_WIDTH + SettingPanel.INNER_PADDING) * 2 + panelOffset * 2 - 2;
-
-                renderer.renderPanel(context, panelX, panelY, panelWidth, panelHeight, 1, false, true);
+                renderer.renderPanel(context, panelX, panelY, panelWidth, panelHeight, 0, false, true);
             }
 
+            modulePanel.render(context, textRenderer, moduleX, moduleY, mouseX, mouseY);
+
+            moduleY += ModulePanel.HEIGHT + MODULE_SPACING;
+
+            if (module.isExpanded()) {
+                SettingPanel.renderSettings(context, textRenderer, module, moduleX, moduleY, mouseX, mouseY);
+                moduleY += expandedHeight;
+            }
         }
-            ScissorUtil.disable(context);
+        ScissorUtil.disable(context);
     }
+
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta, int x, int y, int screenHeight) {
         List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
 
