@@ -107,7 +107,7 @@ public class CategoryPanel {
 
                 int panelWidth = WIDTH - (BORDER_WIDTH + SettingPanel.INNER_PADDING) * 2 + panelOffset * 2 - 2;
 
-                renderer.renderPanel(context, panelX, panelY, panelWidth, panelHeight, 1, false, false);
+                renderer.renderPanel(context, panelX, panelY, panelWidth, panelHeight, 1, false, true);
             }
 
         }
