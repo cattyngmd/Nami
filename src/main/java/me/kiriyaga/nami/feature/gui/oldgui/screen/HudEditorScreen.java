@@ -105,7 +105,7 @@ public class HudEditorScreen extends Screen {
                         int textHeight = 8;
 
                         context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
-                        FONT_MANAGER.drawText(context, Text.of(description), descX, descY, true);
+                        FONT_MANAGER.drawText(context, description, descX, descY, CLICK_GUI.applyFade(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB()), true);
                     }
                     context.getMatrices().popMatrix();
 

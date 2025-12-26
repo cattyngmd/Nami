@@ -16,7 +16,7 @@ public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {
     @Override
     public void render(DrawContext context, TextRenderer textRenderer, EnumSetting<?> setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
-        Color textCol =  getColorModule().getStyledGlobalColor(255);
+        Color textCol =  getColorModule().getStyledTextColor(255);
         Color bgColor = new Color(30, 30, 30, 0);
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));

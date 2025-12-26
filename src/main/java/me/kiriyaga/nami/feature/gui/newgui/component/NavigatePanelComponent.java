@@ -58,9 +58,9 @@ public class NavigatePanelComponent {
             boolean active = name.equals(activeKey);
 
             Color primary = colorModule.getStyledGlobalColor();
-            Color textOff = colorModule.getStyledSecondColor(255);
+            Color textOff = colorModule.getStyledTextSecondColor(255);
             Color textCol = active
-                    ? colorModule.getStyledGlobalColor(255)
+                    ? colorModule.getStyledTextColor(255)
                     : textOff;
 
             int textWidth = FONT_MANAGER.getWidth(name);

@@ -18,7 +18,7 @@ public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
     public void render(DrawContext context, TextRenderer textRenderer, DoubleSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color primary = getColorModule().getStyledGlobalColor();
-        Color text = getColorModule().getStyledGlobalColor(255);
+        Color text = getColorModule().getStyledTextColor(255);
 
         int bgColorInt = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, 0)));
         int textColorInt = CLICK_GUI.applyFade(toRGBA(text));

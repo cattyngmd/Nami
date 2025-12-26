@@ -19,6 +19,8 @@ public class ClickGuiModule extends Module {
     public final BoolSetting fade = addSetting(new BoolSetting("Fade", true));
     public final BoolSetting blur = addSetting(new BoolSetting("Blur", true));
     public final BoolSetting panels = addSetting(new BoolSetting("Panels", true));
+    public final BoolSetting moduleFill = addSetting(new BoolSetting("ModuleFill", true));
+    public final BoolSetting coloredText = addSetting(new BoolSetting("ColoredText", false));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
     public final IntSetting backgroundAlpha = addSetting(new IntSetting("Alpha", 35, 0, 255));
 

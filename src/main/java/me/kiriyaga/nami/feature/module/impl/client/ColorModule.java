@@ -12,6 +12,8 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
 import java.awt.*;
 
+import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+
 @RegisterModule
 public class ColorModule extends Module {
 
@@ -110,6 +112,19 @@ public class ColorModule extends Module {
     public Color getStyledSecondColor(int alpha) {
         Color base = getStyledSecondColor();
         return new Color(base.getRed(), base.getGreen(), base.getBlue(), clampAlpha(alpha));
+    }
+
+    public Color getStyledTextColor(int alpha) {
+        if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).coloredText.get()) {
+            Color base = getStyledGlobalColor();
+            return new Color(base.getRed(), base.getGreen(), base.getBlue(), clampAlpha(alpha));
+        } else {
+            return new Color(255, 255, 255, clampAlpha(alpha));
+        }
+    }
+
+    public Color getStyledTextSecondColor(int alpha) {
+        return applyDarkness(getStyledTextColor(alpha), 0.35);
     }
 
     private int clampAlpha(int alpha) {

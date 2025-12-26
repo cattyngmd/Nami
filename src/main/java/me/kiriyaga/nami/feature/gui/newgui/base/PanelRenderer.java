@@ -61,7 +61,7 @@ public class PanelRenderer {
     public void renderHeaderText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int headerHeight, int padding) {
         if (text == null || textRenderer == null) return; // ???
 
-        Color textCol =  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor(255);
+        Color textCol =  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255);
 
         int textY = y + (headerHeight - textRenderer.fontHeight) / 2;
         FONT_MANAGER.drawText(context, text, x + padding, textY + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);

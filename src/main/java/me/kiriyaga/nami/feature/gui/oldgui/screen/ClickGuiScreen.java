@@ -112,7 +112,7 @@ public class ClickGuiScreen extends Screen {
             int x = (int) (scaledWidth - textWidth - 1);
             int y = startY - textHeight;
 
-            FONT_MANAGER.drawText(context, message, x, y, applyFade(0xFFFFFFFF), true);
+            FONT_MANAGER.drawText(context, message, x, y, applyFade(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB()), true);
             startY = y;
         }
 
@@ -162,9 +162,8 @@ public class ClickGuiScreen extends Screen {
                             int textWidth = FONT_MANAGER.getWidth(description);
                             int textHeight = 8;
 
-                            context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2,
-                                    0x7F000000);
-                            FONT_MANAGER.drawText(context, description, descX, descY, 0xFFFFFFFF, true);
+                            context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
+                            FONT_MANAGER.drawText(context, description, descX, descY, applyFade(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB()), true);
                         }
                         context.getMatrices().popMatrix();
                         return;
