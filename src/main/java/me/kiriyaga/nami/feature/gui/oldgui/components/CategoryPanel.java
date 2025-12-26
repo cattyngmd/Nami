@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.gui.oldgui.components;
 import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -94,7 +95,9 @@ public class CategoryPanel {
                 int fullHeight = ModulePanel.HEIGHT + expandedHeight + (panelOffset * 2);
                 int panelHeight = fullHeight - 2;
                 int panelWidth = WIDTH - (BORDER_WIDTH + SettingPanel.INNER_PADDING) * 2 + panelOffset * 2 - 2;
-                renderer.renderPanel(context, panelX, panelY, panelWidth, panelHeight, 0, false, true);
+
+                if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).panels.get())
+                    renderer.renderPanel(context, panelX, panelY, panelWidth, panelHeight, 0, false, true);
             }
 
             modulePanel.render(context, textRenderer, moduleX, moduleY, mouseX, mouseY);
