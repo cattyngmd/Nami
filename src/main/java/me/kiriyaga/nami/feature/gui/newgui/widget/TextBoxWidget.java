@@ -35,8 +35,8 @@ public class TextBoxWidget {
     public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
         panelRenderer.renderPanel(context, x, y, width, height, 0, false);
         Color textColor = focused
-                ? MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor(255)
-                : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor(255);
+                ? MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255)
+                : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextSecondColor(255);
 
         String display = buffer +
                 (focused && (System.currentTimeMillis() / 500 % 2 == 0) ? "_" : "");

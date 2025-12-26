@@ -34,8 +34,8 @@ public class ButtonWidget {
         panelRenderer.renderPanel(context, x, y, width, height, 0, false);
 
 
-        Color textOff = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor(255);
-        Color textCol = active ?  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor(255)  : textOff;
+        Color textOff = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextSecondColor(255);
+        Color textCol = active ?  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255)  : textOff;
 
         int textWidth = textRenderer.getWidth(label);
         int textX = x + (width - textWidth) / 2;

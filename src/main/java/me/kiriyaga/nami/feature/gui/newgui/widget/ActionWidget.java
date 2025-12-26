@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.feature.gui.newgui.widget;
 
 import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -60,7 +61,7 @@ public class ActionWidget {
             int textWidth = FONT_MANAGER.getWidth(item.getLabel());
 
             int color = (mouseX >= x + padding && mouseX <= x + padding + textWidth &&
-                    mouseY >= drawY && mouseY <= drawY + lineHeight) ? 0xFFFFFFFF : 0xFF969696; // 255, 255,255 and 155, 155, 155
+                    mouseY >= drawY && mouseY <= drawY + lineHeight) ? MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB() : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextSecondColor(255).getRGB();
 
             FONT_MANAGER.drawText(context, item.getLabel(), x + padding, drawY, color, true);
             drawY += lineHeight;
