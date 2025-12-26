@@ -30,7 +30,11 @@ public class FontRendererProvider {
             return MC.textRenderer;
         }
 
-        if (cachedRenderer != null && cachedSize == fontModule.glyphSize.get() && cachedOversample == fontModule.oversample.get()) {
+        fontLoader.init();
+
+        if (cachedRenderer != null
+                && cachedSize == fontLoader.getCurrentSize()
+                && cachedOversample == fontLoader.getCurrentOversample()) {
             return cachedRenderer;
         }
 
@@ -48,8 +52,8 @@ public class FontRendererProvider {
             }
         });
 
-        cachedSize = fontModule.glyphSize.get();
-        cachedOversample = fontModule.oversample.get();
+        cachedSize = fontLoader.getCurrentSize();
+        cachedOversample = fontLoader.getCurrentOversample();
 
         return cachedRenderer;
     }
