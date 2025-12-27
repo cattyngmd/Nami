@@ -44,6 +44,7 @@ public class FontLoader {
             GlyphBaker glyphBaker = new GlyphBaker(MC.getTextureManager(),
                     Identifier.of("nami", selectedFont.getFileName() + "_storage"));
 
+
             storage = new FontStorage(glyphBaker);
             storage.setFonts(List.of(new Font.FontFilterPair(font, FontFilterType.FilterMap.NO_FILTER)),
                     Collections.emptySet());
