@@ -91,7 +91,7 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: Nami ${{ env.VERSION }}
           body: |
-            Multi-branch release
+            release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
 
