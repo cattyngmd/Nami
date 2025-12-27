@@ -1,7 +1,7 @@
 permissions:
   contents: write
 
-name: build release
+name: build upload release
 
 on:
   workflow_dispatch:
