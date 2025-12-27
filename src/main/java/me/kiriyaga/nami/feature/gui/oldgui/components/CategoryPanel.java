@@ -91,9 +91,8 @@ public class CategoryPanel {
 
             if (module.isExpanded()) {
                 int panelX = moduleX - panelOffset + 1;
-                int panelY = startY - panelOffset + 2;
-                int fullHeight = ModulePanel.HEIGHT + expandedHeight + (panelOffset * 2);
-                int panelHeight = fullHeight - 2;
+                int panelY = startY - panelOffset + 1;
+                int panelHeight = ModulePanel.HEIGHT + expandedHeight + (panelOffset * 2) - 1;
                 int panelWidth = WIDTH - (BORDER_WIDTH + SettingPanel.INNER_PADDING) * 2 + panelOffset * 2 - 2;
 
                 if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).panels.get())
