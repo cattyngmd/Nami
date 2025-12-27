@@ -6,6 +6,7 @@ import me.kiriyaga.nami.event.impl.DissconectEvent;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
+import me.kiriyaga.nami.feature.module.impl.client.FontModule;
 import me.kiriyaga.nami.feature.module.impl.combat.AuraModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.exploits.AirPlaceModule;
@@ -14,6 +15,7 @@ import me.kiriyaga.nami.feature.module.impl.world.FastPlaceModule;
 import me.kiriyaga.nami.feature.module.impl.exploits.NoHitDelayModule;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -27,17 +29,20 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.kiriyaga.nami.feature.module.Module;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import static me.kiriyaga.nami.Nami.*;
 

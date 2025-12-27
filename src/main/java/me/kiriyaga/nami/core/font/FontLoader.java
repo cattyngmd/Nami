@@ -1,12 +1,16 @@
 package me.kiriyaga.nami.core.font;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
 import me.kiriyaga.nami.feature.module.impl.client.FontModule;
 import net.minecraft.client.font.*;
+import net.minecraft.client.gl.GpuSampler;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.OptionalDouble;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
