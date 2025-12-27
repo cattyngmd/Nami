@@ -28,7 +28,7 @@ public class PanelRenderer {
         Color secondary = colorModule.getStyledSecondColor();
 
         if (renderBackground) {
-            int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(secondary.getRed(), secondary.getGreen(), secondary.getBlue(), clickGuiModule.guiAlpha.get())));
+            int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(20, 20, 20, clickGuiModule.guiAlpha.get())));
             context.fill(x, y, x + width, y + height, bgColor);
         }
 

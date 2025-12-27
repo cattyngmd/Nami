@@ -90,9 +90,10 @@ public class ClickGuiScreen extends Screen {
 
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get()) {
-            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
+            renderDarkening(context);
+/*            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
             int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
-            context.fill(0, 0, this.width, this.height, applyFade(color));
+            context.fill(0, 0, this.width, this.height, applyFade(color));*/
         }
 
         NAVIGATE_PANEL.render(context, FONT_MANAGER.rendererProvider.getRenderer(), mouseX, mouseY);

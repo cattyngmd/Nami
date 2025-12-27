@@ -17,15 +17,15 @@ import static me.kiriyaga.nami.Nami.MC;
 public class FontModule extends Module {
 
     public final EnumSetting<FontType> fontType = addSetting(new EnumSetting<>("Font", FontType.VERDANA));
-    public final BoolSetting global = addSetting(new BoolSetting("Global", true));
+    public final BoolSetting global = addSetting(new BoolSetting("Global", false));
     public final EnumSetting<FilterMode> filterMode = addSetting(new EnumSetting<>("Filter", FilterMode.LINEAR));
     public final IntSetting anisotropy = addSetting(new IntSetting("Anisotropy", 8, 1, 16));
-    public final DoubleSetting maxLOD = addSetting(new DoubleSetting("MaxLOD", 4.00, -1, 10));
-    public final IntSetting glyphSize = addSetting(new IntSetting("Size", 9, 6, 24));
+    public final DoubleSetting maxLOD = addSetting(new DoubleSetting("MaxLOD", 10.00, -1, 25));
+    public final IntSetting glyphSize = addSetting(new IntSetting("Size", 10, 6, 24));
     public final IntSetting oversample = addSetting(new IntSetting("Oversample", 2, 2, 8));
 
     public FontModule() {
         super("Font", "Custom font renderer.", ModuleCategory.of("Client"), "f", "customfont");
-      //  oversample.setShow(false);
+        global.setShow(false);
     }
 }

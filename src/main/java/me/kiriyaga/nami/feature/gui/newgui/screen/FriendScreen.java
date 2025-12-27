@@ -11,6 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.input.CharInput;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,12 +63,14 @@ public class FriendScreen extends NamiScreen {
         ClickGuiModule clickGuiModule = getClickGuiModule();
 
         if (clickGuiModule != null && clickGuiModule.background.get()) {
-            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
+            //Identifier.ofVanilla("textures/gui/inworld_menu_background.png")
+            renderDarkening(context);
+/*            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
             int color = alpha |
                     (MODULE_MANAGER.getStorage()
                             .getByClass(ColorModule.class)
                             .getStyledGlobalColor().getRGB() & 0xFFFFFF);
-            context.fill(0, 0, width, height, CLICK_GUI.applyFade(color));
+            context.fill(0, 0, width, height, CLICK_GUI.applyFade(color));*/
         }
 
         NAVIGATE_PANEL.render(context, FONT_MANAGER.rendererProvider.getRenderer(), mouseX, mouseY);

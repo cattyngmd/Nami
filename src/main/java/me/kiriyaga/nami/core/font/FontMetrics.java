@@ -14,14 +14,8 @@ public class FontMetrics {
 
     public int getHeight() {
         FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
-
-        if (!fontModule.isEnabled()) {
+        if (!fontModule.isEnabled())
             return rendererProvider.getRenderer().fontHeight;
-        }
-
-        int baseSize = 9;
-        int size = fontModule.glyphSize.get();
-
-        return (int) (baseSize * (size / 9.0));
+        return Math.round(fontModule.glyphSize.get() * 0.85f);
     }
 }
