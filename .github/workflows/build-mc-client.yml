@@ -1,3 +1,6 @@
+permissions:
+  contents: write
+
 name: build release
 
 on:
@@ -90,7 +93,7 @@ jobs:
           body: |
             Multi-branch release
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
 
       - name: Upload all JARs to Release
         run: |
@@ -105,4 +108,4 @@ jobs:
             gh release upload ${{ env.VERSION }} "$file" --clobber
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
