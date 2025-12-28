@@ -71,7 +71,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:0.18.2"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.139.5+1.21.11"
 
-    modImplementation("maven.modrinth:sodium:mc1.21.11-0.8.0-fabric") {
+    modImplementation("maven.modrinth:sodium:mc1.21.11-0.8.2-fabric") {
         transitive = false
     }
 
