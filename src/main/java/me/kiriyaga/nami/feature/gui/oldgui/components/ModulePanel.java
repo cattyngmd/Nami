@@ -35,7 +35,7 @@ public class ModulePanel {
         Color textSecond = getColorModule().getStyledTextSecondColor(255);
         Color textCol = module.isEnabled() ? textPrimary : textSecond;
         Color primary = getColorModule().getStyledGlobalColor();
-        Color second = getColorModule().getStyledSecondColor(30);
+        Color second = getColorModule().getStyledGlobalColor(30);
         Color fillCol = module.isEnabled() ? primary : second;
 
         if (hovered)
