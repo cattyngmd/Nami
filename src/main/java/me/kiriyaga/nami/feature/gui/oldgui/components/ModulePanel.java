@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.gui.oldgui.components;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.util.ColorUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
@@ -34,8 +35,11 @@ public class ModulePanel {
         Color textSecond = getColorModule().getStyledTextSecondColor(255);
         Color textCol = module.isEnabled() ? textPrimary : textSecond;
         Color primary = getColorModule().getStyledGlobalColor();
-        Color second = getColorModule().getStyledSecondColor(60);
+        Color second = getColorModule().getStyledSecondColor(30);
         Color fillCol = module.isEnabled() ? primary : second;
+
+        if (hovered)
+            fillCol = ColorUtils.brighten(fillCol, 10);
 
         if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get())
             context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI.applyFade(toRGBA(fillCol)));
