@@ -1,8 +1,11 @@
 package me.kiriyaga.nami.core.font;
 
 import me.kiriyaga.nami.feature.module.impl.client.FontModule;
+import me.kiriyaga.nami.util.ColorUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+
+import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
@@ -18,27 +21,75 @@ public class FontManager {
     }
 
     public void drawText(DrawContext context, Text text, int x, int y, boolean shadow, int color) {
-        context.drawText(rendererProvider.getRenderer(), text, x, y, color, shadow);
+        if (shadow) {
+            var matrices = context.getMatrices();
+            matrices.pushMatrix();
+            matrices.translate(0.5f, 0.5f);
+            context.drawText(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 50).getRGB(), false);
+            matrices.popMatrix();
+        }
+
+        context.drawText(rendererProvider.getRenderer(), text, x, y, color, false);
     }
 
     public void drawText(DrawContext context, String text, int x, int y, boolean shadow, int color) {
-        context.drawText(rendererProvider.getRenderer(), text, x, y, color, shadow);
+        if (shadow) {
+            var matrices = context.getMatrices();
+            matrices.pushMatrix();
+            matrices.translate(0.5f, 0.5f);
+            context.drawText(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 50).getRGB(), false);
+            matrices.popMatrix();
+        }
+
+        context.drawText(rendererProvider.getRenderer(), text, x, y, color, false);
     }
 
     public void drawText(DrawContext context, Text text, int x, int y, boolean shadow) {
-        context.drawText(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, shadow);
+        if (shadow) {
+            var matrices = context.getMatrices();
+            matrices.pushMatrix();
+            matrices.translate(0.5f, 0.5f);
+            context.drawText(rendererProvider.getRenderer(), ColorUtils.darken(text, 50), x, y, 0xFFFFFFFF, false);
+            matrices.popMatrix();
+        }
+
+        context.drawText(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, false);
     }
 
     public void drawText(DrawContext context, String text, int x, int y, boolean shadow) {
-        context.drawText(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, shadow);
+        if (shadow) {
+            var matrices = context.getMatrices();
+            matrices.pushMatrix();
+            matrices.translate(0.5f, 0.5f);
+            context.drawText(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(0xFFFFFFFF), 50).getRGB(), false);
+            matrices.popMatrix();
+        }
+
+        context.drawText(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, false);
     }
 
-    public void drawText(DrawContext context, Text text, int x, int y, int rgb, boolean shadow) {
-        context.drawText(rendererProvider.getRenderer(), text, x, y, rgb, shadow);
+    public void drawText(DrawContext context, Text text, int x, int y, int color, boolean shadow) {
+        if (shadow) {
+            var matrices = context.getMatrices();
+            matrices.pushMatrix();
+            matrices.translate(0.5f, 0.5f);
+            context.drawText(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 50).getRGB(), false);
+            matrices.popMatrix();
+        }
+
+        context.drawText(rendererProvider.getRenderer(), text, x, y, color, false);
     }
 
-    public void drawText(DrawContext context, String text, int x, int y, int rgb, boolean shadow) {
-        context.drawText(rendererProvider.getRenderer(), text, x, y, rgb, shadow);
+    public void drawText(DrawContext context, String text, int x, int y, int color, boolean shadow) {
+        if (shadow) {
+            var matrices = context.getMatrices();
+            matrices.pushMatrix();
+            matrices.translate(0.5f, 0.5f);
+            context.drawText(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 50).getRGB(), false);
+            matrices.popMatrix();
+        }
+
+        context.drawText(rendererProvider.getRenderer(), text, x, y, color, false);
     }
 
     public int getWidth(Text text) {
