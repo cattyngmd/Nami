@@ -39,7 +39,7 @@ public class ModulePanel {
         Color fillCol = module.isEnabled() ? primary : second;
 
         if (hovered)
-            fillCol = ColorUtils.brighten(fillCol, 10);
+            fillCol = ColorUtils.brighten(fillCol, 20);
 
         if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get())
             context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI.applyFade(toRGBA(fillCol)));

@@ -69,7 +69,7 @@ dependencies {
     minecraft "com.mojang:minecraft:1.21.11"
     mappings "net.fabricmc:yarn:1.21.11+build.3"
     modImplementation "net.fabricmc:fabric-loader:0.18.2"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.139.5+1.21.11"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.140.0+1.21.11"
 
     modImplementation("maven.modrinth:sodium:mc1.21.11-0.8.2-fabric") {
         transitive = false
