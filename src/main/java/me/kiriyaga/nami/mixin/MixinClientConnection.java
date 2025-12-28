@@ -33,9 +33,14 @@ public class MixinClientConnection {
         if (this.channel.isOpen() && packet != null) {
             PacketReceiveEvent event = new PacketReceiveEvent(packet);
             EVENT_MANAGER.post(event);
+
             if (event.isCancelled()) {
                 ci.cancel();
+            } else if (event.getPacket() != packet) {
+                ci.cancel();
+                this.channel.pipeline().fireChannelRead(event.getPacket());
             }
+
         }
     }
 
