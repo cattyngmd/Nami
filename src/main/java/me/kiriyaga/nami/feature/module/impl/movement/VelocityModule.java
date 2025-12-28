@@ -139,7 +139,7 @@ public class VelocityModule extends Module {
             if (packet instanceof ExplosionS2CPacket exp && handleExplosions.get()) {
                 processBundleExplosion(filtered, exp);
             } else if (packet instanceof EntityVelocityUpdateS2CPacket vel && handleKnockback.get()) {
-                processBundleVelocity(filtered, vel);
+                processBundleVelocity(filtered, vel, event);
             } else {
                 filtered.add(packet);
             }
@@ -159,7 +159,8 @@ public class VelocityModule extends Module {
         if (isNoVelocityConfigured()) {
             event.cancel();
         } else {
-            scaleVelocityPacket(packet);
+
+            event.packet = scaleVelocityPacket(packet);
         }
     }
 
@@ -213,7 +214,7 @@ public class VelocityModule extends Module {
         filtered.add(packet);
     }
 
-    private void processBundleVelocity(List<Packet<?>> filtered, EntityVelocityUpdateS2CPacket packet) {
+    private void processBundleVelocity(List<Packet<?>> filtered, EntityVelocityUpdateS2CPacket packet, PacketReceiveEvent event) {
         if (packet.getEntityId() != MC.player.getId()) {
             filtered.add(packet);
             return;
@@ -221,7 +222,7 @@ public class VelocityModule extends Module {
 
         switch (mode.get()) {
             case VANILLA -> {
-                if (!isNoVelocityConfigured()) scaleVelocityPacket(packet); // TODO this shit broke
+                if (!isNoVelocityConfigured()) event.packet = scaleVelocityPacket(packet);
                 else return;
             }
             case WALLS -> {
@@ -229,7 +230,7 @@ public class VelocityModule extends Module {
                     filtered.add(packet);
                     return;
                 }
-                if (!isNoVelocityConfigured()) scaleVelocityPacket(packet);
+                if (!isNoVelocityConfigured()) event.packet = scaleVelocityPacket(packet);
                 else return;
             }
             case GRIM -> {
