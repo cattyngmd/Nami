@@ -17,7 +17,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 @RegisterModule
 public class ColorModule extends Module {
 
-    public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(181, 229, 247, 255), true));
+    public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(255, 135, 151, 255), true));
 
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("Rainbow", false));
     public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.005, 0.0001, 1.50));
