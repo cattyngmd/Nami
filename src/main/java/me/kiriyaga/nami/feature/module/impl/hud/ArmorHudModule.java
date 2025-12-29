@@ -4,9 +4,9 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +34,10 @@ public class ArmorHudModule extends HudElementModule {
         if (MC.player == null) return elements;
 
         ItemStack[] armor = new ItemStack[]{
-                MC.player.getEquippedStack(EquipmentSlot.HEAD),
-                MC.player.getEquippedStack(EquipmentSlot.CHEST),
-                MC.player.getEquippedStack(EquipmentSlot.LEGS),
-                MC.player.getEquippedStack(EquipmentSlot.FEET)
+                MC.player.getItemBySlot(EquipmentSlot.HEAD),
+                MC.player.getItemBySlot(EquipmentSlot.CHEST),
+                MC.player.getItemBySlot(EquipmentSlot.LEGS),
+                MC.player.getItemBySlot(EquipmentSlot.FEET)
         };
 
         int itemSize = 16;
@@ -46,10 +46,10 @@ public class ArmorHudModule extends HudElementModule {
         for (int i = 0; i < armor.length; i++) {
             ItemStack stack = armor[i];
 
-            Text labelText = Text.empty();
+            Component labelText = Component.empty();
             if (showDurability.get() && !stack.isEmpty() && stack.getMaxDamage() > 0) {
                 int max = stack.getMaxDamage();
-                int remaining = max - stack.getDamage();
+                int remaining = max - stack.getDamageValue();
                 int percent = (int) ((remaining / (float) max) * 100);
                 labelText = CAT_FORMAT.format("{bg}" + percent + "%");
             }

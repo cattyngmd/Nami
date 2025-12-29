@@ -4,9 +4,9 @@ import me.kiriyaga.nami.feature.gui.oldgui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 
 import java.awt.*;
 import java.util.LinkedHashMap;
@@ -41,11 +41,11 @@ public class NavigatePanelComponent {
         screens.put(name, screen);
     }
 
-    public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+    public void render(GuiGraphics context, Font textRenderer, int mouseX, int mouseY) {
+        context.pose().pushMatrix();
+        context.pose().scale(CLICK_GUI.scale, CLICK_GUI.scale);
 
-        int scaledWidth = (int) (MC.getWindow().getScaledWidth() / CLICK_GUI.scale);
+        int scaledWidth = (int) (MC.getWindow().getGuiScaledWidth() / CLICK_GUI.scale);
         int totalWidth = calcWidth();
         int x = (scaledWidth - totalWidth) / 2;
         int y = TOP_OFFSET;
@@ -76,14 +76,14 @@ public class NavigatePanelComponent {
             offsetX += textWidth + PADDING * 2;
         }
 
-        context.getMatrices().popMatrix();
+        context.pose().popMatrix();
     }
 
-    public void mouseClicked(double mouseX, double mouseY, TextRenderer textRenderer) {
+    public void mouseClicked(double mouseX, double mouseY, Font textRenderer) {
         double scaledX = mouseX / CLICK_GUI.scale;
         double scaledY = mouseY / CLICK_GUI.scale;
 
-        int scaledWidth = (int) (MC.getWindow().getScaledWidth() / CLICK_GUI.scale);
+        int scaledWidth = (int) (MC.getWindow().getGuiScaledWidth() / CLICK_GUI.scale);
         int totalWidth = calcWidth();
         int x = (scaledWidth - totalWidth) / 2;
         int y = TOP_OFFSET;
@@ -101,7 +101,7 @@ public class NavigatePanelComponent {
                 if (!name.equals(activeKey)) {
                     activeKey = name;
                     if (screen instanceof ClickGuiScreen screen1)
-                        screen1.setPreviousScreen(MC.currentScreen);
+                        screen1.setPreviousScreen(MC.screen);
                     MC.setScreen(screen);
                 }
                 return;

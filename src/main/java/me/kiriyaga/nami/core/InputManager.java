@@ -8,17 +8,21 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.movement.GuiMoveModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.util.InputCache;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.ingame.*;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractCommandBlockEditScreen;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.SignEditScreen;
+import net.minecraft.client.gui.screens.inventory.StructureBlockEditScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.Options;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket;
+import net.minecraft.world.entity.player.Input;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.*; // TODO: 1.20.6 viafabric flags sprinting, since packet does not exists. The grim check, does not apply for input on theese versions, but do apply for sprinting
@@ -45,27 +49,27 @@ public class InputManager {
         int scancode = event.scancode;
         int action = event.action;
 
-        updateHeld(MC.options.forwardKey, key, scancode, action, v -> forwardPressed = v);
-        updateHeld(MC.options.leftKey,    key, scancode, action, v -> leftPressed = v);
-        updateHeld(MC.options.backKey,    key, scancode, action, v -> backPressed = v);
-        updateHeld(MC.options.rightKey,   key, scancode, action, v -> rightPressed = v);
+        updateHeld(MC.options.keyUp, key, scancode, action, v -> forwardPressed = v);
+        updateHeld(MC.options.keyLeft,    key, scancode, action, v -> leftPressed = v);
+        updateHeld(MC.options.keyDown,    key, scancode, action, v -> backPressed = v);
+        updateHeld(MC.options.keyRight,   key, scancode, action, v -> rightPressed = v);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacket() instanceof PlayerInputC2SPacket packet) {
-            PlayerInput input = packet.comp_3139();
+        if (event.getPacket() instanceof ServerboundPlayerInputPacket packet) {
+            Input input = packet.input();
 
-            this.forward = input.comp_3159();
-            this.backward = input.comp_3160();
-            this.left = input.comp_3161();
-            this.right = input.comp_3162();
-            this.jumping = input.comp_3163();
-            this.sneaking = input.sneak();
-            this.sprinting = input.comp_3165();
-        } else if (event.getPacket() instanceof VehicleMoveC2SPacket) {
+            this.forward = input.forward();
+            this.backward = input.backward();
+            this.left = input.left();
+            this.right = input.right();
+            this.jumping = input.jump();
+            this.sneaking = input.shift();
+            this.sprinting = input.sprint();
+        } else if (event.getPacket() instanceof ServerboundMoveVehiclePacket) {
             // TODO: finish this
-        } else if (event.getPacket() instanceof PlayerMoveC2SPacket) {
+        } else if (event.getPacket() instanceof ServerboundMovePlayerPacket) {
         }
     }
 
@@ -115,45 +119,45 @@ public class InputManager {
     }
 
     private void saveKeys() {
-        GameOptions opt = MC.options;
-        savedForward = opt.forwardKey.isPressed();
-        savedBack = opt.backKey.isPressed();
-        savedLeft = opt.leftKey.isPressed();
-        savedRight = opt.rightKey.isPressed();
-        savedJump = opt.jumpKey.isPressed();
-        savedSneak = opt.sneakKey.isPressed();
-        savedSprint = opt.sprintKey.isPressed();
+        Options opt = MC.options;
+        savedForward = opt.keyUp.isDown();
+        savedBack = opt.keyDown.isDown();
+        savedLeft = opt.keyLeft.isDown();
+        savedRight = opt.keyRight.isDown();
+        savedJump = opt.keyJump.isDown();
+        savedSneak = opt.keyShift.isDown();
+        savedSprint = opt.keySprint.isDown();
     }
 
     private void disableAllKeys() {
-        GameOptions opt = MC.options;
-        setPressed(opt.forwardKey, false);
-        setPressed(opt.backKey, false);
-        setPressed(opt.leftKey, false);
-        setPressed(opt.rightKey, false);
-        setPressed(opt.jumpKey, false);
-        setPressed(opt.sneakKey, false);
-        setPressed(opt.sprintKey, false);
+        Options opt = MC.options;
+        setPressed(opt.keyUp, false);
+        setPressed(opt.keyDown, false);
+        setPressed(opt.keyLeft, false);
+        setPressed(opt.keyRight, false);
+        setPressed(opt.keyJump, false);
+        setPressed(opt.keyShift, false);
+        setPressed(opt.keySprint, false);
     }
 
     private void restoreKeys() {
-        GameOptions opt = MC.options;
-        setPressed(opt.forwardKey, savedForward);
-        setPressed(opt.backKey, savedBack);
-        setPressed(opt.leftKey, savedLeft);
-        setPressed(opt.rightKey, savedRight);
-        setPressed(opt.jumpKey, savedJump);
-        setPressed(opt.sneakKey, savedSneak);
-        setPressed(opt.sprintKey, savedSprint);
+        Options opt = MC.options;
+        setPressed(opt.keyUp, savedForward);
+        setPressed(opt.keyDown, savedBack);
+        setPressed(opt.keyLeft, savedLeft);
+        setPressed(opt.keyRight, savedRight);
+        setPressed(opt.keyJump, savedJump);
+        setPressed(opt.keyShift, savedSneak);
+        setPressed(opt.keySprint, savedSprint);
     }
 
-    private void setPressed(KeyBinding key, boolean pressed) {
-        key.setPressed(pressed);
+    private void setPressed(KeyMapping key, boolean pressed) {
+        key.setDown(pressed);
     }
 
-    private void updateHeld(KeyBinding bind, int key, int scancode, int action, java.util.function.Consumer<Boolean> setter) {
-        KeyInput input = new KeyInput(key, scancode, 0); // 0 = нет модификаторов, если нужны, передайте их сюда
-        if (!bind.matchesKey(input)) return;
+    private void updateHeld(KeyMapping bind, int key, int scancode, int action, java.util.function.Consumer<Boolean> setter) {
+        KeyEvent input = new KeyEvent(key, scancode, 0); // 0 = нет модификаторов, если нужны, передайте их сюда
+        if (!bind.matches(input)) return;
         boolean pressed = action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT;
         setter.accept(pressed);
         if (action == GLFW.GLFW_RELEASE) {
@@ -163,7 +167,7 @@ public class InputManager {
 
 
     public float getDirection() {
-        float realYaw = MC.player.getYaw();
+        float realYaw = MC.player.getYRot();
 
         boolean forward = InputCache.forward;
         boolean back = InputCache.back;
@@ -177,27 +181,27 @@ public class InputManager {
 
         if (inputZ > 0) return realYaw;
 
-        if (inputZ < 0) return MathHelper.wrapDegrees(realYaw + 180);
+        if (inputZ < 0) return Mth.wrapDegrees(realYaw + 180);
 
-        if (inputX != 0 && inputZ == 0) return MathHelper.wrapDegrees(realYaw + (inputX > 0 ? 90 : -90));
+        if (inputX != 0 && inputZ == 0) return Mth.wrapDegrees(realYaw + (inputX > 0 ? 90 : -90));
 
         if (inputZ > 0 && inputX != 0) return realYaw;
 
-        if (inputZ < 0 && inputX != 0) return MathHelper.wrapDegrees(realYaw + 180);
+        if (inputZ < 0 && inputX != 0) return Mth.wrapDegrees(realYaw + 180);
 
         return realYaw;
     }
 
     private boolean canMove() {
         if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return false;
-        if (MC.currentScreen == null) return true;
-        if (MC.currentScreen != null && !MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class).isEnabled()) return false;
-        if (MC.currentScreen instanceof ChatScreen
-                || MC.currentScreen instanceof SignEditScreen
-                || MC.currentScreen instanceof AnvilScreen
-                || MC.currentScreen instanceof AbstractCommandBlockScreen
-                || MC.currentScreen instanceof StructureBlockScreen
-                || MC.currentScreen instanceof CreativeInventoryScreen) {
+        if (MC.screen == null) return true;
+        if (MC.screen != null && !MODULE_MANAGER.getStorage().getByClass(GuiMoveModule.class).isEnabled()) return false;
+        if (MC.screen instanceof ChatScreen
+                || MC.screen instanceof SignEditScreen
+                || MC.screen instanceof AnvilScreen
+                || MC.screen instanceof AbstractCommandBlockEditScreen
+                || MC.screen instanceof StructureBlockEditScreen
+                || MC.screen instanceof CreativeModeInventoryScreen) {
             return false;
         }
         return true;

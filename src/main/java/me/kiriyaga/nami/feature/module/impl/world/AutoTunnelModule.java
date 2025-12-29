@@ -10,10 +10,10 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.BlockPos;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -51,29 +51,29 @@ public class AutoTunnelModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onPreTickEvent(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
-        BlockPos playerPos = MC.player.getBlockPos();
+        BlockPos playerPos = MC.player.blockPosition();
         Set<BlockPos> validTargets = new HashSet<>();
 
-        BlockPos forward = playerPos.offset(MC.player.getHorizontalFacing(), 1);
+        BlockPos forward = playerPos.relative(MC.player.getDirection(), 1);
 
         switch (mode.get()) {
             case P1x1 -> addBlockIfBreakable(validTargets, forward);
             case P1x2 -> {
                 addBlockIfBreakable(validTargets, forward);
-                addBlockIfBreakable(validTargets, forward.up());
+                addBlockIfBreakable(validTargets, forward.above());
             }
             case P1x3 -> {
                 addBlockIfBreakable(validTargets, forward);
-                addBlockIfBreakable(validTargets, forward.up());
-                addBlockIfBreakable(validTargets, forward.up(2));
+                addBlockIfBreakable(validTargets, forward.above());
+                addBlockIfBreakable(validTargets, forward.above(2));
             }
             case P3x3 -> {
                 for (int x = -1; x <= 1; x++) {
                     for (int y = 0; y <= 2; y++) {
                         for (int z = -1; z <= 1; z++) {
-                            BlockPos checkPos = forward.add(x, y, z);
+                            BlockPos checkPos = forward.offset(x, y, z);
                             addBlockIfBreakable(validTargets, checkPos);
                         }
                     }
@@ -82,7 +82,7 @@ public class AutoTunnelModule extends Module {
         }
 
         BlockPos bestTarget = validTargets.stream()
-                .min(Comparator.comparingDouble(a -> MC.player.squaredDistanceTo(
+                .min(Comparator.comparingDouble(a -> MC.player.distanceToSqr(
                         a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5)))
                 .orElse(null);
 
@@ -100,7 +100,7 @@ public class AutoTunnelModule extends Module {
     }
 
     private void addBlockIfBreakable(Set<BlockPos> set, BlockPos pos) {
-        BlockState state = MC.world.getBlockState(pos);
+        BlockState state = MC.level.getBlockState(pos);
         Block block = state.getBlock();
 
         if (block == Blocks.BEDROCK || state.isAir()) return;

@@ -11,11 +11,13 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.entity.TargetUtils;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.*;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 
 import java.util.*;
 
@@ -49,13 +51,13 @@ public class AutoArmorModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onTick(PostTickEvent event) {
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
         Entity target = TargetUtils.getTarget();
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (!isArmorSlot(slot)) continue;
 
-            ItemStack current = MC.player.getEquippedStack(slot);
+            ItemStack current = MC.player.getItemBySlot(slot);
 
             if (mendingRepair.get()) {
                 if (shouldEquipMendingRepair(slot, current)) {
@@ -83,7 +85,7 @@ public class AutoArmorModule extends Module {
                             return;
                         }
                     }
-                } else if (!ItemStack.areEqual(best, current)) {
+                } else if (!ItemStack.matches(best, current)) {
                     int invSlot = findInventorySlot(best);
                     if (invSlot != -1) {
                         swap(slot, invSlot);
@@ -116,11 +118,11 @@ public class AutoArmorModule extends Module {
     }
 
     private List<ItemStack> findCandidatesForSlot(EquipmentSlot slot, boolean forceBest) {
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
         List<ItemStack> candidates = new ArrayList<>();
 
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
+            ItemStack stack = player.getInventory().getItem(i);
             if (stack.isEmpty())
                 continue;
             Item item = stack.getItem();
@@ -224,7 +226,7 @@ public class AutoArmorModule extends Module {
     }
 
     private void swap(EquipmentSlot armorSlot, int slot) {
-        ItemStack equipped = MC.player.getEquippedStack(armorSlot);
+        ItemStack equipped = MC.player.getItemBySlot(armorSlot);
         LOG.addEntry(this.name + ": replaced " + equipped.getItem().asItem().getName().getString());
         int realSlot = slot < 9 ? slot + 36 : slot;
         int armorSlotIndex = switch (armorSlot) {
@@ -249,9 +251,9 @@ public class AutoArmorModule extends Module {
     }
 
     private ItemStack findDamagedMendingArmor(EquipmentSlot slot) {
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
+            ItemStack stack = player.getInventory().getItem(i);
             if (stack.isEmpty()) continue;
             if (!isArmorForSlot(stack, slot)) continue;
             if (!hasMending(stack)) continue;
@@ -270,13 +272,13 @@ public class AutoArmorModule extends Module {
     }
 
     private boolean isFullyRepaired(ItemStack stack) {
-        if (!stack.isDamageable()) return true;
-        return stack.getDamage() == 0;
+        if (!stack.isDamageableItem()) return true;
+        return stack.getDamageValue() == 0;
     }
 
     private int findEmptySlot() {
         for (int i = 0; i < 36; i++) {
-            if (MC.player.getInventory().getStack(i).isEmpty()) return i;
+            if (MC.player.getInventory().getItem(i).isEmpty()) return i;
         }
         return -1;
     }
@@ -294,7 +296,7 @@ public class AutoArmorModule extends Module {
 
     private int findInventorySlot(ItemStack target) {
         for (int i = 0; i < 36; i++) {
-            if (ItemStack.areEqual(MC.player.getInventory().getStack(i), target)) return i;
+            if (ItemStack.matches(MC.player.getInventory().getItem(i), target)) return i;
         }
         return -1;
     }

@@ -2,16 +2,12 @@ package me.kiriyaga.nami.feature.module.impl.movement;
 
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.PacketSendEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.PlayerInteractEntityC2SPacketAccessor;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.client.player.LocalPlayer;
 
 import static me.kiriyaga.nami.Nami.MC;
 // some crazy shit happened here
@@ -39,14 +35,14 @@ public class SprintModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTickEvent(PreTickEvent event) {
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
         if (player == null) return;
 
         if (shouldSprintTicks > 0) {
             shouldSprintTicks--;
         }
 
-        if (!inLiquid.get() && (player.isSubmergedInWater() || player.isTouchingWater()))
+        if (!inLiquid.get() && (player.isUnderWater() || player.isInWater()))
             return;
 
         if (shouldForceNoSprint()) {
@@ -54,7 +50,7 @@ public class SprintModule extends Module {
             return;
         }
 
-        boolean canSprint = player.forwardSpeed > 0 && !player.hasVehicle();
+        boolean canSprint = player.zza > 0 && !player.isPassenger();
 
         if (canSprint) {
             player.setSprinting(true);

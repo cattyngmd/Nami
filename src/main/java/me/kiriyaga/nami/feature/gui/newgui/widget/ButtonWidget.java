@@ -3,9 +3,9 @@ package me.kiriyaga.nami.feature.gui.newgui.widget;
 import me.kiriyaga.nami.feature.gui.newgui.base.PanelRenderer;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 
@@ -30,18 +30,18 @@ public class ButtonWidget {
         this.onClick = onClick;
     }
 
-    public void render(DrawContext context, TextRenderer textRenderer, int mouseX, int mouseY) {
+    public void render(GuiGraphics context, Font textRenderer, int mouseX, int mouseY) {
         panelRenderer.renderPanel(context, x, y, width, height, 0, false);
 
 
         Color textOff = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextSecondColor(255);
         Color textCol = active ?  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255)  : textOff;
 
-        int textWidth = textRenderer.getWidth(label);
+        int textWidth = textRenderer.width(label);
         int textX = x + (width - textWidth) / 2;
-        int textY = y + (height - textRenderer.fontHeight) / 2 + 1;
+        int textY = y + (height - textRenderer.lineHeight) / 2 + 1;
 
-        FONT_MANAGER.drawText(context, Text.of(label), textX, textY, true, CLICK_GUI.applyFade(toRGBA(textCol)));
+        FONT_MANAGER.drawText(context, Component.nullToEmpty(label), textX, textY, true, CLICK_GUI.applyFade(toRGBA(textCol)));
     }
 
     public boolean mouseClicked(int mouseX, int mouseY, int button) {

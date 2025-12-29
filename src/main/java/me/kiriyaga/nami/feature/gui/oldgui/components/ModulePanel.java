@@ -4,8 +4,8 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.ColorUtils;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
 import java.util.Set;
 
@@ -28,7 +28,7 @@ public class ModulePanel {
         this.module = module;
     }
 
-    public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics context, Font textRenderer, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
 
         Color textPrimary = getColorModule().getStyledTextColor(255);

@@ -24,7 +24,7 @@ public class GammaCommand extends Command {
     public void execute(Object[] args) {
         int newGamma = (int) args[0];
 
-        ((ISimpleOption) (Object) MC.options.getGamma()).setValue((double) newGamma);
+        ((ISimpleOption) (Object) MC.options.gamma()).setValue((double) newGamma);
         CHAT_MANAGER.sendPersistent(GammaCommand.class.getName(),
                 CAT_FORMAT.format("Gamma set to: {g}" + newGamma + "{reset}."));
     }

@@ -4,8 +4,8 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +29,10 @@ public class CoordinatesModule extends HudElementModule {
     }
 
     @Override
-    public Text getDisplayText() {
+    public Component getDisplayText() {
         if (layout.get() == LayoutMode.VERTICAL) return null; // use getTextElements()
 
-        if (MC.player == null || MC.world == null) {
+        if (MC.player == null || MC.level == null) {
             return CAT_FORMAT.format("{bg}XYZ: {bw}NaN");
         }
 
@@ -40,8 +40,8 @@ public class CoordinatesModule extends HudElementModule {
         double y = MC.player.getY();
         double z = MC.player.getZ();
 
-        boolean isNether = MC.world.getRegistryKey() == World.NETHER;
-        boolean isOverworld = MC.world.getRegistryKey() == World.OVERWORLD;
+        boolean isNether = MC.level.dimension() == Level.NETHER;
+        boolean isOverworld = MC.level.dimension() == Level.OVERWORLD;
 
         double xAlt = isNether ? x * 8 : x / 8;
         double zAlt = isNether ? z * 8 : z / 8;
@@ -74,7 +74,7 @@ public class CoordinatesModule extends HudElementModule {
 
         List<TextElement> lines = new ArrayList<>();
 
-        if (MC.player == null || MC.world == null) {
+        if (MC.player == null || MC.level == null) {
             lines.add(new TextElement(CAT_FORMAT.format("{bg}XYZ: {bw}NaN"), 0, 0));
             return lines;
         }
@@ -83,8 +83,8 @@ public class CoordinatesModule extends HudElementModule {
         double y = MC.getCameraEntity().getY();
         double z = MC.getCameraEntity().getZ();
 
-        boolean isNether = MC.world.getRegistryKey() == World.NETHER;
-        boolean isOverworld = MC.world.getRegistryKey() == World.OVERWORLD;
+        boolean isNether = MC.level.dimension() == Level.NETHER;
+        boolean isOverworld = MC.level.dimension() == Level.OVERWORLD;
 
         double xAlt = isNether ? x * 8 : x / 8;
         double zAlt = isNether ? z * 8 : z / 8;

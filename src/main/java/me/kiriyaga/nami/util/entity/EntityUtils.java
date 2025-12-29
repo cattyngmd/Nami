@@ -1,14 +1,15 @@
 package me.kiriyaga.nami.util.entity;
 
-import me.kiriyaga.nami.mixin.AnimalEntityAccessor;
-import me.kiriyaga.nami.mixin.PassiveEntityAccessor;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.*;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import me.kiriyaga.nami.mixin.DuckAnimal;
+import me.kiriyaga.nami.mixin.DuckAgeableMob;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -44,16 +45,16 @@ public class EntityUtils {
     }
 
     public static List<Entity> getEntities(EntityTypeCategory category, double range, boolean sortByDistance, Predicate<Entity> extraFilter) {
-        if (MC.player == null || MC.world == null) return List.of();
+        if (MC.player == null || MC.level == null) return List.of();
 
-        Vec3d playerPos = MC.player.getEntityPos();
+        Vec3 playerPos = MC.player.position();
         List<Entity> all = getEntitiesBase(category);
 
         return all.stream()
                 .filter(e -> e != MC.player)
-                .filter(e -> e.squaredDistanceTo(playerPos) <= range * range)
+                .filter(e -> e.distanceToSqr(playerPos) <= range * range)
                 .filter(e -> extraFilter == null || extraFilter.test(e))
-                .sorted(sortByDistance ? Comparator.comparingDouble(e -> e.squaredDistanceTo(playerPos)) : (a, b) -> 0)
+                .sorted(sortByDistance ? Comparator.comparingDouble(e -> e.distanceToSqr(playerPos)) : (a, b) -> 0)
                 .collect(Collectors.toList());
     }
 
@@ -67,42 +68,42 @@ public class EntityUtils {
             case PASSIVE -> getAllEntities().stream().filter(HostileUtils::isPassive).toList();
             case PROJECTILES -> getAllEntities().stream().filter(HostileUtils::isProjectile).toList();
             case DROPPED_ITEMS -> getAllEntities().stream().filter(e -> e instanceof ItemEntity).toList();
-            case END_CRYSTALS -> getAllEntities().stream().filter(e -> e instanceof EndCrystalEntity).toList();
+            case END_CRYSTALS -> getAllEntities().stream().filter(e -> e instanceof EndCrystal).toList();
         };
     }
 
     public static List<Entity> getAllEntities() {
-        ClientWorld world = MC.world;
+        ClientLevel world = MC.level;
         return world != null
-                ? StreamSupport.stream(world.getEntities().spliterator(), false).collect(Collectors.toList())
+                ? StreamSupport.stream(world.entitiesForRendering().spliterator(), false).collect(Collectors.toList())
                 : List.of();
     }
 
-    public static List<PlayerEntity> getPlayers() {
-        ClientWorld world = MC.world;
+    public static List<Player> getPlayers() {
+        ClientLevel world = MC.level;
         if (world == null) return List.of();
 
-        return StreamSupport.stream(world.getEntities().spliterator(), false)
-                .filter(e -> e instanceof PlayerEntity)
-                .map(e -> (PlayerEntity) e)
+        return StreamSupport.stream(world.entitiesForRendering().spliterator(), false)
+                .filter(e -> e instanceof Player)
+                .map(e -> (Player) e)
                 .collect(Collectors.toList());
     }
 
-    public static List<PlayerEntity> getOtherPlayers() {
-        ClientPlayerEntity self = MC.player;
+    public static List<Player> getOtherPlayers() {
+        LocalPlayer self = MC.player;
         return getPlayers().stream()
                 .filter(p -> !p.isRemoved() && p != self)
                 .collect(Collectors.toList());
     }
 
-    public static boolean canBreed(AnimalEntity animal) {
-        PassiveEntityAccessor a = (PassiveEntityAccessor) animal;
-        AnimalEntityAccessor a1 = (AnimalEntityAccessor) animal;
+    public static boolean canBreed(Animal animal) {
+        DuckAgeableMob a = (DuckAgeableMob) animal;
+        DuckAnimal a1 = (DuckAnimal) animal;
 
         if (animal.isBaby()) return false;
-        if (a.breedingAge() != 0) return false;
-        if (a1.loveTicks() > 0) return false;
+        if (a.Age() != 0) return false;
+        if (a1.InLove() > 0) return false;
 
-        return animal.canEat();
+        return animal.canFallInLove();
     }
 }

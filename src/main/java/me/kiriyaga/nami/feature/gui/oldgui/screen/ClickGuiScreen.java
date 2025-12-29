@@ -7,14 +7,14 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.DisconnectedScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.Text;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.DisconnectedScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 import java.util.*;
@@ -32,20 +32,20 @@ public class ClickGuiScreen extends Screen {
     public float scale = 1;
     private Screen previousScreen = null;
     private static final long FADE_DURATION_MS = 122L;
-    private long fadeStartMs = Util.getMeasuringTimeMs();
+    private long fadeStartMs = Util.getMillis();
     private boolean closing = false;
 
     private ClickGuiModule getClickGuiModule() {
         return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
     }
 
-    private final List<Text> statusMessages = Arrays.asList(
-            Text.literal("Middle-click a module to toggle its drawn state."),
-            Text.literal("Middle-click a keybind to switch hold/toggle mode.")
+    private final List<Component> statusMessages = Arrays.asList(
+            Component.literal("Middle-click a module to toggle its drawn state."),
+            Component.literal("Middle-click a keybind to switch hold/toggle mode.")
     );
 
     public ClickGuiScreen() {
-        super(Text.literal("NamiGui"));
+        super(Component.literal("NamiGui"));
         syncCategoryPositions();
         initCategoryPanels();
     }
@@ -73,24 +73,24 @@ public class ClickGuiScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        fadeStartMs = Util.getMeasuringTimeMs();
+        fadeStartMs = Util.getMillis();
         closing = false;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         checkClose();
         syncCategoryPositions();
 
         if (previousScreen instanceof TitleScreen
                 || previousScreen instanceof DisconnectedScreen
-                || previousScreen instanceof MultiplayerScreen) {
+                || previousScreen instanceof JoinMultiplayerScreen) {
             previousScreen.render(context, -1, -1, delta);
         }
 
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get()) {
-            renderDarkening(context);
+            renderMenuBackground(context);
 /*            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
             int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
             context.fill(0, 0, this.width, this.height, applyFade(color));*/
@@ -98,15 +98,15 @@ public class ClickGuiScreen extends Screen {
 
         NAVIGATE_PANEL.render(context, FONT_MANAGER.rendererProvider.getRenderer(), mouseX, mouseY);
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(scale, scale);
+        context.pose().pushMatrix();
+        context.pose().scale(scale, scale);
 
         int scaledWidth = (int) (this.width / scale);
         int scaledHeight = (int) (this.height / scale);
 
         int startY = (scaledHeight - 1);
         for (int i = statusMessages.size() - 1; i >= 0; i--) {
-            Text message = statusMessages.get(i);
+            Component message = statusMessages.get(i);
             int textWidth = FONT_MANAGER.getWidth(message);
             int textHeight = FONT_MANAGER.getHeight();
 
@@ -166,7 +166,7 @@ public class ClickGuiScreen extends Screen {
                             context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
                             FONT_MANAGER.drawText(context, description, descX, descY, applyFade(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB()), true);
                         }
-                        context.getMatrices().popMatrix();
+                        context.pose().popMatrix();
                         return;
                     }
 
@@ -178,25 +178,25 @@ public class ClickGuiScreen extends Screen {
             }
         }
 
-        context.getMatrices().popMatrix();
+        context.pose().popMatrix();
         super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
-    public void renderBackground(DrawContext context, int i, int j, float f) {
-        if (MC.world != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
-            this.applyBlur(context);
+    public void renderBackground(GuiGraphics context, int i, int j, float f) {
+        if (MC.level != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).blur.get())
+            this.renderBlurredBackground(context);
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean bl) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean bl) {
         syncCategoryPositions();
 
-        int scaledMouseX = (int) (click.comp_4798() / scale);
-        int scaledMouseY = (int) (click.comp_4799() / scale);
+        int scaledMouseX = (int) (click.x() / scale);
+        int scaledMouseY = (int) (click.y() / scale);
         int scaledHeight = (int) (this.height / scale);
 
-        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), FONT_MANAGER.rendererProvider.getRenderer());
+        NAVIGATE_PANEL.mouseClicked(click.x(), click.y(), FONT_MANAGER.rendererProvider.getRenderer());
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if ("hud".equalsIgnoreCase(moduleCategory.getName())) continue;
@@ -276,30 +276,30 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyInput keyInput) {
-        if (keyInput.getKeycode() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.currentScreen == CLICK_GUI && MC.world != null) {
+    public boolean keyPressed(KeyEvent keyInput) {
+        if (keyInput.input() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.screen == CLICK_GUI && MC.level != null) {
             beginClose();
             return true;
         }
-        if (keyInput.getKeycode() == 256) {
+        if (keyInput.input() == 256) {
             beginClose();
             return true;
         }
 
-        if (SettingPanel.keyPressed(keyInput.getKeycode())) return true;
+        if (SettingPanel.keyPressed(keyInput.input())) return true;
         return super.keyPressed(keyInput);
     }
 
     private void beginClose() {
         if (closing) return;
         closing = true;
-        fadeStartMs = Util.getMeasuringTimeMs();
+        fadeStartMs = Util.getMillis();
     }
 
     @Override
-    public boolean mouseDragged(Click click, double d, double e) {
-        int scaledMouseX = (int) (click.comp_4798() / scale);
-        int scaledMouseY = (int) (click.comp_4799() / scale);
+    public boolean mouseDragged(MouseButtonEvent click, double d, double e) {
+        int scaledMouseX = (int) (click.x() / scale);
+        int scaledMouseY = (int) (click.y() / scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point currentPos = categoryPositions.get(draggedModuleCategory);
@@ -315,7 +315,7 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(Click click) {
+    public boolean mouseReleased(MouseButtonEvent click) {
         draggingCategory = false;
         draggedModuleCategory = null;
         SettingPanel.mouseReleased(click);
@@ -344,13 +344,13 @@ public class ClickGuiScreen extends Screen {
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     private void playClickSound() {
-        MC.getSoundManager().play(net.minecraft.client.sound.PositionedSoundInstance.master(
-                net.minecraft.sound.SoundEvents.UI_BUTTON_CLICK, 1.0f
+        MC.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
+                net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK, 1.0f
         ));
     }
 
@@ -363,7 +363,7 @@ public class ClickGuiScreen extends Screen {
     }
 
     private float getFadeFactor() {
-        long elapsed = Util.getMeasuringTimeMs() - fadeStartMs;
+        long elapsed = Util.getMillis() - fadeStartMs;
         float t = Math.min(1.0f, Math.max(0.0f, elapsed / (float) FADE_DURATION_MS));
         return closing ? (1.0f - t) : t;
     }
@@ -385,7 +385,7 @@ public class ClickGuiScreen extends Screen {
         if (!MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).fade.get())
             return argb;
 
-        if ((previousScreen == HUD_EDITOR || previousScreen == FRIEND) && MC.currentScreen != CLICK_GUI)
+        if ((previousScreen == HUD_EDITOR || previousScreen == FRIEND) && MC.screen != CLICK_GUI)
             return argb;
 
         int a = (argb >>> 24) & 0xFF;

@@ -1,9 +1,9 @@
 package me.kiriyaga.nami.util;
 
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 
 import java.awt.*;
 import java.util.Optional;
@@ -47,15 +47,15 @@ public class ColorUtils {
             color = TextColor.fromRgb(0xFFFFFF);
         }
 
-        int rgb = color.getRgb();
+        int rgb = color.getValue();
         Color c = new Color(rgb | 0xFF000000, true);
         Color bright = brighten(c, percent);
 
         return TextColor.fromRgb(bright.getRGB());
     }
 
-    public static Text brighten(Text original, int brightenPercent) {
-        MutableText result = Text.empty();
+    public static Component brighten(Component original, int brightenPercent) {
+        MutableComponent result = Component.empty();
 
         original.visit((style, string) -> {
             TextColor baseColor = style.getColor();
@@ -66,7 +66,7 @@ public class ColorUtils {
                     .withBold(false)
                     .withItalic(false);
 
-            result.append(Text.literal(string).setStyle(brightStyle));
+            result.append(Component.literal(string).setStyle(brightStyle));
             return Optional.empty();
         }, Style.EMPTY);
 
@@ -80,8 +80,8 @@ public class ColorUtils {
         return new Color(r, g, b, color.getAlpha());
     }
 
-    public static Text darken(Text original, int darkenPercent) {
-        MutableText result = Text.empty();
+    public static Component darken(Component original, int darkenPercent) {
+        MutableComponent result = Component.empty();
 
         original.visit((style, string) -> {
             TextColor baseColor = style.getColor();
@@ -92,7 +92,7 @@ public class ColorUtils {
                     .withBold(false)
                     .withItalic(false);
 
-            result.append(Text.literal(string).setStyle(shadowStyle));
+            result.append(Component.literal(string).setStyle(shadowStyle));
             return Optional.empty();
         }, Style.EMPTY);
 
@@ -113,7 +113,7 @@ public class ColorUtils {
             color = TextColor.fromRgb(0xFFFFFF);
         }
 
-        int rgb = color.getRgb();
+        int rgb = color.getValue();
         Color c = new Color(rgb | 0xFF000000, true);
         Color dark = darken(c, percent);
 

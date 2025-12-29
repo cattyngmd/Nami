@@ -3,7 +3,7 @@ package me.kiriyaga.nami.feature.module;
 import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,16 +57,16 @@ public abstract class Module {
             EVENT_MANAGER.register(this);
             onEnable();
 
-            if (MC.world != null) {
-                Text message = CAT_FORMAT.format("{s}[{g}+{s}] {reset}" + name);
+            if (MC.level != null) {
+                Component message = CAT_FORMAT.format("{s}[{g}+{s}] {reset}" + name);
                 CHAT_MANAGER.sendTransient(message, false);
             }
         } else {
             EVENT_MANAGER.unregister(this);
             onDisable();
 
-            if (MC.world != null) {
-                Text message = CAT_FORMAT.format("{namiDarkRed}[{namiRed}-{namiDarkRed}] {reset}" + name);
+            if (MC.level != null) {
+                Component message = CAT_FORMAT.format("{namiDarkRed}[{namiRed}-{namiDarkRed}] {reset}" + name);
                 CHAT_MANAGER.sendTransient(message, false);
             }
         }

@@ -3,8 +3,8 @@ package me.kiriyaga.nami.feature.gui.oldgui.settings;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
@@ -16,7 +16,7 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
     private int lastSliderX, lastSliderY, lastSliderWidth, lastSliderHeight;
 
     @Override
-    public void render(DrawContext context, TextRenderer textRenderer, IntSetting setting, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics context, Font textRenderer, IntSetting setting, int x, int y, int mouseX, int mouseY) {
 
         boolean hovered = isHovered(mouseX, mouseY, x, y);
 
@@ -92,7 +92,7 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
         return was;
     }
 
-    private void renderSlider(DrawContext context, int x, int y, int width, int height,
+    private void renderSlider(GuiGraphics context, int x, int y, int width, int height,
                               int value, int min, int max, Color color) {
         context.fill(x, y, x + width, y + height, CLICK_GUI.applyFade(toRGBA(new Color(60, 60, 60, 150))));
 

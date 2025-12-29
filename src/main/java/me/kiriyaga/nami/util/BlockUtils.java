@@ -1,9 +1,9 @@
 package me.kiriyaga.nami.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -11,8 +11,8 @@ import java.util.Set;
 
 
 public class BlockUtils {
-    private static final Block AIR_BLOCK = Registries.BLOCK.get(Identifier.of("minecraft", "air"));
-    private static final Block VOID_AIR_BLOCK = Registries.BLOCK.get(Identifier.of("minecraft", "void_air"));
+    private static final Block AIR_BLOCK = BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("minecraft", "air"));
+    private static final Block VOID_AIR_BLOCK = BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("minecraft", "void_air"));
 
 
     private static final Set<String> NON_VANILLA_GENERATED_IDS = Set.of(
@@ -115,14 +115,14 @@ public class BlockUtils {
 
     public static boolean isNonVanillaGenerated(Block block) {
         if (block == null) return false;
-        Identifier id = Registries.BLOCK.getId(block);
+        Identifier id = BuiltInRegistries.BLOCK.getKey(block);
         return NON_VANILLA_GENERATED_IDENTIFIERS.contains(id);
     }
 
     public static Set<Block> getNonVanillaGeneratedBlocks() {
         Set<Block> blocks = new HashSet<>();
         for (Identifier id : NON_VANILLA_GENERATED_IDENTIFIERS) {
-            Block block = Registries.BLOCK.get(id);
+            Block block = BuiltInRegistries.BLOCK.getValue(id);
             if (block != null && block != AIR_BLOCK && block != VOID_AIR_BLOCK) {
                 blocks.add(block);
             }
@@ -183,14 +183,14 @@ public class BlockUtils {
 
     public static boolean isStorage(Block block) {
         if (block == null) return false;
-        Identifier id = Registries.BLOCK.getId(block);
+        Identifier id = BuiltInRegistries.BLOCK.getKey(block);
         return STORAGE_IDENTIFIERS.contains(id);
     }
 
     public static Set<Block> getStorage() {
         Set<Block> blocks = new HashSet<>();
         for (Identifier id : STORAGE_IDENTIFIERS) {
-            Block block = Registries.BLOCK.get(id);
+            Block block = BuiltInRegistries.BLOCK.getValue(id);
             if (block != null && block != AIR_BLOCK && block != VOID_AIR_BLOCK) {
                 blocks.add(block);
             }
@@ -199,7 +199,7 @@ public class BlockUtils {
     }
         public static Color getColorByBlockId(BlockState state) { // ai made
             Block block = state.getBlock();
-            Identifier id = Registries.BLOCK.getId(block);
+            Identifier id = BuiltInRegistries.BLOCK.getKey(block);
 
             if (id == null) {
                 return Color.WHITE;

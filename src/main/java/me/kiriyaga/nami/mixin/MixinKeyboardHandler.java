@@ -1,0 +1,63 @@
+package me.kiriyaga.nami.mixin;
+
+import me.kiriyaga.nami.event.impl.KeyInputEvent;
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
+import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
+import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.gui.components.MultilineTextField;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.client.input.KeyEvent;
+import org.lwjgl.glfw.GLFW;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static me.kiriyaga.nami.Nami.*;
+
+@Mixin(KeyboardHandler.class)
+public abstract class MixinKeyboardHandler {
+
+    @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
+        public void onKey(long l, int i, KeyEvent keyInput, CallbackInfo ci) {
+        if (keyInput.input() == GLFW.GLFW_KEY_F3) return;
+
+        KeyInputEvent event = new KeyInputEvent(keyInput.input(), keyInput.scancode(), i, keyInput.modifiers());
+        EVENT_MANAGER.post(event);
+
+        if (event.isCancelled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "keyPress", at = @At("HEAD"))
+    private void onKeyClickgui(long l, int i, KeyEvent keyInput, CallbackInfo ci) {
+        if (MC == null) return;
+        if (i != GLFW.GLFW_PRESS) return;
+
+        if (MODULE_MANAGER.getStorage() == null) return;
+
+        ClickGuiModule clickGui = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
+        if (clickGui == null) return;
+
+        KeyBindSetting bind = clickGui.getKeyBind();
+        if (bind == null) return;
+
+        if (bind.get() == keyInput.input()) {
+            Screen screen = MC.screen;
+
+            if (screen instanceof TitleScreen
+                    || screen instanceof SelectWorldScreen
+                    || screen instanceof JoinMultiplayerScreen) {
+
+                if (!(screen.getFocused() instanceof MultilineTextField)) {
+                    clickGui.toggle();
+                }
+            }
+        }
+    }
+
+}

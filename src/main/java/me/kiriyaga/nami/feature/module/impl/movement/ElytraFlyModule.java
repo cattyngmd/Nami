@@ -4,27 +4,25 @@ import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.GlidingEvent;
-import me.kiriyaga.nami.event.impl.MoveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
+import me.kiriyaga.nami.mixin.DuckKeyMapping;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -125,7 +123,7 @@ public class ElytraFlyModule extends Module {
         if (MC.player == null)
             return;
 
-        if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
+        if (MC.player.getItemBySlot(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
         if (setbackStop.get() && SERVER_MANAGER.hasElapsedSinceSetback(5000))
@@ -140,7 +138,7 @@ public class ElytraFlyModule extends Module {
         if (MC.player == null)
             return;
 
-        if (MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
+        if (MC.player.getItemBySlot(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
         if (setbackStop.get() && SERVER_MANAGER.hasElapsedSinceSetback(5000))
@@ -156,16 +154,16 @@ public class ElytraFlyModule extends Module {
             }*/
 
             if (pitch.get())
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYaw(), pitchDegree.get().floatValue(), RotationModule.RotationMode.MOTION));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYRot(), pitchDegree.get().floatValue(), RotationModule.RotationMode.MOTION));
 
-            MC.player.networkHandler.sendPacket(
-                    new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
+            MC.player.connection.send(
+                    new ServerboundPlayerCommandPacket(MC.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING)
             );
         } else
         if (mode.get() == FlyMode.ROTATION) {
-            if (!MC.player.isGliding()) return;
+            if (!MC.player.isFallFlying()) return;
 
-            Vec3d dir = getControlDirection();
+            Vec3 dir = getControlDirection();
 
 //            if (midAirFreeze.get() && dir == null) {
 //                float yaw = MC.player.getYaw();
@@ -195,11 +193,11 @@ public class ElytraFlyModule extends Module {
                 float finalPitch;
 
                 if (Math.abs(dir.y) > 0.5) {
-                    finalYaw = MC.player.getYaw();
+                    finalYaw = MC.player.getYRot();
                     finalPitch = dir.y > 0 ? -90f : 90f;
                 } else {
                     finalYaw = (float) Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90f;
-                    finalPitch = MC.player.getPitch();
+                    finalPitch = MC.player.getXRot();
                     if (lockPitch.get()) {
                         finalPitch = -3f;
                     }
@@ -212,7 +210,7 @@ public class ElytraFlyModule extends Module {
                 setJumpHeld(true);
             }
         } else if (mode.get() == FlyMode.GLIDE) {
-            if (!MC.player.isGliding())
+            if (!MC.player.isFallFlying())
                 return;
 
             double playerY = MC.player.getY();
@@ -270,7 +268,7 @@ public class ElytraFlyModule extends Module {
 
             //TODO yaw smooth n
             ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(this.getName(), 1, MC.player.getYaw(), smoothPitch, RotationModule.RotationMode.MOTION)
+                    new RotationRequest(this.getName(), 1, MC.player.getYRot(), smoothPitch, RotationModule.RotationMode.MOTION)
             );
         }
     }
@@ -291,13 +289,13 @@ public class ElytraFlyModule extends Module {
 
 
     private float approach(float current, float target, float maxDelta) {
-        float delta = MathHelper.clamp(target - current, -maxDelta, +maxDelta);
+        float delta = Mth.clamp(target - current, -maxDelta, +maxDelta);
         return current + delta;
     }
 
 
     private float clampPitch(float pitchDeg) {
-        return MathHelper.clamp(pitchDeg, -89f, 89f);
+        return Mth.clamp(pitchDeg, -89f, 89f);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -327,27 +325,27 @@ public class ElytraFlyModule extends Module {
     }
 
     private void setJumpHeld(boolean held) {
-        KeyBinding jumpKey = MC.options.jumpKey;
-        InputUtil.Key boundKey = ((KeyBindingAccessor) jumpKey).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
-        jumpKey.setPressed(physicallyPressed || held);
+        KeyMapping jumpKey = MC.options.keyJump;
+        InputConstants.Key boundKey = ((DuckKeyMapping) jumpKey).getKey();
+        int keyCode = boundKey.getValue();
+        boolean physicallyPressed = InputConstants.isKeyDown(MC.getWindow(), keyCode);
+        jumpKey.setDown(physicallyPressed || held);
     }
 
-    private Vec3d getControlDirection() {
-        boolean forward = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.forwardKey).getBoundKey().getCode());
-        boolean back    = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.backKey).getBoundKey().getCode());
-        boolean left    = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.leftKey).getBoundKey().getCode());
-        boolean right   = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.rightKey).getBoundKey().getCode());
-        boolean up      = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.jumpKey).getBoundKey().getCode());
-        boolean down    = InputUtil.isKeyPressed(MC.getWindow(), ((KeyBindingAccessor) MC.options.sneakKey).getBoundKey().getCode());
+    private Vec3 getControlDirection() {
+        boolean forward = InputConstants.isKeyDown(MC.getWindow(), ((DuckKeyMapping) MC.options.keyUp).getKey().getValue());
+        boolean back    = InputConstants.isKeyDown(MC.getWindow(), ((DuckKeyMapping) MC.options.keyDown).getKey().getValue());
+        boolean left    = InputConstants.isKeyDown(MC.getWindow(), ((DuckKeyMapping) MC.options.keyLeft).getKey().getValue());
+        boolean right   = InputConstants.isKeyDown(MC.getWindow(), ((DuckKeyMapping) MC.options.keyRight).getKey().getValue());
+        boolean up      = InputConstants.isKeyDown(MC.getWindow(), ((DuckKeyMapping) MC.options.keyJump).getKey().getValue());
+        boolean down    = InputConstants.isKeyDown(MC.getWindow(), ((DuckKeyMapping) MC.options.keyShift).getKey().getValue());
 
         if (!(forward || back || left || right || up || down)) return null;
 
         if (up && !down) {
-            return new Vec3d(0, 1, 0);
+            return new Vec3(0, 1, 0);
         } else if (down && !up) {
-            return new Vec3d(0, -1, 0);
+            return new Vec3(0, -1, 0);
         }
 
         double forwardVal = (forward ? 1.0 : 0.0) - (back ? 1.0 : 0.0);
@@ -358,7 +356,7 @@ public class ElytraFlyModule extends Module {
         double lx = strafeVal;
         double lz = forwardVal;
 
-        double yawRad = Math.toRadians(MC.player.getYaw());
+        double yawRad = Math.toRadians(MC.player.getYRot());
         double fx = -Math.sin(yawRad);
         double fz =  Math.cos(yawRad);
         double rx = -Math.sin(yawRad + Math.PI / 2.0);
@@ -367,8 +365,8 @@ public class ElytraFlyModule extends Module {
         double wx = fx * lz + rx * lx;
         double wz = fz * lz + rz * lx;
 
-        Vec3d worldDir = new Vec3d(wx, 0.0, wz);
-        if (worldDir.lengthSquared() == 0.0) return null;
+        Vec3 worldDir = new Vec3(wx, 0.0, wz);
+        if (worldDir.lengthSqr() == 0.0) return null;
         return worldDir.normalize();
     }
 
@@ -378,7 +376,7 @@ public class ElytraFlyModule extends Module {
         if (hotbarSlot != -1) {
             int prevSlot = MC.player.getInventory().getSelectedSlot();
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(hotbarSlot);
-            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+            MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
             return true;
         }
@@ -389,7 +387,7 @@ public class ElytraFlyModule extends Module {
             int containerInvSlot = convertSlot(invSlot);
 
             INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
-            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+            MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
             INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
             return true;
         }
@@ -399,7 +397,7 @@ public class ElytraFlyModule extends Module {
 
     private int getSlotInHotbar(Item item) {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == item) return i;
         }
         return -1;
@@ -407,7 +405,7 @@ public class ElytraFlyModule extends Module {
 
     private int getSlotInInventory(Item item) {
         for (int i = 9; i < 36; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == item) return i;
         }
         return -1;

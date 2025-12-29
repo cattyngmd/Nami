@@ -8,10 +8,10 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.InteractionHand;
 
 import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
@@ -33,29 +33,29 @@ public class AutoFireworkModule extends Module {
     public void onEnable() {
         super.onEnable();
         if (MC.player != null) {
-            lastUseTick = MC.player.age - (int) Math.round(delaySeconds.get() * 20);
+            lastUseTick = MC.player.tickCount - (int) Math.round(delaySeconds.get() * 20);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onTick(PreTickEvent ev) {
         if (!isEnabled()) return;
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
-        if (MC.player.age < lastUseTick) {
-            lastUseTick = MC.player.age - tickDelay;
+        if (MC.player.tickCount < lastUseTick) {
+            lastUseTick = MC.player.tickCount - tickDelay;
         }
 
         tickDelay = (int) Math.round(delaySeconds.get() * 20);
 
-        if (!MC.player.isGliding()) return;
+        if (!MC.player.isFallFlying()) return;
 
         if (MC.player.getY() <= onLevel.get()) return;
 
-        if (MC.player.age - lastUseTick < tickDelay) return;
+        if (MC.player.tickCount - lastUseTick < tickDelay) return;
 
         if (useItemAnywhere(Items.FIREWORK_ROCKET)) {
-            lastUseTick = MC.player.age;
+            lastUseTick = MC.player.tickCount;
         }
     }
 
@@ -65,7 +65,7 @@ public class AutoFireworkModule extends Module {
         if (hotbarSlot != -1) {
             int prevSlot = MC.player.getInventory().getSelectedSlot();
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(hotbarSlot);
-            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+            MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
             return true;
         }
@@ -76,7 +76,7 @@ public class AutoFireworkModule extends Module {
             int containerInvSlot = convertSlot(invSlot);
 
             INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
-            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+            MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
             INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
             return true;
         }
@@ -86,7 +86,7 @@ public class AutoFireworkModule extends Module {
 
     private int getSlotInHotbar(Item item) {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == item) return i;
         }
         return -1;
@@ -94,7 +94,7 @@ public class AutoFireworkModule extends Module {
 
     private int getSlotInInventory(Item item) {
         for (int i = 9; i < 36; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == item) return i;
         }
         return -1;

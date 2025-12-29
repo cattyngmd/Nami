@@ -9,10 +9,10 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.entity.EntityUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.SheepEntity;
-import net.minecraft.item.Items;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
@@ -33,7 +33,7 @@ public class AutoSheepModule extends Module {
 
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
         if (swapCooldown > 0) {
             swapCooldown--;
@@ -41,7 +41,7 @@ public class AutoSheepModule extends Module {
         }
 
         for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE, 10, true)) {
-            if (!(entity instanceof SheepEntity sheep)) continue;
+            if (!(entity instanceof Sheep sheep)) continue;
             if (!sheep.isAlive() || sheep.isSheared() || sheep.isBaby()) continue;
 
             int shearsSlot = getShearsSlot();
@@ -63,7 +63,7 @@ public class AutoSheepModule extends Module {
 
     private int getShearsSlot() {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == Items.SHEARS) return i;
         }
         return -1;

@@ -9,12 +9,12 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FoodComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.InteractionHand;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -48,9 +48,9 @@ public class AutoEatModule extends Module {
         if (MC.player == null) return;
 
         if (eating.get())
-            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+            MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
 
-        double hunger = MC.player.getHungerManager().getFoodLevel();
+        double hunger = MC.player.getFoodData().getFoodLevel();
         double health = MC.player.getHealth();
         boolean needsEat = hunger < minHunger.get() || health < minHealth.get();
         if (!needsEat) {
@@ -90,7 +90,7 @@ public class AutoEatModule extends Module {
         float bestScore = -1;
 
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             float score = getFoodScore(stack);
             if (score > bestScore) {
                 bestScore = score;
@@ -102,7 +102,7 @@ public class AutoEatModule extends Module {
     }
 
     private float getFoodScore(ItemStack stack) {
-        if (stack.isEmpty() || !stack.getItem().getComponents().contains(DataComponentTypes.FOOD)) {
+        if (stack.isEmpty() || !stack.getItem().components().has(DataComponents.FOOD)) {
             return -1;
         }
 
@@ -116,9 +116,9 @@ public class AutoEatModule extends Module {
             return -1;
         }
 
-        FoodComponent food = item.getComponents().get(DataComponentTypes.FOOD);
-        float nutrition = food.comp_2491();
-        float saturation = food.comp_2492();
+        FoodProperties food = item.components().get(DataComponents.FOOD);
+        float nutrition = food.nutrition();
+        float saturation = food.saturation();
         float totalValue = nutrition + saturation;
 
         if (isGapple(item)) {

@@ -2,12 +2,27 @@ package me.kiriyaga.nami.core.inventory;
 
 import me.kiriyaga.nami.feature.module.impl.combat.AutoTotemModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
-import net.minecraft.client.gui.screen.ingame.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
+import net.minecraft.client.gui.screens.inventory.BrewingStandScreen;
+import net.minecraft.client.gui.screens.inventory.CartographyTableScreen;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CrafterScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
+import net.minecraft.client.gui.screens.inventory.FurnaceScreen;
+import net.minecraft.client.gui.screens.inventory.GrindstoneScreen;
+import net.minecraft.client.gui.screens.inventory.HopperScreen;
+import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.MerchantScreen;
+import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
+import net.minecraft.client.gui.screens.inventory.SmithingScreen;
+import net.minecraft.client.gui.screens.inventory.SmokerScreen;
+import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.core.NonNullList;
 
 import com.google.common.collect.Lists;
 
@@ -18,43 +33,43 @@ import static me.kiriyaga.nami.Nami.*;
 public class InventoryClickHandler {
 
     public boolean pickupSlot(int slotIndex, boolean skipGeneric) {
-        return click(slotIndex, 0, SlotActionType.PICKUP, skipGeneric);
+        return click(slotIndex, 0, ClickType.PICKUP, skipGeneric);
     }
 
     public boolean quickMoveSlot(int slotIndex, boolean skipGeneric) {
-        return click(slotIndex, 0, SlotActionType.QUICK_MOVE, skipGeneric);
+        return click(slotIndex, 0, ClickType.QUICK_MOVE, skipGeneric);
     }
 
     public boolean throwSlot(int slotIndex, boolean skipGeneric) {
-        return click(slotIndex, 0, SlotActionType.THROW, skipGeneric);
+        return click(slotIndex, 0, ClickType.THROW, skipGeneric);
     }
 
     public boolean swapSlot(int targetSlot, int hotbarSlotIndex, boolean skipGeneric) {
-        return click(targetSlot, hotbarSlotIndex, SlotActionType.SWAP, skipGeneric);
+        return click(targetSlot, hotbarSlotIndex, ClickType.SWAP, skipGeneric);
     }
 
 
     public boolean pickupSlot(int slotIndex) {
-        return click(slotIndex, 0, SlotActionType.PICKUP);
+        return click(slotIndex, 0, ClickType.PICKUP);
     }
 
     public boolean quickMoveSlot(int slotIndex) {
-        return click(slotIndex, 0, SlotActionType.QUICK_MOVE);
+        return click(slotIndex, 0, ClickType.QUICK_MOVE);
     }
 
     public boolean throwSlot(int slotIndex) {
-        return click(slotIndex, 0, SlotActionType.THROW);
+        return click(slotIndex, 0, ClickType.THROW);
     }
 
     public boolean swapSlot(int targetSlot, int hotbarSlotIndex) {
-        return click(targetSlot, hotbarSlotIndex, SlotActionType.SWAP);
+        return click(targetSlot, hotbarSlotIndex, ClickType.SWAP);
     }
 
-    private boolean click(int slot, int button, SlotActionType type) {
+    private boolean click(int slot, int button, ClickType type) {
         return click(slot, button, type, false);
     }
 
-    private boolean click(int slot, int button, SlotActionType type, boolean skipGeneric) {
+    private boolean click(int slot, int button, ClickType type, boolean skipGeneric) {
         if (slot < 0) return false;
 
         NoSlowModule noSlow = MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class);
@@ -75,33 +90,33 @@ public class InventoryClickHandler {
             }
         }
 
-        if (MC.currentScreen instanceof ShulkerBoxScreen
-                || MC.currentScreen instanceof AnvilScreen
-                || MC.currentScreen instanceof BrewingStandScreen
-                || MC.currentScreen instanceof CartographyTableScreen
-                || MC.currentScreen instanceof CrafterScreen
-                || MC.currentScreen instanceof EnchantmentScreen
-                || MC.currentScreen instanceof FurnaceScreen
-                || MC.currentScreen instanceof GrindstoneScreen
-                || MC.currentScreen instanceof HopperScreen
-                || MC.currentScreen instanceof HorseScreen
-                || MC.currentScreen instanceof MerchantScreen
-                || MC.currentScreen instanceof SmithingScreen
-                || MC.currentScreen instanceof SmokerScreen
-                || MC.currentScreen instanceof StonecutterScreen
-                || (MC.currentScreen instanceof GenericContainerScreen && !skipGeneric)
-                || MC.currentScreen instanceof CreativeInventoryScreen) {
+        if (MC.screen instanceof ShulkerBoxScreen
+                || MC.screen instanceof AnvilScreen
+                || MC.screen instanceof BrewingStandScreen
+                || MC.screen instanceof CartographyTableScreen
+                || MC.screen instanceof CrafterScreen
+                || MC.screen instanceof EnchantmentScreen
+                || MC.screen instanceof FurnaceScreen
+                || MC.screen instanceof GrindstoneScreen
+                || MC.screen instanceof HopperScreen
+                || MC.screen instanceof HorseInventoryScreen
+                || MC.screen instanceof MerchantScreen
+                || MC.screen instanceof SmithingScreen
+                || MC.screen instanceof SmokerScreen
+                || MC.screen instanceof StonecutterScreen
+                || (MC.screen instanceof ContainerScreen && !skipGeneric)
+                || MC.screen instanceof CreativeModeInventoryScreen) {
             MODULE_MANAGER.getStorage().getByClass(AutoTotemModule.class).addDeathReason("invfail", "Inventory Fail");
             return false;
         }
 
-        ScreenHandler handler = MC.player.currentScreenHandler;
+        AbstractContainerMenu handler = MC.player.containerMenu;
 
-        DefaultedList<Slot> slots = handler.slots;
+        NonNullList<Slot> slots = handler.slots;
         List<ItemStack> before = Lists.newArrayListWithCapacity(slots.size());
-        for (Slot s : slots) before.add(s.getStack().copy());
+        for (Slot s : slots) before.add(s.getItem().copy());
 
-        MC.interactionManager.clickSlot(handler.syncId, slot, button, type, MC.player);
+        MC.gameMode.handleInventoryMouseClick(handler.containerId, slot, button, type, MC.player);
         return true;
     }
 }

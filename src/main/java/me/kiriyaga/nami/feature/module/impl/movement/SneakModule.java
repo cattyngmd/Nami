@@ -7,14 +7,14 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
+import me.kiriyaga.nami.mixin.DuckKeyMapping;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ public class SneakModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTickEvent(PreTickEvent event) {
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
         if (player == null) return;
 
         this.setDisplayInfo(mode.get().toString());
@@ -70,37 +70,37 @@ public class SneakModule extends Module {
     public void onLedgeClip(LedgeClipEvent event) {
         if (mode.get() != Mode.LEDGE) return;
         assert MC.player != null;
-        if (!MC.player.isSneaking()) {
-            MC.player.setSneaking(true);
+        if (!MC.player.isShiftKeyDown()) {
+            MC.player.setShiftKeyDown(true);
             event.cancel();
             event.setClipped(true);
         }
     }
 
-    private boolean shouldSneakAtEdges(ClientPlayerEntity player) {
-        Vec3d pos = player.getEntityPos();
+    private boolean shouldSneakAtEdges(LocalPlayer player) {
+        Vec3 pos = player.position();
         int blockY = (int) Math.floor(pos.y - 0.001);
 
-        if (!MC.player.isOnGround())
+        if (!MC.player.onGround())
             return false;
 
         checkedBlocks.clear();
 
-        BlockPos basePos = new BlockPos(player.getBlockPos().getX(), blockY, player.getBlockPos().getZ());
+        BlockPos basePos = new BlockPos(player.blockPosition().getX(), blockY, player.blockPosition().getZ());
 
         BlockPos closestBlock = null;
         double closestDistanceSq = Double.MAX_VALUE;
 
         for (int dx = -CHECK_RADIUS; dx <= CHECK_RADIUS; dx++) {
             for (int dz = -CHECK_RADIUS; dz <= CHECK_RADIUS; dz++) {
-                BlockPos checkPos = basePos.add(dx, 0, dz);
-                BlockState state = MC.world.getBlockState(checkPos);
+                BlockPos checkPos = basePos.offset(dx, 0, dz);
+                BlockState state = MC.level.getBlockState(checkPos);
 
                 if (state.isAir()) continue;
 
                 double centerX = checkPos.getX() + 0.5;
                 double centerZ = checkPos.getZ() + 0.5;
-                double distSq = pos.squaredDistanceTo(centerX, pos.y, centerZ);
+                double distSq = pos.distanceToSqr(centerX, pos.y, centerZ);
 
                 if (distSq < closestDistanceSq) {
                     closestDistanceSq = distSq;
@@ -134,8 +134,8 @@ public class SneakModule extends Module {
             offsetZ = dz > 0 ? 1 : -1;
         }
 
-        BlockPos directionToCheck = closestBlock.add(offsetX, 0, offsetZ);
-        BlockState supportBlock = MC.world.getBlockState(directionToCheck);
+        BlockPos directionToCheck = closestBlock.offset(offsetX, 0, offsetZ);
+        BlockState supportBlock = MC.level.getBlockState(directionToCheck);
 
         checkedBlocks.put(directionToCheck, new Color(255, 255, 0, 60));
 
@@ -165,10 +165,10 @@ public class SneakModule extends Module {
 //    }
 
     private void setSneakHeld(boolean held) {
-        KeyBinding sneakKey = MC.options.sneakKey;
-        InputUtil.Key boundKey = ((KeyBindingAccessor) sneakKey).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
-        sneakKey.setPressed(physicallyPressed || held);
+        KeyMapping sneakKey = MC.options.keyShift;
+        InputConstants.Key boundKey = ((DuckKeyMapping) sneakKey).getKey();
+        int keyCode = boundKey.getValue();
+        boolean physicallyPressed = InputConstants.isKeyDown(MC.getWindow(), keyCode);
+        sneakKey.setDown(physicallyPressed || held);
     }
 }

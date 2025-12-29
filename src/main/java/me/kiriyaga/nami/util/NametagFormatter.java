@@ -2,13 +2,13 @@ package me.kiriyaga.nami.util;
 
 import me.kiriyaga.nami.feature.module.impl.visuals.NametagsModule;
 import me.kiriyaga.nami.util.entity.HostileUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import net.minecraft.world.GameMode;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.level.GameType;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -31,11 +31,11 @@ public class NametagFormatter {
         this.module = module;
     }
 
-    public Text formatPlayer(PlayerEntity player) {
-        return Text.literal(player.getName().getString()).setStyle(getStyle());
+    public Component formatPlayer(Player player) {
+        return Component.literal(player.getName().getString()).setStyle(getStyle());
     }
 
-    public Text getHealthText(PlayerEntity player) {
+    public Component getHealthText(Player player) {
         double hp = player.getHealth() + player.getAbsorptionAmount();
         double health = Math.round(hp * 2.0) / 2.0;
 
@@ -53,13 +53,13 @@ public class NametagFormatter {
         }
 
         Style style = getStyle().withColor(TextColor.fromRgb(rgbColor));
-        return Text.literal(df.format(hp)).setStyle(style);
+        return Component.literal(df.format(hp)).setStyle(style);
     }
 
-    public Text formatGameMode(PlayerEntity player) {
-        GameMode gm = GameMode.SURVIVAL;
+    public Component formatGameMode(Player player) {
+        GameType gm = GameType.SURVIVAL;
         try {
-            var entry = MC.getNetworkHandler().getPlayerListEntry(player.getUuid());
+            var entry = MC.getConnection().getPlayerInfo(player.getUUID());
             if (entry != null) gm = entry.getGameMode();
         } catch (Exception ignored) {}
 
@@ -72,13 +72,13 @@ public class NametagFormatter {
             default -> gmShort = "[?]";
         }
 
-        return Text.literal(gmShort).setStyle(getStyle().withColor(TextColor.fromRgb(Color.WHITE.getRGB())));
+        return Component.literal(gmShort).setStyle(getStyle().withColor(TextColor.fromRgb(Color.WHITE.getRGB())));
     }
 
-    public Text formatPing(PlayerEntity player) {
+    public Component formatPing(Player player) {
         int ping = 0;
         try {
-            var entry = MC.getNetworkHandler().getPlayerListEntry(player.getUuid());
+            var entry = MC.getConnection().getPlayerInfo(player.getUUID());
             if (entry != null) ping = entry.getLatency();
         } catch (Exception ignored) {}
 
@@ -96,30 +96,30 @@ public class NametagFormatter {
         }
 
         Style style = getStyle().withColor(TextColor.fromRgb(rgbColor));
-        return Text.literal(ping + "ms").setStyle(style);
+        return Component.literal(ping + "ms").setStyle(style);
     }
 
-    public Text formatEntityId(Entity entity) {
-        return Text.literal(String.valueOf(entity.getId())).setStyle(getStyle().withColor(TextColor.fromRgb(Color.WHITE.getRGB())));
+    public Component formatEntityId(Entity entity) {
+        return Component.literal(String.valueOf(entity.getId())).setStyle(getStyle().withColor(TextColor.fromRgb(Color.WHITE.getRGB())));
     }
 
-    public Text formatEntity(Entity entity) {
-        return Text.literal(entity.getName().getString()).setStyle(getStyle());
+    public Component formatEntity(Entity entity) {
+        return Component.literal(entity.getName().getString()).setStyle(getStyle());
     }
 
-    public Text formatItem(ItemEntity item) {
-        String name = item.getStack().getName().getString();
-        int count = item.getStack().getCount();
+    public Component formatItem(ItemEntity item) {
+        String name = item.getItem().getHoverName().getString();
+        int count = item.getItem().getCount();
         String text = count > 1 ? name + " x" + count : name;
-        return Text.literal(text).setStyle(getStyle());
+        return Component.literal(text).setStyle(getStyle());
     }
 
-    public Text formatWithColor(Text baseText, Color forcedColor, Entity entity) {
+    public Component formatWithColor(Component baseText, Color forcedColor, Entity entity) {
         Color color = forcedColor;
 
         if (color == null && entity != null) {
-            if (entity instanceof PlayerEntity player) {
-                if (player.isSneaking()) {
+            if (entity instanceof Player player) {
+                if (player.isShiftKeyDown()) {
                     color = COLOR_SNEAK;
                 } else if (FRIEND_MANAGER.isFriend(player.getName().getString())) {
                     color = COLOR_FRIEND;

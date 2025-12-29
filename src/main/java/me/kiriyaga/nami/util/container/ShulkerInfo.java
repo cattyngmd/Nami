@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.util.container;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 
@@ -24,10 +24,10 @@ public class ShulkerInfo {
 
     public static ShulkerInfo create(ItemStack stack, int slot, boolean compact) {
         if (!(stack.getItem() instanceof BlockItem item)) return null;
-        if (!(item.getBlock() instanceof net.minecraft.block.ShulkerBoxBlock)) return null;
+        if (!(item.getBlock() instanceof net.minecraft.world.level.block.ShulkerBoxBlock)) return null;
 
         List<ItemStack> items = new ArrayList<>(Collections.nCopies(27, ItemStack.EMPTY));
-        var component = stack.getComponents().getOrDefault(net.minecraft.component.DataComponentTypes.CONTAINER, null);
+        var component = stack.getComponents().getOrDefault(net.minecraft.core.component.DataComponents.CONTAINER, null);
         if (component == null) return null;
 
         List<ItemStack> input = component.stream().toList();

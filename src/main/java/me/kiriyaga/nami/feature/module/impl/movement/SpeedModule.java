@@ -12,8 +12,8 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.util.InputCache;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -35,33 +35,33 @@ public class SpeedModule extends Module {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
-        if (MC.player.isCrawling() || MC.player.isInSneakingPose() || MC.player.isSneaking() || MC.player.isGliding())
+        if (MC.player.isVisuallyCrawling() || MC.player.isCrouching() || MC.player.isShiftKeyDown() || MC.player.isFallFlying())
             return; // this fallback need due to sprinting not apply for theese states
         // also we do not need swimming because swimming do apply speed for sprinitng
 
-        if (!inLiquid.get() && MC.player.isTouchingWater())
+        if (!inLiquid.get() && MC.player.isInWater())
             return;
 
         this.setDisplayInfo(mode.get().toString());
 
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();
-            float pitch = MC.player.getPitch();
+            float pitch = MC.player.getXRot();
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(SpeedModule.class.getName(), 1, yaw, pitch, RotationModule.RotationMode.MOTION));
 
-            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugSpeedRot(Text.of("Yaw diff: " + Math.abs(((MC.player.getYaw() - getYaw() + 540) % 360) - 180) ));
+            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugSpeedRot(Component.nullToEmpty("Yaw diff: " + Math.abs(((MC.player.getYRot() - getYaw() + 540) % 360) - 180) ));
         }
     }
 
     private boolean isMoving() {
-        return MC.options.forwardKey.isPressed() ||
-                MC.options.backKey.isPressed() ||
-                MC.options.leftKey.isPressed() ||
-                MC.options.rightKey.isPressed();
+        return MC.options.keyUp.isDown() ||
+                MC.options.keyDown.isDown() ||
+                MC.options.keyLeft.isDown() ||
+                MC.options.keyRight.isDown();
     }
 
     private float getYaw() {
-        float realYaw = MC.player.getYaw();
+        float realYaw = MC.player.getYRot();
 
         boolean forward = InputCache.forward;
         boolean back = InputCache.back;
@@ -75,13 +75,13 @@ public class SpeedModule extends Module {
 
         if (inputZ > 0) return realYaw;
 
-        if (inputZ < 0) return MathHelper.wrapDegrees(realYaw + 180);
+        if (inputZ < 0) return Mth.wrapDegrees(realYaw + 180);
 
-        if (inputX != 0 && inputZ == 0) return MathHelper.wrapDegrees(realYaw + (inputX > 0 ? 90 : -90));
+        if (inputX != 0 && inputZ == 0) return Mth.wrapDegrees(realYaw + (inputX > 0 ? 90 : -90));
 
         if (inputZ > 0 && inputX != 0) return realYaw;
 
-        if (inputZ < 0 && inputX != 0) return MathHelper.wrapDegrees(realYaw + 180);
+        if (inputZ < 0 && inputX != 0) return Mth.wrapDegrees(realYaw + 180);
 
         return realYaw;
     }

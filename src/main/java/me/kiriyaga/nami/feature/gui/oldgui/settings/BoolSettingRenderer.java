@@ -3,8 +3,8 @@ package me.kiriyaga.nami.feature.gui.oldgui.settings;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -13,7 +13,7 @@ import static me.kiriyaga.nami.util.ColorUtils.*;
 public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
 
     @Override
-    public void render(DrawContext context, TextRenderer textRenderer, BoolSetting setting, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics context, Font textRenderer, BoolSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color textCol = getColorModule().getStyledTextSecondColor(255);
         Color bgColor = new Color(30, 30, 30, 0);

@@ -2,41 +2,45 @@ package me.kiriyaga.nami.util;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
-import me.kiriyaga.nami.mixin.ClientPlayerInteractionManagerAccessor;
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.*;
+import me.kiriyaga.nami.mixin.DuckMultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
 import static me.kiriyaga.nami.util.RotationUtils.*;
-import static net.minecraft.util.Hand.MAIN_HAND;
+import static net.minecraft.world.InteractionHand.MAIN_HAND;
 
 public class InteractionUtils {
 
     private static BlockPos currentBreakingBlock = null;
 
     public static boolean interactWithEntity(Entity entity, double range, boolean swing, boolean rotate, String rotationId) {
-        if (MC.player == null || MC.interactionManager == null || entity == null) return false;
+        if (MC.player == null || MC.gameMode == null || entity == null) return false;
 
-        Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
-        Vec3d closestPoint = getClosestPointToEye(eyePos, entity.getBoundingBox());
+        Vec3 eyePos = MC.player.getEyePosition(1.0f);
+        Vec3 closestPoint = getClosestPointToEye(eyePos, entity.getBoundingBox());
         float idealYaw = (float) getYawToVec(MC.player, closestPoint);
         float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
 
-        boolean insideBox = entity.getBoundingBox().contains(MC.player.getEyePos());
+        boolean insideBox = entity.getBoundingBox().contains(MC.player.getEyePosition());
         EntityHitResult hitResult = raycastTarget(MC.player, entity, range, idealYaw, idealPitch);
         if (!insideBox && hitResult == null) {
             return false;
@@ -50,24 +54,24 @@ public class InteractionUtils {
         if (!completed)
             return false;
 
-        MC.interactionManager.interactEntityAtLocation(MC.player, entity, hitResult, MAIN_HAND);
-        MC.interactionManager.interactEntity(MC.player, entity, MAIN_HAND);
+        MC.gameMode.interactAt(MC.player, entity, hitResult, MAIN_HAND);
+        MC.gameMode.interact(MC.player, entity, MAIN_HAND);
 
         if (swing)
-            MC.player.swingHand(MAIN_HAND);
+            MC.player.swing(MAIN_HAND);
 
         return true;
     }
 
 
     public static EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
-        Vec3d eyePos = player.getCameraPosVec(1.0f);
-        Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3d reachEnd = eyePos.add(look.multiply(reach));
+        Vec3 eyePos = player.getEyePosition(1.0f);
+        Vec3 look = getLookVectorFromYawPitch(yaw, pitch);
+        Vec3 reachEnd = eyePos.add(look.scale(reach));
 
-        Box targetBox = target.getBoundingBox();
+        AABB targetBox = target.getBoundingBox();
 
-        if (targetBox.raycast(eyePos, reachEnd).isPresent()) {
+        if (targetBox.clip(eyePos, reachEnd).isPresent()) {
             return new EntityHitResult(target);
         }
 
@@ -78,37 +82,37 @@ public class InteractionUtils {
         startUsingItem(MAIN_HAND);
     }
 
-    public static void startUsingItem(Hand hand) {
+    public static void startUsingItem(InteractionHand hand) {
         if (!MC.player.isUsingItem())
-            MC.player.setCurrentHand(hand);
+            MC.player.startUsingItem(hand);
     }
 
     public static void stopUsingItem() {
         if (MC.player.isUsingItem())
-            MC.player.stopUsingItem();
+            MC.player.releaseUsingItem();
     }
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos, int slot,double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
-        if (!MC.world.getBlockState(pos).isReplaceable())
+    public static boolean placeBlock(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
+        if (!MC.level.getBlockState(pos).canBeReplaced())
             return false;
 
         Direction direction = getDirection(pos);
         if (direction == null) {
             return false;
         }
-        BlockPos neighbor = pos.offset(direction.getOpposite());
+        BlockPos neighbor = pos.relative(direction.getOpposite());
         Direction clickFace = direction;
 
-        Vec3d playerPos = MC.player.getEntityPos();
+        Vec3 playerPos = MC.player.position();
         double offX = playerPos.x - Math.floor(playerPos.x);
         double offY = playerPos.y - Math.floor(playerPos.y);
         double offZ = playerPos.z - Math.floor(playerPos.z);
-        offX = MathHelper.clamp(offX, 0.2, 0.8);
-        offY = MathHelper.clamp(offY, 0.2, 0.8);
-        offZ = MathHelper.clamp(offZ, 0.2, 0.8);
-        Vec3d hitVec = Vec3d.ofCenter(neighbor);
+        offX = Mth.clamp(offX, 0.2, 0.8);
+        offY = Mth.clamp(offY, 0.2, 0.8);
+        offZ = Mth.clamp(offZ, 0.2, 0.8);
+        Vec3 hitVec = Vec3.atCenterOf(neighbor);
 
         switch (clickFace) { //todo: refactor this
             case UP, DOWN -> hitVec = hitVec.add(
@@ -133,7 +137,7 @@ public class InteractionUtils {
         // Simplified grim v2 PlacePosition check
         // we do not use all possible eye positions because its just unnecessary
         if (strictDirection) { // todo something while phased
-            Vec3d eyePos = MC.player.getEyePos();
+            Vec3 eyePos = MC.player.getEyePosition();
 
             boolean flag = switch (clickFace) { // https://github.com/GrimAnticheat/Grim/blob/fb926ab0fbca081ad765389c541880a4a435fabb/common/src/main/java/ac/grim/grimac/checks/impl/scaffolding/PositionPlace.java#L49
                 case NORTH -> eyePos.z <= neighbor.getZ() + 1e-3;
@@ -150,12 +154,12 @@ public class InteractionUtils {
             }
         }
 
-        Vec3d eyePos = MC.player.getEyePos();
-        Box blockBox = new Box(neighbor);
-        Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
+        Vec3 eyePos = MC.player.getEyePosition();
+        AABB blockBox = new AABB(neighbor);
+        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
+        Vec3 reachEnd = eyePos.add(lookDir.scale(range));
 
-        if (blockBox.raycast(eyePos, reachEnd).isEmpty())
+        if (blockBox.clip(eyePos, reachEnd).isEmpty())
             return false;
 
         BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, neighbor, false);
@@ -179,12 +183,12 @@ public class InteractionUtils {
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
 
             if (simulate)
-                MC.interactionManager.interactBlock(MC.player, MAIN_HAND, hitResult);
+                MC.gameMode.useItemOn(MC.player, MAIN_HAND, hitResult);
             else
-                sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(MAIN_HAND, hitResult, id));
+                sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hitResult, id));
 
             if (swing)
-                MC.player.swingHand(MAIN_HAND);
+                MC.player.swing(MAIN_HAND);
 
             result = true;
 
@@ -196,10 +200,10 @@ public class InteractionUtils {
 
     public static boolean interactBlockAt(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
 
-        Vec3d eyePos = MC.player.getEyePos();
-        Vec3d hitVec = Vec3d.ofCenter(pos);
+        Vec3 eyePos = MC.player.getEyePosition();
+        Vec3 hitVec = Vec3.atCenterOf(pos);
 
-        Direction clickFace = Direction.getFacing(hitVec.x - eyePos.x, hitVec.y - eyePos.y, hitVec.z - eyePos.z);
+        Direction clickFace = Direction.getApproximateNearest(hitVec.x - eyePos.x, hitVec.y - eyePos.y, hitVec.z - eyePos.z);
 
         if (strictDirection) {
             boolean flag = switch (clickFace) {
@@ -214,11 +218,11 @@ public class InteractionUtils {
                 return false;
         }
 
-       Box box = new Box(pos);
-        Vec3d lookDir = getClosestPointToEye(eyePos, box).subtract(eyePos).normalize();
-        Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
+       AABB box = new AABB(pos);
+        Vec3 lookDir = getClosestPointToEye(eyePos, box).subtract(eyePos).normalize();
+        Vec3 reachEnd = eyePos.add(lookDir.scale(range));
 
-        if (box.raycast(eyePos, reachEnd).isEmpty())
+        if (box.clip(eyePos, reachEnd).isEmpty())
             return false;
 
         BlockHitResult hit = new BlockHitResult(hitVec, clickFace, pos, false);
@@ -244,12 +248,12 @@ public class InteractionUtils {
         INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
 
         if (simulate)
-            MC.interactionManager.interactBlock(MC.player, MAIN_HAND, hit);
+            MC.gameMode.useItemOn(MC.player, MAIN_HAND, hit);
         else
-            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(MAIN_HAND, hit, id));
+            sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hit, id));
 
         if (swing)
-            MC.player.swingHand(MAIN_HAND);
+            MC.player.swing(MAIN_HAND);
 
         INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
         return true;
@@ -257,7 +261,7 @@ public class InteractionUtils {
 
     public static Direction getDirection(BlockPos blockPos) {
         for (final Direction direction : Direction.values()) {
-            final BlockState state = MC.world.getBlockState(blockPos.offset(direction));
+            final BlockState state = MC.level.getBlockState(blockPos.relative(direction));
             if (state.isAir() || !state.getFluidState().isEmpty()) {
                 continue;
             }
@@ -276,25 +280,25 @@ public class InteractionUtils {
 
     public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {
         if (grim) {
-            MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+            MC.getConnection().send(new ServerboundPlayerActionPacket(
+                    ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
 
-            MC.interactionManager.interactBlock(MC.player, Hand.OFF_HAND, target);
+            MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, target);
             if (swing)
-                MC.player.swingHand(Hand.MAIN_HAND, false);
+                MC.player.swing(InteractionHand.MAIN_HAND, false);
 
-            MC.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
-            MC.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+            MC.getConnection().send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
+            MC.getConnection().send(new ServerboundPlayerActionPacket(
+                    ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
         } else {
-            MC.interactionManager.interactBlock(MC.player, Hand.MAIN_HAND, target);
+            MC.gameMode.useItemOn(MC.player, InteractionHand.MAIN_HAND, target);
             if (swing)
-                MC.player.swingHand(Hand.MAIN_HAND);
+                MC.player.swing(InteractionHand.MAIN_HAND);
         }
     }
 
     public static boolean breakBlock(BlockPos pos, double range, boolean rotate, boolean swing, boolean grim, boolean strictDirection, String rotationId) {
-        if (MC.player == null || MC.interactionManager == null)
+        if (MC.player == null || MC.gameMode == null)
             return false;
 
         //CHAT_MANAGER.sendRaw(((ClientPlayerInteractionManagerAccessor) MC.interactionManager).getBlockBreakingCooldown()+"");
@@ -306,12 +310,12 @@ public class InteractionUtils {
             return false;
         }
 
-        Vec3d eyePos = MC.player.getEyePos();
-        Box blockBox = new Box(pos);
-        Vec3d lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3d reachEnd = eyePos.add(lookDir.multiply(range));
+        Vec3 eyePos = MC.player.getEyePosition();
+        AABB blockBox = new AABB(pos);
+        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
+        Vec3 reachEnd = eyePos.add(lookDir.scale(range));
 
-        if (blockBox.raycast(eyePos, reachEnd).isEmpty())
+        if (blockBox.clip(eyePos, reachEnd).isEmpty())
             return false;
 
         double dx = eyePos.x - blockBox.getCenter().x;
@@ -346,10 +350,10 @@ public class InteractionUtils {
 
 
         if (rotate) {
-            Vec3d center = Vec3d.ofCenter(pos).add(
-                    direction.getOffsetX() * 0.5,
-                    direction.getOffsetY() * 0.5,
-                    direction.getOffsetZ() * 0.5
+            Vec3 center = Vec3.atCenterOf(pos).add(
+                    direction.getStepX() * 0.5,
+                    direction.getStepY() * 0.5,
+                    direction.getStepZ() * 0.5
             );
 
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
@@ -364,11 +368,11 @@ public class InteractionUtils {
             }
         }
 
-        boolean success = MC.interactionManager.updateBlockBreakingProgress(pos, direction);
+        boolean success = MC.gameMode.continueDestroyBlock(pos, direction);
         if (swing)
-            MC.player.swingHand(MAIN_HAND);
+            MC.player.swing(MAIN_HAND);
 
-        if (grim && ((ClientPlayerInteractionManagerAccessor) MC.interactionManager).getBlockBreakingCooldown() != 0) // https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/FastBreak.java#L28
+        if (grim && ((DuckMultiPlayerGameMode) MC.gameMode).getDestroyDelay() != 0) // https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/FastBreak.java#L28
             return false;
 
         if (isBlockAirOrFluid(pos)) {  // somehow it happens https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/AirLiquidBreak.java#L18
@@ -378,7 +382,7 @@ public class InteractionUtils {
 
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
             currentBreakingBlock = pos;
-            MC.interactionManager.attackBlock(pos, direction);
+            MC.gameMode.startDestroyBlock(pos, direction);
         } else {
             if (!success) {
                 currentBreakingBlock = null;
@@ -390,10 +394,10 @@ public class InteractionUtils {
     }
 
     private static boolean isBlockAirOrFluid(BlockPos pos) {
-        if (MC.world.getBlockState(pos).isAir()) {
+        if (MC.level.getBlockState(pos).isAir()) {
             return true;
         }
-        FluidState fluidState = MC.world.getFluidState(pos);
+        FluidState fluidState = MC.level.getFluidState(pos);
         return !fluidState.isEmpty();
     }
 
@@ -402,12 +406,12 @@ public class InteractionUtils {
     }
 
     public static boolean isPlaceable(BlockPos pos, int distance) {
-        Box blockBox = new Box(pos);
-        for (Entity entity : MC.world.getEntities()) {
-            if (entity.squaredDistanceTo(MC.player) > distance) continue;
-            if (entity instanceof EndCrystalEntity) continue;
+        AABB blockBox = new AABB(pos);
+        for (Entity entity : MC.level.entitiesForRendering()) {
+            if (entity.distanceToSqr(MC.player) > distance) continue;
+            if (entity instanceof EndCrystal) continue;
             if (entity instanceof ItemEntity) continue;
-            if (entity instanceof ArrowEntity) continue;
+            if (entity instanceof Arrow) continue;
 
             if (entity.getBoundingBox().intersects(blockBox)) {
                 return true;
@@ -417,7 +421,7 @@ public class InteractionUtils {
     }
 
     public static boolean isReplaceable(BlockPos pos) {
-        return MC.world.getBlockState(pos).isReplaceable();
+        return MC.level.getBlockState(pos).canBeReplaced();
     }
 
     public static boolean isBed(Block block) {

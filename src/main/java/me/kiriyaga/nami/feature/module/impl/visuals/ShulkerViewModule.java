@@ -16,16 +16,16 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
 import me.kiriyaga.nami.util.container.ContainerUtils;
 import me.kiriyaga.nami.util.container.ShulkerInfo;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 
 import java.awt.*;
 import java.util.*;
@@ -67,27 +67,27 @@ public class ShulkerViewModule extends Module {
     public void onTick(PreTickEvent event) {
         shulkerList.clear();
 
-        if (!(MC.currentScreen instanceof HandledScreen<?> screen)) return;
+        if (!(MC.screen instanceof AbstractContainerScreen<?> screen)) return;
 
-        for (Slot slot : screen.getScreenHandler().slots) {
-            ShulkerInfo info = ShulkerInfo.create(slot.getStack(), slot.id, compact.get());
+        for (Slot slot : screen.getMenu().slots) {
+            ShulkerInfo info = ShulkerInfo.create(slot.getItem(), slot.index, compact.get());
             if (info != null) shulkerList.add(info);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender(RenderScreenEvent event) {
-        if (!(MC.currentScreen instanceof HandledScreen)) return;
+        if (!(MC.screen instanceof AbstractContainerScreen)) return;
 
-        DrawContext context = event.getDrawContext();
+        GuiGraphics context = event.getDrawContext();
         boolean right = false;
         int edgePadding = 6;
         currentY = bothSides.get() ? edgePadding : edgePadding + offset;
         startX = edgePadding;
         float scale = this.scale.get().floatValue();
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(scale, scale);
+        context.pose().pushMatrix();
+        context.pose().scale(scale, scale);
 
         for (ShulkerInfo info : shulkerList) {
             int rows = info.rows();
@@ -96,13 +96,13 @@ public class ShulkerViewModule extends Module {
             int width = cols * GRID_WIDTH + MARGIN * cols;
             int height = rows * GRID_HEIGHT + MARGIN * rows;
 
-            if (currentY + height > MC.getWindow().getScaledHeight() / scale && bothSides.get() && !right) {
+            if (currentY + height > MC.getWindow().getGuiScaledHeight() / scale && bothSides.get() && !right) {
                 right = true;
                 currentY = edgePadding + offset;
             }
 
             if (right) {
-                startX = (int) ((MC.getWindow().getScaledWidth() - width - edgePadding) / scale);
+                startX = (int) ((MC.getWindow().getGuiScaledWidth() - width - edgePadding) / scale);
             }
 
             context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
@@ -118,11 +118,11 @@ public class ShulkerViewModule extends Module {
                 int x = startX + (count % info.cols()) * GRID_WIDTH + MARGIN;
                 int y = currentY + (count / info.cols()) * GRID_HEIGHT + MARGIN;
 
-                context.drawItem(stack, x, y);
-                context.drawStackOverlay(MC.textRenderer, stack, x, y, null);
+                context.renderItem(stack, x, y);
+                context.renderItemDecorations(MC.font, stack, x, y, null);
 
                 if (tooltip.get() && !stack.isEmpty() && isHovered(event.getMouseX(), event.getMouseY(), x, y, 16, 16, scale)) {
-                    context.drawItemTooltip(MC.textRenderer, stack, (int) event.getMouseX(), (int) event.getMouseY());
+                    context.setTooltipForNextFrame(MC.font, stack, (int) event.getMouseX(), (int) event.getMouseY());
                 }
 
                 count++;
@@ -141,7 +141,7 @@ public class ShulkerViewModule extends Module {
             currentY += height + MARGIN;
         }
 
-        context.getMatrices().popMatrix();
+        context.pose().popMatrix();
         totalHeight = currentY - offset;
     }
 
@@ -157,11 +157,11 @@ public class ShulkerViewModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onScroll(MouseScrollEvent event) {
       //  CHAT_MANAGER.sendRaw("mouse scroll event called");
-        float maxOffset = Math.min(-totalHeight + MC.getWindow().getScaledHeight() / (scale.get()).floatValue(), 0);
-        offset = (int) MathHelper.clamp(offset + (int) Math.ceil(event.amount()) * (scrollsensitivity.get() * 10), maxOffset, 0);
+        float maxOffset = Math.min(-totalHeight + MC.getWindow().getGuiScaledHeight() / (scale.get()).floatValue(), 0);
+        offset = (int) Mth.clamp(offset + (int) Math.ceil(event.amount()) * (scrollsensitivity.get() * 10), maxOffset, 0);
     }
 
-    private void drawBorder(DrawContext context, int x, int y, int width, int height, int color) {
+    private void drawBorder(GuiGraphics context, int x, int y, int width, int height, int color) {
         context.fill(x, y, x + width, y + 1, color);
         context.fill(x, y + height - 1, x + width, y + height, color);
         context.fill(x, y, x + 1, y + height, color);
@@ -169,12 +169,12 @@ public class ShulkerViewModule extends Module {
     }
 
     private int getShulkerColor(ItemStack stack) {
-        if (!(stack.getItem() instanceof BlockItem blockItem)) return ColorHelper.getArgb(255, 128, 128, 128);
+        if (!(stack.getItem() instanceof BlockItem blockItem)) return ARGB.color(255, 128, 128, 128);
 
-        if (!(blockItem.getBlock() instanceof ShulkerBoxBlock shulker)) return ColorHelper.getArgb(255, 128, 128, 128);
+        if (!(blockItem.getBlock() instanceof ShulkerBoxBlock shulker)) return ARGB.color(255, 128, 128, 128);
 
         DyeColor color = shulker.getColor();
-        if (color == null) return ColorHelper.getArgb(255, 128, 0, 128);
+        if (color == null) return ARGB.color(255, 128, 0, 128);
 
         return DyeColorToARGB(color);
     }

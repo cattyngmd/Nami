@@ -9,9 +9,9 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.gui.screens.DeathScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.Nami.MC;
@@ -34,13 +34,13 @@ public class RespawnModule extends Module {
     }
     @SubscribeEvent
     public void onTick(PreTickEvent ev) {
-        if (MC.player == null || !MC.player.isDead() || b)
+        if (MC.player == null || !MC.player.isDeadOrDying() || b)
             return;
 
         b = true;
         if (sendCords.get()) {
-                String coords = String.format("X: %d Y: %d Z: %d", Math.round(MC.player.getEntityPos().x), Math.round(MC.player.getEntityPos().y), Math.round(MC.player.getEntityPos().z));
-                Text reason = CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}.");
+                String coords = String.format("X: %d Y: %d Z: %d", Math.round(MC.player.position().x), Math.round(MC.player.position().y), Math.round(MC.player.position().z));
+                Component reason = CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}.");
                 LOG.addEntry(this.name+": "+ reason.getString());
         }
     }
@@ -52,7 +52,7 @@ public class RespawnModule extends Module {
 
         if (autoRespawn.get()) {
 
-            MC.player.requestRespawn();
+            MC.player.respawn();
             event.cancel();
         }
         b = false;

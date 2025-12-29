@@ -12,7 +12,7 @@ public class MacroManager {
     private final Map<Integer, Boolean> lastKeyStates = new HashMap<>();
 
     public boolean isKeyPressed(int keyCode) {
-        return org.lwjgl.glfw.GLFW.glfwGetKey(MC.getWindow().getHandle(), keyCode) == org.lwjgl.glfw.GLFW.GLFW_PRESS;
+        return org.lwjgl.glfw.GLFW.glfwGetKey(MC.getWindow().handle(), keyCode) == org.lwjgl.glfw.GLFW.GLFW_PRESS;
     }
 
     public boolean wasKeyPressedLastTick(int keyCode) {

@@ -24,7 +24,7 @@ public class YawCommand extends Command {
         double yawDouble = (double) parsedArgs[0];
         float yaw = (float) yawDouble;
 
-        MC.player.setYaw(yaw);
+        MC.player.setYRot(yaw);
         CHAT_MANAGER.sendPersistent(getClass().getName(),
                 CAT_FORMAT.format("Yaw set to: {g}" + yaw + "{reset}."));
     }

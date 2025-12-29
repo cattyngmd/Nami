@@ -4,9 +4,9 @@ import me.kiriyaga.nami.feature.gui.oldgui.settings.*;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.*;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class SettingPanel {
         return height;
     }
 
-    public static int renderSettings(DrawContext context, TextRenderer textRenderer, Module module, int x, int y, int mouseX, int mouseY) {
+    public static int renderSettings(GuiGraphics context, Font textRenderer, Module module, int x, int y, int mouseX, int mouseY) {
         int curY = y + SettingRenderer.MODULE_SPACING;
         for (Setting<?> setting : module.getSettings()) {
             if (!setting.isShow()) continue;
@@ -98,13 +98,13 @@ public class SettingPanel {
             }
         }
 
-    public static void mouseReleased(Click click) {
+    public static void mouseReleased(MouseButtonEvent click) {
         if (draggedSetting != null) {
             SettingRenderer<?> renderer = renderers.get(draggedSetting);
             if (renderer != null) {
                 @SuppressWarnings("unchecked")
                 SettingRenderer<Setting<?>> generic = (SettingRenderer<Setting<?>>) renderer;
-                generic.mouseReleased(draggedSetting, click.comp_4798(), click.comp_4799(), click.button());
+                generic.mouseReleased(draggedSetting, click.x(), click.y(), click.button());
             }
         }
         draggedSetting = null;
@@ -119,8 +119,8 @@ public class SettingPanel {
     }
 
     private static void playClickSound() {
-        MC.getSoundManager().play(net.minecraft.client.sound.PositionedSoundInstance.master(
-                net.minecraft.sound.SoundEvents.UI_BUTTON_CLICK, 1.0f
+        MC.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
+                net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK, 1.0f
         ));
     }
 }

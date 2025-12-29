@@ -10,13 +10,15 @@ import me.kiriyaga.nami.feature.setting.impl.*;
 
 import me.kiriyaga.nami.util.BlockUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.*;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.state.BlockState;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import java.awt.*;
 import java.util.*;
@@ -37,7 +39,7 @@ public class BlockSearchModule extends Module {
     private final BlockingQueue<Chunk> snapshotQueue = new LinkedBlockingQueue<>();
     private BlockSearch workerThread;
     public static final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
-    private final Queue<Text> pendingMessages = new LinkedList<>();
+    private final Queue<Component> pendingMessages = new LinkedList<>();
 
     public BlockSearchModule() {
         super("BlockSearch", "Search for specified blocks.", ModuleCategory.of("Render"));
@@ -71,10 +73,10 @@ public class BlockSearchModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onChunkLoad(ChunkDataEvent event) {
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
         if (notAtSpawn.get()) {
-            BlockPos pos = MC.player.getBlockPos();
+            BlockPos pos = MC.player.blockPosition();
             if (Math.abs(pos.getX()) + Math.abs(pos.getZ()) < 12000) return;
         }
 
@@ -83,19 +85,19 @@ public class BlockSearchModule extends Module {
     }
 
     // yeah we still are forced to load them in main thread
-    private Chunk makeSnapshot(WorldChunk chunk) {
+    private Chunk makeSnapshot(LevelChunk chunk) {
         ChunkPos pos = chunk.getPos();
         List<Block> blocks = new ArrayList<>();
 
         int minY = -64;
         int maxY = 320;
-        BlockPos start = pos.getStartPos();
+        BlockPos start = pos.getWorldPosition();
 
         for (int x = 0; x < 16; x++) {
             for (int y = minY; y < maxY; y++) {
                 for (int z = 0; z < 16; z++) {
-                    BlockState state = MC.world.getBlockState(new BlockPos(start.getX()+x, y, start.getZ()+z));
-                    Identifier id = Registries.BLOCK.getId(state.getBlock());
+                    BlockState state = MC.level.getBlockState(new BlockPos(start.getX()+x, y, start.getZ()+z));
+                    Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
 
                     blocks.add(new Block(x, y, z, id));
                 }
@@ -107,20 +109,20 @@ public class BlockSearchModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender(Render3DEvent event) {
-        MatrixStack matrices = event.getMatrices();
+        PoseStack matrices = event.getMatrices();
 
         synchronized (pendingMessages) {
             while (!pendingMessages.isEmpty()) CHAT_MANAGER.sendRaw(pendingMessages.poll());
         }
 
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
         for (Set<BlockPos> set : chunkBlocks.values()) {
             for (BlockPos pos : set) {
 
-                BlockState state = MC.world.getBlockState(pos);
+                BlockState state = MC.level.getBlockState(pos);
 
-                RenderUtil.drawBlockPosLines(MC.world, pos, state, BlockUtils.getColorByBlockId(state),true,true, 1.5f);
+                RenderUtil.drawBlockPosLines(MC.level, pos, state, BlockUtils.getColorByBlockId(state),true,true, 1.5f);
 
             //    if (tracers.get())
                 //    RenderUtil.drawLine(matrices, MC.player.getEyePos(), pos.toCenterPos(), BlockUtils.getColorByBlockId(state), 1.50);
@@ -129,18 +131,18 @@ public class BlockSearchModule extends Module {
     }
 
     private void reloadChunks() {
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
         snapshotQueue.clear();
         chunkBlocks.clear();
 
-        int radius = MC.options.getViewDistance().getValue();
-        ChunkPos pc = new ChunkPos(MC.player.getBlockPos());
+        int radius = MC.options.renderDistance().get();
+        ChunkPos pc = new ChunkPos(MC.player.blockPosition());
 
         for (int dx = -radius; dx <= radius; dx++)
             for (int dz = -radius; dz <= radius; dz++) {
                 snapshotQueue.offer(makeSnapshot(
-                        MC.world.getChunk(pc.x + dx, pc.z + dz)
+                        MC.level.getChunk(pc.x + dx, pc.z + dz)
                 ));
             }
     }

@@ -29,12 +29,12 @@ public class ClickGuiModule extends Module {
 
     @Override
     public void onEnable(){
-        if (MC == null || MC.mouse == null)
+        if (MC == null || MC.mouseHandler == null)
             return;
 
         NAVIGATE_PANEL.resetActive();
         CLICK_GUI.scale = this.scale.get().floatValue(); // bad
-        CLICK_GUI.setPreviousScreen(MC.currentScreen);
+        CLICK_GUI.setPreviousScreen(MC.screen);
 
         MC.setScreen(CLICK_GUI);
         this.toggle();

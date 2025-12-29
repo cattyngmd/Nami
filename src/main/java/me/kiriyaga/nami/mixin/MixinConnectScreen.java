@@ -1,32 +1,33 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.Nami;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
-import net.minecraft.client.network.CookieStorage;
-import net.minecraft.client.network.ServerAddress;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ConnectScreen;
+import net.minecraft.client.multiplayer.TransferState;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.client.multiplayer.ServerData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.util.Pair;
+import net.minecraft.util.Tuple;
 
 @Mixin(ConnectScreen.class)
 public class MixinConnectScreen {
 
+    // TODO(Ravel): target method connect is ambiguous
     @Inject(method = "connect", at = @At("HEAD"))
     private static void onConnect(
             Screen screen,
-            MinecraftClient client,
+            Minecraft client,
             ServerAddress address,
-            ServerInfo info,
+            ServerData info,
             boolean quickPlay,
-            CookieStorage cookieStorage, // 1.21.5 loved
+            TransferState cookieStorage, // 1.21.5 loved
             CallbackInfo ci
     ) {
-        Nami.LAST_CONNECTION = new Pair<>(address, info);
+        Nami.LAST_CONNECTION = new Tuple<>(address, info);
     }
 }
 

@@ -5,17 +5,17 @@ import com.llamalad7.mixinextras.sugar.Local;
 import me.kiriyaga.nami.feature.module.impl.exploits.ReachModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.GameRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,29 +32,29 @@ public abstract class MixinGameRenderer {
 
     @Shadow
     @Final
-    private MinecraftClient client;
+    private Minecraft minecraft;
 
     @Shadow
-    public abstract void updateCrosshairTarget(float tickDelta);
+    public abstract void pick(float tickDelta);
 
     @Shadow
-    public abstract void reset();
+    public abstract void resetData();
 
     @Shadow
     @Final
-    private Camera camera;
+    private Camera mainCamera;
 
     @Unique
-    private final MatrixStack matrices = new MatrixStack();
+    private final PoseStack matrices = new PoseStack();
 
     @Shadow
-    protected abstract void bobView(MatrixStack matrices, float tickDelta);
+    protected abstract void bobView(PoseStack matrices, float tickDelta);
 
     @Shadow
-    protected abstract void tiltViewWhenHurt(MatrixStack matrices, float tickDelta);
+    protected abstract void bobHurt(PoseStack matrices, float tickDelta);
 
 
-    @Inject(method = "showFloatingItem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "displayItemActivation", at = @At("HEAD"), cancellable = true)
     private void onShowFloatingItem(ItemStack floatingItem, CallbackInfo info) {
         if (MODULE_MANAGER.getStorage() == null) return;
 
@@ -67,58 +67,58 @@ public abstract class MixinGameRenderer {
     @Unique
     private boolean freecamSet = false;
 
-    @Inject(method = "updateCrosshairTarget", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "pick", at = @At("HEAD"), cancellable = true)
     private void updateTargetedEntityInvoke(float tickDelta, CallbackInfo info) {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
         if (freecamModule == null || !freecamModule.isEnabled()) return;
 
-        if (client == null) return;
+        if (minecraft == null) return;
 
-        if (client.getCameraEntity() != null && !freecamSet) {
+        if (minecraft.getCameraEntity() != null && !freecamSet) {
             info.cancel();
 
-            Entity cameraE = client.getCameraEntity();
+            Entity cameraE = minecraft.getCameraEntity();
 
             double x = cameraE.getX();
             double y = cameraE.getY();
             double z = cameraE.getZ();
-            double lastX = cameraE.lastX;
-            double lastY = cameraE.lastY;
-            double lastZ = cameraE.lastZ;
-            float yaw = cameraE.getYaw();
-            float pitch = cameraE.getPitch();
-            float lastYaw = cameraE.lastYaw;
-            float lastPitch = cameraE.lastPitch;
+            double lastX = cameraE.xo;
+            double lastY = cameraE.yo;
+            double lastZ = cameraE.zo;
+            float yaw = cameraE.getYRot();
+            float pitch = cameraE.getXRot();
+            float lastYaw = cameraE.yRotO;
+            float lastPitch = cameraE.xRotO;
 
-            cameraE.setPos(freecamModule.getX(), freecamModule.getY() - cameraE.getEyeHeight(cameraE.getPose()), freecamModule.getZ());
+            cameraE.setPosRaw(freecamModule.getX(), freecamModule.getY() - cameraE.getEyeHeight(cameraE.getPose()), freecamModule.getZ());
 
-            cameraE.lastX = freecamModule.prevPos.x;
-            cameraE.lastY = freecamModule.prevPos.y - cameraE.getEyeHeight(cameraE.getPose());
-            cameraE.lastZ = freecamModule.prevPos.z;
+            cameraE.xo = freecamModule.prevPos.x;
+            cameraE.yo = freecamModule.prevPos.y - cameraE.getEyeHeight(cameraE.getPose());
+            cameraE.zo = freecamModule.prevPos.z;
 
-            cameraE.setYaw(freecamModule.yaw);
-            cameraE.setPitch(freecamModule.pitch);
-            cameraE.lastYaw = freecamModule.lastYaw;
-            cameraE.lastPitch = freecamModule.lastPitch;
+            cameraE.setYRot(freecamModule.yaw);
+            cameraE.setXRot(freecamModule.pitch);
+            cameraE.yRotO = freecamModule.lastYaw;
+            cameraE.xRotO = freecamModule.lastPitch;
 
             freecamSet = true;
 
-            if (client.gameRenderer != null && client.gameRenderer.getCamera() != null) {
-                updateCrosshairTarget(tickDelta);
+            if (minecraft.gameRenderer != null && minecraft.gameRenderer.getMainCamera() != null) {
+                pick(tickDelta);
             }
 
             freecamSet = false;
 
-            cameraE.setPos(x, y, z);
-            cameraE.lastX = lastX;
-            cameraE.lastY = lastY;
-            cameraE.lastZ = lastZ;
-            cameraE.setYaw(yaw);
-            cameraE.setPitch(pitch);
-            cameraE.lastYaw = lastYaw;
-            cameraE.lastPitch = lastPitch;
+            cameraE.setPosRaw(x, y, z);
+            cameraE.xo = lastX;
+            cameraE.yo = lastY;
+            cameraE.zo = lastZ;
+            cameraE.setYRot(yaw);
+            cameraE.setXRot(pitch);
+            cameraE.yRotO = lastYaw;
+            cameraE.xRotO = lastPitch;
         }
     }
 
@@ -171,25 +171,25 @@ public abstract class MixinGameRenderer {
     }*/
 
     private Entity getTargetedEntity() {
-        if (MC.crosshairTarget != null && MC.crosshairTarget.getType() == HitResult.Type.ENTITY) {
-            return ((EntityHitResult) MC.crosshairTarget).getEntity();
+        if (MC.hitResult != null && MC.hitResult.getType() == HitResult.Type.ENTITY) {
+            return ((EntityHitResult) MC.hitResult).getEntity();
         }
         return null;
     }
 
     private boolean isPickaxe(Item item) {
-        return item.getDefaultStack().isIn(ItemTags.PICKAXES);
+        return item.getDefaultInstance().is(ItemTags.PICKAXES);
     }
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
-    private void bobView(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+    private void bobView(PoseStack matrices, float tickDelta, CallbackInfo ci) {
         if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noBob.get()) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
-    private void tiltViewWhenHurt(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+    @Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true)
+    private void tiltViewWhenHurt(PoseStack matrices, float tickDelta, CallbackInfo ci) {
         if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noTilt.get()) {
             ci.cancel();
         }

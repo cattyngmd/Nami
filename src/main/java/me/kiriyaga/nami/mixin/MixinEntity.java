@@ -5,12 +5,12 @@ import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,22 +23,22 @@ import java.awt.*;
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity{
+public abstract class MixinEntity {
 
     @Shadow
-    public abstract Vec3d getRotationVector(float pitch, float yaw);
+    public abstract Vec3 calculateViewVector(float pitch, float yaw);
 
-    @Shadow public abstract boolean isPlayer();
+    @Shadow public abstract boolean isAlwaysTicking();
 
-    @Shadow public abstract float getYaw();
+    @Shadow public abstract float getYRot();
 
-    @Shadow public abstract float getPitch();
+    @Shadow public abstract float getXRot();
 
-    @Shadow public abstract void setYaw(float f);
+    @Shadow public abstract void setYRot(float f);
 
-    @Shadow public abstract void setPitch(float f);
+    @Shadow public abstract void setXRot(float f);
 
-    @Inject(method = "getTeamColorValue", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getTeamColor", at = @At("HEAD"), cancellable = true)
     private void onGetTeamColorValue(CallbackInfoReturnable<Integer> cir) {
         Entity self = (Entity) (Object) this;
 
@@ -48,7 +48,7 @@ public abstract class MixinEntity{
         }
     }
 
-    @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "turn", at = @At("HEAD"), cancellable = true)
     private void updateChangeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
         if ((Object) this != MC.player) return;
 
@@ -69,7 +69,7 @@ public abstract class MixinEntity{
         }
     }
 
-    @Inject(method = "pushAwayFrom", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "push", at = @At(value = "HEAD"), cancellable = true)
     private void pushAwayFrom(Entity e, CallbackInfo ci) {
         EntityPushEvent pushEntityEvent = new EntityPushEvent((Entity)(Object) this, e);
         EVENT_MANAGER.post(pushEntityEvent);
@@ -88,14 +88,14 @@ public abstract class MixinEntity{
         }
     }*/
 
-    @Inject(method = "getRotationVector()Lnet/minecraft/util/math/Vec3d;", at = @At("HEAD"), cancellable = true)
-    private void onGetRotationVector(CallbackInfoReturnable<Vec3d> cir) {
+    @Inject(method = "getLookAngle()Lnet/minecraft/world/phys/Vec3;", at = @At("HEAD"), cancellable = true)
+    private void onGetRotationVector(CallbackInfoReturnable<Vec3> cir) {
         if ((Object) this != MC.player) return;
         if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
         float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
         float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
 
-        cir.setReturnValue(((Entity) (Object) this).getRotationVector(spoofPitch, spoofYaw));
+        cir.setReturnValue(((Entity) (Object) this).calculateViewVector(spoofPitch, spoofYaw));
     }
 }

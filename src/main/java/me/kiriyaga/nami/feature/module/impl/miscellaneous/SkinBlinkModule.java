@@ -6,10 +6,10 @@ import me.kiriyaga.nami.event.impl.PostTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.GameOptionsAccessor;
+import me.kiriyaga.nami.mixin.DuckOptions;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
-import net.minecraft.entity.player.PlayerModelPart;
+import net.minecraft.world.entity.player.PlayerModelPart;
 
 import java.util.EnumSet;
 import java.util.Random;
@@ -56,7 +56,7 @@ public class SkinBlinkModule extends Module {
     public void onEnable() {
         if (MC.options == null) return;
 
-        enabledPlayerModelParts = ((GameOptionsAccessor) MC.options).getPlayerModelParts();
+        enabledPlayerModelParts = ((DuckOptions) MC.options).getPlayerModelParts();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class SkinBlinkModule extends Module {
 
         for (PlayerModelPart part : PlayerModelPart.values()) {
             boolean shouldEnable = enabledPlayerModelParts.contains(part);
-            MC.options.setPlayerModelPart(part, shouldEnable);
+            MC.options.setModelPart(part, shouldEnable);
         }
     }
 
@@ -77,7 +77,7 @@ public class SkinBlinkModule extends Module {
         if (now - lastBlinkTime < speed.get() * 50) return;
         lastBlinkTime = now;
 
-        Set<PlayerModelPart> currentParts = ((GameOptionsAccessor) MC.options).getPlayerModelParts();
+        Set<PlayerModelPart> currentParts = ((DuckOptions) MC.options).getPlayerModelParts();
         Set<Limb> limbsToToggle = EnumSet.noneOf(Limb.class);
 
         if (head.get()) limbsToToggle.add(Limb.HEAD);
@@ -89,7 +89,7 @@ public class SkinBlinkModule extends Module {
             for (PlayerModelPart part : limb.getParts()) {
                 boolean isEnabled = currentParts.contains(part);
                 boolean newValue = random.get() ? randomizer.nextBoolean() : !isEnabled;
-                MC.options.setPlayerModelPart(part, newValue);
+                MC.options.setModelPart(part, newValue);
             }
         }
     }

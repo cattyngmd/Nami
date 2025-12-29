@@ -6,9 +6,9 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import me.kiriyaga.nami.mixin.DuckKeyMapping;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -26,24 +26,24 @@ public class ParkourModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
         boolean shouldJump =
-                MC.player.isOnGround()
-                        && !MC.player.isSneaking()
-                        && MC.world.isSpaceEmpty(MC.player,
+                MC.player.onGround()
+                        && !MC.player.isShiftKeyDown()
+                        && MC.level.noCollision(MC.player,
                         MC.player.getBoundingBox()
-                                .offset(0.0, -0.5, 0.0)
-                                .expand(-0.001, 0.0, -0.001));
+                                .move(0.0, -0.5, 0.0)
+                                .inflate(-0.001, 0.0, -0.001));
 
         setJumpHeld(shouldJump);
     }
 
     private void setJumpHeld(boolean held) {
-        KeyBinding jumpKey = MC.options.jumpKey;
-        InputUtil.Key boundKey = ((KeyBindingAccessor) jumpKey).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
-        jumpKey.setPressed(physicallyPressed || held);
+        KeyMapping jumpKey = MC.options.keyJump;
+        InputConstants.Key boundKey = ((DuckKeyMapping) jumpKey).getKey();
+        int keyCode = boundKey.getValue();
+        boolean physicallyPressed = InputConstants.isKeyDown(MC.getWindow(), keyCode);
+        jumpKey.setDown(physicallyPressed || held);
     }
 }

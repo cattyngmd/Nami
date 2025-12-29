@@ -7,13 +7,13 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
@@ -38,9 +38,9 @@ public class AutoBowReleaseModule extends Module {
 
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null || !MC.player.isUsingItem()) return;
+        if (MC.player == null || MC.level == null || !MC.player.isUsingItem()) return;
 
-        Item usedItem = MC.player.getActiveItem().getItem();
+        Item usedItem = MC.player.getUseItem().getItem();
         if (usedItem != Items.BOW && usedItem != Items.TRIDENT) return;
 
         float tps = switch (tpsMode.get()) {
@@ -54,11 +54,11 @@ public class AutoBowReleaseModule extends Module {
         if (ticker >= ticks.get()) {
             ticker = 0f;
 
-            MC.getNetworkHandler().sendPacket(
-                    new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN)
+            MC.getConnection().send(
+                    new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM, BlockPos.ZERO, Direction.DOWN)
             );
-            MC.player.stopUsingItem();
-            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(MC.player.getActiveHand(), id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
+            MC.player.releaseUsingItem();
+            sendSequencedPacket(id -> new ServerboundUseItemPacket(MC.player.getUsedItemHand(), id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
 
         }
     }

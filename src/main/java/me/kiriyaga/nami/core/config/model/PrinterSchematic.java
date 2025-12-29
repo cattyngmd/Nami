@@ -2,12 +2,12 @@ package me.kiriyaga.nami.core.config.model;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
 
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -33,7 +33,7 @@ public class PrinterSchematic {
         );
 
         JsonArray array = new JsonArray();
-        ClientWorld world = MC.world;
+        ClientLevel world = MC.level;
 
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int y = min.getY(); y <= max.getY(); y++) {
@@ -48,7 +48,7 @@ public class PrinterSchematic {
                     obj.addProperty("y", type.equals("dynamic") ? y - min.getY() : y);
                     obj.addProperty("z", type.equals("dynamic") ? z - min.getZ() : z);
 
-                    String blockId = Registries.BLOCK.getId(state.getBlock()).toString();
+                    String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
                     obj.addProperty("block", blockId);
 
                     array.add(obj);
@@ -82,6 +82,6 @@ public class PrinterSchematic {
 
     public static Block parseBlock(JsonObject obj) {
         String blockId = obj.get("block").getAsString();
-        return Registries.BLOCK.get(Identifier.of(blockId));
+        return BuiltInRegistries.BLOCK.getValue(Identifier.parse(blockId));
     }
 }

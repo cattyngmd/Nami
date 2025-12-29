@@ -9,13 +9,13 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.resources.Identifier;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,38 +32,38 @@ public class NoSoundLagModule extends Module { // TODO whitelist sounds
     public final BoolSetting firework = addSetting(new BoolSetting("Firework", false));
     public final BoolSetting elytra = addSetting(new BoolSetting("Elytra", true));
 
-    private static final Set<RegistryEntry<SoundEvent>> ARMOR_SOUNDS = Sets.newHashSet(
-            SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
-            SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA,
-            SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND,
-            SoundEvents.ITEM_ARMOR_EQUIP_IRON,
-            SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
-            SoundEvents.ITEM_ARMOR_EQUIP_CHAIN,
-            SoundEvents.ITEM_ARMOR_EQUIP_LEATHER
+    private static final Set<Holder<SoundEvent>> ARMOR_SOUNDS = Sets.newHashSet(
+            SoundEvents.ARMOR_EQUIP_GENERIC,
+            SoundEvents.ARMOR_EQUIP_ELYTRA,
+            SoundEvents.ARMOR_EQUIP_DIAMOND,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            SoundEvents.ARMOR_EQUIP_GOLD,
+            SoundEvents.ARMOR_EQUIP_CHAIN,
+            SoundEvents.ARMOR_EQUIP_LEATHER
     );
 
     private static final Set<SoundEvent> FIREWORK_SOUNDS = Sets.newHashSet(
-            SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH,
-            SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST,
-            SoundEvents.ENTITY_FIREWORK_ROCKET_TWINKLE,
-            SoundEvents.ENTITY_FIREWORK_ROCKET_LARGE_BLAST,
-            SoundEvents.ENTITY_FIREWORK_ROCKET_LARGE_BLAST_FAR,
-            SoundEvents.ENTITY_FIREWORK_ROCKET_SHOOT,
-            SoundEvents.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
-            SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST_FAR
+            SoundEvents.FIREWORK_ROCKET_LAUNCH,
+            SoundEvents.FIREWORK_ROCKET_BLAST,
+            SoundEvents.FIREWORK_ROCKET_TWINKLE,
+            SoundEvents.FIREWORK_ROCKET_LARGE_BLAST,
+            SoundEvents.FIREWORK_ROCKET_LARGE_BLAST_FAR,
+            SoundEvents.FIREWORK_ROCKET_SHOOT,
+            SoundEvents.FIREWORK_ROCKET_TWINKLE_FAR,
+            SoundEvents.FIREWORK_ROCKET_BLAST_FAR
     );
 
     private static final Set<SoundEvent> ELYTRA_SOUNDS = Sets.newHashSet(
-            SoundEvents.ITEM_ELYTRA_FLYING
+            SoundEvents.ELYTRA_FLYING
     );
 
     private static final Set<SoundEvent> WITHER_SOUNDS = Sets.newHashSet(
-            SoundEvents.ENTITY_WITHER_AMBIENT,
-            SoundEvents.ENTITY_WITHER_DEATH,
-            SoundEvents.ENTITY_WITHER_BREAK_BLOCK,
-            SoundEvents.ENTITY_WITHER_HURT,
-            SoundEvents.ENTITY_WITHER_SPAWN,
-            SoundEvents.ENTITY_WITHER_SHOOT
+            SoundEvents.WITHER_AMBIENT,
+            SoundEvents.WITHER_DEATH,
+            SoundEvents.WITHER_BREAK_BLOCK,
+            SoundEvents.WITHER_HURT,
+            SoundEvents.WITHER_SPAWN,
+            SoundEvents.WITHER_SHOOT
     );
 
     private final Set<SoundEvent> activeSounds = ConcurrentHashMap.newKeySet();
@@ -85,8 +85,8 @@ public class NoSoundLagModule extends Module { // TODO whitelist sounds
             lastClearTime = now;
         }
 
-        if (event.getPacket() instanceof PlaySoundS2CPacket packet) {
-            SoundEvent sound = packet.getSound().comp_349();
+        if (event.getPacket() instanceof ClientboundSoundPacket packet) {
+            SoundEvent sound = packet.getSound().value();
 
             boolean cancel = false;
 
@@ -115,10 +115,10 @@ public class NoSoundLagModule extends Module { // TODO whitelist sounds
     public void onPreTick(PreTickEvent event) {
         if (!isEnabled() || !elytra.get()) return;
 
-        if (MC.player != null && MC.player.isGliding()) {
+        if (MC.player != null && MC.player.isFallFlying()) {
             for (SoundEvent sound : ELYTRA_SOUNDS) {
-                Identifier id = Registries.SOUND_EVENT.getId(sound);
-                MC.getSoundManager().stopSounds(id, SoundCategory.PLAYERS);
+                Identifier id = BuiltInRegistries.SOUND_EVENT.getKey(sound);
+                MC.getSoundManager().stop(id, SoundSource.PLAYERS);
             }
         }
     }

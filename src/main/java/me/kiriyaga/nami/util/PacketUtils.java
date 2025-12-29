@@ -1,23 +1,23 @@
 package me.kiriyaga.nami.util;
 
-import me.kiriyaga.nami.mixin.ClientWorldAccessor;
-import net.minecraft.client.network.PendingUpdateManager;
-import net.minecraft.client.network.SequencedPacketCreator;
+import me.kiriyaga.nami.mixin.DuckClientLevel;
+import net.minecraft.client.multiplayer.prediction.BlockStatePredictionHandler;
+import net.minecraft.client.multiplayer.prediction.PredictiveAction;
 
 import static me.kiriyaga.nami.Nami.MC;
 
 public class PacketUtils {
 
-    public static void sendSequencedPacket(SequencedPacketCreator packetCreator) {
-        if (MC.world == null || MC.getNetworkHandler() == null) {
+    public static void sendSequencedPacket(PredictiveAction packetCreator) {
+        if (MC.level == null || MC.getConnection() == null) {
             return;
         }
 
-        PendingUpdateManager p = ((ClientWorldAccessor) MC.world).getPendingUpdateManager().incrementSequence();
+        BlockStatePredictionHandler p = ((DuckClientLevel) MC.level).getBlockStatePredictionHandler().startPredicting();
 
         try (p) {
-            int sequence = p.getSequence();
-            MC.getNetworkHandler().sendPacket(packetCreator.predict(sequence));
+            int sequence = p.currentSequence();
+            MC.getConnection().send(packetCreator.predict(sequence));
         }
     }
 }

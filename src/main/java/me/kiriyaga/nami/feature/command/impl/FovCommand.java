@@ -24,7 +24,7 @@ public class FovCommand extends Command {
     public void execute(Object[] args) {
         int newFov = (int) args[0];
 
-        ((ISimpleOption)(Object) MC.options.getFov()).setValue(newFov);
+        ((ISimpleOption)(Object) MC.options.fov()).setValue(newFov);
 
         CHAT_MANAGER.sendPersistent(FovCommand.class.getName(),
                 CAT_FORMAT.format("FOV set to: {g}" + newFov + "{reset}."));

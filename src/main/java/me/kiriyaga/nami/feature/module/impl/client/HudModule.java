@@ -12,7 +12,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.ColorSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
-import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screens.ChatScreen;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class HudModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender2D(Render2DEvent event) {
-        boolean chatOpen = MC.currentScreen instanceof ChatScreen;
+        boolean chatOpen = MC.screen instanceof ChatScreen;
         ChatAnimationHelper.setChatOpen(chatOpen);
         ChatAnimationHelper.tick();
 
@@ -74,19 +74,19 @@ public class HudModule extends Module {
             if (offset > 0) {
                 event.getDrawContext().fill(
                         2,
-                        MC.getWindow().getScaledHeight() - offset,
-                        MC.getWindow().getScaledWidth() - 2,
-                        MC.getWindow().getScaledHeight() - 2,
-                        MC.options.getTextBackgroundColor(Integer.MIN_VALUE)
+                        MC.getWindow().getGuiScaledHeight() - offset,
+                        MC.getWindow().getGuiScaledWidth() - 2,
+                        MC.getWindow().getGuiScaledHeight() - 2,
+                        MC.options.getBackgroundColor(Integer.MIN_VALUE)
                 );
             }
         }
 
-        int screenHeight = MC.getWindow().getScaledHeight();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
         int chatZoneTop = screenHeight - (screenHeight / 8);
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
 
-        if (MC.getDebugHud().shouldShowDebugHud())
+        if (MC.getDebugOverlay().showDebugScreen())
             return;
 
         for (Module module : MODULE_MANAGER.getStorage().getAll()) {
@@ -97,7 +97,7 @@ public class HudModule extends Module {
                     int drawX = hudElement.getRenderXForElement(element);
                     int drawY = baseY + element.offsetY();
 
-                    boolean isInChatZone = (drawY + MC.textRenderer.fontHeight) >= chatZoneTop;
+                    boolean isInChatZone = (drawY + MC.font.lineHeight) >= chatZoneTop;
                     if (isInChatZone) {
                         drawY -= chatAnimationOffset;
                     }

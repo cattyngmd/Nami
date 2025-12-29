@@ -15,7 +15,7 @@ public class FontMetrics {
     public int getHeight() {
         FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
         if (!fontModule.isEnabled())
-            return rendererProvider.getRenderer().fontHeight;
+            return rendererProvider.getRenderer().lineHeight;
         return Math.round(fontModule.glyphSize.get() * 0.85f);
     }
 }

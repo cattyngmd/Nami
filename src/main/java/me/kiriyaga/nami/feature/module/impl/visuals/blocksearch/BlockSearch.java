@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.feature.module.impl.visuals.blocksearch;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -32,15 +32,15 @@ public class BlockSearch extends Thread {
                 Set<BlockPos> found = new HashSet<>();
 
                 for (Block bs : snapshot.blocks) {
-                    if (bs.id == Identifier.of("air") || bs.id == Identifier.of("void_air")|| bs.id == Identifier.of("cave_air")) {
+                    if (bs.id == Identifier.parse("air") || bs.id == Identifier.parse("void_air")|| bs.id == Identifier.parse("cave_air")) {
                         continue;
                     }
 
                     if (targets.contains(bs.id)) {
                         found.add(new BlockPos(
-                                snapshot.pos.getStartX() + bs.x,
+                                snapshot.pos.getMinBlockX() + bs.x,
                                 bs.y,
-                                snapshot.pos.getStartZ() + bs.z
+                                snapshot.pos.getMinBlockZ() + bs.z
                         ));
                     }
                 }

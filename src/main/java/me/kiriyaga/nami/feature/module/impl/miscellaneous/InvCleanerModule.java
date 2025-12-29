@@ -7,9 +7,9 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -33,15 +33,15 @@ public class InvCleanerModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
         if (++i < delay.get()) return;
         i = 0;
 
-        for (int i = 9; i < MC.player.getInventory().size(); i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+        for (int i = 9; i < MC.player.getInventory().getContainerSize(); i++) {
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.isEmpty()) continue;
 
-            Identifier id = Registries.ITEM.getId(stack.getItem());
+            Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
 
             if (blacklist.get()) {
                 if (blacklist.isWhitelisted(id)) {

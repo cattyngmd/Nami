@@ -3,11 +3,11 @@ package me.kiriyaga.nami.feature.module;
 import me.kiriyaga.nami.feature.module.impl.client.HudModule;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 import java.util.List;
@@ -26,7 +26,7 @@ public abstract class HudElementModule extends Module {
     public int height;
     public static final int PADDING = 1;
 
-    public record TextElement(Text text, int offsetX, int offsetY) {}
+    public record TextElement(Component text, int offsetX, int offsetY) {}
 
     public record ItemElement(ItemStack stack, int offsetX, int offsetY) {}
 
@@ -45,12 +45,12 @@ public abstract class HudElementModule extends Module {
         this.alignment = addSetting(new EnumSetting<>("Alignment", HudAlignment.LEFT));
     }
 
-    public Text getDisplayText() {
+    public Component getDisplayText() {
         return null;
     }
 
     public List<TextElement> getTextElements() {
-        Text single = getDisplayText();
+        Component single = getDisplayText();
         if (single != null) {
             return List.of(new TextElement(single, 0, 0));
         }
@@ -110,7 +110,7 @@ public abstract class HudElementModule extends Module {
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
-    public record LabeledItemElement(ItemStack stack, Text label, LabelPosition position, int offsetX, int offsetY, double scale) {}
+    public record LabeledItemElement(ItemStack stack, Component label, LabelPosition position, int offsetX, int offsetY, double scale) {}
 
     public int getRenderXForElement(TextElement element) {
         int baseX = getRenderX();
@@ -124,17 +124,17 @@ public abstract class HudElementModule extends Module {
     }
 
     public int getAbsoluteX() {
-        int screenWidth = MC.getWindow().getScaledWidth();
+        int screenWidth = MC.getWindow().getGuiScaledWidth();
         return (int)(x.get() * screenWidth);
     }
 
     public int getAbsoluteY() {
-        int screenHeight = MC.getWindow().getScaledHeight();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
         return (int)(y.get() * screenHeight);
     }
 
     public int getRenderX() {
-        int screenWidth = MC.getWindow().getScaledWidth();
+        int screenWidth = MC.getWindow().getGuiScaledWidth();
         int posX = getAbsoluteX();
         Rectangle bounds = getBoundingBox();
 
@@ -155,7 +155,7 @@ public abstract class HudElementModule extends Module {
     }
 
     public int getRenderY() {
-        int screenHeight = MC.getWindow().getScaledHeight();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
         int posY = getAbsoluteY();
         Rectangle bounds = getBoundingBox();
 
@@ -168,28 +168,28 @@ public abstract class HudElementModule extends Module {
         return clamped;
     }
 
-    public void renderItems(DrawContext context) {
+    public void renderItems(GuiGraphics context) {
         ItemRenderer itemRenderer = MC.getItemRenderer();
-        TextRenderer textRenderer = MC.textRenderer;
+        Font textRenderer = MC.font;
         int baseY = getRenderY();
 
         for (ItemElement element : getItemElements()) {
             int drawX = getRenderXForItem(element);
             int drawY = baseY + element.offsetY();
 
-            context.drawItem(element.stack(), drawX, drawY);
+            context.renderItem(element.stack(), drawX, drawY);
 
-            context.drawStackOverlay(textRenderer, element.stack(), drawX, drawY, null);
+            context.renderItemDecorations(textRenderer, element.stack(), drawX, drawY, null);
         }
 
         for (LabeledItemElement element : getLabeledItemElements()) {
             int drawX = getRenderX() + element.offsetX();
             int drawY = baseY + element.offsetY();
 
-            context.drawItem(element.stack(), drawX, drawY);
-            context.drawStackOverlay(MC.textRenderer, element.stack(), drawX, drawY, null);
+            context.renderItem(element.stack(), drawX, drawY);
+            context.renderItemDecorations(MC.font, element.stack(), drawX, drawY, null);
 
-            Text label = element.label();
+            Component label = element.label();
             int labelWidth = FONT_MANAGER.getWidth(label);
             int labelHeight = FONT_MANAGER.getHeight();
 
@@ -234,12 +234,12 @@ public abstract class HudElementModule extends Module {
 
             float scale = (float) element.scale;
 
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate(labelX, labelY);
-            context.getMatrices().scale(scale, scale);
+            context.pose().pushMatrix();
+            context.pose().translate(labelX, labelY);
+            context.pose().scale(scale, scale);
 
             FONT_MANAGER.drawText(context, label, 0, 0, MODULE_MANAGER.getStorage().getByClass(HudModule.class).shadow.get());
-            context.getMatrices().popMatrix();
+            context.pose().popMatrix();
         }
     }
 

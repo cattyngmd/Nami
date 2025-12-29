@@ -14,17 +14,21 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import me.kiriyaga.nami.util.NametagFormatter;
 import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.*;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Camera;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL32C;
 
@@ -76,20 +80,20 @@ public class NametagsModule extends Module {
 
     @SubscribeEvent
     public void onRender3d(Render3DEvent event) {
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
         int i = 0;
 
-        MatrixStack matrices = event.getMatrices();
+        PoseStack matrices = event.getMatrices();
 
         if (players.get()) {
-            for (PlayerEntity player : EntityUtils.getOtherPlayers()) {
+            for (Player player : EntityUtils.getOtherPlayers()) {
                 i++;
                 renderEntityNametag(player, event.getTickDelta(), matrices, 30, null);
             }
         }
 
-        if (self.get() && !MC.options.getPerspective().isFirstPerson()){
+        if (self.get() && !MC.options.getCameraType().isFirstPerson()){
             i++;
             renderEntityNametag(MC.player, event.getTickDelta(), matrices, 30, null);
         }
@@ -118,7 +122,7 @@ public class NametagsModule extends Module {
         if (items.get()) {
             for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
                 if (entity instanceof ItemEntity itemEntity) {
-                    renderEntityNametag(entity, Text.translatable(itemEntity.getStack().getItem().getTranslationKey()).getString(), event.getTickDelta(), matrices, 30, null);
+                    renderEntityNametag(entity, Component.translatable(itemEntity.getItem().getItem().getDescriptionId()).getString(), event.getTickDelta(), matrices, 30, null);
                 }
             }
         }
@@ -127,9 +131,9 @@ public class NametagsModule extends Module {
 
             for (var entity : EntityUtils.getAllEntities()) {
 
-                @Nullable LazyEntityReference<LivingEntity> owner;
+                @Nullable EntityReference<LivingEntity> owner;
 
-                if (entity instanceof TameableEntity tameable) {
+                if (entity instanceof TamableAnimal tameable) {
                     owner = tameable.getOwnerReference();
                 } else {
                     continue;
@@ -138,7 +142,7 @@ public class NametagsModule extends Module {
                 if (owner == null)
                     return;
 
-                UUID uuid = owner.getUuid();
+                UUID uuid = owner.getUUID();
 
                 String ownerName;
 
@@ -203,7 +207,7 @@ public class NametagsModule extends Module {
 
         if (pearls.get()) {
             for (var entity : EntityUtils.getAllEntities()) {
-                if (!(entity instanceof EnderPearlEntity pearl)) continue;
+                if (!(entity instanceof ThrownEnderpearl pearl)) continue;
                 if (pearl.getOwner() == null) continue;
                 i++;
                 renderEntityNametag(pearl, pearl.getOwner().getName().getString(), event.getTickDelta(), matrices, 30, null);
@@ -212,23 +216,23 @@ public class NametagsModule extends Module {
         this.setDisplayInfo(String.valueOf(i));
     }
 
-    private void renderEntityNametag(Entity entity, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
+    private void renderEntityNametag(Entity entity, float tickDelta, PoseStack matrices, float scale, Color forcedColor) {
         renderEntityNametag(entity, entity.getName().getString(), tickDelta, matrices, scale, forcedColor);
     }
 
-    private void renderEntityNametag(Entity entity, String name, float tickDelta, MatrixStack matrices, float scale, Color forcedColor) {
-        Vec3d camPos = MinecraftClient.getInstance().gameRenderer.getCamera().getCameraPos();
+    private void renderEntityNametag(Entity entity, String name, float tickDelta, PoseStack matrices, float scale, Color forcedColor) {
+        Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
 
-        double baseHeightOffset = entity.isSneaking() ? entity.getBoundingBox().getLengthY() : entity.getBoundingBox().getLengthY() + 0.3;
+        double baseHeightOffset = entity.isShiftKeyDown() ? entity.getBoundingBox().getYsize() : entity.getBoundingBox().getYsize() + 0.3;
 
-        double interpX = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
-        double interpY = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
-        double interpZ = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
+        double interpX = Mth.lerp(tickDelta, entity.xOld, entity.getX());
+        double interpY = Mth.lerp(tickDelta, entity.yOld, entity.getY());
+        double interpZ = Mth.lerp(tickDelta, entity.zOld, entity.getZ());
 
-        float distance = (float) camPos.distanceTo(new Vec3d(interpX, interpY, interpZ));
+        float distance = (float) camPos.distanceTo(new Vec3(interpX, interpY, interpZ));
         double distanceYOffset = distance * 0.02;
 
-        Vec3d pos = new Vec3d(
+        Vec3 pos = new Vec3(
                 interpX,
                 interpY + baseHeightOffset + distanceYOffset,
                 interpZ
@@ -237,71 +241,71 @@ public class NametagsModule extends Module {
         float dynamicScale = 0.0018f + (scale / 10000.0f) * distance;
         if (distance <= 8.0f) dynamicScale = 0.0245f;
 
-        Text displayName;
+        Component displayName;
 
-        if (entity instanceof PlayerEntity player) {
+        if (entity instanceof Player player) {
             displayName = formatter.formatPlayer(player);
 
             if (showHealth.get()) {
-                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.getHealthText(player));
+                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.getHealthText(player));
             }
             if (showPing.get()) {
-                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatPing(player));
+                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.formatPing(player));
             }
             if (showGameMode.get()) {
-                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatGameMode(player));
+                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.formatGameMode(player));
             }
             if (showEntityId.get()) {
-                displayName = Text.literal("").append(displayName).append(Text.literal(" ")).append(formatter.formatEntityId(entity));
+                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.formatEntityId(entity));
             }
         } else if (name != null) {
-            displayName = Text.literal(name);
+            displayName = Component.literal(name);
         } else {
             displayName = formatter.formatEntity(entity);
         }
 
-        Text colored = formatter.formatWithColor(displayName, forcedColor, entity);
+        Component colored = formatter.formatWithColor(displayName, forcedColor, entity);
 
         RenderUtil.drawText3D(matrices, colored, pos, dynamicScale, background.get(), border.get(), borderWidth.get().floatValue());
 
-        if (showItems.get() && entity instanceof PlayerEntity player) {
+        if (showItems.get() && entity instanceof Player player) {
             renderPlayerItems(player, matrices, tickDelta, scale);
         }
     }
 
-    private void renderPlayerItems(PlayerEntity player, MatrixStack matrices, float tickDelta, float baseScale) {
+    private void renderPlayerItems(Player player, PoseStack matrices, float tickDelta, float baseScale) {
         List<ItemStack> items = Arrays.asList(
-                player.getMainHandStack(),
-                player.getEquippedStack(EquipmentSlot.HEAD),
-                player.getEquippedStack(EquipmentSlot.CHEST),
-                player.getEquippedStack(EquipmentSlot.LEGS),
-                player.getEquippedStack(EquipmentSlot.FEET),
-                player.getOffHandStack()
+                player.getMainHandItem(),
+                player.getItemBySlot(EquipmentSlot.HEAD),
+                player.getItemBySlot(EquipmentSlot.CHEST),
+                player.getItemBySlot(EquipmentSlot.LEGS),
+                player.getItemBySlot(EquipmentSlot.FEET),
+                player.getOffhandItem()
         );
 
         List<ItemStack> nonEmptyItems = items.stream().filter(stack -> !stack.isEmpty()).toList();
         int itemCount = nonEmptyItems.size();
         if (itemCount == 0) return;
 
-        double interpMinX = MathHelper.lerp(tickDelta, player.lastRenderX, player.getX()) - player.getWidth() / 2.0;
-        double interpMinY = MathHelper.lerp(tickDelta, player.lastRenderY, player.getY());
-        double interpMinZ = MathHelper.lerp(tickDelta, player.lastRenderZ, player.getZ()) - player.getWidth() / 2.0;
+        double interpMinX = Mth.lerp(tickDelta, player.xOld, player.getX()) - player.getBbWidth() / 2.0;
+        double interpMinY = Mth.lerp(tickDelta, player.yOld, player.getY());
+        double interpMinZ = Mth.lerp(tickDelta, player.zOld, player.getZ()) - player.getBbWidth() / 2.0;
 
-        double interpMaxX = interpMinX + player.getWidth();
-        double interpMaxY = interpMinY + player.getHeight();
-        double interpMaxZ = interpMinZ + player.getWidth();
+        double interpMaxX = interpMinX + player.getBbWidth();
+        double interpMaxY = interpMinY + player.getBbHeight();
+        double interpMaxZ = interpMinZ + player.getBbWidth();
 
         double baseX = (interpMinX + interpMaxX) / 2.0;
-        double baseY = interpMaxY + (player.isSneaking() ? 0.0 : 0.3);
+        double baseY = interpMaxY + (player.isShiftKeyDown() ? 0.0 : 0.3);
         double baseZ = (interpMinZ + interpMaxZ) / 2.0;
 
-        Vec3d camPos = MC.getEntityRenderDispatcher().camera.getCameraPos();
-        Camera camera = MC.gameRenderer.getCamera();
-        float pitch = camera.getPitch();
-        float yaw = camera.getYaw();
+        Vec3 camPos = MC.getEntityRenderDispatcher().camera.position();
+        Camera camera = MC.gameRenderer.getMainCamera();
+        float pitch = camera.xRot();
+        float yaw = camera.yRot();
 
-        Vec3d lookDir = Vec3d.fromPolar(pitch, yaw).normalize().negate();
-        Vec3d camRight = lookDir.crossProduct(new Vec3d(0, 1, 0)).normalize();
+        Vec3 lookDir = Vec3.directionFromRotation(pitch, yaw).normalize().reverse();
+        Vec3 camRight = lookDir.cross(new Vec3(0, 1, 0)).normalize();
 
         int renderIndex = 0;
         for (ItemStack stack : nonEmptyItems) {
@@ -312,13 +316,13 @@ public class NametagsModule extends Module {
 
     private void renderItemWithDepthIsolation(
             ItemStack stack,
-            MatrixStack matrices,
+            PoseStack matrices,
             double baseX, double baseY, double baseZ,
             int renderIndex, int itemCount,
-            Vec3d camPos, Vec3d camRight, Vec3d lookDir,
+            Vec3 camPos, Vec3 camRight, Vec3 lookDir,
             float baseScale
     ) {
-        Vec3d itemPosBase = new Vec3d(baseX, baseY, baseZ);
+        Vec3 itemPosBase = new Vec3(baseX, baseY, baseZ);
         float distance = (float) camPos.distanceTo(itemPosBase);
         float dynamicScale = 0.0018f + (baseScale / 10000.0f) * distance;
         if (distance <= 8.0f) dynamicScale = 0.0245f;
@@ -329,7 +333,7 @@ public class NametagsModule extends Module {
 
         double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
 
-        Vec3d itemPos = itemPosBase.add(camRight.multiply(offsetX)).add(0, verticalOffset, 0);
+        Vec3 itemPos = itemPosBase.add(camRight.scale(offsetX)).add(0, verticalOffset, 0);
 
         //GL32C.glDisable(GL32C.GL_DEPTH_TEST);
         //GL32C.glDepthMask(false);

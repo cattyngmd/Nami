@@ -15,10 +15,10 @@ import me.kiriyaga.nami.feature.module.impl.exploits.IllegalDisconnectModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.entity.EntityUtils;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -42,12 +42,12 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdate(PreTickEvent event) {
-        if (MC.player == null || MC.world == null)
+        if (MC.player == null || MC.level == null)
             return;
 
         this.setDisplayInfo(health.get().toString());
 
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
 
         if (onLevel.get() != 0) {
 
@@ -80,8 +80,8 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
-            if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 35 && onPop.get()) {
+        if (event.getPacket() instanceof ClientboundEntityEventPacket packet) {
+            if (packet.getEntity(MC.level) == MC.player && packet.getEventId() == 35 && onPop.get()) {
                 EXECUTABLE_MANAGER.getRequestHandler().submit(() -> logOut("AutoLog: totem got popped."), 0, ExecutableThreadType.PRE_TICK);
             }
         }
@@ -89,9 +89,9 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onEntitySpawn(EntitySpawnEvent event) {
-        if (MC.player == null || MC.world == null || !packet.get() || !onRender.get()) return;
+        if (MC.player == null || MC.level == null || !packet.get() || !onRender.get()) return;
 
-        if (event.getEntity() instanceof PlayerEntity player) {
+        if (event.getEntity() instanceof Player player) {
 
             if (player == MC.player)
                 return;
@@ -111,10 +111,10 @@ public class AutoLogModule extends Module {
             triggerToggle();
             EVENT_MANAGER.post(new DissconectEvent());
         } else {
-            if (MC.getNetworkHandler() != null) {
+            if (MC.getConnection() != null) {
                 triggerToggle();
-                MC.getNetworkHandler().onDisconnect(new net.minecraft.network.packet.s2c.common.DisconnectS2CPacket(
-                        net.minecraft.text.Text.of("AutoLog: §7" + reason)
+                MC.getConnection().handleDisconnect(new net.minecraft.network.protocol.common.ClientboundDisconnectPacket(
+                        net.minecraft.network.chat.Component.nullToEmpty("AutoLog: §7" + reason)
                 ));
             }
         }

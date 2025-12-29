@@ -21,16 +21,16 @@ public class KeyBindSetting extends Setting<Integer> {
         if (value == KEY_NONE) return false;
 
         if (value == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            return MC.mouse.wasLeftButtonClicked();
+            return MC.mouseHandler.isLeftPressed();
         }
         if (value == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            return MC.mouse.wasRightButtonClicked();
+            return MC.mouseHandler.isRightPressed();
         }
         if (value == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
-            return MC.mouse.wasMiddleButtonClicked();
+            return MC.mouseHandler.isMiddlePressed();
         }
 
-        return GLFW.glfwGetKey(MC.getWindow().getHandle(), value) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetKey(MC.getWindow().handle(), value) == GLFW.GLFW_PRESS;
     }
 
 

@@ -1,13 +1,11 @@
 package me.kiriyaga.nami.core.font;
 
 import me.kiriyaga.nami.feature.module.impl.client.FontModule;
-import me.kiriyaga.nami.mixin.TextRendererAccessor;
-import net.minecraft.client.font.EffectGlyph;
-import net.minecraft.client.font.FontStorage;
-import net.minecraft.client.font.GlyphProvider;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.StyleSpriteSource;
-import net.minecraft.util.Identifier;
+import me.kiriyaga.nami.mixin.DuckFont;
+import net.minecraft.client.gui.font.glyphs.EffectGlyph;
+import net.minecraft.client.gui.GlyphSource;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.FontDescription;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
@@ -15,7 +13,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class FontRendererProvider {
 
     private final FontLoader fontLoader;
-    private TextRenderer cachedRenderer;
+    private Font cachedRenderer;
     private int cachedSize = -1;
     private int cachedOversample = -1;
 
@@ -23,11 +21,11 @@ public class FontRendererProvider {
         this.fontLoader = fontLoader;
     }
 
-    public TextRenderer getRenderer() {
+    public Font getRenderer() {
         FontModule fontModule = MODULE_MANAGER.getStorage().getByClass(FontModule.class);
 
         if (!fontModule.isEnabled()) {
-            return MC.textRenderer;
+            return MC.font;
         }
 
         fontLoader.init();
@@ -38,16 +36,16 @@ public class FontRendererProvider {
             return cachedRenderer;
         }
 
-        EffectGlyph rectangle = ((TextRendererAccessor) MC.textRenderer).getFonts().getRectangleGlyph();
+        EffectGlyph rectangle = ((DuckFont) MC.font).getProvider().effect();
 
-        cachedRenderer = new TextRenderer(new TextRenderer.GlyphsProvider() {
+        cachedRenderer = new Font(new Font.Provider() {
             @Override
-            public GlyphProvider getGlyphs(StyleSpriteSource font) {
-                return fontLoader.getStorage().getGlyphs(true);
+            public GlyphSource glyphs(FontDescription font) {
+                return fontLoader.getStorage().source(true);
             }
 
             @Override
-            public EffectGlyph getRectangleGlyph() {
+            public EffectGlyph effect() {
                 return rectangle;
             }
         });

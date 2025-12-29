@@ -12,13 +12,13 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.text.Text;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.network.chat.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,15 +53,15 @@ public class AutoTotemModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTick(PreTickEvent event) {
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
         int totemCount = 0;
-        for (ItemStack stack : MC.player.getInventory().getMainStacks()) {
+        for (ItemStack stack : MC.player.getInventory().getNonEquipmentItems()) {
             if (stack.getItem() == Items.TOTEM_OF_UNDYING) {
                 totemCount += stack.getCount();
             }
         }
-        ItemStack offHandStack = MC.player.getOffHandStack();
+        ItemStack offHandStack = MC.player.getOffhandItem();
         if (offHandStack.getItem() == Items.TOTEM_OF_UNDYING) {
             totemCount += offHandStack.getCount();
         }
@@ -72,20 +72,20 @@ public class AutoTotemModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onReceivePacket(PacketReceiveEvent event) {
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
-        if (event.getPacket() instanceof EntityStatusS2CPacket packet) {
-            if (packet.getEntity(MC.world) == MC.player && packet.getStatus() == 3 && deathLog.get()) {
+        if (event.getPacket() instanceof ClientboundEntityEventPacket packet) {
+            if (packet.getEntity(MC.level) == MC.player && packet.getEventId() == 3 && deathLog.get()) {
                 EXECUTABLE_MANAGER.getRequestHandler().submit(this::logDeathData, 20, ExecutableThreadType.PRE_TICK);
             }
         }
     }
 
     private void attemptPlaceOffhand() {
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
         if (player == null) return;
 
-        ItemStack offhandStack = player.getOffHandStack();
+        ItemStack offhandStack = player.getOffhandItem();
         ItemStack targetStack = null;
         boolean overrideActive = false;
 
@@ -105,7 +105,7 @@ public class AutoTotemModule extends Module {
         }
 
         if (mainhand.get()) {
-            boolean useGapple = mainhandGapple.get() && MC.options.useKey.isPressed();
+            boolean useGapple = mainhandGapple.get() && MC.options.keyUse.isDown();
 
             if (useGapple) {
                 int gappleSlot = findInventorySlot(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE), mainhandSlot.get());
@@ -113,8 +113,8 @@ public class AutoTotemModule extends Module {
                     gappleSlot = findInventorySlot(new ItemStack(Items.GOLDEN_APPLE), mainhandSlot.get());
                 }
 
-                if (gappleSlot != -1 && MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.ENCHANTED_GOLDEN_APPLE
-                        && MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.GOLDEN_APPLE) {
+                if (gappleSlot != -1 && MC.player.getInventory().getItem(mainhandSlot.get()).getItem() != Items.ENCHANTED_GOLDEN_APPLE
+                        && MC.player.getInventory().getItem(mainhandSlot.get()).getItem() != Items.GOLDEN_APPLE) {
                     if (fastSwap.get()) {
                         INVENTORY_MANAGER.getClickHandler().swapSlot(convertSlot(gappleSlot), mainhandSlot.get());
                         lastAttemptTime = System.currentTimeMillis();
@@ -124,7 +124,7 @@ public class AutoTotemModule extends Module {
                     }
                 }
             } else {
-                if (MC.player.getInventory().getStack(mainhandSlot.get()).getItem() != Items.TOTEM_OF_UNDYING) {
+                if (MC.player.getInventory().getItem(mainhandSlot.get()).getItem() != Items.TOTEM_OF_UNDYING) {
                     int totem = findInventorySlot(new ItemStack(Items.TOTEM_OF_UNDYING), mainhandSlot.get());
                     if (totem != -1) {
                         if (fastSwap.get()) {
@@ -139,7 +139,7 @@ public class AutoTotemModule extends Module {
             }
 
 
-            if (MC.player.getHealth() + MC.player.getAbsorptionAmount() <= health.get() && MC.player.getInventory().getStack(mainhandSlot.get()).getItem() == Items.TOTEM_OF_UNDYING)
+            if (MC.player.getHealth() + MC.player.getAbsorptionAmount() <= health.get() && MC.player.getInventory().getItem(mainhandSlot.get()).getItem() == Items.TOTEM_OF_UNDYING)
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(mainhandSlot.get());
         }
 
@@ -170,7 +170,7 @@ public class AutoTotemModule extends Module {
 
     private ItemStack findTotemStack() {
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == Items.TOTEM_OF_UNDYING) return stack;
         }
         return null;
@@ -178,7 +178,7 @@ public class AutoTotemModule extends Module {
 
     private ItemStack getOverrideStack() {
         Offhand type = overrideItem.get();
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
 
         switch (type) {
             case CRYSTAL:
@@ -189,13 +189,13 @@ public class AutoTotemModule extends Module {
                 return new ItemStack(Items.ITEM_FRAME);
             case MENDING:
                 for (int i = 0; i < 36; i++) {
-                    ItemStack stack = player.getInventory().getStack(i);
+                    ItemStack stack = player.getInventory().getItem(i);
                     if (stack.isEmpty()) continue;
 
-                    if (stack.isIn(ItemTags.HEAD_ARMOR)) continue;
-                    if (stack.isIn(ItemTags.CHEST_ARMOR)) continue;
-                    if (stack.isIn(ItemTags.LEG_ARMOR)) continue;
-                    if (stack.isIn(ItemTags.FOOT_ARMOR)) continue;
+                    if (stack.is(ItemTags.HEAD_ARMOR)) continue;
+                    if (stack.is(ItemTags.CHEST_ARMOR)) continue;
+                    if (stack.is(ItemTags.LEG_ARMOR)) continue;
+                    if (stack.is(ItemTags.FOOT_ARMOR)) continue;
 
                     if (!hasMending(stack)) continue;
                     if (isFullyRepaired(stack)) continue;
@@ -210,11 +210,11 @@ public class AutoTotemModule extends Module {
     private void clickSlot(int invSlot, int index) {
         int realSlot = convertSlot(invSlot);
 
-        ItemStack cursor = MC.player.currentScreenHandler.getCursorStack();
+        ItemStack cursor = MC.player.containerMenu.getCarried();
 
         if (cursor.isEmpty()) {
             INVENTORY_MANAGER.getClickHandler().pickupSlot(realSlot);
-            cursor = MC.player.currentScreenHandler.getCursorStack();
+            cursor = MC.player.containerMenu.getCarried();
         }
 
         if (!cursor.isEmpty()) {
@@ -225,7 +225,7 @@ public class AutoTotemModule extends Module {
     private int countTotems() {
         int count = 0;
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack != null && stack.getItem() == Items.TOTEM_OF_UNDYING) {
                 count += stack.getCount();
             }
@@ -250,7 +250,7 @@ public class AutoTotemModule extends Module {
     }
 
     private void logDeathData() {
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
         if (player == null) return;
 
         int ping = SERVER_MANAGER.getPing();
@@ -280,7 +280,7 @@ public class AutoTotemModule extends Module {
             reasonsBuilder.append("- ").append(entry.getValue()).append("\n");
         }
 
-        Text message = CAT_FORMAT.format(
+        Component message = CAT_FORMAT.format(
                 "\n=== {g}AutoTotem{reset} ===\n" +
                         "Death reasons:\n{g}" + reasonsBuilder.toString() + "{reset}\n" +
                         "Ping: {g}" + ping + " ms{reset}\n" +
@@ -297,7 +297,7 @@ public class AutoTotemModule extends Module {
 
     private int findInventorySlot(ItemStack stack) {
         for (int i = 0; i < 36; i++) {
-            if (MC.player.getInventory().getStack(i).getItem() == stack.getItem()) {
+            if (MC.player.getInventory().getItem(i).getItem() == stack.getItem()) {
                 return i;
             }
         }
@@ -307,7 +307,7 @@ public class AutoTotemModule extends Module {
     private int findInventorySlot(ItemStack stack, int excluded) {
         for (int i = 0; i < 36; i++) {
             if (i == excluded) continue;
-            if (MC.player.getInventory().getStack(i).getItem() == stack.getItem()) {
+            if (MC.player.getInventory().getItem(i).getItem() == stack.getItem()) {
                 return i;
             }
         }
@@ -320,7 +320,7 @@ public class AutoTotemModule extends Module {
     }
 
     private boolean isFullyRepaired(ItemStack stack) {
-        if (!stack.isDamageable()) return true;
-        return stack.getDamage() == 0;
+        if (!stack.isDamageableItem()) return true;
+        return stack.getDamageValue() == 0;
     }
 }

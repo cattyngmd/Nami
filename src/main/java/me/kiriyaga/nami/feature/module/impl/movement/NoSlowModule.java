@@ -8,10 +8,10 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.util.Mth;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -38,10 +38,10 @@ public class NoSlowModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onSlow(ItemUseSlowEvent ev){
-        if (MC.player == null || MC.world == null || !MC.player.isUsingItem() || MC.player.isGliding() || MC.player.isRiding())
+        if (MC.player == null || MC.level == null || !MC.player.isUsingItem() || MC.player.isFallFlying() || MC.player.isHandsBusy())
             return;
 
-        if (onlyOnGround.get() && !MC.player.isOnGround())
+        if (onlyOnGround.get() && !MC.player.onGround())
             return;
 
         if (mode.get() == SlowMode.VANILLA){
@@ -51,7 +51,7 @@ public class NoSlowModule extends Module {
 
         boolean boost = true; //cattyngmd
         if (mode.get() == SlowMode.GRIMV3){
-            boost = MC.player.age % 3 == 0 || MC.player.age % 4 == 0;
+            boost = MC.player.tickCount % 3 == 0 || MC.player.tickCount % 4 == 0;
             //if (MC.player.age % 12 == 0) boost = false;
 
             if (boost){
@@ -73,22 +73,22 @@ public class NoSlowModule extends Module {
 //    }
 
     private BlockPos getPhasedWebBlock() {
-        if (MC.player == null || MC.world == null) return null;
+        if (MC.player == null || MC.level == null) return null;
 
-        Box bb = MC.player.getBoundingBox();
+        AABB bb = MC.player.getBoundingBox();
 
-        int minX = MathHelper.floor(bb.minX);
-        int maxX = MathHelper.ceil(bb.maxX);
-        int minY = MathHelper.floor(bb.minY);
-        int maxY = MathHelper.ceil(bb.maxY);
-        int minZ = MathHelper.floor(bb.minZ);
-        int maxZ = MathHelper.ceil(bb.maxZ);
+        int minX = Mth.floor(bb.minX);
+        int maxX = Mth.ceil(bb.maxX);
+        int minY = Mth.floor(bb.minY);
+        int maxY = Mth.ceil(bb.maxY);
+        int minZ = Mth.floor(bb.minZ);
+        int maxZ = Mth.ceil(bb.maxZ);
 
         for (int x = minX; x < maxX; x++) {
             for (int y = minY; y < maxY; y++) {
                 for (int z = minZ; z < maxZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    if (MC.world.getBlockState(pos).getBlock() == Blocks.COBWEB) {
+                    if (MC.level.getBlockState(pos).getBlock() == Blocks.COBWEB) {
                         return pos;
                     }
                 }

@@ -26,9 +26,9 @@ public class ClientTimeModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     private void onPreTickEvent(PreTickEvent event) {
-        if (MC.world == null || MC.player == null)
+        if (MC.level == null || MC.player == null)
             return;
 
-        MC.world.getLevelProperties().setTimeOfDay((long)value.get());
+        MC.level.getLevelData().setDayTime((long)value.get());
     }
 }

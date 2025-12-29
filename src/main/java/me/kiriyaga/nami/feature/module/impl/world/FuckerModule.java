@@ -11,8 +11,16 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
-import net.minecraft.block.*;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.BambooStalkBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.NetherWartBlock;
+import net.minecraft.world.level.block.SugarCaneBlock;
+import net.minecraft.world.level.block.SweetBerryBushBlock;
+import net.minecraft.world.level.block.VegetationBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -50,9 +58,9 @@ public class FuckerModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTickEvent(PreTickEvent ev) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
-        BlockPos playerPos = MC.player.getBlockPos();
+        BlockPos playerPos = MC.player.blockPosition();
         int r = radius.get();
 
         Set<BlockPos> validTargets = new HashSet<>();
@@ -62,7 +70,7 @@ public class FuckerModule extends Module {
                 for (int x = -r; x <= r; x++) {
                     for (int y = -r; y <= r; y++) {
                         for (int z = -r; z <= r; z++) {
-                            BlockPos checkPos = playerPos.add(x, y, z);
+                            BlockPos checkPos = playerPos.offset(x, y, z);
                             if (checkPos.equals(playerPos)) continue;
                             if (isFarmPlant(checkPos)) {
                                 validTargets.add(checkPos);
@@ -75,7 +83,7 @@ public class FuckerModule extends Module {
                 for (int x = -r; x <= r; x++) {
                     for (int y = -r; y <= r; y++) {
                         for (int z = -r; z <= r; z++) {
-                            BlockPos checkPos = playerPos.add(x, y, z);
+                            BlockPos checkPos = playerPos.offset(x, y, z);
                             if (checkPos.equals(playerPos)) continue;
                             if (isSugarCaneBlock(checkPos)) {
                                 validTargets.add(checkPos);
@@ -88,7 +96,7 @@ public class FuckerModule extends Module {
                 for (int x = -r; x <= r; x++) {
                     for (int y = -r; y <= r; y++) {
                         for (int z = -r; z <= r; z++) {
-                            BlockPos checkPos = playerPos.add(x, y, z);
+                            BlockPos checkPos = playerPos.offset(x, y, z);
                             if (checkPos.equals(playerPos)) continue;
                             if (isGrassLike(checkPos)) {
                                 validTargets.add(checkPos);
@@ -100,7 +108,7 @@ public class FuckerModule extends Module {
         }
 
         BlockPos bestTarget = validTargets.stream()
-                .min(Comparator.comparingDouble(a -> MC.player.squaredDistanceTo(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5)))
+                .min(Comparator.comparingDouble(a -> MC.player.distanceToSqr(a.getX() + 0.5, a.getY() + 0.5, a.getZ() + 0.5)))
                 .orElse(null);
 
         if (bestTarget != null) {
@@ -117,22 +125,22 @@ public class FuckerModule extends Module {
     }
 
     private boolean isFarmPlant(BlockPos pos) {
-        BlockState state = MC.world.getBlockState(pos);
+        BlockState state = MC.level.getBlockState(pos);
         Block block = state.getBlock();
 
         if (block == Blocks.BEDROCK || state.isAir()) return false;
 
         if (block instanceof CropBlock cropBlock) {
-            return cropBlock.isMature(state);
+            return cropBlock.isMaxAge(state);
         }
 
         if (block instanceof SweetBerryBushBlock) {
-            Integer age = state.get(SweetBerryBushBlock.AGE);
+            Integer age = state.getValue(SweetBerryBushBlock.AGE);
             return age != null && age >= 3;
         }
 
         if (block instanceof NetherWartBlock) {
-            Integer age = state.get(NetherWartBlock.AGE);
+            Integer age = state.getValue(NetherWartBlock.AGE);
             return age != null && age >= 3;  // it's 3 for a fully grown netherwart
         }
 
@@ -140,14 +148,14 @@ public class FuckerModule extends Module {
     }
 
     private boolean isSugarCaneBlock(BlockPos pos) {
-        BlockState state = MC.world.getBlockState(pos);
+        BlockState state = MC.level.getBlockState(pos);
         Block block = state.getBlock();
 
         if (block == Blocks.BEDROCK || state.isAir()) return false;
 
-        if (block instanceof SugarCaneBlock || block instanceof BambooBlock) {
-            BlockPos belowPos = pos.down();
-            Block belowBlock = MC.world.getBlockState(belowPos).getBlock();
+        if (block instanceof SugarCaneBlock || block instanceof BambooStalkBlock) {
+            BlockPos belowPos = pos.below();
+            Block belowBlock = MC.level.getBlockState(belowPos).getBlock();
             return belowBlock == block;
         }
 
@@ -155,11 +163,11 @@ public class FuckerModule extends Module {
     }
 
     private boolean isGrassLike(BlockPos pos) {
-        BlockState state = MC.world.getBlockState(pos);
+        BlockState state = MC.level.getBlockState(pos);
         Block block = state.getBlock();
 
         if (block == Blocks.BEDROCK || state.isAir()) return false;
 
-        return block instanceof PlantBlock;
+        return block instanceof VegetationBlock;
     }
 }

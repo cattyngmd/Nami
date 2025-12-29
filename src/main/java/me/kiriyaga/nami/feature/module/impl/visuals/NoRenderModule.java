@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.particle.ParticleTypes;
+import net.minecraft.core.particles.ParticleTypes;
 
 import static me.kiriyaga.nami.Nami.MC;
 
@@ -55,8 +55,8 @@ public class NoRenderModule extends Module {
     }
 
     private void reloadRenderer() {
-        if (MC.world != null) {
-            MC.worldRenderer.reload();
+        if (MC.level != null) {
+            MC.levelRenderer.allChanged();
         }
     }
 
@@ -72,7 +72,7 @@ public class NoRenderModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onParticle(ParticleEvent ev){
-        if (MC.world == null || MC.player == null)
+        if (MC.level == null || MC.player == null)
             return;
 
 //        if (noExplosion.get() && (ev.getParticle() instanceof ExplosionEmitterParticle || ev.getParticle() instanceof ExplosionLargeParticle || ev.getParticle() instanceof ExplosionSmokeParticle))

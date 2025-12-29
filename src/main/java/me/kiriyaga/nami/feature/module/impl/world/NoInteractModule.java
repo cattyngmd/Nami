@@ -10,20 +10,20 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.HoneycombItem;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionTypes;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.HoneycombItem;
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 
 import java.util.Map;
 
@@ -44,15 +44,15 @@ public class NoInteractModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onPlaceBlock(PlaceBlockEvent event) {
-        ClientPlayerEntity player = event.getPlayer();
+        LocalPlayer player = event.getPlayer();
         BlockHitResult hitResult = event.getHitResult();
 
-        if (player.getEntityWorld() == null) return;
+        if (player.level() == null) return;
 
-        Block block = player.getEntityWorld().getBlockState(hitResult.getBlockPos()).getBlock();
-        String dimension = player.getEntityWorld().getDimension().toString();
+        Block block = player.level().getBlockState(hitResult.getBlockPos()).getBlock();
+        String dimension = player.level().dimensionType().toString();
 
-        Identifier blockId = Registries.BLOCK.getId(block);
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
 
         if (whitelist.get() && whitelist.isWhitelisted(blockId)) {
             event.cancel();
@@ -60,20 +60,20 @@ public class NoInteractModule extends Module {
         }
 
         if (spawnPoint.get()) {
-            if (player.getEntityWorld().getDimension().comp_642() && isBed(block)) {
+            if (player.level().dimensionType().hasSkyLight() && isBed(block)) {
                 event.cancel();
                 return;
             }
 
-            if (block == Blocks.RESPAWN_ANCHOR && dimension.contains("nether")) {
+            if (block == Blocks.RESPAWN_ANCHOR && player.level().dimensionType().hasCeiling()) {
                 event.cancel();
                 return;
             }
         }
 
         if (strip.get()) {
-            boolean isMain = MC.player.getMainHandStack().isIn(ItemTags.AXES) && event.getHand() == Hand.MAIN_HAND;
-            boolean isOff = MC.player.getOffHandStack().isIn(ItemTags.AXES) && event.getHand() == Hand.OFF_HAND;
+            boolean isMain = MC.player.getMainHandItem().is(ItemTags.AXES) && event.getHand() == InteractionHand.MAIN_HAND;
+            boolean isOff = MC.player.getOffhandItem().is(ItemTags.AXES) && event.getHand() == InteractionHand.OFF_HAND;
             if (isMain || isOff) {
 
                 Map<Block, Block> strippables = net.fabricmc.fabric.impl.content.registry.util.ImmutableCollectionUtils.getAsMutableMap(
@@ -94,17 +94,17 @@ public class NoInteractModule extends Module {
     private void onPacketSendRespawn(PacketSendEvent ev) {
         if (!packet.get()) return;
 
-        if (!(ev.getPacket() instanceof PlayerInteractBlockC2SPacket interactPacket)) return;
-        if (MC.world == null) return;
+        if (!(ev.getPacket() instanceof ServerboundUseItemOnPacket interactPacket)) return;
+        if (MC.level == null) return;
 
-        BlockPos pos = interactPacket.getBlockHitResult().getBlockPos();
-        Block block = MC.world.getBlockState(pos).getBlock();
-        var dimension = MC.world.getDimensionEntry().matchesKey(DimensionTypes.OVERWORLD) ? "overworld"
-                : MC.world.getDimensionEntry().matchesKey(DimensionTypes.THE_NETHER) ? "nether"
-                : MC.world.getDimensionEntry().matchesKey(DimensionTypes.THE_END) ? "end"
+        BlockPos pos = interactPacket.getHitResult().getBlockPos();
+        Block block = MC.level.getBlockState(pos).getBlock();
+        var dimension = MC.level.dimensionTypeRegistration().is(BuiltinDimensionTypes.OVERWORLD) ? "overworld"
+                : MC.level.dimensionTypeRegistration().is(BuiltinDimensionTypes.NETHER) ? "nether"
+                : MC.level.dimensionTypeRegistration().is(BuiltinDimensionTypes.END) ? "end"
                 : "unknown";
 
-        Identifier blockId = Registries.BLOCK.getId(block);
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
 
         if (whitelist.get() && whitelist.isWhitelisted(blockId)) {
             ev.cancel();
@@ -124,8 +124,8 @@ public class NoInteractModule extends Module {
         }
 
         if (strip.get()) {
-            boolean isMain = MC.player.getMainHandStack().isIn(ItemTags.AXES) && interactPacket.getHand() == Hand.MAIN_HAND;
-            boolean isOff = MC.player.getOffHandStack().isIn(ItemTags.AXES) && interactPacket.getHand() == Hand.OFF_HAND;
+            boolean isMain = MC.player.getMainHandItem().is(ItemTags.AXES) && interactPacket.getHand() == InteractionHand.MAIN_HAND;
+            boolean isOff = MC.player.getOffhandItem().is(ItemTags.AXES) && interactPacket.getHand() == InteractionHand.OFF_HAND;
 
             if (isMain || isOff) { // this is fucking shizo
                 Map<Block, Block> strippables = net.fabricmc.fabric.impl.content.registry.util.ImmutableCollectionUtils.getAsMutableMap(

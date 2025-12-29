@@ -2,8 +2,8 @@ package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
@@ -11,7 +11,7 @@ public class WhitelistSettingRenderer implements SettingRenderer<WhitelistSettin
     private final BoolSettingRenderer boolRenderer = new BoolSettingRenderer();
 
     @Override
-    public void render(DrawContext context, TextRenderer textRenderer, WhitelistSetting setting, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics context, Font textRenderer, WhitelistSetting setting, int x, int y, int mouseX, int mouseY) {
         boolRenderer.render(context, textRenderer, setting, x, y, mouseX, mouseY);
 
         //TODO: item identifier list extension

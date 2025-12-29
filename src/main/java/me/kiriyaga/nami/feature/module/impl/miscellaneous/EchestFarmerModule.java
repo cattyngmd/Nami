@@ -12,13 +12,13 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 
 import java.awt.*;
 
@@ -43,14 +43,14 @@ public class EchestFarmerModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTickEvent(PreTickEvent ev) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
-        BlockPos targetPos = MC.player.getBlockPos().offset(MC.player.getHorizontalFacing(), 1);
+        BlockPos targetPos = MC.player.blockPosition().relative(MC.player.getDirection(), 1);
         renderPos = targetPos;
 
-        Block blockAt = MC.world.getBlockState(targetPos).getBlock();
+        Block blockAt = MC.level.getBlockState(targetPos).getBlock();
 
-        if (MC.world.isAir(targetPos)) {
+        if (MC.level.isEmptyBlock(targetPos)) {
             int echestSlot = findEchestInHotbar();
             if (echestSlot != -1) {
                 InteractionUtils.placeBlock(
@@ -81,21 +81,21 @@ public class EchestFarmerModule extends Module {
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MC.player == null || MC.world == null || renderPos == null || !render.get()) return;
+        if (MC.player == null || MC.level == null || renderPos == null || !render.get()) return;
 
-        MatrixStack matrices = event.getMatrices();
+        PoseStack matrices = event.getMatrices();
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
 
-        Box box = new Box(renderPos);
+        AABB box = new AABB(renderPos);
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
     private int findEchestInHotbar() {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == Items.ENDER_CHEST) {
                 return i;
             }

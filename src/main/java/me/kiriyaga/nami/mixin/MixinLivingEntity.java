@@ -7,20 +7,20 @@ import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
 import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.exploits.NoJumpDelayModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoLevitation;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Holder;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,61 +37,61 @@ public abstract class MixinLivingEntity extends Entity {
 
     private float originalYaw;
     @Shadow
-    private int jumpingCooldown;
+    private int noJumpDelay;
     @Shadow
-    public float headYaw;
+    public float yHeadRot;
     private float originalPitch;
 
-    public MixinLivingEntity(EntityType<?> type, World world) {
+    public MixinLivingEntity(EntityType<?> type, Level world) {
         super(type, world);
     }
 
     @Inject(method = "travel", at = @At("HEAD"))
-    private void travelPreHook(Vec3d movementInput, CallbackInfo ci) {
-        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
+    private void travelPreHook(Vec3 movementInput, CallbackInfo ci) {
+        if (Minecraft.getInstance() == null || Minecraft.getInstance().player != (Object)this) return;
         if (MODULE_MANAGER.getStorage() == null) return;
         RotationModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
         if (rotationModule == null || !rotationModule.moveFix.get()) return;
         if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
-        originalYaw = super.getYaw();
-        originalPitch = super.getPitch();
+        originalYaw = super.getYRot();
+        originalPitch = super.getXRot();
 
         float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
         float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
 
-        this.setYaw(spoofYaw);
-        this.setPitch(spoofPitch);
+        this.setYRot(spoofYaw);
+        this.setXRot(spoofPitch);
     }
 
     @Inject(method = "travel", at = @At("TAIL"))
-    private void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
-        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().player != (Object)this) return;
+    private void travelPostHook(Vec3 movementInput, CallbackInfo ci) {
+        if (Minecraft.getInstance() == null || Minecraft.getInstance().player != (Object)this) return;
         if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
         if (MODULE_MANAGER.getStorage() == null) return;
         RotationModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
         if (rotationModule == null || !rotationModule.moveFix.get()) return;
 
-        this.setYaw(originalYaw);
-        this.setPitch(originalPitch);
+        this.setYRot(originalYaw);
+        this.setXRot(originalPitch);
     }
 
-    @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
+    @ModifyExpressionValue(method = "jumpFromGround", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getYRot()F"))
     private float jumpFix(float originalYaw) {
-        if ((Object)this != MinecraftClient.getInstance().player) return originalYaw;
+        if ((Object)this != Minecraft.getInstance().player) return originalYaw;
         return ROTATION_MANAGER.getStateHandler().isRotating() ? ROTATION_MANAGER.getStateHandler().getRotationYaw() : originalYaw;
     }
 
-    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
         NoJumpDelayModule module = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(NoJumpDelayModule.class) : null;
         if (module != null && module.isEnabled()) {
-            jumpingCooldown = 0;
+            noJumpDelay = 0;
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "isGliding()Z", cancellable = true)
+    @Inject(at = @At("HEAD"), method = "isFallFlying()Z", cancellable = true)
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
         GlidingEvent ev = new GlidingEvent();
 
@@ -101,22 +101,22 @@ public abstract class MixinLivingEntity extends Entity {
             cir.setReturnValue(true);
     }
 
-    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
     private void onJump(CallbackInfo ci) {
         HighJumpModule mod = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(HighJumpModule.class) : null;
         if (mod == null || !mod.isEnabled()) return;
 
         float jumpBoost = mod.height.get().floatValue();
 
-        Vec3d vel = this.getVelocity();
-        this.setVelocity(vel.x, Math.max(jumpBoost, vel.y), vel.z);
+        Vec3 vel = this.getDeltaMovement();
+        this.setDeltaMovement(vel.x, Math.max(jumpBoost, vel.y), vel.z);
 
         if (this.isSprinting()) {
-            float yawRad = this.getYaw() * 0.017453292F;
-            this.addVelocityInternal(new Vec3d(-MathHelper.sin(yawRad) * 0.2, 0.0, MathHelper.cos(yawRad) * 0.2));
+            float yawRad = this.getYRot() * 0.017453292F;
+            this.addDeltaMovement(new Vec3(-Mth.sin(yawRad) * 0.2, 0.0, Mth.cos(yawRad) * 0.2));
         }
 
-        this.velocityDirty = true;
+        this.needsSync = true;
         ci.cancel();
     }
 
@@ -158,30 +158,30 @@ public abstract class MixinLivingEntity extends Entity {
 //        }
 //    }
 
-    @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
-    private boolean hasStatusEffect(boolean original, RegistryEntry<StatusEffect> effect) {
-        if ((Object) this instanceof PlayerEntity player &&
+    @ModifyReturnValue(method = "hasEffect", at = @At("RETURN"))
+    private boolean hasStatusEffect(boolean original, Holder<MobEffect> effect) {
+        if ((Object) this instanceof Player player &&
                 player == MC.player) {
 
             NoLevitation nl = MODULE_MANAGER.getStorage().getByClass(NoLevitation.class);
             if (nl != null && nl.isEnabled()) {
-                RegistryKey<StatusEffect> slowFallKey = StatusEffects.SLOW_FALLING.getKey().orElse(null);
-                if (nl.noSlowFall.get() && slowFallKey != null && effect.matchesKey(slowFallKey))
+                ResourceKey<MobEffect> slowFallKey = MobEffects.SLOW_FALLING.unwrapKey().orElse(null);
+                if (nl.noSlowFall.get() && slowFallKey != null && effect.is(slowFallKey))
                     return false;
 
-                RegistryKey<StatusEffect> levitationKey = StatusEffects.LEVITATION.getKey().orElse(null); // this just removes levitation damage reducing
-                if (levitationKey != null && effect.matchesKey(levitationKey))
+                ResourceKey<MobEffect> levitationKey = MobEffects.LEVITATION.unwrapKey().orElse(null); // this just removes levitation damage reducing
+                if (levitationKey != null && effect.is(levitationKey))
                     return false;
             }
         }
         return original;
     }
 
-    @ModifyReturnValue(method = "getStatusEffect", at = @At("RETURN"))
-    private StatusEffectInstance getStatusEffect(StatusEffectInstance original, RegistryEntry<StatusEffect> effect) {
+    @ModifyReturnValue(method = "getEffect", at = @At("RETURN"))
+    private MobEffectInstance getStatusEffect(MobEffectInstance original, Holder<MobEffect> effect) {
         NoLevitation nl = MODULE_MANAGER.getStorage().getByClass(NoLevitation.class);
         if (nl != null && nl.isEnabled()) {
-            if (effect == StatusEffects.LEVITATION)
+            if (effect == MobEffects.LEVITATION)
                 return null;
 //            if (nl.noSlowFall.get() && effect.value == StatusEffects.SLOW_FALLING)
 //                return null;
@@ -189,25 +189,25 @@ public abstract class MixinLivingEntity extends Entity {
         return original;
     }
 
-    @ModifyVariable(method = "turnHead(F)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    @ModifyVariable(method = "tickHeadTurn(F)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float turnHead(float f) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof ClientPlayerEntity player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
+        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
             return ROTATION_MANAGER.getStateHandler().getRotationYaw();
         }
         return f;
     }
 
-    @Inject(method = "lerpHeadYaw", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "lerpHeadRotationStep", at = @At("HEAD"), cancellable = true)
     private void lerpHeadYawInject(int i, double d, CallbackInfo ci) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof ClientPlayerEntity player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
+        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
 
             double targetYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
 
-            this.headYaw = (float)MathHelper.lerpAngleDegrees(1.0 / i, this.headYaw, targetYaw);
+            this.yHeadRot = (float) Mth.rotLerp(1.0 / i, this.yHeadRot, targetYaw);
 
             ci.cancel();
         }

@@ -13,22 +13,22 @@ import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class LiquidFillModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null || MC.interactionManager == null) return;
+        if (MC.player == null || MC.level == null || MC.gameMode == null) return;
 
         if (cooldown > 0) {
             cooldown--;
@@ -84,31 +84,31 @@ public class LiquidFillModule extends Module {
         }
 
         int r = (int) Math.ceil(range.get());
-        BlockPos playerPos = MC.player.getBlockPos();
+        BlockPos playerPos = MC.player.blockPosition();
 
         List<BlockPos> positions = new ArrayList<>();
         for (int x = -r; x <= r; x++) {
             for (int y = -r; y <= r; y++) {
                 for (int z = -r; z <= r; z++) {
-                    positions.add(playerPos.add(x, y, z));
+                    positions.add(playerPos.offset(x, y, z));
                 }
             }
         }
 
-        Vec3d playerVec = Vec3d.of(playerPos); // fucking why i need this
-        positions.sort(Comparator.comparingDouble(pos -> Vec3d.of(pos).squaredDistanceTo(playerVec)));
+        Vec3 playerVec = Vec3.atLowerCornerOf(playerPos); // fucking why i need this
+        positions.sort(Comparator.comparingDouble(pos -> Vec3.atLowerCornerOf(pos).distanceToSqr(playerVec)));
 
         boolean placed = false;
 
         for (BlockPos pos : positions) {
-            BlockState state = MC.world.getBlockState(pos);
+            BlockState state = MC.level.getBlockState(pos);
             if (hasEntity(pos)) continue;
 
             boolean shouldPlace = switch (liquidType.get()) {
-                case WATER -> state.getBlock() == Blocks.WATER && state.get(FluidBlock.LEVEL) == 0;
-                case LAVA -> state.getBlock() == Blocks.LAVA && state.get(FluidBlock.LEVEL) == 0;
-                case BOTH -> (state.getBlock() == Blocks.WATER && state.get(FluidBlock.LEVEL) == 0)
-                        || (state.getBlock() == Blocks.LAVA && state.get(FluidBlock.LEVEL) == 0);
+                case WATER -> state.getBlock() == Blocks.WATER && state.getValue(LiquidBlock.LEVEL) == 0;
+                case LAVA -> state.getBlock() == Blocks.LAVA && state.getValue(LiquidBlock.LEVEL) == 0;
+                case BOTH -> (state.getBlock() == Blocks.WATER && state.getValue(LiquidBlock.LEVEL) == 0)
+                        || (state.getBlock() == Blocks.LAVA && state.getValue(LiquidBlock.LEVEL) == 0);
             };
 
             if (!shouldPlace) continue;
@@ -119,8 +119,8 @@ public class LiquidFillModule extends Module {
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                         LiquidFillModule.class.getName(),
                         3,
-                        (float) getYawToVec(MC.player, Vec3d.of(pos)),
-                        (float) getPitchToVec(MC.player, Vec3d.of(pos))
+                        (float) getYawToVec(MC.player, Vec3.atLowerCornerOf(pos)),
+                        (float) getPitchToVec(MC.player, Vec3.atLowerCornerOf(pos))
                 ));
             }
 
@@ -130,7 +130,7 @@ public class LiquidFillModule extends Module {
                 if (currentSlot != blockSlot)
                     INVENTORY_MANAGER.getSlotHandler().attemptSwitch(blockSlot);
 
-                BlockHitResult hit = new BlockHitResult(Vec3d.of(pos).add(0.5,0.5,0.5), Direction.UP, pos, false);
+                BlockHitResult hit = new BlockHitResult(Vec3.atLowerCornerOf(pos).add(0.5,0.5,0.5), Direction.UP, pos, false);
 
                 airPlace(hit, grim.get(), swing.get());
 
@@ -148,27 +148,27 @@ public class LiquidFillModule extends Module {
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MC.player == null || MC.world == null || renderPos == null) return;
+        if (MC.player == null || MC.level == null || renderPos == null) return;
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
-        Box box = new Box(renderPos);
+        AABB box = new AABB(renderPos);
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
     private boolean hasEntity(BlockPos pos) {
-        for (Entity entity : MC.world.getEntities()) {
-            if (entity.getBoundingBox().intersects(new Box(pos))) return true;
+        for (Entity entity : MC.level.entitiesForRendering()) {
+            if (entity.getBoundingBox().intersects(new AABB(pos))) return true;
         }
         return false;
     }
 
     private int findBlockInHotbar() {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() instanceof BlockItem blockItem) {
                 Block block = blockItem.getBlock();
-                if (block != Blocks.AIR && block.getDefaultState().isOpaqueFullCube()) {
+                if (block != Blocks.AIR && block.defaultBlockState().isSolidRender()) {
                     return i;
                 }
             }

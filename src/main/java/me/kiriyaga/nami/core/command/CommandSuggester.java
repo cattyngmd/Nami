@@ -15,9 +15,9 @@ import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.BlockUtils;
 import me.kiriyaga.nami.util.KeyUtils;
-import net.minecraft.command.CommandSource;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class CommandSuggester {
 
-    private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
+    private final CommandDispatcher<SharedSuggestionProvider> dispatcher = new CommandDispatcher<>();
     private final CommandStorage storage;
 
     private final List<String> itemIdCache = new ArrayList<>();
@@ -47,11 +47,11 @@ public class CommandSuggester {
     public CommandSuggester(CommandStorage storage) {
         this.storage = storage;
         EXECUTABLE_MANAGER.getRequestHandler().submitRepeating(() -> {
-            if (MC.getNetworkHandler() == null) {
+            if (MC.getConnection() == null) {
                 if (!playerListCache.isEmpty()) playerListCache.clear();
                 return;
             }
-            List<String> currentNames = MC.getNetworkHandler().getPlayerList()
+            List<String> currentNames = MC.getConnection().getOnlinePlayers()
                     .stream()
                     .map(p -> p.getProfile().name())
                     .toList();
@@ -68,8 +68,8 @@ public class CommandSuggester {
             java.util.LinkedHashSet<String> ids = new java.util.LinkedHashSet<>();
 
             // Items
-            Registries.ITEM.stream().forEach(item -> {
-                Identifier id = Registries.ITEM.getId(item);
+            BuiltInRegistries.ITEM.stream().forEach(item -> {
+                Identifier id = BuiltInRegistries.ITEM.getKey(item);
                 if (id != null) {
                     String s = id.toString().toLowerCase(Locale.ROOT);
                     itemIdCache.add(s);
@@ -77,8 +77,8 @@ public class CommandSuggester {
                 }
             });
             // Blocks
-            Registries.BLOCK.stream().forEach(block -> {
-                Identifier id = Registries.BLOCK.getId(block);
+            BuiltInRegistries.BLOCK.stream().forEach(block -> {
+                Identifier id = BuiltInRegistries.BLOCK.getKey(block);
                 if (id != null) {
                     String s = id.toString().toLowerCase(Locale.ROOT);
                     blockIdCache.add(s);
@@ -86,16 +86,16 @@ public class CommandSuggester {
                 }
             });
 
-            Registries.SOUND_EVENT.stream().forEach(snd -> {
-                Identifier id = Registries.SOUND_EVENT.getId(snd);
+            BuiltInRegistries.SOUND_EVENT.stream().forEach(snd -> {
+                Identifier id = BuiltInRegistries.SOUND_EVENT.getKey(snd);
                 if (id != null) {
                     soundIdCache.add(id.toString().toLowerCase(Locale.ROOT));
                     ids.add(id.toString().toLowerCase(Locale.ROOT));
                 }
             });
 
-            Registries.PARTICLE_TYPE.stream().forEach(p -> {
-                Identifier id = Registries.PARTICLE_TYPE.getId(p);
+            BuiltInRegistries.PARTICLE_TYPE.stream().forEach(p -> {
+                Identifier id = BuiltInRegistries.PARTICLE_TYPE.getKey(p);
                 if (id != null) {
                     particleIdCache.add(id.toString().toLowerCase(Locale.ROOT));
                     ids.add(id.toString().toLowerCase(Locale.ROOT));
@@ -123,22 +123,22 @@ public class CommandSuggester {
 
             // Other registries useful for whitelists
             try {
-                Registries.ENTITY_TYPE.stream().forEach(e -> {
-                    Identifier id = Registries.ENTITY_TYPE.getId(e);
+                BuiltInRegistries.ENTITY_TYPE.stream().forEach(e -> {
+                    Identifier id = BuiltInRegistries.ENTITY_TYPE.getKey(e);
                     if (id != null) ids.add(id.toString().toLowerCase(Locale.ROOT));
                 });
                         } catch (Exception e) { e.printStackTrace(); }
 
             try {
-                Registries.SOUND_EVENT.stream().forEach(snd -> {
-                    Identifier id = Registries.SOUND_EVENT.getId(snd);
+                BuiltInRegistries.SOUND_EVENT.stream().forEach(snd -> {
+                    Identifier id = BuiltInRegistries.SOUND_EVENT.getKey(snd);
                     if (id != null) ids.add(id.toString().toLowerCase(Locale.ROOT));
                 });
             } catch (Exception e) { e.printStackTrace(); }
 
             try {
-                Registries.PARTICLE_TYPE.stream().forEach(p -> {
-                    Identifier id = Registries.PARTICLE_TYPE.getId(p);
+                BuiltInRegistries.PARTICLE_TYPE.stream().forEach(p -> {
+                    Identifier id = BuiltInRegistries.PARTICLE_TYPE.getKey(p);
                     if (id != null) ids.add(id.toString().toLowerCase(Locale.ROOT));
                 });
             } catch (Exception e) { e.printStackTrace(); }
@@ -159,18 +159,18 @@ public class CommandSuggester {
 
         for (Command command : storage.getCommands()) {
             String displayName = command.getName() == null ? "" : command.getName().replaceAll("\\s", "");
-            LiteralArgumentBuilder<CommandSource> builder = LiteralArgumentBuilder.literal(displayName);
+            LiteralArgumentBuilder<SharedSuggestionProvider> builder = LiteralArgumentBuilder.literal(displayName);
             CommandArgument[] args = command.getArguments();
 
             if (args.length == 0) {
                 builder.executes(context -> 1);
             } else {
-                com.mojang.brigadier.builder.ArgumentBuilder<CommandSource, ?> argumentChain = null;
+                com.mojang.brigadier.builder.ArgumentBuilder<SharedSuggestionProvider, ?> argumentChain = null;
                 for (int i = args.length - 1; i >= 0; i--) {
                     CommandArgument arg = args[i];
                     boolean isLast = (i == args.length - 1);
 
-                    RequiredArgumentBuilder<CommandSource, ?> argBuilder = RequiredArgumentBuilder.argument(arg.getName(), toBrigadierArgument(arg, isLast));
+                    RequiredArgumentBuilder<SharedSuggestionProvider, ?> argBuilder = RequiredArgumentBuilder.argument(arg.getName(), toBrigadierArgument(arg, isLast));
 
                     if (arg instanceof CommandArgument.ActionArg actionArg) {
                         argBuilder.suggests((context, suggestionBuilder) -> {
@@ -338,8 +338,8 @@ public class CommandSuggester {
                             if (count.get() < SUGGESTION_LIMIT) offerList.accept(secondary);
 
                             if (idArg.getTarget() == CommandArgument.IdentifierArg.Target.BLOCK && count.get() < SUGGESTION_LIMIT) {
-                                for (net.minecraft.block.Block b : BlockUtils.getNonVanillaGeneratedBlocks()) {
-                                    Identifier id = Registries.BLOCK.getId(b);
+                                for (net.minecraft.world.level.block.Block b : BlockUtils.getNonVanillaGeneratedBlocks()) {
+                                    Identifier id = BuiltInRegistries.BLOCK.getKey(b);
                                     if (id == null) continue;
                                     String s = id.toString().toLowerCase(Locale.ROOT);
                                     if (!matches.test(s)) continue;
@@ -441,7 +441,7 @@ public class CommandSuggester {
         return StringArgumentType.string();
     }
 
-    public CommandDispatcher<CommandSource> getDispatcher() {
+    public CommandDispatcher<SharedSuggestionProvider> getDispatcher() {
         return dispatcher;
     }
 }

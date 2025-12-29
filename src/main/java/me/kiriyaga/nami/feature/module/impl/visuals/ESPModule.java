@@ -13,19 +13,26 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.block.*;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.block.enums.SlabType;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ScaffoldingBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.TransparentBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.Level;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -62,7 +69,7 @@ public class ESPModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
-        if (MC == null || MC.world == null || MC.player == null) return;
+        if (MC == null || MC.level == null || MC.player == null) return;
 
         this.setDisplayInfo(renderMode.get().toString());
 
@@ -83,7 +90,7 @@ public class ESPModule extends Module {
     }
 
     private void renderBoxes(Render3DEvent event) {
-        MatrixStack matrices = event.getMatrices();
+        PoseStack matrices = event.getMatrices();
         float partialTicks = event.getTickDelta();
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
 
@@ -106,14 +113,14 @@ public class ESPModule extends Module {
 
         if (renderMode.get() == RenderMode.OUTLINE) {
             double maxDistSq = outlineDistance.get() * outlineDistance.get();
-            entities.removeIf(entity -> MC.player.squaredDistanceTo(entity) > maxDistSq);
+            entities.removeIf(entity -> MC.player.distanceToSqr(entity) > maxDistSq);
         }
 
         return entities;
     }
 
     private Color getColorForEntity(Entity entity, ColorModule colorModule) {
-        if (entity instanceof PlayerEntity) {
+        if (entity instanceof Player) {
             return colorModule.getStyledGlobalColor();
         } else if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) {
             return COLOR_PASSIVE;
@@ -128,7 +135,7 @@ public class ESPModule extends Module {
     }
 
     private void renderItemBoxes(Render3DEvent event) {
-        MatrixStack matrices = event.getMatrices();
+        PoseStack matrices = event.getMatrices();
         float partialTicks = event.getTickDelta();
 
         for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
@@ -139,12 +146,12 @@ public class ESPModule extends Module {
         }
     }
 
-    private void drawBox(Entity entity, Color color, MatrixStack matrices, float partialTicks) {
-        double interpX = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * partialTicks;
-        double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
-        double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
+    private void drawBox(Entity entity, Color color, PoseStack matrices, float partialTicks) {
+        double interpX = entity.xOld + (entity.getX() - entity.xOld) * partialTicks;
+        double interpY = entity.yOld + (entity.getY() - entity.yOld) * partialTicks;
+        double interpZ = entity.zOld + (entity.getZ() - entity.zOld) * partialTicks;
 
-        Box box = entity.getBoundingBox().offset(
+        AABB box = entity.getBoundingBox().move(
                 interpX - entity.getX(),
                 interpY - entity.getY(),
                 interpZ - entity.getZ()
@@ -164,7 +171,7 @@ public class ESPModule extends Module {
 
         if (entity == null || entity.isRemoved() || !entity.isAlive()) return null;
 
-        if (entity instanceof PlayerEntity) {
+        if (entity instanceof Player) {
             if (!esp.showPlayers.get()) return null;
             return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
         }
@@ -181,51 +188,51 @@ public class ESPModule extends Module {
     }
 
     public static boolean canMobSpawn(BlockPos pos, int spawnLightLimit) {
-        BlockState state = MC.world.getBlockState(pos);
-        BlockState below = MC.world.getBlockState(pos.down());
+        BlockState state = MC.level.getBlockState(pos);
+        BlockState below = MC.level.getBlockState(pos.below());
         Block blockBelow = below.getBlock();
 
-        boolean isSnowLayer = state.getBlock() instanceof SnowBlock && state.get(SnowBlock.LAYERS) == 1;
+        boolean isSnowLayer = state.getBlock() instanceof SnowLayerBlock && state.getValue(SnowLayerBlock.LAYERS) == 1;
         if (!state.isAir() && !isSnowLayer) return false;
         if (blockBelow == Blocks.BEDROCK || blockBelow == Blocks.BARRIER || blockBelow instanceof TransparentBlock || blockBelow instanceof ScaffoldingBlock)
             return false;
 
-        if (!(blockBelow == Blocks.SOUL_SAND || blockBelow == Blocks.MUD || (blockBelow instanceof SlabBlock && below.get(SlabBlock.TYPE) == SlabType.TOP) || (blockBelow instanceof StairsBlock && below.get(StairsBlock.HALF) == BlockHalf.TOP) || below.isOpaqueFullCube()))
+        if (!(blockBelow == Blocks.SOUL_SAND || blockBelow == Blocks.MUD || (blockBelow instanceof SlabBlock && below.getValue(SlabBlock.TYPE) == SlabType.TOP) || (blockBelow instanceof StairBlock && below.getValue(StairBlock.HALF) == Half.TOP) || below.isSolidRender()))
             return false;
 
-        int block = MC.world.getLightLevel(LightType.BLOCK, pos);
+        int block = MC.level.getBrightness(LightLayer.BLOCK, pos);
         //int sky = MC.world.getLightLevel(LightType.SKY, pos);
 
         return block <= spawnLightLimit;
     }
 
     private void renderMob(Render3DEvent event) {
-        MatrixStack matrices = event.getMatrices();
-        World world = MC.world;
-        BlockPos playerPos = MC.player.getBlockPos();
+        PoseStack matrices = event.getMatrices();
+        Level world = MC.level;
+        BlockPos playerPos = MC.player.blockPosition();
         int lightLimit = mobSpawnLightThreshold.get();
 
         for (int x = -9; x <= 9; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -9; z <= 9; z++) {
-                    BlockPos pos = playerPos.add(x, y, z);
+                    BlockPos pos = playerPos.offset(x, y, z);
 
                     if (canMobSpawn(pos, lightLimit)) {
-                        int blockLight = world.getLightLevel(pos);
+                        int blockLight = world.getMaxLocalRawBrightness(pos);
 
                         double renderX = pos.getX() + 0.5;
                         double renderY = pos.getY() + 1.0;
                         double renderZ = pos.getZ() + 0.5;
-                        Vec3d camPos = MC.gameRenderer.getCamera().getCameraPos();
+                        Vec3 camPos = MC.gameRenderer.getMainCamera().position();
 
-                        float distance = (float) camPos.distanceTo(new Vec3d(renderX, renderY, renderZ));
+                        float distance = (float) camPos.distanceTo(new Vec3(renderX, renderY, renderZ));
                         int scale = 30;
 
                         float dynamicScale = 0.0018f + (scale / 10000.0f) * distance;
                         if (distance <= 8.0f) dynamicScale = 0.0245f;
 
-                        Vec3d renderPos = new Vec3d(renderX, renderY, renderZ);
-                        Text text = Text.of(String.valueOf(blockLight));
+                        Vec3 renderPos = new Vec3(renderX, renderY, renderZ);
+                        Component text = Component.nullToEmpty(String.valueOf(blockLight));
                         RenderUtil.drawText3D(matrices, text, renderPos, dynamicScale, false, false, 1);
                     }
                 }

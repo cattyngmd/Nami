@@ -4,10 +4,10 @@ import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ViewClipModule;
 import me.kiriyaga.nami.mixininterface.ICamera;
-import net.minecraft.client.render.Camera;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.client.Camera;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -24,27 +24,27 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 @Mixin(Camera.class)
 public abstract class MixinCamera implements ICamera {
 
-    @Shadow private float yaw;
-    @Shadow private float pitch;
+    @Shadow private float yRot;
+    @Shadow private float xRot;
 
     @Unique
     private float tickDelta;
 
     @Shadow
-    private static float BASE_CAMERA_DISTANCE;
+    private static float DEFAULT_CAMERA_DISTANCE;
 
     @Override
     public void setRot(double yaw, double pitch) {
-        this.yaw = (float) yaw;
-        this.pitch = (float) pitch;
+        this.yRot = (float) yaw;
+        this.xRot = (float) pitch;
     }
 
-    @Inject(method = "update", at = @At("HEAD"))
-    private void onUpdateHead(World world, Entity entity, boolean bl, boolean bl2, float f, CallbackInfo ci) {
+    @Inject(method = "setup", at = @At("HEAD"))
+    private void onUpdateHead(Level world, Entity entity, boolean bl, boolean bl2, float f, CallbackInfo ci) {
         this.tickDelta = tickDelta;
     }
 
-    @ModifyVariable(method = "clipToSpace", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    @ModifyVariable(method = "getMaxZoom", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float modifyClipToSpace(float d) {
         FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
                 ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
@@ -55,7 +55,7 @@ public abstract class MixinCamera implements ICamera {
         return d;
     }
 
-    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V"))
+    @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V"))
     private void onUpdateSetPosArgs(Args args) {
         FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
                 ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
@@ -72,7 +72,7 @@ public abstract class MixinCamera implements ICamera {
         }
     }
 
-    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V"))
+    @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V"))
     private void onUpdateSetRotationArgs(Args args) {
         FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
                 ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
@@ -93,7 +93,7 @@ public abstract class MixinCamera implements ICamera {
         }
     }
 
-    @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getMaxZoom", at = @At("HEAD"), cancellable = true)
     private void allowClip(float f, CallbackInfoReturnable<Float> i) {
         ViewClipModule viewClipModule = MODULE_MANAGER.getStorage() != null
                 ? MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class)
@@ -104,7 +104,7 @@ public abstract class MixinCamera implements ICamera {
         }
     }
 
-    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;clipToSpace(F)F"))
+    @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getMaxZoom(F)F"))
     private void extendDistance(Args args) {
         ViewClipModule viewClipModule = MODULE_MANAGER.getStorage() != null
                 ? MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class)

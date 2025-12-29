@@ -7,9 +7,9 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import me.kiriyaga.nami.mixin.DuckKeyMapping;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.SERVER_MANAGER;
@@ -25,7 +25,7 @@ public class AutoWalkModule extends Module {
 
     @Override
     public void onDisable() {
-        if (MC.player == null || MC.world == null)
+        if (MC.player == null || MC.level == null)
             return;
 
         setWalkHeld(false);
@@ -33,7 +33,7 @@ public class AutoWalkModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null)
+        if (MC.player == null || MC.level == null)
             return;
 
         if (setbackStop.get() && SERVER_MANAGER.hasElapsedSinceSetback(5000))
@@ -43,10 +43,10 @@ public class AutoWalkModule extends Module {
     }
 
     private void setWalkHeld(boolean held) {
-        KeyBinding walkKey = MC.options.forwardKey;
-        InputUtil.Key boundKey = ((KeyBindingAccessor) walkKey).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
-        walkKey.setPressed(physicallyPressed || held);
+        KeyMapping walkKey = MC.options.keyUp;
+        InputConstants.Key boundKey = ((DuckKeyMapping) walkKey).getKey();
+        int keyCode = boundKey.getValue();
+        boolean physicallyPressed = InputConstants.isKeyDown(MC.getWindow(), keyCode);
+        walkKey.setDown(physicallyPressed || held);
     }
 }

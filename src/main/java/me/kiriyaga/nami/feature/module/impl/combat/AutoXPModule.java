@@ -13,18 +13,18 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.entity.TargetUtils;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
@@ -51,7 +51,7 @@ public class AutoXPModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onPreTickEvent(PreTickEvent ev) {
-        if (!isEnabled() || MC.player == null || MC.world == null) return;
+        if (!isEnabled() || MC.player == null || MC.level == null) return;
 
         if (is1_12.get() && anyAboveThreshold()) { // old minecraft versions does not have mending bugfix
             if (selfToggle.get())
@@ -88,7 +88,7 @@ public class AutoXPModule extends Module {
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
                 this.name,
                 6,
-                MC.player.getYaw(),
+                MC.player.getYRot(),
                 90.0f,
                 RotationModule.RotationMode.MOTION // only motion here sorry
                 )
@@ -101,22 +101,22 @@ public class AutoXPModule extends Module {
         switch (swapMode.get()) {
             case NORMAL -> {
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(xpSlot);
-                MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+                MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
 
                 if (packet.get()) {
                     for (int l = 0; l < packetShift.get(); l++) {
-                      sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
+                      sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
                         }
                 }
 
             }
             case SILENT -> {
                 INVENTORY_MANAGER.getSlotHandler().attemptSwitch(xpSlot);
-                MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+                MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
 
                 if (packet.get()) {
                     for (int l = 0; l < packetShift.get(); l++) {
-                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
+                        sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch()));
                     }
                 }
 
@@ -127,7 +127,7 @@ public class AutoXPModule extends Module {
 
     private boolean shouldRepair() {
         for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-            ItemStack stack = MC.player.getEquippedStack(slot);
+            ItemStack stack = MC.player.getItemBySlot(slot);
             if (!hasMending(stack))
                 continue;
 
@@ -138,7 +138,7 @@ public class AutoXPModule extends Module {
 
     private boolean anyAboveThreshold() {
         for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-            ItemStack stack = MC.player.getEquippedStack(slot);
+            ItemStack stack = MC.player.getItemBySlot(slot);
             if (isAbove(stack)) return true;
         }
         return false;
@@ -146,24 +146,24 @@ public class AutoXPModule extends Module {
 
 
     private boolean isBelow(ItemStack stack) {
-        if (stack == null || stack.isEmpty() || !stack.isDamageable()) return false;
+        if (stack == null || stack.isEmpty() || !stack.isDamageableItem()) return false;
         int max = stack.getMaxDamage();
-        int damage = stack.getDamage();
+        int damage = stack.getDamageValue();
         int percentRemaining = (int) (((max - damage) / (float) max) * 100);
         return percentRemaining <= durability.get();
     }
 
     private boolean isAbove(ItemStack stack) {
-        if (stack == null || stack.isEmpty() || !stack.isDamageable()) return false;
+        if (stack == null || stack.isEmpty() || !stack.isDamageableItem()) return false;
         int max = stack.getMaxDamage();
-        int damage = stack.getDamage();
+        int damage = stack.getDamageValue();
         int percentRemaining = (int) (((max - damage) / (float) max) * 100);
         return percentRemaining > durability.get();
     }
 
     private int getSlotInHotbar(Item item) {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (!stack.isEmpty() && stack.getItem() == item) return i;
         }
         return -1;

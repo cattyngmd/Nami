@@ -3,8 +3,8 @@ package me.kiriyaga.nami.feature.gui.oldgui.settings;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.ColorSetting;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
@@ -26,7 +26,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     private int lastHueX, lastHueY;
 
     @Override
-    public void render(DrawContext context, TextRenderer textRenderer, ColorSetting setting,
+    public void render(GuiGraphics context, Font textRenderer, ColorSetting setting,
                        int x, int y, int mouseX, int mouseY) {
 
         boolean hovered = isHovered(mouseX, mouseY, x, y);
@@ -65,7 +65,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         return HEIGHT + SV_SIZE + SV_HUE_PADDING + HUE_HEIGHT + BOTTOM_PADDING;
     }
 
-    private void renderSVSquare(DrawContext context, int x, int y, int w, int h, ColorSetting setting) {
+    private void renderSVSquare(GuiGraphics context, int x, int y, int w, int h, ColorSetting setting) {
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
         float hue = hsb[0];
 
@@ -85,7 +85,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
                 CLICK_GUI.applyFade(toRGBA(Color.WHITE)));
     }
 
-    private void renderHueSlider(DrawContext context, int x, int y, int width, int height, ColorSetting setting) {
+    private void renderHueSlider(GuiGraphics context, int x, int y, int width, int height, ColorSetting setting) {
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
 
         for (int i = 0; i < width; i++) {

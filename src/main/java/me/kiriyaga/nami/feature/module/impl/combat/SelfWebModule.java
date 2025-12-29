@@ -14,12 +14,12 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
 import me.kiriyaga.nami.util.entity.TargetUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.level.block.Blocks;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class SelfWebModule extends Module {
 
     @SubscribeEvent
     public void onPreTickEvent(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
         if (cooldown > 0) {
             cooldown--;
@@ -76,7 +76,7 @@ public class SelfWebModule extends Module {
         int placed = 0;
 
         for (BlockPos pos : positions) {
-            if (MC.world.getBlockState(pos).isAir()) {
+            if (MC.level.getBlockState(pos).isAir()) {
                 renderPos = pos;
                 InteractionUtils.placeBlock(pos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
                 placed++;
@@ -93,19 +93,19 @@ public class SelfWebModule extends Module {
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MC.player == null || MC.world == null || renderPos == null || !render.get()) return;
+        if (MC.player == null || MC.level == null || renderPos == null || !render.get()) return;
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
 
-        Box box = new Box(renderPos);
+        AABB box = new AABB(renderPos);
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
     private int findSlot() {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (!stack.isEmpty() && stack.getItem() == Blocks.COBWEB.asItem()) {
                 return i;
             }
@@ -113,7 +113,7 @@ public class SelfWebModule extends Module {
         return -1;
     }
 
-    private List<BlockPos> getPositions(PlayerEntity player) {
+    private List<BlockPos> getPositions(Player player) {
         double maxX = player.getBoundingBox().maxX;
         double minZ = player.getBoundingBox().minZ;
         double maxZ = player.getBoundingBox().maxZ;

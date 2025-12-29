@@ -8,9 +8,14 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.*;
 import me.kiriyaga.nami.util.InteractionUtils;
-import net.minecraft.block.*;
-import net.minecraft.item.*;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -34,9 +39,9 @@ public class AutoFarmModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTickEvent(PreTickEvent e) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
-        BlockPos playerPos = MC.player.getBlockPos();
+        BlockPos playerPos = MC.player.blockPosition();
         int r = radius.get();
 
         Set<BlockPos> targets = new HashSet<>();
@@ -44,7 +49,7 @@ public class AutoFarmModule extends Module {
         for (int x = -r; x <= r; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -r; z <= r; z++) {
-                    BlockPos base = playerPos.add(x, y, z);
+                    BlockPos base = playerPos.offset(x, y, z);
 
                     if (isPlantable(base)) {
                         targets.add(base);
@@ -55,35 +60,35 @@ public class AutoFarmModule extends Module {
 
         if (targets.isEmpty()) return;
 
-        BlockPos bestTarget = targets.stream().min(Comparator.comparingDouble(a -> MC.player.squaredDistanceTo(a.getX() + 0.5, a.getY() + 1.0, a.getZ() + 0.5))).orElse(null);
+        BlockPos bestTarget = targets.stream().min(Comparator.comparingDouble(a -> MC.player.distanceToSqr(a.getX() + 0.5, a.getY() + 1.0, a.getZ() + 0.5))).orElse(null);
 
         if (bestTarget == null) return;
 
         int slot = getSlot(bestTarget);
         if (slot == -1) return;
 
-        BlockPos placePos = bestTarget.up();
+        BlockPos placePos = bestTarget.above();
 
         InteractionUtils.placeBlock(placePos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
     }
 
     private boolean isPlantable(BlockPos pos) {
-        BlockState base = MC.world.getBlockState(pos);
+        BlockState base = MC.level.getBlockState(pos);
         Block block = base.getBlock();
 
         if (!(block == Blocks.FARMLAND || block == Blocks.SOUL_SAND))
             return false;
 
-        BlockState above = MC.world.getBlockState(pos.up());
+        BlockState above = MC.level.getBlockState(pos.above());
         return above.isAir();
     }
 
     private int getSlot(BlockPos base) {
-        Block block = MC.world.getBlockState(base).getBlock();
+        Block block = MC.level.getBlockState(base).getBlock();
 
         if (block == Blocks.FARMLAND) {
             for (int i = 0; i < 9; i++) {
-                Item item = MC.player.getInventory().getStack(i).getItem();
+                Item item = MC.player.getInventory().getItem(i).getItem();
                 if (item instanceof BlockItem bi && bi.getBlock() instanceof CropBlock)
                     return i;
 
@@ -102,7 +107,7 @@ public class AutoFarmModule extends Module {
 
         if (block == Blocks.SOUL_SAND) {
             for (int i = 0; i < 9; i++) {
-                if (MC.player.getInventory().getStack(i).getItem() == Items.NETHER_WART)
+                if (MC.player.getInventory().getItem(i).getItem() == Items.NETHER_WART)
                     return i;
             }
             return -1;

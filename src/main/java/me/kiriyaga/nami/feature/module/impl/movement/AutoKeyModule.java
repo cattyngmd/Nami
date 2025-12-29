@@ -6,9 +6,9 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import me.kiriyaga.nami.mixin.DuckKeyMapping;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +18,10 @@ import static me.kiriyaga.nami.Nami.MC;
 @RegisterModule
 public class AutoKeyModule extends Module {
 
-    private KeyBinding[] trackedKeys;
+    private KeyMapping[] trackedKeys;
 
 
-    private final Map<KeyBinding, Boolean> savedKeyStates = new HashMap<>();
+    private final Map<KeyMapping, Boolean> savedKeyStates = new HashMap<>();
 
     public AutoKeyModule() {
         super("AutoKey", "Holds all physically pressed keys automatically.", ModuleCategory.of("Movement"),"autokey");
@@ -29,23 +29,23 @@ public class AutoKeyModule extends Module {
 
     @Override
     public void onEnable() {
-        trackedKeys = new KeyBinding[]{
-                MC.options.forwardKey,
-                MC.options.backKey,
-                MC.options.leftKey,
-                MC.options.rightKey,
-                MC.options.jumpKey,
-                MC.options.sprintKey,
-                MC.options.attackKey,
-                MC.options.sneakKey,
-                MC.options.useKey
+        trackedKeys = new KeyMapping[]{
+                MC.options.keyUp,
+                MC.options.keyDown,
+                MC.options.keyLeft,
+                MC.options.keyRight,
+                MC.options.keyJump,
+                MC.options.keySprint,
+                MC.options.keyAttack,
+                MC.options.keyShift,
+                MC.options.keyUse
         };
 
         savedKeyStates.clear();
-        for (KeyBinding key : trackedKeys) {
-            InputUtil.Key boundKey = ((KeyBindingAccessor) key).getBoundKey();
-            int keyCode = boundKey.getCode();
-            boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
+        for (KeyMapping key : trackedKeys) {
+            InputConstants.Key boundKey = ((DuckKeyMapping) key).getKey();
+            int keyCode = boundKey.getValue();
+            boolean physicallyPressed = InputConstants.isKeyDown(MC.getWindow(), keyCode);
             if (physicallyPressed) {
                 savedKeyStates.put(key, true);
             }
@@ -55,8 +55,8 @@ public class AutoKeyModule extends Module {
     @Override
     public void onDisable() {
         if (trackedKeys == null) return;
-        for (KeyBinding key : savedKeyStates.keySet()) {
-            key.setPressed(false);
+        for (KeyMapping key : savedKeyStates.keySet()) {
+            key.setDown(false);
         }
         savedKeyStates.clear();
     }
@@ -64,11 +64,11 @@ public class AutoKeyModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdateEvent(PreTickEvent event) {
         if (trackedKeys == null) return;
-        for (KeyBinding key : trackedKeys) {
+        for (KeyMapping key : trackedKeys) {
             if (savedKeyStates.getOrDefault(key, false)) {
-                key.setPressed(true);
+                key.setDown(true);
             } else {
-                key.setPressed(false);
+                key.setDown(false);
             }
         }
     }

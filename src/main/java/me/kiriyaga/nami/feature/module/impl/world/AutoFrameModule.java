@@ -9,12 +9,12 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.item.FilledMapItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,18 +45,18 @@ public class AutoFrameModule extends Module {
 
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
         if (cooldown > 0) {
             cooldown--;
             return;
         }
 
-        for (Entity entity : MC.world.getEntities()) {
-            if (!(entity instanceof ItemFrameEntity frame))
+        for (Entity entity : MC.level.entitiesForRendering()) {
+            if (!(entity instanceof ItemFrame frame))
                 continue;
 
-            if (frame.getHeldItemStack() != null)
+            if (frame.getItem() != null)
                 continue;
 
             int mapSlot = getMapSlot();
@@ -79,8 +79,8 @@ public class AutoFrameModule extends Module {
 
     private int getMapSlot() {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof FilledMapItem) {
+            ItemStack stack = MC.player.getInventory().getItem(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof MapItem) {
                 return i;
             }
         }

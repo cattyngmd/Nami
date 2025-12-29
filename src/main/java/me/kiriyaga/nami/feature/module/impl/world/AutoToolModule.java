@@ -10,11 +10,11 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameMode;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.GameType;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
@@ -33,13 +33,13 @@ public class AutoToolModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     private void onStartBreakingBlockEvent(StartBreakingBlockEvent event) {
-        if (MC.player == null || MC.world == null || MC.player.getGameMode() != GameMode.SURVIVAL) {
+        if (MC.player == null || MC.level == null || MC.player.gameMode() != GameType.SURVIVAL) {
             return;
         }
 
         EXECUTABLE_MANAGER.getRequestHandler().submit(() -> { // we are not on main thread!
             BlockPos targetPos = event.blockPos;
-            BlockState targetState = MC.world.getBlockState(targetPos);
+            BlockState targetState = MC.level.getBlockState(targetPos);
 
             int bestSlot = -1;
             float bestSpeed = 1.0f;
@@ -47,7 +47,7 @@ public class AutoToolModule extends Module {
             int prioritySlot = -1;
 
             for (int slot = 0; slot < 9; slot++) {
-                ItemStack stack = MC.player.getInventory().getStack(slot);
+                ItemStack stack = MC.player.getInventory().getItem(slot);
                 if (stack.isEmpty()) continue;
                 if (isBroken(stack, damageThreshold.get())) continue;
 
@@ -73,14 +73,14 @@ public class AutoToolModule extends Module {
             }
 
             for (int slot = 0; slot < 9; slot++) {
-                ItemStack stack = MC.player.getInventory().getStack(slot);
+                ItemStack stack = MC.player.getInventory().getItem(slot);
                 if (stack.isEmpty()) continue;
                 if (isBroken(stack, damageThreshold.get())) continue;
 
                 float totalSpeed = 1.0f;
-                if (stack.isSuitableFor(targetState)) {
+                if (stack.isCorrectToolForDrops(targetState)) {
                     float efficiencyLevel = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
-                    float miningSpeed = stack.getMiningSpeedMultiplier(targetState);
+                    float miningSpeed = stack.getDestroySpeed(targetState);
                     totalSpeed = miningSpeed * (1 + efficiencyLevel * 0.2f);
                 }
 

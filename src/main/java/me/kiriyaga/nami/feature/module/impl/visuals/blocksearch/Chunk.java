@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.feature.module.impl.visuals.blocksearch;
 
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.level.ChunkPos;
 import java.util.List;
 
 public class Chunk {
@@ -14,6 +14,6 @@ public class Chunk {
     }
 
     public long getKey() {
-        return ChunkPos.toLong(pos.x, pos.z);
+        return ChunkPos.asLong(pos.x, pos.z);
     }
 }

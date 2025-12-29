@@ -3,8 +3,8 @@ package me.kiriyaga.nami.feature.gui.oldgui.settings;
 import me.kiriyaga.nami.feature.gui.oldgui.components.CategoryPanel;
 import me.kiriyaga.nami.feature.gui.oldgui.components.SettingPanel;
 import me.kiriyaga.nami.feature.setting.Setting;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 
 public interface SettingRenderer<T extends Setting<?>> {
     int HEIGHT = 13;
@@ -13,7 +13,7 @@ public interface SettingRenderer<T extends Setting<?>> {
     int SLIDER_HEIGHT = 1;
     int MODULE_SPACING = 1;
 
-    void render(DrawContext context, TextRenderer textRenderer, T setting, int x, int y, int mouseX, int mouseY);
+    void render(GuiGraphics context, Font textRenderer, T setting, int x, int y, int mouseX, int mouseY);
     boolean mouseClicked(T setting, double mouseX, double mouseY, int button);
     void mouseDragged(T setting, double mouseX);
     default boolean mouseReleased(T setting, double mouseX, double mouseY, int button) {

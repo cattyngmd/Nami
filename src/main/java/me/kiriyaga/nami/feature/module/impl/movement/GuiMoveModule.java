@@ -6,20 +6,23 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.mixin.KeyBindingAccessor;
+import me.kiriyaga.nami.mixin.DuckKeyMapping;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.EditBox;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.ingame.*;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.network.packet.s2c.play.CloseScreenS2CPacket;
+import net.minecraft.client.gui.screens.inventory.AbstractCommandBlockEditScreen;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.SignEditScreen;
+import net.minecraft.client.gui.screens.inventory.StructureBlockEditScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
+import net.minecraft.network.protocol.game.ClientboundContainerClosePacket;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -35,7 +38,7 @@ public class GuiMoveModule extends Module {
     private boolean jumpHeld = false;
 
     private Screen lastScreen = null;
-    private final java.util.Deque<ClickSlotC2SPacket> clickBuffer = new java.util.ArrayDeque<>();
+    private final java.util.Deque<ServerboundContainerClickPacket> clickBuffer = new java.util.ArrayDeque<>();
 
     public final BoolSetting _2b2t = addSetting(new BoolSetting("2b2t", true));
 
@@ -65,7 +68,7 @@ public class GuiMoveModule extends Module {
         if (!_2b2t.get())
             return;
 
-        if (ev.getPacket() instanceof CloseScreenS2CPacket packet && packet.getSyncId() == MC.player.playerScreenHandler.syncId)
+        if (ev.getPacket() instanceof ClientboundContainerClosePacket packet && packet.getContainerId() == MC.player.inventoryMenu.containerId)
             ev.cancel();
     }
 
@@ -122,20 +125,20 @@ public class GuiMoveModule extends Module {
     public void onKeyInput(KeyInputEvent event) {
         if (!canMove()) return;
 
-        updateHeld(MC.options.forwardKey, event.key, event.scancode, event.action, event.modifiers, false, v -> forwardHeld = v);
-        updateHeld(MC.options.backKey, event.key, event.scancode, event.action, event.modifiers, false, v -> backHeld = v);
-        updateHeld(MC.options.leftKey, event.key, event.scancode, event.action, event.modifiers, false, v -> leftHeld = v);
-        updateHeld(MC.options.rightKey, event.key, event.scancode, event.action, event.modifiers, false, v -> rightHeld = v);
-        updateHeld(MC.options.jumpKey, event.key, event.scancode, event.action, event.modifiers, false, v -> jumpHeld = v);
+        updateHeld(MC.options.keyUp, event.key, event.scancode, event.action, event.modifiers, false, v -> forwardHeld = v);
+        updateHeld(MC.options.keyDown, event.key, event.scancode, event.action, event.modifiers, false, v -> backHeld = v);
+        updateHeld(MC.options.keyLeft, event.key, event.scancode, event.action, event.modifiers, false, v -> leftHeld = v);
+        updateHeld(MC.options.keyRight, event.key, event.scancode, event.action, event.modifiers, false, v -> rightHeld = v);
+        updateHeld(MC.options.keyJump, event.key, event.scancode, event.action, event.modifiers, false, v -> jumpHeld = v);
     }
 
-    private void updateHeld(KeyBinding bind, int key, int scancode, int action, int modifiers, boolean mouse, java.util.function.Consumer<Boolean> setter) {
+    private void updateHeld(KeyMapping bind, int key, int scancode, int action, int modifiers, boolean mouse, java.util.function.Consumer<Boolean> setter) {
         if (!mouse) {
-            KeyInput input = new KeyInput(key, scancode, modifiers);
-            if (!bind.matchesKey(input)) return;
+            KeyEvent input = new KeyEvent(key, scancode, modifiers);
+            if (!bind.matches(input)) return;
         } else {
-            MouseInput mouseInput = new MouseInput(key, 0);
-            Click click = new Click(0, 0, mouseInput);
+            MouseButtonInfo mouseInput = new MouseButtonInfo(key, 0);
+            MouseButtonEvent click = new MouseButtonEvent(0, 0, mouseInput);
             if (!bind.matchesMouse(click)) return;
         }
 
@@ -148,7 +151,7 @@ public class GuiMoveModule extends Module {
     public void onRender3D(Render3DEvent event) {
         if (MODULE_MANAGER.getStorage().getByClass(FreecamModule.class).isEnabled()) return;
 
-        Screen currentScreen = MC.currentScreen;
+        Screen currentScreen = MC.screen;
 
         if (currentScreen != null) {
             if (lastScreen != currentScreen) {
@@ -166,11 +169,11 @@ public class GuiMoveModule extends Module {
             return;
         }
 
-        updateKeyWithHold(MC.options.forwardKey, forwardHeld);
-        updateKeyWithHold(MC.options.backKey, backHeld);
-        updateKeyWithHold(MC.options.leftKey, leftHeld);
-        updateKeyWithHold(MC.options.rightKey, rightHeld);
-        updateKeyWithHold(MC.options.jumpKey, jumpHeld);
+        updateKeyWithHold(MC.options.keyUp, forwardHeld);
+        updateKeyWithHold(MC.options.keyDown, backHeld);
+        updateKeyWithHold(MC.options.keyLeft, leftHeld);
+        updateKeyWithHold(MC.options.keyRight, rightHeld);
+        updateKeyWithHold(MC.options.keyJump, jumpHeld);
     }
 
     private void resetHeldKeys() {
@@ -182,22 +185,22 @@ public class GuiMoveModule extends Module {
         setKeysPressed(false);
     }
 
-    private void updateKeyWithHold(KeyBinding bind, boolean held) {
-        InputUtil.Key boundKey = ((KeyBindingAccessor) bind).getBoundKey();
-        int keyCode = boundKey.getCode();
-        boolean physicallyPressed = InputUtil.isKeyPressed(MC.getWindow(), keyCode);
-        bind.setPressed(physicallyPressed || held);
+    private void updateKeyWithHold(KeyMapping bind, boolean held) {
+        InputConstants.Key boundKey = ((DuckKeyMapping) bind).getKey();
+        int keyCode = boundKey.getValue();
+        boolean physicallyPressed = InputConstants.isKeyDown(MC.getWindow(), keyCode);
+        bind.setDown(physicallyPressed || held);
     }
 
     private boolean canMove() {
-        if (MC.currentScreen == null) return true;
+        if (MC.screen == null) return true;
 
-        if (MC.currentScreen instanceof ChatScreen
-                || MC.currentScreen instanceof SignEditScreen
-                || MC.currentScreen instanceof AnvilScreen
-                || MC.currentScreen instanceof AbstractCommandBlockScreen
-                || MC.currentScreen instanceof StructureBlockScreen
-                || MC.currentScreen instanceof CreativeInventoryScreen) {
+        if (MC.screen instanceof ChatScreen
+                || MC.screen instanceof SignEditScreen
+                || MC.screen instanceof AnvilScreen
+                || MC.screen instanceof AbstractCommandBlockEditScreen
+                || MC.screen instanceof StructureBlockEditScreen
+                || MC.screen instanceof CreativeModeInventoryScreen) {
             return false;
         }
 
@@ -226,17 +229,17 @@ public class GuiMoveModule extends Module {
 
     private boolean isPlayerInv() {
         if (MC.player == null) return false;
-        if (!(MC.currentScreen instanceof InventoryScreen)) return false;
-        return MC.player.currentScreenHandler == MC.player.playerScreenHandler;
+        if (!(MC.screen instanceof InventoryScreen)) return false;
+        return MC.player.containerMenu == MC.player.inventoryMenu;
     }
 
     private void setKeysPressed(boolean pressed) {
-        MC.options.forwardKey.setPressed(pressed);
-        MC.options.backKey.setPressed(pressed);
-        MC.options.leftKey.setPressed(pressed);
-        MC.options.rightKey.setPressed(pressed);
-        MC.options.jumpKey.setPressed(pressed);
-        MC.options.sneakKey.setPressed(pressed);
-        MC.options.sprintKey.setPressed(pressed);
+        MC.options.keyUp.setDown(pressed);
+        MC.options.keyDown.setDown(pressed);
+        MC.options.keyLeft.setDown(pressed);
+        MC.options.keyRight.setDown(pressed);
+        MC.options.keyJump.setDown(pressed);
+        MC.options.keyShift.setDown(pressed);
+        MC.options.keySprint.setDown(pressed);
     }
 }

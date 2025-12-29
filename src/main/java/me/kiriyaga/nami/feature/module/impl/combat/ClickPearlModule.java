@@ -11,16 +11,16 @@ import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.ClipContext;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.RotationUtils.getLookVectorFromYawPitch;
@@ -52,13 +52,13 @@ public class ClickPearlModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onTick(PreTickEvent ev) {
-        if (MC.world == null || MC.player == null) return;
+        if (MC.level == null || MC.player == null) return;
 
         boolean pressed = useKey.isPressed();
 
         if (pressed && !useKey.wasPressedLastTick() || recall) {
             recall = false;
-            if (MC.player.isGliding()) {
+            if (MC.player.isFallFlying()) {
                 useGlide();
             } else {
                 use();
@@ -78,7 +78,7 @@ public class ClickPearlModule extends Module {
 
         if (item == null) return;
 
-        if (checkCooldown.get() && MC.player.getItemCooldownManager().isCoolingDown(item.getDefaultStack())) {
+        if (checkCooldown.get() && MC.player.getCooldowns().isOnCooldown(item.getDefaultInstance())) {
             return;
         }
 
@@ -98,7 +98,7 @@ public class ClickPearlModule extends Module {
 
         if (item == null) return;
 
-        if (checkCooldown.get() && MC.player.getItemCooldownManager().isCoolingDown(item.getDefaultStack())) {
+        if (checkCooldown.get() && MC.player.getCooldowns().isOnCooldown(item.getDefaultInstance())) {
             return;
         }
 
@@ -111,7 +111,7 @@ public class ClickPearlModule extends Module {
         if (hotbarSlot != -1) {
             int prevSlot = MC.player.getInventory().getSelectedSlot();
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(hotbarSlot);
-            MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+            MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prevSlot);
             return;
         }
@@ -124,7 +124,7 @@ public class ClickPearlModule extends Module {
             int containerInvSlot = convertSlot(invSlot);
 
             if (INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex)) {
-                MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+                MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
 
                 INVENTORY_MANAGER.getClickHandler().swapSlot(containerInvSlot, selectedHotbarIndex);
             } else recall = true;
@@ -134,9 +134,9 @@ public class ClickPearlModule extends Module {
     private boolean canCastRay() {
         double rayRange = 6.0;
 
-        for (Entity entity : MC.world.getEntities()) {
+        for (Entity entity : MC.level.entitiesForRendering()) {
             if (entity == MC.player) continue;
-            if (MC.player.squaredDistanceTo(entity) > 100) continue;
+            if (MC.player.distanceToSqr(entity) > 100) continue;
 
             EntityHitResult hitResult = raycastTarget(MC.player, entity, rayRange,
                     ROTATION_MANAGER.getStateHandler().getServerYaw(),
@@ -150,7 +150,7 @@ public class ClickPearlModule extends Module {
 
     private int getSlotInHotbar(Item item) {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == item) return i;
         }
         return -1;
@@ -158,7 +158,7 @@ public class ClickPearlModule extends Module {
 
     private int getSlotInInventory(Item item) {
         for (int i = 9; i < 36; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == item) return i;
         }
         return -1;
@@ -169,13 +169,13 @@ public class ClickPearlModule extends Module {
     }
 
     private EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
-        Vec3d eyePos = player.getCameraPosVec(1.0f);
-        Vec3d look = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3d reachEnd = eyePos.add(look.multiply(reach));
+        Vec3 eyePos = player.getEyePosition(1.0f);
+        Vec3 look = getLookVectorFromYawPitch(yaw, pitch);
+        Vec3 reachEnd = eyePos.add(look.scale(reach));
 
-        Box targetBox = target.getBoundingBox();
+        AABB targetBox = target.getBoundingBox();
 
-        if (targetBox.raycast(eyePos, reachEnd).isPresent()) {
+        if (targetBox.clip(eyePos, reachEnd).isPresent()) {
             return new EntityHitResult(target);
         }
 

@@ -20,23 +20,27 @@ import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.EnchantmentUtils;
 import me.kiriyaga.nami.util.entity.TargetUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
-import net.minecraft.item.*;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
-import net.minecraft.util.hit.EntityHitResult;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MaceItem;
+import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.projectile.ShulkerBullet;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 
@@ -79,7 +83,7 @@ public class AuraModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
         float tps;
         switch (tpsMode.get()) {
@@ -91,7 +95,7 @@ public class AuraModule extends Module {
         attackCooldownTicks -= 1f * (tps / 20f);
         if (attackCooldownTicks < 0f) attackCooldownTicks = 0f;
 
-        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugAura(Text.of("cooldown ticks is : "+attackCooldownTicks));
+        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugAura(Component.nullToEmpty("cooldown ticks is : "+attackCooldownTicks));
 
         if (!multiTask.get() && MC.player.isUsingItem()) {
             currentTarget = null;
@@ -100,12 +104,12 @@ public class AuraModule extends Module {
 
         long startTime = System.nanoTime();
 
-        ItemStack stack = MC.player.getMainHandStack();
+        ItemStack stack = MC.player.getMainHandItem();
         Entity target = TargetUtils.getTarget();
         DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
         if (target == null || (swap.get() == Swap.REQUIRE && !(stack.getItem() instanceof AxeItem
-                || stack.isIn(ItemTags.SWORDS)
+                || stack.is(ItemTags.SWORDS)
                 || stack.getItem() instanceof TridentItem
                 || stack.getItem() instanceof MaceItem))) {
             currentTarget = null;
@@ -124,19 +128,19 @@ public class AuraModule extends Module {
 
         boolean skipCooldown = false;
 
-        if (target instanceof ShulkerBulletEntity) {
+        if (target instanceof ShulkerBullet) {
             skipCooldown = true;
         } else {
             ItemStack held = stack;
             float attackDamage = 1.0f;
 
-            if (MC.player.hasStatusEffect(StatusEffects.STRENGTH)) {
-                var strength = MC.player.getStatusEffect(StatusEffects.STRENGTH);
+            if (MC.player.hasEffect(MobEffects.STRENGTH)) {
+                var strength = MC.player.getEffect(MobEffects.STRENGTH);
                 attackDamage += 3.0f * (strength.getAmplifier() + 1);
             }
 
-            if (MC.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
-                var weakness = MC.player.getStatusEffect(StatusEffects.WEAKNESS);
+            if (MC.player.hasEffect(MobEffects.WEAKNESS)) {
+                var weakness = MC.player.getEffect(MobEffects.WEAKNESS);
                 attackDamage -= 4.0f * (weakness.getAmplifier() + 1); // im not sure is it 4 or 3 btw
             }
 
@@ -163,8 +167,8 @@ public class AuraModule extends Module {
 
         // RayCast as main distance check
         if ((skipCooldown || attackCooldownTicks <= preRotate * tps)) {
-            Vec3d eyePos = MC.player.getCameraPosVec(1.0f);
-            Vec3d closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
+            Vec3 eyePos = MC.player.getEyePosition(1.0f);
+            Vec3 closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
             float idealYaw = (float) getYawToVec(MC.player, closestPoint);
             float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
 
@@ -176,7 +180,7 @@ public class AuraModule extends Module {
                     idealPitch
             );
 
-            boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePos());
+            boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePosition());
 
             if (!insideBox && distanceCheck == null) {
                 currentTarget = null;
@@ -226,9 +230,9 @@ public class AuraModule extends Module {
 
         boolean b = false;
 
-        if (stopSprinting.get() == Sprint.PACKET && !MC.player.isSneaking())
+        if (stopSprinting.get() == Sprint.PACKET && !MC.player.isShiftKeyDown())
             if (MC.player.isSprinting()){
-                MC.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                MC.getConnection().send(new ServerboundPlayerCommandPacket(MC.player, ServerboundPlayerCommandPacket.Action.STOP_SPRINTING));
                 b = true;
             }
 
@@ -242,10 +246,10 @@ public class AuraModule extends Module {
             }
         }
 
-        MC.interactionManager.attackEntity(MC.player, target);
+        MC.gameMode.attack(MC.player, target);
 
         if (swing.get())
-            MC.player.swingHand(Hand.MAIN_HAND);
+            MC.player.swing(InteractionHand.MAIN_HAND);
 
         if (swap.get() == Swap.SILENT) {
             if (prev != -1) {
@@ -255,23 +259,23 @@ public class AuraModule extends Module {
 
         if (stopSprinting.get() == Sprint.PACKET)
             if (b)
-                MC.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+                MC.getConnection().send(new ServerboundPlayerCommandPacket(MC.player, ServerboundPlayerCommandPacket.Action.START_SPRINTING));
 
         if (!skipCooldown) attackCooldownTicks = getBaseCooldownTicks(stack, tps);
 
         long auraLogicDuration = System.nanoTime() - auraLogicStart;
-        debugModule.debugAura(Text.of(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0)));
+        debugModule.debugAura(Component.nullToEmpty(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0)));
         long totalDuration = System.nanoTime() - startTime;
-        debugModule.debugAura(Text.of(String.format("total %.3f ms", totalDuration / 1_000_000.0)));
+        debugModule.debugAura(Component.nullToEmpty(String.format("total %.3f ms", totalDuration / 1_000_000.0)));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceive(PacketReceiveEvent ev) {
-        if (!(ev.getPacket() instanceof UpdateSelectedSlotC2SPacket)) return;
-        if (MC.player == null || MC.world == null) return;
+        if (!(ev.getPacket() instanceof ServerboundSetCarriedItemPacket)) return;
+        if (MC.player == null || MC.level == null) return;
 
         EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
-            ItemStack stack = MC.player.getMainHandStack();
+            ItemStack stack = MC.player.getMainHandItem();
             if (stack == null || stack.isEmpty()) return;
 
             float tps;
@@ -293,11 +297,11 @@ public class AuraModule extends Module {
         drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
     }
 
-    private void drawBox(Entity entity, Color color, MatrixStack matrices, float partialTicks) {
-        double interpX = entity.lastRenderX + (entity.getX() - entity.lastRenderX) * partialTicks;
-        double interpY = entity.lastRenderY + (entity.getY() - entity.lastRenderY) * partialTicks;
-        double interpZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ) * partialTicks;
-        Box box = entity.getBoundingBox().offset(interpX - entity.getX(), interpY - entity.getY(), interpZ - entity.getZ());
+    private void drawBox(Entity entity, Color color, PoseStack matrices, float partialTicks) {
+        double interpX = entity.xOld + (entity.getX() - entity.xOld) * partialTicks;
+        double interpY = entity.yOld + (entity.getY() - entity.yOld) * partialTicks;
+        double interpZ = entity.zOld + (entity.getZ() - entity.zOld) * partialTicks;
+        AABB box = entity.getBoundingBox().move(interpX - entity.getX(), interpY - entity.getY(), interpZ - entity.getZ());
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
 
@@ -306,9 +310,9 @@ public class AuraModule extends Module {
     private float getBaseCooldownTicks(ItemStack stack, float tps) {
         float baseTicks;
 
-        ItemStack currentStack = ((swap.get() == Swap.SILENT || swap.get() == Swap.NORMAL) && getWeapon() != -1) ? MC.player.getInventory().getStack(getWeapon()) : stack;
-        if (currentStack.isIn(ItemTags.SWORDS)) baseTicks = 13f;
-        else if (currentStack.isIn(ItemTags.AXES)) baseTicks = 21f;
+        ItemStack currentStack = ((swap.get() == Swap.SILENT || swap.get() == Swap.NORMAL) && getWeapon() != -1) ? MC.player.getInventory().getItem(getWeapon()) : stack;
+        if (currentStack.is(ItemTags.SWORDS)) baseTicks = 13f;
+        else if (currentStack.is(ItemTags.AXES)) baseTicks = 21f;
         else if (currentStack.getItem() instanceof TridentItem) baseTicks = 19f;
         else if (currentStack.getItem() instanceof MaceItem) baseTicks = 34f;
         else {
@@ -333,14 +337,14 @@ public class AuraModule extends Module {
         int bestSlot = -1;
         float bestDamage = -1f;
 
-        boolean prioritizeMace = !MC.player.getAbilities().flying && !MC.player.isOnGround();
+        boolean prioritizeMace = !MC.player.getAbilities().flying && !MC.player.onGround();
 
         for (int slot = 0; slot < 9; slot++) {
-            ItemStack held = MC.player.getInventory().getStack(slot);
+            ItemStack held = MC.player.getInventory().getItem(slot);
             if (held.isEmpty()) continue;
 
-            boolean isSword = held.isIn(ItemTags.SWORDS);
-            boolean isAxe = held.isIn(ItemTags.AXES);
+            boolean isSword = held.is(ItemTags.SWORDS);
+            boolean isAxe = held.is(ItemTags.AXES);
             boolean isTrident = held.getItem() instanceof TridentItem;
             boolean isMace = held.getItem() instanceof MaceItem;
 
@@ -350,11 +354,11 @@ public class AuraModule extends Module {
 
             float attackDamage = 0f;
 
-            if (held.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
-                AttributeModifiersComponent modifiers = held.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-                for (var entry : modifiers.comp_2393()) {
-                    if (entry.comp_2395().matches(EntityAttributes.ATTACK_DAMAGE)) {
-                        attackDamage += (float) entry.comp_2396().value();
+            if (held.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
+                ItemAttributeModifiers modifiers = held.get(DataComponents.ATTRIBUTE_MODIFIERS);
+                for (var entry : modifiers.modifiers()) {
+                    if (entry.attribute().is(Attributes.ATTACK_DAMAGE)) {
+                        attackDamage += (float) entry.modifier().amount();
                     }
                 }
             }

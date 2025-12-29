@@ -15,14 +15,14 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
 import me.kiriyaga.nami.util.PredictMovementUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -60,7 +60,7 @@ public class ScaffoldModule extends Module {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) {
+        if (MC.player == null || MC.level == null) {
             cooldown = 0;
             renderPos = null;
             return;
@@ -81,7 +81,7 @@ public class ScaffoldModule extends Module {
 
         renderPos = null;
         for (BlockPos pos : corners) {
-            BlockPos targetPos = pos.down();
+            BlockPos targetPos = pos.below();
 
             if (isPlaceable(targetPos) || !isReplaceable(targetPos))
                 continue;
@@ -102,14 +102,14 @@ public class ScaffoldModule extends Module {
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MC.player == null || MC.world == null || renderPos == null || !render.get()) return;
+        if (MC.player == null || MC.level == null || renderPos == null || !render.get()) return;
 
-        MatrixStack matrices = event.getMatrices();
+        PoseStack matrices = event.getMatrices();
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         Color color = colorModule.getStyledGlobalColor();
 
-        Box box = new Box(renderPos);
+        AABB box = new AABB(renderPos);
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
 
@@ -118,10 +118,10 @@ public class ScaffoldModule extends Module {
     private int getSlot() {
         int selectedSlot = MC.player.getInventory().getSelectedSlot();
 
-        if (!MC.player.getInventory().getStack(selectedSlot).isEmpty()) {
-            Block block = Block.getBlockFromItem(MC.player.getInventory().getStack(selectedSlot).getItem());
+        if (!MC.player.getInventory().getItem(selectedSlot).isEmpty()) {
+            Block block = Block.byItem(MC.player.getInventory().getItem(selectedSlot).getItem());
             if (block != Blocks.AIR) {
-                Identifier blockId = Registries.BLOCK.getId(block);
+                Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
                 if (!whitelist.get() || whitelist.isWhitelisted(blockId)) {
                     return selectedSlot;
                 }
@@ -129,12 +129,12 @@ public class ScaffoldModule extends Module {
         }
 
         for (int i = 0; i < 9; i++) {
-            if (MC.player.getInventory().getStack(i).isEmpty()) continue;
+            if (MC.player.getInventory().getItem(i).isEmpty()) continue;
 
-            Block block = Block.getBlockFromItem(MC.player.getInventory().getStack(i).getItem());
+            Block block = Block.byItem(MC.player.getInventory().getItem(i).getItem());
             if (block == Blocks.AIR) continue;
 
-            Identifier blockId = Registries.BLOCK.getId(block);
+            Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
             if (whitelist.get() && !whitelist.isWhitelisted(blockId)) continue;
 
             return i;
@@ -160,16 +160,16 @@ public class ScaffoldModule extends Module {
         if (!singleBlock.get() || valid.length <= 1)
             return valid;
 
-        PredictMovementUtils.PredictedEntity initial = new PredictMovementUtils.PredictedEntity(MC.player.getEntityPos(), MC.player.getVelocity(), MC.player.getYaw(), MC.player.getPitch(), MC.player.isOnGround(), MC.player.getStandingEyeHeight());
+        PredictMovementUtils.PredictedEntity initial = new PredictMovementUtils.PredictedEntity(MC.player.position(), MC.player.getDeltaMovement(), MC.player.getYRot(), MC.player.getXRot(), MC.player.onGround(), MC.player.getEyeHeight());
 
-        PredictMovementUtils.PredictedEntity predicted = PredictMovementUtils.predict(initial, 3, t -> Vec3d.ZERO);
-        Vec3d eyePos = predicted != null ? predicted.getEyePos() : MC.player.getEyePos();
+        PredictMovementUtils.PredictedEntity predicted = PredictMovementUtils.predict(initial, 3, t -> Vec3.ZERO);
+        Vec3 eyePos = predicted != null ? predicted.getEyePos() : MC.player.getEyePosition();
         BlockPos closest = null;
         double bestDist = Double.MAX_VALUE;
 
         for (BlockPos pos : valid) {
-            Vec3d center = Vec3d.ofCenter(pos);
-            double dist = center.squaredDistanceTo(eyePos);
+            Vec3 center = Vec3.atCenterOf(pos);
+            double dist = center.distanceToSqr(eyePos);
 
             if (dist < bestDist) {
                 bestDist = dist;

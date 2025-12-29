@@ -9,11 +9,11 @@ import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.util.ChatAnimationHelper;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.Text;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Point;
 import java.util.*;
@@ -34,7 +34,7 @@ public class HudEditorScreen extends Screen {
     private int dragOffsetX, dragOffsetY;
 
     public HudEditorScreen() {
-        super(Text.literal("NamiHudEditor"));
+        super(Component.literal("NamiHudEditor"));
         initPanels();
     }
 
@@ -53,21 +53,21 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(DrawContext context, int i, int j, float f) {
+    public void renderBackground(GuiGraphics context, int i, int j, float f) {
         ClickGuiModule clickGui = getClickGuiModule();
-        if (MC.world != null && clickGui != null && clickGui.blur.get()) {
-            this.applyBlur(context);
+        if (MC.level != null && clickGui != null && clickGui.blur.get()) {
+            this.renderBlurredBackground(context);
         }
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
         int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
 
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get()) {
-            renderDarkening(context);
+            renderMenuBackground(context);
 /*            int alpha = (clickGuiModule.backgroundAlpha.get() & 0xFF) << 24;
             int color = alpha | (MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB() & 0xFFFFFF);
             context.fill(0, 0, this.width, this.height, CLICK_GUI.applyFade(color));*/
@@ -76,8 +76,8 @@ public class HudEditorScreen extends Screen {
         NAVIGATE_PANEL.render(context, FONT_MANAGER.rendererProvider.getRenderer(), mouseX, mouseY);
 
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+        context.pose().pushMatrix();
+        context.pose().scale(CLICK_GUI.scale, CLICK_GUI.scale);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
@@ -102,13 +102,13 @@ public class HudEditorScreen extends Screen {
                     if (description != null && !description.isEmpty()) {
                         int descX = scaledMouseX + 5;
                         int descY = scaledMouseY;
-                        int textWidth = FONT_MANAGER.getWidth(Text.of(description));
+                        int textWidth = FONT_MANAGER.getWidth(Component.nullToEmpty(description));
                         int textHeight = 8;
 
                         context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
                         FONT_MANAGER.drawText(context, description, descX, descY, CLICK_GUI.applyFade(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB()), true);
                     }
-                    context.getMatrices().popMatrix();
+                    context.pose().popMatrix();
 
                     renderHudElements(context, mouseX, mouseY);
 
@@ -123,16 +123,16 @@ public class HudEditorScreen extends Screen {
             }
         }
 
-        context.getMatrices().popMatrix();
+        context.pose().popMatrix();
 
         renderHudElements(context, mouseX, mouseY);
 
         super.render(context, mouseX, mouseY, delta);
     }
 
-    private void renderHudElements(DrawContext context, int mouseX, int mouseY) {
+    private void renderHudElements(GuiGraphics context, int mouseX, int mouseY) {
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
-        int screenHeight = MC.getWindow().getScaledHeight();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
         int chatZoneTop = screenHeight - (screenHeight / 8);
 
         for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
@@ -160,11 +160,11 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean bl) {
-        int scaledMouseX = (int) (click.comp_4798() / CLICK_GUI.scale);
-        int scaledMouseY = (int) (click.comp_4799() / CLICK_GUI.scale);
+    public boolean mouseClicked(MouseButtonEvent click, boolean bl) {
+        int scaledMouseX = (int) (click.x() / CLICK_GUI.scale);
+        int scaledMouseY = (int) (click.y() / CLICK_GUI.scale);
 
-        NAVIGATE_PANEL.mouseClicked(click.comp_4798(), click.comp_4799(), FONT_MANAGER.rendererProvider.getRenderer());
+        NAVIGATE_PANEL.mouseClicked(click.x(), click.y(), FONT_MANAGER.rendererProvider.getRenderer());
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
@@ -219,7 +219,7 @@ public class HudEditorScreen extends Screen {
 
         if (click.button() == 0) {
             int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
-            int screenHeight = MC.getWindow().getScaledHeight();
+            int screenHeight = MC.getWindow().getGuiScaledHeight();
             int chatZoneTop = screenHeight - (screenHeight / 8);
 
             for (Module module : MODULE_MANAGER.getStorage().getByCategory(ModuleCategory.of("HUD"))) {
@@ -228,11 +228,11 @@ public class HudEditorScreen extends Screen {
                     int y = hud.getRenderY();
                     int renderY = (y + hud.height >= chatZoneTop) ? y - chatAnimationOffset : y;
 
-                    if (click.comp_4798() >= x && click.comp_4798() <= x + hud.width &&
-                            click.comp_4799() >= renderY && click.comp_4799() <= renderY + hud.height) {
+                    if (click.x() >= x && click.x() <= x + hud.width &&
+                            click.y() >= renderY && click.y() <= renderY + hud.height) {
                         draggingElement = hud;
-                        dragOffsetX = (int) click.comp_4798() - x;
-                        dragOffsetY = (int) click.comp_4799() - renderY;
+                        dragOffsetX = (int) click.x() - x;
+                        dragOffsetY = (int) click.y() - renderY;
                         return true;
                     }
                 }
@@ -243,9 +243,9 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(Click click, double d, double e) {
-        int scaledMouseX = (int) (click.comp_4798() / CLICK_GUI.scale);
-        int scaledMouseY = (int) (click.comp_4799() / CLICK_GUI.scale);
+    public boolean mouseDragged(MouseButtonEvent click, double d, double e) {
+        int scaledMouseX = (int) (click.x() / CLICK_GUI.scale);
+        int scaledMouseY = (int) (click.y() / CLICK_GUI.scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point pos = categoryPositions.get(draggedModuleCategory);
@@ -257,7 +257,7 @@ public class HudEditorScreen extends Screen {
         }
 
         if (click.button() == 0 && draggingElement != null) {
-            dragHudElement(click.comp_4798(), click.comp_4799());
+            dragHudElement(click.x(), click.y());
             return true;
         }
 
@@ -270,8 +270,8 @@ public class HudEditorScreen extends Screen {
         int newRenderX = (int) mouseX - dragOffsetX;
         int newRenderY = (int) (mouseY - dragOffsetY + chatAnimationOffset);
 
-        int screenWidth = MC.getWindow().getScaledWidth();
-        int screenHeight = MC.getWindow().getScaledHeight();
+        int screenWidth = MC.getWindow().getGuiScaledWidth();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
 
         newRenderY = Math.max(1, Math.min(newRenderY, screenHeight - draggingElement.height - 1));
 
@@ -331,7 +331,7 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(Click click) {
+    public boolean mouseReleased(MouseButtonEvent click) {
         draggingCategory = false;
         draggedModuleCategory = null;
 
@@ -342,23 +342,23 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyInput keyInput) {
-        if (keyInput.getKeycode() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.world != null) {
+    public boolean keyPressed(KeyEvent keyInput) {
+        if (keyInput.input() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.level != null) {
             MC.setScreen(null);
             return true;
         }
-        if (SettingPanel.keyPressed(keyInput.getKeycode())) return true;
+        if (SettingPanel.keyPressed(keyInput.input())) return true;
         return super.keyPressed(keyInput);
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     private void playClickSound() {
-        MC.getSoundManager().play(net.minecraft.client.sound.PositionedSoundInstance.master(
-                net.minecraft.sound.SoundEvents.UI_BUTTON_CLICK, 1.0f
+        MC.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
+                net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK, 1.0f
         ));
     }
 }

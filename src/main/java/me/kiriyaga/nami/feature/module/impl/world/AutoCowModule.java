@@ -9,10 +9,10 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.entity.EntityUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.interactWithEntity;
@@ -33,7 +33,7 @@ public class AutoCowModule extends Module {
 
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
         if (swapCooldown > 0) {
             swapCooldown--;
@@ -41,7 +41,7 @@ public class AutoCowModule extends Module {
         }
 
         for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE, 10, true)) {
-            if (!(entity instanceof CowEntity cow)) continue;
+            if (!(entity instanceof Cow cow)) continue;
             if (!cow.isAlive() || cow.isBaby()) continue;
 
             int bucketSlot = getBucketSlot();
@@ -62,7 +62,7 @@ public class AutoCowModule extends Module {
 
     private int getBucketSlot() {
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getStack(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.getItem() == Items.BUCKET) return i;
         }
         return -1;

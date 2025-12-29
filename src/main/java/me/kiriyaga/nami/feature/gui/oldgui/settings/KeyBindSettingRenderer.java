@@ -4,8 +4,8 @@ import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import me.kiriyaga.nami.util.KeyUtils;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -17,7 +17,7 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
     private static KeyBindSetting waitingForKeyBind = null;
 
     @Override
-    public void render(DrawContext context, TextRenderer textRenderer, KeyBindSetting setting, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics context, Font textRenderer, KeyBindSetting setting, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color textCol = getColorModule().getStyledTextColor(255);
         Color bgColor = new Color(30, 30, 30, 0);

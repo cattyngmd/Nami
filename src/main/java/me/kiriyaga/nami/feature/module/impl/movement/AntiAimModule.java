@@ -27,7 +27,7 @@ public class AntiAimModule extends Module {
 
     @Override
     public void onEnable() {
-        currentYaw = MC.player != null ? MC.player.getYaw() : 0.0f;
+        currentYaw = MC.player != null ? MC.player.getYRot() : 0.0f;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

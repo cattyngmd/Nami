@@ -5,8 +5,8 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.util.render.ScissorUtil;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 import java.util.List;
@@ -32,7 +32,7 @@ public class CategoryPanel {
         this.moduleCategory = moduleCategory;
     }
 
-    public void render(DrawContext context, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
+    public void render(GuiGraphics context, Font textRenderer, int x, int y, int mouseX, int mouseY, int screenHeight) {
 
         List<Module> modules = MODULE_MANAGER.getStorage().getByCategory(moduleCategory);
 

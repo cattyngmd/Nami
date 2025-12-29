@@ -7,7 +7,7 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.util.RotationUtils.alignYaw;
@@ -24,13 +24,13 @@ public class YawModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
-        if (MC.player == null || MC.world == null) return;
+        if (MC.player == null || MC.level == null) return;
 
         float s = 360f / directions.get();
-        float targetYaw = Math.round(MC.player.getYaw() / s) * s;
+        float targetYaw = Math.round(MC.player.getYRot() / s) * s;
 
-        targetYaw = alignYaw(targetYaw, MC.player.getYaw());
-        MC.player.setYaw(targetYaw);
+        targetYaw = alignYaw(targetYaw, MC.player.getYRot());
+        MC.player.setYRot(targetYaw);
     }
 
 }

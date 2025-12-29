@@ -8,9 +8,9 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.player.LocalPlayer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,15 +32,15 @@ public class ReplenishModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onTick(PostTickEvent event) {
-        if (MC.world == null || MC.player == null) return;
-        if (!inScreen.get() && MC.currentScreen != null) return;
-        ClientPlayerEntity player = MC.player;
-        ItemStack cursor = player.currentScreenHandler.getCursorStack();
+        if (MC.level == null || MC.player == null) return;
+        if (!inScreen.get() && MC.screen != null) return;
+        LocalPlayer player = MC.player;
+        ItemStack cursor = player.containerMenu.getCarried();
 
         if (!cursor.isEmpty()) return;
 
         for (int hotbarSlot = 0; hotbarSlot < 9; hotbarSlot++) {
-            ItemStack stack = player.getInventory().getStack(hotbarSlot);
+            ItemStack stack = player.getInventory().getItem(hotbarSlot);
             Item currentItem = stack.isEmpty() ? null : stack.getItem();
 
             if (lastHotbarItems.getOrDefault(hotbarSlot, null) != currentItem) {
@@ -54,7 +54,7 @@ public class ReplenishModule extends Module {
 
             if (stack.isEmpty()) continue;
 
-            int maxCount = stack.getMaxCount();
+            int maxCount = stack.getMaxStackSize();
             int minCount = Math.max(1, (int) (maxCount * (percentage.get() / 100f)));
 
             if (stack.getCount() < minCount) {
@@ -68,12 +68,12 @@ public class ReplenishModule extends Module {
     }
 
     private int findInventorySlotToReplenish(ItemStack target) {
-        ClientPlayerEntity player = MC.player;
+        LocalPlayer player = MC.player;
 
         for (int i = 9; i < 36; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
+            ItemStack stack = player.getInventory().getItem(i);
             if (stack.isEmpty()) continue;
-            if (!ItemStack.areItemsAndComponentsEqual(stack, target)) continue; // this is component not nbt, but anyway it works the same since components are just wrapper for nbt
+            if (!ItemStack.isSameItemSameComponents(stack, target)) continue; // this is component not nbt, but anyway it works the same since components are just wrapper for nbt
             return i;
         }
         return -1;
@@ -89,9 +89,9 @@ public class ReplenishModule extends Module {
 
         //boolean inventoryOpen = MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof HudEditorScreen || MC.currentScreen instanceof ClickGuiScreen;
 
-        MC.interactionManager.clickSlot(MC.player.playerScreenHandler.syncId, realInvSlot, 0, net.minecraft.screen.slot.SlotActionType.PICKUP, MC.player);
-        MC.interactionManager.clickSlot(MC.player.playerScreenHandler.syncId, realHotbarSlot, 0, net.minecraft.screen.slot.SlotActionType.PICKUP, MC.player);
-        MC.interactionManager.clickSlot(MC.player.playerScreenHandler.syncId, realInvSlot, 0, net.minecraft.screen.slot.SlotActionType.PICKUP, MC.player);
+        MC.gameMode.handleInventoryMouseClick(MC.player.inventoryMenu.containerId, realInvSlot, 0, net.minecraft.world.inventory.ClickType.PICKUP, MC.player);
+        MC.gameMode.handleInventoryMouseClick(MC.player.inventoryMenu.containerId, realHotbarSlot, 0, net.minecraft.world.inventory.ClickType.PICKUP, MC.player);
+        MC.gameMode.handleInventoryMouseClick(MC.player.inventoryMenu.containerId, realInvSlot, 0, net.minecraft.world.inventory.ClickType.PICKUP, MC.player);
     }
 
 }
