@@ -19,15 +19,10 @@ public class MixinConnectScreen {
     // TODO(Ravel): target method connect is ambiguous
     @Inject(method = "connect", at = @At("HEAD"))
     private static void onConnect(
-            Screen screen,
-            Minecraft client,
-            ServerAddress address,
-            ServerData info,
-            boolean quickPlay,
-            TransferState cookieStorage, // 1.21.5 loved
-            CallbackInfo ci
+            Minecraft minecraft, ServerAddress serverAddress, ServerData serverData, TransferState transferState, CallbackInfo ci
+            // 1.21.5 loved
     ) {
-        Nami.LAST_CONNECTION = new Tuple<>(address, info);
+        Nami.LAST_CONNECTION = new Tuple<>(serverAddress, serverData);
     }
 }
 
