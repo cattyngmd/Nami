@@ -18,7 +18,7 @@ public class FontModule extends Module {
 
     public final EnumSetting<FontType> fontType = addSetting(new EnumSetting<>("Font", FontType.VERDANA));
     public final BoolSetting global = addSetting(new BoolSetting("Global", false));
-    public final EnumSetting<FilterMode> filterMode = addSetting(new EnumSetting<>("Filter", FilterMode.LINEAR));
+    public final EnumSetting<FilterMode> filterMode = addSetting(new EnumSetting<>("Filter", FilterMode.NEAREST));
     public final IntSetting anisotropy = addSetting(new IntSetting("Anisotropy", 8, 1, 16));
     public final DoubleSetting maxLOD = addSetting(new DoubleSetting("MaxLOD", 10.00, -1, 25));
     public final IntSetting glyphSize = addSetting(new IntSetting("Size", 10, 6, 24));
