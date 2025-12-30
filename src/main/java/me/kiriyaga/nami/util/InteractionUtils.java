@@ -23,6 +23,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Optional;
+
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
 import static me.kiriyaga.nami.util.RotationUtils.*;
@@ -78,6 +80,29 @@ public class InteractionUtils {
         return null;
     }
 
+    public static EntityHitResult raycastAABB(Vec3 start, Vec3 end, AABB box) {
+        Optional<Vec3> clipped = box.clip(start, end);
+        if (clipped.isPresent())
+            return new EntityHitResult(null, clipped.get());
+        return null;
+    }
+
+    public static EntityHitResult raycastAABBFromPlayer(Entity player, AABB box, double reach, float yaw, float pitch) {
+        Vec3 eyePos = player.getEyePosition(1.0f);
+        Vec3 lookVec = getLookVectorFromYawPitch(yaw, pitch);
+        Vec3 reachEnd = eyePos.add(lookVec.scale(reach));
+
+        return raycastAABB(eyePos, reachEnd, box);
+    }
+
+    private static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
+        float f = (float) Math.cos(-yaw * 0.017453292F - Math.PI);
+        float g = (float) Math.sin(-yaw * 0.017453292F - Math.PI);
+        float h = - (float) Math.cos(-pitch * 0.017453292F);
+        float i = (float) Math.sin(-pitch * 0.017453292F);
+        return new Vec3(g * h, i, f * h);
+    }
+
     public static void startUsingItem() {
         startUsingItem(MAIN_HAND);
     }
@@ -98,7 +123,7 @@ public class InteractionUtils {
         if (!MC.level.getBlockState(pos).canBeReplaced())
             return false;
 
-        Direction direction = getDirection(pos);
+        Direction direction = getBlockPlaceDir(pos);
         if (direction == null) {
             return false;
         }
@@ -199,11 +224,10 @@ public class InteractionUtils {
     }
 
     public static boolean interactBlockAt(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
-
         Vec3 eyePos = MC.player.getEyePosition();
         Vec3 hitVec = Vec3.atCenterOf(pos);
 
-        Direction clickFace = Direction.getApproximateNearest(hitVec.x - eyePos.x, hitVec.y - eyePos.y, hitVec.z - eyePos.z);
+        Direction clickFace = getBlockInteractDir(pos);
 
         if (strictDirection) {
             boolean flag = switch (clickFace) {
@@ -214,16 +238,20 @@ public class InteractionUtils {
                 case DOWN  -> eyePos.y <= pos.getY() + 1e-3;
                 case UP    -> eyePos.y >= pos.getY() + 1 - 1e-3;
             };
-            if (!flag)
+            if (!flag) {
+                CHAT_MANAGER.sendRaw("interactBlockAt: failed strictDirection check");
                 return false;
+            }
         }
 
-       AABB box = new AABB(pos);
-        Vec3 lookDir = getClosestPointToEye(eyePos, box).subtract(eyePos).normalize();
+        AABB blockBox = new AABB(pos);
+        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
         Vec3 reachEnd = eyePos.add(lookDir.scale(range));
 
-        if (box.clip(eyePos, reachEnd).isEmpty())
+        if (blockBox.clip(eyePos, reachEnd).isEmpty()) {
+            CHAT_MANAGER.sendRaw("interactBlockAt: failed reach check" + pos);
             return false;
+        }
 
         BlockHitResult hit = new BlockHitResult(hitVec, clickFace, pos, false);
 
@@ -241,8 +269,10 @@ public class InteractionUtils {
             canInteract = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
         }
 
-        if (!canInteract)
+        if (!canInteract) {
+            CHAT_MANAGER.sendRaw("interactBlockAt: rotation incomplete");
             return false;
+        }
 
         int prev = MC.player.getInventory().getSelectedSlot();
         INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
@@ -256,10 +286,34 @@ public class InteractionUtils {
             MC.player.swing(MAIN_HAND);
 
         INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+
+        CHAT_MANAGER.sendRaw("interactBlockAt: success");
         return true;
     }
 
-    public static Direction getDirection(BlockPos blockPos) {
+    public static Direction getBlockInteractDir(BlockPos blockPos) {
+        Vec3 playerPos = MC.player.getEyePosition();
+        Vec3 blockCenter = Vec3.atCenterOf(blockPos);
+
+        double dx = playerPos.x - blockCenter.x;
+        double dy = playerPos.y - blockCenter.y;
+        double dz = playerPos.z - blockCenter.z;
+
+        double absX = Math.abs(dx);
+        double absY = Math.abs(dy);
+        double absZ = Math.abs(dz);
+
+        if (absX >= absY && absX >= absZ) {
+            return dx > 0 ? Direction.EAST : Direction.WEST;
+        } else if (absY >= absX && absY >= absZ) {
+            return dy > 0 ? Direction.UP : Direction.DOWN;
+        } else {
+            return dz > 0 ? Direction.SOUTH : Direction.NORTH;
+        }
+    }
+
+
+    public static Direction getBlockPlaceDir(BlockPos blockPos) {
         for (final Direction direction : Direction.values()) {
             final BlockState state = MC.level.getBlockState(blockPos.relative(direction));
             if (state.isAir() || !state.getFluidState().isEmpty()) {

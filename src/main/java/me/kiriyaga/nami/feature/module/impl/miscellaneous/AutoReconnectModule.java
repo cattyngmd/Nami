@@ -7,7 +7,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 
 @RegisterModule
-public class AutoReconnectModule extends Module {
+public class AutoReconnectModule extends Module { // todo: this shit isnt workin for some reason, mixins on mojmap?
 
     public final BoolSetting hardHide = addSetting(new BoolSetting("HideMenu", false));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 5, 0, 80));
