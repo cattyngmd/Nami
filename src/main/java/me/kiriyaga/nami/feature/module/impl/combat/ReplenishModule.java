@@ -15,12 +15,14 @@ import net.minecraft.client.player.LocalPlayer;
 import java.util.HashMap;
 import java.util.Map;
 
+import static me.kiriyaga.nami.Nami.INVENTORY_MANAGER;
 import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class ReplenishModule extends Module {
 
     private final IntSetting percentage = addSetting(new IntSetting("Percentage", 20, 10, 50));
+    private final BoolSetting alternative = addSetting(new BoolSetting("Alternative", true));
     private final BoolSetting inScreen = addSetting(new BoolSetting("InScreen", false));
 
     private final Map<Integer, Integer> hotbarTicks = new HashMap<>();
@@ -89,9 +91,12 @@ public class ReplenishModule extends Module {
 
         //boolean inventoryOpen = MC.currentScreen instanceof InventoryScreen || MC.currentScreen instanceof HudEditorScreen || MC.currentScreen instanceof ClickGuiScreen;
 
-        MC.gameMode.handleInventoryMouseClick(MC.player.inventoryMenu.containerId, realInvSlot, 0, net.minecraft.world.inventory.ClickType.PICKUP, MC.player);
-        MC.gameMode.handleInventoryMouseClick(MC.player.inventoryMenu.containerId, realHotbarSlot, 0, net.minecraft.world.inventory.ClickType.PICKUP, MC.player);
-        MC.gameMode.handleInventoryMouseClick(MC.player.inventoryMenu.containerId, realInvSlot, 0, net.minecraft.world.inventory.ClickType.PICKUP, MC.player);
-    }
-
+        if (alternative.get()) {
+            INVENTORY_MANAGER.getClickHandler().quickMoveSlot(realInvSlot);
+        } else {
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(realInvSlot);
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(realHotbarSlot);
+            INVENTORY_MANAGER.getClickHandler().pickupSlot(realInvSlot);
+        }
+     }
 }
