@@ -37,6 +37,6 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        EXECUTABLE_MANAGER.getRequestHandler().submit(found::toggle, 1, ExecutableThreadType.PRE_TICK);
+        EXECUTABLE_MANAGER.getRequestHandler().submit(found::toggle, 0, ExecutableThreadType.PRE_TICK);
     }
 }
