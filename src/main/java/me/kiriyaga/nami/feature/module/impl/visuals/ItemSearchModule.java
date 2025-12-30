@@ -1,0 +1,83 @@
+package me.kiriyaga.nami.feature.module.impl.visuals;
+
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.Render3DEvent;
+import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
+import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.util.entity.EntityUtils;
+import me.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.client.Camera;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+import java.awt.*;
+
+import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.util.NametagFormatter.COLOR_ITEM;
+
+@RegisterModule
+public class ItemSearchModule extends Module {
+
+    private final WhitelistSetting itemWhitelist = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.ENTITY));
+    private final BoolSetting renderBoxes = addSetting(new BoolSetting("Render", true));
+    private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
+    private final BoolSetting chatFeedback = addSetting(new BoolSetting("ChatFeedback", false));
+
+    public ItemSearchModule() {
+        super("ItemSearch", "Searches for specified item entities.", ModuleCategory.of("Render"));
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onRender(Render3DEvent event) {
+        if (MC.level == null || MC.player == null) return;
+
+        Camera camera = MC.gameRenderer.getMainCamera();
+        Vec3 camPos = camera.position();
+        Vec3 start = camPos.add(Vec3.directionFromRotation(camera.xRot(), camera.yRot()));
+
+        for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
+            if (entity instanceof ItemEntity item) {
+                if (item.isRemoved() || !item.isAlive()) continue;
+
+
+                Identifier id = BuiltInRegistries.ITEM.getKey(item.getItem().getItem());
+
+                if (!itemWhitelist.getWhitelist().contains(id)) continue;
+
+                double interpX = item.xOld + (item.getX() - item.xOld) * event.getTickDelta();
+                double interpY = item.yOld + (item.getY() - item.yOld) * event.getTickDelta();
+                double interpZ = item.zOld + (item.getZ() - item.zOld) * event.getTickDelta();
+
+                AABB box = item.getBoundingBox().move(
+                        interpX - item.getX(),
+                        interpY - item.getY(),
+                        interpZ - item.getZ()
+                );
+
+                if (renderBoxes.get()) {
+                    RenderUtil.drawBoxLines(box, COLOR_ITEM, true, true, 1.5f);
+                }
+
+                if (tracers.get()) {
+                    RenderUtil.drawLine(start, box.getCenter(), COLOR_ITEM, 1.5f);
+                }
+
+                if (chatFeedback.get()) {
+                    String name = item.getItem().getHoverName().getString();
+                    Component message = CAT_FORMAT.format("Item: {g}" + item.getItem().getHoverName().getString() + " {reset} found.");
+                    CHAT_MANAGER.sendPersistent(name, message);
+                }
+            }
+        }
+    }
+}

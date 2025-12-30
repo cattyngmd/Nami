@@ -66,7 +66,7 @@ public class EntitySearchModule extends Module {
             }
 
             if (tracers.get()) {
-                RenderUtil.drawLine(start, box.getCenter(), color, 3f);
+                RenderUtil.drawLine(start, box.getCenter(), color, 1.5f);
             }
         }
     }

@@ -136,7 +136,7 @@ public class BlockSearchModule extends Module {
                 }
 
                 if (tracers.get()) {
-                    RenderUtil.drawLine(start, Vec3.atCenterOf(pos), color, 3f);
+                    RenderUtil.drawLine(start, Vec3.atCenterOf(pos), color, 1.5f);
                 }
             }
         }
