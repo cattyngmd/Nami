@@ -34,7 +34,7 @@ def getGitBranch() {
 
 // versions
 //version = "beta2.4.5_mc${getGitBranch()}"
-version = "beta2.4.5_${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
+version = "beta.2.4.5_${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
 
 // java version
 java {
