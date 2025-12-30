@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         branch:
-          - 1.21.11
-          - 1.21.8
+          - mc.1.21.11
+          - mc.1.21.8
 
     steps:
       - name: Checkout repository
