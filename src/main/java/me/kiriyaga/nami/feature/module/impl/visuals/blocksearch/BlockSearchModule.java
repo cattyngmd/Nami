@@ -1,70 +1,73 @@
 package me.kiriyaga.nami.feature.module.impl.visuals.blocksearch;
 
-import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.*;
-import me.kiriyaga.nami.feature.module.*;
+import me.kiriyaga.nami.event.impl.ChunkDataEvent;
+import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.Module;
-import me.kiriyaga.nami.feature.setting.impl.*;
-
+import me.kiriyaga.nami.feature.module.ModuleCategory;
+import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.mixin.DuckNearPlane;
 import me.kiriyaga.nami.util.BlockUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.state.BlockState;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3fc;
 
 import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import static me.kiriyaga.nami.Nami.*;
+import static me.kiriyaga.nami.Nami.MC;
 
 @RegisterModule
 public class BlockSearchModule extends Module {
 
     private final WhitelistSetting blockList = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.BLOCK));
-    //private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
+    private final BoolSetting render = addSetting(new BoolSetting("Render", true));
+    private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("NotAtSpawn", false));
 
     private Set<Identifier> candidateIds = new HashSet<>();
-    private final BlockingQueue<Chunk> snapshotQueue = new LinkedBlockingQueue<>();
-    private BlockSearch workerThread;
+    private final BlockingQueue<ChunkSnapshot> snapshotQueue = new LinkedBlockingQueue<>();
     public static final ConcurrentMap<Long, Set<BlockPos>> chunkBlocks = new ConcurrentHashMap<>();
-    private final Queue<Component> pendingMessages = new LinkedList<>();
+
+    private BlockSearch worker;
 
     public BlockSearchModule() {
         super("BlockSearch", "Search for specified blocks.", ModuleCategory.of("Render"));
 
-        blockList.setOnChanged(() -> updateCandidateBlocks());
-
-        notAtSpawn.setOnChanged(() -> reloadChunks());
+        blockList.setOnChanged(this::updateCandidateBlocks);
+        notAtSpawn.setOnChanged(this::reloadChunks);
     }
 
     @Override
     public void onEnable() {
         updateCandidateBlocks();
 
-        workerThread = new BlockSearch(snapshotQueue, chunkBlocks, candidateIds);
-        workerThread.start();
-
+        worker = new BlockSearch(snapshotQueue, chunkBlocks);
+        worker.start();
         reloadChunks();
     }
 
     @Override
     public void onDisable() {
-        if (workerThread != null) workerThread.stopWorker();
-
-        chunkBlocks.clear();
+        if (worker != null) worker.stopWorker();
         snapshotQueue.clear();
+        chunkBlocks.clear();
     }
 
     private void updateCandidateBlocks() {
@@ -76,56 +79,65 @@ public class BlockSearchModule extends Module {
         if (MC.level == null || MC.player == null) return;
 
         if (notAtSpawn.get()) {
-            BlockPos pos = MC.player.blockPosition();
-            if (Math.abs(pos.getX()) + Math.abs(pos.getZ()) < 12000) return;
+            BlockPos p = MC.player.blockPosition();
+            if (Math.abs(p.getX()) + Math.abs(p.getZ()) < 12000) return;
         }
 
-        EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
-            snapshotQueue.offer(makeSnapshot(event.getChunk()));}, 0, ExecutableThreadType.PRE_TICK);
+        snapshotQueue.offer(makeSnapshot(event.getChunk()));
     }
 
-    // yeah we still are forced to load them in main thread
-    private Chunk makeSnapshot(LevelChunk chunk) {
+    private ChunkSnapshot makeSnapshot(LevelChunk chunk) {
         ChunkPos pos = chunk.getPos();
-        List<Block> blocks = new ArrayList<>();
+        Set<BlockPos> found = new HashSet<>();
+        LevelChunkSection[] sections = chunk.getSections();
+        for (int secIndex = 0; secIndex < sections.length; secIndex++) {
+            LevelChunkSection section = sections[secIndex];
+            if (section == null || section.hasOnlyAir()) continue;
 
-        int minY = -64;
-        int maxY = 320;
-        BlockPos start = pos.getWorldPosition();
+            int baseY = chunk.getSectionYFromSectionIndex(secIndex) << 4;
 
-        for (int x = 0; x < 16; x++) {
-            for (int y = minY; y < maxY; y++) {
-                for (int z = 0; z < 16; z++) {
-                    BlockState state = MC.level.getBlockState(new BlockPos(start.getX()+x, y, start.getZ()+z));
-                    Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    for (int z = 0; z < 16; z++) {
 
-                    blocks.add(new Block(x, y, z, id));
+                        var state = section.getBlockState(x, y, z);
+                        Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+
+                        if (!candidateIds.contains(id)) continue;
+
+                        found.add(new BlockPos(
+                                pos.getMinBlockX() + x,
+                                baseY + y,
+                                pos.getMinBlockZ() + z
+                        ));
+                    }
                 }
             }
         }
-
-        return new Chunk(pos, blocks);
+        return new ChunkSnapshot(pos, found);
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender(Render3DEvent event) {
-        PoseStack matrices = event.getMatrices();
-
-        synchronized (pendingMessages) {
-            while (!pendingMessages.isEmpty()) CHAT_MANAGER.sendRaw(pendingMessages.poll());
-        }
-
         if (MC.level == null || MC.player == null) return;
+        Camera camera = MC.gameRenderer.getMainCamera();
+
+        Vec3 camPos = camera.position();
+        Vec3 start = camPos.add(Vec3.directionFromRotation(camera.xRot(), camera.yRot()));
+
 
         for (Set<BlockPos> set : chunkBlocks.values()) {
             for (BlockPos pos : set) {
+                var state = MC.level.getBlockState(pos);
+                Color color = BlockUtils.getColorByBlockId(state);
 
-                BlockState state = MC.level.getBlockState(pos);
+                if (render.get()) {
+                    RenderUtil.drawBlockPosLines(MC.level, pos, state, color, true, true, 1.5f);
+                }
 
-                RenderUtil.drawBlockPosLines(MC.level, pos, state, BlockUtils.getColorByBlockId(state),true,true, 1.5f);
-
-            //    if (tracers.get())
-                //    RenderUtil.drawLine(matrices, MC.player.getEyePos(), pos.toCenterPos(), BlockUtils.getColorByBlockId(state), 1.50);
+                if (tracers.get()) {
+                    RenderUtil.drawLine(start, Vec3.atCenterOf(pos), color, 3f);
+                }
             }
         }
     }
@@ -135,15 +147,13 @@ public class BlockSearchModule extends Module {
 
         snapshotQueue.clear();
         chunkBlocks.clear();
-
         int radius = MC.options.renderDistance().get();
         ChunkPos pc = new ChunkPos(MC.player.blockPosition());
 
-        for (int dx = -radius; dx <= radius; dx++)
+        for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                snapshotQueue.offer(makeSnapshot(
-                        MC.level.getChunk(pc.x + dx, pc.z + dz)
-                ));
+                snapshotQueue.offer(makeSnapshot(MC.level.getChunk(pc.x + dx, pc.z + dz)));
             }
+        }
     }
 }

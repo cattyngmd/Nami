@@ -156,7 +156,7 @@ public class InputManager {
     }
 
     private void updateHeld(KeyMapping bind, int key, int scancode, int action, java.util.function.Consumer<Boolean> setter) {
-        KeyEvent input = new KeyEvent(key, scancode, 0); // 0 = нет модификаторов, если нужны, передайте их сюда
+        KeyEvent input = new KeyEvent(key, scancode, 0);
         if (!bind.matches(input)) return;
         boolean pressed = action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT;
         setter.accept(pressed);

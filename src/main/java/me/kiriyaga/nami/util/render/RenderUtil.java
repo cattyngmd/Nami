@@ -140,6 +140,18 @@ public class RenderUtil {
         }
     }
 
+    public static void drawLine(Vec3 from, Vec3 to, Color color, float width) {
+        int lineColor = ARGB.color(
+                255,
+                color.getRed(),
+                color.getGreen(),
+                color.getBlue()
+        );
+
+        Gizmos.line(from, to, lineColor, width)
+                .setAlwaysOnTop();
+    }
+
     public static void drawText3D(PoseStack matrices, Component text, Vec3 pos, float scale, boolean background, boolean border, float borderWidth) {
         Camera camera = MC.gameRenderer.getMainCamera();
 

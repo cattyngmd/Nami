@@ -1,24 +1,23 @@
 package me.kiriyaga.nami.feature.module.impl.visuals.blocksearch;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 
-import java.util.*;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 
 public class BlockSearch extends Thread {
 
-    private final BlockingQueue<Chunk> queue;
+    private final BlockingQueue<ChunkSnapshot> queue;
     private final ConcurrentMap<Long, Set<BlockPos>> resultMap;
     private volatile boolean running = true;
-    private final Set<Identifier> targets;
 
-    public BlockSearch(BlockingQueue<Chunk> queue, ConcurrentMap<Long, Set<BlockPos>> resultMap, Set<Identifier> targetIds) {
+    public BlockSearch(
+            BlockingQueue<ChunkSnapshot> queue,
+            ConcurrentMap<Long, Set<BlockPos>> resultMap
+    ) {
         this.queue = queue;
         this.resultMap = resultMap;
-        this.targets = targetIds;
         setName("BlockSearchWorker");
         setDaemon(true);
     }
@@ -27,28 +26,12 @@ public class BlockSearch extends Thread {
     public void run() {
         while (running) {
             try {
-                Chunk snapshot = queue.take();
+                ChunkSnapshot snap = queue.take();
 
-                Set<BlockPos> found = new HashSet<>();
-
-                for (Block bs : snapshot.blocks) {
-                    if (bs.id == Identifier.parse("air") || bs.id == Identifier.parse("void_air")|| bs.id == Identifier.parse("cave_air")) {
-                        continue;
-                    }
-
-                    if (targets.contains(bs.id)) {
-                        found.add(new BlockPos(
-                                snapshot.pos.getMinBlockX() + bs.x,
-                                bs.y,
-                                snapshot.pos.getMinBlockZ() + bs.z
-                        ));
-                    }
-                }
-
-                if (found.isEmpty()) {
-                    resultMap.remove(snapshot.getKey());
+                if (snap.blocks.isEmpty()) {
+                    resultMap.remove(snap.getKey());
                 } else {
-                    resultMap.put(snapshot.getKey(), found);
+                    resultMap.put(snap.getKey(), snap.blocks);
                 }
 
             } catch (InterruptedException ignored) {}
