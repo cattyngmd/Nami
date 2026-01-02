@@ -105,7 +105,7 @@ public class ItemSearchModule extends Module {
 
                 if (chatFeedback.get()) {
                     Integer entId = entity.getId();
-                    Component message = CAT_FORMAT.format("Item: {g}" + frame.getItem().getHoverName().getString() + " {reset} found.");
+                    Component message = CAT_FORMAT.format("Item: {g}" + frame.getItem().getItemName() + " {reset} found.");
                     CHAT_MANAGER.sendPersistent(entId.toString(), message);
                     sent.add(entId);
                 }
