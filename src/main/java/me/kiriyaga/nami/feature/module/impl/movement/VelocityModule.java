@@ -287,7 +287,7 @@ public class VelocityModule extends Module {
                 v.z * (horizontalPercent.get() / 100.0)
         );
 
-        ((I gClientboundSetEntityMotionPacket) packet).setMovement(scaled);
+        ((IClientboundSetEntityMotionPacket) packet).setMovement(scaled);
     }
 
     private void scaleExplosionPacket(ClientboundExplodePacket packet) {
