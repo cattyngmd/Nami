@@ -41,6 +41,7 @@ public class FeetTrapModule extends Module {
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     private final BoolSetting render = addSetting(new BoolSetting("Render", true));
@@ -89,14 +90,14 @@ public class FeetTrapModule extends Module {
                 BlockPos foundation = pos.below();
                 if (MC.level.getBlockState(foundation).canBeReplaced()) {
                     int slot = getSlot();
-                    if (slot != -1 && InteractionUtils.placeBlock(foundation, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name)) {
+                    if (slot != -1 && InteractionUtils.placeBlock(foundation, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
                         blocksPlaced++;
                         if (blocksPlaced >= shiftTicks.get()) break;
                     }
                 }
 
                 int slotTop = getSlot();
-                if (slotTop != -1 && InteractionUtils.placeBlock(pos, slotTop, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name)) {
+                if (slotTop != -1 && InteractionUtils.placeBlock(pos, slotTop, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
                     blocksPlaced++;
                     if (blocksPlaced >= shiftTicks.get()) break;
                 }

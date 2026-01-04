@@ -32,6 +32,7 @@ public class AutoFarmModule extends Module {
     public final BoolSetting swing  = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
 
     public AutoFarmModule() {
         super("AutoFarm", "Automatically plants specified croops.", ModuleCategory.of("World"));
@@ -69,7 +70,7 @@ public class AutoFarmModule extends Module {
 
         BlockPos placePos = bestTarget.above();
 
-        InteractionUtils.placeBlock(placePos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
+        InteractionUtils.placeBlock(placePos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get());
     }
 
     private boolean isPlantable(BlockPos pos) {

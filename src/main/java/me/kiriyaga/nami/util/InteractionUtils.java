@@ -81,8 +81,11 @@ public class InteractionUtils {
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
+    public static boolean placeBlock(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId, boolean multiTask) {
         if (!MC.level.getBlockState(pos).canBeReplaced())
+            return false;
+
+        if (!multiTask && MC.player.isUsingItem())
             return false;
 
         Direction direction = getBlockPlaceDir(pos);

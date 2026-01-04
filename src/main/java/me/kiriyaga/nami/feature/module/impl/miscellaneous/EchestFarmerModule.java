@@ -30,6 +30,7 @@ public class EchestFarmerModule extends Module {
     public final DoubleSetting distance = addSetting(new DoubleSetting("Range", 3.0, 1.0, 6.0));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
@@ -61,7 +62,8 @@ public class EchestFarmerModule extends Module {
                         strictDirection.get(),
                         simulate.get(),
                         swing.get(),
-                        this.name+"break"
+                        this.name+"break",
+                        multiTask.get()
                 );
             }
         }

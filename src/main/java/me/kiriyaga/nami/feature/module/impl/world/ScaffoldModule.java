@@ -38,6 +38,7 @@ public class ScaffoldModule extends Module {
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
@@ -88,7 +89,7 @@ public class ScaffoldModule extends Module {
 
             renderPos = targetPos;
 
-            if (placeBlock(targetPos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name))
+            if (placeBlock(targetPos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get()))
                 blocksPlaced++;
 
             if (blocksPlaced >= shiftTicks.get()) break;

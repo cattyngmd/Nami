@@ -42,6 +42,7 @@ public class AutoWebModule extends Module {
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
@@ -79,7 +80,7 @@ public class AutoWebModule extends Module {
         for (BlockPos pos : positions) {
             if (MC.level.getBlockState(pos).isAir()) {
                 renderPos = pos;
-                InteractionUtils.placeBlock(pos, slot,range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
+                InteractionUtils.placeBlock(pos, slot,range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get());
                 placed++;
                 if (placed >= shiftTicks.get()) break;
             }

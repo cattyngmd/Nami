@@ -36,6 +36,7 @@ public class SelfWebModule extends Module {
     private final EnumSetting<PlaceMode> placeMode = addSetting(new EnumSetting<>("PlaceMode", PlaceMode.LEGS));
     private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
     private final BoolSetting onlyTarget = addSetting(new BoolSetting("OnlyTarget", false));
+    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     private final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 5));
     private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
@@ -78,7 +79,7 @@ public class SelfWebModule extends Module {
         for (BlockPos pos : positions) {
             if (MC.level.getBlockState(pos).isAir()) {
                 renderPos = pos;
-                InteractionUtils.placeBlock(pos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
+                InteractionUtils.placeBlock(pos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get());
                 placed++;
                 if (placed >= shiftTicks.get()) break;
             }
