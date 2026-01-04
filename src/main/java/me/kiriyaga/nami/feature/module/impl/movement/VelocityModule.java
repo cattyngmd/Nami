@@ -166,7 +166,7 @@ public class VelocityModule extends Module {
             event.cancel();
         } else {
 
-            event.packet = scaleVelocityPacket(packet);
+            scaleVelocityPacket(packet);
         }
     }
 
@@ -228,7 +228,7 @@ public class VelocityModule extends Module {
 
         switch (mode.get()) {
             case VANILLA -> {
-                if (!isNoVelocityConfigured()) event.packet = scaleVelocityPacket(packet);
+                if (!isNoVelocityConfigured()) scaleVelocityPacket(packet);
                 else return;
             }
             case WALLS -> {
@@ -236,7 +236,7 @@ public class VelocityModule extends Module {
                     filtered.add(packet);
                     return;
                 }
-                if (!isNoVelocityConfigured()) event.packet = scaleVelocityPacket(packet);
+                if (!isNoVelocityConfigured())  scaleVelocityPacket(packet);
                 else return;
             }
             case GRIM -> {
@@ -277,7 +277,7 @@ public class VelocityModule extends Module {
         return horizontalPercent.get() == 0 && verticalPercent.get() == 0;
     }
 
-    private ClientboundSetEntityMotionPacket scaleVelocityPacket(ClientboundSetEntityMotionPacket packet) {
+    private void scaleVelocityPacket(ClientboundSetEntityMotionPacket packet) {
         Vec3 v = packet.getMovement();
 
         Vec3 scaled = new Vec3(
@@ -286,10 +286,8 @@ public class VelocityModule extends Module {
                 v.z * (horizontalPercent.get() / 100.0)
         );
 
-        ClientboundSetEntityMotionPacket newPacket = DuckClientboundSetEntityMotionPacket.create(packet.getId(), scaled);
-        return newPacket;
+        ((DuckClientboundSetEntityMotionPacket) packet).setMovement(scaled);
     }
-
 
     private void scaleExplosionPacket(ClientboundExplodePacket packet) {
         DuckClientboundExplodePacket accessor = (DuckClientboundExplodePacket) (Object) packet;
