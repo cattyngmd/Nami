@@ -8,6 +8,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Optional;
+
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
@@ -137,5 +139,34 @@ public class RotationUtils {
         double z = Math.cos(fPitch) * Math.cos(fYaw);
 
         return new Vec3(x, y, z).normalize();
+    }
+
+    public static EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
+        Vec3 eyePos = player.getEyePosition(1.0f);
+        Vec3 look = getLookVectorFromYawPitch(yaw, pitch);
+        Vec3 reachEnd = eyePos.add(look.scale(reach));
+
+        AABB targetBox = target.getBoundingBox();
+
+        if (targetBox.clip(eyePos, reachEnd).isPresent()) {
+            return new EntityHitResult(target);
+        }
+
+        return null;
+    }
+
+    public static EntityHitResult raycastAABB(Vec3 start, Vec3 end, AABB box) {
+        Optional<Vec3> clipped = box.clip(start, end);
+        if (clipped.isPresent())
+            return new EntityHitResult(null, clipped.get());
+        return null;
+    }
+
+    public static EntityHitResult raycastAABBFromPlayer(Entity player, AABB box, double reach, float yaw, float pitch) {
+        Vec3 eyePos = player.getEyePosition(1.0f);
+        Vec3 lookVec = getLookVectorFromYawPitch(yaw, pitch);
+        Vec3 reachEnd = eyePos.add(lookVec.scale(reach));
+
+        return raycastAABB(eyePos, reachEnd, box);
     }
 }

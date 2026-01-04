@@ -65,44 +65,6 @@ public class InteractionUtils {
         return true;
     }
 
-
-    public static EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
-        Vec3 eyePos = player.getEyePosition(1.0f);
-        Vec3 look = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3 reachEnd = eyePos.add(look.scale(reach));
-
-        AABB targetBox = target.getBoundingBox();
-
-        if (targetBox.clip(eyePos, reachEnd).isPresent()) {
-            return new EntityHitResult(target);
-        }
-
-        return null;
-    }
-
-    public static EntityHitResult raycastAABB(Vec3 start, Vec3 end, AABB box) {
-        Optional<Vec3> clipped = box.clip(start, end);
-        if (clipped.isPresent())
-            return new EntityHitResult(null, clipped.get());
-        return null;
-    }
-
-    public static EntityHitResult raycastAABBFromPlayer(Entity player, AABB box, double reach, float yaw, float pitch) {
-        Vec3 eyePos = player.getEyePosition(1.0f);
-        Vec3 lookVec = getLookVectorFromYawPitch(yaw, pitch);
-        Vec3 reachEnd = eyePos.add(lookVec.scale(reach));
-
-        return raycastAABB(eyePos, reachEnd, box);
-    }
-
-    private static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
-        float f = (float) Math.cos(-yaw * 0.017453292F - Math.PI);
-        float g = (float) Math.sin(-yaw * 0.017453292F - Math.PI);
-        float h = - (float) Math.cos(-pitch * 0.017453292F);
-        float i = (float) Math.sin(-pitch * 0.017453292F);
-        return new Vec3(g * h, i, f * h);
-    }
-
     public static void startUsingItem() {
         startUsingItem(MAIN_HAND);
     }
@@ -191,15 +153,30 @@ public class InteractionUtils {
         boolean canPlace = true;
 
         if (rotate) {
-            float yaw = (float) getYawToVec(MC.player, hitVec);
-            float pitch = (float) getPitchToVec(MC.player, hitVec);
+            float yaw = (float) getYawToVec(MC.player, neighbor.getCenter());
+            float pitch = (float) getPitchToVec(MC.player, neighbor.getCenter());
 
-            if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
+         //   if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
                 ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
-            else
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
+           // else
+             //   ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
 
-            canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+            //canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+
+            // for some reason grim checks if you look at block, you gonna place, not on a block you click (i see logic here but still)
+            AABB b = new AABB(neighbor);
+            boolean insideBox = b.contains(MC.player.getEyePosition());
+
+            EntityHitResult serverCheck = raycastAABBFromPlayer(
+                    MC.player,
+                    b,
+                    range,
+                    ROTATION_MANAGER.getStateHandler().getServerYaw(),
+                    ROTATION_MANAGER.getStateHandler().getServerPitch()
+            );
+
+
+            canPlace = insideBox || serverCheck != null;
         }
 
         boolean result = false;
@@ -239,7 +216,7 @@ public class InteractionUtils {
                 case UP    -> eyePos.y >= pos.getY() + 1 - 1e-3;
             };
             if (!flag) {
-                CHAT_MANAGER.sendRaw("interactBlockAt: failed strictDirection check");
+             //   CHAT_MANAGER.sendRaw("interactBlockAt: failed strictDirection check");
                 return false;
             }
         }
@@ -249,7 +226,7 @@ public class InteractionUtils {
         Vec3 reachEnd = eyePos.add(lookDir.scale(range));
 
         if (blockBox.clip(eyePos, reachEnd).isEmpty()) {
-            CHAT_MANAGER.sendRaw("interactBlockAt: failed reach check" + pos);
+           // CHAT_MANAGER.sendRaw("interactBlockAt: failed reach check" + pos);
             return false;
         }
 
@@ -270,7 +247,7 @@ public class InteractionUtils {
         }
 
         if (!canInteract) {
-            CHAT_MANAGER.sendRaw("interactBlockAt: rotation incomplete");
+          //  CHAT_MANAGER.sendRaw("interactBlockAt: rotation incomplete");
             return false;
         }
 
@@ -287,7 +264,7 @@ public class InteractionUtils {
 
         INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
 
-        CHAT_MANAGER.sendRaw("interactBlockAt: success");
+        //CHAT_MANAGER.sendRaw("interactBlockAt: success");
         return true;
     }
 
@@ -480,5 +457,14 @@ public class InteractionUtils {
 
     public static boolean isBed(Block block) {
         return block instanceof BedBlock;
+    }
+
+
+    private static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
+        float f = (float) Math.cos(-yaw * 0.017453292F - Math.PI);
+        float g = (float) Math.sin(-yaw * 0.017453292F - Math.PI);
+        float h = - (float) Math.cos(-pitch * 0.017453292F);
+        float i = (float) Math.sin(-pitch * 0.017453292F);
+        return new Vec3(g * h, i, f * h);
     }
 }

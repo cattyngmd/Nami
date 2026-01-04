@@ -45,7 +45,6 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InteractionUtils.raycastTarget;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxLines;
 
