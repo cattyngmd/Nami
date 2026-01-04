@@ -12,6 +12,8 @@ public interface DuckClientboundSetEntityMotionPacket {
     @Accessor("movement")
     Vec3 getMovement();
 
-    @Accessor("movement")
-    void setMovement(Vec3 movement);
+    @Invoker("<init>")
+    static ClientboundSetEntityMotionPacket create(int entityId, Vec3 velocity) {
+        throw new UnsupportedOperationException();
+    }
 }

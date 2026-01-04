@@ -51,6 +51,7 @@ public class AutoCrystalModule extends Module {
     public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
     public final BoolSetting placeSimulate = addSetting(new BoolSetting("Simulate", false));
+    public final BoolSetting placeMultitask = addSetting(new BoolSetting("Multitask", false));
 
 
     //break
@@ -89,6 +90,8 @@ public class AutoCrystalModule extends Module {
         placeSwing.setShowCondition(doPlace::get);
         placeIgnoreItems.setShowCondition(doPlace::get);
         placeSimulate.setShowCondition(doPlace::get);
+        placeMultitask.setShowCondition(doPlace::get);
+
     }
 
     @Override
@@ -235,6 +238,8 @@ public class AutoCrystalModule extends Module {
     }
 
     private void doPlace() {
+        if (!placeMultitask.get() && MC.player.isUsingItem()) return;
+
         placeTarget = findBestPlace();
         if (placeTarget == null) return;
         int crystalSlot = findHotbarItem(stack -> stack.getItem() instanceof EndCrystalItem);

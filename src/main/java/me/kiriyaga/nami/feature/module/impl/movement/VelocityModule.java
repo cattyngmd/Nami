@@ -13,6 +13,7 @@ import me.kiriyaga.nami.feature.setting.impl.*;
 import me.kiriyaga.nami.mixin.DuckBundlePacket;
 import me.kiriyaga.nami.mixin.DuckClientboundExplodePacket;
 import me.kiriyaga.nami.mixin.DuckClientboundSetEntityMotionPacket;
+import me.kiriyaga.nami.mixininterface.IClientboundSetEntityMotionPacket;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
@@ -286,7 +287,7 @@ public class VelocityModule extends Module {
                 v.z * (horizontalPercent.get() / 100.0)
         );
 
-        ((DuckClientboundSetEntityMotionPacket) packet).setMovement(scaled);
+        ((I gClientboundSetEntityMotionPacket) packet).setMovement(scaled);
     }
 
     private void scaleExplosionPacket(ClientboundExplodePacket packet) {
