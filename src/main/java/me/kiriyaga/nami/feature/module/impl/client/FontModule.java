@@ -24,6 +24,9 @@ public class FontModule extends Module {
 
     public FontModule() {
         super("Font", "Custom font renderer.", ModuleCategory.of("Client"), "f", "customfont");
+        if (!this.isEnabled())
+            this.toggle();
+
         global.setShow(false);
         filterMode.setShow(false);
     }

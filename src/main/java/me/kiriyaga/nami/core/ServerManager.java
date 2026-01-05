@@ -5,7 +5,7 @@ import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
-import me.kiriyaga.nami.feature.module.impl.client.FastLatencyModule;
+import me.kiriyaga.nami.feature.module.impl.client.LatencyModule;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
@@ -86,9 +86,9 @@ public class ServerManager {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPacketReceive3(PacketReceiveEvent packet) {
-        FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
+        LatencyModule config = MODULE_MANAGER.getStorage().getByClass(LatencyModule.class);
 
-        if (config.fastLatencyMode.get() != FastLatencyModule.FastLatencyMode.OLD)
+        if (config.fastLatencyMode.get() != LatencyModule.mode.OLD)
             return;
 
         if (packet.getPacket() instanceof ClientboundKeepAlivePacket) {
@@ -187,7 +187,7 @@ public class ServerManager {
     }
 
     public void updatePing() {
-        FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
+        LatencyModule config = MODULE_MANAGER.getStorage().getByClass(LatencyModule.class);
         if (config == null) ping = lastPing;
 
         switch (config.fastLatencyMode.get()) {
@@ -220,7 +220,7 @@ public class ServerManager {
     }
 
     public boolean isConnectionUnstable() {
-        FastLatencyModule config = MODULE_MANAGER.getStorage().getByClass(FastLatencyModule.class);
+        LatencyModule config = MODULE_MANAGER.getStorage().getByClass(LatencyModule.class);
         if (config == null) return false;
 
         DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
