@@ -28,7 +28,7 @@ public class ConfigScreen extends NamiScreen {
         if (console == null) {
             console = new ConsolePanelComponent<>(
                     "Configs",
-                    20, 20, 300, 200,
+                    20, 20, 550, 300,
 
                     entry -> {
                         CONFIG_MANAGER.saveConfig(entry.getName());
