@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import net.minecraft.world.entity.Entity;
@@ -69,7 +69,7 @@ public class AgroModule extends Module {
                             2,
                             (float) getYawToVec(MC.player, eyes),
                             (float) getPitchToVec(MC.player, eyes),
-                            RotationModule.RotationMode.MOTION
+                            RotationsModule.RotationMode.MOTION
                     )
             );
         }

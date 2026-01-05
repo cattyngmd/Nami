@@ -8,7 +8,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
@@ -25,7 +25,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
-import java.util.Arrays;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.InteractionUtils.*;
@@ -95,7 +94,7 @@ public class ScaffoldModule extends Module {
             if (blocksPlaced >= shiftTicks.get()) break;
         }
 
-        if (lookBack.get() && INPUT_MANAGER.hasAnyInput() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION)
+        if (lookBack.get() && INPUT_MANAGER.hasAnyInput() && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.MOTION)
             ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.name+"hold", 3, INPUT_MANAGER.getDirection() - 180, 81));
 
         if (blocksPlaced > 0) cooldown = delay.get();

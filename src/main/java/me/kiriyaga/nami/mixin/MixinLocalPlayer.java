@@ -3,7 +3,7 @@ package me.kiriyaga.nami.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.gui.screens.Screen;
@@ -113,7 +113,7 @@ public abstract class MixinLocalPlayer {
     // i hope it gets fucking patched in 1.22/1.23
     @Inject(method = "sendPosition", at = @At("HEAD"))
     private void sendMovementPackets1(CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT
+        if (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.SILENT
         && ROTATION_MANAGER.getStateHandler().getSilentSyncRequired()) {
             this.originalSilentPitch = MC.player.getXRot();
             this.xRotLast = -9999;
@@ -123,7 +123,7 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "sendPosition", at = @At("RETURN"))
     private void sendMovementPackets2(CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT
+        if (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.SILENT
                 && ROTATION_MANAGER.getStateHandler().getSilentSyncRequired()) {
             MC.player.setXRot(this.originalSilentPitch);
             ROTATION_MANAGER.getStateHandler().setSilentSyncRequired(false);

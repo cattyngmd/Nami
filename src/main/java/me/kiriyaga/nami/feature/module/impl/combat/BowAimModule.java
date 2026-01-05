@@ -9,7 +9,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.util.entity.TargetUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
@@ -63,7 +63,7 @@ public class BowAimModule extends Module {
                 6,
                 (float) getYawToVec(MC.player, aimPos),
                 (float) getPitchToVec(MC.player, aimPos),
-                RotationModule.RotationMode.MOTION
+                RotationsModule.RotationMode.MOTION
         ));
     }
 

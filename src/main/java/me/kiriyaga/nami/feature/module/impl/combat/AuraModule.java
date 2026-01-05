@@ -12,7 +12,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
@@ -46,7 +46,6 @@ import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.RotationUtils.*;
-import static me.kiriyaga.nami.util.render.RenderUtil.drawBoxLines;
 
 @RegisterModule
 public class AuraModule extends Module {
@@ -161,7 +160,7 @@ public class AuraModule extends Module {
             default -> preRotate = 0.10;
         }
 
-        if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT)
+        if (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.SILENT)
             preRotate = 0.00; // rotation silent are instant and do not require pre rotate to reduce attack delay
 
         // RayCast as main distance check
@@ -174,7 +173,7 @@ public class AuraModule extends Module {
             EntityHitResult distanceCheck = raycastTarget(
                     MC.player,
                     target,
-                    attackRange.get() + (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.MOTION ? 0.10 : 0.00),
+                    attackRange.get() + (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.MOTION ? 0.10 : 0.00),
                     idealYaw,
                     idealPitch
             );

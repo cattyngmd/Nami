@@ -7,12 +7,11 @@ import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.setting.impl.*;
 
 import me.kiriyaga.nami.mixin.DuckBundlePacket;
 import me.kiriyaga.nami.mixin.DuckClientboundExplodePacket;
-import me.kiriyaga.nami.mixin.DuckClientboundSetEntityMotionPacket;
 import me.kiriyaga.nami.mixininterface.IClientboundSetEntityMotionPacket;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
@@ -262,7 +261,7 @@ public class VelocityModule extends Module {
         float yaw = ROTATION_MANAGER.getStateHandler().getServerYaw();
         float pitch = ROTATION_MANAGER.getStateHandler().getServerPitch();
 
-        ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.name, 0, yaw, pitch, RotationModule.RotationMode.SILENT));
+        ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.name, 0, yaw, pitch, RotationsModule.RotationMode.SILENT));
         MC.getConnection().send(new ServerboundPlayerActionPacket(
                 ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK,
                 MC.player.isVisuallyCrawling() ? MC.player.blockPosition() : MC.player.blockPosition().above(),

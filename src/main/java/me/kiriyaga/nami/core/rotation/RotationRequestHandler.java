@@ -1,8 +1,9 @@
 package me.kiriyaga.nami.core.rotation;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -48,7 +49,7 @@ public class RotationRequestHandler {
     public void submit(RotationRequest request) {
 //        RotationModule.RotationMode mode = MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get();
 
-        if (request.rotationMode == RotationModule.RotationMode.SILENT) {
+        if (request.rotationMode == RotationsModule.RotationMode.SILENT) {
             performSilent(request);
             stateHandler.setSilentSyncRequired(true);
             return;
@@ -82,7 +83,7 @@ public class RotationRequestHandler {
     public boolean isCompleted(String id) {
         return isCompleted(
                 id,
-                MODULE_MANAGER.getStorage().getByClass(RotationModule.class)
+                MODULE_MANAGER.getStorage().getByClass(RotationsModule.class)
                         .rotationThreshold.get().floatValue()
         );
     }
@@ -95,7 +96,7 @@ public class RotationRequestHandler {
      * @return {@code true}, if yaw pitch is close enough to target
      */
     public boolean isCompleted(String id, float threshold) {
-        if (MODULE_MANAGER.getStorage().getByClass(RotationModule.class).rotation.get() == RotationModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired())
+        if (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired())
             return true; // TODO: find better solution
         return requests.stream()
                 .filter(r -> r.id.equals(id))
@@ -137,6 +138,20 @@ public class RotationRequestHandler {
     private void performSilent(RotationRequest req) {
         float targetYaw = req.targetYaw;
         float targetPitch = req.targetPitch;
+
+        if (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).jitter.get()) {
+            float minJitter = (float) (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotationThreshold.get() / 4f);
+            float maxJitter = (float) (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotationThreshold.get() / 2);
+            float jitterYaw = minJitter + (float) (Math.random() * (maxJitter - minJitter));
+            float jitterPitch = minJitter + (float) (Math.random() * (maxJitter - minJitter));
+            jitterYaw *= Math.random() < 0.5 ? -1 : 1;
+            jitterPitch *= Math.random() < 0.5 ? -1 : 1;
+
+            targetYaw += jitterYaw;
+            targetPitch += jitterPitch;
+
+            targetPitch = Mth.clamp(targetPitch, -90f, 90f);
+        }
 
 //        ROTATION_MANAGER.getStateHandler().setRotationYaw(targetYaw);
 //        ROTATION_MANAGER.getStateHandler().setRotationPitch(targetPitch);

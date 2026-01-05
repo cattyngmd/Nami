@@ -4,7 +4,7 @@ import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.util.InputCache;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.util.Mth;
@@ -27,8 +27,8 @@ public class RotationTickHandler {
 //    private float jitterSpeed;
     private float currentYawSpeed = 0f, currentPitchSpeed = 0f;
     private int ticksHolding = 0;
+    private boolean rotationJitter = false;
     private boolean returning = false;
-    private int tickCount = 0;
 
     public RotationTickHandler(RotationStateHandler stateHandler, RotationRequestHandler requestHandler) {
         this.stateHandler = stateHandler;
@@ -43,12 +43,12 @@ public class RotationTickHandler {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
 
-        RotationModule module = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
+        RotationsModule module = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
         loadSettings(module);
         stateHandler.updateRealRotation(MC.player.getYRot(), MC.player.getXRot());
 
         RotationRequest active = requestHandler.getActiveRequest();
-        if (module.rotation.get() == RotationModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
+        if (module.rotation.get() == RotationsModule.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
             //performSilent(active); // actually this can be skipped if we somehow simulate client rotation packet sending idk
             //stateHandler.setSilentSyncRequired(false);
             //resetRotationToReal();
@@ -67,8 +67,6 @@ public class RotationTickHandler {
 
         if (module.moveFix.get() && stateHandler.isRotating())
             fixMovementForSpoof();
-
-        tickCount++;
     }
 
     private void fixMovementForSpoof() {
@@ -118,11 +116,12 @@ public class RotationTickHandler {
         }
     }
 
-    private void loadSettings(RotationModule module) {
+    private void loadSettings(RotationsModule module) {
         rotationSpeed = module.rotationSpeed.get().floatValue();
         rotationEaseFactor = module.rotationEaseFactor.get().floatValue();
         rotationThreshold = module.rotationThreshold.get().floatValue();
         ticksBeforeRelease = module.ticksBeforeRelease.get();
+        rotationJitter = module.jitter.get();
     }
 
     private void processRequest(RotationRequest request) {
@@ -207,6 +206,20 @@ public class RotationTickHandler {
 
         float newYaw = stateHandler.getRotationYaw() + yawSpeed;
         float newPitch = stateHandler.getRotationPitch() + pitchSpeed;
+
+        if (rotationJitter) {
+            float minJitter = rotationThreshold / 4f;
+            float maxJitter = rotationThreshold / 2;
+            float jitterYaw = minJitter + (float) (Math.random() * (maxJitter - minJitter));
+            float jitterPitch = minJitter + (float) (Math.random() * (maxJitter - minJitter));
+            jitterYaw *= Math.random() < 0.5 ? -1 : 1;
+            jitterPitch *= Math.random() < 0.5 ? -1 : 1;
+
+            newYaw += jitterYaw;
+            newPitch += jitterPitch;
+
+            newPitch = Mth.clamp(newPitch, -90f, 90f);
+        }
 
 //        RotationManagerModule module = MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class);
 //        if (module.mouseDeltaFix.get()) { // https://github.com/GrimAnticheat/Grim/blob/57a9f8f432800382d43c28df9e8409b4d7d80813/common/src/main/java/ac/grim/grimac/checks/impl/aim/AimModulo360.java#L31

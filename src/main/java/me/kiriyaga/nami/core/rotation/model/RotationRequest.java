@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.core.rotation.model;
 
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -62,7 +62,7 @@ public class RotationRequest {
     /**
      * Rotation mode (default = settinga)
      */
-    public final RotationModule.RotationMode rotationMode;
+    public final RotationsModule.RotationMode rotationMode;
 
     @Override
     public boolean equals(Object o) {
@@ -98,7 +98,7 @@ public class RotationRequest {
      * @param pitch         static pitch value
      * @param rotationMode  override rotation mode
      */
-    public RotationRequest(String id, int priority, float yaw, float pitch, RotationModule.RotationMode rotationMode) {
+    public RotationRequest(String id, int priority, float yaw, float pitch, RotationsModule.RotationMode rotationMode) {
         this.id = id;
         this.priority = priority;
         this.dynamic = false;
@@ -130,7 +130,7 @@ public class RotationRequest {
      * @param pitchSupplier  dynamic pitch supplier
      * @param rotationMode   override rotation mode
      */
-    public RotationRequest(String id, int priority, Supplier<Float> yawSupplier, Supplier<Float> pitchSupplier, RotationModule.RotationMode rotationMode) {
+    public RotationRequest(String id, int priority, Supplier<Float> yawSupplier, Supplier<Float> pitchSupplier, RotationsModule.RotationMode rotationMode) {
         this.id = id;
         this.priority = priority;
         this.dynamic = true;
@@ -151,7 +151,7 @@ public class RotationRequest {
     public RotationRequest(String id, int priority, LivingEntity player, Vec3 pos) {
         this.id = id;
         this.priority = priority;
-        this.rotationMode = RotationModule.RotationMode.MOTION;
+        this.rotationMode = RotationsModule.RotationMode.MOTION;
 
         Vec3 predictedEye = predictMotion(player);
 
@@ -178,8 +178,8 @@ public class RotationRequest {
         }
     }
 
-    private static RotationModule.RotationMode getDefaultRotationMode() {
-        RotationModule module = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
-        return module != null ? module.rotation.get() : RotationModule.RotationMode.MOTION;
+    private static RotationsModule.RotationMode getDefaultRotationMode() {
+        RotationsModule module = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
+        return module != null ? module.rotation.get() : RotationsModule.RotationMode.MOTION;
     }
 }

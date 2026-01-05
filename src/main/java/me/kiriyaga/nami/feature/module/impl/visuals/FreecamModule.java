@@ -7,7 +7,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import net.minecraft.client.CameraType;
@@ -133,7 +133,7 @@ public class FreecamModule extends Module { // todo this shit broke
                 double yawToTarget = Math.toDegrees(Math.atan2(diffZ, diffX)) - 90;
                 double pitchToTarget = -Math.toDegrees(Math.atan2(diffY, Math.sqrt(diffX * diffX + diffZ * diffZ)));
 
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(FreecamModule.class.getName() ,3, (float)yawToTarget, (float)pitchToTarget, RotationModule.RotationMode.MOTION));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(FreecamModule.class.getName() ,3, (float)yawToTarget, (float)pitchToTarget, RotationsModule.RotationMode.MOTION));
             }
         }
     }

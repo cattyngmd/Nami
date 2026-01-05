@@ -3,7 +3,7 @@ package me.kiriyaga.nami.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.kiriyaga.nami.event.impl.GlidingEvent;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.exploits.NoJumpDelayModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoLevitation;
@@ -50,8 +50,8 @@ public abstract class MixinLivingEntity extends Entity {
     private void travelPreHook(Vec3 movementInput, CallbackInfo ci) {
         if (Minecraft.getInstance() == null || Minecraft.getInstance().player != (Object)this) return;
         if (MODULE_MANAGER.getStorage() == null) return;
-        RotationModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
-        if (rotationModule == null || !rotationModule.moveFix.get()) return;
+        RotationsModule rotationsModule = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
+        if (rotationsModule == null || !rotationsModule.moveFix.get()) return;
         if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
         originalYaw = super.getYRot();
@@ -70,8 +70,8 @@ public abstract class MixinLivingEntity extends Entity {
         if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
 
         if (MODULE_MANAGER.getStorage() == null) return;
-        RotationModule rotationModule = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
-        if (rotationModule == null || !rotationModule.moveFix.get()) return;
+        RotationsModule rotationsModule = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
+        if (rotationsModule == null || !rotationsModule.moveFix.get()) return;
 
         this.setYRot(originalYaw);
         this.setXRot(originalPitch);
@@ -193,7 +193,7 @@ public abstract class MixinLivingEntity extends Entity {
     private float turnHead(float f) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
+        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
             return ROTATION_MANAGER.getStateHandler().getRotationYaw();
         }
         return f;
@@ -203,7 +203,7 @@ public abstract class MixinLivingEntity extends Entity {
     private void lerpHeadYawInject(int i, double d, CallbackInfo ci) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationModule.class).render.get()) {
+        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
 
             double targetYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
 

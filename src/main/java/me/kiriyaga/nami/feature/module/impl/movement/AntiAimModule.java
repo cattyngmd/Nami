@@ -7,7 +7,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -47,7 +47,7 @@ public class AntiAimModule extends Module {
                 0,
                 yaw,
                 pitch,
-                RotationModule.RotationMode.MOTION
+                RotationsModule.RotationMode.MOTION
         ));
     }
 }

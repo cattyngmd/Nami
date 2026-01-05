@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.util;
 
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.mixin.DuckMultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,8 +22,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Optional;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
@@ -323,9 +321,9 @@ public class InteractionUtils {
         return null;
     }
 
-    private static RotationModule.RotationMode getDefaultRotationMode() {
-        RotationModule module = MODULE_MANAGER.getStorage().getByClass(RotationModule.class);
-        return module != null ? module.rotation.get() : RotationModule.RotationMode.MOTION;
+    private static RotationsModule.RotationMode getDefaultRotationMode() {
+        RotationsModule module = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
+        return module != null ? module.rotation.get() : RotationsModule.RotationMode.MOTION;
     }
 
     public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {

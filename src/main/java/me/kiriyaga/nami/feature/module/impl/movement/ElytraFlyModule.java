@@ -8,7 +8,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.mixin.DuckKeyMapping;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
@@ -154,7 +154,7 @@ public class ElytraFlyModule extends Module {
             }*/
 
             if (pitch.get())
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYRot(), pitchDegree.get().floatValue(), RotationModule.RotationMode.MOTION));
+                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(this.getName(), 1, MC.player.getYRot(), pitchDegree.get().floatValue(), RotationsModule.RotationMode.MOTION));
 
             MC.player.connection.send(
                     new ServerboundPlayerCommandPacket(MC.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING)
@@ -204,7 +204,7 @@ public class ElytraFlyModule extends Module {
                 }
 
                 ROTATION_MANAGER.getRequestHandler().submit(
-                        new RotationRequest(this.getName(), 1, finalYaw, finalPitch, RotationModule.RotationMode.MOTION)
+                        new RotationRequest(this.getName(), 1, finalYaw, finalPitch, RotationsModule.RotationMode.MOTION)
                 );
 
                 setJumpHeld(true);
@@ -268,7 +268,7 @@ public class ElytraFlyModule extends Module {
 
             //TODO yaw smooth n
             ROTATION_MANAGER.getRequestHandler().submit(
-                    new RotationRequest(this.getName(), 1, MC.player.getYRot(), smoothPitch, RotationModule.RotationMode.MOTION)
+                    new RotationRequest(this.getName(), 1, MC.player.getYRot(), smoothPitch, RotationsModule.RotationMode.MOTION)
             );
         }
     }

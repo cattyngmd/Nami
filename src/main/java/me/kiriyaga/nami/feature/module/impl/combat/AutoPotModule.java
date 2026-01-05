@@ -7,7 +7,7 @@ import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.RotationModule;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.util.Timer;
@@ -93,7 +93,7 @@ public class AutoPotModule extends Module {
                 6,
                 MC.player.getYRot(),
                 pitch,
-                RotationModule.RotationMode.MOTION
+                RotationsModule.RotationMode.MOTION
         ));
 
         if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
