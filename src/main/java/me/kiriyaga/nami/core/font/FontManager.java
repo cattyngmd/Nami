@@ -73,7 +73,7 @@ public class FontManager {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(0.5f, 0.5f);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, 100), x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
             matrices.popMatrix();
         }
 
