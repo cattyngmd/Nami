@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.feature.module.impl.miscellaneous;
 
-import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
@@ -11,7 +10,6 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.phys.Vec3;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.Nami.MC;
@@ -41,8 +39,7 @@ public class RespawnModule extends Module {
         if (sendCords.get()) {
                 String coords = String.format("X: %d Y: %d Z: %d", Math.round(MC.player.position().x), Math.round(MC.player.position().y), Math.round(MC.player.position().z));
                 Component reason = CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}.");
-                LOG.addEntry(this.name+": "+ reason.getString());
-        }
+            }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

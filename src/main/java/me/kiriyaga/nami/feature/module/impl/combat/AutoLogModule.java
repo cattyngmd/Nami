@@ -106,7 +106,6 @@ public class AutoLogModule extends Module {
 
 
     private void logOut(String reason) {
-        LOG.addEntry(this.name + ": "+reason);
         if (MODULE_MANAGER.getStorage().getByClass(IllegalDisconnectModule.class).isEnabled()){
             triggerToggle();
             EVENT_MANAGER.post(new DissconectEvent());

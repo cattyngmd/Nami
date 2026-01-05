@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import net.minecraft.client.gui.Font;
@@ -23,8 +22,8 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
         Color primary = getColorModule().getStyledGlobalColor();
         Color text = getColorModule().getStyledTextColor(255);
 
-        int bgColorInt = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, 0)));
-        int textColorInt = CLICK_GUI.applyFade(toRGBA(text));
+        int bgColorInt = CLICK_GUI_SCREEN.applyFade(toRGBA(new Color(30, 30, 30, 0)));
+        int textColorInt = CLICK_GUI_SCREEN.applyFade(toRGBA(text));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
@@ -94,13 +93,13 @@ public class IntSettingRenderer implements SettingRenderer<IntSetting> {
 
     private void renderSlider(GuiGraphics context, int x, int y, int width, int height,
                               int value, int min, int max, Color color) {
-        context.fill(x, y, x + width, y + height, CLICK_GUI.applyFade(toRGBA(new Color(60, 60, 60, 150))));
+        context.fill(x, y, x + width, y + height, CLICK_GUI_SCREEN.applyFade(toRGBA(new Color(60, 60, 60, 150))));
 
         value = Math.max(min, Math.min(max, value));
         double percent = (value - min) / (double) Math.max(1, (max - min));
         int filledWidth = (int) (width * percent);
 
-        context.fill(x, y, x + filledWidth, y + height, CLICK_GUI.applyFade(toRGBA(color)));
+        context.fill(x, y, x + filledWidth, y + height, CLICK_GUI_SCREEN.applyFade(toRGBA(color)));
     }
 
     private static boolean isHovered(double mouseX, double mouseY, int x, int y) {

@@ -94,6 +94,16 @@ public class ConfigSerializer {
             LOGGER.error("Failed to load config " + configName, e);
         }
     }
+
+    public boolean delete(String configName) {
+        File file = new File(dirs.getConfigSaveDir(), configName + ".json");
+        if (!file.exists()) {
+            LOGGER.warn("Config file not found for delete: " + configName);
+            return false;
+        }
+        return file.delete();
+    }
+
     public List<String> listConfigs() {
         File dir = dirs.getConfigSaveDir();
         if (!dir.exists() || !dir.isDirectory()) {

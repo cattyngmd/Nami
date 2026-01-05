@@ -62,8 +62,8 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
-        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+        int scaledMouseX = (int) (mouseX / CLICK_GUI_SCREEN.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI_SCREEN.scale);
 
         ClickGuiModule clickGuiModule = getClickGuiModule();
         if (clickGuiModule != null && clickGuiModule.background.get()) {
@@ -77,7 +77,7 @@ public class HudEditorScreen extends Screen {
 
 
         context.pose().pushMatrix();
-        context.pose().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+        context.pose().scale(CLICK_GUI_SCREEN.scale, CLICK_GUI_SCREEN.scale);
 
         ModuleCategory hudCategory = ModuleCategory.of("HUD");
         Point pos = categoryPositions.get(hudCategory);
@@ -106,7 +106,7 @@ public class HudEditorScreen extends Screen {
                         int textHeight = 8;
 
                         context.fill(descX - 2, descY - 2, descX + textWidth + 2, descY + textHeight + 2, 0x7F000000);
-                        FONT_MANAGER.drawText(context, description, descX, descY, CLICK_GUI.applyFade(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB()), true);
+                        FONT_MANAGER.drawText(context, description, descX, descY, CLICK_GUI_SCREEN.applyFade(MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255).getRGB()), true);
                     }
                     context.pose().popMatrix();
 
@@ -161,8 +161,8 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean bl) {
-        int scaledMouseX = (int) (click.x() / CLICK_GUI.scale);
-        int scaledMouseY = (int) (click.y() / CLICK_GUI.scale);
+        int scaledMouseX = (int) (click.x() / CLICK_GUI_SCREEN.scale);
+        int scaledMouseY = (int) (click.y() / CLICK_GUI_SCREEN.scale);
 
         NAVIGATE_PANEL.mouseClicked(click.x(), click.y(), FONT_MANAGER.rendererProvider.getRenderer());
 
@@ -244,8 +244,8 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public boolean mouseDragged(MouseButtonEvent click, double d, double e) {
-        int scaledMouseX = (int) (click.x() / CLICK_GUI.scale);
-        int scaledMouseY = (int) (click.y() / CLICK_GUI.scale);
+        int scaledMouseX = (int) (click.x() / CLICK_GUI_SCREEN.scale);
+        int scaledMouseY = (int) (click.y() / CLICK_GUI_SCREEN.scale);
 
         if (draggingCategory && draggedModuleCategory != null) {
             Point pos = categoryPositions.get(draggedModuleCategory);
@@ -312,8 +312,8 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        int scaledMouseX = (int) (mouseX / CLICK_GUI.scale);
-        int scaledMouseY = (int) (mouseY / CLICK_GUI.scale);
+        int scaledMouseX = (int) (mouseX / CLICK_GUI_SCREEN.scale);
+        int scaledMouseY = (int) (mouseY / CLICK_GUI_SCREEN.scale);
 
         for (ModuleCategory moduleCategory : ModuleCategory.getAll()) {
             if (!"hud".equalsIgnoreCase(moduleCategory.getName())) continue;

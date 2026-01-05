@@ -44,7 +44,7 @@ public class TextBoxWidget {
         int textX = x + 4;
         int textY = y + (height - textRenderer.lineHeight) / 2 + 1;
 
-        FONT_MANAGER.drawText(context, Component.nullToEmpty(display), textX, textY, true, CLICK_GUI.applyFade(toRGBA(textColor)));
+        FONT_MANAGER.drawText(context, Component.nullToEmpty(display), textX, textY, true, CLICK_GUI_SCREEN.applyFade(toRGBA(textColor)));
     }
 
     public boolean mouseClicked(int mouseX, int mouseY, int button) {

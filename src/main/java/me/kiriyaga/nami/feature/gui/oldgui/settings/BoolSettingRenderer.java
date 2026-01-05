@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import net.minecraft.client.gui.Font;
@@ -19,8 +18,8 @@ public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
         Color bgColor = new Color(30, 30, 30, 0);
         Color textColActivated = getColorModule().getStyledTextColor(255);
 
-        int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
-        int textColorInt = CLICK_GUI.applyFade(setting.get() ? toRGBA(textColActivated) : toRGBA(textCol));
+        int bgColorInt = CLICK_GUI_SCREEN.applyFade(toRGBA(bgColor));
+        int textColorInt = CLICK_GUI_SCREEN.applyFade(setting.get() ? toRGBA(textColActivated) : toRGBA(textCol));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 

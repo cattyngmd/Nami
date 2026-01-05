@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -63,6 +64,14 @@ public class ConfigManager {
 
     public void loadConfig(String name) {
         configSerializer.load(name);
+    }
+
+    public boolean deleteConfig(String name) {
+        return configSerializer.delete(name);
+    }
+
+    public List<String> listConfigs() {
+        return configSerializer.listConfigs();
     }
 
     public void saveFriends(Set<String> friends) {

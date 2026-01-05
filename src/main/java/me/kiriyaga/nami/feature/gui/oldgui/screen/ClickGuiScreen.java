@@ -277,7 +277,7 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent keyInput) {
-        if (keyInput.input() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.screen == CLICK_GUI && MC.level != null) {
+        if (keyInput.input() == MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).getKeyBind().get() && MC.screen == CLICK_GUI_SCREEN && MC.level != null) {
             beginClose();
             return true;
         }
@@ -385,7 +385,7 @@ public class ClickGuiScreen extends Screen {
         if (!MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).fade.get())
             return argb;
 
-        if ((previousScreen == HUD_EDITOR || previousScreen == FRIEND) && MC.screen != CLICK_GUI)
+        if ((previousScreen == HUD_EDITOR_SCREEN || previousScreen == FRIEND_SCREEN) && MC.screen != CLICK_GUI_SCREEN)
             return argb;
 
         int a = (argb >>> 24) & 0xFF;

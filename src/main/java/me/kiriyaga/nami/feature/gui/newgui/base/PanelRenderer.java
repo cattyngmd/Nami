@@ -28,15 +28,15 @@ public class PanelRenderer {
         Color secondary = colorModule.getStyledSecondColor();
 
         if (renderBackground) {
-            int bgColor = CLICK_GUI.applyFade(toRGBA(new Color(20, 20, 20, clickGuiModule.guiAlpha.get())));
+            int bgColor = CLICK_GUI_SCREEN.applyFade(toRGBA(new Color(20, 20, 20, clickGuiModule.guiAlpha.get())));
             context.fill(x, y, x + width, y + height, bgColor);
         }
 
         int lineColor;
         if (clickGuiModule.lines.get()) {
-            lineColor = CLICK_GUI.applyFade(primary.getRGB());
+            lineColor = CLICK_GUI_SCREEN.applyFade(primary.getRGB());
         } else {
-            lineColor = CLICK_GUI.applyFade(new Color(20, 20, 20, 0).getRGB());
+            lineColor = CLICK_GUI_SCREEN.applyFade(new Color(20, 20, 20, 0).getRGB());
         }
 
         if (!renderHeader) {
@@ -54,7 +54,7 @@ public class PanelRenderer {
         context.fill(x + width - 1, y + topOffset, x + width, y + height - 1, lineColor);
 
         if (renderHeader && headerHeight > 0) {
-            context.fill(x, y, x + width, y + headerHeight, CLICK_GUI.applyFade(toRGBA(primary)));
+            context.fill(x, y, x + width, y + headerHeight, CLICK_GUI_SCREEN.applyFade(toRGBA(primary)));
         }
     }
 
@@ -64,7 +64,7 @@ public class PanelRenderer {
         Color textCol =  MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledTextColor(255);
 
         int textY = y + (headerHeight - textRenderer.lineHeight) / 2;
-        FONT_MANAGER.drawText(context, text, x + padding, textY + 1, CLICK_GUI.applyFade(toRGBA(textCol)), true);
+        FONT_MANAGER.drawText(context, text, x + padding, textY + 1, CLICK_GUI_SCREEN.applyFade(toRGBA(textCol)), true);
     }
 
 

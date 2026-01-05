@@ -7,7 +7,6 @@ import me.kiriyaga.nami.util.ColorUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
-import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.ColorUtils.*;
@@ -42,7 +41,7 @@ public class ModulePanel {
             fillCol = ColorUtils.brighten(fillCol, 20);
 
         if (MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleFill.get())
-            context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI.applyFade(toRGBA(fillCol)));
+            context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI_SCREEN.applyFade(toRGBA(fillCol)));
 
         if (!MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).coloredText.get())
             textCol = new Color(255, 255, 255, 255);
@@ -54,7 +53,7 @@ public class ModulePanel {
                 module.getName(),
                 baseTextX,
                 textY,
-                CLICK_GUI.applyFade(toRGBA(textCol)),
+                CLICK_GUI_SCREEN.applyFade(toRGBA(textCol)),
                 true
         );
     }

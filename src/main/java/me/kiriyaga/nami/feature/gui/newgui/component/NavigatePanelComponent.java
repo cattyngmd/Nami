@@ -28,10 +28,10 @@ public class NavigatePanelComponent {
     private String activeKey;
 
     public NavigatePanelComponent() {
-        addScreen("ClickGui", CLICK_GUI);
-        addScreen("HudEditor", HUD_EDITOR);
-        addScreen("Friends", FRIEND);
-        addScreen("Logs", LOG);
+        addScreen("ClickGui", CLICK_GUI_SCREEN);
+        addScreen("HudEditor", HUD_EDITOR_SCREEN);
+        addScreen("Friends", FRIEND_SCREEN);
+        addScreen("Configs", CONFIG_SCREEN);
         this.colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         this.clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
         resetActive();
@@ -43,9 +43,9 @@ public class NavigatePanelComponent {
 
     public void render(GuiGraphics context, Font textRenderer, int mouseX, int mouseY) {
         context.pose().pushMatrix();
-        context.pose().scale(CLICK_GUI.scale, CLICK_GUI.scale);
+        context.pose().scale(CLICK_GUI_SCREEN.scale, CLICK_GUI_SCREEN.scale);
 
-        int scaledWidth = (int) (MC.getWindow().getGuiScaledWidth() / CLICK_GUI.scale);
+        int scaledWidth = (int) (MC.getWindow().getGuiScaledWidth() / CLICK_GUI_SCREEN.scale);
         int totalWidth = calcWidth();
         int x = (scaledWidth - totalWidth) / 2;
         int y = TOP_OFFSET;
@@ -69,7 +69,7 @@ public class NavigatePanelComponent {
                     name,
                     offsetX,
                     (y + (HEIGHT - FONT_MANAGER.getHeight()) / 2),
-                    CLICK_GUI.applyFade(toRGBA(textCol)),
+                    CLICK_GUI_SCREEN.applyFade(toRGBA(textCol)),
                     true
             );
 
@@ -80,10 +80,10 @@ public class NavigatePanelComponent {
     }
 
     public void mouseClicked(double mouseX, double mouseY, Font textRenderer) {
-        double scaledX = mouseX / CLICK_GUI.scale;
-        double scaledY = mouseY / CLICK_GUI.scale;
+        double scaledX = mouseX / CLICK_GUI_SCREEN.scale;
+        double scaledY = mouseY / CLICK_GUI_SCREEN.scale;
 
-        int scaledWidth = (int) (MC.getWindow().getGuiScaledWidth() / CLICK_GUI.scale);
+        int scaledWidth = (int) (MC.getWindow().getGuiScaledWidth() / CLICK_GUI_SCREEN.scale);
         int totalWidth = calcWidth();
         int x = (scaledWidth - totalWidth) / 2;
         int y = TOP_OFFSET;

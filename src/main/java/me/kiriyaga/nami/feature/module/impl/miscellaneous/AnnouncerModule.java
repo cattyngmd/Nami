@@ -49,7 +49,6 @@ public class AnnouncerModule extends Module {
 
                     if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
                         Component message = CAT_FORMAT.format("{g}" + playerName + " {reset}joined the game.");
-                        LOG.addEntry(this.name + ": " + message.getString());
                         CHAT_MANAGER.sendPersistent(playerName, message);
                     }
                 }
@@ -66,7 +65,6 @@ public class AnnouncerModule extends Module {
 
                 if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
                     Component message = CAT_FORMAT.format("{g}" + playerName + " {reset}has left the game.");
-                    LOG.addEntry(this.name + ": " + message.getString());
                     CHAT_MANAGER.sendPersistent(playerName, message);
                 }
             }
@@ -93,7 +91,6 @@ public class AnnouncerModule extends Module {
 
             Component message = CAT_FORMAT.format("{g}" + player.getName().getString() + " {reset}has entered visual range.");
 
-            LOG.addEntry(this.name + ": " + message.getString());
             CHAT_MANAGER.sendPersistent(player.getStringUUID(), message);
 
             switch (soundMode.get()) {

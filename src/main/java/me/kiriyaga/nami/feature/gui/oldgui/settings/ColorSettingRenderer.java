@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.ColorSetting;
 import net.minecraft.client.gui.Font;
@@ -32,8 +31,8 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
         Color textCol = getColorModule().getStyledTextColor(255);
 
-        int bgColorInt = CLICK_GUI.applyFade(toRGBA(new Color(30, 30, 30, 0)));
-        int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
+        int bgColorInt = CLICK_GUI_SCREEN.applyFade(toRGBA(new Color(30, 30, 30, 0)));
+        int textColorInt = CLICK_GUI_SCREEN.applyFade(toRGBA(textCol));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 
@@ -74,7 +73,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
                 float sat = i / (float) w;
                 float bri = 1f - j / (float) h;
                 Color c = Color.getHSBColor(hue, sat, bri);
-                context.fill(x + i, y + j, x + i + RENDER_STEP, y + j + RENDER_STEP, CLICK_GUI.applyFade(toRGBA(c)));
+                context.fill(x + i, y + j, x + i + RENDER_STEP, y + j + RENDER_STEP, CLICK_GUI_SCREEN.applyFade(toRGBA(c)));
             }
         }
 
@@ -82,7 +81,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         int cursorY = (int) ((1 - hsb[2]) * h);
         context.fill(x + cursorX - 2, y + cursorY - 2,
                 x + cursorX + 2, y + cursorY + 2,
-                CLICK_GUI.applyFade(toRGBA(Color.WHITE)));
+                CLICK_GUI_SCREEN.applyFade(toRGBA(Color.WHITE)));
     }
 
     private void renderHueSlider(GuiGraphics context, int x, int y, int width, int height, ColorSetting setting) {
@@ -91,11 +90,11 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         for (int i = 0; i < width; i++) {
             float h = i / (float) width;
             Color c = Color.getHSBColor(h, 1f, 1f);
-            context.fill(x + i, y, x + i + 1, y + height, CLICK_GUI.applyFade(toRGBA(c)));
+            context.fill(x + i, y, x + i + 1, y + height, CLICK_GUI_SCREEN.applyFade(toRGBA(c)));
         }
 
         int huePos = (int) (hsb[0] * width);
-        context.fill(x + huePos - 2, y - 1, x + huePos + 2, y + height + 1, CLICK_GUI.applyFade(toRGBA(Color.WHITE)));
+        context.fill(x + huePos - 2, y - 1, x + huePos + 2, y + height + 1, CLICK_GUI_SCREEN.applyFade(toRGBA(Color.WHITE)));
     }
 
     @Override

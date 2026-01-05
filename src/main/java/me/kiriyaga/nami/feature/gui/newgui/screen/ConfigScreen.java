@@ -1,31 +1,24 @@
 package me.kiriyaga.nami.feature.gui.newgui.screen;
 
 import me.kiriyaga.nami.feature.gui.newgui.base.NamiScreen;
-import me.kiriyaga.nami.feature.gui.newgui.entry.FriendEntry;
+import me.kiriyaga.nami.feature.gui.newgui.component.ConsolePanelComponent;
+import me.kiriyaga.nami.feature.gui.newgui.entry.ConfigEntry;
 import me.kiriyaga.nami.feature.gui.newgui.widget.ActionItem;
 import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.gui.newgui.component.ConsolePanelComponent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static me.kiriyaga.nami.Nami.*;
 
-public class FriendScreen extends NamiScreen {
-    private ConsolePanelComponent<FriendEntry> console;
-    private long lastOnlineUpdate;
+public class ConfigScreen extends NamiScreen {
 
-    public FriendScreen() {
-        super(Component.literal("NamiFriends"));
-    }
+    private ConsolePanelComponent<ConfigEntry> console;
 
-    private ClickGuiModule getClickGuiModule() {
-        return MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
+    public ConfigScreen() {
+        super(Component.literal("Configs"));
     }
 
     @Override
@@ -34,31 +27,61 @@ public class FriendScreen extends NamiScreen {
 
         if (console == null) {
             console = new ConsolePanelComponent<>(
-                    "Friends", 20, 20, 300, 200,
-                    entry -> { FRIEND_MANAGER.addFriend(entry.getName()); reloadEntry(); },
-                    entry -> { FRIEND_MANAGER.removeFriend(entry.getName()); reloadEntry(); },
+                    "Configs",
+                    20, 20, 300, 200,
+
+                    name -> {
+                        if (!name.getName().isBlank()) {
+                            CONFIG_MANAGER.saveConfig(name.getName());
+                            refresh();
+                        }
+                    },
+
+                    entry -> {
+                        CONFIG_MANAGER.deleteConfig(entry.getName());
+                        refresh();
+                    },
+
                     entry -> {},
-                    FriendEntry::new
+                    ConfigEntry::new
             );
         }
-        reloadEntry();
+
+        refresh();
     }
 
-    private void reloadEntry() {
-        List<FriendEntry> friends = FRIEND_MANAGER.getFriends().stream().map(FriendEntry::new).collect(Collectors.toList());
-        console.setEntries(friends);
+    private void refresh() {
+        console.getEntries().clear();
+        for (String name : CONFIG_MANAGER.listConfigs()) {
+            console.addEntry(new ConfigEntry(name));
+        }
     }
 
-    private void updateOnlineStatuses() {
-        if (System.currentTimeMillis() - lastOnlineUpdate < 15000) return;
-        lastOnlineUpdate = System.currentTimeMillis();
+    private ConfigEntry getEntryAt(double mouseX, double mouseY) {
+        int contentY = console.getY() + console.getHeaderHeight() + 4;
+        int lineHeight = FONT_MANAGER.getHeight() + 4;
+        int contentHeight = console.getHeight()
+                - console.getHeaderHeight()
+                - console.getInputHeight() - 8;
 
-        console.getEntries().forEach(FriendEntry::refreshEntry);
+        int maxVisible = contentHeight / lineHeight;
+        double scroll = console.getScrollOffset();
+        int start = (int) Math.floor(scroll);
+        double partial = scroll - start;
+        int drawY = contentY - (int) (partial * lineHeight);
+
+        for (int i = start; i < Math.min(console.getEntries().size(), start + maxVisible + 1); i++) {
+            ConfigEntry entry = console.getEntries().get(i);
+            if (mouseY >= drawY && mouseY <= drawY + lineHeight)
+                return entry;
+            drawY += lineHeight;
+        }
+        return null;
     }
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        ClickGuiModule clickGuiModule = getClickGuiModule();
+        ClickGuiModule clickGuiModule = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
 
         if (clickGuiModule != null && clickGuiModule.background.get()) {
             //Identifier.ofVanilla("textures/gui/inworld_menu_background.png")
@@ -75,7 +98,6 @@ public class FriendScreen extends NamiScreen {
 
         context.pose().pushMatrix();
         context.pose().scale(CLICK_GUI_SCREEN.scale, CLICK_GUI_SCREEN.scale);
-        updateOnlineStatuses();
         console.render(context, FONT_MANAGER.rendererProvider.getRenderer(), (int) (mouseX / CLICK_GUI_SCREEN.scale), (int) (mouseY / CLICK_GUI_SCREEN.scale));
 
         context.pose().popMatrix();
@@ -95,13 +117,22 @@ public class FriendScreen extends NamiScreen {
         double sy = click.y() / CLICK_GUI_SCREEN.scale;
 
         if (click.button() == 1) {
-            FriendEntry entry = getFriendAt(sx, sy);
+            ConfigEntry entry = getEntryAt(sx, sy);
             if (entry != null) {
                 console.getActionWidget().clearItems();
-                console.getActionWidget().addItem(new ActionItem("delete", () -> {
-                    FRIEND_MANAGER.removeFriend(entry.getName());
-                    reloadEntry();
-                }));
+
+                console.getActionWidget().addItem(new ActionItem(
+                        "load",
+                        () -> CONFIG_MANAGER.loadConfig(entry.getName())
+                ));
+
+                console.getActionWidget().addItem(new ActionItem(
+                        "delete",
+                        () -> {
+                            CONFIG_MANAGER.deleteConfig(entry.getName());
+                            refresh();
+                        }
+                ));
 
                 console.getActionWidget().setPosition((int) sx, (int) sy);
                 console.getActionWidget().setVisible(true);
@@ -113,25 +144,8 @@ public class FriendScreen extends NamiScreen {
                 && console.getActionWidget().mouseClicked(sx, sy, click.button()))
             return true;
 
-        return console.mouseClicked(sx, sy, click.button()) || super.mouseClicked(click, bl);
-    }
-
-    private FriendEntry getFriendAt(double mouseX, double mouseY) { // oh god i need to rewrite it
-        int contentY = console.getY() + console.getHeaderHeight() + 4;
-        int lineHeight = FONT_MANAGER.getHeight() + 4;
-        int contentHeight = console.getHeight() - console.getHeaderHeight() - console.getInputHeight() - 8;
-        int maxVisible = contentHeight / lineHeight;
-        double scroll = console.getScrollOffset();
-        int start = (int) Math.floor(scroll);
-        double partial = scroll - start;
-        int drawY = contentY - (int) (partial * lineHeight);
-        for (int i = start; i < Math.min(console.getEntries().size(), start + maxVisible + 1);i++) {
-            FriendEntry entry = console.getEntries().get(i);
-            if (mouseY >= drawY && mouseY <= drawY + lineHeight)
-                return entry;
-            drawY += lineHeight;
-        }
-        return null;
+        return console.mouseClicked(sx, sy, click.button())
+                || super.mouseClicked(click, bl);
     }
 
     @Override public boolean mouseScrolled(double x, double y, double h, double v) {
@@ -168,6 +182,8 @@ public class FriendScreen extends NamiScreen {
         return console.charTyped(character.charAt(0), modifiers) || super.charTyped(charInput);
     }
 
-
-    @Override public boolean isPauseScreen() { return false; }
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
 }

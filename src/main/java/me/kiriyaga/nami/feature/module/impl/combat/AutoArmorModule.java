@@ -227,7 +227,6 @@ public class AutoArmorModule extends Module {
 
     private void swap(EquipmentSlot armorSlot, int slot) {
         ItemStack equipped = MC.player.getItemBySlot(armorSlot);
-        LOG.addEntry(this.name + ": replaced " + equipped.getItem().asItem().getName().getString());
         int realSlot = slot < 9 ? slot + 36 : slot;
         int armorSlotIndex = switch (armorSlot) {
             case HEAD -> 5;

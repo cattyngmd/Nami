@@ -9,7 +9,7 @@ import me.kiriyaga.nami.core.inventory.InventoryManager;
 import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.core.rotation.RotationManager;
 import me.kiriyaga.nami.feature.gui.newgui.component.NavigatePanelComponent;
-import me.kiriyaga.nami.feature.gui.newgui.screen.LogScreen;
+import me.kiriyaga.nami.feature.gui.newgui.screen.ConfigScreen;
 import me.kiriyaga.nami.feature.gui.oldgui.screen.ClickGuiScreen;
 import me.kiriyaga.nami.core.*;
 import me.kiriyaga.nami.core.module.ModuleManager;
@@ -61,10 +61,11 @@ public class Nami implements ClientModInitializer {
 
     public static Tuple<ServerAddress, ServerData> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
-    public static ClickGuiScreen CLICK_GUI;
-    public static HudEditorScreen HUD_EDITOR;
-    public static FriendScreen FRIEND;
-    public static LogScreen LOG;
+
+    public static ClickGuiScreen CLICK_GUI_SCREEN;
+    public static HudEditorScreen HUD_EDITOR_SCREEN;
+    public static FriendScreen FRIEND_SCREEN;
+    public static ConfigScreen CONFIG_SCREEN;
     public static NavigatePanelComponent NAVIGATE_PANEL;
 
 
@@ -84,10 +85,10 @@ public class Nami implements ClientModInitializer {
 
         CAT_FORMAT.add(new CatStyles());
 
-        CLICK_GUI = new ClickGuiScreen();
-        HUD_EDITOR = new HudEditorScreen();
-        FRIEND = new FriendScreen();
-        LOG = new LogScreen();
+        CLICK_GUI_SCREEN = new ClickGuiScreen();
+        HUD_EDITOR_SCREEN = new HudEditorScreen();
+        FRIEND_SCREEN = new FriendScreen();
+        CONFIG_SCREEN = new ConfigScreen();
         NAVIGATE_PANEL = new NavigatePanelComponent();
 
         FRIEND_MANAGER.load();

@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.feature.gui.oldgui.settings;
 
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import me.kiriyaga.nami.util.KeyUtils;
@@ -22,8 +21,8 @@ public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
         Color textCol = getColorModule().getStyledTextColor(255);
         Color bgColor = new Color(30, 30, 30, 0);
 
-        int bgColorInt = CLICK_GUI.applyFade(toRGBA(bgColor));
-        int textColorInt = CLICK_GUI.applyFade(toRGBA(textCol));
+        int bgColorInt = CLICK_GUI_SCREEN.applyFade(toRGBA(bgColor));
+        int textColorInt = CLICK_GUI_SCREEN.applyFade(toRGBA(textCol));
 
         context.fill(x, y, x + WIDTH, y + HEIGHT, bgColorInt);
 

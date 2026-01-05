@@ -33,10 +33,10 @@ public class ClickGuiModule extends Module {
             return;
 
         NAVIGATE_PANEL.resetActive();
-        CLICK_GUI.scale = this.scale.get().floatValue(); // bad
-        CLICK_GUI.setPreviousScreen(MC.screen);
+        CLICK_GUI_SCREEN.scale = this.scale.get().floatValue(); // bad
+        CLICK_GUI_SCREEN.setPreviousScreen(MC.screen);
 
-        MC.setScreen(CLICK_GUI);
+        MC.setScreen(CLICK_GUI_SCREEN);
         this.toggle();
     }
 }
