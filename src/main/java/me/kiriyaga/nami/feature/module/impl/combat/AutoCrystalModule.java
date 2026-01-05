@@ -20,6 +20,7 @@ import me.kiriyaga.nami.util.entity.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.InteractionHand;
@@ -52,6 +53,7 @@ public class AutoCrystalModule extends Module {
     public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
     public final BoolSetting placeSimulate = addSetting(new BoolSetting("Simulate", false));
+    public final BoolSetting placeOnlyCanBreak = addSetting(new BoolSetting("OnlyCanBreak", true));
     public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("StrictDirection", false));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("Multitask", false));
 
@@ -63,7 +65,7 @@ public class AutoCrystalModule extends Module {
     public final BoolSetting breakRotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting breakSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting breakMultitask = addSetting(new BoolSetting("Multitask", true));
-    public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 45));
+    public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
 
     //damages
     public final BoolSetting noSelfPop = addSetting(new BoolSetting("NoSelfPop", true));
@@ -79,6 +81,7 @@ public class AutoCrystalModule extends Module {
 
     public AutoCrystalModule() {
         super("AutoCrystal", "Automatically places and break crystals to kill people, if you are good enough!.", ModuleCategory.of("Combat"), "autocrystal", "ac", "crystalaura");
+        doBreak.setShowCondition(() -> page.get() == Page.BREAK);
         breakRange.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakDelay.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakRotate.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
@@ -86,14 +89,16 @@ public class AutoCrystalModule extends Module {
         breakMultitask.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakAge.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
 
-        placeRange.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
-        placeDelay.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
-        placeRotate.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
-        placeSwing.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
-        placeIgnoreItems.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
-        placeSimulate.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
-        placeMultitask.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
-        placeStrictDirection.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        doPlace.setShowCondition(() -> page.get() == Page.PLACE);
+        placeRange.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeDelay.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeRotate.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeSwing.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeIgnoreItems.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeSimulate.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeMultitask.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeStrictDirection.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeOnlyCanBreak.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
@@ -137,7 +142,6 @@ public class AutoCrystalModule extends Module {
         Color color = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
-      // RenderUtil.drawBoxLines(crystalBox, color, true, true, 1.5f);
     }
 
     private void doBreak() {
@@ -220,7 +224,7 @@ public class AutoCrystalModule extends Module {
             }
         }
 
-        this.setDisplayInfo(totalDamage+"");
+        this.setDisplayInfo(String.format("%.2f", totalDamage));
         return totalDamage;
     }
 
@@ -306,11 +310,12 @@ public class AutoCrystalModule extends Module {
         Vec3 eyePos = MC.player.getEyePosition();
 
         AABB blockBox = new AABB(pos);
+        AABB placeBox = new AABB(pos.above());
         Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
         float yaw = (float) getYawToVec(MC.player, point);
         float pitch = (float) getPitchToVec(MC.player, point);
 
-        if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, breakRange.get(), yaw, pitch) == null) {
+        if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, placeRange.get(), yaw, pitch) == null) {
             return false;
         }
 
@@ -327,22 +332,25 @@ public class AutoCrystalModule extends Module {
 
         AABB crystalBox = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
 
-        for (Entity e : MC.level.getEntities(null, crystalBox)) {
+        for (Entity e : MC.level.getEntities(null, placeBox)) {
             if (e instanceof EndCrystal endCrystal && e.position() == endCrystal.position()) continue;
             if (placeIgnoreItems.get() && e instanceof ItemEntity) continue;
             return false;
         }
 
-        Vec3 hitVec = getClosestPointToEye(eyePos, crystalBox);
-        float idealYaw = (float) getYawToVec(MC.player, hitVec);
-        float idealPitch = (float) getPitchToVec(MC.player, hitVec);
+        if (placeOnlyCanBreak.get()) { // todo: this shit is incorrect for some reason, prob because of hitbox size
 
-        EntityHitResult distanceCheck = raycastAABBFromPlayer(MC.player, crystalBox, breakRange.get(), idealYaw, idealPitch);
+            Vec3 hitVec = getClosestPointToEye(eyePos, crystalBox);
+            float idealYaw = (float) getYawToVec(MC.player, hitVec);
+            float idealPitch = (float) getPitchToVec(MC.player, hitVec);
 
-        boolean insideBox = crystalBox.contains(eyePos);
+            EntityHitResult distanceCheck = raycastAABBFromPlayer(MC.player, crystalBox, breakRange.get(), idealYaw, idealPitch);
 
-        if (!insideBox && distanceCheck == null)
-            return false;
+            boolean insideBox = crystalBox.contains(eyePos);
+
+            if (!insideBox && distanceCheck == null)
+                return false;
+        }
 
         return true;
     }
@@ -381,6 +389,9 @@ public class AutoCrystalModule extends Module {
     private int findHotbarItem(Predicate<ItemStack> predicate) {
         if (MC.player == null)
             return -1;
+
+/*        if (predicate.test(MC.player.getInventory().getSelectedItem()))
+            return MC.player.getInventory().getSelectedSlot();*/
 
         for (int slot = 0; slot < 9; slot++) {
             ItemStack stack = MC.player.getInventory().getItem(slot);

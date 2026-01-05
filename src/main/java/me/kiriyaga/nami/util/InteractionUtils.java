@@ -145,12 +145,14 @@ public class InteractionUtils {
         }
 
         Vec3 eyePos = MC.player.getEyePosition();
-        AABB blockBox = new AABB(neighbor);
-        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3 reachEnd = eyePos.add(lookDir.scale(range));
+            AABB blockBox = new AABB(pos);
+            Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
+            float idealYaw = (float) getYawToVec(MC.player, point);
+            float idealPitch = (float) getPitchToVec(MC.player, point);
 
-        if (blockBox.clip(eyePos, reachEnd).isEmpty())
-            return false;
+            if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
+                return false;
+            }
 
         BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, neighbor, false);
         boolean canPlace = true;
@@ -224,29 +226,43 @@ public class InteractionUtils {
             }
         }
 
-        AABB blockBox = new AABB(pos);
-        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3 reachEnd = eyePos.add(lookDir.scale(range));
+            AABB blockBox = new AABB(pos);
+            Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
+            float idealYaw = (float) getYawToVec(MC.player, point);
+            float idealPitch = (float) getPitchToVec(MC.player, point);
 
-        if (blockBox.clip(eyePos, reachEnd).isEmpty()) {
-           // CHAT_MANAGER.sendRaw("interactBlockAt: failed reach check" + pos);
-            return false;
-        }
+            if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
+                return false;
+            }
 
         BlockHitResult hit = new BlockHitResult(hitVec, clickFace, pos, false);
 
         boolean canInteract = true;
 
         if (rotate) {
-            float yaw = (float) getYawToVec(MC.player, hitVec);
-            float pitch = (float) getPitchToVec(MC.player, hitVec);
+            float yaw = (float) getYawToVec(MC.player, pos.getCenter());
+            float pitch = (float) getPitchToVec(MC.player, pos.getCenter());
 
-            if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
-            else
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
+            // else
+            //   ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
 
-            canInteract = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+            //canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+
+            // for some reason grim checks if you look at block, you gonna place, not on a block you click (i see logic here but still)
+            AABB b = new AABB(pos);
+            boolean insideBox = b.contains(MC.player.getEyePosition());
+
+            EntityHitResult serverCheck = raycastAABBFromPlayer(
+                    MC.player,
+                    b,
+                    range,
+                    ROTATION_MANAGER.getStateHandler().getServerYaw(),
+                    ROTATION_MANAGER.getStateHandler().getServerPitch()
+            );
+
+
+            canInteract = insideBox || serverCheck != null;
         }
 
         if (!canInteract) {
