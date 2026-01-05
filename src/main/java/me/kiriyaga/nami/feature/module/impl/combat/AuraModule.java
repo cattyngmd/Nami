@@ -96,7 +96,7 @@ public class AuraModule extends Module {
 
         MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugAura(Component.nullToEmpty("cooldown ticks is : "+attackCooldownTicks));
 
-        if (!multiTask.get() && MC.player.isUsingItem()) {
+        if (!multiTask.get() && MC.player.getUseItemRemainingTicks() > 0 && MC.player.getMainHandItem() == MC.player.getUseItem()) {
             currentTarget = null;
             return;
         }
