@@ -11,14 +11,14 @@ import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.core.rotation.model.RotationRequest;
+import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.InteractionUtils;
+import me.kiriyaga.nami.util.RotationUtils;
 import me.kiriyaga.nami.util.entity.DamageUtils;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
@@ -29,7 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.EntityHitResult;
 
@@ -37,11 +36,13 @@ import java.awt.*;
 import java.util.function.Predicate;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.InteractionUtils.*;
 import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
 public class AutoCrystalModule extends Module {
+    public enum Page {PLACE, BREAK, DAMAGES}
+
+    private final EnumSetting<Page> page = addSetting(new EnumSetting<>("Page", Page.PLACE));
 
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));
@@ -51,6 +52,7 @@ public class AutoCrystalModule extends Module {
     public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
     public final BoolSetting placeSimulate = addSetting(new BoolSetting("Simulate", false));
+    public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("StrictDirection", false));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("Multitask", false));
 
 
@@ -77,20 +79,26 @@ public class AutoCrystalModule extends Module {
 
     public AutoCrystalModule() {
         super("AutoCrystal", "Automatically places and break crystals to kill people, if you are good enough!.", ModuleCategory.of("Combat"), "autocrystal", "ac", "crystalaura");
-        breakRange.setShowCondition(doBreak::get);
-        breakDelay.setShowCondition(doBreak::get);
-        breakRotate.setShowCondition(doBreak::get);
-        breakSwing.setShowCondition(doBreak::get);
-        breakMultitask.setShowCondition(doBreak::get);
-        breakAge.setShowCondition(doBreak::get);
+        breakRange.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        breakDelay.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        breakRotate.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        breakSwing.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        breakMultitask.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        breakAge.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
 
-        placeRange.setShowCondition(doPlace::get);
-        placeDelay.setShowCondition(doPlace::get);
-        placeRotate.setShowCondition(doPlace::get);
-        placeSwing.setShowCondition(doPlace::get);
-        placeIgnoreItems.setShowCondition(doPlace::get);
-        placeSimulate.setShowCondition(doPlace::get);
-        placeMultitask.setShowCondition(doPlace::get);
+        placeRange.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        placeDelay.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        placeRotate.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        placeSwing.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        placeIgnoreItems.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        placeSimulate.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        placeMultitask.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+        placeStrictDirection.setShowCondition(() -> doBreak.get() && page.get() == Page.PLACE);
+
+        noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
+        minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
+        maxSelfDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
+        maxFriendDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
 
     }
 
@@ -129,10 +137,11 @@ public class AutoCrystalModule extends Module {
         Color color = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
+      // RenderUtil.drawBoxLines(crystalBox, color, true, true, 1.5f);
     }
 
     private void doBreak() {
-        CrystalTarget target = bestCrystal();
+        BreakTarget target = bestCrystal();
         if (target == null) return;
 
         if (!breakMultitask.get() && MC.player.isUsingItem()) return;
@@ -155,8 +164,8 @@ public class AutoCrystalModule extends Module {
         breakTimer = breakDelay.get().intValue();
     }
 
-    private CrystalTarget bestCrystal() {
-        CrystalTarget best = null;
+    private BreakTarget bestCrystal() {
+        BreakTarget best = null;
 
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.END_CRYSTALS, 10)) {
             if (!(e instanceof EndCrystal crystal)) continue;
@@ -180,7 +189,7 @@ public class AutoCrystalModule extends Module {
                 continue;
 
             if (best == null || totalDamage > best.totalDamage)
-                best = new CrystalTarget(crystal, totalDamage);
+                best = new BreakTarget(crystal, totalDamage);
         }
         return best;
     }
@@ -244,7 +253,7 @@ public class AutoCrystalModule extends Module {
         if (placeTarget == null) return;
         int crystalSlot = findHotbarItem(stack -> stack.getItem() instanceof EndCrystalItem);
         if (crystalSlot == -1) return;
-        InteractionUtils.interactBlockAt(placeTarget.pos, crystalSlot, placeRange.get(), placeRotate.get(), false, placeSimulate.get(), placeSwing.get(), AutoCrystalModule.class.getName() + "_PLACE");
+        InteractionUtils.interactBlockAt(placeTarget.pos, crystalSlot, placeRange.get(), placeRotate.get(), placeStrictDirection.get(), placeSimulate.get(), placeSwing.get(), AutoCrystalModule.class.getName() + "_PLACE");
 
         placeTimer = placeDelay.get().intValue();
     }
@@ -296,14 +305,26 @@ public class AutoCrystalModule extends Module {
         Vec3 eyePos = MC.player.getEyePosition();
 
         AABB blockBox = new AABB(pos);
-        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3 reachEnd = eyePos.add(lookDir.scale(placeRange.get()));
+        Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
+        float yaw = (float) getYawToVec(MC.player, point);
+        float pitch = (float) getPitchToVec(MC.player, point);
 
-        if (blockBox.clip(eyePos, reachEnd).isEmpty()) {
+        if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, breakRange.get(), yaw, pitch) == null) {
             return false;
         }
 
-        AABB crystalBox = new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
+        double centerX = pos.getX() + 0.5;
+        double centerZ = pos.getZ() + 0.5;
+        double bottomY = pos.getY() + 1;
+
+        double minX = centerX - 1.00;
+        double minY = bottomY;
+        double minZ = centerZ - 1.00;
+        double maxX = centerX + 1.00;
+        double maxY = bottomY + 2.00;
+        double maxZ = centerZ + 1.00;
+
+        AABB crystalBox = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
 
         for (Entity e : MC.level.getEntities(null, crystalBox)) {
             if (e instanceof EndCrystal endCrystal && e.position() == endCrystal.position()) continue;
@@ -373,5 +394,5 @@ public class AutoCrystalModule extends Module {
     }
 
     private record PlaceTarget(BlockPos pos, float totalDamage) {}
-    private record CrystalTarget(EndCrystal crystal, float totalDamage) {}
+    private record BreakTarget(EndCrystal crystal, float totalDamage) {}
 }
