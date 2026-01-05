@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import me.kiriyaga.nami.Nami;
+import me.kiriyaga.nami.core.config.model.ConfigMeta;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.setting.Setting;
 
@@ -11,12 +13,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static me.kiriyaga.nami.Nami.LOGGER;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class ConfigSerializer {
     private final ConfigDirectoryProvider dirs;
@@ -28,6 +31,14 @@ public class ConfigSerializer {
 
     public void save(String configName) {
         JsonObject root = new JsonObject();
+
+        JsonObject meta = new JsonObject();
+        meta.addProperty("author", MC.getUser().getName());
+        meta.addProperty("createdAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        meta.addProperty("client", NAME);
+        meta.addProperty("version", VERSION);
+
+        root.add("meta", meta);
 
         JsonObject modules = new JsonObject();
         for (Module m : MODULE_MANAGER.getStorage().getAll()) {
@@ -113,5 +124,27 @@ public class ConfigSerializer {
         return Arrays.stream(dir.listFiles((d, name) -> name.endsWith(".json")))
                 .map(f -> f.getName().replaceFirst("\\.json$", ""))
                 .collect(Collectors.toList());
+    }
+
+
+    public ConfigMeta readMeta(String configName) {
+        File file = new File(dirs.getConfigSaveDir(), configName + ".json");
+        if (!file.exists()) return null;
+
+        try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
+            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+            if (!root.has("meta")) return null;
+
+            JsonObject meta = root.getAsJsonObject("meta");
+
+            return new ConfigMeta(
+                    meta.has("author") ? meta.get("author").getAsString() : "unknown",
+                    meta.has("version") ? meta.get("version").getAsString() : "unknown",
+                    meta.has("createdAt") ? LocalDateTime.parse(meta.get("createdAt").getAsString()) : null
+            );
+        } catch (Exception e) {
+            LOGGER.error("Failed to read meta for " + configName, e);
+            return null;
+        }
     }
 }

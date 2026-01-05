@@ -30,11 +30,9 @@ public class ConfigScreen extends NamiScreen {
                     "Configs",
                     20, 20, 300, 200,
 
-                    name -> {
-                        if (!name.getName().isBlank()) {
-                            CONFIG_MANAGER.saveConfig(name.getName());
-                            refresh();
-                        }
+                    entry -> {
+                        CONFIG_MANAGER.saveConfig(entry.getName());
+                        refresh();
                     },
 
                     entry -> {
@@ -43,7 +41,11 @@ public class ConfigScreen extends NamiScreen {
                     },
 
                     entry -> {},
-                    ConfigEntry::new
+
+                    name -> new ConfigEntry(
+                            name,
+                            CONFIG_MANAGER.getConfigMeta(name)
+                    )
             );
         }
 
@@ -51,18 +53,14 @@ public class ConfigScreen extends NamiScreen {
     }
 
     private void refresh() {
-        console.getEntries().clear();
-        for (String name : CONFIG_MANAGER.listConfigs()) {
-            console.addEntry(new ConfigEntry(name));
-        }
+        console.setEntries(
+                CONFIG_MANAGER.listConfigs().stream().map(name -> new ConfigEntry(name, CONFIG_MANAGER.getConfigMeta(name))).toList());
     }
 
     private ConfigEntry getEntryAt(double mouseX, double mouseY) {
         int contentY = console.getY() + console.getHeaderHeight() + 4;
         int lineHeight = FONT_MANAGER.getHeight() + 4;
-        int contentHeight = console.getHeight()
-                - console.getHeaderHeight()
-                - console.getInputHeight() - 8;
+        int contentHeight = console.getHeight() - console.getHeaderHeight() - console.getInputHeight() - 8;
 
         int maxVisible = contentHeight / lineHeight;
         double scroll = console.getScrollOffset();

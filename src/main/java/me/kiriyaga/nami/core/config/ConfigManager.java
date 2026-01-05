@@ -1,6 +1,7 @@
 package me.kiriyaga.nami.core.config;
 
 import com.google.gson.*;
+import me.kiriyaga.nami.core.config.model.ConfigMeta;
 import me.kiriyaga.nami.core.macro.MacroManager;
 import me.kiriyaga.nami.feature.module.Module;
 
@@ -72,6 +73,10 @@ public class ConfigManager {
 
     public List<String> listConfigs() {
         return configSerializer.listConfigs();
+    }
+
+    public ConfigMeta getConfigMeta(String name) {
+        return configSerializer.readMeta(name);
     }
 
     public void saveFriends(Set<String> friends) {
