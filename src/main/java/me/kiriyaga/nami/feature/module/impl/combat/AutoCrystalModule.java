@@ -220,6 +220,7 @@ public class AutoCrystalModule extends Module {
             }
         }
 
+        this.setDisplayInfo(totalDamage+"");
         return totalDamage;
     }
 
