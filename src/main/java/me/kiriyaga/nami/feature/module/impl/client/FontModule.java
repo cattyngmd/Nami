@@ -14,6 +14,7 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 public class FontModule extends Module {
 
     public final EnumSetting<FontType> fontType = addSetting(new EnumSetting<>("Font", FontType.VERDANA));
+    public final IntSetting shadowDarken = addSetting(new IntSetting("ShadowDarken", 75, 60, 100));
     public final BoolSetting global = addSetting(new BoolSetting("Global", false));
     public final EnumSetting<FilterMode> filterMode = addSetting(new EnumSetting<>("Filter", FilterMode.NEAREST));
     public final IntSetting anisotropy = addSetting(new IntSetting("Anisotropy", 8, 1, 16));
@@ -24,5 +25,6 @@ public class FontModule extends Module {
     public FontModule() {
         super("Font", "Custom font renderer.", ModuleCategory.of("Client"), "f", "customfont");
         global.setShow(false);
+        filterMode.setShow(false);
     }
 }

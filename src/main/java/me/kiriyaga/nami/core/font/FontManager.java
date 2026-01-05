@@ -25,7 +25,7 @@ public class FontManager {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(0.5f, 0.5f);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), MODULE_MANAGER.getStorage().getByClass(FontModule.class).shadowDarken.get()).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -37,7 +37,7 @@ public class FontManager {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(0.5f, 0.5f);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), MODULE_MANAGER.getStorage().getByClass(FontModule.class).shadowDarken.get()).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -49,7 +49,7 @@ public class FontManager {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(0.5f, 0.5f);
-            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, 100), x, y, 0xFFFFFFFF, false);
+            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, MODULE_MANAGER.getStorage().getByClass(FontModule.class).shadowDarken.get()), x, y, 0xFFFFFFFF, false);
             matrices.popMatrix();
         }
 
@@ -61,7 +61,7 @@ public class FontManager {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(0.5f, 0.5f);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(0xFFFFFFFF), 100).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(0xFFFFFFFF), MODULE_MANAGER.getStorage().getByClass(FontModule.class).shadowDarken.get()).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -73,7 +73,7 @@ public class FontManager {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(0.5f, 0.5f);
-            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, 100), x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, MODULE_MANAGER.getStorage().getByClass(FontModule.class).shadowDarken.get()), x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -85,7 +85,7 @@ public class FontManager {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(0.5f, 0.5f);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), MODULE_MANAGER.getStorage().getByClass(FontModule.class).shadowDarken.get()).getRGB(), false);
             matrices.popMatrix();
         }
 
