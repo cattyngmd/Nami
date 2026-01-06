@@ -10,6 +10,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -55,7 +56,7 @@ public abstract class MixinGameRenderer {
 
 
     @Inject(method = "displayItemActivation", at = @At("HEAD"), cancellable = true)
-    private void onShowFloatingItem(ItemStack floatingItem, CallbackInfo info) {
+    private void displayItemActivation(ItemStack floatingItem, CallbackInfo info) {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
@@ -68,7 +69,7 @@ public abstract class MixinGameRenderer {
     private boolean freecamSet = false;
 
     @Inject(method = "pick", at = @At("HEAD"), cancellable = true)
-    private void updateTargetedEntityInvoke(float tickDelta, CallbackInfo info) {
+    private void pick1(float tickDelta, CallbackInfo info) {
         if (MODULE_MANAGER.getStorage() == null) return;
 
         FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
@@ -123,8 +124,8 @@ public abstract class MixinGameRenderer {
     }
 
 
-/*    @ModifyReturnValue(method = "updateCrosshairTarget", at = @At("RETURN"))
-    private HitResult findCrosshairTarget(HitResult original, HitResult hitResult) {
+    @ModifyReturnValue(method = "pick", at = @At("RETURN"))
+    private HitResult pick2(HitResult original, HitResult hitResult) {
         ReachModule reachModule = MODULE_MANAGER.getStorage().getByClass(ReachModule.class);
         if (reachModule == null || !reachModule.isEnabled() || !reachModule.noEntityTrace.get()) {
             return original;
@@ -135,9 +136,9 @@ public abstract class MixinGameRenderer {
             boolean pickaxeOnly = reachModule.pickaxeOnly.get();
 
             var targetEntity = getTargetedEntity();
-            var mainHandItem = MC.player.getMainHandStack().getItem();
+            var mainHandItem = MC.player.getMainHandItem().getItem();
 
-            boolean lookingAtPlayer = targetEntity != null && targetEntity.isPlayer();
+            boolean lookingAtPlayer = targetEntity instanceof Player;
             boolean holdingPickaxe = isPickaxe(mainHandItem);
 
             if (playerOnly && pickaxeOnly) {
@@ -168,7 +169,7 @@ public abstract class MixinGameRenderer {
         }
 
         return original;
-    }*/
+    }
 
     private Entity getTargetedEntity() {
         if (MC.hitResult != null && MC.hitResult.getType() == HitResult.Type.ENTITY) {
