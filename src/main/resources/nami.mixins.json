@@ -21,6 +21,7 @@
     "MixinChatComponent",
     "MixinChatScreen",
     "MixinChestRenderer",
+    "MixinChunkBorderRenderer",
     "MixinClientLevel",
     "MixinClientPacketListener",
     "MixinCommandSuggestions",

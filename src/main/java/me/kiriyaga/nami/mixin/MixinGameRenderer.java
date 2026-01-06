@@ -17,12 +17,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -124,51 +126,37 @@ public abstract class MixinGameRenderer {
     }
 
 
-    @ModifyReturnValue(method = "pick", at = @At("RETURN"))
-    private HitResult pick2(HitResult original, HitResult hitResult) {
-        ReachModule reachModule = MODULE_MANAGER.getStorage().getByClass(ReachModule.class);
-        if (reachModule == null || !reachModule.isEnabled() || !reachModule.noEntityTrace.get()) {
-            return original;
-        }
+    @Inject(method = "pick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;raycastHitResult(FLnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/HitResult;"))
+    private void nami$beforeHitResult(float f, CallbackInfo ci) {
+        HitResult hit = this.minecraft.player.raycastHitResult(f, this.minecraft.getCameraEntity());
 
-        if (hitResult.getType() == HitResult.Type.BLOCK) {
-            boolean playerOnly = reachModule.playerOnly.get();
-            boolean pickaxeOnly = reachModule.pickaxeOnly.get();
+        HitResult modified = modifyHit(hit);
 
-            var targetEntity = getTargetedEntity();
-            var mainHandItem = MC.player.getMainHandItem().getItem();
+        this.minecraft.hitResult = modified;
+    }
+
+    private HitResult modifyHit(HitResult hit) {
+
+        ReachModule reach = MODULE_MANAGER.getStorage().getByClass(ReachModule.class);
+        if (reach == null || !reach.isEnabled() || !reach.noEntityTrace.get())
+            return hit;
+
+        if (hit.getType() == HitResult.Type.BLOCK) {
+
+            Entity targetEntity = getTargetedEntity();
+            Item mainHandItem = MC.player.getMainHandItem().getItem();
 
             boolean lookingAtPlayer = targetEntity instanceof Player;
-            boolean holdingPickaxe = isPickaxe(mainHandItem);
+            boolean holdingPickaxe = mainHandItem.getDefaultInstance().is(ItemTags.PICKAXES);
 
-            if (playerOnly && pickaxeOnly) {
-                if (lookingAtPlayer && holdingPickaxe) {
-                    return hitResult;
-                } else {
-                    return original;
-                }
-            }
+            if (reach.playerOnly.get() && !lookingAtPlayer)
+                return hit;
 
-            if (playerOnly) {
-                if (lookingAtPlayer) {
-                    return hitResult;
-                } else {
-                    return original;
-                }
-            }
-
-            if (pickaxeOnly) {
-                if (holdingPickaxe) {
-                    return hitResult;
-                } else {
-                    return original;
-                }
-            }
-
-            return hitResult;
+            if (reach.pickaxeOnly.get() && !holdingPickaxe)
+                return hit;
         }
 
-        return original;
+        return hit;
     }
 
     private Entity getTargetedEntity() {
@@ -176,10 +164,6 @@ public abstract class MixinGameRenderer {
             return ((EntityHitResult) MC.hitResult).getEntity();
         }
         return null;
-    }
-
-    private boolean isPickaxe(Item item) {
-        return item.getDefaultInstance().is(ItemTags.PICKAXES);
     }
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
