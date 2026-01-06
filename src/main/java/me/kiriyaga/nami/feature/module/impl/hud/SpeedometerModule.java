@@ -46,7 +46,13 @@ public class SpeedometerModule extends HudElementModule {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     private void onTick(PreTickEvent event) {
-        if (MC.player == null) return;
+        if (MC.player == null  || !MC.player.isAlive()) {
+            speedSamples = new double[samples.get()];
+            speedSampleIndex = 0;
+            speedBufferFilled = false;
+
+            return;
+        }
 
         int sampleCount = samples.get();
         if (speedSamples == null || speedSamples.length != sampleCount) {
