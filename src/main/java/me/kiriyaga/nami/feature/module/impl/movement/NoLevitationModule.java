@@ -6,11 +6,11 @@ import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 
 @RegisterModule
-public class NoLevitation extends Module {
+public class NoLevitationModule extends Module {
 
     public final BoolSetting noSlowFall = addSetting(new BoolSetting("NoSlowFall", false));
 
-    public NoLevitation() {
+    public NoLevitationModule() {
         super("NoLevitation", "Removes levitation status effect.", ModuleCategory.of("Movement"), "antilevitation");
     }
 }

@@ -6,7 +6,7 @@ import me.kiriyaga.nami.event.impl.GlidingEvent;
 import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
 import me.kiriyaga.nami.feature.module.impl.exploits.NoJumpDelayModule;
-import me.kiriyaga.nami.feature.module.impl.movement.NoLevitation;
+import me.kiriyaga.nami.feature.module.impl.movement.NoLevitationModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -163,7 +163,7 @@ public abstract class MixinLivingEntity extends Entity {
         if ((Object) this instanceof Player player &&
                 player == MC.player) {
 
-            NoLevitation nl = MODULE_MANAGER.getStorage().getByClass(NoLevitation.class);
+            NoLevitationModule nl = MODULE_MANAGER.getStorage().getByClass(NoLevitationModule.class);
             if (nl != null && nl.isEnabled()) {
                 ResourceKey<MobEffect> slowFallKey = MobEffects.SLOW_FALLING.unwrapKey().orElse(null);
                 if (nl.noSlowFall.get() && slowFallKey != null && effect.is(slowFallKey))
@@ -179,7 +179,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @ModifyReturnValue(method = "getEffect", at = @At("RETURN"))
     private MobEffectInstance getStatusEffect(MobEffectInstance original, Holder<MobEffect> effect) {
-        NoLevitation nl = MODULE_MANAGER.getStorage().getByClass(NoLevitation.class);
+        NoLevitationModule nl = MODULE_MANAGER.getStorage().getByClass(NoLevitationModule.class);
         if (nl != null && nl.isEnabled()) {
             if (effect == MobEffects.LEVITATION)
                 return null;
