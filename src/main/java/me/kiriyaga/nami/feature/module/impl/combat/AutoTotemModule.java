@@ -105,7 +105,7 @@ public class AutoTotemModule extends Module {
         }
 
         if (mainhand.get()) {
-            boolean useGapple = mainhandGapple.get() && MC.options.keyUse.isDown();
+            boolean useGapple = mainhandGapple.get() && MC.options.keyUse.isDown() && MC.player.getInventory().getSelectedSlot() == mainhandSlot.get();
 
             if (useGapple) {
                 int gappleSlot = findInventorySlot(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE), mainhandSlot.get());
