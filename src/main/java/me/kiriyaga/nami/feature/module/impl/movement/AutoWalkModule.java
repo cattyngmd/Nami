@@ -36,7 +36,7 @@ public class AutoWalkModule extends Module {
         if (MC.player == null || MC.level == null)
             return;
 
-        if (setbackStop.get() && SERVER_MANAGER.hasElapsedSinceSetback(5000))
+        if (setbackStop.get() && !SERVER_MANAGER.hasElapsedSinceSetback(5000))
             return;
 
         setWalkHeld(true);

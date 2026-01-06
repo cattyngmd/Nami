@@ -126,7 +126,7 @@ public class ElytraFlyModule extends Module {
         if (MC.player.getItemBySlot(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
-        if (setbackStop.get() && SERVER_MANAGER.hasElapsedSinceSetback(5000))
+        if (setbackStop.get() && !SERVER_MANAGER.hasElapsedSinceSetback(5000))
             return;
 
         if (mode.get() == FlyMode.BOUNCE)

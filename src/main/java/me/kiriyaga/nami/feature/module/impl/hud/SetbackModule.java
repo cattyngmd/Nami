@@ -17,7 +17,7 @@ public class SetbackModule extends HudElementModule {
     @Override
     public Component getDisplayText() {
 
-        if (!SERVER_MANAGER.hasElapsedSinceSetback(5000))
+        if (SERVER_MANAGER.hasElapsedSinceSetback(5000))
             return Component.empty();
 
         if (MC.isLocalServer() || MC.level == null) return Component.nullToEmpty("Setback:");
