@@ -61,6 +61,7 @@
     "DuckClientboundPlayerPositionPacket",
     "DuckClientboundSetEntityMotionPacket",
     "DuckServerboundInteractPacket",
+    "DuckServerboundMovePlayerPacket",
     "MixinClientboundSetEntityMotionPacket",
     "MixinConnection",
     "MixinEntity",
