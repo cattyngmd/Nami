@@ -84,6 +84,12 @@ public class BlockSearchModule extends Module {
         }
 
         snapshotQueue.offer(makeSnapshot(event.getChunk()));
+
+        chunkBlocks.keySet().removeIf(chunkKey -> {
+            int chunkX = ChunkPos.getX(chunkKey);
+            int chunkZ = ChunkPos.getZ(chunkKey);
+            return !MC.level.hasChunk(chunkX, chunkZ);
+        });
     }
 
     private ChunkSnapshot makeSnapshot(LevelChunk chunk) {
