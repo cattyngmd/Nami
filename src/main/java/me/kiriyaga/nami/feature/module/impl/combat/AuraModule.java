@@ -56,9 +56,9 @@ public class AuraModule extends Module {
     public enum Swap { NONE, REQUIRE, NORMAL, SILENT }
 
     public final DoubleSetting attackRange = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
-    public final DoubleSetting delay = addSetting(new DoubleSetting("Delay", 0.89, 0.00, 1.00));
+    public final DoubleSetting delay = addSetting(new DoubleSetting("Delay", 0.92, 0.00, 1.00));
     public final EnumSetting<Swap> swap = addSetting(new EnumSetting<>("Swap", Swap.REQUIRE));
-    public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
+    public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.AVERAGE));
     public final BoolSetting multiTask = addSetting(new BoolSetting("Multitask", true));
     public final EnumSetting<Sprint> stopSprinting = addSetting(new EnumSetting<>("Sprinting", Sprint.NONE));
     public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("Rotate", Rotate.NORMAL));

@@ -32,7 +32,7 @@ public class AgroModule extends Module {
     private final EnumSetting<Mode> modeSetting = new EnumSetting<>("Mode", Mode.ENDERMAN);
 
     public AgroModule() {
-        super("AutoAgro", "Automatically looks at certain mobs.", ModuleCategory.of("Miscellaneous"));
+        super("Agro", "Automatically looks at certain mobs.", ModuleCategory.of("Miscellaneous"));
         addSetting(modeSetting);
     }
 

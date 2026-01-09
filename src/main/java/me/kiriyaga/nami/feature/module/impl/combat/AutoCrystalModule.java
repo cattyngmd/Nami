@@ -47,16 +47,15 @@ public class AutoCrystalModule extends Module {
 
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));
-    public final DoubleSetting placeRange = addSetting(new DoubleSetting("Range", 3.0, 1.0, 7.0));
+    public final DoubleSetting placeRange = addSetting(new DoubleSetting("Range", 4.0, 1.0, 7.0));
     public final DoubleSetting placeDelay = addSetting(new DoubleSetting("Delay", 0, 0, 20));
     public final BoolSetting placeRotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
     public final BoolSetting placeSimulate = addSetting(new BoolSetting("Simulate", false));
-    public final BoolSetting placeOnlyCanBreak = addSetting(new BoolSetting("OnlyCanBreak", true));
+    public final BoolSetting placeOnlyCanBreak = addSetting(new BoolSetting("OnlyCanBreak", false));
     public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("StrictDirection", false));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("Multitask", false));
-
 
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));

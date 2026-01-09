@@ -9,7 +9,7 @@ import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
 public class WatermarkModule extends HudElementModule {
-    public final BoolSetting plain = addSetting(new BoolSetting("Plain", true));
+    public final BoolSetting plain = addSetting(new BoolSetting("Plain", false));
 
     public WatermarkModule() {
         super("Watermark", "Displays client watermark.", 0, 0, 50, 9);

@@ -188,6 +188,8 @@ public class AutoTotemModule extends Module {
             case ITEMFRAME:
                 return new ItemStack(Items.ITEM_FRAME);
             case MENDING:
+                if (hasMending(MC.player.getOffhandItem()) && !isFullyRepaired(MC.player.getOffhandItem())) return null;
+
                 for (int i = 0; i < 36; i++) {
                     ItemStack stack = player.getInventory().getItem(i);
                     if (stack.isEmpty()) continue;

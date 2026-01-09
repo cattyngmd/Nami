@@ -4,6 +4,7 @@ import me.kiriyaga.nami.core.rotation.model.RotationRequest;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.RegisterModule;
@@ -21,7 +22,7 @@ import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.ROTATION_MANAGER;
 
 @RegisterModule
-public class FreecamModule extends Module { // todo this shit broke
+public class FreecamModule extends Module {
     private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 0.5, 0.1, 5.0));
     private final DoubleSetting accelerate = addSetting(new DoubleSetting("Accelerate", 2.3, 1.0, 3.0));
     private final BoolSetting look = addSetting(new BoolSetting("Look", true));
@@ -73,7 +74,7 @@ public class FreecamModule extends Module { // todo this shit broke
     }
 
     @SubscribeEvent
-    public void onPreTick(PreTickEvent event) {
+    public void onPreTick(Render3DEvent event) {
         if (cameraPos == null || MC.player == null || MC.level == null) {
             this.toggle();
             return;
@@ -94,7 +95,7 @@ public class FreecamModule extends Module { // todo this shit broke
             accelStartTime = -1;
         }
 
-        double spd = speed.get() * currentFactor;
+        double spd = (speed.get() * currentFactor ) /6;
 
         double dx = 0, dy = 0, dz = 0;
         Vec3 forwardVec = Vec3.directionFromRotation(0, yaw);

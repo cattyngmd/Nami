@@ -17,7 +17,7 @@ public class ClickGuiModule extends Module {
     public final BoolSetting descriptions = addSetting(new BoolSetting("Descriptions", true));
     public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 70, 0, 255));
     public final BoolSetting fade = addSetting(new BoolSetting("Fade", true));
-    public final BoolSetting blur = addSetting(new BoolSetting("Blur", true));
+    public final BoolSetting blur = addSetting(new BoolSetting("Blur", false));
     public final BoolSetting panels = addSetting(new BoolSetting("Panels", false));
     public final BoolSetting moduleFill = addSetting(new BoolSetting("ModuleFill", true));
     public final BoolSetting coloredText = addSetting(new BoolSetting("ColoredText", false));
@@ -25,6 +25,7 @@ public class ClickGuiModule extends Module {
 
     public ClickGuiModule() {
         super("ClickGui", "Opens client UI.", ModuleCategory.of("Client"), "clickgui","click", "gui", "menu", "clckgui");
+        this.keyBind.setDefaultKey(80);
     }
 
     @Override

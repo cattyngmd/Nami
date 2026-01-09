@@ -11,7 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 @RegisterModule
 public class TargetModule extends Module {
 
-    public final DoubleSetting targetRange = addSetting(new DoubleSetting("Range", 8.0, 4.0, 16.0));
+    public final DoubleSetting targetRange = addSetting(new DoubleSetting("Range", 10.0, 4.0, 16.0));
     public final DoubleSetting minTicksExisted = addSetting(new DoubleSetting("Age", 12, 0.0, 20.0));
     public final BoolSetting targetPlayers = addSetting(new BoolSetting("Players", true));
     public final BoolSetting targetHostiles = addSetting(new BoolSetting("Hostiles", true));

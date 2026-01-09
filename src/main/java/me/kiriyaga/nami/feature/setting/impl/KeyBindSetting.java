@@ -3,6 +3,7 @@ package me.kiriyaga.nami.feature.setting.impl;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.kiriyaga.nami.feature.setting.Setting;
+import me.kiriyaga.nami.util.KeyUtils;
 import org.lwjgl.glfw.GLFW;
 
 import static me.kiriyaga.nami.Nami.MC;
@@ -13,9 +14,26 @@ public class KeyBindSetting extends Setting<Integer> {
     private boolean wasPressedLastTick = false;
     private boolean holdMode = false;
 
+    public KeyBindSetting(String name) {
+        this(name, KEY_NONE);
+    }
+
     public KeyBindSetting(String name, int defaultKey) {
         super(name, defaultKey);
     }
+
+    public KeyBindSetting(String name, String defaultKeyName) {
+        super(name, defaultKeyName != null ? KeyUtils.parseKey(defaultKeyName) : KEY_NONE);
+    }
+
+    public void setDefaultKey(String keyName) {
+        this.value = KeyUtils.parseKey(keyName);
+    }
+
+    public void setDefaultKey(int keyCode) {
+        this.value = keyCode;
+    }
+
 
     public boolean isPressed() {
         if (value == KEY_NONE) return false;
@@ -32,7 +50,6 @@ public class KeyBindSetting extends Setting<Integer> {
 
         return GLFW.glfwGetKey(MC.getWindow().handle(), value) == GLFW.GLFW_PRESS;
     }
-
 
     public String getKeyName() {
         if (value == KEY_NONE) return "none";
@@ -59,7 +76,6 @@ public class KeyBindSetting extends Setting<Integer> {
     public void setHoldMode(boolean holdMode) {
         this.holdMode = holdMode;
     }
-
 
     public boolean wasPressedLastTick() {
         return wasPressedLastTick;

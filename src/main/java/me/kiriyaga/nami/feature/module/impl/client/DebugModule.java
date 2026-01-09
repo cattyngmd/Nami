@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 
 import static me.kiriyaga.nami.Nami.CHAT_MANAGER;
 
-@RegisterModule
+//@RegisterModule
 public class DebugModule extends Module {
 
     private final BoolSetting aura = addSetting(new BoolSetting("Aura", false));
