@@ -1,6 +1,6 @@
 # Nami
 
-1.21.11 and 1.21.8
+1.21.11
 
 <p align="left">
   <a href="https://github.com/NamiDevelopment/nami/releases">
@@ -20,9 +20,9 @@
   </a>
 </p>
 
-![# badge](Assets/Readme/no-stops-no-regrets.svg)
-![# badge](Assets/Readme/ensuring-code-integrity.svg)
-![# badge](Assets/Readme/works-on-selfmerging.svg)
+![# badge](assets/readme/no-stops-no-regrets.svg)
+![# badge](assets/readme/ensuring-code-integrity.svg)
+![# badge](assets/readme/works-on-selfmerging.svg)
 
 
 **Nami** is a modular and lightweight anarchy client base built for PVE and automation.  
@@ -38,9 +38,10 @@ This project started as a clean, open-source alternative aiming to be transparen
 <details>
 <summary>View screenshots</summary>
 
-<img width="1920" height="1080" alt="ClickGUI" src="Assets/clickgui.png" />
-<img width="1920" height="1080" alt="HudEditor" src="Assets/hudeditor.png" />
-<img width="1920" height="1080" alt="Friends" src="Assets/friends.png" />
+<img width="1920" height="1080" alt="ClickGUI" src="assets/clickgui.png" />
+<img width="1920" height="1080" alt="HudEditor" src="assets/hudeditor.png" />
+<img width="1920" height="1080" alt="Friends" src="assets/friends.png" />
+<img width="1920" height="1080" alt="Friends" src="assets/configs.png" />
 
 </details>
 
@@ -51,9 +52,7 @@ This project started as a clean, open-source alternative aiming to be transparen
 <details>
 <summary>How to open ClickGUI?</summary>
 
-ClickGUI is not bound by default. Use the command:  
-`-bind clickgui KEY`  
-to bind it to your preferred key.
+Default keybind is: P  
 
 </details>
 
