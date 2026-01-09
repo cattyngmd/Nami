@@ -28,6 +28,7 @@
     "MixinCompassAngleState",
     "MixinConnectScreen",
     "MixinDebugScreenOverlay",
+    "MixinDeltaTracker",
     "MixinDisconnectedScreen",
     "MixinEntityRenderer",
     "MixinFogRenderer",

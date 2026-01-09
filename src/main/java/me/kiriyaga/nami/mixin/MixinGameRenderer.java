@@ -126,8 +126,8 @@ public abstract class MixinGameRenderer {
     }
 
 
-    @Inject(method = "pick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;raycastHitResult(FLnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/HitResult;"))
-    private void nami$beforeHitResult(float f, CallbackInfo ci) {
+    @Inject(method = "pick", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;raycastHitResult(FLnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/HitResult;"))
+    private void pick(float f, CallbackInfo ci) {
         HitResult hit = this.minecraft.player.raycastHitResult(f, this.minecraft.getCameraEntity());
 
         HitResult modified = modifyHit(hit);
