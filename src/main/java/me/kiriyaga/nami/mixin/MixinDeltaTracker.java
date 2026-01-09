@@ -16,13 +16,17 @@ public abstract class MixinDeltaTracker {
     @Shadow
     private float deltaTicks;
 
-    @Inject(method = "advanceGameTime", at = @At("RETURN"))
-    private void onAdvanceGameTime(long time, CallbackInfoReturnable<Integer> cir) {
-        GameTimeEvent ev = new GameTimeEvent(-1);
+    @Shadow
+    private float deltaTickResidual;
 
+    @Inject(method = "advanceGameTime", at = @At("TAIL"))
+    private void onAdvanceGameTime(long time, CallbackInfoReturnable<Integer> cir) {
+        GameTimeEvent ev = new GameTimeEvent(1.0F);
         EVENT_MANAGER.post(ev);
 
-        if (ev.isCancelled())
+        if (ev.isCancelled()) {
             deltaTicks *= ev.getTicks();
+            deltaTickResidual *= ev.getTicks();
+        }
     }
 }
