@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.util.container;
 
-import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -23,7 +22,6 @@ public class ContainerUtils {
 
     public static boolean openContainer(ItemStack stack) {
         if (!hasItems(stack)) {
-            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugPeek(Component.nullToEmpty("peek not a container " + stack));
             return false;
         }
 
@@ -32,7 +30,6 @@ public class ContainerUtils {
 
         ContainerScreen.open(stack, contents);
 
-        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugPeek(Component.nullToEmpty("peek opened container preview for " + stack));
         return true;
     }
 
@@ -51,10 +48,6 @@ public class ContainerUtils {
                 for (int i = 0; i < stacks.size() && i < items.length; i++) {
                     items[i] = stacks.get(i);
                 }
-
-                MODULE_MANAGER.getStorage()
-                        .getByClass(DebugModule.class)
-                        .debugPeek(Component.nullToEmpty("peek got " + container.nonEmptyStream().count() + " items from container " + itemStack));
             }
         }
     }

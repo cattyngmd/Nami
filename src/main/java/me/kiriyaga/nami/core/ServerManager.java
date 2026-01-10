@@ -4,7 +4,6 @@ import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
-import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.client.LatencyModule;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket;
@@ -114,9 +113,6 @@ public class ServerManager {
                 countPing = Math.min(countPing + 1, smoothingStrength);
 
                 updatePing(averagePing());
-                DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
-
-                debugModule.debugPing(Component.nullToEmpty("Interval=" + interval + "ms, Ping=" + ping + "ms, Average=" + lastPing + "ms"));
             }
 
             lastReceiveTime = now;
@@ -223,16 +219,13 @@ public class ServerManager {
         LatencyModule config = MODULE_MANAGER.getStorage().getByClass(LatencyModule.class);
         if (config == null) return false;
 
-        DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
         int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
 
         if (lastUpdated == -1) {
-            debugModule.debugPing(Component.nullToEmpty("Connection unstable: no ping data yet"));
             return true;
         }
 
         boolean unstable = (System.currentTimeMillis() - lastUpdated) > timeoutMillis;
-        debugModule.debugPing(Component.nullToEmpty("Connection unstable: last ping updated " + (System.currentTimeMillis() - lastUpdated) + "ms ago"));
         return unstable;
     }
 

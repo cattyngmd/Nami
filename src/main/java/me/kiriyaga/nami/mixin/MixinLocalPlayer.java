@@ -2,7 +2,6 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
-import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
@@ -99,10 +98,6 @@ public abstract class MixinLocalPlayer {
     private void postSendMovementPackets(CallbackInfo ci) {
         if (!ROTATION_MANAGER.getStateHandler().isRotating())
             return;
-
-        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugRot(Component.nullToEmpty(
-                "post yaw=" + MC.player.getYRot() + ", pitch=" + MC.player.getXRot() + "\n "
-        ));
 
         MC.player.setYRot(originalYaw);
         MC.player.setXRot(originalPitch);

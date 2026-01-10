@@ -11,7 +11,6 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.module.impl.movement.SprintModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
@@ -93,8 +92,6 @@ public class AuraModule extends Module {
         attackCooldownTicks -= 1f * (tps / 20f);
         if (attackCooldownTicks < 0f) attackCooldownTicks = 0f;
 
-        MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugAura(Component.nullToEmpty("cooldown ticks is : "+attackCooldownTicks));
-
         if (!multiTask.get() && MC.player.getUseItemRemainingTicks() > 0 && MC.player.getMainHandItem() == MC.player.getUseItem()) {
             currentTarget = null;
             return;
@@ -104,7 +101,6 @@ public class AuraModule extends Module {
 
         ItemStack stack = MC.player.getMainHandItem();
         Entity target = TargetUtils.getTarget();
-        DebugModule debugModule = MODULE_MANAGER.getStorage().getByClass(DebugModule.class);
 
         if (target == null || (swap.get() == Swap.REQUIRE && !(stack.getItem() instanceof AxeItem
                 || stack.is(ItemTags.SWORDS)
@@ -117,7 +113,6 @@ public class AuraModule extends Module {
 
         currentTarget = target;
         this.setDisplayInfo(target.getName().getString());
-        long auraLogicStart = System.nanoTime();
 
 //        if (!ItemStack.areEqual(stack, lastHeldStack)) {
 //            lastHeldStack = stack;
@@ -260,11 +255,6 @@ public class AuraModule extends Module {
                 MC.getConnection().send(new ServerboundPlayerCommandPacket(MC.player, ServerboundPlayerCommandPacket.Action.START_SPRINTING));
 
         if (!skipCooldown) attackCooldownTicks = getBaseCooldownTicks(stack, tps);
-
-        long auraLogicDuration = System.nanoTime() - auraLogicStart;
-        debugModule.debugAura(Component.nullToEmpty(String.format("logic time: %.3f ms", auraLogicDuration / 1_000_000.0)));
-        long totalDuration = System.nanoTime() - startTime;
-        debugModule.debugAura(Component.nullToEmpty(String.format("total %.3f ms", totalDuration / 1_000_000.0)));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

@@ -4,7 +4,6 @@ import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.feature.command.Command;
 import me.kiriyaga.nami.feature.command.CommandArgument;
 import me.kiriyaga.nami.feature.command.RegisterCommand;
-import me.kiriyaga.nami.feature.module.impl.client.DebugModule;
 import me.kiriyaga.nami.util.container.ContainerUtils;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +27,6 @@ public class PeekCommand extends Command {
         EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
             ItemStack main = MC.player.getMainHandItem();
             ItemStack off = MC.player.getOffhandItem();
-            MODULE_MANAGER.getStorage().getByClass(DebugModule.class).debugPeek(Component.nullToEmpty("called"));
 
             if (ContainerUtils.openContainer(main)) return;
             if (ContainerUtils.openContainer(off)) return;
