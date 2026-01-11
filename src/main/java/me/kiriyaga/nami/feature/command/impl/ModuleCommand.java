@@ -165,7 +165,7 @@ public class ModuleCommand extends Command {
             if (valueRaw == null) {
                 boolSetting.set(!boolSetting.get());
                 CHAT_MANAGER.sendPersistent(module.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} toggled to {g}" + boolSetting.get() + "{reset}."));
+                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} toggled to "+ (boolSetting.get() ? "{green}" : "{red}") + boolSetting.get() + "{reset} for {g}" + module.getName() + "{reset}."));
             } else {
                 switch (valueRaw.toLowerCase()) {
                     case "true", "on" -> boolSetting.set(true);
