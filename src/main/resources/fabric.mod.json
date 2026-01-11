@@ -6,7 +6,7 @@
   "description": "A high-performance, modular client base for anarchy servers.",
   "authors": ["Kiriyaga"],
   "contact": {
-    "sources": "https://github.com/Kiriyaga7615/NamiClient"
+    "sources": "https://github.com/NamiDevelopment/nami"
   },
   "license": "MIT",
   "environment": "*",
