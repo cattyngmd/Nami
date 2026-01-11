@@ -22,6 +22,7 @@ public class ClickGuiModule extends Module {
     public final BoolSetting moduleFill = addSetting(new BoolSetting("ModuleFill", true));
     public final BoolSetting coloredText = addSetting(new BoolSetting("ColoredText", false));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
+    public final BoolSetting moduleChatFeedback = addSetting(new BoolSetting("ModuleChatFeedback", true));
 
     public ClickGuiModule() {
         super("ClickGui", "Opens client UI.", ModuleCategory.of("Client"), "clickgui","click", "gui", "menu", "clckgui");

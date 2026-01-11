@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.module;
 
+import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
 import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
@@ -57,18 +58,15 @@ public abstract class Module {
             EVENT_MANAGER.register(this);
             onEnable();
 
-            if (MC.level != null) {
-                Component message = CAT_FORMAT.format("{s}[{g}+{s}] {reset}" + name);
-                CHAT_MANAGER.sendTransient(message, false);
-            }
         } else {
             EVENT_MANAGER.unregister(this);
             onDisable();
 
-            if (MC.level != null) {
-                Component message = CAT_FORMAT.format("{namiDarkRed}[{namiRed}-{namiDarkRed}] {reset}" + name);
-                CHAT_MANAGER.sendTransient(message, false);
-            }
+        }
+
+        if (MC.level != null && MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class).moduleChatFeedback.get()) {
+            Component message = CAT_FORMAT.format("{g}"+name + "{reset} toggled" + (enabled ? " {green}on" : " {red}off") + "{reset}.");
+            CHAT_MANAGER.sendPersistent(name, message);
         }
     }
 
