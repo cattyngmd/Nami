@@ -21,6 +21,7 @@ public class PatchModule extends Module {
 
     public final BoolSetting grimAttackVelocity = addSetting(new BoolSetting("GrimAttackVelocity", true));
     public final BoolSetting preventUpdateSlot = addSetting(new BoolSetting("PreventUpdateSlot", true));
+    public final BoolSetting slotDragDesync = addSetting(new BoolSetting("SlotDragDesync", true));
 
     public PatchModule() {
         super("Patch", "Any kind of hotfixes you defenetly should apply based on what server and ac u on.", ModuleCategory.of("Client"), "entity", "entitymanager", "enity");
