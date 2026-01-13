@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.feature.gui.newgui.screen;
 
+import me.kiriyaga.nami.core.config.ConfigMode;
 import me.kiriyaga.nami.feature.gui.newgui.base.NamiScreen;
 import me.kiriyaga.nami.feature.gui.newgui.component.ConsolePanelComponent;
 import me.kiriyaga.nami.feature.gui.newgui.entry.ConfigEntry;
@@ -31,7 +32,7 @@ public class ConfigScreen extends NamiScreen {
                     20, 20, 550, 300,
 
                     entry -> {
-                        CONFIG_MANAGER.saveConfig(entry.getName());
+                        CONFIG_MANAGER.saveConfig(entry.getName(), ConfigMode.SETTINGS);
                         refresh();
                     },
 
@@ -120,8 +121,23 @@ public class ConfigScreen extends NamiScreen {
                 console.getActionWidget().clearItems();
 
                 console.getActionWidget().addItem(new ActionItem(
-                        "load",
-                        () -> CONFIG_MANAGER.loadConfig(entry.getName())
+                        "load all",
+                        () -> CONFIG_MANAGER.loadConfig(entry.getName(), ConfigMode.ALL)
+                ));
+
+                console.getActionWidget().addItem(new ActionItem(
+                        "load settings",
+                        () -> CONFIG_MANAGER.loadConfig(entry.getName(), ConfigMode.SETTINGS)
+                ));
+
+                console.getActionWidget().addItem(new ActionItem(
+                        "load keybinds",
+                        () -> CONFIG_MANAGER.loadConfig(entry.getName(), ConfigMode.KEYBIND)
+                ));
+
+                console.getActionWidget().addItem(new ActionItem(
+                        "load color",
+                        () -> CONFIG_MANAGER.loadConfig(entry.getName(), ConfigMode.COLOR)
                 ));
 
                 console.getActionWidget().addItem(new ActionItem(
@@ -138,12 +154,10 @@ public class ConfigScreen extends NamiScreen {
             }
         }
 
-        if (console.getActionWidget().isVisible()
-                && console.getActionWidget().mouseClicked(sx, sy, click.button()))
+        if (console.getActionWidget().isVisible() && console.getActionWidget().mouseClicked(sx, sy, click.button()))
             return true;
 
-        return console.mouseClicked(sx, sy, click.button())
-                || super.mouseClicked(click, bl);
+        return console.mouseClicked(sx, sy, click.button()) || super.mouseClicked(click, bl);
     }
 
     @Override public boolean mouseScrolled(double x, double y, double h, double v) {

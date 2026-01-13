@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import me.kiriyaga.nami.Nami;
 import me.kiriyaga.nami.core.config.model.ConfigMeta;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.setting.Setting;
@@ -22,6 +21,7 @@ import java.util.stream.Collectors;
 import static me.kiriyaga.nami.Nami.*;
 
 public class ConfigSerializer {
+
     private final ConfigDirectoryProvider dirs;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -29,7 +29,7 @@ public class ConfigSerializer {
         this.dirs = dirs;
     }
 
-    public void save(String configName) {
+    public void save(String configName, ConfigMode mode) {
         JsonObject root = new JsonObject();
 
         JsonObject meta = new JsonObject();
@@ -37,20 +37,17 @@ public class ConfigSerializer {
         meta.addProperty("createdAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         meta.addProperty("client", NAME);
         meta.addProperty("version", VERSION);
-
+        meta.addProperty("mode", mode.name());
         root.add("meta", meta);
-
         JsonObject modules = new JsonObject();
+
         for (Module m : MODULE_MANAGER.getStorage().getAll()) {
             JsonObject mod = new JsonObject();
             mod.addProperty("enabled", m.isEnabled());
 
             JsonObject settings = new JsonObject();
             for (Setting<?> s : m.getSettings()) {
-                if (s instanceof me.kiriyaga.nami.feature.setting.impl.KeyBindSetting ||
-                        s instanceof me.kiriyaga.nami.feature.setting.impl.ColorSetting) {
-                    continue;
-                }
+                if (!mode.accept(s)) continue;
                 settings.add(s.getName(), s.toJson());
             }
 
@@ -70,7 +67,7 @@ public class ConfigSerializer {
         }
     }
 
-    public void load(String configName) {
+    public void load(String configName, ConfigMode mode) {
         File file = new File(dirs.getConfigSaveDir(), configName + ".json");
         if (!file.exists()) {
             LOGGER.warn("Config file not found: " + configName);
@@ -79,28 +76,30 @@ public class ConfigSerializer {
 
         try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-
             JsonObject modules = root.getAsJsonObject("modules");
+
             for (Module m : MODULE_MANAGER.getStorage().getAll()) {
                 if (!modules.has(m.getName())) continue;
 
                 JsonObject mod = modules.getAsJsonObject(m.getName());
 
-                boolean enabled = mod.get("enabled").getAsBoolean();
-                if (enabled != m.isEnabled()) m.toggle();
+                if (mod.has("enabled")) {
+                    boolean enabled = mod.get("enabled").getAsBoolean();
+                    if (enabled != m.isEnabled()) {
+                        m.toggle();
+                    }
+                }
 
                 JsonObject settings = mod.getAsJsonObject("settings");
+                if (settings == null) continue;
+
                 for (Setting<?> s : m.getSettings()) {
-                    if (s instanceof me.kiriyaga.nami.feature.setting.impl.KeyBindSetting ||
-                            s instanceof me.kiriyaga.nami.feature.setting.impl.ColorSetting) {
-                        continue;
-                    }
+                    if (!mode.accept(s)) continue;
                     if (settings.has(s.getName())) {
                         s.fromJson(settings.get(s.getName()));
                     }
                 }
             }
-
         } catch (Exception e) {
             LOGGER.error("Failed to load config " + configName, e);
         }
@@ -121,11 +120,8 @@ public class ConfigSerializer {
             return List.of();
         }
 
-        return Arrays.stream(dir.listFiles((d, name) -> name.endsWith(".json")))
-                .map(f -> f.getName().replaceFirst("\\.json$", ""))
-                .collect(Collectors.toList());
+        return Arrays.stream(dir.listFiles((d, name) -> name.endsWith(".json"))).map(f -> f.getName().replaceFirst("\\.json$", "")).collect(Collectors.toList());
     }
-
 
     public ConfigMeta readMeta(String configName) {
         File file = new File(dirs.getConfigSaveDir(), configName + ".json");
@@ -136,12 +132,15 @@ public class ConfigSerializer {
             if (!root.has("meta")) return null;
 
             JsonObject meta = root.getAsJsonObject("meta");
+            ConfigMode mode = ConfigMode.ALL;
+            if (meta.has("mode")) {
+                try {
+                    mode = ConfigMode.valueOf(meta.get("mode").getAsString());
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
 
-            return new ConfigMeta(
-                    meta.has("author") ? meta.get("author").getAsString() : "unknown",
-                    meta.has("version") ? meta.get("version").getAsString() : "unknown",
-                    meta.has("createdAt") ? LocalDateTime.parse(meta.get("createdAt").getAsString()) : null
-            );
+            return new ConfigMeta(meta.has("author") ? meta.get("author").getAsString() : "unknown", meta.has("version") ? meta.get("version").getAsString() : "unknown", meta.has("createdAt") ? LocalDateTime.parse(meta.get("createdAt").getAsString()) : null, mode);
         } catch (Exception e) {
             LOGGER.error("Failed to read meta for " + configName, e);
             return null;

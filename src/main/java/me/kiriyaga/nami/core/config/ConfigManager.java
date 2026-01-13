@@ -59,12 +59,12 @@ public class ConfigManager {
         }
     }
 
-    public void saveConfig(String name) {
-        configSerializer.save(name);
+    public void saveConfig(String name, ConfigMode mode) {
+        configSerializer.save(name, mode);
     }
 
-    public void loadConfig(String name) {
-        configSerializer.load(name);
+    public void loadConfig(String name, ConfigMode mode) {
+        configSerializer.load(name, mode);
     }
 
     public boolean deleteConfig(String name) {
