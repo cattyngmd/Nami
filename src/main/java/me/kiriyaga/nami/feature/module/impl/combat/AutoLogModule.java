@@ -80,11 +80,20 @@ public class AutoLogModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (event.getPacket() instanceof ClientboundEntityEventPacket packet) {
-            if (packet.getEntity(MC.level) == MC.player && packet.getEventId() == 35 && onPop.get()) {
-                EXECUTABLE_MANAGER.getRequestHandler().submit(() -> logOut("AutoLog: totem got popped."), 0, ExecutableThreadType.PRE_TICK);
+        if (!(event.getPacket() instanceof ClientboundEntityEventPacket packet))
+            return;
+
+        EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
+            if (MC.player == null || MC.level == null)
+                return;
+
+            if (packet.getEntity(MC.level) == MC.player
+                    && packet.getEventId() == 35
+                    && onPop.get()) {
+
+                logOut("AutoLog: totem got popped.");
             }
-        }
+        }, 0, ExecutableThreadType.PRE_TICK);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
