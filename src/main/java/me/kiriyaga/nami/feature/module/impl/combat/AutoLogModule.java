@@ -16,6 +16,8 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
@@ -34,6 +36,7 @@ public class AutoLogModule extends Module {
     private final BoolSetting reconnectToggle = addSetting(new BoolSetting("ReconnectToggle", true));
 
     private boolean triggeredLevel = false;
+    private boolean loggingOut = false;
 
     public AutoLogModule() {
         super("AutoLog", "Automatically logs out in certain conditions.", ModuleCategory.of("Combat"), "autolog", "panic", "logout");
@@ -115,18 +118,20 @@ public class AutoLogModule extends Module {
 
 
     private void logOut(String reason) {
-        if (MODULE_MANAGER.getStorage().getByClass(IllegalDisconnectModule.class).isEnabled()){
+        if (loggingOut)
+            return;
+
+        loggingOut = true;
+        if (MODULE_MANAGER.getStorage().getByClass(IllegalDisconnectModule.class).isEnabled()) {
             triggerToggle();
-            EVENT_MANAGER.post(new DissconectEvent());
-        } else {
+            EVENT_MANAGER.post(new DissconectEvent());} else {
             if (MC.getConnection() != null) {
                 triggerToggle();
-                MC.getConnection().handleDisconnect(new net.minecraft.network.protocol.common.ClientboundDisconnectPacket(
-                        net.minecraft.network.chat.Component.nullToEmpty("AutoLog: §7" + reason)
-                ));
+                MC.getConnection().handleDisconnect(new ClientboundDisconnectPacket(Component.nullToEmpty("AutoLog: §7" + reason)));
             }
         }
     }
+
 
     private void triggerToggle(){
         if (selfToggle.get())
