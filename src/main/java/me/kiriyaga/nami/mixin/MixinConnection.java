@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,26 +22,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(Connection.class)
-public class MixinConnection {
+public abstract class MixinConnection {
 
-    @Shadow private Channel channel;
-    @Shadow @Final private PacketFlow receiving;
-
-    @Shadow @Nullable private volatile PacketListener packetListener;
+    @Invoker("channelRead0")
+    protected abstract void invokeChannelRead0(ChannelHandlerContext ctx, Packet<?> packet);
 
     @Inject(method = "channelRead0", at = @At("HEAD"), cancellable = true)
     public void onPacketReceive(ChannelHandlerContext chc, Packet<?> packet, CallbackInfo ci) {
-        if (this.channel.isOpen() && packet != null) {
-            PacketReceiveEvent event = new PacketReceiveEvent(packet);
-            EVENT_MANAGER.post(event);
+        PacketReceiveEvent event = new PacketReceiveEvent(packet);
+        EVENT_MANAGER.post(event);
 
-            if (event.isCancelled()) {
-                ci.cancel();
-            } else if (event.getPacket() != packet) {
-                ci.cancel();
-                this.channel.pipeline().fireChannelRead(event.getPacket());
-            }
+        if (event.isCancelled()) {
+            ci.cancel();
+            return;
+        }
 
+        if (event.getPacket() != packet) {
+            ci.cancel();
+            invokeChannelRead0(chc, event.getPacket());
         }
     }
 
