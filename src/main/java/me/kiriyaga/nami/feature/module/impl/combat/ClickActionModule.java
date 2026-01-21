@@ -1,13 +1,11 @@
 package me.kiriyaga.nami.feature.module.impl.combat;
 
-import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.EventPriority;
 import me.kiriyaga.nami.event.SubscribeEvent;
 import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
@@ -17,16 +15,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.ClipContext;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.RotationUtils.getLookVectorFromYawPitch;
 
 @RegisterModule
-public class ClickPearlModule extends Module {
+public class ClickActionModule extends Module {
 
     public enum GroundAction { PEARL, WIND, EXP, NONE }
 
@@ -38,8 +34,8 @@ public class ClickPearlModule extends Module {
     private final BoolSetting entityCheck = addSetting(new BoolSetting("EntityCheck", true));
     private final KeyBindSetting useKey = addSetting(new KeyBindSetting("Use", KeyBindSetting.KEY_NONE));
 
-    public ClickPearlModule() {
-        super("ClickPearl", "Uses configured item when pressing key.", ModuleCategory.of("Combat"), "clickpearl");
+    public ClickActionModule() {
+        super("ClickAction", "Uses configured item when pressing key.", ModuleCategory.of("Combat"), "clickpearl");
     }
 
     private boolean recall;
