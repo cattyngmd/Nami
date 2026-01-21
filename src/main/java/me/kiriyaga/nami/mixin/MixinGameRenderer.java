@@ -8,8 +8,10 @@ import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -19,6 +21,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector4f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -42,11 +45,45 @@ public abstract class MixinGameRenderer {
     @Shadow
     public abstract void pick(float tickDelta);
 
-    @Inject(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(" + "Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;" + "Lnet/minecraft/client/DeltaTracker;" + "Z" + "Lnet/minecraft/client/Camera;" + "Lorg/joml/Matrix4f;" + "Lorg/joml/Matrix4f;" + "Lorg/joml/Matrix4f;" + "Lcom/mojang/blaze3d/buffers/GpuBufferSlice;" + "Lorg/joml/Vector4f;" + "Z)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void captureMatrices(DeltaTracker deltaTracker, CallbackInfo ci, Object resourcePool, DeltaTracker dt, boolean bl, Object camera, Matrix4f view, Matrix4f projection, Matrix4f culling, Object gpuBufferSlice, Vector4f vector4f, boolean flag) {
+    @Inject(
+            method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(" +
+                            "Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;" +
+                            "Lnet/minecraft/client/DeltaTracker;" +
+                            "Z" +
+                            "Lnet/minecraft/client/Camera;" +
+                            "Lorg/joml/Matrix4f;" +
+                            "Lorg/joml/Matrix4f;" +
+                            "Lorg/joml/Matrix4f;" +
+                            "Lcom/mojang/blaze3d/buffers/GpuBufferSlice;" +
+                            "Lorg/joml/Vector4f;" +
+                            "Z)V"
+            ),
+            locals = LocalCapture.CAPTURE_FAILHARD
+    )
+    private void captureMatrices(
+            DeltaTracker deltaTracker,
+            CallbackInfo ci,
+            float f,
+            LocalPlayer localPlayer,
+            ProfilerFiller profilerFiller,
+            boolean bl,
+            float g,
+            Matrix4f projection,      // matrix4f
+            PoseStack poseStack,
+            float h,
+            float i,
+            float j,
+            float k,
+            Quaternionf quaternionf,
+            Matrix4f view             // matrix4f2
+    ) {
         PROJECTION_MATRIX.set(projection);
         MODEL_VIEW_MATRIX.set(view);
     }
+
 
 
     @Inject(method = "displayItemActivation", at = @At("HEAD"), cancellable = true)
