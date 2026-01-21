@@ -1,28 +1,20 @@
 name: build upload artifact
 
 on:
+  push:
   workflow_dispatch:
   schedule:
-    - cron: '0 3 * * 1' ## each monday
+    - cron: '0 3 * * 1'
 
 jobs:
   build:
-    if: github.actor == 'Kiriyaga7615' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        branch:
-          - mc.1.21.11
-          - mc.1.21.8
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: true
-          ref: ${{ matrix.branch }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -42,7 +34,7 @@ jobs:
 
       - name: Set safe branch name
         run: |
-          SAFE_BRANCH="${{ matrix.branch }}"
+          SAFE_BRANCH="${{ github.ref_name }}"
           SAFE_BRANCH="${SAFE_BRANCH//./-}"
           echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
 
