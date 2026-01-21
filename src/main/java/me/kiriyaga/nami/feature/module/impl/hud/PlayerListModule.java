@@ -1,5 +1,7 @@
 package me.kiriyaga.nami.feature.module.impl.hud;
 
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
 import me.kiriyaga.nami.feature.module.HudElementModule;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
@@ -30,12 +32,9 @@ public class PlayerListModule extends HudElementModule {
         super("PlayerList", "Shows nearby players", 0, 0, 80, 10);
     }
 
-    @Override
-    public List<TextElement> getTextElements() {
+    @SubscribeEvent
+    public void onPreTickEvent(PreTickEvent ev) {
         elements.clear();
-
-        if (MC.level == null || MC.player == null)
-            return elements;
 
         List<Entity> players = EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS);;
         sort(players);
@@ -52,6 +51,15 @@ public class PlayerListModule extends HudElementModule {
         }
         this.width = w;
         this.height = offset;
+    }
+
+    @Override
+    public List<TextElement> getTextElements() {
+
+        if (MC.level == null || MC.player == null) {
+            elements.clear();
+            return elements;
+        }
 
         return elements;
     }
