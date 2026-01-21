@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -128,5 +129,12 @@ public class EntityUtils {
 
         PlayerInfo entry = MC.getConnection().getPlayerInfo(player.getUUID());
         return entry != null ? entry.getLatency() : -1;
+    }
+
+    public static String getHealthNumber(Entity entity) {
+        if (!(entity instanceof Player player)) return "";
+
+        double hp = player.getHealth() + player.getAbsorptionAmount();
+        return new DecimalFormat("#.#").format(hp);
     }
 }

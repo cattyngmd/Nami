@@ -132,22 +132,16 @@ public class ColorUtils {
         return TextColor.fromRgb(dark.getRGB());
     }
 
-    public static Component getHealthText(Entity entity) {
-        if (!(entity instanceof Player player)) return Component.empty();
+    public static String getHealthColor(Entity entity) {
+        if (!(entity instanceof Player player)) return "";
 
         double hp = player.getHealth() + player.getAbsorptionAmount();
         double health = Math.round(hp * 2.0) / 2.0;
 
-        StringBuilder sb = new StringBuilder();
-
-        if (health >= 19) sb.append("{green}");
-        else if (health >= 13) sb.append("{yellow}");
-        else if (health >= 8) sb.append("{gold}");
-        else if (health >= 6) sb.append("{red}");
-        else sb.append("{dark_red}");
-
-        sb.append(new DecimalFormat().format(hp)).append(" ");
-
-        return CAT_FORMAT.format(sb.toString());
+        if (health >= 19) return "{green}";
+        if (health >= 13) return "{yellow}";
+        if (health >= 8) return "{gold}";
+        if (health >= 6) return "{red}";
+        return "{dark_red}";
     }
 }

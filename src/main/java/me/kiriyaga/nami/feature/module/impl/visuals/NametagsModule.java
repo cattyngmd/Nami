@@ -79,21 +79,19 @@ public class NametagsModule extends Module {
                 Vec3 projected = project(vec3d.add(0, (player.isShiftKeyDown() ? 1.9f : 2.1f), 0));
 
                 if (!invisible.get() && player.isInvisible()) continue;
-                if (!player.isAlive()) return;
+                if (!player.isAlive()) continue;
                 if (!projectionVisible(projected)) continue;
 
                 String ign = player.getName().getString();
-                UUID uuid = player.getUUID();
 
-                String shownName = ign;
+                String text = "";
 
-                StringBuilder nameBuilder = new StringBuilder();
-                nameBuilder.append(shownName);
+                if (gameMode.get()) {
+                    String gm = EntityUtils.getGameMode(player).getName().toUpperCase();
+                    text += "[" + (gm.isEmpty() ? "" : gm.substring(0, 1)) + "]";
+                }
 
-                String text = nameBuilder.toString();
-
-                if (gameMode.get())
-                    text += " [" + EntityUtils.getGameMode(player) + "]";
+                text += ign;
 
                 if (ping.get())
                     text += " " + EntityUtils.getLatency(player) + "ms";
@@ -102,15 +100,20 @@ public class NametagsModule extends Module {
                     text += " " + player.getId();
 
                 if (health.get())
-                    text += " " + ColorUtils.getHealthText(ent);
+                    text += " " + EntityUtils.getHealthNumber(ent);
 
-                //int pops = Services.WORLD.getPoppedTotems().getOrDefault(uuid, 0);
-                //if (display.getWhitelistIds().contains("TotemPops") && pops > 0)
-                  //  text += " " + ColorUtils.getTotemColor(pops) + "-" + pops;
+                float width = FONT_MANAGER.getWidth(text);
 
-                Component display = CAT_FORMAT.format(text);
+                String colored = FRIEND_MANAGER.isFriend(ign) ? "{g}" + text : text;
 
-                float width = FONT_MANAGER.getWidth(display);
+                if (health.get())
+                    colored = colored.replace(
+                            " " + EntityUtils.getHealthNumber(ent),
+                            " " + ColorUtils.getHealthColor(ent) + EntityUtils.getHealthNumber(ent)
+                    );
+
+                Component display = CAT_FORMAT.format(colored);
+
 
                 float scale = 1.0f;
                 if (scaling.get()) {
@@ -188,25 +191,52 @@ public class NametagsModule extends Module {
 
                 matrices.popMatrix();
             }
+        }
 
-            if (items.get()) {
-                for (Entity enttt : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
-                    Vec3 pos = getRenderPos(enttt, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
-                    pos = pos.add(0, 0.2, 0);
-                    Vec3 proj = project(pos);
+        if (items.get()) {
+            for (Entity enttt : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
+                Vec3 pos = getRenderPos(enttt, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+                pos = pos.add(0, 0.2, 0);
+                Vec3 proj = project(pos);
+                if (!projectionVisible(proj)) continue;
+
+                if (enttt instanceof ItemEntity item) {
+                    ItemStack stack = item.getItem();
+                    if (stack.isEmpty()) continue;
+
+                    String name = stack.getItemName().getString();
+                    int count = stack.getCount();
+                    String display = name + (count > 1 ? " x" + count : "");
+
+                    float scale = 1.0f;
+                    if (scaling.get()) {
+                        float dist = MC.getCameraEntity().distanceTo(item);
+                        scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
+                    }
+
+                    matrices.pushMatrix();
+                    matrices.translate((float) proj.x, (float) proj.y);
+                    matrices.scale(scale, scale);
+                    FONT_MANAGER.drawText(event.getDrawContext(), display, -FONT_MANAGER.getWidth(display) / 2, -FONT_MANAGER.getHeight(), true, Color.white.getRGB());
+                    matrices.popMatrix();
+                }
+            }
+        }
+
+        if (pearls.get()) {
+            for (Entity entt : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.ALL)) {
+                if (entt instanceof ThrownEnderpearl pearl) {
+                    Vec3 pos = getRenderPos(pearl, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+                    Vec3 proj = project(pos.add(0, 0.25, 0));
+
                     if (!projectionVisible(proj)) continue;
 
-                    if (enttt instanceof ItemEntity item) {
-                        ItemStack stack = item.getItem();
-                        if (stack.isEmpty()) continue;
-
-                        String name = stack.getItemName().getString();
-                        int count = stack.getCount();
-                        String display = name + (count > 1 ? " x" + count : "");
+                    if (pearl.getOwner() instanceof Player thrower) {
+                        String display = thrower.getName().getString();
 
                         float scale = 1.0f;
                         if (scaling.get()) {
-                            float dist = MC.getCameraEntity().distanceTo(item);
+                            float dist = MC.getCameraEntity().distanceTo(pearl);
                             scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
                         }
 
@@ -215,33 +245,6 @@ public class NametagsModule extends Module {
                         matrices.scale(scale, scale);
                         FONT_MANAGER.drawText(event.getDrawContext(), display, -FONT_MANAGER.getWidth(display) / 2, -FONT_MANAGER.getHeight(), true, Color.white.getRGB());
                         matrices.popMatrix();
-                    }
-                }
-            }
-
-            if (pearls.get()) {
-                for (Entity entt : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.ALL)) {
-                    if (entt instanceof ThrownEnderpearl pearl) {
-                        Vec3 pos = getRenderPos(pearl, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
-                        Vec3 proj = project(pos.add(0, 0.25, 0));
-
-                        if (!projectionVisible(proj)) continue;
-
-                        if (pearl.getOwner() instanceof Player thrower) {
-                            String display = thrower.getName().getString();
-
-                            float scale = 1.0f;
-                            if (scaling.get()) {
-                                float dist = MC.getCameraEntity().distanceTo(pearl);
-                                scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
-                            }
-
-                            matrices.pushMatrix();
-                            matrices.translate((float) proj.x, (float) proj.y);
-                            matrices.scale(scale, scale);
-                            FONT_MANAGER.drawText(event.getDrawContext(), display, -FONT_MANAGER.getWidth(display) / 2, -FONT_MANAGER.getHeight(), true, Color.white.getRGB());
-                            matrices.popMatrix();
-                        }
                     }
                 }
             }
