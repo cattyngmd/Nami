@@ -18,7 +18,7 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 @RegisterModule
 public class BlockHighlightModule extends Module {
 
-    public final BoolSetting fill = addSetting(new BoolSetting("fill", true));
+    public final BoolSetting fill = addSetting(new BoolSetting("Fill", true));
 
     public BlockHighlightModule() {
         super("BlockHighlight", "Highlights block you look at.", ModuleCategory.of("Render"));
