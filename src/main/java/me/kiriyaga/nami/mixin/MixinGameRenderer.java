@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import me.kiriyaga.nami.feature.module.impl.exploits.ReachModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,32 +31,42 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static me.kiriyaga.nami.Nami.MC;
 import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.util.render.RenderUtil.MODEL_VIEW_MATRIX;
+import static me.kiriyaga.nami.util.render.RenderUtil.PROJECTION_MATRIX;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
 
     @Shadow
-    @Final
-    private Minecraft minecraft;
-
-    @Shadow
     public abstract void pick(float tickDelta);
 
-    @Shadow
-    public abstract void resetData();
-
-    @Shadow
-    @Final
-    private Camera mainCamera;
-
-    @Unique
-    private final PoseStack matrices = new PoseStack();
-
-    @Shadow
-    protected abstract void bobView(PoseStack matrices, float tickDelta);
-
-    @Shadow
-    protected abstract void bobHurt(PoseStack matrices, float tickDelta);
+    @Inject(
+            method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
+            at = @At(
+                    value = "INVOKE",
+                    target =
+                            "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(" +
+                                    "Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;" +
+                                    "Lnet/minecraft/client/DeltaTracker;" +
+                                    "Z" +
+                                    "Lnet/minecraft/client/Camera;" +
+                                    "Lorg/joml/Matrix4f;" +
+                                    "Lorg/joml/Matrix4f;" +
+                                    "Lorg/joml/Matrix4f;" +
+                                    "Lcom/mojang/blaze3d/buffers/GpuBufferSlice;" +
+                                    "Lorg/joml/Vector4f;" +
+                                    "Z)V"
+            )
+    )
+    private void captureMatrices(
+            DeltaTracker deltaTracker,
+            CallbackInfo ci,
+            @Local(name = "matrix4f") Matrix4f projection,
+            @Local(name = "matrix4f2") Matrix4f view
+    ) {
+        PROJECTION_MATRIX.set(projection);
+        MODEL_VIEW_MATRIX.set(view);
+    }
 
 
     @Inject(method = "displayItemActivation", at = @At("HEAD"), cancellable = true)
@@ -77,12 +89,12 @@ public abstract class MixinGameRenderer {
         FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
         if (freecamModule == null || !freecamModule.isEnabled()) return;
 
-        if (minecraft == null) return;
+        if (MC == null) return;
 
-        if (minecraft.getCameraEntity() != null && !freecamSet) {
+        if (MC.getCameraEntity() != null && !freecamSet) {
             info.cancel();
 
-            Entity cameraE = minecraft.getCameraEntity();
+            Entity cameraE = MC.getCameraEntity();
 
             double x = cameraE.getX();
             double y = cameraE.getY();
@@ -108,7 +120,7 @@ public abstract class MixinGameRenderer {
 
             freecamSet = true;
 
-            if (minecraft.gameRenderer != null && minecraft.gameRenderer.getMainCamera() != null) {
+            if (MC.gameRenderer != null && MC.gameRenderer.getMainCamera() != null) {
                 pick(tickDelta);
             }
 
@@ -128,11 +140,11 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "pick", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;raycastHitResult(FLnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/HitResult;"))
     private void pick(float f, CallbackInfo ci) {
-        HitResult hit = this.minecraft.player.raycastHitResult(f, this.minecraft.getCameraEntity());
+        HitResult hit = MC.player.raycastHitResult(f, MC.getCameraEntity());
 
         HitResult modified = modifyHit(hit);
 
-        this.minecraft.hitResult = modified;
+        MC.hitResult = modified;
     }
 
     private HitResult modifyHit(HitResult hit) {

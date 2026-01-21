@@ -17,16 +17,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.NametagFormatter.COLOR_ITEM;
+import static me.kiriyaga.nami.util.ColorUtils.COLOR_ITEM;
 
 @RegisterModule
 public class ItemSearchModule extends Module {

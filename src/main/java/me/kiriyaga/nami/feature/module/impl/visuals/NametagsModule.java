@@ -1,350 +1,250 @@
+/*
+Originally from:
+https://github.com/NamiDevelopment/mint/blob/d8274468792503ccbfb1b374aaaeb74225a42056/src/main/java/net/melbourne/modules/impl/render/NametagsFeature.java
+
+Licensed under MIT License
+Copyright (c) 2026 Nami Development
+
+https://github.com/NamiDevelopment/mint/blob/master/LICENSE
+ */
+
 package me.kiriyaga.nami.feature.module.impl.visuals;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import me.kiriyaga.nami.core.executable.model.ExecutableThreadType;
 import me.kiriyaga.nami.event.SubscribeEvent;
-import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.ModuleCategory;
+import me.kiriyaga.nami.event.impl.Render2DEvent;
 import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
-import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
+import me.kiriyaga.nami.util.ColorUtils;
 import me.kiriyaga.nami.util.entity.EntityUtils;
-import me.kiriyaga.nami.util.NametagFormatter;
-import me.kiriyaga.nami.util.render.RenderUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Camera;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL32C;
+import org.joml.Matrix3x2fStack;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static me.kiriyaga.nami.Nami.*;
-import static net.caffeinemc.mods.sodium.client.util.FlawlessFrames.isActive;
+import static me.kiriyaga.nami.util.entity.EntityUtils.getRenderPos;
+import static me.kiriyaga.nami.util.render.RenderUtil.project;
+import static me.kiriyaga.nami.util.render.RenderUtil.projectionVisible;
 
 @RegisterModule
 public class NametagsModule extends Module {
 
     public final BoolSetting self = addSetting(new BoolSetting("Self", false));
-    public final BoolSetting players = addSetting(new BoolSetting("Players", true));
-    public final BoolSetting hostiles = addSetting(new BoolSetting("Hostiles", false));
-    public final BoolSetting neutrals = addSetting(new BoolSetting("Neutrals", false));
-    public final BoolSetting passives = addSetting(new BoolSetting("Passives", false));
+    public final BoolSetting invisible = addSetting(new BoolSetting("Invisibles", true));
+    public final BoolSetting scaling = addSetting(new BoolSetting("Scaling", true));
+    public final BoolSetting gameMode = addSetting(new BoolSetting("GameMode", false));
+    public final BoolSetting ping = addSetting(new BoolSetting("Ping", true));
+    public final BoolSetting entityId = addSetting(new BoolSetting("EntityID", false));
+    public final BoolSetting health = addSetting(new BoolSetting("Health", true));
+    public final BoolSetting totemPops = addSetting(new BoolSetting("TotemPops", false));
+    public final BoolSetting armor = addSetting(new BoolSetting("Armor", true));
+    public final BoolSetting durability = addSetting(new BoolSetting("Durability", true));
+    public final BoolSetting rectangle = addSetting(new BoolSetting("Background", true));
     public final BoolSetting items = addSetting(new BoolSetting("Items", false));
-    public final BoolSetting tamed = addSetting(new BoolSetting("Tamed", false));
-    public final BoolSetting pearls = addSetting(new BoolSetting("Pearls", false));
-    public final BoolSetting showItems = addSetting(new BoolSetting("Equipment", true));
-    public final BoolSetting showHealth = addSetting(new BoolSetting("Health", false));
-    public final BoolSetting showGameMode = addSetting(new BoolSetting("Gamemode", false));
-    public final BoolSetting showPing = addSetting(new BoolSetting("Ping", true));
-    public final BoolSetting showEntityId = addSetting(new BoolSetting("EntityId", false));
-    public final EnumSetting<TextFormat> formatting = addSetting(new EnumSetting<>("Format", TextFormat.NONE));
-    public final BoolSetting background = addSetting(new BoolSetting("Background", false));
-    public final BoolSetting border = addSetting(new BoolSetting("Border", true));
-    public final DoubleSetting borderWidth = addSetting(new DoubleSetting("Width", 0.25, 0.11, 1));
+    public final BoolSetting pearls = addSetting(new BoolSetting("Pearls", true));
 
-    private final NametagFormatter formatter = new NametagFormatter(this);
-
-    public enum TextFormat {
-        NONE, BOLD, ITALIC, BOTH
-    }
-
-    private static final Map<UUID, String> uuid = new HashMap<>();
+    //0, 0, 0, 100
+    //19, 19, 19, 140
 
     public NametagsModule() {
         super("Nametags", "Draws nametags above certain entities.", ModuleCategory.of("Render"));
-        border.setShowCondition(background::get);
-        borderWidth.setShowCondition(() -> background.get() && border.get());
     }
 
     @SubscribeEvent
-    public void onRender3d(Render3DEvent event) {
-        if (MC.level == null || MC.player == null) return;
+    public void onRenderOverlay(Render2DEvent event) {
+        if (MC.level == null) return;
 
-        int i = 0;
 
-        PoseStack matrices = event.getMatrices();
+        Matrix3x2fStack matrices = event.getDrawContext().pose();
 
-        if (players.get()) {
-            for (Player player : EntityUtils.getOtherPlayers()) {
-                i++;
-                renderEntityNametag(player, event.getTickDelta(), matrices, 30, null);
-            }
-        }
+        for (Entity ent : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS)) {
+            if (ent == MC.player && !self.get()) continue;
 
-        if (self.get() && !MC.options.getCameraType().isFirstPerson()){
-            i++;
-            renderEntityNametag(MC.player, event.getTickDelta(), matrices, 30, null);
-        }
+            if (ent instanceof Player player) {
 
-        if (hostiles.get()) {
-            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE)) {
-                i++;
-                renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
-            }
-        }
+                Vec3 vec3d = getRenderPos(player, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+                Vec3 projected = project(vec3d.add(0, (player.isShiftKeyDown() ? 1.9f : 2.1f), 0));
 
-        if (neutrals.get()) {
-            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL)) {
-                i++;
-                renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
-            }
-        }
+                if (!invisible.get() && player.isInvisible()) continue;
+                if (!player.isAlive()) return;
+                if (!projectionVisible(projected)) continue;
 
-        if (passives.get()) {
-            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE)) {
-                i++;
-                renderEntityNametag(entity, event.getTickDelta(), matrices, 30, null);
-            }
-        }
+                String ign = player.getName().getString();
+                UUID uuid = player.getUUID();
 
-        if (items.get()) {
-            for (var entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
-                if (entity instanceof ItemEntity itemEntity) {
-                    renderEntityNametag(entity, Component.translatable(itemEntity.getItem().getItem().getDescriptionId()).getString(), event.getTickDelta(), matrices, 30, null);
-                }
-            }
-        }
+                String shownName = ign;
 
-        if (tamed.get()) {
+                StringBuilder nameBuilder = new StringBuilder();
+                nameBuilder.append(shownName);
 
-            for (var entity : EntityUtils.getAllEntities()) {
+                String text = nameBuilder.toString();
 
-                @Nullable EntityReference<LivingEntity> owner;
+                if (gameMode.get())
+                    text += " [" + EntityUtils.getGameMode(player) + "]";
 
-                if (entity instanceof TamableAnimal tameable) {
-                    owner = tameable.getOwnerReference();
-                } else {
-                    continue;
+                if (ping.get())
+                    text += " " + EntityUtils.getLatency(player) + "ms";
+
+                if (entityId.get())
+                    text += " " + player.getId();
+
+                if (health.get())
+                    text += " " + ColorUtils.getHealthText(ent);
+
+                //int pops = Services.WORLD.getPoppedTotems().getOrDefault(uuid, 0);
+                //if (display.getWhitelistIds().contains("TotemPops") && pops > 0)
+                  //  text += " " + ColorUtils.getTotemColor(pops) + "-" + pops;
+
+                Component display = CAT_FORMAT.format(text);
+
+                float width = FONT_MANAGER.getWidth(display);
+
+                float scale = 1.0f;
+                if (scaling.get()) {
+                    float dist = MC.getCameraEntity().distanceTo(ent);
+                    scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
                 }
 
-                if (owner == null)
-                    return;
+                matrices.pushMatrix();
+                matrices.translate((float) projected.x, (float) projected.y);
+                matrices.scale(scale, scale);
 
-                UUID uuid = owner.getUUID();
+                if (rectangle.get()) {
+                    GuiGraphics ctx = event.getDrawContext();
+                    int x1 = (int) (-width / 2f - 1);
+                    int y1 = (int) (-FONT_MANAGER.getHeight() - 2);
+                    int x2 = (int) (width / 2 + 2);
+                    int y2 = 0;
+                    ctx.fill(x1, y1, x2, y2, 0x64000000); // 0x64 = 100 alpha
+                    int outlineColor = (140 << 24) | (19 << 16) | (19 << 8) | 19;
+                    ctx.fill(x1, y1, x2, y1 + 1, outlineColor);
+                    ctx.fill(x1, y2 - 1, x2, y2, outlineColor);
+                    ctx.fill(x1, y1, x1 + 1, y2, outlineColor);
+                    ctx.fill(x2 - 1, y1, x2, y2, outlineColor);
+                }
 
-                String ownerName;
+                FONT_MANAGER.drawText(event.getDrawContext(), display, (int) (-FONT_MANAGER.getWidth(text) / 2.f), -FONT_MANAGER.getHeight(), true);
 
-                if (NametagsModule.uuid.containsKey(uuid)) {
-                    ownerName = NametagsModule.uuid.get(uuid);
-                } else {
-                    ownerName = "";
+                if (armor.get()) {
+                    List<ItemStack> stacks = new ArrayList<>();
+                    ItemStack[] all = new ItemStack[]{
+                            ((Player) ent).getItemBySlot(EquipmentSlot.MAINHAND),
+                            ((Player) ent).getItemBySlot(EquipmentSlot.FEET),
+                            ((Player) ent).getItemBySlot(EquipmentSlot.LEGS),
+                            ((Player) ent).getItemBySlot(EquipmentSlot.CHEST),
+                            ((Player) ent).getItemBySlot(EquipmentSlot.HEAD),
+                            ((Player) ent).getItemBySlot(EquipmentSlot.OFFHAND)
+                    };
 
-                    EXECUTABLE_MANAGER.getRequestHandler().submit(() -> {
+                    for (ItemStack stack : all) {
+                        if (!stack.isEmpty()) stacks.add(stack);
+                    }
 
-                        if (isActive()) {
-                            try {
-                                String urlStr = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "");
-                                URL url = new URL(urlStr);
-                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                connection.setRequestMethod("GET");
-                                connection.setConnectTimeout(5000);
-                                connection.setReadTimeout(5000);
+                    if (!stacks.isEmpty()) {
+                        int totalWidth = (stacks.size() * 16) + ((stacks.size() - 1) * 2);
+                        int x = -totalWidth / 2;
+                        int y = -30;
 
-                                int status = connection.getResponseCode();
+                        for (int i = stacks.size() - 1; i >= 0; i--) {
+                            ItemStack stack = stacks.get(i);
+                            event.getDrawContext().renderItem(stack, x, y);
+                            event.getDrawContext().renderItemDecorations(FONT_MANAGER.rendererProvider.getRenderer(), stack, x, y);
 
-                                if (status == 200) {
-                                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                                    StringBuilder responseBuilder = new StringBuilder();
-                                    String line;
-                                    while ((line = reader.readLine()) != null) {
-                                        responseBuilder.append(line);
-                                    }
-                                    reader.close();
+                            if (durability.get()) {
+                                int damage = stack.getDamageValue();
+                                int maxDamage = stack.getMaxDamage();
 
-                                    String response = responseBuilder.toString();
+                                if (maxDamage > 0) {
+                                    event.getDrawContext().pose().pushMatrix();
+                                    event.getDrawContext().pose().translate(x + 8 - (FONT_MANAGER.getWidth((((maxDamage - damage) * 100) / maxDamage) + "%") * 0.75f) / 2.0F, y - (6 * 0.75f));
+                                    event.getDrawContext().pose().pushMatrix();
+                                    event.getDrawContext().pose().scale(0.75f, 0.75f);
+                                    float ratio = (maxDamage - damage) / (float) maxDamage;
+                                    int color = new Color(1.0f - ratio, ratio, 0).getRGB();
 
-                                    if (response != null && !response.isEmpty()) {
-                                        JsonObject json = JsonParser.parseString(response).getAsJsonObject();
-                                        if (json.has("name")) {
-                                            String name = json.get("name").getAsString();
-                                            NametagsModule.uuid.put(uuid, name);
-                                        } else {
-                                            NametagsModule.uuid.put(uuid, "Failed to get name");
-                                        }
-                                    } else {
-                                        NametagsModule.uuid.put(uuid, "Failed to get name");
-                                    }
-                                } else {
-                                    NametagsModule.uuid.put(uuid, "Failed to get name");
+                                    FONT_MANAGER.drawText(event.getDrawContext(), (((maxDamage - damage) * 100) / maxDamage) + "%", 0, 0, true, color);
+                                    event.getDrawContext().pose().popMatrix();
+                                    event.getDrawContext().pose().popMatrix();
                                 }
-
-                                connection.disconnect();
-                            } catch (Exception e) {
-                                NametagsModule.uuid.put(uuid, "Failed to get name");
                             }
-                        } else {
+
+                            x += 16 + 2;
                         }
-                    }, 0, ExecutableThreadType.ASYNC);
+                    }
                 }
 
-                i++;
-                renderEntityNametag(entity, "Owned by " + ownerName, event.getTickDelta(), matrices, 30, null);
+                matrices.popMatrix();
             }
-    }
 
+            if (items.get()) {
+                for (Entity enttt : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
+                    Vec3 pos = getRenderPos(enttt, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+                    pos = pos.add(0, 0.2, 0);
+                    Vec3 proj = project(pos);
+                    if (!projectionVisible(proj)) continue;
 
-        if (pearls.get()) {
-            for (var entity : EntityUtils.getAllEntities()) {
-                if (!(entity instanceof ThrownEnderpearl pearl)) continue;
-                if (pearl.getOwner() == null) continue;
-                i++;
-                renderEntityNametag(pearl, pearl.getOwner().getName().getString(), event.getTickDelta(), matrices, 30, null);
+                    if (enttt instanceof ItemEntity item) {
+                        ItemStack stack = item.getItem();
+                        if (stack.isEmpty()) continue;
+
+                        String name = stack.getItemName().getString();
+                        int count = stack.getCount();
+                        String display = name + (count > 1 ? " x" + count : "");
+
+                        float scale = 1.0f;
+                        if (scaling.get()) {
+                            float dist = MC.getCameraEntity().distanceTo(item);
+                            scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
+                        }
+
+                        matrices.pushMatrix();
+                        matrices.translate((float) proj.x, (float) proj.y);
+                        matrices.scale(scale, scale);
+                        FONT_MANAGER.drawText(event.getDrawContext(), display, -FONT_MANAGER.getWidth(display) / 2, -FONT_MANAGER.getHeight(), true, Color.white.getRGB());
+                        matrices.popMatrix();
+                    }
+                }
+            }
+
+            if (pearls.get()) {
+                for (Entity entt : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.ALL)) {
+                    if (entt instanceof ThrownEnderpearl pearl) {
+                        Vec3 pos = getRenderPos(pearl, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+                        Vec3 proj = project(pos.add(0, 0.25, 0));
+
+                        if (!projectionVisible(proj)) continue;
+
+                        if (pearl.getOwner() instanceof Player thrower) {
+                            String display = thrower.getName().getString();
+
+                            float scale = 1.0f;
+                            if (scaling.get()) {
+                                float dist = MC.getCameraEntity().distanceTo(pearl);
+                                scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
+                            }
+
+                            matrices.pushMatrix();
+                            matrices.translate((float) proj.x, (float) proj.y);
+                            matrices.scale(scale, scale);
+                            FONT_MANAGER.drawText(event.getDrawContext(), display, -FONT_MANAGER.getWidth(display) / 2, -FONT_MANAGER.getHeight(), true, Color.white.getRGB());
+                            matrices.popMatrix();
+                        }
+                    }
+                }
             }
         }
-        this.setDisplayInfo(String.valueOf(i));
-    }
-
-    private void renderEntityNametag(Entity entity, float tickDelta, PoseStack matrices, float scale, Color forcedColor) {
-        renderEntityNametag(entity, entity.getName().getString(), tickDelta, matrices, scale, forcedColor);
-    }
-
-    private void renderEntityNametag(Entity entity, String name, float tickDelta, PoseStack matrices, float scale, Color forcedColor) {
-        Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-
-        double baseHeightOffset = entity.isShiftKeyDown() ? entity.getBoundingBox().getYsize() : entity.getBoundingBox().getYsize() + 0.3;
-
-        double interpX = Mth.lerp(tickDelta, entity.xOld, entity.getX());
-        double interpY = Mth.lerp(tickDelta, entity.yOld, entity.getY());
-        double interpZ = Mth.lerp(tickDelta, entity.zOld, entity.getZ());
-
-        float distance = (float) camPos.distanceTo(new Vec3(interpX, interpY, interpZ));
-        double distanceYOffset = distance * 0.02;
-
-        Vec3 pos = new Vec3(
-                interpX,
-                interpY + baseHeightOffset + distanceYOffset,
-                interpZ
-        );
-
-        float dynamicScale = 0.0018f + (scale / 10000.0f) * distance;
-        if (distance <= 8.0f) dynamicScale = 0.0245f;
-
-        Component displayName;
-
-        if (entity instanceof Player player) {
-            displayName = formatter.formatPlayer(player);
-
-            if (showHealth.get()) {
-                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.getHealthText(player));
-            }
-            if (showPing.get()) {
-                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.formatPing(player));
-            }
-            if (showGameMode.get()) {
-                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.formatGameMode(player));
-            }
-            if (showEntityId.get()) {
-                displayName = Component.literal("").append(displayName).append(Component.literal(" ")).append(formatter.formatEntityId(entity));
-            }
-        } else if (name != null) {
-            displayName = Component.literal(name);
-        } else {
-            displayName = formatter.formatEntity(entity);
-        }
-
-        Component colored = formatter.formatWithColor(displayName, forcedColor, entity);
-
-        RenderUtil.drawText3D(matrices, colored, pos, dynamicScale, background.get(), border.get(), borderWidth.get().floatValue());
-
-        if (showItems.get() && entity instanceof Player player) {
-            renderPlayerItems(player, matrices, tickDelta, scale);
-        }
-    }
-
-    private void renderPlayerItems(Player player, PoseStack matrices, float tickDelta, float baseScale) {
-        List<ItemStack> items = Arrays.asList(
-                player.getMainHandItem(),
-                player.getItemBySlot(EquipmentSlot.HEAD),
-                player.getItemBySlot(EquipmentSlot.CHEST),
-                player.getItemBySlot(EquipmentSlot.LEGS),
-                player.getItemBySlot(EquipmentSlot.FEET),
-                player.getOffhandItem()
-        );
-
-        List<ItemStack> nonEmptyItems = items.stream().filter(stack -> !stack.isEmpty()).toList();
-        int itemCount = nonEmptyItems.size();
-        if (itemCount == 0) return;
-
-        double interpMinX = Mth.lerp(tickDelta, player.xOld, player.getX()) - player.getBbWidth() / 2.0;
-        double interpMinY = Mth.lerp(tickDelta, player.yOld, player.getY());
-        double interpMinZ = Mth.lerp(tickDelta, player.zOld, player.getZ()) - player.getBbWidth() / 2.0;
-
-        double interpMaxX = interpMinX + player.getBbWidth();
-        double interpMaxY = interpMinY + player.getBbHeight();
-        double interpMaxZ = interpMinZ + player.getBbWidth();
-
-        double baseX = (interpMinX + interpMaxX) / 2.0;
-        double baseY = interpMaxY + (player.isShiftKeyDown() ? 0.0 : 0.3);
-        double baseZ = (interpMinZ + interpMaxZ) / 2.0;
-
-        Vec3 camPos = MC.getEntityRenderDispatcher().camera.position();
-        Camera camera = MC.gameRenderer.getMainCamera();
-        float pitch = camera.xRot();
-        float yaw = camera.yRot();
-
-        Vec3 lookDir = Vec3.directionFromRotation(pitch, yaw).normalize().reverse();
-        Vec3 camRight = lookDir.cross(new Vec3(0, 1, 0)).normalize();
-
-        int renderIndex = 0;
-        for (ItemStack stack : nonEmptyItems) {
-            renderItemWithDepthIsolation(stack, matrices, baseX, baseY, baseZ, renderIndex, itemCount, camPos, camRight, lookDir, baseScale);
-            renderIndex++;
-        }
-    }
-
-    private void renderItemWithDepthIsolation(
-            ItemStack stack,
-            PoseStack matrices,
-            double baseX, double baseY, double baseZ,
-            int renderIndex, int itemCount,
-            Vec3 camPos, Vec3 camRight, Vec3 lookDir,
-            float baseScale
-    ) {
-        Vec3 itemPosBase = new Vec3(baseX, baseY, baseZ);
-        float distance = (float) camPos.distanceTo(itemPosBase);
-        float dynamicScale = 0.0018f + (baseScale / 10000.0f) * distance;
-        if (distance <= 8.0f) dynamicScale = 0.0245f;
-
-        double itemSpacing = dynamicScale * 12.0;
-
-        double verticalOffset = dynamicScale * 10.0 + distance * 0.02;
-
-        double offsetX = (renderIndex - (itemCount - 1) / 2.0) * itemSpacing;
-
-        Vec3 itemPos = itemPosBase.add(camRight.scale(offsetX)).add(0, verticalOffset, 0);
-
-        //GL32C.glDisable(GL32C.GL_DEPTH_TEST);
-        //GL32C.glDepthMask(false);
-        //GL32C.glDepthFunc(GL32C.GL_ALWAYS);
-        GL32C.glDepthRange(1.0, 0.1);
-
-        RenderUtil.renderItem3D(stack, matrices, itemPos, dynamicScale, lookDir);
-        
-        //GL32C.glDepthFunc(GL32C.GL_LEQUAL);
-        //GL32C.glDepthMask(true);
-        //GL32C.glEnable(GL32C.GL_DEPTH_TEST);
-        GL32C.glDepthRange(0.0, 1.0);
     }
 }

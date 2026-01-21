@@ -2,13 +2,17 @@ package me.kiriyaga.nami.util.entity;
 
 import me.kiriyaga.nami.mixin.DuckAnimal;
 import me.kiriyaga.nami.mixin.DuckAgeableMob;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.telemetry.TelemetryProperty;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
@@ -105,5 +109,24 @@ public class EntityUtils {
         if (a1.InLove() > 0) return false;
 
         return animal.canFallInLove();
+    }
+
+    public static Vec3 getRenderPos(Entity entity, float tickDelta) {
+        double x = Mth.lerp(tickDelta, entity.xOld, entity.getX());
+        double y = Mth.lerp(tickDelta, entity.yOld, entity.getY());
+        double z = Mth.lerp(tickDelta, entity.zOld, entity.getZ());
+        return new Vec3(x, y, z);
+    }
+
+    public static GameType getGameMode(Player player) {
+        PlayerInfo playerListEntry = MC.getConnection().getPlayerInfo(player.getUUID());
+        return playerListEntry == null ? GameType.CREATIVE : playerListEntry.getGameMode();
+    }
+
+    public static int getLatency(Player player) {
+        if (player == null || MC.getConnection() == null) return -1;
+
+        PlayerInfo entry = MC.getConnection().getPlayerInfo(player.getUUID());
+        return entry != null ? entry.getLatency() : -1;
     }
 }

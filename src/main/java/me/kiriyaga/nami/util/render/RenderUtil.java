@@ -29,11 +29,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.gizmos.Gizmos;
 import org.joml.*;
 import net.minecraft.core.BlockPos;
+import org.lwjgl.opengl.GL11;
 
 import static me.kiriyaga.nami.Nami.*;
 import java.awt.*;
 
 public class RenderUtil {
+    public static final Matrix4f PROJECTION_MATRIX = new Matrix4f();
+    public static final Matrix4f MODEL_VIEW_MATRIX = new Matrix4f();
+    public static final Matrix4f POSITION_MATRIX = new Matrix4f();
+    public static Camera CAMERA = new Camera();
 
     public static void rect3d(PoseStack matrix, float x1, float y1, float x2, float y2, int color) {
         float i;
@@ -152,103 +157,42 @@ public class RenderUtil {
                 .setAlwaysOnTop();
     }
 
-    public static void drawText3D(PoseStack matrices, Component text, Vec3 pos, float scale, boolean background, boolean border, float borderWidth) {
-        Camera camera = MC.gameRenderer.getMainCamera();
-
-        matrices.pushPose();
-        matrices.translate(
-                pos.x - camera.position().x,
-                pos.y - camera.position().y,
-                pos.z - camera.position().z
-        );
-
-        matrices.mulPose(Axis.YP.rotationDegrees(-camera.yRot()));
-        matrices.mulPose(Axis.XP.rotationDegrees(camera.xRot()));
-
-        matrices.scale(-scale, -scale, scale);
-
-        Font textRenderer = FONT_MANAGER.rendererProvider.getRenderer();
-        float textWidth = FONT_MANAGER.getWidth(text) / 2f;
-
-        Matrix4f matrix = matrices.last().pose();
-        MultiBufferSource.BufferSource provider = MC.renderBuffers().bufferSource();
-
-        if (background) {
-            float bgPadding = 1f;
-            float height = FONT_MANAGER.getHeight();
-
-            float left = -textWidth - bgPadding;
-            float right = textWidth + bgPadding;
-            float top = -bgPadding;
-            float bottom = height;
-
-            int backgroundColor = 0x90000000;
-            int borderColor = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor().getRGB();
-
-            RenderUtil.rect3d(matrices, left, top, right, bottom, backgroundColor);
-
-            if (border){
-                RenderUtil.rect3d(matrices, left - borderWidth, top, left, bottom, borderColor);
-                RenderUtil.rect3d(matrices, right, top, right + borderWidth, bottom, borderColor);
-                RenderUtil.rect3d(matrices, left - borderWidth, top - borderWidth, right + borderWidth, top, borderColor);
-                RenderUtil.rect3d(matrices, left - borderWidth, bottom, right + borderWidth, bottom + borderWidth, borderColor);
-            }
-        }
-
-        textRenderer.drawInBatch(
-                text, -textWidth, 0, -1, !MODULE_MANAGER.getStorage().getByClass(FontModule.class).isEnabled(), matrix, provider, Font.DisplayMode.SEE_THROUGH, 0, 15728880
-        );
-
-        provider.endBatch();
-
-        matrices.popPose();
+    private static AABB cameraTransform(AABB box) {
+        Vec3 camera = MC.gameRenderer.getMainCamera().position();
+        return new AABB(box.minX - camera.x(),
+                box.minY - camera.y(),
+                box.minZ - camera.z(),
+                box.maxX - camera.x(),
+                box.maxY - camera.y(),
+                box.maxZ - camera.z());
     }
 
-    public static void renderItem3D(ItemStack stack, PoseStack matrices, Vec3 pos, float scale, Vec3 lookDir) {
-        ItemRenderer itemRenderer = MC.getItemRenderer();
-        Camera camera = MC.gameRenderer.getMainCamera();
+    private static Vec3 cameraTransform(Vec3 vec3d) {
+        Vec3 camera = MC.gameRenderer.getMainCamera().position();
+        return new Vec3(vec3d.x - camera.x(),
+                vec3d.y - camera.y(),
+                vec3d.z - camera.z());
+    }
 
-        matrices.pushPose();
+    public static Vec3 project(Vec3 vec3d) {
+        vec3d = cameraTransform(vec3d);
 
-        Vec3 camPos = camera.position();
+        int displayHeight = MC.getWindow().getHeight();
+        int[] viewport = new int[4];
+        GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
+        Vector3f target = new Vector3f();
 
-        matrices.translate((float)(pos.x - camPos.x), (float)(pos.y - camPos.y), (float)(pos.z - camPos.z));
+        Vector4f transformedCoordinates = new Vector4f((float) vec3d.x, (float) vec3d.y, (float) vec3d.z, 1.f).mul(POSITION_MATRIX);
+        Matrix4f matrixProj = new Matrix4f(PROJECTION_MATRIX);
+        Matrix4f matrixModel = new Matrix4f(MODEL_VIEW_MATRIX);
+        matrixProj.mul(matrixModel).project(transformedCoordinates.x(), transformedCoordinates.y(), transformedCoordinates.z(), viewport, target);
 
-        Vec3 dir = lookDir.normalize();
+        double scale = MC.getWindow().getGuiScale();
 
-        Vec3 up = new Vec3(0, 1, 0);
-        Vec3 right = up.cross(dir).normalize();
-        if (right.lengthSqr() < 1e-6) {
-            right = new Vec3(1, 0, 0);
-        }
-        Vec3 newUp = dir.cross(right).normalize();
+        return new Vec3(target.x / scale, (displayHeight - target.y) / scale, target.z);
+    }
 
-        Matrix3f basis = new Matrix3f(
-                (float) right.x, (float) right.y, (float) right.z,
-                (float) newUp.x, (float) newUp.y, (float) newUp.z,
-                (float) dir.x, (float) dir.y, (float) dir.z
-        );
-
-        Quaternionf rotation = new Quaternionf().setFromNormalized(basis);
-        matrices.mulPose(rotation);
-
-        float s = scale * 13f;
-        matrices.scale(s, s, s);
-        matrices.scale(1.0f, 1.0f, 0.0001f);
-
-/*        itemRenderer.renderItem( // todo: fix this
-                stack,
-                ItemDisplayContext.FIXED,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                OverlayTexture.DEFAULT_UV,
-                matrices,
-                MC.getBufferBuilders().getEntityVertexConsumers(),
-                MC.world,
-                0
-        );*/
-
-        MC.renderBuffers().bufferSource().endBatch();
-
-        matrices.popPose();
+    public static boolean projectionVisible(Vec3 vec3d) {
+        return vec3d.z > 0 && vec3d.z < 1;
     }
 }

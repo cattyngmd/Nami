@@ -11,6 +11,7 @@ import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.feature.setting.impl.EnumSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import me.kiriyaga.nami.util.ColorUtils;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.world.level.block.Block;
@@ -27,19 +28,15 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.Level;
 
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.NametagFormatter.*;
 
 @RegisterModule
 public class ESPModule extends Module {
@@ -123,13 +120,13 @@ public class ESPModule extends Module {
         if (entity instanceof Player) {
             return colorModule.getStyledGlobalColor();
         } else if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) {
-            return COLOR_PASSIVE;
+            return ColorUtils.COLOR_PASSIVE;
         } else if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL).contains(entity)) {
-            return COLOR_NEUTRAL;
+            return ColorUtils.COLOR_NEUTRAL;
         } else if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE).contains(entity)) {
-            return COLOR_HOSTILE;
+            return ColorUtils.COLOR_HOSTILE;
         } else if (entity instanceof ItemEntity) {
-            return COLOR_ITEM;
+            return ColorUtils.COLOR_ITEM;
         }
         return Color.WHITE;
     }
@@ -141,7 +138,7 @@ public class ESPModule extends Module {
         for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS)) {
             if (!showItems.get() || entity.isRemoved() || !entity.isAlive()) continue;
 
-            Color color = COLOR_ITEM;
+            Color color = ColorUtils.COLOR_ITEM;
             drawBox(entity, color, matrices, partialTicks);
         }
     }
@@ -176,13 +173,13 @@ public class ESPModule extends Module {
             return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
         }
 
-        if (esp.showPeacefuls.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) return COLOR_PASSIVE;
-        if (esp.showNeutrals.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL).contains(entity)) return COLOR_NEUTRAL;
-        if (esp.showHostiles.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE).contains(entity)) return COLOR_HOSTILE;
+        if (esp.showPeacefuls.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) return ColorUtils.COLOR_PASSIVE;
+        if (esp.showNeutrals.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL).contains(entity)) return ColorUtils.COLOR_NEUTRAL;
+        if (esp.showHostiles.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE).contains(entity)) return ColorUtils.COLOR_HOSTILE;
         if (entity instanceof ItemEntity) {
             if (!esp.showItems.get()) return null;
             if (esp.itemBoundingBox.get()) return null;
-            return COLOR_ITEM;
+            return ColorUtils.COLOR_ITEM;
         }
         return null;
     }
@@ -207,8 +204,6 @@ public class ESPModule extends Module {
     }
 
     private void renderMob(Render3DEvent event) {
-        PoseStack matrices = event.getMatrices();
-        Level world = MC.level;
         BlockPos playerPos = MC.player.blockPosition();
         int lightLimit = mobSpawnLightThreshold.get();
 
@@ -218,23 +213,10 @@ public class ESPModule extends Module {
                     BlockPos pos = playerPos.offset(x, y, z);
 
                     if (canMobSpawn(pos, lightLimit)) {
-                        int blockLight = world.getMaxLocalRawBrightness(pos);
-
-                        double renderX = pos.getX() + 0.5;
-                        double renderY = pos.getY() + 1.0;
-                        double renderZ = pos.getZ() + 0.5;
-                        Vec3 camPos = MC.gameRenderer.getMainCamera().position();
-
-                        float distance = (float) camPos.distanceTo(new Vec3(renderX, renderY, renderZ));
-                        int scale = 30;
-
-                        float dynamicScale = 0.0018f + (scale / 10000.0f) * distance;
-                        if (distance <= 8.0f) dynamicScale = 0.0245f;
-
-                        Vec3 renderPos = new Vec3(renderX, renderY, renderZ);
-                        Component text = Component.nullToEmpty(String.valueOf(blockLight));
-                        RenderUtil.drawText3D(matrices, text, renderPos, dynamicScale, false, false, 1);
+                        AABB box = new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, pos.getY() + 0.1, pos.getZ() + 1.0);
+                        RenderUtil.drawBoxLines(box, new Color(125, 125, 0, 255), true, true, 1.50f);
                     }
+
                 }
             }
         }

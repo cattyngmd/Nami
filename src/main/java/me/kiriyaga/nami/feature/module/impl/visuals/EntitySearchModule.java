@@ -8,11 +8,10 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.WhitelistSetting;
+import me.kiriyaga.nami.util.ColorUtils;
 import me.kiriyaga.nami.util.entity.EntityUtils;
-import me.kiriyaga.nami.util.entity.HostileUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.Camera;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -23,7 +22,6 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 
 import static me.kiriyaga.nami.Nami.*;
-import static me.kiriyaga.nami.util.NametagFormatter.*;
 
 @RegisterModule
 public class EntitySearchModule extends Module {
@@ -75,10 +73,10 @@ public class EntitySearchModule extends Module {
         if (entity instanceof Player) {
             return MODULE_MANAGER.getStorage().getByClass(me.kiriyaga.nami.feature.module.impl.client.ColorModule.class).getStyledGlobalColor();
         }
-        if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) return COLOR_PASSIVE;
-        if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL).contains(entity)) return COLOR_NEUTRAL;
-        if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE).contains(entity)) return COLOR_HOSTILE;
-        if (entity instanceof ItemEntity) return COLOR_ITEM;
+        if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) return ColorUtils.COLOR_PASSIVE;
+        if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.NEUTRAL).contains(entity)) return ColorUtils.COLOR_NEUTRAL;
+        if (EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE).contains(entity)) return ColorUtils.COLOR_HOSTILE;
+        if (entity instanceof ItemEntity) return ColorUtils.COLOR_ITEM;
         return Color.WHITE;
     }
 }

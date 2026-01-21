@@ -4,11 +4,23 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.Optional;
 
+import static me.kiriyaga.nami.Nami.CAT_FORMAT;
+
 public class ColorUtils {
+    public static final Color COLOR_PASSIVE = new Color(211, 211, 211, 255);
+    public static final Color COLOR_NEUTRAL = new Color(255, 255, 0, 255);
+    public static final Color COLOR_HOSTILE = new Color(255, 0, 0, 255);
+    public static final Color COLOR_ITEM = new Color(211, 211, 211, 255);
+    public static final Color COLOR_FRIEND = new Color(0, 170, 170, 255);
+    public static final Color COLOR_SNEAK = new Color(255, 165, 0, 255);
+
     public static int toRGBA(Color color) {
         return (color.getAlpha() << 24) |
                 (color.getRed() << 16) |
@@ -118,5 +130,24 @@ public class ColorUtils {
         Color dark = darken(c, percent);
 
         return TextColor.fromRgb(dark.getRGB());
+    }
+
+    public static Component getHealthText(Entity entity) {
+        if (!(entity instanceof Player player)) return Component.empty();
+
+        double hp = player.getHealth() + player.getAbsorptionAmount();
+        double health = Math.round(hp * 2.0) / 2.0;
+
+        StringBuilder sb = new StringBuilder();
+
+        if (health >= 19) sb.append("{green}");
+        else if (health >= 13) sb.append("{yellow}");
+        else if (health >= 8) sb.append("{gold}");
+        else if (health >= 6) sb.append("{red}");
+        else sb.append("{dark_red}");
+
+        sb.append(new DecimalFormat().format(hp)).append(" ");
+
+        return CAT_FORMAT.format(sb.toString());
     }
 }
