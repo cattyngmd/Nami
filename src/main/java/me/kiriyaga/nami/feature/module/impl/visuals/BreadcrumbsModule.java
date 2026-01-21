@@ -14,6 +14,7 @@ import me.kiriyaga.nami.util.entity.EntityUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.entity.projectile.arrow.SpectralArrow;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.phys.Vec3;
 
@@ -86,9 +87,9 @@ public class BreadcrumbsModule extends Module {
 
         for (Entity entity : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.ALL)) {
 
-            if (arrows.get() && entity instanceof Arrow arrow) {
-                int id = arrow.getId();
-                Vec3 pos = arrow.position();
+            if (arrows.get() && entity instanceof Arrow || entity instanceof SpectralArrow) {
+                int id = entity.getId();
+                Vec3 pos = entity.position();
                 Vec3 last = lastArrowPositions.get(id);
                 if (last != null)
                     arrowCrumbs.add(new Breadcrumb(last, pos, fadeTime.get()));
