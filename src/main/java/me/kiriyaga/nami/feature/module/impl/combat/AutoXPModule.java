@@ -31,6 +31,7 @@ public class AutoXPModule extends Module {
     public enum SwapMode {NORMAL, SILENT }
 
     private final IntSetting durability = addSetting(new IntSetting("Durability", 80, 70, 99));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
     private final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
     private final IntSetting packetShift = addSetting(new IntSetting("ShiftTicks", 3, 1, 6));
     private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
@@ -80,16 +81,19 @@ public class AutoXPModule extends Module {
             return;
         }
 
-        ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
-                this.name,
-                6,
-                MC.player.getYRot(),
-                90.0f,
-                RotationsModule.RotationMode.MOTION // only motion here sorry
-                )
-        );
+        if (rotate.get()) {
 
-        if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+                            this.name,
+                            6,
+                            MC.player.getYRot(),
+                            90.0f,
+                            RotationsModule.RotationMode.MOTION // only motion here sorry
+                    )
+            );
+
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
+        }
 
         int prevSlot = MC.player.getInventory().getSelectedSlot();
 
