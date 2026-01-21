@@ -65,7 +65,8 @@ public class ClickPearlModule extends Module {
             }
         }
 
-        useKey.setWasPressedLastTick(pressed);
+        if (!MC.player.isFallFlying() && groundAction.get() != GroundAction.EXP)
+            useKey.setWasPressedLastTick(pressed); // so we spam with exp
     }
 
     private void use() {
