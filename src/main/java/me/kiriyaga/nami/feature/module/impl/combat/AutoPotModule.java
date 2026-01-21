@@ -30,12 +30,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import static me.kiriyaga.nami.Nami.*;
 
 @RegisterModule
-public class AutoPotModule extends Module {
+public class AutoPotModule extends Module { // TODO: refactor this
 
     public enum SwapMode { NORMAL, SILENT }
     public enum ThrowMode { ABOVE, UNDER }
 
     private final EnumSetting<Pot> potEffect = addSetting(new EnumSetting<>("Effect", Pot.RESISTANCE));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
     private final EnumSetting<ThrowMode> throwMode = addSetting(new EnumSetting<>("Throw", ThrowMode.UNDER));
     private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
     private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
@@ -46,6 +47,7 @@ public class AutoPotModule extends Module {
 
     public AutoPotModule() {
         super("AutoPot", "Throws specified splash potion under/above you.", ModuleCategory.of("Combat"), "autopot");
+        throwMode.setShowCondition(rotate::get);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -72,10 +74,54 @@ public class AutoPotModule extends Module {
         }
 
         int potSlot = getSlot(potEffect.get());
+        int potInvSlot = getSlotInInventory(potEffect.get());
+        int prev = MC.player.getInventory().getSelectedSlot();
         if (potSlot == -1) {
-            if (selfToggle.get())
-                toggle();
-            return;
+            if (potInvSlot != -1) {
+                if (!throwTimer.hasElapsed(5000)) return;
+
+                float pitch = 90.00f;
+
+                switch (throwMode.get()) {
+                    case ABOVE -> pitch = -90.00f;
+                    case UNDER -> pitch = 90.00f;
+                    default -> pitch = 90.00f;
+                }
+
+                if (rotate.get()) {
+                    ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+                            this.name,
+                            6,
+                            MC.player.getYRot(),
+                            pitch,
+                            RotationsModule.RotationMode.MOTION
+                    ));
+
+                    if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
+                }
+
+                move(potInvSlot, prev);
+
+                throwTimer.reset();
+
+                switch (swapMode.get()) {
+                    case NORMAL -> {
+                        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(potSlot);
+                        MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
+                    }
+                    case SILENT -> {
+                        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(potSlot);
+                        MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
+                        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+                    }
+                }
+
+                move(potInvSlot, prev);
+            } else {
+                if (selfToggle.get())
+                    toggle();
+                return;
+            }
         }
 
         if (!throwTimer.hasElapsed(5000)) return;
@@ -88,15 +134,17 @@ public class AutoPotModule extends Module {
             default -> pitch = 90.00f;
         }
 
-        ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
-                this.name,
-                6,
-                MC.player.getYRot(),
-                pitch,
-                RotationsModule.RotationMode.MOTION
-        ));
+        if (rotate.get()) {
+            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+                    this.name,
+                    6,
+                    MC.player.getYRot(),
+                    pitch,
+                    RotationsModule.RotationMode.MOTION
+            ));
 
-        if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
+            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(this.name)) return;
+        }
 
         int prevSlot = MC.player.getInventory().getSelectedSlot();
         throwTimer.reset();
@@ -117,6 +165,34 @@ public class AutoPotModule extends Module {
     private int getSlot(Pot targetEffect) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getItem(i);
+            if (stack.isEmpty() || stack.getItem() != Items.SPLASH_POTION) continue;
+
+            PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
+            if (contents == null) continue;
+
+            for (MobEffectInstance inst : contents.getAllEffects()) {
+                if (inst.getEffect() == targetEffect.getEffect()) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private void move(int invSlot, int hotbarSlot) {
+        int realInv = invSlot < 9 ? invSlot + 36 : invSlot;
+        int realHotbar = hotbarSlot + 36;
+
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(realInv);
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(realHotbar);
+        INVENTORY_MANAGER.getClickHandler().pickupSlot(realInv);
+    }
+
+    private int getSlotInInventory(AutoPotModule.Pot targetEffect) {
+        LocalPlayer player = MC.player;
+
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
             if (stack.isEmpty() || stack.getItem() != Items.SPLASH_POTION) continue;
 
             PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);

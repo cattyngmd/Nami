@@ -8,9 +8,13 @@ import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.IntSetting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -98,5 +102,5 @@ public class ReplenishModule extends Module {
             INVENTORY_MANAGER.getClickHandler().pickupSlot(realHotbarSlot);
             INVENTORY_MANAGER.getClickHandler().pickupSlot(realInvSlot);
         }
-     }
+    }
 }
