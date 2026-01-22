@@ -51,6 +51,11 @@ public class ClickActionModule extends Module {
         if (MC.level == null || MC.player == null) return;
 
         boolean pressed = useKey.isPressed();
+        if (groundAction.get() == GroundAction.EXP && pressed && !MC.player.isFallFlying()) {
+            use();
+            useKey.setWasPressedLastTick(pressed);
+            return;
+        }
 
         if (pressed && !useKey.wasPressedLastTick() || recall) {
             recall = false;
@@ -61,8 +66,7 @@ public class ClickActionModule extends Module {
             }
         }
 
-        if (!MC.player.isFallFlying() && groundAction.get() != GroundAction.EXP)
-            useKey.setWasPressedLastTick(pressed); // so we spam with exp
+        useKey.setWasPressedLastTick(pressed);
     }
 
     private void use() {
