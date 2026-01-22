@@ -37,7 +37,7 @@ import static me.kiriyaga.nami.Nami.MC;
 public class BlockSearchModule extends Module {
 
     private final WhitelistSetting blockList = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.BLOCK));
-    private final BoolSetting render = addSetting(new BoolSetting("Render", true));
+    private final BoolSetting fill = addSetting(new BoolSetting("Fill", true));
     private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
     private final BoolSetting notAtSpawn = addSetting(new BoolSetting("NotAtSpawn", false));
 
@@ -137,9 +137,7 @@ public class BlockSearchModule extends Module {
                 var state = MC.level.getBlockState(pos);
                 Color color = BlockUtils.getColorByBlockId(state);
 
-                if (render.get()) {
-                    RenderUtil.drawBlockPosLines(MC.level, pos, state, color, true, true, 1.5f);
-                }
+                RenderUtil.drawBlockPosLines(MC.level, pos, state, color, fill.get(), true, 1.5f);
 
                 if (tracers.get()) {
                     RenderUtil.drawLine(start, Vec3.atCenterOf(pos), color, 1.5f);
