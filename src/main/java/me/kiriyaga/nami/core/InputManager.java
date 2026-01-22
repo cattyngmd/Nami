@@ -109,6 +109,8 @@ public class InputManager {
     public boolean isBackPressed() { return backPressed; }
     public boolean isLeftPressed() { return leftPressed; }
     public boolean isRightPressed() { return rightPressed; }
+    public boolean isJumpPressed() { return jumping; }
+    public boolean isShiftPressed() { return sneaking; }
 
     public boolean hasAnyInput() {
         return forward || backward || left || right || jumping || sneaking || sprinting;

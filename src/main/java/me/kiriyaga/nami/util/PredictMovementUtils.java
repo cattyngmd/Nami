@@ -1,5 +1,6 @@
 package me.kiriyaga.nami.util;
 
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.phys.Vec3;
@@ -48,7 +49,7 @@ public final class PredictMovementUtils {
         }
     }
 
-    public static PredictedEntity toPredicted(net.minecraft.world.entity.LivingEntity entity) {
+    public static PredictedEntity toPredicted(LivingEntity entity) {
         PredictedEntity p = new PredictedEntity(
                 entity.position(),
                 entity.getDeltaMovement(),
