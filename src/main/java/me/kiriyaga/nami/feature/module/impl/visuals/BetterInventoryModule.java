@@ -95,14 +95,17 @@ public class BetterInventoryModule extends Module {
 
         float percent = usedSlots / 27f;
         percent = Math.min(1f, Math.max(0f, percent));
-        int width = 16;
+        int width = 13;
         int height = 2;
-        ctx.fill(x, y, x + width, y - height, 0xFF000000);
-        int r = (int) (255 * (1 - percent));
+
+        int startX = x + 2;
+        ctx.fill(startX, y, startX + width, y - height, 0xFF000000);
+        int r = (int) (255 * (1f - percent));
         int g = (int) (255 * percent);
         int color = (0xFF << 24) | (r << 16) | (g << 8);
-
-        ctx.fill(x, y, x + (int) (width * percent), y - height, color);
+        int fill = Math.round(width * percent);
+        fill = Math.max(0, Math.min(fill, width));
+        ctx.fill(startX, y - 1, startX + fill, y - height, color);
     }
 
     private void renderDominantItem(GuiGraphics ctx, int slotX, int slotY, ShulkerInfo info) {
