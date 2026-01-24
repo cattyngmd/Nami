@@ -82,14 +82,18 @@ public class BetterInventoryModule extends Module {
         int x = slotX;
         int y = slotY + 15;
 
-        int total = 0;
+        float usedSlots = 0f;
         for (ItemStack s : info.stacks()) {
             if (s.isEmpty()) continue;
-            total += getSlotUsage(s);
+
+            int max = s.getMaxStackSize();
+            int count = s.getCount();
+            float slotUsage = (float) count / (float) max;
+            slotUsage = Math.min(1f, slotUsage);
+            usedSlots += slotUsage;
         }
 
-        int max = 27 * 64; // TODO theoretically stack can be bigger then 64 on some weird servers
-        float percent = (float) total / (float) max;
+        float percent = usedSlots / 27f;
         percent = Math.min(1f, Math.max(0f, percent));
         int width = 16;
         int height = 2;
@@ -99,14 +103,6 @@ public class BetterInventoryModule extends Module {
         int color = (0xFF << 24) | (r << 16) | (g << 8);
 
         ctx.fill(x, y, x + (int) (width * percent), y + height, color);
-    }
-
-    private int getSlotUsage(ItemStack stack) {
-        if (stack.isEmpty()) return 0;
-
-        int max = stack.getMaxStackSize();
-        int count = stack.getCount();
-        return Math.min(max, count);
     }
 
     private void renderDominantItem(GuiGraphics ctx, int slotX, int slotY, ShulkerInfo info) {
