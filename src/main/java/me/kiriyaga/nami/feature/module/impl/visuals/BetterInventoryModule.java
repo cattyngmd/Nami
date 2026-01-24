@@ -69,11 +69,11 @@ public class BetterInventoryModule extends Module {
                 ShulkerInfo info = ShulkerInfo.create(stack, slot.index, false);
                 if (info == null) continue;
 
-                if (shulkerFillBar.get())
-                    renderShulkerFill(ctx, slot.x, slot.y, info);
-
                 if (dominantItem.get())
                     renderDominantItem(ctx, slot.x, slot.y, info);
+
+                if (shulkerFillBar.get())
+                    renderShulkerFill(ctx, slot.x, slot.y, info);
             }
         }
     }
@@ -97,12 +97,12 @@ public class BetterInventoryModule extends Module {
         percent = Math.min(1f, Math.max(0f, percent));
         int width = 16;
         int height = 2;
-        ctx.fill(x, y, x + width, y + height, 0xFF000000);
+        ctx.fill(x, y, x + width, y - height, 0xFF000000);
         int r = (int) (255 * (1 - percent));
         int g = (int) (255 * percent);
         int color = (0xFF << 24) | (r << 16) | (g << 8);
 
-        ctx.fill(x, y, x + (int) (width * percent), y + height, color);
+        ctx.fill(x, y, x + (int) (width * percent), y - height, color);
     }
 
     private void renderDominantItem(GuiGraphics ctx, int slotX, int slotY, ShulkerInfo info) {
