@@ -16,6 +16,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
+import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
 import me.kiriyaga.nami.util.ColorUtils;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,7 +33,6 @@ import org.joml.Matrix3x2fStack;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.entity.EntityUtils.getRenderPos;
@@ -44,7 +44,8 @@ public class NametagsModule extends Module {
 
     public final BoolSetting self = addSetting(new BoolSetting("Self", false));
     public final BoolSetting invisible = addSetting(new BoolSetting("Invisibles", true));
-    public final BoolSetting scaling = addSetting(new BoolSetting("Scaling", true));
+    public final BoolSetting dynamicScale = addSetting(new BoolSetting("DynamicScale", true));
+    public final DoubleSetting scaling = addSetting(new DoubleSetting("Scaling", 1.00, 0.50, 1.50));
     public final BoolSetting gameMode = addSetting(new BoolSetting("GameMode", false));
     public final BoolSetting ping = addSetting(new BoolSetting("Ping", true));
     public final BoolSetting entityId = addSetting(new BoolSetting("EntityID", false));
@@ -116,7 +117,7 @@ public class NametagsModule extends Module {
 
 
                 float scale = 1.0f;
-                if (scaling.get()) {
+                if (dynamicScale.get()) {
                     float dist = MC.getCameraEntity().distanceTo(ent);
                     scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
                 }
@@ -131,7 +132,7 @@ public class NametagsModule extends Module {
                     int y1 = (int) (-FONT_MANAGER.getHeight() - 2);
                     int x2 = (int) (width / 2 + 2);
                     int y2 = 0;
-                    ctx.fill(x1, y1, x2, y2, 0x64000000); // 0x64 = 100 alpha
+                    ctx.fill(x1, y1, x2, y2, 0x64000000);
                     int outlineColor = (140 << 24) | (19 << 16) | (19 << 8) | 19;
                     ctx.fill(x1, y1, x2, y1 + 1, outlineColor);
                     ctx.fill(x1, y2 - 1, x2, y2, outlineColor);
@@ -209,10 +210,12 @@ public class NametagsModule extends Module {
                     String display = name + (count > 1 ? " x" + count : "");
 
                     float scale = 1.0f;
-                    if (scaling.get()) {
+                    if (dynamicScale.get()) {
                         float dist = MC.getCameraEntity().distanceTo(item);
                         scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
                     }
+
+                    scale = scale * scaling.get().floatValue();
 
                     matrices.pushMatrix();
                     matrices.translate((float) proj.x, (float) proj.y);
@@ -235,7 +238,7 @@ public class NametagsModule extends Module {
                         String display = thrower.getName().getString();
 
                         float scale = 1.0f;
-                        if (scaling.get()) {
+                        if (dynamicScale.get()) {
                             float dist = MC.getCameraEntity().distanceTo(pearl);
                             scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
                         }
