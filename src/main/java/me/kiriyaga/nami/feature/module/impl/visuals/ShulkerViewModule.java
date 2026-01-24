@@ -11,90 +11,184 @@ import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.Module;
 import me.kiriyaga.nami.feature.module.ModuleCategory;
 import me.kiriyaga.nami.feature.module.RegisterModule;
-import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
-import me.kiriyaga.nami.feature.setting.impl.DoubleSetting;
-
-import me.kiriyaga.nami.util.container.ContainerUtils;
+import me.kiriyaga.nami.feature.setting.impl.*;
 import me.kiriyaga.nami.util.container.ShulkerInfo;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.item.DyeColor;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static me.kiriyaga.nami.Nami.*;
 import static me.kiriyaga.nami.util.container.ContainerUtils.DyeColorToARGB;
-import static me.kiriyaga.nami.util.container.ContainerUtils.openContainer;
 
 @RegisterModule
 public class ShulkerViewModule extends Module {
 
+    public enum Mode { MULTI, SINGLE }
+
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.MULTI));
     public final BoolSetting tooltip = addSetting(new BoolSetting("Tooltip", true));
-    public final BoolSetting compact = addSetting(new BoolSetting("Compact", true));
+    public final BoolSetting compact = addSetting(new BoolSetting("Compact", false));
     public final BoolSetting bothSides = addSetting(new BoolSetting("BothSides", true));
     public final BoolSetting borders = addSetting(new BoolSetting("Borders", true));
-    public final BoolSetting middleOpen = addSetting(new BoolSetting("MiddleclickOpen", false));
     public final DoubleSetting scale = addSetting(new DoubleSetting("Scale", 1, 0.5, 1.5));
-    public final DoubleSetting scrollsensitivity = addSetting(new DoubleSetting("Sensitivity", 1, 0.5, 3));
+    public final DoubleSetting scrollSensitivity = addSetting(new DoubleSetting("Sensitivity", 1, 0.5, 3));
+    public final KeyBindSetting freezeKey = addSetting(new KeyBindSetting("FreezeKey", "LSHIFT"));
+
+    private static final int GRID_WIDTH = 18;
+    private static final int GRID_HEIGHT = 18;
+    private static final int MARGIN = 2;
 
     private final List<ShulkerInfo> shulkerList = new ArrayList<>();
-    private final int GRID_WIDTH = 20;
-    private final int GRID_HEIGHT = 18;
-    private final int MARGIN = 2;
 
-    private int currentY = 0;
-    private int startX = 0;
-    private int offset = 0;
-    private int totalHeight = 0;
+    private int currentY;
+    private int startX;
+    private int offset;
+    private int totalHeight;
+    private boolean frozen = false;
+    private int frozenX;
+    private int frozenY;
+    private ItemStack frozenStack = ItemStack.EMPTY;
 
-    private double clickedX = -1, clickedY = -1;
-    private int button = -1;
 
-    public ShulkerViewModule() {
-        super("ShulkerView", "Improves shulker management.", ModuleCategory.of("Render"),"shulkerview");
+    public ShulkerViewModule() {super("ShulkerView", "Shows shulker content preview.", ModuleCategory.of("Render"), "shulkerview");
+        bothSides.setShowCondition(() -> mode.get() == Mode.MULTI);
+        scrollSensitivity.setShowCondition(() -> mode.get() == Mode.MULTI);
+        freezeKey.setShowCondition(() -> mode.get() == Mode.SINGLE);
     }
+
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onTick(PreTickEvent event) {
         shulkerList.clear();
 
+        if (mode.get() != Mode.MULTI) return;
         if (!(MC.screen instanceof AbstractContainerScreen<?> screen)) return;
 
         for (Slot slot : screen.getMenu().slots) {
             ShulkerInfo info = ShulkerInfo.create(slot.getItem(), slot.index, compact.get());
-            if (info != null) shulkerList.add(info);
+            if (info != null) {
+                shulkerList.add(info);
+            }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onRender(RenderScreenEvent event) {
-        if (!(MC.screen instanceof AbstractContainerScreen)) return;
+    @SubscribeEvent
+    public void onRenderTooltipEvent(RenderTooltipEvent event) {
+        if (!(MC.screen instanceof AbstractContainerScreen<?>)) return;
 
-        GuiGraphics context = event.getDrawContext();
-        boolean right = false;
-        int edgePadding = 6;
-        currentY = bothSides.get() ? edgePadding : edgePadding + offset;
-        startX = edgePadding;
+        if (mode.get() == Mode.SINGLE) {
+            renderSingle(event);
+        }
+    }
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onRenderScreenEvent(RenderScreenEvent event) {
+        if (!(MC.screen instanceof AbstractContainerScreen<?>)) return;
+
+        if (mode.get() == Mode.MULTI) {
+            renderMulti(event);
+        }
+    }
+
+    private void renderSingle(RenderTooltipEvent event) {
+        ItemStack hovered = event.hoveredStack();
+        boolean freezePressed = freezeKey.isPressed();
+
+        if ((hovered == null || hovered.isEmpty()) && !frozen) return;
+        if (!freezePressed) {
+            frozen = false;
+            frozenStack = ItemStack.EMPTY;
+        }
+        if (freezePressed && !frozen) {
+            ShulkerInfo test = ShulkerInfo.create(hovered, -1, compact.get());
+            if (test != null) {
+                frozen = true;
+                frozenX = event.mouseX();
+                frozenY = event.mouseY();
+                frozenStack = hovered;
+            }
+        }
+
+        ItemStack stack = frozen ? frozenStack : hovered;
+        if (stack == null || stack.isEmpty()) return;
+
+        ShulkerInfo info = ShulkerInfo.create(stack, -1, compact.get());
+        if (info == null) return;
+
+        event.cancel();
+
+        GuiGraphics ctx = event.graphics();
+        float scale = this.scale.get().floatValue();
+        int cols = info.cols();
+        int rows = info.rows();
+        int width  = cols * GRID_WIDTH + MARGIN * (cols-1);
+        int height = rows * GRID_HEIGHT + MARGIN * (rows-1);
+        int baseX = frozen ? frozenX : event.mouseX();
+        int baseY = frozen ? frozenY : event.mouseY();
+        int x = (int) (baseX / scale);
+        int y = (int) (baseY / scale);
+        double mouseX = event.mouseX() / scale;
+        double mouseY = event.mouseY() / scale;
+
+        ctx.pose().pushMatrix();
+        ctx.pose().scale(scale, scale);
+
+        ctx.fill(x, y, x + width, y + height, new Color(0, 0, 0, 90).getRGB());
+
+        if (borders.get()) {
+            drawBorder(ctx, x, y, width, height, getShulkerColor(stack));
+        }
+
+        ItemStack tooltipStack = ItemStack.EMPTY;
+        int index = 0;
+
+        for (ItemStack content : info.stacks()) {
+            int ix = x + (index % cols) * GRID_WIDTH + MARGIN;
+            int iy = y + (index / cols) * GRID_HEIGHT + MARGIN;
+
+            ctx.renderItem(content, ix, iy);
+            ctx.renderItemDecorations(MC.font, content, ix, iy, null);
+
+            if (!content.isEmpty()
+                    && mouseX >= ix && mouseX <= ix + 16
+                    && mouseY >= iy && mouseY <= iy + 16) {
+                tooltipStack = content;
+            }
+
+            index++;
+        }
+        if (tooltip.get() && !tooltipStack.isEmpty()) {
+            ctx.setTooltipForNextFrame(MC.font, tooltipStack, event.mouseX(), event.mouseY());
+        }
+        ctx.pose().popMatrix();
+    }
+
+    private void renderMulti(RenderScreenEvent event) {
+        GuiGraphics ctx = event.getDrawContext();
         float scale = this.scale.get().floatValue();
 
-        context.pose().pushMatrix();
-        context.pose().scale(scale, scale);
+        boolean right = false;
+        int edgePadding = 6;
+
+        currentY = bothSides.get() ? edgePadding : edgePadding + offset;
+        startX = edgePadding;
+
+        ctx.pose().pushMatrix();
+        ctx.pose().scale(scale, scale);
 
         for (ShulkerInfo info : shulkerList) {
-            int rows = info.rows();
-            int cols = info.cols();
+            int width  = info.cols() * GRID_WIDTH + MARGIN * (info.cols()-1);
+            int height = info.rows() * GRID_HEIGHT + MARGIN * (info.rows()-1);
 
-            int width = cols * GRID_WIDTH + MARGIN * cols;
-            int height = rows * GRID_HEIGHT + MARGIN * rows;
 
             if (currentY + height > MC.getWindow().getGuiScaledHeight() / scale && bothSides.get() && !right) {
                 right = true;
@@ -105,83 +199,68 @@ public class ShulkerViewModule extends Module {
                 startX = (int) ((MC.getWindow().getGuiScaledWidth() - width - edgePadding) / scale);
             }
 
-            context.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
+            ctx.fill(startX, currentY, startX + width, currentY + height, new Color(0, 0, 0, 75).getRGB());
 
-            if (borders.get()){
-                int borderColor = getShulkerColor(info.shulker());
-                drawBorder(context, startX, currentY, width, height, borderColor);
+            if (borders.get()) {
+                drawBorder(ctx, startX, currentY, width, height, getShulkerColor(info.shulker()));
             }
 
-            int count = 0;
+            int index = 0;
             for (ItemStack stack : info.stacks()) {
                 if (compact.get() && stack.isEmpty()) break;
-                int x = startX + (count % info.cols()) * GRID_WIDTH + MARGIN;
-                int y = currentY + (count / info.cols()) * GRID_HEIGHT + MARGIN;
 
-                context.renderItem(stack, x, y);
-                context.renderItemDecorations(MC.font, stack, x, y, null);
+                int x = startX + (index % info.cols()) * GRID_WIDTH + MARGIN;
+                int y = currentY + (index / info.cols()) * GRID_HEIGHT + MARGIN;
 
-                if (tooltip.get() && !stack.isEmpty() && isHovered(event.getMouseX(), event.getMouseY(), x, y, 16, 16, scale)) {
-                    context.setTooltipForNextFrame(MC.font, stack, (int) event.getMouseX(), (int) event.getMouseY());
+                ctx.renderItem(stack, x, y);
+                ctx.renderItemDecorations(MC.font, stack, x, y, null);
+
+                if (tooltip.get() && !stack.isEmpty()
+                        && isHovered(event.getMouseX(), event.getMouseY(), x, y, 16, 16, scale)) {
+                    ctx.setTooltipForNextFrame(MC.font, stack,event.getMouseX(), event.getMouseY());
                 }
-
-                count++;
+                index++;
             }
-
-            if (button != -1 && clickedX != -1 && clickedY != -1 && isHovered(clickedX, clickedY, startX, currentY, width, height, scale)) {
-                if (button == 0)
-                    INVENTORY_MANAGER.getClickHandler().pickupSlot(info.slot(), true);
-
-                if (button == 2 && middleOpen.get())
-                    openContainer(info.shulker());
-
-                clickedX = clickedY = button = -1;
-            }
-
             currentY += height + MARGIN;
         }
 
-        context.pose().popMatrix();
+        ctx.pose().popMatrix();
         totalHeight = currentY - offset;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onClick(MouseClickEvent event) {
-        if (event.button() == 0 || event.button() == 2) {
-            clickedX = event.mouseX();
-            clickedY = event.mouseY();
-            button = event.button();
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onScroll(MouseScrollEvent event) {
-      //  CHAT_MANAGER.sendRaw("mouse scroll event called");
-        float maxOffset = Math.min(-totalHeight + MC.getWindow().getGuiScaledHeight() / (scale.get()).floatValue(), 0);
-        offset = (int) Mth.clamp(offset + (int) Math.ceil(event.amount()) * (scrollsensitivity.get() * 10), maxOffset, 0);
+        if (mode.get() != Mode.MULTI) return;
+
+        float maxOffset = Math.min(-totalHeight + MC.getWindow().getGuiScaledHeight() / scale.get().floatValue(), 0);
+        offset = (int) Mth.clamp(offset + Math.ceil(event.amount()) * (scrollSensitivity.get() * 10), maxOffset, 0);
     }
 
-    private void drawBorder(GuiGraphics context, int x, int y, int width, int height, int color) {
-        context.fill(x, y, x + width, y + 1, color);
-        context.fill(x, y + height - 1, x + width, y + height, color);
-        context.fill(x, y, x + 1, y + height, color);
-        context.fill(x + width - 1, y, x + width, y + height, color);
+    private void drawBorder(GuiGraphics ctx, int x, int y, int w, int h, int color) {
+        ctx.fill(x, y, x + w, y + 1, color);
+        ctx.fill(x, y + h - 1, x + w, y + h, color);
+        ctx.fill(x, y, x + 1, y + h, color);
+        ctx.fill(x + w - 1, y, x + w, y + h, color);
     }
 
     private int getShulkerColor(ItemStack stack) {
-        if (!(stack.getItem() instanceof BlockItem blockItem)) return ARGB.color(255, 128, 128, 128);
+        if (!(stack.getItem() instanceof BlockItem bi)) {
+            return ARGB.color(255, 128, 128, 128);
+        }
 
-        if (!(blockItem.getBlock() instanceof ShulkerBoxBlock shulker)) return ARGB.color(255, 128, 128, 128);
+        if (!(bi.getBlock() instanceof ShulkerBoxBlock shulker)) {
+            return ARGB.color(255, 128, 128, 128);
+        }
 
         DyeColor color = shulker.getColor();
-        if (color == null) return ARGB.color(255, 128, 0, 128);
-
-        return DyeColorToARGB(color);
+        return color == null
+                ? ARGB.color(255, 128, 0, 128)
+                : DyeColorToARGB(color);
     }
 
-    private boolean isHovered(double mx, double my, int x, int y, int width, int height, float scale) {
+    private boolean isHovered(double mx, double my, int x, int y, int w, int h, float scale) {
         mx /= scale;
         my /= scale;
-        return mx >= x && mx <= x + width && my >= y && my <= y + height;
+        return mx >= x && mx <= x + w && my >= y && my <= y + h;
     }
 }

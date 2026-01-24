@@ -3,11 +3,13 @@ package me.kiriyaga.nami.mixin;
 import me.kiriyaga.nami.event.impl.MouseClickEvent;
 import me.kiriyaga.nami.event.impl.MouseScrollEvent;
 import me.kiriyaga.nami.event.impl.RenderScreenEvent;
+import me.kiriyaga.nami.event.impl.RenderTooltipEvent;
 import me.kiriyaga.nami.feature.module.impl.client.PatchModule;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
@@ -26,6 +28,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
     @Shadow
     @Final
     protected T menu;
+    @Shadow protected Slot hoveredSlot;
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(MouseButtonEvent click, boolean bl, CallbackInfoReturnable<Boolean> cir) {
@@ -52,5 +55,15 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
         if (cursorStack == null || cursorStack.isEmpty()) return;
         if (!cursorStack.isStackable() || cursorStack.getItem() instanceof MapItem || cursorStack.getItem() instanceof BannerItem)
             cir.setReturnValue(true);
+    }
+
+    @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
+    protected void onRenderTooltip(GuiGraphics graphics, int mouseX, int mouseY, CallbackInfo ci) {
+        ItemStack stack = hoveredSlot != null ? hoveredSlot.getItem() : ItemStack.EMPTY;
+        RenderTooltipEvent event = new RenderTooltipEvent(graphics, mouseX, mouseY, stack);
+        EVENT_MANAGER.post(event);
+
+        if (event.isCancelled())
+            ci.cancel();
     }
 }
