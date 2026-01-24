@@ -1,0 +1,143 @@
+package me.kiriyaga.nami.feature.module.impl.visuals;
+
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.RenderSlotsEvent;
+import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.feature.module.ModuleCategory;
+import me.kiriyaga.nami.feature.module.RegisterModule;
+import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
+import me.kiriyaga.nami.feature.setting.impl.*;
+import me.kiriyaga.nami.util.container.ShulkerInfo;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.item.Item;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static me.kiriyaga.nami.Nami.*;
+
+@RegisterModule
+public class BetterInventoryModule extends Module {
+
+    private final WhitelistSetting highlightSlots = addSetting(new WhitelistSetting("HighlightSlots", true, WhitelistSetting.Type.ITEM));
+    private final BoolSetting shulkerFillBar = addSetting(new BoolSetting("ShulkerFill", true));
+    private final BoolSetting dominantItem = addSetting(new BoolSetting("DominantItem", false));
+
+    public BetterInventoryModule() {
+        super("BetterInventory", "Quality of life features to improve inventory managment.", ModuleCategory.of("Render"), "betterinventory");
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onRenderSlots(RenderSlotsEvent event) {
+        if (!(MC.screen instanceof AbstractContainerScreen<?>)) return;
+
+        GuiGraphics ctx = event.graphics();
+        List<Slot> slots = event.slots();
+
+        Color primary = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor(90);
+
+        if (highlightSlots.get()) {
+            for (Slot slot : slots) {
+                if (!slot.hasItem()) continue;
+
+
+                Identifier id = BuiltInRegistries.ITEM.getKey(slot.getItem().getItem());
+
+                if (highlightSlots.isWhitelisted(id)) {
+                    int x = slot.x;
+                    int y = slot.y;
+                    ctx.fill(x, y, x + 16, y + 16, primary.getRGB());
+                }
+            }
+        }
+
+        if (shulkerFillBar.get() || dominantItem.get()) {
+            for (Slot slot : slots) {
+                ItemStack stack = slot.getItem();
+                if (!(stack.getItem() instanceof BlockItem bi) || stack.isEmpty() || !(bi.getBlock() instanceof ShulkerBoxBlock)) continue;
+
+                ShulkerInfo info = ShulkerInfo.create(stack, slot.index, false);
+                if (info == null) continue;
+
+                if (shulkerFillBar.get())
+                    renderShulkerFill(ctx, slot.x, slot.y, info);
+
+                if (dominantItem.get())
+                    renderDominantItem(ctx, slot.x, slot.y, info);
+            }
+        }
+    }
+
+    private void renderShulkerFill(GuiGraphics ctx, int slotX, int slotY, ShulkerInfo info) {
+        int x = slotX;
+        int y = slotY + 15;
+
+        int total = 0;
+        for (ItemStack s : info.stacks()) {
+            if (s.isEmpty()) continue;
+            total += getSlotUsage(s);
+        }
+
+        int max = 27 * 64; // TODO theoretically stack can be bigger then 64 on some weird servers
+        float percent = (float) total / (float) max;
+        percent = Math.min(1f, Math.max(0f, percent));
+        int width = 16;
+        int height = 2;
+        ctx.fill(x, y, x + width, y + height, 0xFF000000);
+        int r = (int) (255 * (1 - percent));
+        int g = (int) (255 * percent);
+        int color = (0xFF << 24) | (r << 16) | (g << 8);
+
+        ctx.fill(x, y, x + (int) (width * percent), y + height, color);
+    }
+
+    private int getSlotUsage(ItemStack stack) {
+        if (stack.isEmpty()) return 0;
+
+        int max = stack.getMaxStackSize();
+        int count = stack.getCount();
+        return Math.min(max, count);
+    }
+
+    private void renderDominantItem(GuiGraphics ctx, int slotX, int slotY, ShulkerInfo info) {
+        Map<Item, Integer> map = new HashMap<>();
+        for (ItemStack s : info.stacks()) {
+            if (s.isEmpty()) continue;
+            map.put(s.getItem(), map.getOrDefault(s.getItem(), 0) + s.getCount());
+        }
+
+        if (map.isEmpty()) return;
+
+        Item dominant = null;
+        int maxCount = 0;
+        for (Map.Entry<Item, Integer> e : map.entrySet()) {
+            if (e.getValue() > maxCount) {
+                maxCount = e.getValue();
+                dominant = e.getKey();
+            }
+        }
+
+        if (dominant == null) return;
+
+        ItemStack dominantStack = new ItemStack(dominant, 1);
+        int centerX = slotX + 8;
+        int centerY = slotY + 8;
+
+        ctx.pose().pushMatrix();
+        ctx.pose().translate(centerX, centerY);
+        ctx.pose().scale(0.85f, 0.85f);
+        ctx.renderItem(dominantStack, -8, -8);
+        ctx.renderItemDecorations(MC.font, dominantStack, -8, -8, null);
+        ctx.pose().popMatrix();
+    }
+}

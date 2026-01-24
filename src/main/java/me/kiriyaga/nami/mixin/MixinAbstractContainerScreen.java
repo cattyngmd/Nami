@@ -1,9 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.event.impl.MouseClickEvent;
-import me.kiriyaga.nami.event.impl.MouseScrollEvent;
-import me.kiriyaga.nami.event.impl.RenderScreenEvent;
-import me.kiriyaga.nami.event.impl.RenderTooltipEvent;
+import me.kiriyaga.nami.event.impl.*;
 import me.kiriyaga.nami.feature.module.impl.client.PatchModule;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
@@ -65,5 +62,11 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
 
         if (event.isCancelled())
             ci.cancel();
+    }
+
+    @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlots(Lnet/minecraft/client/gui/GuiGraphics;II)V", shift = At.Shift.AFTER))
+    private void onRenderSlots(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        RenderSlotsEvent event = new RenderSlotsEvent(graphics, mouseX, mouseY, menu.slots);
+        EVENT_MANAGER.post(event);
     }
 }
