@@ -2,6 +2,8 @@
 
 1.21.11
 
+### Join our discord - https://discord.gg/auHTtNAqRq
+
 <p align="left">
   <a href="https://github.com/NamiDevelopment/nami/releases">
     <img src="https://img.shields.io/github/downloads/NamiDevelopment/nami/total?color=green&label=Total%20Downloads" alt="Total Downloads" />
@@ -15,7 +17,7 @@
   <a href="https://github.com/NamiDevelopment/nami/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/NamiDevelopment/nami?color=blue" alt="License" />
   </a>
-  <a href="https://discord.gg/qy3eS42beW">
+  <a href="https://discord.gg/auHTtNAqRq">
     <img src="https://img.shields.io/discord/1298742596633497744?color=7289DB&label=Discord" alt="Discord" />
   </a>
 </p>
