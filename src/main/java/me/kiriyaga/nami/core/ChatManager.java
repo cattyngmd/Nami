@@ -48,7 +48,7 @@ public class ChatManager {
         byte[] data = new byte[256];
         new SecureRandom().nextBytes(data);
         return new MessageSignature(data);
-    }
+    } // todo: add catformat level here
 
     public void sendRaw(String message) {
         sendRaw(Component.literal(message), true);
