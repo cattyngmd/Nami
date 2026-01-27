@@ -104,7 +104,7 @@ public abstract class MixinPlayerTabOverlay {
                     }
                 }
             } else {
-                formattedName = PlayerTeam.formatNameForTeam(entry.getTeam(), Component.literal(playerName).withStyle(ChatFormatting.AQUA));
+                formattedName = PlayerTeam.formatNameForTeam(entry.getTeam(), CAT_FORMAT.format("{friend}"+playerName));
             }
 
             info.setReturnValue(decorateName(entry, formattedName));
