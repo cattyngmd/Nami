@@ -135,7 +135,7 @@ public class AutoCrystalModule extends Module {
     public void onRender3DEvent(Render3DEvent event) {
         if (MC.level == null || MC.player == null || placeTarget == null || !render.get()) return;
 
-        BlockPos pos = placeTarget.pos;
+        BlockPos pos = placeTarget.pos.below();
         AABB box = new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
         Color color = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
 
@@ -253,13 +253,14 @@ public class AutoCrystalModule extends Module {
 
         placeTarget = findBestPlace();
         if (placeTarget == null) return;
+        if (placeTarget.totalDamage < minDamage.get()) return;
+
         int crystalSlot = findHotbarItem(stack -> stack.getItem() instanceof EndCrystalItem);
         if (crystalSlot == -1) return;
-        InteractionUtils.interactBlockAt(placeTarget.pos, crystalSlot, placeRange.get(), placeRotate.get(), false, false, placeSwing.get(), AutoCrystalModule.class.getName() + "_PLACE");
+        InteractionUtils.interactBlockAt(placeTarget.pos.below(), crystalSlot, placeRange.get(), placeRotate.get(), false, false, placeSwing.get(), AutoCrystalModule.class.getName() + "_PLACE");
 
         placeTimer = placeDelay.get().intValue();
     }
-
     private PlaceTarget findBestPlace() {
         PlaceTarget best = null;
         BlockPos playerPos = MC.player.blockPosition();
@@ -269,18 +270,19 @@ public class AutoCrystalModule extends Module {
             for (int y = -r; y <= r; y++) {
                 for (int z = -r; z <= r; z++) {
                     BlockPos pos = playerPos.offset(x, y, z);
-                    BlockPos basePos = pos.below();
+                    BlockPos base = pos.below();
 
-                    BlockState baseState = MC.level.getBlockState(basePos);
+                    BlockState baseState = MC.level.getBlockState(base);
                     if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK)) continue;
                     if (!MC.level.getBlockState(pos).isAir()) continue;
-                    if (!MC.level.getBlockState(pos.above()).isAir()) continue;
 
                     if (!canPlaceAt(pos)) continue;
 
-                    Vec3 crystalVec = Vec3.atCenterOf(pos).add(0, 1, 0);
-                    float totalDamage = calculatePlaceDamage(crystalVec);
-                    if (totalDamage <= -0.9f) continue;
+                    EndCrystal fakeCrystal = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
+                    fakeCrystal.setPos(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
+
+                    float totalDamage = calculatePlaceDamage(fakeCrystal.position());
+                    if (totalDamage < minDamage.get()) continue;
 
                     if (best == null || totalDamage > best.totalDamage)
                         best = new PlaceTarget(pos, totalDamage);
@@ -289,7 +291,7 @@ public class AutoCrystalModule extends Module {
         }
 
         if (best != null) {
-            PlaceTarget ret = new PlaceTarget(best.pos.below(), best.totalDamage);
+            PlaceTarget ret = new PlaceTarget(best.pos, best.totalDamage);
             return ret;
         }
         return best; // always null here
@@ -302,7 +304,6 @@ public class AutoCrystalModule extends Module {
         if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK)) return false;
 
         if (!MC.level.getBlockState(pos).isAir()) return false;
-        if (!MC.level.getBlockState(pos.above()).isAir()) return false;
 
         Vec3 eyePos = MC.player.getEyePosition();
 
@@ -316,10 +317,10 @@ public class AutoCrystalModule extends Module {
         }
 
         EndCrystal fakeCrystal = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
-        fakeCrystal.setPos(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+        fakeCrystal.setPos(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
         MC.level.addFreshEntity(fakeCrystal); //  thats crazy how raycast works
 
-        AABB checkIntersects = new AABB(pos.getX(), pos.getY() + 1, pos.getZ(), pos.getX() + 1, pos.getY() + 3, pos.getZ() + 1);
+        AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 3, base.getZ() + 1);
 
         for (Entity e : MC.level.getEntities(null, checkIntersects)) {
             if (placeIgnoreItems.get() && e instanceof ItemEntity) continue;
@@ -363,18 +364,19 @@ public class AutoCrystalModule extends Module {
             if (FRIEND_MANAGER.isFriend(e.getName().getString())) {
                 if (dmg > maxFriendDamage.get())
                     return -1f;
-                else
-                    continue;
+                continue;
             }
+
+            if (FRIEND_MANAGER.isFriend(e.getName().getString())) continue;
+
+            if (dmg < minDamage.get())
+                return -1f;
 
             totalDamage += dmg;
         }
-
-        if (totalDamage < minDamage.get())
-            return -1f;
-
         return totalDamage;
     }
+
 
     private int findHotbarItem(Predicate<ItemStack> predicate) {
         if (MC.player == null)
