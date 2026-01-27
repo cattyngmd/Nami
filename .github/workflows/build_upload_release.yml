@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    if: github.actor == 'Kiriyaga7615'
+    if: github.actor == 'Kiriyaga7615' || github.actor == 'github-actions'
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +19,7 @@ jobs:
         with:
           submodules: true
           ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -47,21 +48,32 @@ jobs:
           JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
           VERSION=$(unzip -p "$JAR_PATH" fabric.mod.json | jq -r '.version')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "VERSION=$VERSION" > version.txt
+          echo "$VERSION" > version.txt
+      - name: Generate changelog
+        run: |
+          COMMITS=$(git log --pretty=format:"- %s by %an" origin/main..HEAD)
+          echo "$COMMITS" > changelog.txt
 
-      - name: Upload build JAR
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nami-${{ env.SAFE_BRANCH }}
           path: |
             build/libs/*.jar
             version.txt
+            changelog.txt
 
   release:
     needs: build
     if: github.actor == 'Kiriyaga7615' || github.actor == 'github-actions'
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout (for release)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
@@ -73,12 +85,12 @@ jobs:
           VERSION=$(cat "$VERSION_FILE")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Generate changelog
+      - name: Read changelog
         run: |
-          git fetch --prune --unshallow || true
-          COMMITS=$(git log --pretty=format:"- %s by %an" origin/main..HEAD)
+          CHANGELOG_FILE=$(find ./artifact -name "changelog.txt" -print -quit)
+          CHANGELOG=$(cat "$CHANGELOG_FILE")
           echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-          echo "$COMMITS" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create release
@@ -88,7 +100,7 @@ jobs:
           name: Nami ${{ env.VERSION }}
           body: ${{ env.CHANGELOG }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload all artifacts
         run: |
@@ -103,4 +115,4 @@ jobs:
             gh release upload ${{ env.VERSION }} "$file" --clobber
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
