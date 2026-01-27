@@ -44,6 +44,7 @@ public class FeetTrapModule extends Module {
     private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    private final BoolSetting extension = addSetting(new BoolSetting("Extension", false));
     private final BoolSetting render = addSetting(new BoolSetting("Render", true));
     private final BoolSetting jumpDisable = addSetting(new BoolSetting("JumpDisable", false));
 
@@ -175,6 +176,9 @@ public class FeetTrapModule extends Module {
 
 
     private void expand(Set<BlockPos> positions, Player player) {
+        if (!extension.get())
+            return;
+
         Set<BlockPos> extra = new HashSet<>();
 
         for (BlockPos pos : positions) {
