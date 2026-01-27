@@ -67,6 +67,7 @@ public class AutoCrystalModule extends Module {
     public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
 
     //damages
+    public final BoolSetting assumeBestArmor = addSetting(new BoolSetting("AssumeBestArmor", true));
     public final BoolSetting noSelfPop = addSetting(new BoolSetting("NoSelfPop", true));
     public final DoubleSetting minDamage = addSetting(new DoubleSetting("MinDamage", 2.0, 0.0, 36.0));
     public final DoubleSetting maxSelfDamage = addSetting(new DoubleSetting("MaxSelfDamage", 4.0, 0.0, 36.0));
@@ -201,7 +202,7 @@ public class AutoCrystalModule extends Module {
         Vec3 pos = crystal.position();
         float totalDamage = 0f;
 
-        float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK);
+        float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
 
         if (selfDamage > maxSelfDamage.get() || (noSelfPop.get() && selfDamage > (MC.player.getHealth() + MC.player.getAbsorptionAmount())))
             return -1f;
@@ -210,7 +211,7 @@ public class AutoCrystalModule extends Module {
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 15)) {
             if (!(e instanceof LivingEntity living)) continue;
 
-            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK);
+            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
 
             if (e == MC.player)
                 continue;
@@ -358,7 +359,7 @@ public class AutoCrystalModule extends Module {
     private float calculatePlaceDamage(Vec3 crystalPos) {
         float totalDamage = 0f;
 
-        float self = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK);
+        float self = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
 
         if (self > maxSelfDamage.get() || (noSelfPop.get() && self > MC.player.getHealth() + MC.player.getAbsorptionAmount()))
             return -1f;
@@ -367,7 +368,7 @@ public class AutoCrystalModule extends Module {
             if (!(e instanceof LivingEntity living)) continue;
             if (e == MC.player) continue;
 
-            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK);
+            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
 
             if (FRIEND_MANAGER.isFriend(e.getName().getString())) {
                 if (dmg > maxFriendDamage.get())

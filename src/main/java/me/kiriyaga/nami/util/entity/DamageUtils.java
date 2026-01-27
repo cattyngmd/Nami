@@ -35,19 +35,19 @@ public class DamageUtils {
         return state.getCollisionShape(MC.level, pos).clip(ctx.start(), ctx.end(), pos);
     };
 
-    public static float crystalDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider) {
-        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 12f, raycastProvider);
+    public static float crystalDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor) {
+        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 12f, raycastProvider, assumeBestArmor);
     }
 
-    public static float bedDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider) {
-        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 10f, raycastProvider);
+    public static float bedDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor) {
+        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 10f, raycastProvider, assumeBestArmor);
     }
 
-    public static float anchorDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider) {
-        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 10f, raycastProvider);
+    public static float anchorDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor) {
+        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 10f, raycastProvider, assumeBestArmor);
     }
 
-    private static float computeExplosionDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, float strength, BlockRaycastProvider raycastProvider) {
+    private static float computeExplosionDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, float strength, BlockRaycastProvider raycastProvider, boolean assumeBestArmor) {
         Vec3 lookDir = getClosestPointToEye(explosionPos, target.getBoundingBox()).subtract(explosionPos).normalize();
         Vec3 rayEnd = explosionPos.add(lookDir.scale(strength));
 
@@ -58,10 +58,10 @@ public class DamageUtils {
         double impact = (1 - (distance / strength)) * exposure;
         float baseDamage = (float) ((impact * impact + impact) / 2 * 7 * 12 + 1);
 
-        return applyReductions(baseDamage, target, MC.level.damageSources().explosion(null));
+        return applyReductions(baseDamage, target, MC.level.damageSources().explosion(null), assumeBestArmor);
     }
 
-    public static float applyReductions(float damage, Entity entity, DamageSource source) {
+    public static float applyReductions(float damage, Entity entity, DamageSource source, boolean assumeBestArmor) {
         if (source.scalesWithDifficulty()) {
             switch (MC.level.getDifficulty()) {
                 case EASY -> damage = Math.min(damage / 2 + 1, damage);
@@ -74,29 +74,51 @@ public class DamageUtils {
         damage = CombatRules.getDamageAfterAbsorb(living, damage, source, (float) Math.floor(living.getAttributeValue(Attributes.ARMOR)),
                 (float) living.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
         damage = reduceByResistance(living, damage);
-        damage = reduceByProtection(living, damage, source);
+        damage = reduceByProtection(living, damage, source, assumeBestArmor);
 
         return Math.max(damage, 0);
     }
 
-    private static float reduceByProtection(LivingEntity entity, float damage, DamageSource source) {
+    private static float reduceByProtection(LivingEntity entity, float damage, DamageSource source, boolean assumeBestArmor) {
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) return damage;
 
         int totalProtection = 0;
+
+        if (assumeBestArmor) {
+            for (EquipmentSlot slot : EquipmentSlotGroup.ARMOR) {
+                ItemStack stack = entity.getItemBySlot(slot);
+                if (stack.isEmpty()) continue;
+
+                if (slot != EquipmentSlot.LEGS)
+                    totalProtection += 4;
+
+                if (slot == EquipmentSlot.LEGS && source.is(DamageTypeTags.IS_EXPLOSION))
+                    totalProtection += 8;
+            }
+            return CombatRules.getDamageAfterMagicAbsorb(damage, totalProtection);
+        }
 
         for (EquipmentSlot slot : EquipmentSlotGroup.ARMOR) {
             ItemStack stack = entity.getItemBySlot(slot);
             int prot = EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.PROTECTION);
             if (prot > 0) totalProtection += prot;
 
-            if (source.is(DamageTypeTags.IS_FIRE)) totalProtection += 2 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.FIRE_PROTECTION);
-            if (source.is(DamageTypeTags.IS_EXPLOSION)) totalProtection += 2 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.BLAST_PROTECTION);
-            if (source.is(DamageTypeTags.IS_PROJECTILE)) totalProtection += 2 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.PROJECTILE_PROTECTION);
-            if (source.is(DamageTypeTags.IS_FALL)) totalProtection += 3 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.FEATHER_FALLING);
+            if (source.is(DamageTypeTags.IS_FIRE))
+                totalProtection += 2 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.FIRE_PROTECTION);
+
+            if (source.is(DamageTypeTags.IS_EXPLOSION))
+                totalProtection += 2 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.BLAST_PROTECTION);
+
+            if (source.is(DamageTypeTags.IS_PROJECTILE))
+                totalProtection += 2 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.PROJECTILE_PROTECTION);
+
+            if (source.is(DamageTypeTags.IS_FALL))
+                totalProtection += 3 * EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.FEATHER_FALLING);
         }
 
         return CombatRules.getDamageAfterMagicAbsorb(damage, totalProtection);
     }
+
 
     private static float reduceByResistance(LivingEntity entity, float damage) {
         MobEffectInstance resistance = entity.getEffect(MobEffects.RESISTANCE);
