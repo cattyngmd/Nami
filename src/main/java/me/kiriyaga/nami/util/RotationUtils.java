@@ -48,18 +48,6 @@ public class RotationUtils {
         return new Vec3(centerX, centerY, centerZ);
     }
 
-    public static double getClosestEyeDistance(Vec3 eyePos, AABB box) {
-        Vec3 closest;
-
-        if (MC.player.isFallFlying()) {
-            closest = box.getCenter();
-        } else {
-            closest = getClosestPointToEye(eyePos, box);
-        }
-
-        return eyePos.distanceTo(closest);
-    }
-
     public static Vec3 getClosestPointToEye(Vec3 eyePos, AABB box) {
         double x = eyePos.x;
         double y = eyePos.y;
@@ -89,6 +77,14 @@ public class RotationUtils {
         } else if (Math.abs(z - box.maxZ) < EPS) {
             z = Math.max(box.maxZ - VEC, box.minZ + EPS);
         }
+
+        return new Vec3(x, y, z);
+    }
+
+        public static Vec3 getClosestCattynIdiNahui(Vec3 eyePos, AABB box) {
+        double x = Mth.clamp(eyePos.x, box.minX, box.maxX);
+        double y = Mth.clamp(eyePos.y, box.minY, box.maxY);
+        double z = Mth.clamp(eyePos.z, box.minZ, box.maxZ);
 
         return new Vec3(x, y, z);
     }
