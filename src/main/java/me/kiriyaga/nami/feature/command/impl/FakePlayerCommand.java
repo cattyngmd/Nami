@@ -9,6 +9,7 @@ import me.kiriyaga.nami.feature.command.RegisterCommand;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
@@ -49,6 +50,7 @@ public class FakePlayerCommand extends Command {
         fakePlayer.setXRot(MC.player.getXRot());
         fakePlayer.setId(-696969); // mint!!!!!!!!
         fakePlayer.setHealth((float)health);
+        copy(MC.player, fakePlayer);
         MC.level.addEntity(fakePlayer);
 
         CHAT_MANAGER.sendPersistent(this.name, CAT_FORMAT.format("Fake player has been{green} added{reset}."));
@@ -78,4 +80,14 @@ public class FakePlayerCommand extends Command {
             fakePlayer.setHealth(newHealth);
         }
     }
+
+    private void copy(Player from, Player to) {
+        to.setItemSlot(EquipmentSlot.MAINHAND, from.getItemBySlot(EquipmentSlot.MAINHAND).copy());
+        to.setItemSlot(EquipmentSlot.OFFHAND, from.getItemBySlot(EquipmentSlot.OFFHAND).copy());
+        to.setItemSlot(EquipmentSlot.HEAD, from.getItemBySlot(EquipmentSlot.HEAD).copy());
+        to.setItemSlot(EquipmentSlot.CHEST, from.getItemBySlot(EquipmentSlot.CHEST).copy());
+        to.setItemSlot(EquipmentSlot.LEGS, from.getItemBySlot(EquipmentSlot.LEGS).copy());
+        to.setItemSlot(EquipmentSlot.FEET, from.getItemBySlot(EquipmentSlot.FEET).copy());
+    }
+
 }

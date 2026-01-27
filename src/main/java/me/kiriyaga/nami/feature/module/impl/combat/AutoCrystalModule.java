@@ -41,7 +41,7 @@ import static me.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterModule
 public class AutoCrystalModule extends Module {
-    public enum Page {PLACE, BREAK, DAMAGES}
+    public enum Page {PLACE, BREAK, DAMAGES, RENDER}
 
     private final EnumSetting<Page> page = addSetting(new EnumSetting<>("Page", Page.PLACE));
 
@@ -52,9 +52,7 @@ public class AutoCrystalModule extends Module {
     public final BoolSetting placeRotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
-    public final BoolSetting placeSimulate = addSetting(new BoolSetting("Simulate", false));
     public final BoolSetting placeOnlyCanBreak = addSetting(new BoolSetting("OnlyCanBreak", false));
-    public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("StrictDirection", false));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("Multitask", false));
 
     //break
@@ -95,16 +93,16 @@ public class AutoCrystalModule extends Module {
         placeRotate.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeSwing.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeIgnoreItems.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
-        placeSimulate.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeMultitask.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
-        placeStrictDirection.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeOnlyCanBreak.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
         maxSelfDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
         maxFriendDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
+        assumeBestArmor.setShowCondition(() -> page.get() == Page.DAMAGES);
 
+        render.setShowCondition(() -> page.get() == Page.RENDER);
     }
 
     @Override
@@ -258,7 +256,7 @@ public class AutoCrystalModule extends Module {
         if (placeTarget == null) return;
         int crystalSlot = findHotbarItem(stack -> stack.getItem() instanceof EndCrystalItem);
         if (crystalSlot == -1) return;
-        InteractionUtils.interactBlockAt(placeTarget.pos, crystalSlot, placeRange.get(), placeRotate.get(), placeStrictDirection.get(), placeSimulate.get(), placeSwing.get(), AutoCrystalModule.class.getName() + "_PLACE");
+        InteractionUtils.interactBlockAt(placeTarget.pos, crystalSlot, placeRange.get(), placeRotate.get(), false, false, placeSwing.get(), AutoCrystalModule.class.getName() + "_PLACE");
 
         placeTimer = placeDelay.get().intValue();
     }
@@ -332,8 +330,7 @@ public class AutoCrystalModule extends Module {
 
         AABB crystalBox = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
 
-        for (Entity e : MC.level.getEntities(null, placeBox)) {
-            if (e instanceof EndCrystal endCrystal && e.position() == endCrystal.position()) continue;
+        for (Entity e : MC.level.getEntities(null, placeBox)) { // todo: check if we can place into crystals
             if (placeIgnoreItems.get() && e instanceof ItemEntity) continue;
             return false;
         }
