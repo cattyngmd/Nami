@@ -132,7 +132,7 @@ public class AutoCrystalModule extends Module {
         }
     }
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onRender(Render3DEvent event) {
+    public void onRender3DEvent(Render3DEvent event) {
         if (MC.level == null || MC.player == null || placeTarget == null || !render.get()) return;
 
         BlockPos pos = placeTarget.pos;
@@ -245,7 +245,6 @@ public class AutoCrystalModule extends Module {
       //  ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(AutoCrystalModule.class.getName(), 5, idealYaw, idealPitch));
 
         EntityHitResult serverCheck = raycastTarget(MC.player, crystal, breakRange.get(), ROTATION_MANAGER.getStateHandler().getServerYaw(), ROTATION_MANAGER.getStateHandler().getServerPitch());
-
         return serverCheck != null || insideBox;
     }
 
@@ -308,7 +307,6 @@ public class AutoCrystalModule extends Module {
         Vec3 eyePos = MC.player.getEyePosition();
 
         AABB blockBox = new AABB(pos);
-        AABB placeBox = new AABB(pos.above());
         Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
         float yaw = (float) getYawToVec(MC.player, point);
         float pitch = (float) getPitchToVec(MC.player, point);
@@ -317,38 +315,33 @@ public class AutoCrystalModule extends Module {
             return false;
         }
 
-        double centerX = pos.getX() + 0.5;
-        double centerZ = pos.getZ() + 0.5;
-        double bottomY = pos.getY() + 1;
+        EndCrystal fakeCrystal = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
+        fakeCrystal.setPos(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+        MC.level.addFreshEntity(fakeCrystal); //  thats crazy how raycast works
 
-        double minX = centerX - 1.00;
-        double minY = bottomY;
-        double minZ = centerZ - 1.00;
-        double maxX = centerX + 1.00;
-        double maxY = bottomY + 2.00;
-        double maxZ = centerZ + 1.00;
+        AABB checkIntersects = new AABB(pos.getX(), pos.getY() + 1, pos.getZ(), pos.getX() + 1, pos.getY() + 3, pos.getZ() + 1);
 
-        AABB crystalBox = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
-
-        for (Entity e : MC.level.getEntities(null, placeBox)) { // todo: check if we can place into crystals
+        for (Entity e : MC.level.getEntities(null, checkIntersects)) {
             if (placeIgnoreItems.get() && e instanceof ItemEntity) continue;
+            if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
+            fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
             return false;
         }
 
-        if (placeOnlyCanBreak.get()) { // todo: this shit is incorrect for some reason, prob because of hitbox size
-
-            Vec3 hitVec = getClosestPointToEye(eyePos, crystalBox);
+        if (placeOnlyCanBreak.get()) {
+            Vec3 hitVec = getClosestPointToEye(eyePos, fakeCrystal.getBoundingBox());
             float idealYaw = (float) getYawToVec(MC.player, hitVec);
             float idealPitch = (float) getPitchToVec(MC.player, hitVec);
+            EntityHitResult distanceCheck = raycastTarget(MC.player, fakeCrystal, breakRange.get(), idealYaw, idealPitch);
+            boolean insideBox = fakeCrystal.getBoundingBox().contains(eyePos);
 
-            EntityHitResult distanceCheck = raycastAABBFromPlayer(MC.player, crystalBox, breakRange.get(), idealYaw, idealPitch);
-
-            boolean insideBox = crystalBox.contains(eyePos);
-
-            if (!insideBox && distanceCheck == null)
+            if (!insideBox && distanceCheck == null) {
+                fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
                 return false;
+            }
         }
 
+        fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
         return true;
     }
 
