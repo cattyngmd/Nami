@@ -320,6 +320,7 @@ public class SpeedMineModule extends Module {
             MC.player.swing(InteractionHand.MAIN_HAND);
 
         sendDestroyPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, task);
+        MC.level.destroyBlock(task.blockPos, false, MC.player, 512);
 
         if (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) {
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);

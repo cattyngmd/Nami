@@ -92,12 +92,16 @@ public class AuraModule extends Module {
         attackCooldownTicks -= 1f * (tps / 20f);
         if (attackCooldownTicks < 0f) attackCooldownTicks = 0f;
 
-        if (!multiTask.get() && MC.player.getUseItemRemainingTicks() > 0 && MC.player.getMainHandItem() == MC.player.getUseItem()) {
+        if (MC.player.isUsingItem() && MC.player.getUseItem() == MC.player.getInventory().getSelectedItem()) {
             currentTarget = null;
             return;
         }
 
-        long startTime = System.nanoTime();
+
+        if (!multiTask.get() && MC.player.getUseItemRemainingTicks() > 0) {
+            currentTarget = null;
+            return;
+        }
 
         ItemStack stack = MC.player.getMainHandItem();
         Entity target = TargetUtils.getTarget();
