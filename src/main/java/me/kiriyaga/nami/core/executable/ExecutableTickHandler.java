@@ -60,9 +60,7 @@ public class ExecutableTickHandler {
     }
 
     private void execute(ExecutableThreadType type) {
-        Iterator<ExecutableRequest> it = stateHandler.getActiveRequests().iterator();
-        while (it.hasNext()) {
-            ExecutableRequest req = it.next();
+        for (ExecutableRequest req : stateHandler.getActiveRequests()) {
 
             if (req.ticksDelay > 0)
                 req.ticksDelay--;
@@ -91,7 +89,7 @@ public class ExecutableTickHandler {
             if (req.repeat) {
                 req.ticksDelay = req.initialDelay;
             } else {
-                it.remove();
+                stateHandler.getActiveRequests().remove(req);
             }
         }
     }

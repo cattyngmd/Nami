@@ -65,6 +65,9 @@ public class FeetTrapModule extends Module {
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
 
+        if (MODULE_MANAGER.getStorage().getByClass(SelfTrapModule.class).isEnabled())
+            return;
+
         if (jumpDisable.get() && !MC.player.onGround()) {
             this.toggle();
             return;
