@@ -95,10 +95,10 @@ public abstract class MixinPlayerTabOverlay {
                 for (Component sibling : entry.getTabListDisplayName().getSiblings()) {
                     String str = sibling.getString();
                     if (str.equals(playerName)) {
-                        formattedName.append(CAT_FORMAT.format("{friend}"));
+                        formattedName.append(CAT_FORMAT.format("{friend}" + playerName));
                     } else if (str.equals("] " + playerName)) {
                         formattedName.append(Component.literal("] ").withStyle(ChatFormatting.WHITE))
-                                .append(CAT_FORMAT.format("{friend}"));
+                                .append(CAT_FORMAT.format("{friend}" + playerName));
                     } else {
                         formattedName.append(sibling);
                     }
