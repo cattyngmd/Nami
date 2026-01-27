@@ -1,7 +1,7 @@
+name: build upload release
+
 permissions:
   contents: write
-
-name: build upload release
 
 on:
   workflow_dispatch:
@@ -57,50 +57,50 @@ jobs:
             build/libs/*.jar
             version.txt
 
-release:
-  needs: build
-  if: github.actor == 'Kiriyaga7615' || github.actor == 'github-actions'
-  runs-on: ubuntu-latest
-  steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: ./artifact
+  release:
+    needs: build
+    if: github.actor == 'Kiriyaga7615' || github.actor == 'github-actions'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifact
 
-    - name: Read version
-      run: |
-        VERSION_FILE=$(find ./artifact -name "version.txt" -print -quit)
-        VERSION=$(cat "$VERSION_FILE")
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Read version
+        run: |
+          VERSION_FILE=$(find ./artifact -name "version.txt" -print -quit)
+          VERSION=$(cat "$VERSION_FILE")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-    - name: Generate changelog
-      run: |
-        git fetch --prune --unshallow || true
-        COMMITS=$(git log --pretty=format:"- %s by %an" origin/main..HEAD)
-        echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-        echo "$COMMITS" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
+      - name: Generate changelog
+        run: |
+          git fetch --prune --unshallow || true
+          COMMITS=$(git log --pretty=format:"- %s by %an" origin/main..HEAD)
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-    - name: Create release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ env.VERSION }}
-        name: Nami ${{ env.VERSION }}
-        body: ${{ env.CHANGELOG }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: Nami ${{ env.VERSION }}
+          body: ${{ env.CHANGELOG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
 
-    - name: Upload all artifacts
-      run: |
-        shopt -s nullglob
-        JAR_FILES=(./artifact/*/*.jar)
-        if [ ${#JAR_FILES[@]} -eq 0 ]; then
-          echo "No JAR files found, exiting"
-          exit 1
-        fi
-        for file in "${JAR_FILES[@]}"; do
-          echo "Uploading $file to release tag ${{ env.VERSION }}"
-          gh release upload ${{ env.VERSION }} "$file" --clobber
-        done
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Upload all artifacts
+        run: |
+          shopt -s nullglob
+          JAR_FILES=(./artifact/*/*.jar)
+          if [ ${#JAR_FILES[@]} -eq 0 ]; then
+            echo "No JAR files found, exiting"
+            exit 1
+          fi
+          for file in "${JAR_FILES[@]}"; do
+            echo "Uploading $file to release tag ${{ env.VERSION }}"
+            gh release upload ${{ env.VERSION }} "$file" --clobber
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
