@@ -317,23 +317,32 @@ public class AutoCrystalModule extends Module {
 
         EndCrystal fakeCrystal = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
         fakeCrystal.setPos(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+        MC.level.addFreshEntity(fakeCrystal); //  thats crazy how raycast works
 
         AABB checkIntersects = new AABB(pos.getX(), pos.getY() + 1, pos.getZ(), pos.getX() + 1, pos.getY() + 3, pos.getZ() + 1);
 
         for (Entity e : MC.level.getEntities(null, checkIntersects)) {
             if (placeIgnoreItems.get() && e instanceof ItemEntity) continue;
             if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
+            fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
             return false;
         }
 
         if (placeOnlyCanBreak.get()) {
-            Vec3 hitVec = getClosestCattynIdiNahui(eyePos, fakeCrystal.getBoundingBox());
+            Vec3 hitVec = getClosestPointToEye(eyePos, fakeCrystal.getBoundingBox());
+            float idealYaw = (float) getYawToVec(MC.player, hitVec);
+            float idealPitch = (float) getPitchToVec(MC.player, hitVec);
+            EntityHitResult distanceCheck = raycastTarget(MC.player, fakeCrystal, breakRange.get(), idealYaw, idealPitch);
+            boolean insideBox = fakeCrystal.getBoundingBox().contains(eyePos);
 
-            if (MC.player.getEyePosition().distanceTo(hitVec) > breakRange.get()) {
+            if (!insideBox && distanceCheck == null) {
+                fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
                 return false;
             }
         }
-        gitreturn true;
+
+        fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
+        return true;
     }
 
 
