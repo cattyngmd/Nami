@@ -5,26 +5,22 @@ name: build upload release
 
 on:
   workflow_dispatch:
-#  push:
-#    branches:
-#      - '**'
+  schedule:
+    - cron: '0 3 * * 1' ##Each monday
 
 jobs:
   build:
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch: [mc.1.21.11, mc.1.21.8]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
-          ref: ${{ matrix.branch }}
+          ref: ${{ github.ref_name }}
 
-      - name: Set up Java 21
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -34,68 +30,66 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Grant execute permission to gradlew
+      - name: chmod Gradlew
         run: chmod +x ./gradlew
 
       - name: Build client
         run: ./gradlew clean build remapJar --stacktrace
 
-      - name: List files in build/libs
-        run: ls -l build/libs/
-
-      - name: Set safe branch name
+      - name: Set branch name
         run: |
-          SAFE_BRANCH="${{ matrix.branch }}"
+          SAFE_BRANCH="${{ github.ref_name }}"
           SAFE_BRANCH="${SAFE_BRANCH//./-}"
           echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
 
-      - name: Rename JAR to include branch
+      - name: Set version from JAR
         run: |
-          for jar in build/libs/*.jar; do
-            BASENAME=$(basename "$jar")
-            mv "$jar" "build/libs/nami-${SAFE_BRANCH}-${BASENAME}"
-          done
+          JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
+          VERSION=$(unzip -p "$JAR_PATH" fabric.mod.json | jq -r '.version')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" > version.txt
 
-      - name: Upload built JAR
+      - name: Upload build JAR
         uses: actions/upload-artifact@v4
         with:
           name: nami-${{ env.SAFE_BRANCH }}
-          path: build/libs/*.jar
+          path: |
+            build/libs/*.jar
+            version.txt
 
   release:
     needs: build
     if: github.actor == 'Kiriyaga7615'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository for release
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Set version for release
-        run: |
-          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
-          echo "VERSION=multi-branch-latest-${SHORT_SHA}" >> $GITHUB_ENV
-
-      - name: Download all branch artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifact
 
-      - name: List downloaded files
-        run: ls -l ./artifact
+      - name: Read version
+        run: |
+          VERSION=$(cat ./artifact/version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Create GitHub Release
+      - name: Generate changelog
+        run: |
+          git fetch --prune --unshallow || true
+          COMMITS=$(git log --pretty=format:"- %s by %an" origin/main..HEAD)
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
           name: Nami ${{ env.VERSION }}
-          body: |
-            release
+          body: ${{ env.CHANGELOG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
 
-      - name: Upload all JARs to Release
+      - name: Upload all artifacts
         run: |
           shopt -s nullglob
           JAR_FILES=(./artifact/*/*.jar)
