@@ -24,6 +24,7 @@ public class FriendManager {
     public FriendManager(ConfigManager configManager) {
         this.configManager = configManager;
         load();
+        LOGGER.info("Friend Manager loaded.");
     }
 
     public void load() {

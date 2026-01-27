@@ -11,6 +11,7 @@ public class ModuleManager {
     public void init() {
         ModuleRegistry.registerAnnotatedModules(storage);
         LOGGER.info("Registered " + storage.size() + " modules.");
+        LOGGER.info("Module Manager loaded.");
     }
 
     public ModuleStorage getStorage() {

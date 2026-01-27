@@ -65,7 +65,7 @@ public class NametagsModule extends Module {
     }
 
     @SubscribeEvent
-    public void onRenderOverlay(Render2DEvent event) {
+    public void onRender2DEvent(Render2DEvent event) {
         if (MC.level == null) return;
 
 
@@ -85,20 +85,18 @@ public class NametagsModule extends Module {
 
                 String ign = player.getName().getString();
 
-                String text = "";
+                String text = ign;
 
                 if (gameMode.get()) {
                     String gm = EntityUtils.getGameMode(player).getName().toUpperCase();
                     text += "[" + (gm.isEmpty() ? "" : gm.substring(0, 1)) + "]";
                 }
 
-                text += ign;
-
                 if (ping.get())
                     text += " " + EntityUtils.getLatency(player) + "ms";
 
                 if (entityId.get())
-                    text += " " + player.getId();
+                    text += " ID:" + player.getId();
 
                 if (health.get())
                     text += " " + EntityUtils.getHealthNumber(ent);
@@ -129,7 +127,7 @@ public class NametagsModule extends Module {
                 if (rectangle.get()) {
                     GuiGraphics ctx = event.getDrawContext();
                     int x1 = (int) (-width / 2f - 1);
-                    int y1 = (int) (-FONT_MANAGER.getHeight() - 2);
+                    int y1 = (int) (-FONT_MANAGER.getHeight());
                     int x2 = (int) (width / 2 + 2);
                     int y2 = 0;
                     ctx.fill(x1, y1, x2, y2, 0x64000000);

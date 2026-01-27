@@ -14,6 +14,7 @@ public class CommandManager {
         suggester.updateDispatcher();
         EVENT_MANAGER.register(executor);
         LOGGER.info("Registered " + storage.size() + " commands.");
+        LOGGER.info("Command Manager loaded.");
     }
 
     public CommandStorage getStorage() {

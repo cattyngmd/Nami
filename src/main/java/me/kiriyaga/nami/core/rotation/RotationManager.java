@@ -1,5 +1,7 @@
 package me.kiriyaga.nami.core.rotation;
 
+import static me.kiriyaga.nami.Nami.LOGGER;
+
 /**
  * Rotation manager doc.
  * <p>
@@ -36,6 +38,7 @@ public class RotationManager {
 
     public void init() {
         tickHandler.init();
+        LOGGER.info("Rotation Manager loaded.");
     }
 
     public RotationStateHandler getStateHandler() {

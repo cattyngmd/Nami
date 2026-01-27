@@ -40,7 +40,7 @@ public class ServerManager {
 
     public void init() {
         EVENT_MANAGER.register(this);
-        LOGGER.info("Server Manager loaded");
+        LOGGER.info("Server Manager loaded.");
         Arrays.fill(pendingTransactions, -1);
     }
 

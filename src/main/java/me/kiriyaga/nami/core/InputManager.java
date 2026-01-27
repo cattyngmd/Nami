@@ -38,7 +38,7 @@ public class InputManager {
 
     public void init() {
         EVENT_MANAGER.register(this);
-        LOGGER.info("Input Manager loaded");
+        LOGGER.info("Input Manager loaded.");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

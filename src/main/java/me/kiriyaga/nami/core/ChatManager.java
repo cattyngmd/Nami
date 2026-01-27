@@ -42,6 +42,7 @@ public class ChatManager {
 
     public void init(){
         EVENT_MANAGER.register(this);
+        LOGGER.info("Chat Manager loaded.");
     }
 
     private MessageSignature generateSignature() {

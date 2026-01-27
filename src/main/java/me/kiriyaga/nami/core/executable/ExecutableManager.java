@@ -1,5 +1,7 @@
 package me.kiriyaga.nami.core.executable;
 
+import static me.kiriyaga.nami.Nami.LOGGER;
+
 public class ExecutableManager {
 
     private final ExecutableStateHandler stateHandler = new ExecutableStateHandler();
@@ -8,6 +10,7 @@ public class ExecutableManager {
 
     public void init() {
         tickHandler.init();
+        LOGGER.info("Executable Manager loaded.");
     }
 
     public ExecutableStateHandler getStateHandler() {

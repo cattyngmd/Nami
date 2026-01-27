@@ -7,8 +7,7 @@ import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 public class FontManager {
 
@@ -18,6 +17,7 @@ public class FontManager {
 
     public void init() {
         fontLoader.init();
+        LOGGER.info("Font Manager loaded.");
     }
 
     public void drawText(GuiGraphics context, Component text, int x, int y, boolean shadow, int color) {
