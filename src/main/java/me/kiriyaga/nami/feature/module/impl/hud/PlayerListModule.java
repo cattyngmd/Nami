@@ -80,7 +80,7 @@ public class PlayerListModule extends HudElementModule {
         }
 
         String name = entity.getName().getString();
-        if (FRIEND_MANAGER.isFriend(name)) sb.append("{bg}").append(name);
+        if (FRIEND_MANAGER.isFriend(name)) sb.append("{bf}").append(name);
         else sb.append("{bw}").append(name);
 
         if (showDistance.get()) {

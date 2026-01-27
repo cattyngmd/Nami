@@ -23,8 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static me.kiriyaga.nami.Nami.FRIEND_MANAGER;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.*;
 
 @Mixin(PlayerTabOverlay.class)
 public abstract class MixinPlayerTabOverlay {
@@ -96,10 +95,10 @@ public abstract class MixinPlayerTabOverlay {
                 for (Component sibling : entry.getTabListDisplayName().getSiblings()) {
                     String str = sibling.getString();
                     if (str.equals(playerName)) {
-                        formattedName.append(Component.literal(playerName).withStyle(ChatFormatting.AQUA));
+                        formattedName.append(CAT_FORMAT.format("{friend}"));
                     } else if (str.equals("] " + playerName)) {
                         formattedName.append(Component.literal("] ").withStyle(ChatFormatting.WHITE))
-                                .append(Component.literal(playerName).withStyle(ChatFormatting.AQUA));
+                                .append(CAT_FORMAT.format("{friend}"));
                     } else {
                         formattedName.append(sibling);
                     }

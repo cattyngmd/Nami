@@ -41,10 +41,7 @@ import static me.kiriyaga.nami.Nami.*;
 @RegisterModule
 public class ESPModule extends Module {
 
-    public static enum RenderMode {
-        OUTLINE,
-        BOX
-    }
+    public enum RenderMode {OUTLINE, BOX}
 
     public final BoolSetting showPlayers = addSetting(new BoolSetting("Players", true));
     public final BoolSetting showPeacefuls = addSetting(new BoolSetting("Peacefuls", true));
@@ -168,9 +165,9 @@ public class ESPModule extends Module {
 
         if (entity == null || entity.isRemoved() || !entity.isAlive()) return null;
 
-        if (entity instanceof Player) {
+        if (entity instanceof Player player) {
             if (!esp.showPlayers.get()) return null;
-            return MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+            return (FRIEND_MANAGER.isFriend(player.getName().getString()) ? MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getFriendColor() : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor());
         }
 
         if (esp.showPeacefuls.get() && EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PASSIVE).contains(entity)) return ColorUtils.COLOR_PASSIVE;

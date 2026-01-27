@@ -16,6 +16,12 @@ public class CatStyles {
         return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
+    @Style("friend")
+    Color friend() {
+        Color gc = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getFriendColor();
+        return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
+    }
+
     @Style("s")
     Color secondary() {
         Color gs = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor();
@@ -35,6 +41,13 @@ public class CatStyles {
     @Style("bg")
     Color bounceGlobal() {
         Color gc = MODULE_MANAGER.getStorage().getByClass(HudModule.class).accent.get() ? MODULE_MANAGER.getStorage().getByClass(HudModule.class).globalColor.get() : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+
+        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
+    }
+
+    @Style("bf")
+    Color bounceFriend() {
+        Color gc = MODULE_MANAGER.getStorage().getByClass(HudModule.class).accent.get() ? MODULE_MANAGER.getStorage().getByClass(HudModule.class).globalColor.get() : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getFriendColor();
 
         return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
     }

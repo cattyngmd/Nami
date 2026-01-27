@@ -105,7 +105,7 @@ public class NametagsModule extends Module {
 
                 float width = FONT_MANAGER.getWidth(text);
 
-                String colored = FRIEND_MANAGER.isFriend(ign) ? "{g}" + text : text;
+                String colored = FRIEND_MANAGER.isFriend(ign) ? "{friend}" + text : text;
 
                 if (health.get())
                     colored = colored.replace(

@@ -18,9 +18,10 @@ import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 public class ColorModule extends Module {
 
     public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(255, 135, 151, 255), true));
-
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("Rainbow", false));
     public final DoubleSetting rainbowSpeed = addSetting(new DoubleSetting("Speed", 0.005, 0.0001, 1.50));
+
+    public final ColorSetting friendColor = addSetting(new ColorSetting("Friends", new Color(85, 255, 255, 255), true));
 
     private int phase = 0;
 
@@ -92,12 +93,17 @@ public class ColorModule extends Module {
         globalColor.set(c);
     }
 
-    public Color getEffectiveGlobalColor() {
-        return globalColor.get();
+    public Color getStyledGlobalColor() {
+        return getStyledColor(globalColor.get(), 1.00, 0.00);
     }
 
-    public Color getStyledGlobalColor() {
-        return getStyledColor(getEffectiveGlobalColor(), 1.00, 0.00);
+    public Color getFriendColor() {
+        return getStyledColor(friendColor.get(), 1.00, 0.00);
+    }
+
+    public Color getFriendTextColor(int alpha) {
+            Color base = getFriendColor();
+            return new Color(base.getRed(), base.getGreen(), base.getBlue(), clampAlpha(alpha));
     }
 
     public Color getStyledSecondColor() {
