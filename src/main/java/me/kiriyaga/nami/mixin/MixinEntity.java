@@ -1,11 +1,15 @@
 package me.kiriyaga.nami.mixin;
 
+import me.kiriyaga.nami.core.rotation.RotationStateHandler;
 import me.kiriyaga.nami.event.impl.EntityPushEvent;
+import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
 import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
 import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -25,18 +29,10 @@ import static me.kiriyaga.nami.Nami.*;
 @Mixin(Entity.class)
 public abstract class MixinEntity {
 
-    @Shadow
-    public abstract Vec3 calculateViewVector(float pitch, float yaw);
-
-    @Shadow public abstract boolean isAlwaysTicking();
-
     @Shadow public abstract float getYRot();
 
     @Shadow public abstract float getXRot();
 
-    @Shadow public abstract void setYRot(float f);
-
-    @Shadow public abstract void setXRot(float f);
 
     @Inject(method = "getTeamColor", at = @At("HEAD"), cancellable = true)
     private void onGetTeamColorValue(CallbackInfoReturnable<Integer> cir) {
@@ -98,4 +94,19 @@ public abstract class MixinEntity {
 
         cir.setReturnValue(((Entity) (Object) this).calculateViewVector(spoofPitch, spoofYaw));
     }
+
+/*    @Inject(method = "lookAt", at = @At("TAIL"))
+    private void onLookAt(EntityAnchorArgument.Anchor anchor, Vec3 vec3, CallbackInfo ci) {
+        Entity entity = (Entity) (Object) this;
+
+        if (!(entity instanceof LocalPlayer player)) return;
+        if (player != Minecraft.getInstance().player) return;
+
+        RotationsModule rotations = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
+        if (!rotations.render.get()) return;
+        RotationStateHandler handler = ROTATION_MANAGER.getStateHandler();
+        handler.setRenderPitch(player.getXRot());
+        handler.setRenderHeadYaw(player.yHeadRot);
+        handler.setRenderBodyYaw(player.yBodyRot);
+    }*/
 }

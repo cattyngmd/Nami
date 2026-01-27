@@ -193,8 +193,8 @@ public abstract class MixinLivingEntity extends Entity {
     private float turnHead(float f) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
-            return ROTATION_MANAGER.getStateHandler().getRotationYaw();
+        if (self instanceof LocalPlayer player && player == MC.player && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
+            return ROTATION_MANAGER.getStateHandler().getServerYaw();
         }
         return f;
     }
@@ -203,9 +203,9 @@ public abstract class MixinLivingEntity extends Entity {
     private void lerpHeadYawInject(int i, double d, CallbackInfo ci) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof LocalPlayer player && player == MC.player && ROTATION_MANAGER.getStateHandler().isRotating() && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
+        if (self instanceof LocalPlayer player && player == MC.player && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
 
-            double targetYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
+            double targetYaw = ROTATION_MANAGER.getStateHandler().getServerYaw();
 
             this.yHeadRot = (float) Mth.rotLerp(1.0 / i, this.yHeadRot, targetYaw);
 

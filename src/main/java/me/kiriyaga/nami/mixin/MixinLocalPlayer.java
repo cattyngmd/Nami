@@ -71,8 +71,6 @@ public abstract class MixinLocalPlayer {
     @Inject(method = "sendPosition", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
         if (!ROTATION_MANAGER.getStateHandler().isRotating()) {
-            ROTATION_MANAGER.getStateHandler().setServerYaw(MC.player.getYRot()); // we do update server rotations even tho no rotation is proceeded
-            ROTATION_MANAGER.getStateHandler().setServerPitch(MC.player.getXRot());
             ROTATION_MANAGER.getStateHandler().setServerDeltaYaw(0f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
             return;
         }
@@ -96,6 +94,9 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "sendPosition", at = @At("TAIL"))
     private void postSendMovementPackets(CallbackInfo ci) {
+        ROTATION_MANAGER.getStateHandler().setServerYaw(MC.player.getYRot());
+        ROTATION_MANAGER.getStateHandler().setServerPitch(MC.player.getXRot());
+
         if (!ROTATION_MANAGER.getStateHandler().isRotating())
             return;
 

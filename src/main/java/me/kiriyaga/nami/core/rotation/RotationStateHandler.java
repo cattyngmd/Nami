@@ -48,7 +48,6 @@ public class RotationStateHandler {
     public float getRotationPitch() { return rotationPitch; }
 
     public void setRotationYaw(float yaw) {this.rotationYaw = yaw;}
-
     public void setRotationPitch(float pitch) {this.rotationPitch = Mth.clamp(pitch, -90f, 90f);}
 
     // WE DO NOT WRAP/NORMALIZE SERVER ROTATIONS!!!
