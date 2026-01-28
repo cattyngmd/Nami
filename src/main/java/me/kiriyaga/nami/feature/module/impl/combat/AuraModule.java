@@ -83,6 +83,10 @@ public class AuraModule extends Module {
         if (MC.player == null || MC.level == null) return;
         this.clearDisplayInfo();
 
+        AutoCrystalModule ac = MODULE_MANAGER.getStorage().getByClass(AutoCrystalModule.class);
+        if (ac.lastTotalDamage >= ac.minDamage.get())
+            return;
+
         float tps;
         switch (tpsMode.get()) {
             case LATEST -> tps = SERVER_MANAGER.getLatestTPS();
@@ -285,6 +289,10 @@ public class AuraModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
         if (!render.get() || currentTarget == null) return;
+
+        AutoCrystalModule ac = MODULE_MANAGER.getStorage().getByClass(AutoCrystalModule.class);
+        if (ac.lastTotalDamage >= ac.minDamage.get())
+            return;
 
         ColorModule colorModule = MODULE_MANAGER.getStorage().getByClass(ColorModule.class);
         drawBox(currentTarget, colorModule.getStyledGlobalColor(), event.getMatrices(), event.getTickDelta());
