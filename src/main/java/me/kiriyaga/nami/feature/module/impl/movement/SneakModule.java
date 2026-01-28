@@ -51,14 +51,14 @@ public class SneakModule extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTickEvent(PreTickEvent event) {
-        LocalPlayer player = MC.player;
-        if (player == null) return;
+        if (MC.player == null) return;
+        this.clearDisplayInfo();
 
-        this.setDisplayInfo(mode.get().toString());
+        this.addDisplayInfo(mode.get().toString());
 
         boolean shouldSneak = switch (mode.get()) {
             case ALWAYS -> true;
-            case CORNERS -> shouldSneakAtEdges(player);
+            case CORNERS -> shouldSneakAtEdges(MC.player);
             case LEDGE -> false;
         };
 

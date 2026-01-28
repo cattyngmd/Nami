@@ -52,14 +52,9 @@ public class ModuleListModule extends HudElementModule {
         long currentTime = System.currentTimeMillis();
         elements.clear();
 
-        List<Module> activeModules = new ArrayList<>(MODULE_MANAGER.getStorage().getAll().stream()
-                .filter(Module::isEnabled)
-                .filter(Module::isDrawn)
-                .toList());
+        List<Module> activeModules = new ArrayList<>(MODULE_MANAGER.getStorage().getAll().stream().filter(Module::isEnabled).filter(Module::isDrawn).toList());
 
-        animationStates.keySet().removeIf(name ->
-                activeModules.stream().noneMatch(module -> module.getName().equals(name))
-        );
+        animationStates.keySet().removeIf(name -> activeModules.stream().noneMatch(module -> module.getName().equals(name)));
 
         for (Module module : activeModules) {
             String name = module.getName();
@@ -67,16 +62,32 @@ public class ModuleListModule extends HudElementModule {
                 ModuleAnimationState state = new ModuleAnimationState();
                 state.startTime = currentTime;
 
-                String displayName = showDisplayName.get() ? module.getDisplayInfo() : null;
+                List<Component> displayInfos = showDisplayName.get() ? module.getDisplayInfo() : null;
+
                 String rawText;
-                if (displayName != null && !displayName.isEmpty()) {
-                    rawText = module.getName() + " [" + displayName + "]";
+
+                if (displayInfos != null && !displayInfos.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(module.getName()).append(" [");
+
+                    for (int i = 0; i < displayInfos.size(); i++) {
+                        Component info = displayInfos.get(i);
+                        if (info == null) continue;
+
+                        sb.append("{bw}").append(info.getString());
+
+                        if (i < displayInfos.size() - 1) {
+                            sb.append("{bg},");
+                        }
+                    }
+                    sb.append("{bg}]");
+                    rawText = sb.toString();
+
                 } else {
                     rawText = module.getName();
                 }
                 Component formattedText = CAT_FORMAT.format("{bg}" + rawText);
                 state.textWidth = FONT_MANAGER.getWidth(formattedText);
-
                 animationStates.put(name, state);
             }
         }
@@ -103,21 +114,39 @@ public class ModuleListModule extends HudElementModule {
 
         List<ModuleTextInfo> moduleTexts = new ArrayList<>();
         for (Module module : activeModules) {
-            String displayName = showDisplayName.get() ? module.getDisplayInfo() : null;
+            List<Component> displayInfos = showDisplayName.get() ? module.getDisplayInfo() : null;
             String rawText;
-            if (displayName != null && !displayName.isEmpty()) {
-                rawText = module.getName() + " [" + displayName + "]";
+            String formattedTextStr;
+
+            if (displayInfos != null && !displayInfos.isEmpty()) {
+                StringBuilder rawSb = new StringBuilder();
+                rawSb.append(module.getName()).append(" [");
+                StringBuilder formattedSb = new StringBuilder();
+                formattedSb.append("{bg}").append(module.getName()).append(" {bg}[");
+
+                for (int i = 0; i < displayInfos.size(); i++) {
+                    Component info = displayInfos.get(i);
+                    if (info == null) continue;
+
+                    rawSb.append(info.getString());
+                    formattedSb.append("{bw}").append(info.getString());
+
+                    if (i < displayInfos.size() - 1) {
+                        rawSb.append(",");
+                        formattedSb.append("{bg},");
+                    }
+                }
+
+                rawSb.append("]");
+                formattedSb.append("{bg}]");
+
+                rawText = rawSb.toString();
+                formattedTextStr = formattedSb.toString();
+
             } else {
                 rawText = module.getName();
-            }
-
-            String formattedTextStr;
-            if (displayName != null && !displayName.isEmpty()) {
-                formattedTextStr = "{bg}" + module.getName() + " {bg}[{bw}" + displayName + "{bg}]";
-            } else {
                 formattedTextStr = "{bg}" + module.getName();
             }
-
             Component formattedText = CAT_FORMAT.format(formattedTextStr);
             int width = FONT_MANAGER.getWidth(formattedText);
             moduleTexts.add(new ModuleTextInfo(module, formattedText, rawText, width));

@@ -81,6 +81,7 @@ public class AuraModule extends Module {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
+        this.clearDisplayInfo();
 
         float tps;
         switch (tpsMode.get()) {
@@ -111,12 +112,12 @@ public class AuraModule extends Module {
                 || stack.getItem() instanceof TridentItem
                 || stack.getItem() instanceof MaceItem))) {
             currentTarget = null;
-            this.setDisplayInfo("");
+            this.clearDisplayInfo();
             return;
         }
 
         currentTarget = target;
-        this.setDisplayInfo(target.getName().getString());
+        this.addDisplayInfo(target.getName());
 
 //        if (!ItemStack.areEqual(stack, lastHeldStack)) {
 //            lastHeldStack = stack;

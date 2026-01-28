@@ -33,6 +33,7 @@ public class SpeedModule extends Module {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null) return;
+        this.clearDisplayInfo();
 
         if (MC.player.isVisuallyCrawling() || MC.player.isCrouching() || MC.player.isShiftKeyDown() || MC.player.isFallFlying())
             return; // this fallback need due to sprinting not apply for theese states
@@ -41,7 +42,7 @@ public class SpeedModule extends Module {
         if (!inLiquid.get() && MC.player.isInWater())
             return;
 
-        this.setDisplayInfo(mode.get().toString());
+        this.addDisplayInfo(mode.get().toString());
 
         if (mode.get() == Mode.ROTATION && isMoving()) {
             float yaw = getYaw();

@@ -38,8 +38,9 @@ public class StepModule extends Module {
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
+        this.clearDisplayInfo();
 
-        this.setDisplayInfo(height.get()+"");
+        this.addDisplayInfo(height.get()+"");
         double currentY = MC.player.getY();
         double stepHeight = currentY - lastY;
 

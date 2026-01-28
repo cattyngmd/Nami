@@ -138,13 +138,15 @@ public class ElytraFlyModule extends Module {
         if (MC.player == null)
             return;
 
+        this.clearDisplayInfo();
+
         if (MC.player.getItemBySlot(EquipmentSlot.CHEST).getItem() != Items.ELYTRA)
             return;
 
         if (setbackStop.get() && !SERVER_MANAGER.hasElapsedSinceSetback(5000))
             return;
 
-        this.setDisplayInfo(mode.get().toString());
+        this.addDisplayInfo(mode.get().toString());
 
         if (mode.get() == FlyMode.BOUNCE) {
             setJumpHeld(true);

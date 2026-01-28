@@ -19,6 +19,7 @@ import me.kiriyaga.nami.util.entity.DamageUtils;
 import me.kiriyaga.nami.util.entity.EntityUtils;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,6 +35,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.EntityHitResult;
 
 import java.awt.*;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 import static me.kiriyaga.nami.Nami.*;
@@ -76,6 +78,7 @@ public class AutoCrystalModule extends Module {
 
     private int breakTimer, placeTimer = 0; // i love it
     private PlaceTarget placeTarget = null;
+    float lastTotalDamage, lastCalcTimeMs = 0;
 
     public AutoCrystalModule() {
         super("AutoCrystal", "Automatically places and break crystals to kill people, if you are good enough!.", ModuleCategory.of("Combat"), "autocrystal", "ac", "crystalaura");
@@ -106,14 +109,20 @@ public class AutoCrystalModule extends Module {
     }
 
     @Override
-    public void onDisable() {
+    public void onEnable() {
         breakTimer = 0;
         placeTimer = 0;
+        lastTotalDamage = 0;
+        lastCalcTimeMs = 0;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTickEvent(PreTickEvent event) {
         if (MC.player == null) return;
+
+        lastTotalDamage = 0;
+        lastCalcTimeMs = 0;
+        this.clearDisplayInfo();
 
         if (doPlace.get()) {
             if (placeTimer > 0) {
@@ -130,7 +139,11 @@ public class AutoCrystalModule extends Module {
             }
             doBreak();
         }
+
+        this.addDisplayInfo(String.format(Locale.US, "%.2f", lastTotalDamage));
+        this.addDisplayInfo(String.format(Locale.US, "%.4f", lastCalcTimeMs));
     }
+
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender3DEvent(Render3DEvent event) {
         if (MC.level == null || MC.player == null || placeTarget == null || !render.get()) return;
@@ -222,7 +235,7 @@ public class AutoCrystalModule extends Module {
             }
         }
 
-        this.setDisplayInfo(String.format("%.2f", totalDamage));
+        lastTotalDamage = totalDamage;
         return totalDamage;
     }
 
@@ -262,6 +275,7 @@ public class AutoCrystalModule extends Module {
         placeTimer = placeDelay.get().intValue();
     }
     private PlaceTarget findBestPlace() {
+        long startTime = System.nanoTime();
         PlaceTarget best = null;
         BlockPos playerPos = MC.player.blockPosition();
         int r = (int) Math.ceil(placeRange.get());
@@ -290,6 +304,7 @@ public class AutoCrystalModule extends Module {
             }
         }
 
+        lastCalcTimeMs = (System.nanoTime() - startTime) / 1_000_000f;
         if (best != null) {
             PlaceTarget ret = new PlaceTarget(best.pos, best.totalDamage);
             return ret;

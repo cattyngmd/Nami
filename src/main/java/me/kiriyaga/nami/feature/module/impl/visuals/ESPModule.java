@@ -64,8 +64,9 @@ public class ESPModule extends Module {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
         if (MC == null || MC.level == null || MC.player == null) return;
+        this.clearDisplayInfo();
 
-        this.setDisplayInfo(renderMode.get().toString());
+        this.addDisplayInfo(renderMode.get().toString());
 
 
         if (showMobSpawns.get())

@@ -45,6 +45,7 @@ public class BowAimModule extends Module {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
+        this.clearDisplayInfo();
 
         ItemStack stack = MC.player.getMainHandItem();
 
@@ -55,7 +56,7 @@ public class BowAimModule extends Module {
         }
 
         currentTarget = target;
-        this.setDisplayInfo(target.getName().getString());
+        this.addDisplayInfo(target.getName().getString());
 
         Vec3 aimPos = getAimPosition(target);
         ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(

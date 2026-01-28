@@ -65,6 +65,7 @@ public class AutoTrapModule extends Module {
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
+        this.clearDisplayInfo();
 
         Entity target = TargetUtils.getTarget();
         if (target == null) {
@@ -72,7 +73,7 @@ public class AutoTrapModule extends Module {
             return;
         }
 
-        this.setDisplayInfo(surroundPositions.size()+"");
+        this.addDisplayInfo(surroundPositions.size()+"");
         if (cooldown > 0) {
             cooldown--;
             return;

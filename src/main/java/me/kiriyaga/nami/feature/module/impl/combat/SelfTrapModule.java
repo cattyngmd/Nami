@@ -66,13 +66,14 @@ public class SelfTrapModule extends Module {
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
+        this.clearDisplayInfo();
 
         if (jumpDisable.get() && !MC.player.onGround()) {
             this.toggle();
             return;
         }
 
-        this.setDisplayInfo(surroundPositions.size()+"");
+        this.addDisplayInfo(surroundPositions.size()+"");
         if (cooldown > 0) {
             cooldown--;
             return;

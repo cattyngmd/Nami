@@ -20,11 +20,11 @@ public abstract class Module {
 
     private BoolSetting drawn;
     private boolean enabled = false;
-    private String displayInfo = "";
+    private final List<Component> displayInfo = new ArrayList<>();
 
     protected final List<Setting<?>> settings = new ArrayList<>();
     protected final KeyBindSetting keyBind;
-    private boolean expanded = false;
+    private boolean expanded;
 
     public Module(String name, String description, ModuleCategory category, String... aliases) {
         this.name = name;
@@ -34,7 +34,7 @@ public abstract class Module {
         expanded = false;
 
         this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
-        this.drawn = new BoolSetting("Drawn", false);
+        this.drawn = new BoolSetting("Drawn", true);
         this.drawn.setShow(false);
         addSetting(keyBind);
         addSetting(drawn);
@@ -148,15 +148,25 @@ public abstract class Module {
         return null;
     }
 
-    public void setDisplayInfo(String info) {
-        this.displayInfo = info;
+    public void addDisplayInfo(Component info) {
+        if (info == null) return;
+        if (info.getString().isEmpty()) return;
+
+        displayInfo.add(info);
     }
 
-    public String getDisplayInfo() {
-        if (displayInfo != null && !displayInfo.isEmpty()) {
-            return  displayInfo;
-        }
-        return null;
+    public void addDisplayInfo(String info) {
+        if (info == null || info.isEmpty()) return;
+        displayInfo.add(Component.literal(info));
+    }
+
+    public void clearDisplayInfo() {
+        displayInfo.clear();
+    }
+
+    public List<Component> getDisplayInfo() {
+        if (displayInfo.isEmpty()) return null;
+        return displayInfo;
     }
 
     protected void onEnable() {}

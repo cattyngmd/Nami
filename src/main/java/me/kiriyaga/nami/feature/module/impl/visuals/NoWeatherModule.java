@@ -25,6 +25,7 @@ public class NoWeatherModule extends Module {
     private void onUpdate (PreTickEvent ev){
         if (MC == null || MC.level == null || MC.player == null)
             return;
+        this.clearDisplayInfo();
 
         String weather;
 
@@ -38,6 +39,6 @@ public class NoWeatherModule extends Module {
             weather = "clear";
         }
 
-        this.setDisplayInfo(weather);
+        this.addDisplayInfo(weather);
     }
 }

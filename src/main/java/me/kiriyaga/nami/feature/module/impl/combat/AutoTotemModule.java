@@ -54,6 +54,7 @@ public class AutoTotemModule extends Module {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreTick(PreTickEvent event) {
         if (MC.level == null || MC.player == null) return;
+        this.clearDisplayInfo();
 
         int totemCount = 0;
         for (ItemStack stack : MC.player.getInventory().getNonEquipmentItems()) {
@@ -65,7 +66,7 @@ public class AutoTotemModule extends Module {
         if (offHandStack.getItem() == Items.TOTEM_OF_UNDYING) {
             totemCount += offHandStack.getCount();
         }
-        this.setDisplayInfo(String.valueOf(totemCount));
+        this.addDisplayInfo(String.valueOf(totemCount));
 
         attemptPlaceOffhand();
     }
@@ -165,7 +166,7 @@ public class AutoTotemModule extends Module {
         }
 
         totemCount = countTotems();
-        setDisplayInfo("" + totemCount);
+        addDisplayInfo("" + totemCount);
     }
 
     private ItemStack findTotemStack() {

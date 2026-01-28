@@ -65,6 +65,7 @@ public class FeetTrapModule extends Module {
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
+        this.clearDisplayInfo();
 
         if (MODULE_MANAGER.getStorage().getByClass(SelfTrapModule.class).isEnabled())
             return;
@@ -74,7 +75,7 @@ public class FeetTrapModule extends Module {
             return;
         }
 
-        this.setDisplayInfo(surroundPositions.size()+"");
+        this.addDisplayInfo(surroundPositions.size()+"");
         if (cooldown > 0) {
             cooldown--;
             return;

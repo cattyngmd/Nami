@@ -47,8 +47,9 @@ public class AutoLogModule extends Module {
     public void onUpdate(PreTickEvent event) {
         if (MC.player == null || MC.level == null)
             return;
+        this.clearDisplayInfo();
 
-        this.setDisplayInfo(health.get().toString());
+        this.addDisplayInfo(health.get().toString());
 
         LocalPlayer player = MC.player;
 
