@@ -29,6 +29,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import org.apache.logging.log4j.Level;
 
 import java.awt.*;
 import java.util.*;
@@ -55,7 +56,7 @@ public class BreakManager {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceive(PacketReceiveEvent event) {
-
+        MC.execute(() -> {
         if (event.getPacket() instanceof ClientboundBlockDestructionPacket packet) {
 //            if (packet.getProgress() != 0)
 //                return;
@@ -69,12 +70,11 @@ public class BreakManager {
             float speed = MODULE_MANAGER.getStorage().getByClass(SpeedMineModule.class).speed.get().floatValue();
             this.get(uuid).startBreak(pos, Direction.UP, speed);
         }
+        });
     }
 
-
-
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onTick(PreTickEvent event) {
+    public void onPreTickEvent(PreTickEvent event) {
         if (MC.level == null) return;
 
         for (PlayerBreakState state : players.values()) {
@@ -83,7 +83,7 @@ public class BreakManager {
     }
 
     @SubscribeEvent
-    public void onRender(Render3DEvent event) {
+    public void onRender3DEvent(Render3DEvent event) {
         if (MODULE_MANAGER.getStorage().getByClass(BreakHighlightModule.class).isEnabled()) {
             for (PlayerBreakState state : players.values()) {
                 state.render(event);
