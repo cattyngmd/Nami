@@ -62,8 +62,8 @@ public class SpeedMineModule extends Module {
     public final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
 
-    private BlockBreakingTask currentTask;
-    private BlockBreakingTask doubleMineTask;
+    public BlockBreakingTask currentTask;
+    public BlockBreakingTask doubleMineTask;
 
     private int shouldSwapBack = -1;
 
@@ -105,11 +105,14 @@ public class SpeedMineModule extends Module {
     public void onBlockStartBreak(StartBreakingBlockEvent event) {
         BlockState state = MC.level.getBlockState(event.blockPos);
 
+        event.cancel();
+
         if (state.getBlock().defaultDestroyTime() == -1.0f || state.isAir()) {
             return;
         }
 
-        event.cancel();
+        if (doubleMineTask != null && doubleMineTask.getBlockPos().equals(event.blockPos))
+            return;
 
         if (swing.get())
             MC.player.swing(InteractionHand.MAIN_HAND);
@@ -146,6 +149,10 @@ public class SpeedMineModule extends Module {
 
     private void renderProgress(Render3DEvent event, BlockBreakingTask task) {
         BlockPos pos = task.getBlockPos();
+
+        if (MC.level.getBlockState(pos).isAir())
+            return;
+
         VoxelShape shape = task.isInstantRemine() ? Shapes.block() : task.getBlockState().getShape(MC.level, pos);
 
         if (shape.isEmpty()) shape = Shapes.block();
@@ -286,7 +293,7 @@ public class SpeedMineModule extends Module {
     }
 
     private void finishMining(BlockBreakingTask task) {
-        if (!task.isStarted() || task.getBlockState().isAir()) return;
+        if (!task.isStarted() || task.getBlockState().isAir() && !async.get()) return;
 
         if (currentTask.lastBrokenCount == currentTask.brokenCount && !async.get())
             return;
@@ -320,7 +327,7 @@ public class SpeedMineModule extends Module {
             MC.player.swing(InteractionHand.MAIN_HAND);
 
         sendDestroyPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, task);
-        MC.level.destroyBlock(task.blockPos, false, MC.player, 512);
+        //MC.level.destroyBlock(task.blockPos, false, MC.player, 512);
 
         if (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) {
             INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
@@ -345,8 +352,6 @@ public class SpeedMineModule extends Module {
             }
         }
     }
-
-
 
     private void sendDestroyPacket(ServerboundPlayerActionPacket.Action action, BlockBreakingTask task) {
         sendSequencedPacket(id -> new ServerboundPlayerActionPacket(action, task.getBlockPos(), task.getFacing(), id));

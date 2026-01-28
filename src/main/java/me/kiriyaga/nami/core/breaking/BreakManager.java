@@ -42,7 +42,7 @@ public class BreakManager {
 
     private final Map<UUID, PlayerBreakState> players = new ConcurrentHashMap<>();
 
-    public void init() {
+    public void init() { // TODO: this shit doesnt work if player mines with automine
         EVENT_MANAGER.register(this);
         LOGGER.info("Break Manager loaded.");
     }

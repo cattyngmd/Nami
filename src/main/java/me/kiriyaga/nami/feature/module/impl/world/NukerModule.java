@@ -41,10 +41,14 @@ public class NukerModule extends Module {
     public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
     public final BoolSetting safeOnly = addSetting(new BoolSetting("SafeOnly", false));
     public final BoolSetting flatten = addSetting(new BoolSetting("Flatten", true));
+    public final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.BLOCK));
 
     private Set<BlockPos> selectiveTargets = new HashSet<>();
     private Block blockBeingMined = null;
+    private BlockPos target1 = null;
+    private BlockPos target2 = null;
+    private boolean b = false;
 
     public NukerModule() {
         super("Nuker", "Automatically breaks blocks around you.", ModuleCategory.of("World"));
@@ -54,24 +58,29 @@ public class NukerModule extends Module {
     public void onPreTickEvent(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
 
-        BlockPos targetBlock = null;
-
-        if (mode.get() == NukerMode.SPHERE) {
-            targetBlock = looking();
-            if (targetBlock == null) {
-                targetBlock = closest();
-            }
-        } else if (mode.get() == NukerMode.SELECTIVE) {
-            selectiveTargets.removeIf(pos -> !canBreak(pos));
-            if (!selectiveTargets.isEmpty()) {
-                targetBlock = closestSelective();
-            }
+        if (!doubleMine.get()) {
+            BlockPos target = getTarget(null);
+            if (target != null)
+                InteractionUtils.breakBlock(target, range.get(), rotate.get(), swing.get(), grim.get(), strictDirection.get(), this.name);
+            target1 = null;
+            target2 = null;
+            b = false;
+            return;
         }
 
-        if (targetBlock != null)
-            if (!InteractionUtils.breakBlock(targetBlock, range.get(), rotate.get(), swing.get(), grim.get(), strictDirection.get(), this.name));
-               // selectiveTargets.remove(targetBlock);
+        if (target1 == null || !canBreak(target1)) {
+            target1 = getTarget(null);
+        }
+
+        if (target2 == null || !canBreak(target2) || target2.equals(target1))
+            target2 = getTarget(target1);
+
+        BlockPos target = b ? target2 : target1;
+        b = !b;
+        if (target != null)
+            InteractionUtils.breakBlock(target, range.get(), rotate.get(), swing.get(), grim.get(), strictDirection.get(), this.name);
     }
+
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onBlockStartBreak(StartBreakingBlockEvent event) {
@@ -99,6 +108,26 @@ public class NukerModule extends Module {
         }
     }
 
+    private BlockPos getTarget(BlockPos exclude) {
+        if (mode.get() == NukerMode.SPHERE) {
+            BlockPos look = looking();
+            if (look != null && !look.equals(exclude)) return look;
+            return closest(exclude);
+        }
+
+        if (mode.get() == NukerMode.SELECTIVE) {
+            selectiveTargets.removeIf(pos -> !canBreak(pos));
+            if (selectiveTargets.isEmpty()) return null;
+
+            if (exclude == null) {
+                return closestSelective(null);
+            } else {
+                return closestSelective(exclude);
+            }
+        }
+
+        return null;
+    }
     private BlockPos looking() {
         HitResult hit = MC.player.pick(range.get(), 1.0f, false);
         if (hit instanceof BlockHitResult blockHit) {
@@ -108,7 +137,7 @@ public class NukerModule extends Module {
         return null;
     }
 
-    private BlockPos closest() {
+    private BlockPos closest(BlockPos exclude) {
         Vec3 eyePos = MC.player.getEyePosition(1.0f);
         int radius = 6;
         BlockPos playerPos = MC.player.blockPosition();
@@ -119,6 +148,7 @@ public class NukerModule extends Module {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
                     BlockPos pos = playerPos.offset(x, y, z);
+                    if (exclude != null && pos.equals(exclude)) continue;
                     if (!canBreak(pos)) continue;
 
                     double dist = eyePos.distanceToSqr(Vec3.atCenterOf(pos));
@@ -132,7 +162,7 @@ public class NukerModule extends Module {
         return closest;
     }
 
-    private BlockPos closestSelective() {
+    private BlockPos closestSelective(BlockPos exclude) {
         if (selectiveTargets.isEmpty()) return null;
 
         Vec3 eyePos = MC.player.getEyePosition(1.0f);
@@ -146,6 +176,8 @@ public class NukerModule extends Module {
                 it.remove();
                 continue;
             }
+            if (exclude != null && pos.equals(exclude)) continue;
+
             double dist = eyePos.distanceToSqr(Vec3.atCenterOf(pos));
             if (dist < closestDistance) {
                 closest = pos;
