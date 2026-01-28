@@ -58,6 +58,7 @@ public class SpeedMineModule extends Module {
     public final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final BoolSetting async = addSetting(new BoolSetting("Async", true));
+    public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
     public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
     public final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
@@ -294,6 +295,7 @@ public class SpeedMineModule extends Module {
 
     private void finishMining(BlockBreakingTask task) {
         if (!task.isStarted() || task.getBlockState().isAir() && !async.get()) return;
+        if (!multitask.get() && MC.player.isUsingItem())return;
 
         if (currentTask.lastBrokenCount == currentTask.brokenCount && !async.get())
             return;
