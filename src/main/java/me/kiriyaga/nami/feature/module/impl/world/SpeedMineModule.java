@@ -49,17 +49,17 @@ public class SpeedMineModule extends Module {
     public enum Swap { NONE, NORMAL, SILENT121, SILENT}
     public enum EchestPriority {FORTUNE, SILK}
 
-    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.5, 2.0, 7.0));
-    private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.0, 0.7, 1.0));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.5, 2.0, 7.0));
+    public final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.0, 0.7, 1.0));
     public final EnumSetting<Swap> swap = addSetting(new EnumSetting<>("Swap", Swap.NORMAL));
     public final EnumSetting<Rotate> rotate = addSetting(new EnumSetting<>("Rotate", Rotate.NORMAL));
-    private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
-    private final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
-    private final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
-    private final BoolSetting async = addSetting(new BoolSetting("Async", true));
+    public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    public final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
+    public final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final BoolSetting async = addSetting(new BoolSetting("Async", true));
     public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
-    private final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
+    public final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
 
     private BlockBreakingTask currentTask;

@@ -1,5 +1,6 @@
 package me.kiriyaga.nami;
 
+import me.kiriyaga.nami.core.breaking.BreakManager;
 import me.kiriyaga.nami.core.cat.FabricCatFormat;
 import me.kiriyaga.nami.core.command.CommandManager;
 import me.kiriyaga.nami.core.config.ConfigManager;
@@ -58,6 +59,7 @@ public class Nami implements ClientModInitializer {
     public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
     public static final ServerManager SERVER_MANAGER = new ServerManager();
     public static final InputManager INPUT_MANAGER = new InputManager();
+    public static final BreakManager BREAK_MANAGER = new BreakManager();
 
     public static Tuple<ServerAddress, ServerData> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
@@ -82,6 +84,7 @@ public class Nami implements ClientModInitializer {
         SERVER_MANAGER.init();
         CHAT_MANAGER.init();
         INPUT_MANAGER.init();
+        BREAK_MANAGER.init();
 
         CAT_FORMAT.add(new CatStyles());
 
