@@ -49,12 +49,11 @@ public class AutoCrystalModule extends Module {
 
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));
-    public final DoubleSetting placeRange = addSetting(new DoubleSetting("Range", 4.0, 1.0, 7.0));
+    public final DoubleSetting placeRange = addSetting(new DoubleSetting("Range", 5.0, 1.0, 7.0));
     public final IntSetting placeDelay = addSetting(new IntSetting("Delay", 0, 0, 20));
     public final BoolSetting placeRotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
-    public final BoolSetting placeOnlyCanBreak = addSetting(new BoolSetting("OnlyCanBreak", false));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("Multitask", false));
 
     //break
@@ -97,7 +96,6 @@ public class AutoCrystalModule extends Module {
         placeSwing.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeIgnoreItems.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeMultitask.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
-        placeOnlyCanBreak.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
@@ -342,7 +340,6 @@ public class AutoCrystalModule extends Module {
             return false;
         }
 
-        if (placeOnlyCanBreak.get()) {
             Vec3 hitVec = getClosestPointToEye(eyePos, fakeCrystal.getBoundingBox());
             float idealYaw = (float) getYawToVec(MC.player, hitVec);
             float idealPitch = (float) getPitchToVec(MC.player, hitVec);
@@ -353,7 +350,6 @@ public class AutoCrystalModule extends Module {
                 fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
                 return false;
             }
-        }
 
         fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
         return true;
