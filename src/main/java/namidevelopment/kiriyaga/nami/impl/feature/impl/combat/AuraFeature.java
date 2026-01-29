@@ -44,6 +44,7 @@ import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
+import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isItemAWeapon;
 
 @RegisterFeature
 public class AuraFeature extends Feature {
@@ -110,10 +111,7 @@ public class AuraFeature extends Feature {
         ItemStack stack = MC.player.getMainHandItem();
         Entity target = TargetUtils.getTarget();
 
-        if (target == null || (swap.get() == Swap.REQUIRE && !(stack.getItem() instanceof AxeItem
-                || stack.is(ItemTags.SWORDS)
-                || stack.getItem() instanceof TridentItem
-                || stack.getItem() instanceof MaceItem))) {
+        if (target == null || !isItemAWeapon(stack)) {
             currentTarget = null;
             this.clearDisplayInfo();
             return;

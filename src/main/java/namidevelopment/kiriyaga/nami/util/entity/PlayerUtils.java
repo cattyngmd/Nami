@@ -1,11 +1,10 @@
 package namidevelopment.kiriyaga.nami.util.entity;
 
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.util.Mth;
@@ -30,6 +29,18 @@ public class PlayerUtils {
                 item == Items.GOLDEN_CHESTPLATE ||
                 item == Items.GOLDEN_LEGGINGS ||
                 item == Items.GOLDEN_BOOTS;
+    }
+
+    public static boolean isItemAWeapon(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
+
+        Item item = stack.getItem();
+        return item instanceof AxeItem
+                || stack.is(ItemTags.SWORDS)
+                || item instanceof TridentItem
+                || item instanceof MaceItem;
     }
 
     public static boolean isBroken(ItemStack stack, int threshold) {

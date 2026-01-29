@@ -24,15 +24,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isItemAWeapon;
 
 @RegisterFeature
 public class AutoTotemFeature extends Feature {
 
-    private enum Offhand { CRYSTAL, GAPPLE, ITEMFRAME, MENDING}
+    private enum Offhand { CRYSTAL, GAPPLE, ITEMFRAME, MENDING, TOTEM}
 
-    private final IntSetting health = addSetting(new IntSetting("Health", 12, 10, 36));
+    private final IntSetting health = addSetting(new IntSetting("Health", 12, 2, 36));
     private final BoolSetting offhandOverride = addSetting(new BoolSetting("Override", false));
     private final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("Item", Offhand.CRYSTAL));
+    private final BoolSetting swordGap = addSetting(new BoolSetting("SwordGap", true));
     private final BoolSetting fastSwap = addSetting(new BoolSetting("Alternative", false));
     private final BoolSetting mainhand = addSetting(new BoolSetting("Mainhand", false));
     private final BoolSetting mainhandGapple = addSetting(new BoolSetting("MainhandGapple", false));
@@ -48,6 +50,7 @@ public class AutoTotemFeature extends Feature {
         super("AutoTotem", "Automatically places totem in your hand.", FeatureCategory.of("Combat"), "autototem");
         mainhandSlot.setShowCondition(mainhand::get);
         overrideItem.setShowCondition(offhandOverride::get);
+        swordGap.setShowCondition(offhandOverride::get);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -180,7 +183,15 @@ public class AutoTotemFeature extends Feature {
         Offhand type = overrideItem.get();
         LocalPlayer player = MC.player;
 
+        if (swordGap.get()
+        && MC.player.getHealth() + MC.player.getAbsorptionAmount() >= health.get()
+        && isItemAWeapon(MC.player.getInventory().getSelectedItem())
+        && MC.options.keyUse.isDown())
+            return new ItemStack(Items.ENCHANTED_GOLDEN_APPLE);
+
         switch (type) {
+            case TOTEM:
+                return new ItemStack(Items.TOTEM_OF_UNDYING);
             case CRYSTAL:
                 return new ItemStack(Items.END_CRYSTAL);
             case GAPPLE:
