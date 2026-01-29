@@ -333,7 +333,7 @@ public class AutoCrystalFeature extends Feature {
         AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 3, base.getZ() + 1);
 
         for (Entity e : MC.level.getEntities(null, checkIntersects)) {
-            if (placeIgnoreItems.get() && e instanceof ItemEntity) continue;
+            if (placeIgnoreItems.get() && e instanceof ItemEntity && ((ItemEntity) e).getAge() > 3) continue;
             if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
             fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
             return false;

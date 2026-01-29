@@ -3,7 +3,7 @@
   "id": "nami",
   "version": "${version}",
   "name": "Nami Client",
-  "description": "A high-performance, modular client base for anarchy servers.",
+  "description": "A high-performance, modular client for anarchy servers.",
   "authors": ["Kiriyaga"],
   "contact": {
     "sources": "https://github.com/NamiDevelopment/nami"
