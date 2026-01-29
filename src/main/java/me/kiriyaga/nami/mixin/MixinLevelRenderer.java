@@ -1,8 +1,10 @@
 package me.kiriyaga.nami.mixin;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
 import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoWeatherModule;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -44,10 +46,18 @@ public class MixinLevelRenderer {
     }
 
     @Inject(method = "doesMobEffectBlockSky(Lnet/minecraft/client/Camera;)Z", at = @At("HEAD"), cancellable = true)
-    private void onDoesMobEffectBlockSky(Camera camera, CallbackInfoReturnable<Boolean> cir) {
+    private void doesMobEffectBlockSky(Camera camera, CallbackInfoReturnable<Boolean> cir) {
         NoRenderModule nr = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
 
         if (nr != null && nr.isEnabled() && nr.noDarkness.get())
             cir.setReturnValue(false);
+    }
+
+    @Inject(method = "addWeatherPass", at = @At("HEAD"), cancellable = true)
+    private void addWeatherPass(FrameGraphBuilder frameGraphBuilder, GpuBufferSlice gpuBufferSlice, CallbackInfo ci) {
+        NoWeatherModule nr = MODULE_MANAGER.getStorage().getByClass(NoWeatherModule.class);
+
+        if (nr != null && nr.isEnabled())
+            ci.cancel();
     }
 }
