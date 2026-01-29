@@ -49,20 +49,20 @@ public class AutoCrystalModule extends Module {
 
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));
-    public final DoubleSetting placeRange = addSetting(new DoubleSetting("Range", 5.0, 1.0, 7.0));
-    public final IntSetting placeDelay = addSetting(new IntSetting("Delay", 0, 0, 20));
-    public final BoolSetting placeRotate = addSetting(new BoolSetting("Rotate", true));
-    public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
+    public final DoubleSetting placeRange = addSetting(new DoubleSetting("PlaceRange","Range", 5.0, 1.0, 7.0));
+    public final IntSetting placeDelay = addSetting(new IntSetting("PlaceDelay","Delay", 0, 0, 20));
+    public final BoolSetting placeRotate = addSetting(new BoolSetting("PlaceRotate","Rotate", true));
+    public final BoolSetting placeSwing = addSetting(new BoolSetting("PlaceSwing","Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
-    public final BoolSetting placeMultitask = addSetting(new BoolSetting("Multitask", false));
+    public final BoolSetting placeMultitask = addSetting(new BoolSetting("PlaceMultitask","Multitask", false));
 
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));
-    public final DoubleSetting breakRange = addSetting(new DoubleSetting("Range", 3.0, 1.0, 7.0));
-    public final IntSetting breakDelay = addSetting(new IntSetting("Delay", 0, 0, 20));
-    public final BoolSetting breakRotate = addSetting(new BoolSetting("Rotate", true));
-    public final BoolSetting breakSwing = addSetting(new BoolSetting("Swing", true));
-    public final BoolSetting breakMultitask = addSetting(new BoolSetting("Multitask", true));
+    public final DoubleSetting breakRange = addSetting(new DoubleSetting("BreakRange","Range", 3.0, 1.0, 7.0));
+    public final IntSetting breakDelay = addSetting(new IntSetting("BreakDelay","Delay", 0, 0, 20));
+    public final BoolSetting breakRotate = addSetting(new BoolSetting("BreakRotate","Rotate", true));
+    public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
+    public final BoolSetting breakMultitask = addSetting(new BoolSetting("BreakMultitask","Multitask", true));
     public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
 
     //damages

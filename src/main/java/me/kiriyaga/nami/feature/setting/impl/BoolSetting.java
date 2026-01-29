@@ -10,6 +10,10 @@ public class BoolSetting extends Setting<Boolean> {
         super(name, defaultValue);
     }
 
+    public BoolSetting(String identifier, String name, boolean defaultValue) {
+        super(identifier, name, defaultValue);
+    }
+
     public void toggle() {
         set(!value);
     }

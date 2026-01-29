@@ -15,6 +15,11 @@ public class ColorSetting extends Setting<Color> {
         this.hasAlpha = hasAlpha;
     }
 
+    public ColorSetting(String identifier, String name, Color defaultValue, boolean hasAlpha) {
+        super(identifier, name, defaultValue);
+        this.hasAlpha = hasAlpha;
+    }
+
     public int getRed() {
         return value.getRed();
     }

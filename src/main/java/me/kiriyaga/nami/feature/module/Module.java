@@ -5,6 +5,7 @@ import me.kiriyaga.nami.feature.setting.Setting;
 import me.kiriyaga.nami.feature.setting.impl.BoolSetting;
 import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import static me.kiriyaga.nami.Nami.*;
 
 public abstract class Module {
 
+    protected final String identifier;
     protected final String name;
     protected final String description;
     protected final String[] aliases;
@@ -26,11 +28,12 @@ public abstract class Module {
     protected final KeyBindSetting keyBind;
     private boolean expanded;
 
-    public Module(String name, String description, ModuleCategory category, String... aliases) {
+    public Module(String identifier, String name, String description, ModuleCategory category, String... aliases) {
         this.name = name;
         this.description = description;
         this.aliases = aliases;
         this.category = category;
+        this.identifier = identifier;
         expanded = false;
 
         this.keyBind = new KeyBindSetting("Bind", KeyBindSetting.KEY_NONE);
@@ -40,6 +43,9 @@ public abstract class Module {
         addSetting(drawn);
     }
 
+    public Module(String name, String description, ModuleCategory category, String... aliases) {
+        this(name, name, description, category, aliases);
+    }
 
     public void toggle() {
         setEnabled(!enabled);
@@ -98,6 +104,10 @@ public abstract class Module {
 
     public String getName() {
         return name;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     public String getDescription() {

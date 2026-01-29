@@ -6,6 +6,7 @@ import me.kiriyaga.nami.feature.module.Module;
 import java.util.function.BooleanSupplier;
 
 public abstract class Setting<T> {
+    private final String identifier;
     private String name;
     protected T value;
     private Runnable onChanged = null;
@@ -14,9 +15,14 @@ public abstract class Setting<T> {
 
     private BooleanSupplier showCondition = null;
 
-    public Setting(String name, T defaultValue) {
+    public Setting(String identifier, String name, T defaultValue) {
+        this.identifier = identifier;
         this.name = name;
         this.value = defaultValue;
+    }
+
+    public Setting(String name, T defaultValue) {
+        this(name, name, defaultValue);
     }
 
     public String getName() {
@@ -61,6 +67,10 @@ public abstract class Setting<T> {
 
     public Module getParentModule() {
         return parentModule;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     public abstract void fromJson(JsonElement json);

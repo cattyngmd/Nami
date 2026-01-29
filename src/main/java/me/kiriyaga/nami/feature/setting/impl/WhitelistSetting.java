@@ -17,20 +17,22 @@ public class WhitelistSetting extends BoolSetting {
 
     private final Set<Type> allowedTypes = new HashSet<>();
 
-    public WhitelistSetting(String name, boolean defaultValue) {
-        super(name, defaultValue);
-
+    public WhitelistSetting(String identifier, String name, boolean defaultValue) {
+        super(identifier, name, defaultValue);
         this.allowedTypes.add(Type.ANY);
+    }
 
-//        try {
-//            if (COMMAND_MANAGER.getStorage().getCommandByNameOrAlias(this.moduleName) == null) {
-//                COMMAND_MANAGER.addCommand(new WhitelistCommand(moduleName));
-//            }
-//        } catch (Exception ignored) {}
+    public WhitelistSetting(String name, boolean defaultValue) {
+        this(name, name, defaultValue);
     }
 
     public WhitelistSetting(String name, boolean defaultValue, Type... types) {
-        this(name, defaultValue);
+        this(name, name, defaultValue, types);
+    }
+
+    public WhitelistSetting(String identifier, String name, boolean defaultValue, Type... types) {
+        this(identifier, name, defaultValue);
+
         this.allowedTypes.clear();
         if (types == null || types.length == 0) {
             this.allowedTypes.add(Type.ANY);

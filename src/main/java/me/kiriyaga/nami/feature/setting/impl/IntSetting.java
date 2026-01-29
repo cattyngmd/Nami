@@ -3,13 +3,20 @@ package me.kiriyaga.nami.feature.setting.impl;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import me.kiriyaga.nami.feature.setting.Setting;
+import net.minecraft.resources.Identifier;
 
 public class IntSetting extends Setting<Integer> {
 
     private final int min, max;
 
     public IntSetting(String name, int defaultValue, int min, int max) {
-        super(name, defaultValue);
+        super(name, name, defaultValue);
+        this.min = min;
+        this.max = max;
+    }
+
+    public IntSetting(String identifier, String name, int defaultValue, int min, int max) {
+        super(identifier, name, defaultValue);
         this.min = min;
         this.max = max;
     }

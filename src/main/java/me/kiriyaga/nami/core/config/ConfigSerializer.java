@@ -48,11 +48,11 @@ public class ConfigSerializer {
             JsonObject settings = new JsonObject();
             for (Setting<?> s : m.getSettings()) {
                 if (!mode.accept(s)) continue;
-                settings.add(s.getName(), s.toJson());
+                settings.add(s.getIdentifier(), s.toJson());
             }
 
             mod.add("settings", settings);
-            modules.add(m.getName(), mod);
+            modules.add(m.getIdentifier(), mod);
         }
 
         root.add("modules", modules);
@@ -79,9 +79,9 @@ public class ConfigSerializer {
             JsonObject modules = root.getAsJsonObject("modules");
 
             for (Module m : MODULE_MANAGER.getStorage().getAll()) {
-                if (!modules.has(m.getName())) continue;
+                if (!modules.has(m.getIdentifier())) continue;
 
-                JsonObject mod = modules.getAsJsonObject(m.getName());
+                JsonObject mod = modules.getAsJsonObject(m.getIdentifier());
 
                 if (mod.has("enabled")) {
                     boolean enabled = mod.get("enabled").getAsBoolean();
@@ -95,8 +95,8 @@ public class ConfigSerializer {
 
                 for (Setting<?> s : m.getSettings()) {
                     if (!mode.accept(s)) continue;
-                    if (settings.has(s.getName())) {
-                        s.fromJson(settings.get(s.getName()));
+                    if (settings.has(s.getIdentifier())) {
+                        s.fromJson(settings.get(s.getIdentifier()));
                     }
                 }
             }

@@ -26,18 +26,18 @@ public class ModuleConfigWriter {
 
         JsonObject settings = new JsonObject();
         for (Setting<?> s : module.getSettings()) {
-            settings.add(s.getName(), s.toJson());
+            settings.add(s.getIdentifier(), s.toJson());
         }
 
         json.add("settings", settings);
 
-        File file = new File(dirs.getModuleConfigDir(), module.getName() + ".json");
+        File file = new File(dirs.getModuleConfigDir(), module.getIdentifier() + ".json");
         file.getParentFile().mkdirs();
 
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             gson.toJson(json, writer);
         } catch (Exception e) {
-            LOGGER.error("Failed to save module config: " + module.getName(), e);
+            LOGGER.error("Failed to save module config: " + module.getIdentifier(), e);
         }
     }
 }

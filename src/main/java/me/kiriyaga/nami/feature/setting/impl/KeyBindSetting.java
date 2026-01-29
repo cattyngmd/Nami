@@ -14,17 +14,26 @@ public class KeyBindSetting extends Setting<Integer> {
     private boolean wasPressedLastTick = false;
     private boolean holdMode = false;
 
+    public KeyBindSetting(String identifier, String name, int defaultKey) {
+        super(identifier, name, defaultKey);
+    }
+
+    public KeyBindSetting(String identifier, String name, String defaultKeyName) {
+        this(identifier, name, defaultKeyName != null ? KeyUtils.parseKey(defaultKeyName) : KEY_NONE);
+    }
+
     public KeyBindSetting(String name) {
-        this(name, KEY_NONE);
+        this(name, name, KEY_NONE);
     }
 
     public KeyBindSetting(String name, int defaultKey) {
-        super(name, defaultKey);
+        this(name, name, defaultKey);
     }
 
     public KeyBindSetting(String name, String defaultKeyName) {
-        super(name, defaultKeyName != null ? KeyUtils.parseKey(defaultKeyName) : KEY_NONE);
+        this(name, name, defaultKeyName);
     }
+
 
     public void setDefaultKey(String keyName) {
         this.value = KeyUtils.parseKey(keyName);

@@ -9,7 +9,13 @@ public class DoubleSetting extends Setting<Double> {
     private final double min, max;
 
     public DoubleSetting(String name, double defaultValue, double min, double max) {
-        super(name, defaultValue);
+        super(name, name, defaultValue);
+        this.min = min;
+        this.max = max;
+    }
+
+    public DoubleSetting(String identifier, String name, double defaultValue, double min, double max) {
+        super(identifier, name, defaultValue);
         this.min = min;
         this.max = max;
     }

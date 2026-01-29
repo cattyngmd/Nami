@@ -19,9 +19,9 @@ public class ModuleConfigReader {
     }
 
     public void loadModule(Module module) {
-        File file = new File(dirs.getModuleConfigDir(), module.getName() + ".json");
+        File file = new File(dirs.getModuleConfigDir(), module.getIdentifier() + ".json");
         if (!file.exists()) {
-            LOGGER.warn("Module config not found: " + module.getName());
+            LOGGER.warn("Module config not found: " + module.getIdentifier());
             return;
         }
 
@@ -38,15 +38,15 @@ public class ModuleConfigReader {
             if (root.has("settings")) {
                 JsonObject settingsJson = root.getAsJsonObject("settings");
                 for (Setting<?> setting : module.getSettings()) {
-                    if (settingsJson.has(setting.getName())) {
-                        JsonElement value = settingsJson.get(setting.getName());
+                    if (settingsJson.has(setting.getIdentifier())) {
+                        JsonElement value = settingsJson.get(setting.getIdentifier());
                         setting.fromJson(value);
                     }
                 }
             }
 
         } catch (Exception e) {
-            LOGGER.error("Failed to load module config: " + module.getName(), e);
+            LOGGER.error("Failed to load module config: " + module.getIdentifier(), e);
         }
     }
 }
