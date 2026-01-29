@@ -2,6 +2,7 @@ package me.kiriyaga.nami.mixin;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -39,5 +41,13 @@ public class MixinLevelRenderer {
         //RenderUtil.MODEL_VIEW_MATRIX.set(new Matrix4f(matrix4f2));
         //  RenderUtil.POSITION_MATRIX.set(new Matrix4f(matrix4f3));
         RenderUtil.CAMERA = camera;
+    }
+
+    @Inject(method = "doesMobEffectBlockSky(Lnet/minecraft/client/Camera;)Z", at = @At("HEAD"), cancellable = true)
+    private void onDoesMobEffectBlockSky(Camera camera, CallbackInfoReturnable<Boolean> cir) {
+        NoRenderModule nr = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+
+        if (nr != null && nr.isEnabled() && nr.noDarkness.get())
+            cir.setReturnValue(false);
     }
 }

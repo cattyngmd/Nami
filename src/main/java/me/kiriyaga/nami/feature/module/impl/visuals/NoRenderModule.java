@@ -36,6 +36,7 @@ public class NoRenderModule extends Module {
     public final BoolSetting noBossBar = addSetting(new BoolSetting("NoBoss", true));
     public final BoolSetting noPortal = addSetting(new BoolSetting("NoPortalGui", true));
     public final BoolSetting noPotIcon = addSetting(new BoolSetting("NoPotIcon", true));
+    public final BoolSetting noDarkness = addSetting(new BoolSetting("NoDarkness", true));
     public final BoolSetting noFog = addSetting(new BoolSetting("NoFog", true));
     public final BoolSetting noArmor = addSetting(new BoolSetting("NoArmor", true)); // todo this shit broke
     public final BoolSetting noNausea = addSetting(new BoolSetting("NoNausea", true));
