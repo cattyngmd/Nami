@@ -229,8 +229,6 @@ public class SpeedMineModule extends Module {
         if (!doubleMine.get())
             return;
 
-        if (!multitask.get() && MC.player.isUsingItem())return;
-
         if (task.getDoublemineHoldTicks() > 2) {
             doubleMineTask = null;
             return;
@@ -253,7 +251,7 @@ public class SpeedMineModule extends Module {
         }
 
         float damageDelta = calculateBlockDamage(task.getBlockState(), MC.level, task.getBlockPos());
-        int prev = MC.player.getInventory().getSelectedSlot();
+        if (!multitask.get() && MC.player.isUsingItem())return;
 
         if (task.incrementProgress(damageDelta) >= task.getTargetSpeed()) {
             if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
