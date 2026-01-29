@@ -56,7 +56,6 @@ public class EntityUtils {
         List<Entity> all = getEntitiesBase(category);
 
         return all.stream()
-                .filter(e -> e != MC.player)
                 .filter(e -> e.distanceToSqr(playerPos) <= range * range)
                 .filter(e -> extraFilter == null || extraFilter.test(e))
                 .sorted(sortByDistance ? Comparator.comparingDouble(e -> e.distanceToSqr(playerPos)) : (a, b) -> 0)

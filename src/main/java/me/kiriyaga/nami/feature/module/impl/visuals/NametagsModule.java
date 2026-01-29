@@ -22,6 +22,7 @@ import me.kiriyaga.nami.util.entity.EntityUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -72,59 +73,54 @@ public class NametagsModule extends Module {
         Matrix3x2fStack matrices = event.getDrawContext().pose();
 
         for (Entity ent : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS)) {
-            if (ent == MC.player && !self.get()) continue;
+            if (ent == MC.player && (!self.get() || MC.options.getCameraType().isFirstPerson())) continue;
 
-            if (ent instanceof Player player) {
+            Vec3 vec3d = getRenderPos(ent, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+            Vec3 projected = project(vec3d.add(0, ent.getDimensions(ent.getPose()).height() + 0.2, 0));
 
-                Vec3 vec3d = getRenderPos(player, MC.getDeltaTracker().getGameTimeDeltaPartialTick(true));
-                Vec3 projected = project(vec3d.add(0, (player.isShiftKeyDown() ? 1.9f : 2.1f), 0));
+            if (!invisible.get() && ent.isInvisible()) continue;
+            if (!ent.isAlive()) continue;
+            if (!projectionVisible(projected)) continue;
 
-                if (!invisible.get() && player.isInvisible()) continue;
-                if (!player.isAlive()) continue;
-                if (!projectionVisible(projected)) continue;
+            String ign = ent.getName().getString();
 
-                String ign = player.getName().getString();
+            String text = ign;
 
-                String text = ign;
+            if (gameMode.get()) {
+                String gm = EntityUtils.getGameMode((Player) ent).getName().toUpperCase();
+                text += "[" + (gm.isEmpty() ? "" : gm.substring(0, 1)) + "]";
+            }
 
-                if (gameMode.get()) {
-                    String gm = EntityUtils.getGameMode(player).getName().toUpperCase();
-                    text += "[" + (gm.isEmpty() ? "" : gm.substring(0, 1)) + "]";
-                }
+            if (ping.get())
+                text += " " + EntityUtils.getLatency((Player) ent) + "ms";
 
-                if (ping.get())
-                    text += " " + EntityUtils.getLatency(player) + "ms";
+            if (entityId.get())
+                text += " ID:" + ent.getId();
 
-                if (entityId.get())
-                    text += " ID:" + player.getId();
+            if (health.get())
+                text += " " + EntityUtils.getHealthNumber(ent);
 
-                if (health.get())
-                    text += " " + EntityUtils.getHealthNumber(ent);
+            float width = FONT_MANAGER.getWidth(text);
 
-                float width = FONT_MANAGER.getWidth(text);
+            String colored = FRIEND_MANAGER.isFriend(ign) ? "{friend}" + text : text;
 
-                String colored = FRIEND_MANAGER.isFriend(ign) ? "{friend}" + text : text;
+            if (health.get()) colored = colored.replace(" " + EntityUtils.getHealthNumber(ent), " " + ColorUtils.getHealthColor(ent) + EntityUtils.getHealthNumber(ent));
 
-                if (health.get())
-                    colored = colored.replace(
-                            " " + EntityUtils.getHealthNumber(ent),
-                            " " + ColorUtils.getHealthColor(ent) + EntityUtils.getHealthNumber(ent)
-                    );
-
-                Component display = CAT_FORMAT.format(colored);
+            Component display = CAT_FORMAT.format(colored);
 
 
-                float scale = 1.0f;
-                if (dynamicScale.get()) {
-                    float dist = MC.getCameraEntity().distanceTo(ent);
-                    scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
-                }
+            float scale = 1.0f;if (dynamicScale.get()) {
+                float dist = MC.getCameraEntity().distanceTo(ent);
+                scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
+            }
 
-                matrices.pushMatrix();
-                matrices.translate((float) projected.x, (float) projected.y);
-                matrices.scale(scale, scale);
+            scale = scale * scaling.get().floatValue();
 
-                if (rectangle.get()) {
+            matrices.pushMatrix();
+            matrices.translate((float) projected.x, (float) projected.y);
+            matrices.scale(scale, scale);
+
+            if (rectangle.get()) {
                     GuiGraphics ctx = event.getDrawContext();
                     int x1 = (int) (-width / 2f - 1);
                     int y1 = (int) (-FONT_MANAGER.getHeight());
@@ -189,7 +185,6 @@ public class NametagsModule extends Module {
                 }
 
                 matrices.popMatrix();
-            }
         }
 
         if (items.get()) {
