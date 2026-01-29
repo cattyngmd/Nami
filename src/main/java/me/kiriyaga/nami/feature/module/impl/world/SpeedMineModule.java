@@ -229,6 +229,13 @@ public class SpeedMineModule extends Module {
         if (!doubleMine.get())
             return;
 
+        if (!multitask.get() && MC.player.isUsingItem())return;
+
+        if (task.getDoublemineHoldTicks() > 2) {
+            doubleMineTask = null;
+            return;
+        }
+
         Vec3 eyePos = MC.player.getEyePosition();
         AABB blockBox = new AABB(task.getBlockPos());
         Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
@@ -251,6 +258,7 @@ public class SpeedMineModule extends Module {
         if (task.incrementProgress(damageDelta) >= task.getTargetSpeed()) {
             if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
                 int slot = getSlot(task.getBlockState());
+                task.setDoublemineHoldTicks(task.doublemineHoldTicks+1);
                 if (slot == MC.player.getInventory().getSelectedSlot())
                     return;
 
@@ -469,6 +477,7 @@ public class SpeedMineModule extends Module {
         private boolean started;
         private int brokenCount;
         private int lastBrokenCount;
+        private int doublemineHoldTicks;
 
         public BlockBreakingTask(BlockPos pos, Direction face, float speed) {
             this.blockPos = pos;
@@ -476,6 +485,7 @@ public class SpeedMineModule extends Module {
             this.targetSpeed = speed;
             brokenCount = 0;
             lastBrokenCount = -1;
+            doublemineHoldTicks = 0;
         }
 
         public BlockPos getBlockPos() { return blockPos; }
@@ -512,5 +522,7 @@ public class SpeedMineModule extends Module {
         public int getLastBrokenCount() { return lastBrokenCount; }
         public void markLastBroken() { lastBrokenCount = brokenCount; }
 
+        public int getDoublemineHoldTicks() { return doublemineHoldTicks; }
+        public void setDoublemineHoldTicks(int i) { doublemineHoldTicks = i; }
     }
 }

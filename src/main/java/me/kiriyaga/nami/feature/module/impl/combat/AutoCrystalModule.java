@@ -50,7 +50,7 @@ public class AutoCrystalModule extends Module {
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));
     public final DoubleSetting placeRange = addSetting(new DoubleSetting("Range", 4.0, 1.0, 7.0));
-    public final DoubleSetting placeDelay = addSetting(new DoubleSetting("Delay", 0, 0, 20));
+    public final IntSetting placeDelay = addSetting(new IntSetting("Delay", 0, 0, 20));
     public final BoolSetting placeRotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting placeSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
@@ -60,7 +60,7 @@ public class AutoCrystalModule extends Module {
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));
     public final DoubleSetting breakRange = addSetting(new DoubleSetting("Range", 3.0, 1.0, 7.0));
-    public final DoubleSetting breakDelay = addSetting(new DoubleSetting("Delay", 0, 0, 20));
+    public final IntSetting breakDelay = addSetting(new IntSetting("Delay", 0, 0, 20));
     public final BoolSetting breakRotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting breakSwing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting breakMultitask = addSetting(new BoolSetting("Multitask", true));
@@ -119,16 +119,14 @@ public class AutoCrystalModule extends Module {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTickEvent(PreTickEvent event) {
         if (MC.player == null) return;
-
-        lastTotalDamage = 0;
         lastCalcTimeMs = 0;
-        this.clearDisplayInfo();
 
         if (doPlace.get()) {
             if (placeTimer > 0) {
                 placeTimer--;
                 return;
             }
+            lastTotalDamage = 0;
             doPlace();
         }
 
@@ -140,6 +138,7 @@ public class AutoCrystalModule extends Module {
             doBreak();
         }
 
+        this.clearDisplayInfo();
         this.addDisplayInfo(String.format(Locale.US, "%.2f", lastTotalDamage));
         this.addDisplayInfo(String.format(Locale.US, "%.4f", lastCalcTimeMs));
     }
@@ -176,7 +175,7 @@ public class AutoCrystalModule extends Module {
         if (breakSwing.get())
             MC.player.swing(InteractionHand.MAIN_HAND);
 
-        breakTimer = breakDelay.get().intValue();
+        breakTimer = breakDelay.get();
     }
 
     private BreakTarget bestCrystal() {
@@ -234,8 +233,6 @@ public class AutoCrystalModule extends Module {
                 totalDamage += dmg;
             }
         }
-
-        lastTotalDamage = totalDamage;
         return totalDamage;
     }
 
@@ -272,8 +269,9 @@ public class AutoCrystalModule extends Module {
         if (crystalSlot == -1) return;
         InteractionUtils.interactBlockAt(placeTarget.pos.below(), crystalSlot, placeRange.get(), placeRotate.get(), false, false, placeSwing.get(), AutoCrystalModule.class.getName() + "_PLACE");
 
-        placeTimer = placeDelay.get().intValue();
+        placeTimer = placeDelay.get();
     }
+
     private PlaceTarget findBestPlace() {
         long startTime = System.nanoTime();
         PlaceTarget best = null;
@@ -297,7 +295,7 @@ public class AutoCrystalModule extends Module {
 
                     float totalDamage = calculatePlaceDamage(fakeCrystal.position());
                     if (totalDamage < minDamage.get()) continue;
-
+                    lastTotalDamage = totalDamage;
                     if (best == null || totalDamage > best.totalDamage)
                         best = new PlaceTarget(pos, totalDamage);
                 }
