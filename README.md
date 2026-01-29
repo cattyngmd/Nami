@@ -4,7 +4,7 @@
 
 ### Join our discord - https://discord.gg/auHTtNAqRq
 
-<p align="left">
+<p>
   <a href="https://github.com/NamiDevelopment/nami/releases">
     <img src="https://img.shields.io/github/downloads/NamiDevelopment/nami/total?color=green&label=Total%20Downloads" alt="Total Downloads" />
   </a>

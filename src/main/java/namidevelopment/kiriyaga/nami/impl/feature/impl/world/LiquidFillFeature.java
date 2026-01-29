@@ -1,0 +1,173 @@
+package namidevelopment.kiriyaga.nami.impl.feature.impl.world;
+
+import namidevelopment.kiriyaga.nami.api.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
+import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
+import namidevelopment.kiriyaga.nami.impl.feature.Feature;
+import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
+import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
+import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
+import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
+import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
+
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
+import static namidevelopment.kiriyaga.nami.util.InteractionUtils.airPlace;
+import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
+
+import static namidevelopment.kiriyaga.nami.Nami.*;
+
+@RegisterFeature
+public class LiquidFillFeature extends Feature {
+
+    public enum LiquidType {
+        WATER, LAVA, BOTH
+    }
+
+    // TODO: shift ticks, or maybe not?
+    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 10));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("Liquid", LiquidType.BOTH));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+
+    private int cooldown = 0;
+    private BlockPos renderPos = null;
+
+    public LiquidFillFeature() {
+        super("LiquidFill", "Automatically fills nearby liquids with blocks.", FeatureCategory.of("World"), "liquidfill");
+    }
+
+    @Override
+    public void onDisable() {
+        cooldown = 0;
+        renderPos = null;
+    }
+
+    @SubscribeEvent
+    public void onPreTick(PreTickEvent event) {
+        if (MC.player == null || MC.level == null || MC.gameMode == null) return;
+
+        if (cooldown > 0) {
+            cooldown--;
+            return;
+        }
+
+        int blockSlot = findBlockInHotbar();
+        if (blockSlot == -1) {
+            renderPos = null;
+            return;
+        }
+
+        int r = (int) Math.ceil(range.get());
+        BlockPos playerPos = MC.player.blockPosition();
+
+        List<BlockPos> positions = new ArrayList<>();
+        for (int x = -r; x <= r; x++) {
+            for (int y = -r; y <= r; y++) {
+                for (int z = -r; z <= r; z++) {
+                    positions.add(playerPos.offset(x, y, z));
+                }
+            }
+        }
+
+        Vec3 playerVec = Vec3.atLowerCornerOf(playerPos); // fucking why i need this
+        positions.sort(Comparator.comparingDouble(pos -> Vec3.atLowerCornerOf(pos).distanceToSqr(playerVec)));
+
+        boolean placed = false;
+
+        for (BlockPos pos : positions) {
+            BlockState state = MC.level.getBlockState(pos);
+            if (hasEntity(pos)) continue;
+
+            boolean shouldPlace = switch (liquidType.get()) {
+                case WATER -> state.getBlock() == Blocks.WATER && state.getValue(LiquidBlock.LEVEL) == 0;
+                case LAVA -> state.getBlock() == Blocks.LAVA && state.getValue(LiquidBlock.LEVEL) == 0;
+                case BOTH -> (state.getBlock() == Blocks.WATER && state.getValue(LiquidBlock.LEVEL) == 0)
+                        || (state.getBlock() == Blocks.LAVA && state.getValue(LiquidBlock.LEVEL) == 0);
+            };
+
+            if (!shouldPlace) continue;
+
+            renderPos = pos;
+
+            if (rotate.get()) {
+                ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(
+                        LiquidFillFeature.class.getName(),
+                        3,
+                        (float) getYawToVec(MC.player, Vec3.atLowerCornerOf(pos)),
+                        (float) getPitchToVec(MC.player, Vec3.atLowerCornerOf(pos))
+                ));
+            }
+
+            if (!rotate.get() || ROTATION_SERVICE.getRequestHandler().isCompleted(LiquidFillFeature.class.getName())) {
+
+                int currentSlot = MC.player.getInventory().getSelectedSlot();
+                if (currentSlot != blockSlot)
+                    INVENTORY_SERVICE.getSlotHandler().attemptSwitch(blockSlot);
+
+                BlockHitResult hit = new BlockHitResult(Vec3.atLowerCornerOf(pos).add(0.5,0.5,0.5), Direction.UP, pos, false);
+
+                airPlace(hit, grim.get(), swing.get());
+
+                if (currentSlot != MC.player.getInventory().getSelectedSlot())
+                    INVENTORY_SERVICE.getSlotHandler().attemptSwitch(currentSlot);
+
+                cooldown = delay.get();
+                placed = true;
+                break;
+            }
+        }
+
+        if (!placed) renderPos = null;
+    }
+
+    @SubscribeEvent
+    public void onRender(Render3DEvent event) {
+        if (MC.player == null || MC.level == null || renderPos == null) return;
+
+        ColorFeature colorFeature = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class);
+        Color color = colorFeature.getStyledGlobalColor();
+        AABB box = new AABB(renderPos);
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
+    }
+
+    private boolean hasEntity(BlockPos pos) {
+        for (Entity entity : MC.level.entitiesForRendering()) {
+            if (entity.getBoundingBox().intersects(new AABB(pos))) return true;
+        }
+        return false;
+    }
+
+    private int findBlockInHotbar() {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = MC.player.getInventory().getItem(i);
+            if (stack.getItem() instanceof BlockItem blockItem) {
+                Block block = blockItem.getBlock();
+                if (block != Blocks.AIR && block.defaultBlockState().isSolidRender()) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+}

@@ -6,13 +6,13 @@ plugins {
 group = "me.kiriyaga"
 
 // git functions
-def getGitHash() {
+static def getGitHash() {
     def proc = "git rev-parse --short HEAD".execute()
     proc.waitFor()
     return proc.in.text.trim()
 }
 
-def getLastTag() {
+static def getLastTag() {
     def proc = "git describe --tags --abbrev=0".execute()
     proc.waitFor()
     return proc.in.text.trim()
@@ -26,7 +26,7 @@ def getCommitsCount() {
     return proc.in.text.trim()
 }
 
-def getGitBranch() {
+static def getGitBranch() {
     def proc = "git rev-parse --abbrev-ref HEAD".execute()
     proc.waitFor()
     return proc.in.text.trim()
