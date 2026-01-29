@@ -39,7 +39,6 @@ public class ServerService {
 
     public void init() {
         EVENT_SERVICE.register(this);
-        LOGGER.info("Server SERVICE loaded.");
         Arrays.fill(pendingTransactions, -1);
     }
 

@@ -17,7 +17,6 @@ public class FriendService {
     public FriendService(ConfigService configService) {
         this.configService = configService;
         load();
-        LOGGER.info("Friend SERVICE loaded.");
     }
 
     public void load() {

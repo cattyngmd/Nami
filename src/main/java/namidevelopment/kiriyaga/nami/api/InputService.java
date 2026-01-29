@@ -37,7 +37,6 @@ public class InputService {
 
     public void init() {
         EVENT_SERVICE.register(this);
-        LOGGER.info("Input SERVICE loaded.");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

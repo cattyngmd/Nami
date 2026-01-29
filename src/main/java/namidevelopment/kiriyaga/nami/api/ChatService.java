@@ -42,7 +42,6 @@ public class ChatService {
 
     public void init(){
         EVENT_SERVICE.register(this);
-        LOGGER.info("Chat SERVICE loaded.");
     }
 
     private MessageSignature generateSignature() {

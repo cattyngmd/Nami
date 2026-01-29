@@ -16,7 +16,6 @@ public class CommandService {
         suggester.updateDispatcher();
         EVENT_SERVICE.register(executor);
         LOGGER.info("Registered " + storage.size() + " commands.");
-        LOGGER.info("Command SERVICE loaded.");
     }
 
     public CommandStorage getStorage() {

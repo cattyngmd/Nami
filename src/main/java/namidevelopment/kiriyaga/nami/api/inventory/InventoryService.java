@@ -8,7 +8,6 @@ public class InventoryService {
     private final InventoryClickHandler clickHandler = new InventoryClickHandler();
 
     public void init() {
-        LOGGER.info("Inventory SERVICE loaded.");
     }
 
     public InventorySlotHandler getSlotHandler() {

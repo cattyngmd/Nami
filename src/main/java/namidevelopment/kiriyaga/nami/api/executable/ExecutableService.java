@@ -10,7 +10,6 @@ public class ExecutableService {
 
     public void init() {
         tickHandler.init();
-        LOGGER.info("Executable SERVICE loaded.");
     }
 
     public ExecutableStateHandler getStateHandler() {

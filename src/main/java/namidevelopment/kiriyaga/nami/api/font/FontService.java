@@ -15,7 +15,6 @@ public class FontService {
 
     public void init() {
         fontLoader.init();
-        LOGGER.info("Font SERVICE loaded.");
     }
 
     public void drawText(GuiGraphics context, Component text, int x, int y, boolean shadow, int color) {

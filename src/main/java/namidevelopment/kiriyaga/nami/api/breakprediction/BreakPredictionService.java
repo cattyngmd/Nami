@@ -23,7 +23,6 @@ public class BreakPredictionService {
 
     public void init() { // TODO: this shit doesnt work if player mines with automine
         EVENT_SERVICE.register(this);
-        LOGGER.info("Break SERVICE loaded.");
     }
 
     public PlayerBreakState get(UUID uuid) {

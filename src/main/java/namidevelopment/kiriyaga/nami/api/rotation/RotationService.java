@@ -38,7 +38,6 @@ public class RotationService {
 
     public void init() {
         tickHandler.init();
-        LOGGER.info("Rotation SERVICE loaded.");
     }
 
     public RotationStateHandler getStateHandler() {
