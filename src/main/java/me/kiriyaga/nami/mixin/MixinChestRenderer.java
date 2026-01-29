@@ -1,23 +1,18 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 
 @Mixin(ChestRenderer.class)
 public abstract class MixinChestRenderer {
@@ -34,7 +29,7 @@ public abstract class MixinChestRenderer {
             CameraRenderState camera,
             CallbackInfo ci
     ) {
-        NoRenderModule nr = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature nr = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
         if (nr != null && nr.isEnabled() && nr.tileEntity.get() >= 2) {
 
 

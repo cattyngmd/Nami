@@ -1,21 +1,21 @@
 package me.kiriyaga.nami;
 
-import me.kiriyaga.nami.core.breaking.BreakManager;
-import me.kiriyaga.nami.core.cat.FabricCatFormat;
-import me.kiriyaga.nami.core.command.CommandManager;
-import me.kiriyaga.nami.core.config.ConfigManager;
-import me.kiriyaga.nami.core.executable.ExecutableManager;
-import me.kiriyaga.nami.core.font.FontManager;
-import me.kiriyaga.nami.core.inventory.InventoryManager;
-import me.kiriyaga.nami.core.macro.MacroManager;
-import me.kiriyaga.nami.core.rotation.RotationManager;
-import me.kiriyaga.nami.feature.gui.newgui.component.NavigatePanelComponent;
-import me.kiriyaga.nami.feature.gui.newgui.screen.ConfigScreen;
-import me.kiriyaga.nami.feature.gui.oldgui.screen.ClickGuiScreen;
-import me.kiriyaga.nami.core.*;
-import me.kiriyaga.nami.core.module.ModuleManager;
-import me.kiriyaga.nami.feature.gui.newgui.screen.FriendScreen;
-import me.kiriyaga.nami.feature.gui.oldgui.screen.HudEditorScreen;
+import me.kiriyaga.nami.api.breakprediction.BreakPredictionService;
+import me.kiriyaga.nami.api.cat.FabricCatFormat;
+import me.kiriyaga.nami.api.command.CommandService;
+import me.kiriyaga.nami.api.config.ConfigService;
+import me.kiriyaga.nami.api.executable.ExecutableService;
+import me.kiriyaga.nami.api.font.FontService;
+import me.kiriyaga.nami.api.inventory.InventoryService;
+import me.kiriyaga.nami.api.macro.MacroService;
+import me.kiriyaga.nami.api.rotation.RotationService;
+import me.kiriyaga.nami.impl.gui.newgui.component.NavigatePanelComponent;
+import me.kiriyaga.nami.impl.gui.newgui.screen.ConfigScreen;
+import me.kiriyaga.nami.impl.gui.oldgui.screen.ClickGuiScreen;
+import me.kiriyaga.nami.api.*;
+import me.kiriyaga.nami.api.feature.FeatureService;
+import me.kiriyaga.nami.impl.gui.newgui.screen.FriendScreen;
+import me.kiriyaga.nami.impl.gui.oldgui.screen.HudEditorScreen;
 import me.kiriyaga.nami.util.CatStyles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -46,20 +46,20 @@ public class Nami implements ClientModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 
-    public static final EventManager EVENT_MANAGER = new EventManager();
-    public static final MacroManager MACRO_MANAGER = new MacroManager();
-    public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
-    public static final ModuleManager MODULE_MANAGER = new ModuleManager();
-    public static final FontManager FONT_MANAGER = new FontManager();
-    public static final ExecutableManager EXECUTABLE_MANAGER = new ExecutableManager();
-    public static final CommandManager COMMAND_MANAGER = new CommandManager();
-    public static final ChatManager CHAT_MANAGER = new ChatManager();
-    public static final FriendManager FRIEND_MANAGER = new FriendManager(CONFIG_MANAGER);
-    public static final RotationManager ROTATION_MANAGER = new RotationManager();
-    public static final InventoryManager INVENTORY_MANAGER = new InventoryManager();
-    public static final ServerManager SERVER_MANAGER = new ServerManager();
-    public static final InputManager INPUT_MANAGER = new InputManager();
-    public static final BreakManager BREAK_MANAGER = new BreakManager();
+    public static final EventService EVENT_SERVICE = new EventService();
+    public static final MacroService MACRO_SERVICE = new MacroService();
+    public static final ConfigService CONFIG_SERVICE = new ConfigService();
+    public static final FeatureService FEATURE_SERVICE = new FeatureService();
+    public static final FontService FONT_SERVICE = new FontService();
+    public static final ExecutableService EXECUTABLE_SERVICE = new ExecutableService();
+    public static final CommandService COMMAND_SERVICE = new CommandService();
+    public static final ChatService CHAT_SERVICE = new ChatService();
+    public static final FriendService FRIEND_SERVICE = new FriendService(CONFIG_SERVICE);
+    public static final RotationService ROTATION_SERVICE = new RotationService();
+    public static final InventoryService INVENTORY_SERVICE = new InventoryService();
+    public static final ServerService SERVER_SERVICE = new ServerService();
+    public static final InputService INPUT_SERVICE = new InputService();
+    public static final BreakPredictionService BREAK_SERVICE = new BreakPredictionService();
 
     public static Tuple<ServerAddress, ServerData> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
@@ -74,17 +74,17 @@ public class Nami implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        MODULE_MANAGER.init();
-        COMMAND_MANAGER.init();
-        COMMAND_MANAGER.getSuggester().updateDispatcher();
-        //FONT_MANAGER.init();
-        ROTATION_MANAGER.init();
-        INVENTORY_MANAGER.init();
-        EXECUTABLE_MANAGER.init();
-        SERVER_MANAGER.init();
-        CHAT_MANAGER.init();
-        INPUT_MANAGER.init();
-        BREAK_MANAGER.init();
+        FEATURE_SERVICE.init();
+        COMMAND_SERVICE.init();
+        COMMAND_SERVICE.getSuggester().updateDispatcher();
+        //FONT_SERVICE.init();
+        ROTATION_SERVICE.init();
+        INVENTORY_SERVICE.init();
+        EXECUTABLE_SERVICE.init();
+        SERVER_SERVICE.init();
+        CHAT_SERVICE.init();
+        INPUT_SERVICE.init();
+        BREAK_SERVICE.init();
 
         CAT_FORMAT.add(new CatStyles());
 
@@ -94,28 +94,28 @@ public class Nami implements ClientModInitializer {
         CONFIG_SCREEN = new ConfigScreen();
         NAVIGATE_PANEL = new NavigatePanelComponent();
 
-        FRIEND_MANAGER.load();
+        FRIEND_SERVICE.load();
 
         LOGGER.info(NAME + "\n " + VERSION + " has been initialized\n");
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            FONT_MANAGER.init(); // font is making glyph textures, it should be after game loaded not on initialize
+            FONT_SERVICE.init(); // font is making glyph textures, it should be after game loaded not on initialize
 
             START_TIME = System.currentTimeMillis();
 
-            CONFIG_MANAGER.loadModules();
-            CONFIG_MANAGER.loadFriends();
-            if (CONFIG_MANAGER.loadName() == null)
-                CONFIG_MANAGER.saveName(DISPLAY_NAME);
+            CONFIG_SERVICE.loadFeatures();
+            CONFIG_SERVICE.loadFriends();
+            if (CONFIG_SERVICE.loadName() == null)
+                CONFIG_SERVICE.saveName(DISPLAY_NAME);
             else
-                DISPLAY_NAME = CONFIG_MANAGER.loadName();
-            COMMAND_MANAGER.getExecutor().setPrefix(CONFIG_MANAGER.loadPrefix());
-            CONFIG_MANAGER.loadMacros();
+                DISPLAY_NAME = CONFIG_SERVICE.loadName();
+            COMMAND_SERVICE.getExecutor().setPrefix(CONFIG_SERVICE.loadPrefix());
+            CONFIG_SERVICE.loadMacros();
         });
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
-            CONFIG_MANAGER.saveModules();
-            CONFIG_MANAGER.saveMacros();
+            CONFIG_SERVICE.saveFeatures();
+            CONFIG_SERVICE.saveMacros();
         });
 
     }

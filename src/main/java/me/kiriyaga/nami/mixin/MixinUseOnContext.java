@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.kiriyaga.nami.Nami.EVENT_MANAGER;
+import static me.kiriyaga.nami.Nami.EVENT_SERVICE;
 import static me.kiriyaga.nami.Nami.MC;
 
 @Mixin(UseOnContext.class)
@@ -19,7 +19,7 @@ public final class MixinUseOnContext {
             return;
 
         ItemEvent event = new ItemEvent();
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
 
         if (info.getReturnValue().equals(MC.player.getMainHandItem()) && event.isCancelled())
             info.setReturnValue(event.getStack());

@@ -3,8 +3,8 @@ package me.kiriyaga.nami.mixin;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import me.kiriyaga.nami.event.impl.Render3DEvent;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoWeatherModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NoWeatherFeature;
 import me.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -32,7 +32,7 @@ public class MixinLevelRenderer {
         matrices.mulPose(Axis.XP.rotationDegrees(camera.xRot()));
         matrices.mulPose(Axis.YP.rotationDegrees(camera.yRot() + 180.0F));
 
-        EVENT_MANAGER.post(new Render3DEvent(matrices, tickCounter.getGameTimeDeltaPartialTick(true), camera, matrix4f3, matrix4f));
+        EVENT_SERVICE.post(new Render3DEvent(matrices, tickCounter.getGameTimeDeltaPartialTick(true), camera, matrix4f3, matrix4f));
 
         matrices.popPose();
     }
@@ -47,7 +47,7 @@ public class MixinLevelRenderer {
 
     @Inject(method = "doesMobEffectBlockSky(Lnet/minecraft/client/Camera;)Z", at = @At("HEAD"), cancellable = true)
     private void doesMobEffectBlockSky(Camera camera, CallbackInfoReturnable<Boolean> cir) {
-        NoRenderModule nr = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature nr = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
 
         if (nr != null && nr.isEnabled() && nr.noDarkness.get())
             cir.setReturnValue(false);
@@ -55,7 +55,7 @@ public class MixinLevelRenderer {
 
     @Inject(method = "addWeatherPass", at = @At("HEAD"), cancellable = true)
     private void addWeatherPass(FrameGraphBuilder frameGraphBuilder, GpuBufferSlice gpuBufferSlice, CallbackInfo ci) {
-        NoWeatherModule nr = MODULE_MANAGER.getStorage().getByClass(NoWeatherModule.class);
+        NoWeatherFeature nr = FEATURE_SERVICE.getStorage().getByClass(NoWeatherFeature.class);
 
         if (nr != null && nr.isEnabled())
             ci.cancel();

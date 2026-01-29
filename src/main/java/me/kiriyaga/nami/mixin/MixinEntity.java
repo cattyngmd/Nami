@@ -1,19 +1,10 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.core.rotation.RotationStateHandler;
 import me.kiriyaga.nami.event.impl.EntityPushEvent;
-import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
-import me.kiriyaga.nami.feature.module.impl.movement.ElytraFlyModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
+import me.kiriyaga.nami.impl.feature.impl.visuals.ESPFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.FreeLookFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,7 +29,7 @@ public abstract class MixinEntity {
     private void onGetTeamColorValue(CallbackInfoReturnable<Integer> cir) {
         Entity self = (Entity) (Object) this;
 
-        Color espColor = ESPModule.getESPColor(self);
+        Color espColor = ESPFeature.getESPColor(self);
         if (espColor != null) {
             cir.setReturnValue(espColor.getRGB() & 0xFFFFFF);
         }
@@ -48,18 +39,18 @@ public abstract class MixinEntity {
     private void updateChangeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
         if ((Object) this != MC.player) return;
 
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
-        FreeLookModule freeLookModule = MODULE_MANAGER.getStorage().getByClass(FreeLookModule.class);
+        FreecamFeature freecamFeature = FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class);
+        FreeLookFeature freeLookFeature = FEATURE_SERVICE.getStorage().getByClass(FreeLookFeature.class);
 
-        if (freecamModule != null && freecamModule.isEnabled()) {
-            freecamModule.changeLookDirection(cursorDeltaX * 0.15, cursorDeltaY * 0.15);
+        if (freecamFeature != null && freecamFeature.isEnabled()) {
+            freecamFeature.changeLookDirection(cursorDeltaX * 0.15, cursorDeltaY * 0.15);
             ci.cancel();
-        } else if (freeLookModule != null && freeLookModule.isEnabled()) {
-            freeLookModule.cameraYaw += (float) (cursorDeltaX / freeLookModule.sensivity.get().floatValue());
-            freeLookModule.cameraPitch += (float) (cursorDeltaY / freeLookModule.sensivity.get().floatValue());
+        } else if (freeLookFeature != null && freeLookFeature.isEnabled()) {
+            freeLookFeature.cameraYaw += (float) (cursorDeltaX / freeLookFeature.sensivity.get().floatValue());
+            freeLookFeature.cameraPitch += (float) (cursorDeltaY / freeLookFeature.sensivity.get().floatValue());
 
-            if (Math.abs(freeLookModule.cameraPitch) > 90.0F)
-                freeLookModule.cameraPitch = freeLookModule.cameraPitch > 0.0F ? 90.0F : -90.0F;
+            if (Math.abs(freeLookFeature.cameraPitch) > 90.0F)
+                freeLookFeature.cameraPitch = freeLookFeature.cameraPitch > 0.0F ? 90.0F : -90.0F;
 
             ci.cancel();
         }
@@ -68,16 +59,16 @@ public abstract class MixinEntity {
     @Inject(method = "push", at = @At(value = "HEAD"), cancellable = true)
     private void pushAwayFrom(Entity e, CallbackInfo ci) {
         EntityPushEvent pushEntityEvent = new EntityPushEvent((Entity)(Object) this, e);
-        EVENT_MANAGER.post(pushEntityEvent);
+        EVENT_SERVICE.post(pushEntityEvent);
         if (pushEntityEvent.isCancelled()) ci.cancel();
     }
 
     // this is like not needed?
 /*    @Inject(at = @At("HEAD"), method = "Lnet/minecraft/entity/Entity;getPose()Lnet/minecraft/entity/EntityPose;", cancellable = true)
     private void entityPose(CallbackInfoReturnable<EntityPose> cir) {
-        ElytraFlyModule elytraFlyModule = MODULE_MANAGER.getStorage().getByClass(ElytraFlyModule.class);
-        if (elytraFlyModule != null && elytraFlyModule.isEnabled()
-                && elytraFlyModule.mode.get() == ElytraFlyModule.FlyMode.BOUNCE
+        ElytraFlyFeature elytraFlyFeature = Feature_SERVICE.getStorage().getByClass(ElytraFlyFeature.class);
+        if (elytraFlyFeature != null && elytraFlyFeature.isEnabled()
+                && elytraFlyFeature.mode.get() == ElytraFlyFeature.FlyMode.BOUNCE
                 && (Object) this == MinecraftClient.getInstance().player
                 && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             cir.setReturnValue(EntityPose.STANDING);
@@ -87,10 +78,10 @@ public abstract class MixinEntity {
     @Inject(method = "getLookAngle()Lnet/minecraft/world/phys/Vec3;", at = @At("HEAD"), cancellable = true)
     private void onGetRotationVector(CallbackInfoReturnable<Vec3> cir) {
         if ((Object) this != MC.player) return;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
+        if (ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating()) return;
 
-        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-        float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+        float spoofYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
+        float spoofPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
 
         cir.setReturnValue(((Entity) (Object) this).calculateViewVector(spoofPitch, spoofYaw));
     }
@@ -102,9 +93,9 @@ public abstract class MixinEntity {
         if (!(entity instanceof LocalPlayer player)) return;
         if (player != Minecraft.getInstance().player) return;
 
-        RotationsModule rotations = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
+        RotationsFeature rotations = Feature_SERVICE.getStorage().getByClass(RotationsFeature.class);
         if (!rotations.render.get()) return;
-        RotationStateHandler handler = ROTATION_MANAGER.getStateHandler();
+        RotationStateHandler handler = ROTATION_SERVICE.getStateHandler();
         handler.setRenderPitch(player.getXRot());
         handler.setRenderHeadYaw(player.yHeadRot);
         handler.setRenderBodyYaw(player.yBodyRot);

@@ -1,30 +1,30 @@
 package me.kiriyaga.nami.util;
 
 import dev.cattyn.catformat.stylist.annotations.Style;
-import me.kiriyaga.nami.feature.module.impl.client.ColorModule;
-import me.kiriyaga.nami.feature.module.impl.client.HudModule;
+import me.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
+import me.kiriyaga.nami.impl.feature.impl.client.HudFeature;
 
 import java.awt.*;
 
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 
 public class CatStyles {
 
     @Style("g")
     Color global() {
-        Color gc = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+        Color gc = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor();
         return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
     @Style("friend")
     Color friend() {
-        Color gc = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getFriendColor();
+        Color gc = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getFriendColor();
         return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
     @Style("s")
     Color secondary() {
-        Color gs = MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledSecondColor();
+        Color gs = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledSecondColor();
         return new Color(gs.getRed(), gs.getGreen(), gs.getBlue(), 255);
     }
 
@@ -40,25 +40,25 @@ public class CatStyles {
 
     @Style("bg")
     Color bounceGlobal() {
-        Color gc = MODULE_MANAGER.getStorage().getByClass(HudModule.class).accent.get() ? MODULE_MANAGER.getStorage().getByClass(HudModule.class).globalColor.get() : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getStyledGlobalColor();
+        Color gc = FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).accent.get() ? FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).globalColor.get() : FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor();
 
-        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
+        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
     }
 
     @Style("bf")
     Color bounceFriend() {
-        Color gc = MODULE_MANAGER.getStorage().getByClass(HudModule.class).accent.get() ? MODULE_MANAGER.getStorage().getByClass(HudModule.class).globalColor.get() : MODULE_MANAGER.getStorage().getByClass(ColorModule.class).getFriendColor();
+        Color gc = FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).accent.get() ? FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).globalColor.get() : FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getFriendColor();
 
-        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
+        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
     }
 
     @Style("bw")
     Color bounceWhite() {
-        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(255, 255,255));
+        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(255, 255,255));
     }
 
     @Style("bgr")
     Color bounceGray() {
-        return MODULE_MANAGER.getStorage().getByClass(HudModule.class).getPulsingColor(new Color(77,77,77));
+        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(77,77,77));
     }
 }

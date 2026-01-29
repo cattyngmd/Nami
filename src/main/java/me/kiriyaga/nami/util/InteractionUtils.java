@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.util;
 
-import me.kiriyaga.nami.core.rotation.model.RotationRequest;
-import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
+import me.kiriyaga.nami.api.rotation.model.RotationRequest;
+import me.kiriyaga.nami.impl.feature.impl.client.RotationsFeature;
 import me.kiriyaga.nami.mixin.DuckMultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -47,9 +47,9 @@ public class InteractionUtils {
         }
 
         if (rotate)
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 4, idealYaw, idealPitch));
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 4, idealYaw, idealPitch));
 
-        boolean completed = !rotate || ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+        boolean completed = !rotate || ROTATION_SERVICE.getRequestHandler().isCompleted(rotationId);
 
         if (!completed)
             return false;
@@ -159,12 +159,12 @@ public class InteractionUtils {
             float yaw = (float) getYawToVec(MC.player, neighbor.getCenter());
             float pitch = (float) getPitchToVec(MC.player, neighbor.getCenter());
 
-         //   if (getDefaultRotationMode() == RotationModule.RotationMode.SILENT)
-                ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
+         //   if (getDefaultRotationMode() == RotationFeature.RotationMode.SILENT)
+                ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
            // else
-             //   ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
+             //   ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
 
-            //canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+            //canPlace = ROTATION_SERVICE.getRequestHandler().isCompleted(rotationId);
 
             // for some reason grim checks if you look at block, you gonna place, not on a block you click (i see logic here but still)
             AABB b = new AABB(neighbor);
@@ -174,8 +174,8 @@ public class InteractionUtils {
                     MC.player,
                     b,
                     range,
-                    ROTATION_MANAGER.getStateHandler().getServerYaw(),
-                    ROTATION_MANAGER.getStateHandler().getServerPitch()
+                    ROTATION_SERVICE.getStateHandler().getServerYaw(),
+                    ROTATION_SERVICE.getStateHandler().getServerPitch()
             );
 
 
@@ -185,7 +185,7 @@ public class InteractionUtils {
         boolean result = false;
         if (canPlace) {
             int prev = MC.player.getInventory().getSelectedSlot();
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
 
             if (simulate)
                 MC.gameMode.useItemOn(MC.player, MAIN_HAND, hitResult);
@@ -197,7 +197,7 @@ public class InteractionUtils {
 
             result = true;
 
-            INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
         }
 
         return result;
@@ -219,7 +219,7 @@ public class InteractionUtils {
                 case UP    -> eyePos.y >= pos.getY() + 1 - 1e-3;
             };
             if (!flag) {
-             //   CHAT_MANAGER.sendRaw("interactBlockAt: failed strictDirection check");
+             //   CHAT_SERVICE.sendRaw("interactBlockAt: failed strictDirection check");
                 return false;
             }
         }
@@ -241,11 +241,11 @@ public class InteractionUtils {
             float yaw = (float) getYawToVec(MC.player, pos.getCenter());
             float pitch = (float) getPitchToVec(MC.player, pos.getCenter());
 
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
             // else
-            //   ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
+            //   ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, MC.player, hitVec));
 
-            //canPlace = ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId);
+            //canPlace = ROTATION_SERVICE.getRequestHandler().isCompleted(rotationId);
 
             // for some reason grim checks if you look at block, you gonna place, not on a block you click (i see logic here but still)
             AABB b = new AABB(pos);
@@ -255,8 +255,8 @@ public class InteractionUtils {
                     MC.player,
                     b,
                     range,
-                    ROTATION_MANAGER.getStateHandler().getServerYaw(),
-                    ROTATION_MANAGER.getStateHandler().getServerPitch()
+                    ROTATION_SERVICE.getStateHandler().getServerYaw(),
+                    ROTATION_SERVICE.getStateHandler().getServerPitch()
             );
 
 
@@ -264,12 +264,12 @@ public class InteractionUtils {
         }
 
         if (!canInteract) {
-          //  CHAT_MANAGER.sendRaw("interactBlockAt: rotation incomplete");
+          //  CHAT_SERVICE.sendRaw("interactBlockAt: rotation incomplete");
             return false;
         }
 
         int prev = MC.player.getInventory().getSelectedSlot();
-        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(slot);
+        INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
 
         if (simulate)
             MC.gameMode.useItemOn(MC.player, MAIN_HAND, hit);
@@ -279,9 +279,9 @@ public class InteractionUtils {
         if (swing)
             MC.player.swing(MAIN_HAND);
 
-        INVENTORY_MANAGER.getSlotHandler().attemptSwitch(prev);
+        INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
 
-        //CHAT_MANAGER.sendRaw("interactBlockAt: success");
+        //CHAT_SERVICE.sendRaw("interactBlockAt: success");
         return true;
     }
 
@@ -321,9 +321,9 @@ public class InteractionUtils {
         return null;
     }
 
-    private static RotationsModule.RotationMode getDefaultRotationMode() {
-        RotationsModule module = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
-        return module != null ? module.rotation.get() : RotationsModule.RotationMode.MOTION;
+    private static RotationsFeature.RotationMode getDefaultRotationMode() {
+        RotationsFeature Feature = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
+        return Feature != null ? Feature.rotation.get() : RotationsFeature.RotationMode.MOTION;
     }
 
     public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {
@@ -349,7 +349,7 @@ public class InteractionUtils {
         if (MC.player == null || MC.gameMode == null)
             return false;
 
-        //CHAT_MANAGER.sendRaw(((ClientPlayerInteractionManagerAccessor) MC.interactionManager).getBlockBreakingCooldown()+"");
+        //CHAT_SERVICE.sendRaw(((ClientPlayerInteractionSERVICEAccessor) MC.interactionSERVICE).getBlockBreakingCooldown()+"");
 
         if (isBlockAirOrFluid(pos)) {
             if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
@@ -404,14 +404,14 @@ public class InteractionUtils {
                     direction.getStepZ() * 0.5
             );
 
-            ROTATION_MANAGER.getRequestHandler().submit(new RotationRequest(
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(
                     rotationId,
                     3,
                     (float) getYawToVec(MC.player, center),
                     (float) getPitchToVec(MC.player, center)
             ));
 
-            if (!ROTATION_MANAGER.getRequestHandler().isCompleted(rotationId)) {
+            if (!ROTATION_SERVICE.getRequestHandler().isCompleted(rotationId)) {
                 return false;
             }
         }

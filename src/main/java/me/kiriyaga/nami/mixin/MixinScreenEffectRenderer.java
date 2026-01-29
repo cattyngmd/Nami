@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,9 +18,9 @@ public class MixinScreenEffectRenderer {
 
     @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
     private static void onRenderFireOverlay(PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, TextureAtlasSprite sprite, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature noRender = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
         if (noRender != null && noRender.isEnabled() && noRender.noFire.get()) {
             ci.cancel();
         }
@@ -28,9 +28,9 @@ public class MixinScreenEffectRenderer {
 
     @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
     private static void onRenderUnderwaterOverlay(Minecraft client, PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature noRender = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
         if (noRender != null && noRender.isEnabled() && noRender.noLiguid.get()) {
             ci.cancel();
         }
@@ -38,9 +38,9 @@ public class MixinScreenEffectRenderer {
 
     @Inject(method = "renderTex", at = @At("HEAD"), cancellable = true)
     private static void render(TextureAtlasSprite sprite, PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature noRender = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
         if (noRender != null && noRender.isEnabled() && noRender.noWall.get()) {
             ci.cancel();
         }

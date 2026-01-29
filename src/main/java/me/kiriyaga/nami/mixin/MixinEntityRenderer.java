@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.visuals.NametagsModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NametagsFeature;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
@@ -10,18 +10,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer<T extends Entity, S extends EntityRenderState> {
 
     @Inject(method = "getNameTag", at = @At("HEAD"), cancellable = true)
     private void onRenderLabel(T entity, CallbackInfoReturnable<Component> cir) {
-        NametagsModule nametagsModule = MODULE_MANAGER.getStorage() != null
-                ? MODULE_MANAGER.getStorage().getByClass(NametagsModule.class)
+        NametagsFeature nametagsFeature = FEATURE_SERVICE.getStorage() != null
+                ? FEATURE_SERVICE.getStorage().getByClass(NametagsFeature.class)
                 : null;
 
-        if (nametagsModule != null && nametagsModule.isEnabled()) {
+        if (nametagsFeature != null && nametagsFeature.isEnabled()) {
             cir.setReturnValue(null);
             return;
         }

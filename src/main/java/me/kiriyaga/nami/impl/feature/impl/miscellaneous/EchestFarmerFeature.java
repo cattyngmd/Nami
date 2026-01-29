@@ -1,0 +1,107 @@
+package me.kiriyaga.nami.impl.feature.impl.miscellaneous;
+
+import me.kiriyaga.nami.event.EventPriority;
+import me.kiriyaga.nami.event.SubscribeEvent;
+import me.kiriyaga.nami.event.impl.PreTickEvent;
+import me.kiriyaga.nami.event.impl.Render3DEvent;
+import me.kiriyaga.nami.impl.feature.Feature;
+import me.kiriyaga.nami.impl.feature.FeatureCategory;
+import me.kiriyaga.nami.impl.feature.RegisterFeature;
+import me.kiriyaga.nami.impl.setting.impl.BoolSetting;
+import me.kiriyaga.nami.impl.setting.impl.DoubleSetting;
+import me.kiriyaga.nami.util.InteractionUtils;
+import me.kiriyaga.nami.util.render.RenderUtil;
+import me.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+
+import java.awt.*;
+
+import static me.kiriyaga.nami.Nami.*;
+
+@RegisterFeature
+public class EchestFarmerFeature extends Feature {
+
+    public final DoubleSetting distance = addSetting(new DoubleSetting("Range", 3.0, 1.0, 6.0));
+    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
+    private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
+    private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
+
+    private BlockPos renderPos = null;
+
+    public EchestFarmerFeature() {
+        super("EchestFarmer", "Automatically places and breaks ender chests.", FeatureCategory.of("Miscellaneous"));
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onPreTickEvent(PreTickEvent ev) {
+        if (MC.player == null || MC.level == null) return;
+
+        BlockPos targetPos = MC.player.blockPosition().relative(MC.player.getDirection(), 1);
+        renderPos = targetPos;
+
+        Block blockAt = MC.level.getBlockState(targetPos).getBlock();
+
+        if (MC.level.isEmptyBlock(targetPos)) {
+            int echestSlot = findEchestInHotbar();
+            if (echestSlot != -1) {
+                InteractionUtils.placeBlock(
+                        targetPos,
+                        echestSlot,
+                        distance.get(),
+                        rotate.get(),
+                        strictDirection.get(),
+                        simulate.get(),
+                        swing.get(),
+                        this.name+"break",
+                        multiTask.get()
+                );
+            }
+        }
+
+        if (blockAt == Blocks.ENDER_CHEST) {
+            InteractionUtils.breakBlock(
+                    targetPos,
+                    distance.get(),
+                    rotate.get(),
+                    swing.get(),
+                    grim.get(),
+                    strictDirection.get(), // oh god haha
+                    this.name+"place"
+            );
+        }
+    }
+
+    @SubscribeEvent
+    public void onRender(Render3DEvent event) {
+        if (MC.player == null || MC.level == null || renderPos == null || !render.get()) return;
+
+        PoseStack matrices = event.getMatrices();
+
+        ColorFeature colorFeature = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class);
+        Color color = colorFeature.getStyledGlobalColor();
+
+        AABB box = new AABB(renderPos);
+
+        RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
+    }
+
+    private int findEchestInHotbar() {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = MC.player.getInventory().getItem(i);
+            if (stack.getItem() == Items.ENDER_CHEST) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}

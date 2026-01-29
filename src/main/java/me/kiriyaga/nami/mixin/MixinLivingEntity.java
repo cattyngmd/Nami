@@ -3,10 +3,10 @@ package me.kiriyaga.nami.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.kiriyaga.nami.event.impl.GlidingEvent;
-import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
-import me.kiriyaga.nami.feature.module.impl.movement.HighJumpModule;
-import me.kiriyaga.nami.feature.module.impl.exploits.NoJumpDelayModule;
-import me.kiriyaga.nami.feature.module.impl.movement.NoLevitationModule;
+import me.kiriyaga.nami.impl.feature.impl.client.RotationsFeature;
+import me.kiriyaga.nami.impl.feature.impl.movement.HighJumpFeature;
+import me.kiriyaga.nami.impl.feature.impl.exploits.NoJumpDelayFeature;
+import me.kiriyaga.nami.impl.feature.impl.movement.NoLevitationFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -49,16 +49,16 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3 movementInput, CallbackInfo ci) {
         if (Minecraft.getInstance() == null || Minecraft.getInstance().player != (Object)this) return;
-        if (MODULE_MANAGER.getStorage() == null) return;
-        RotationsModule rotationsModule = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
-        if (rotationsModule == null || !rotationsModule.moveFix.get()) return;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
+        RotationsFeature rotationsFeature = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
+        if (rotationsFeature == null || !rotationsFeature.moveFix.get()) return;
+        if (ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating()) return;
 
         originalYaw = super.getYRot();
         originalPitch = super.getXRot();
 
-        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-        float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+        float spoofYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
+        float spoofPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
 
         this.setYRot(spoofYaw);
         this.setXRot(spoofPitch);
@@ -67,11 +67,11 @@ public abstract class MixinLivingEntity extends Entity {
     @Inject(method = "travel", at = @At("TAIL"))
     private void travelPostHook(Vec3 movementInput, CallbackInfo ci) {
         if (Minecraft.getInstance() == null || Minecraft.getInstance().player != (Object)this) return;
-        if (ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating()) return;
+        if (ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating()) return;
 
-        if (MODULE_MANAGER.getStorage() == null) return;
-        RotationsModule rotationsModule = MODULE_MANAGER.getStorage().getByClass(RotationsModule.class);
-        if (rotationsModule == null || !rotationsModule.moveFix.get()) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
+        RotationsFeature rotationsFeature = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
+        if (rotationsFeature == null || !rotationsFeature.moveFix.get()) return;
 
         this.setYRot(originalYaw);
         this.setXRot(originalPitch);
@@ -80,13 +80,13 @@ public abstract class MixinLivingEntity extends Entity {
     @ModifyExpressionValue(method = "jumpFromGround", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getYRot()F"))
     private float jumpFix(float originalYaw) {
         if ((Object)this != Minecraft.getInstance().player) return originalYaw;
-        return ROTATION_MANAGER.getStateHandler().isRotating() ? ROTATION_MANAGER.getStateHandler().getRotationYaw() : originalYaw;
+        return ROTATION_SERVICE.getStateHandler().isRotating() ? ROTATION_SERVICE.getStateHandler().getRotationYaw() : originalYaw;
     }
 
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V", ordinal = 2, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
-        NoJumpDelayModule module = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(NoJumpDelayModule.class) : null;
-        if (module != null && module.isEnabled()) {
+        NoJumpDelayFeature Feature = FEATURE_SERVICE.getStorage() != null ? FEATURE_SERVICE.getStorage().getByClass(NoJumpDelayFeature.class) : null;
+        if (Feature != null && Feature.isEnabled()) {
             noJumpDelay = 0;
         }
     }
@@ -95,7 +95,7 @@ public abstract class MixinLivingEntity extends Entity {
     private void isGlidingZ(CallbackInfoReturnable<Boolean> cir) {
         GlidingEvent ev = new GlidingEvent();
 
-        EVENT_MANAGER.post(ev);
+        EVENT_SERVICE.post(ev);
 
         if (ev.isCancelled())
             cir.setReturnValue(true);
@@ -103,7 +103,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
     private void onJump(CallbackInfo ci) {
-        HighJumpModule mod = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(HighJumpModule.class) : null;
+        HighJumpFeature mod = FEATURE_SERVICE.getStorage() != null ? FEATURE_SERVICE.getStorage().getByClass(HighJumpFeature.class) : null;
         if (mod == null || !mod.isEnabled()) return;
 
         float jumpBoost = mod.height.get().floatValue();
@@ -124,8 +124,8 @@ public abstract class MixinLivingEntity extends Entity {
 //    private void setSprinting(boolean sprinting, CallbackInfo ci) {
 //        if ((Object)this != MinecraftClient.getInstance().player) return;
 //
-//        RotationManagerModule rotationModule = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(RotationManagerModule.class) : null;
-//        if (rotationModule == null || ROTATION_MANAGER == null || !ROTATION_MANAGER.getStateHandler().isRotating() || !rotationModule.sprintFix.get())
+//        RotationSERVICEFeature rotationFeature = Feature_SERVICE.getStorage() != null ? Feature_SERVICE.getStorage().getByClass(RotationSERVICEFeature.class) : null;
+//        if (rotationFeature == null || ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating() || !rotationFeature.sprintFix.get())
 //            return;
 //
 //        if (sprinting && MC.player.input != null) {
@@ -163,7 +163,7 @@ public abstract class MixinLivingEntity extends Entity {
         if ((Object) this instanceof Player player &&
                 player == MC.player) {
 
-            NoLevitationModule nl = MODULE_MANAGER.getStorage().getByClass(NoLevitationModule.class);
+            NoLevitationFeature nl = FEATURE_SERVICE.getStorage().getByClass(NoLevitationFeature.class);
             if (nl != null && nl.isEnabled()) {
                 ResourceKey<MobEffect> slowFallKey = MobEffects.SLOW_FALLING.unwrapKey().orElse(null);
                 if (nl.noSlowFall.get() && slowFallKey != null && effect.is(slowFallKey))
@@ -179,7 +179,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @ModifyReturnValue(method = "getEffect", at = @At("RETURN"))
     private MobEffectInstance getStatusEffect(MobEffectInstance original, Holder<MobEffect> effect) {
-        NoLevitationModule nl = MODULE_MANAGER.getStorage().getByClass(NoLevitationModule.class);
+        NoLevitationFeature nl = FEATURE_SERVICE.getStorage().getByClass(NoLevitationFeature.class);
         if (nl != null && nl.isEnabled()) {
             if (effect == MobEffects.LEVITATION)
                 return null;
@@ -193,8 +193,8 @@ public abstract class MixinLivingEntity extends Entity {
     private float turnHead(float f) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof LocalPlayer player && player == MC.player && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
-            return ROTATION_MANAGER.getStateHandler().getServerYaw();
+        if (self instanceof LocalPlayer player && player == MC.player && FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).render.get()) {
+            return ROTATION_SERVICE.getStateHandler().getServerYaw();
         }
         return f;
     }
@@ -203,9 +203,9 @@ public abstract class MixinLivingEntity extends Entity {
     private void lerpHeadYawInject(int i, double d, CallbackInfo ci) {
         LivingEntity self = (LivingEntity)(Object)this;
 
-        if (self instanceof LocalPlayer player && player == MC.player && MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).render.get()) {
+        if (self instanceof LocalPlayer player && player == MC.player && FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).render.get()) {
 
-            double targetYaw = ROTATION_MANAGER.getStateHandler().getServerYaw();
+            double targetYaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
 
             this.yHeadRot = (float) Mth.rotLerp(1.0 / i, this.yHeadRot, targetYaw);
 

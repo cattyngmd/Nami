@@ -1,21 +1,19 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import me.kiriyaga.nami.core.macro.model.Macro;
+import me.kiriyaga.nami.api.macro.model.Macro;
 import me.kiriyaga.nami.event.impl.DissconectEvent;
 import me.kiriyaga.nami.event.impl.EntityDeathEvent;
 import me.kiriyaga.nami.event.impl.InteractionEvent;
 import me.kiriyaga.nami.event.impl.OpenScreenEvent;
-import me.kiriyaga.nami.feature.module.impl.client.FontModule;
-import me.kiriyaga.nami.feature.module.impl.combat.AuraModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.ESPModule;
-import me.kiriyaga.nami.feature.module.impl.exploits.AirPlaceModule;
-import me.kiriyaga.nami.feature.module.impl.world.AutoEatModule;
-import me.kiriyaga.nami.feature.module.impl.world.FastPlaceModule;
-import me.kiriyaga.nami.feature.module.impl.exploits.NoHitDelayModule;
-import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
+import me.kiriyaga.nami.impl.feature.impl.combat.AuraFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.ESPFeature;
+import me.kiriyaga.nami.impl.feature.impl.exploits.AirPlaceFeature;
+import me.kiriyaga.nami.impl.feature.impl.world.AutoEatFeature;
+import me.kiriyaga.nami.impl.feature.impl.world.FastPlaceFeature;
+import me.kiriyaga.nami.impl.feature.impl.exploits.NoHitDelayFeature;
+import me.kiriyaga.nami.impl.setting.impl.KeyBindSetting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -29,20 +27,17 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import me.kiriyaga.nami.feature.module.Module;
+import me.kiriyaga.nami.impl.feature.Feature;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import static me.kiriyaga.nami.Nami.*;
 
@@ -63,7 +58,7 @@ public abstract class MixinMinecraft {
     @Inject(method = "disconnectFromWorld(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"), cancellable = true)
     private void onDisconnect(Component reason, CallbackInfo ci) {
         DissconectEvent ev = new DissconectEvent();
-        EVENT_MANAGER.post(ev);
+        EVENT_SERVICE.post(ev);
 
         if (ev.isCancelled()) {
             ci.cancel();
@@ -74,23 +69,23 @@ public abstract class MixinMinecraft {
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
         if (MC == null || MC.mouseHandler == null || MC.screen != null) return;
 
-        for (Module module : MODULE_MANAGER.getStorage().getAll()) {
-            if (module == null) continue;
-            KeyBindSetting bind = module.getKeyBind();
+        for (Feature Feature : FEATURE_SERVICE.getStorage().getAll()) {
+            if (Feature == null) continue;
+            KeyBindSetting bind = Feature.getKeyBind();
             if (bind == null) continue;
 
             if (bind.get() != KeyBindSetting.KEY_NONE) {
                 boolean currentlyPressed = bind.isPressed();
 
                 if (bind.isHoldMode()) {
-                    if (currentlyPressed && !module.isEnabled()) {
-                        module.setEnabled(true);
-                    } else if (!currentlyPressed && module.isEnabled()) {
-                        module.setEnabled(false);
+                    if (currentlyPressed && !Feature.isEnabled()) {
+                        Feature.setEnabled(true);
+                    } else if (!currentlyPressed && Feature.isEnabled()) {
+                        Feature.setEnabled(false);
                     }
                 } else {
                     if (currentlyPressed && !bind.wasPressedLastTick()) {
-                        module.toggle();
+                        Feature.toggle();
                     }
                 }
 
@@ -98,10 +93,10 @@ public abstract class MixinMinecraft {
             }
         }
 
-        for (Macro macro : MACRO_MANAGER.getAll()) {
+        for (Macro macro : MACRO_SERVICE.getAll()) {
             int keyCode = macro.getKeyCode();
-            boolean currentlyPressed = MACRO_MANAGER.isKeyPressed(keyCode);
-            boolean wasPressed = MACRO_MANAGER.wasKeyPressedLastTick(keyCode);
+            boolean currentlyPressed = MACRO_SERVICE.isKeyPressed(keyCode);
+            boolean wasPressed = MACRO_SERVICE.wasKeyPressedLastTick(keyCode);
 
             if (currentlyPressed && !wasPressed) {
                 if (MC.player != null) {
@@ -109,7 +104,7 @@ public abstract class MixinMinecraft {
                 }
             }
 
-            MACRO_MANAGER.setKeyPressedLastTick(keyCode, currentlyPressed);
+            MACRO_SERVICE.setKeyPressedLastTick(keyCode, currentlyPressed);
         }
     }
 
@@ -117,8 +112,8 @@ public abstract class MixinMinecraft {
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isHandsBusy()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
 
-        AirPlaceModule airPlace = MODULE_MANAGER.getStorage().getByClass(AirPlaceModule.class);
-        FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
+        AirPlaceFeature airPlace = FEATURE_SERVICE.getStorage().getByClass(AirPlaceFeature.class);
+        FastPlaceFeature fastPlace = FEATURE_SERVICE.getStorage().getByClass(FastPlaceFeature.class);
 
         if (airPlace == null || fastPlace == null) return;
 
@@ -151,7 +146,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo info) {
-        FastPlaceModule fastPlace = MODULE_MANAGER.getStorage().getByClass(FastPlaceModule.class);
+        FastPlaceFeature fastPlace = FEATURE_SERVICE.getStorage().getByClass(FastPlaceFeature.class);
 
         if (fastPlace == null) return;
 
@@ -166,7 +161,7 @@ public abstract class MixinMinecraft {
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         OpenScreenEvent event = new OpenScreenEvent(screen);
 
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
 
         if (event.isCancelled())
             ci.cancel();
@@ -174,7 +169,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "startAttack", at = @At("HEAD"))
     private void doAttack(CallbackInfoReturnable<Boolean> info) {
-        NoHitDelayModule noHitDelay = MODULE_MANAGER.getStorage().getByClass(NoHitDelayModule.class);
+        NoHitDelayFeature noHitDelay = FEATURE_SERVICE.getStorage().getByClass(NoHitDelayFeature.class);
         if (noHitDelay != null && noHitDelay.isEnabled()) {
             missTime = 0;
         }
@@ -183,7 +178,7 @@ public abstract class MixinMinecraft {
     @Inject(method = "continueAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"), cancellable = true)
     private void handleBlockBreaking(boolean bl, CallbackInfo ci) {
         InteractionEvent ev = new InteractionEvent();
-        EVENT_MANAGER.post(ev);
+        EVENT_SERVICE.post(ev);
         if (ev.isCancelled()) {
             ci.cancel();
         }
@@ -192,7 +187,7 @@ public abstract class MixinMinecraft {
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;isDestroying()Z"), cancellable = true)
     private void doItemUse2(CallbackInfo ci) {
         InteractionEvent ev = new InteractionEvent();
-        EVENT_MANAGER.post(ev);
+        EVENT_SERVICE.post(ev);
         if (ev.isCancelled()) {
             ci.cancel();
         }
@@ -207,7 +202,7 @@ public abstract class MixinMinecraft {
             if (entity instanceof LivingEntity e) {
                 if (e.isDeadOrDying() && !deadList.contains(e.getId())) {
                     EntityDeathEvent ev = new EntityDeathEvent(e);
-                    EVENT_MANAGER.post(ev);
+                    EVENT_SERVICE.post(ev);
                     deadList.add(e.getId());
                 } else if (!e.isDeadOrDying()) {
                     deadList.remove(e.getId());
@@ -219,9 +214,9 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "shouldEntityAppearGlowing", at = @At("HEAD"), cancellable = true)
     private void onHasOutline(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        ESPModule esp = MODULE_MANAGER.getStorage().getByClass(ESPModule.class);
-        if (esp != null && esp.isEnabled() && esp.renderMode.get() == ESPModule.RenderMode.OUTLINE) {
-            if (ESPModule.getESPColor(entity) != null) {
+        ESPFeature esp = FEATURE_SERVICE.getStorage().getByClass(ESPFeature.class);
+        if (esp != null && esp.isEnabled() && esp.renderMode.get() == ESPFeature.RenderMode.OUTLINE) {
+            if (ESPFeature.getESPColor(entity) != null) {
                 cir.setReturnValue(true);
             }
         }
@@ -230,14 +225,14 @@ public abstract class MixinMinecraft {
     // Author @cattyngmd
     @ModifyExpressionValue(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"))
     private boolean handleInputEvents(boolean original) {
-        if (MODULE_MANAGER.getStorage().getByClass(AutoEatModule.class).eating.get())
+        if (FEATURE_SERVICE.getStorage().getByClass(AutoEatFeature.class).eating.get())
             return false;
         return original;
     }
 
     @Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void handleInputEvents3(CallbackInfo info) {
-        if (MODULE_MANAGER.getStorage().getByClass(AuraModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(AuraModule.class).multitask() && player != null && player.isUsingItem()) {
+        if (FEATURE_SERVICE.getStorage().getByClass(AuraFeature.class).isEnabled() && FEATURE_SERVICE.getStorage().getByClass(AuraFeature.class).multitask() && player != null && player.isUsingItem()) {
             if (!options.keyUse.isDown()) {
                 gameMode.releaseUsingItem(player);
             }

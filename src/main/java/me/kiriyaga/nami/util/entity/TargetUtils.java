@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.util.entity;
 
-import me.kiriyaga.nami.feature.module.impl.client.TargetModule;
+import me.kiriyaga.nami.impl.feature.impl.client.TargetFeature;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
@@ -16,8 +16,8 @@ import static me.kiriyaga.nami.Nami.*;
 
 public class TargetUtils {
     public static Entity getTarget() {
-        TargetModule targetModule = MODULE_MANAGER.getStorage().getByClass(TargetModule.class);
-        if (MC.player == null || MC.level == null || targetModule == null)
+        TargetFeature targetFeature = FEATURE_SERVICE.getStorage().getByClass(TargetFeature.class);
+        if (MC.player == null || MC.level == null || targetFeature == null)
             return null;
 
         List<Entity> candidates = EntityUtils.getAllEntities().stream()
@@ -26,17 +26,17 @@ public class TargetUtils {
                     if (e instanceof LivingEntity) {
                         LivingEntity le = (LivingEntity) e;
                         if (!le.isAlive()) return false;
-                        if (e.tickCount < targetModule.minTicksExisted.get().intValue()) return false;
+                        if (e.tickCount < targetFeature.minTicksExisted.get().intValue()) return false;
                         double distSq = e.distanceToSqr(MC.player);
-                        if (distSq > targetModule.targetRange.get() * targetModule.targetRange.get()) return false;
+                        if (distSq > targetFeature.targetRange.get() * targetFeature.targetRange.get()) return false;
 
-                        return (targetModule.targetPlayers.get() && e instanceof Player && !FRIEND_MANAGER.isFriend(e.getName().getString()))
-                                || (targetModule.targetHostiles.get() && HostileUtils.isHostile(e))
-                                || (targetModule.targetNeutrals.get() && HostileUtils.isNeutral(e))
-                                || (targetModule.targetPassives.get() && HostileUtils.isPassive(e));
+                        return (targetFeature.targetPlayers.get() && e instanceof Player && !FRIEND_SERVICE.isFriend(e.getName().getString()))
+                                || (targetFeature.targetHostiles.get() && HostileUtils.isHostile(e))
+                                || (targetFeature.targetNeutrals.get() && HostileUtils.isNeutral(e))
+                                || (targetFeature.targetPassives.get() && HostileUtils.isPassive(e));
                     }
 
-                    if (targetModule.targetPrijectiles.get()) {
+                    if (targetFeature.targetPrijectiles.get()) {
                         return (e instanceof ShulkerBullet) || (e instanceof LargeFireball);
                     }
 
@@ -44,7 +44,7 @@ public class TargetUtils {
                 })
                 .collect(Collectors.toList());
 
-        switch (targetModule.priority.get()) {
+        switch (targetFeature.priority.get()) {
             case HEALTH:
                 return candidates.stream()
                         .filter(e -> e instanceof LivingEntity)
@@ -58,7 +58,7 @@ public class TargetUtils {
 
             case SMART:
                 List<Entity> players = candidates.stream()
-                        .filter(e -> e instanceof Player && !FRIEND_MANAGER.isFriend(e.getName().getString()))
+                        .filter(e -> e instanceof Player && !FRIEND_SERVICE.isFriend(e.getName().getString()))
                         .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(MC.player)))
                         .toList();
 

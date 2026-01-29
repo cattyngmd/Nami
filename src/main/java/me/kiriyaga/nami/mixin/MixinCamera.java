@@ -1,12 +1,11 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.visuals.FreeLookModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.ViewClipModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.FreeLookFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.ViewClipFeature;
 import me.kiriyaga.nami.mixininterface.ICamera;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 
 @Mixin(Camera.class)
 public abstract class MixinCamera implements ICamera {
@@ -46,25 +45,25 @@ public abstract class MixinCamera implements ICamera {
 
     @ModifyVariable(method = "getMaxZoom", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float modifyClipToSpace(float d) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
-                ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
+        FreecamFeature freecamFeature = FEATURE_SERVICE.getStorage() != null
+                ? FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class)
                 : null;
 
-        if (freecamModule != null && freecamModule.isEnabled()) return 0;
+        if (freecamFeature != null && freecamFeature.isEnabled()) return 0;
 
         return d;
     }
 
     @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V"))
     private void onUpdateSetPosArgs(Args args) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
-                ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
+        FreecamFeature freecamFeature = FEATURE_SERVICE.getStorage() != null
+                ? FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class)
                 : null;
 
-        if (freecamModule != null && freecamModule.isEnabled()) {
-            double x = freecamModule.prevPos.x + (freecamModule.pos.x - freecamModule.prevPos.x) * tickDelta;
-            double y = freecamModule.prevPos.y + (freecamModule.pos.y - freecamModule.prevPos.y) * tickDelta;
-            double z = freecamModule.prevPos.z + (freecamModule.pos.z - freecamModule.prevPos.z) * tickDelta;
+        if (freecamFeature != null && freecamFeature.isEnabled()) {
+            double x = freecamFeature.prevPos.x + (freecamFeature.pos.x - freecamFeature.prevPos.x) * tickDelta;
+            double y = freecamFeature.prevPos.y + (freecamFeature.pos.y - freecamFeature.prevPos.y) * tickDelta;
+            double z = freecamFeature.prevPos.z + (freecamFeature.pos.z - freecamFeature.prevPos.z) * tickDelta;
 
             args.set(0, x);
             args.set(1, y);
@@ -74,44 +73,44 @@ public abstract class MixinCamera implements ICamera {
 
     @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V"))
     private void onUpdateSetRotationArgs(Args args) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage() != null
-                ? MODULE_MANAGER.getStorage().getByClass(FreecamModule.class)
+        FreecamFeature freecamFeature = FEATURE_SERVICE.getStorage() != null
+                ? FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class)
                 : null;
-        FreeLookModule freeLookModule = MODULE_MANAGER.getStorage() != null
-                ? MODULE_MANAGER.getStorage().getByClass(FreeLookModule.class)
+        FreeLookFeature freeLookFeature = FEATURE_SERVICE.getStorage() != null
+                ? FEATURE_SERVICE.getStorage().getByClass(FreeLookFeature.class)
                 : null;
 
-        if (freecamModule != null && freecamModule.isEnabled()) {
-            float yaw = freecamModule.lastYaw + (freecamModule.yaw - freecamModule.lastYaw) * tickDelta;
-            float pitch = freecamModule.lastPitch + (freecamModule.pitch - freecamModule.lastPitch) * tickDelta;
+        if (freecamFeature != null && freecamFeature.isEnabled()) {
+            float yaw = freecamFeature.lastYaw + (freecamFeature.yaw - freecamFeature.lastYaw) * tickDelta;
+            float pitch = freecamFeature.lastPitch + (freecamFeature.pitch - freecamFeature.lastPitch) * tickDelta;
 
             args.set(0, yaw);
             args.set(1, pitch);
-        } else if (freeLookModule != null && freeLookModule.isEnabled()) {
-            args.set(0, freeLookModule.cameraYaw);
-            args.set(1, freeLookModule.cameraPitch);
+        } else if (freeLookFeature != null && freeLookFeature.isEnabled()) {
+            args.set(0, freeLookFeature.cameraYaw);
+            args.set(1, freeLookFeature.cameraPitch);
         }
     }
 
     @Inject(method = "getMaxZoom", at = @At("HEAD"), cancellable = true)
     private void allowClip(float f, CallbackInfoReturnable<Float> i) {
-        ViewClipModule viewClipModule = MODULE_MANAGER.getStorage() != null
-                ? MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class)
+        ViewClipFeature viewClipFeature = FEATURE_SERVICE.getStorage() != null
+                ? FEATURE_SERVICE.getStorage().getByClass(ViewClipFeature.class)
                 : null;
 
-        if (viewClipModule != null && viewClipModule.isEnabled()) {
+        if (viewClipFeature != null && viewClipFeature.isEnabled()) {
             i.setReturnValue(f);
         }
     }
 
     @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getMaxZoom(F)F"))
     private void extendDistance(Args args) {
-        ViewClipModule viewClipModule = MODULE_MANAGER.getStorage() != null
-                ? MODULE_MANAGER.getStorage().getByClass(ViewClipModule.class)
+        ViewClipFeature viewClipFeature = FEATURE_SERVICE.getStorage() != null
+                ? FEATURE_SERVICE.getStorage().getByClass(ViewClipFeature.class)
                 : null;
 
-        if (viewClipModule != null && viewClipModule.isEnabled()) {
-            args.set(0, viewClipModule.getAnimatedDistance());
+        if (viewClipFeature != null && viewClipFeature.isEnabled()) {
+            args.set(0, viewClipFeature.getAnimatedDistance());
         }
     }
 }

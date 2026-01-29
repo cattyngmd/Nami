@@ -24,7 +24,7 @@ public class MixinClientPacketListener {
     @Inject(method = "sendChat", at = @At("HEAD"), cancellable = true)
     public void onSendChatMessage(String message, CallbackInfo ci) {
         ChatMessageEvent event = new ChatMessageEvent(message);
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
 
         if (event.isCancelled()) {
             ci.cancel();
@@ -38,13 +38,13 @@ public class MixinClientPacketListener {
         LevelChunk chunk = level.getChunk(packet.getX(), packet.getZ());
         if (chunk == null || chunk.isEmpty()) return;
 
-        EVENT_MANAGER.post(new ChunkDataEvent(chunk));
+        EVENT_SERVICE.post(new ChunkDataEvent(chunk));
     }
 
     @Inject(method = "handleSetTime", at = @At("HEAD"), cancellable = true)
     private void onWorldTimeUpdate(ClientboundSetTimePacket worldTimeUpdateS2CPacket, CallbackInfo ci) {
         WorldTimeUpdateEvent event = new WorldTimeUpdateEvent();
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
 
         if (event.isCancelled()) ci.cancel();
     }

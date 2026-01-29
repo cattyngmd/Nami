@@ -59,7 +59,7 @@ public class ClasspathScanner {
             } else if (file.getName().endsWith(".class")) {
                 String className = pkg + "." + file.getName().replace(".class", "");
 
-                if (file.getName().equals("module-info.class")) {
+                if (file.getName().equals("Feature-info.class")) {
                     continue;
                 }
 
@@ -87,7 +87,7 @@ public class ClasspathScanner {
             String name = entry.getName();
 
             if (name.endsWith(".class")) {
-                if (name.equals("module-info.class")) {
+                if (name.equals("Feature-info.class")) {
                     continue;
                 }
 

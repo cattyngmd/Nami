@@ -2,15 +2,14 @@ package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.kiriyaga.nami.event.impl.*;
-import me.kiriyaga.nami.feature.module.impl.client.RotationsModule;
-import me.kiriyaga.nami.feature.module.impl.movement.NoSlowModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import me.kiriyaga.nami.impl.feature.impl.client.RotationsFeature;
+import me.kiriyaga.nami.impl.feature.impl.movement.NoSlowFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.*;
@@ -33,19 +32,19 @@ public abstract class MixinLocalPlayer {
     @Inject(method = "tick", at = @At("HEAD"))
     private void tickHookPre(CallbackInfo ci) {
 
-        EVENT_MANAGER.post(new PreTickEvent());
+        EVENT_SERVICE.post(new PreTickEvent());
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickHookPost(CallbackInfo ci) {
 
-        EVENT_MANAGER.post(new PostTickEvent());
+        EVENT_SERVICE.post(new PostTickEvent());
     }
 
     @Inject(method = "moveTowardsClosestSpace", at = @At(value = "HEAD"), cancellable = true)
     private void pushOutOfBlocks(double x, double z, CallbackInfo ci) {
         BlockPushEvent pushOutOfBlocksEvent = new BlockPushEvent();
-        EVENT_MANAGER.post(pushOutOfBlocksEvent);
+        EVENT_SERVICE.post(pushOutOfBlocksEvent);
 
         if (pushOutOfBlocksEvent.isCancelled())
             ci.cancel();
@@ -54,7 +53,7 @@ public abstract class MixinLocalPlayer {
     @Inject(method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"), cancellable = true)
     private void onMove(MoverType movementType, Vec3 movement, CallbackInfo ci) {
         MoveEvent moveEvent = new MoveEvent(movementType, movement);
-        EVENT_MANAGER.post(moveEvent);
+        EVENT_SERVICE.post(moveEvent);
 
         if (moveEvent.isCancelled()) {
             ci.cancel();
@@ -70,34 +69,34 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "sendPosition", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
-        if (!ROTATION_MANAGER.getStateHandler().isRotating()) {
-            ROTATION_MANAGER.getStateHandler().setServerDeltaYaw(0f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
+        if (!ROTATION_SERVICE.getStateHandler().isRotating()) {
+            ROTATION_SERVICE.getStateHandler().setServerDeltaYaw(0f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
             return;
         }
 
         originalYaw = MC.player.getYRot();
         originalPitch = MC.player.getXRot();
 
-        float newYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-        float newPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+        float newYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
+        float newPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
         MC.player.setYRot(newYaw);
         MC.player.setXRot(newPitch);
 
-        float deltaYaw = newYaw - ROTATION_MANAGER.getStateHandler().getServerYaw();
-        //float deltaPitch = newPitch - ROTATION_MANAGER.getStateHandler().getServerPitch();
+        float deltaYaw = newYaw - ROTATION_SERVICE.getStateHandler().getServerYaw();
+        //float deltaPitch = newPitch - ROTATION_SERVICE.getStateHandler().getServerPitch();
 
-        ROTATION_MANAGER.getStateHandler().setServerDeltaYaw(deltaYaw);
+        ROTATION_SERVICE.getStateHandler().setServerDeltaYaw(deltaYaw);
 
-        ROTATION_MANAGER.getStateHandler().setServerYaw(newYaw);
-        ROTATION_MANAGER.getStateHandler().setServerPitch(newPitch);
+        ROTATION_SERVICE.getStateHandler().setServerYaw(newYaw);
+        ROTATION_SERVICE.getStateHandler().setServerPitch(newPitch);
     }
 
     @Inject(method = "sendPosition", at = @At("TAIL"))
     private void postSendMovementPackets(CallbackInfo ci) {
-        ROTATION_MANAGER.getStateHandler().setServerYaw(MC.player.getYRot());
-        ROTATION_MANAGER.getStateHandler().setServerPitch(MC.player.getXRot());
+        ROTATION_SERVICE.getStateHandler().setServerYaw(MC.player.getYRot());
+        ROTATION_SERVICE.getStateHandler().setServerPitch(MC.player.getXRot());
 
-        if (!ROTATION_MANAGER.getStateHandler().isRotating())
+        if (!ROTATION_SERVICE.getStateHandler().isRotating())
             return;
 
         MC.player.setYRot(originalYaw);
@@ -109,8 +108,8 @@ public abstract class MixinLocalPlayer {
     // i hope it gets fucking patched in 1.22/1.23
     @Inject(method = "sendPosition", at = @At("HEAD"))
     private void sendMovementPackets1(CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.SILENT
-        && ROTATION_MANAGER.getStateHandler().getSilentSyncRequired()) {
+        if (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.SILENT
+        && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
             this.originalSilentPitch = MC.player.getXRot();
             this.xRotLast = -9999;
             MC.player.setXRot(this.originalSilentPitch + 1f);
@@ -119,10 +118,10 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "sendPosition", at = @At("RETURN"))
     private void sendMovementPackets2(CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage().getByClass(RotationsModule.class).rotation.get() == RotationsModule.RotationMode.SILENT
-                && ROTATION_MANAGER.getStateHandler().getSilentSyncRequired()) {
+        if (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.SILENT
+                && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
             MC.player.setXRot(this.originalSilentPitch);
-            ROTATION_MANAGER.getStateHandler().setSilentSyncRequired(false);
+            ROTATION_SERVICE.getStateHandler().setSilentSyncRequired(false);
         }
     }
 
@@ -131,7 +130,7 @@ public abstract class MixinLocalPlayer {
 
         if (self instanceof Player player && player.isUsingItem() && !player.isPassenger()) {
             ItemUseSlowEvent event = new ItemUseSlowEvent(player, player.getUseItem());
-            EVENT_MANAGER.post(event);
+            EVENT_SERVICE.post(event);
 
             if (event.isCancelled()) {
                 Vec2 vec2f2 = vec2f.scale(0.98F);
@@ -149,7 +148,7 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "isMovingSlowly", at = @At("HEAD"), cancellable = true)
     private void shouldSlowDown(CallbackInfoReturnable<Boolean> info) {
-        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class) == null || !MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class).isEnabled() || !MODULE_MANAGER.getStorage().getByClass(NoSlowModule.class).fastCrawl.get())
+        if (FEATURE_SERVICE == null || FEATURE_SERVICE.getStorage() == null || FEATURE_SERVICE.getStorage().getByClass(NoSlowFeature.class) == null || !FEATURE_SERVICE.getStorage().getByClass(NoSlowFeature.class).isEnabled() || !FEATURE_SERVICE.getStorage().getByClass(NoSlowFeature.class).fastCrawl.get())
             return;
 
         boolean b = !MC.player.isVisuallyCrawling();
@@ -160,10 +159,10 @@ public abstract class MixinLocalPlayer {
 
     @ModifyExpressionValue(method = "handlePortalTransitionEffect", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;"))
     private Screen tickNausea(Screen s) {
-        if (MODULE_MANAGER == null)
+        if (FEATURE_SERVICE == null)
             return s;
 
-        if (MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).portalGui.get())
+        if (FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class).isEnabled() && FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class).portalGui.get())
             return null;
 
         return s;

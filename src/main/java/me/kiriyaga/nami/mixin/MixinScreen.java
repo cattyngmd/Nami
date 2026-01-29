@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.RenderScreenEvent;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,9 +15,9 @@ import static me.kiriyaga.nami.Nami.*;
 public abstract class MixinScreen {
     @Inject(method = "renderBackground(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At("HEAD"), cancellable = true)
     public void noBackground(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        NoRenderModule m = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature m = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
 
         if (m != null && m.isEnabled() && m.noBackground.get() && MC.level != null) {
             ci.cancel();
@@ -26,9 +26,9 @@ public abstract class MixinScreen {
 
     @Inject(method = "renderTransparentBackground", at = @At("HEAD"), cancellable = true)
     private void renderInGameBackground(GuiGraphics drawContext, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        NoRenderModule m = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature m = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
 
         if (m != null && m.isEnabled() && m.noBackground.get() && MC.level != null) {
             ci.cancel();
@@ -37,7 +37,7 @@ public abstract class MixinScreen {
 
     @Inject(method = "render", at = @At("TAIL"))
     public void onRender(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        EVENT_MANAGER.post(new RenderScreenEvent(context, null, mouseX, mouseY));
+        EVENT_SERVICE.post(new RenderScreenEvent(context, null, mouseX, mouseY));
     }
 }
 

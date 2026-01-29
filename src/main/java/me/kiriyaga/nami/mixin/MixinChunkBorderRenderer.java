@@ -1,15 +1,14 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
 import net.minecraft.client.renderer.debug.ChunkBorderRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 
 @Mixin(ChunkBorderRenderer.class)
 public abstract class MixinChunkBorderRenderer {
@@ -22,21 +21,21 @@ public abstract class MixinChunkBorderRenderer {
             )
     )
     private BlockPos nami$modifyEntityPos(BlockPos originalPos) {
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        FreecamFeature freecamFeature = FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class);
 
-        if (freecamModule == null || !freecamModule.isEnabled()) {
+        if (freecamFeature == null || !freecamFeature.isEnabled()) {
             return originalPos;
         }
 
         float delta = MC.getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
         double interpolatedX =
-                freecamModule.prevPos.x +
-                        (freecamModule.pos.x - freecamModule.prevPos.x) * delta;
+                freecamFeature.prevPos.x +
+                        (freecamFeature.pos.x - freecamFeature.prevPos.x) * delta;
 
         double interpolatedZ =
-                freecamModule.prevPos.z +
-                        (freecamModule.pos.z - freecamModule.prevPos.z) * delta;
+                freecamFeature.prevPos.z +
+                        (freecamFeature.pos.z - freecamFeature.prevPos.z) * delta;
 
         return new BlockPos(
                 (int) Math.floor(interpolatedX),

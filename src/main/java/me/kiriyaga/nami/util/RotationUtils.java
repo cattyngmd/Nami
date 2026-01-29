@@ -1,6 +1,5 @@
 package me.kiriyaga.nami.util;
 
-import me.kiriyaga.nami.feature.module.impl.client.PredictTestModule;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
@@ -11,7 +10,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Optional;
 
 import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class RotationUtils {
     public static int wrapDegrees(int angle) {

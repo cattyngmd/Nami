@@ -18,17 +18,17 @@ public abstract class MixinChatComponent {
     @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("HEAD"), cancellable = true)
     private void onAddMessage(Component message, MessageSignature signatureData, GuiMessageTag indicator, CallbackInfo ci) {
         if (signatureData != null) {
-            if (CHAT_MANAGER.transientSignature != null && signatureData.equals(CHAT_MANAGER.transientSignature)) {
+            if (CHAT_SERVICE.transientSignature != null && signatureData.equals(CHAT_SERVICE.transientSignature)) {
                 return;
             }
 
-            if (CHAT_MANAGER.persistentMessages.containsValue(signatureData)) {
+            if (CHAT_SERVICE.persistentMessages.containsValue(signatureData)) {
                 return;
             }
         }
 
         ReceiveMessageEvent event = new ReceiveMessageEvent(message, signatureData, indicator);
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
 
         if (event.isCancelled()) {
             ci.cancel();

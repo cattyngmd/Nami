@@ -3,7 +3,7 @@ package me.kiriyaga.nami.mixin;
 import me.kiriyaga.nami.event.impl.BreakBlockEvent;
 import me.kiriyaga.nami.event.impl.PlaceBlockEvent;
 import me.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
-import me.kiriyaga.nami.feature.module.impl.world.NoBreakDelayModule;
+import me.kiriyaga.nami.impl.feature.impl.world.NoBreakDelayFeature;
 import me.kiriyaga.nami.mixininterface.IClientPlayerInteractionManager;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -38,13 +38,13 @@ public abstract class MixinMultiPlayerGameMode implements IClientPlayerInteracti
     @Inject(method = "useItem", at = @At("HEAD"))
     private void interactItem1(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         if (player != MC.player) return;
-        if (!ROTATION_MANAGER.getStateHandler().isRotating()) return;
+        if (!ROTATION_SERVICE.getStateHandler().isRotating()) return;
 
         savedYaw = player.getYRot();
         savedPitch = player.getXRot();
 
-        float spoofYaw = ROTATION_MANAGER.getStateHandler().getRotationYaw();
-        float spoofPitch = ROTATION_MANAGER.getStateHandler().getRotationPitch();
+        float spoofYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
+        float spoofPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
 
         player.setYRot(spoofYaw);
         player.setXRot(spoofPitch);
@@ -53,7 +53,7 @@ public abstract class MixinMultiPlayerGameMode implements IClientPlayerInteracti
     @Inject(method = "useItem", at = @At("RETURN"))
     private void interactItem2(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         if (player != MC.player) return;
-        if (!ROTATION_MANAGER.getStateHandler().isRotating()) return;
+        if (!ROTATION_SERVICE.getStateHandler().isRotating()) return;
 
         player.setYRot(savedYaw);
         player.setXRot(savedPitch);
@@ -62,7 +62,7 @@ public abstract class MixinMultiPlayerGameMode implements IClientPlayerInteracti
     @Inject(method = "startDestroyBlock", at = @At("HEAD"), cancellable = true)
     private void onAttackBlock(BlockPos blockPos, Direction direction, CallbackInfoReturnable<Boolean> call){
         StartBreakingBlockEvent ev = new StartBreakingBlockEvent(blockPos, direction);
-        EVENT_MANAGER.post(ev);
+        EVENT_SERVICE.post(ev);
 
         if (ev.isCancelled())
             call.cancel();
@@ -71,7 +71,7 @@ public abstract class MixinMultiPlayerGameMode implements IClientPlayerInteracti
     @Inject(method = "useItemOn", at = @At(value = "HEAD"), cancellable = true)
     private void interactBlock(LocalPlayer player, InteractionHand hand, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
         PlaceBlockEvent interactBlockEvent = new PlaceBlockEvent(player, hand, hitResult);
-        EVENT_MANAGER.post(interactBlockEvent);
+        EVENT_SERVICE.post(interactBlockEvent);
 
         if (interactBlockEvent.isCancelled()) {
             cir.setReturnValue(InteractionResult.SUCCESS);
@@ -82,7 +82,7 @@ public abstract class MixinMultiPlayerGameMode implements IClientPlayerInteracti
     @Inject(method = "destroyBlock", at = @At(value = "HEAD"), cancellable = true)
     private void breakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         BreakBlockEvent breakBlockEvent = new BreakBlockEvent(pos);
-        EVENT_MANAGER.post(breakBlockEvent);
+        EVENT_SERVICE.post(breakBlockEvent);
         if (breakBlockEvent.isCancelled()) {
             cir.setReturnValue(false);
             cir.cancel();
@@ -91,11 +91,11 @@ public abstract class MixinMultiPlayerGameMode implements IClientPlayerInteracti
 
     @Inject(method = "continueDestroyBlock", at = @At("HEAD"))
     private void disableBreakCooldown(CallbackInfoReturnable<Boolean> cir) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        //CHAT_MANAGER.sendRaw(""+this.blockBreakingCooldown);
+        //CHAT_SERVICE.sendRaw(""+this.blockBreakingCooldown);
 
-        NoBreakDelayModule noBreakDelay = MODULE_MANAGER.getStorage().getByClass(NoBreakDelayModule.class);
+        NoBreakDelayFeature noBreakDelay = FEATURE_SERVICE.getStorage().getByClass(NoBreakDelayFeature.class);
         if (noBreakDelay != null && noBreakDelay.isEnabled()) {
             this.destroyDelay = 0;
         }

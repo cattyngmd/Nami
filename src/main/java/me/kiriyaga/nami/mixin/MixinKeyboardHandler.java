@@ -1,8 +1,8 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.KeyInputEvent;
-import me.kiriyaga.nami.feature.module.impl.client.ClickGuiModule;
-import me.kiriyaga.nami.feature.setting.impl.KeyBindSetting;
+import me.kiriyaga.nami.impl.feature.impl.client.ClickGuiFeature;
+import me.kiriyaga.nami.impl.setting.impl.KeyBindSetting;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.gui.components.MultilineTextField;
 import net.minecraft.client.gui.screens.Screen;
@@ -26,7 +26,7 @@ public abstract class MixinKeyboardHandler {
         if (keyInput.input() == GLFW.GLFW_KEY_F3) return;
 
         KeyInputEvent event = new KeyInputEvent(keyInput.input(), keyInput.scancode(), i, keyInput.modifiers());
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
 
         if (event.isCancelled()) {
             ci.cancel();
@@ -38,9 +38,9 @@ public abstract class MixinKeyboardHandler {
         if (MC == null) return;
         if (i != GLFW.GLFW_PRESS) return;
 
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        ClickGuiModule clickGui = MODULE_MANAGER.getStorage().getByClass(ClickGuiModule.class);
+        ClickGuiFeature clickGui = FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class);
         if (clickGui == null) return;
 
         KeyBindSetting bind = clickGui.getKeyBind();

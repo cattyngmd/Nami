@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import me.kiriyaga.nami.event.impl.*;
-import me.kiriyaga.nami.feature.module.impl.client.PatchModule;
+import me.kiriyaga.nami.impl.feature.impl.client.PatchFeature;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -30,13 +30,13 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(MouseButtonEvent click, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         MouseClickEvent event = new MouseClickEvent(click.x(), click.y(), click.button());
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
     }
 
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
     private void onMouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount, CallbackInfoReturnable<Boolean> cir) {
         MouseScrollEvent event = new MouseScrollEvent(mouseX, mouseY, verticalAmount);
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
     }
 
     /*
@@ -45,7 +45,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
      */
     @Inject(method = "mouseDragged", at = @At("HEAD"), cancellable = true)
     public void mouseDragged(MouseButtonEvent mouseButtonEvent, double d, double e, CallbackInfoReturnable<Boolean> cir) {
-        if (!MODULE_MANAGER.getStorage().getByClass(PatchModule.class).slotDragDesync.get()) return;
+        if (!FEATURE_SERVICE.getStorage().getByClass(PatchFeature.class).slotDragDesync.get()) return;
 
         if (MC.player != null && MC.player.getAbilities().instabuild) return;
         ItemStack cursorStack = menu.getCarried();
@@ -58,7 +58,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
     protected void onRenderTooltip(GuiGraphics graphics, int mouseX, int mouseY, CallbackInfo ci) {
         ItemStack stack = hoveredSlot != null ? hoveredSlot.getItem() : ItemStack.EMPTY;
         RenderTooltipEvent event = new RenderTooltipEvent(graphics, mouseX, mouseY, stack);
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
 
         if (event.isCancelled())
             ci.cancel();
@@ -67,6 +67,6 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlots(Lnet/minecraft/client/gui/GuiGraphics;II)V", shift = At.Shift.AFTER))
     private void onRenderSlots(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         RenderSlotsEvent event = new RenderSlotsEvent(graphics, mouseX, mouseY, menu.slots);
-        EVENT_MANAGER.post(event);
+        EVENT_SERVICE.post(event);
     }
 }

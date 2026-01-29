@@ -1,13 +1,9 @@
 package me.kiriyaga.nami.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.sugar.Local;
-import me.kiriyaga.nami.feature.module.impl.exploits.ReachModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
-import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import me.kiriyaga.nami.impl.feature.impl.exploits.ReachFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
+import me.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Camera;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -22,20 +18,16 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector4f;
-import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 import static me.kiriyaga.nami.util.render.RenderUtil.MODEL_VIEW_MATRIX;
 import static me.kiriyaga.nami.util.render.RenderUtil.PROJECTION_MATRIX;
 
@@ -88,9 +80,9 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "displayItemActivation", at = @At("HEAD"), cancellable = true)
     private void displayItemActivation(ItemStack floatingItem, CallbackInfo info) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        NoRenderModule noRender = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+        NoRenderFeature noRender = FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class);
         if (noRender != null && floatingItem.getItem() == Items.TOTEM_OF_UNDYING && noRender.isEnabled() && noRender.noTotem.get()) {
             info.cancel();
         }
@@ -101,10 +93,10 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "pick", at = @At("HEAD"), cancellable = true)
     private void pick1(float tickDelta, CallbackInfo info) {
-        if (MODULE_MANAGER.getStorage() == null) return;
+        if (FEATURE_SERVICE.getStorage() == null) return;
 
-        FreecamModule freecamModule = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
-        if (freecamModule == null || !freecamModule.isEnabled()) return;
+        FreecamFeature freecamFeature = FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class);
+        if (freecamFeature == null || !freecamFeature.isEnabled()) return;
 
         if (MC == null) return;
 
@@ -124,16 +116,16 @@ public abstract class MixinGameRenderer {
             float lastYaw = cameraE.yRotO;
             float lastPitch = cameraE.xRotO;
 
-            cameraE.setPosRaw(freecamModule.getX(), freecamModule.getY() - cameraE.getEyeHeight(cameraE.getPose()), freecamModule.getZ());
+            cameraE.setPosRaw(freecamFeature.getX(), freecamFeature.getY() - cameraE.getEyeHeight(cameraE.getPose()), freecamFeature.getZ());
 
-            cameraE.xo = freecamModule.prevPos.x;
-            cameraE.yo = freecamModule.prevPos.y - cameraE.getEyeHeight(cameraE.getPose());
-            cameraE.zo = freecamModule.prevPos.z;
+            cameraE.xo = freecamFeature.prevPos.x;
+            cameraE.yo = freecamFeature.prevPos.y - cameraE.getEyeHeight(cameraE.getPose());
+            cameraE.zo = freecamFeature.prevPos.z;
 
-            cameraE.setYRot(freecamModule.yaw);
-            cameraE.setXRot(freecamModule.pitch);
-            cameraE.yRotO = freecamModule.lastYaw;
-            cameraE.xRotO = freecamModule.lastPitch;
+            cameraE.setYRot(freecamFeature.yaw);
+            cameraE.setXRot(freecamFeature.pitch);
+            cameraE.yRotO = freecamFeature.lastYaw;
+            cameraE.xRotO = freecamFeature.lastPitch;
 
             freecamSet = true;
 
@@ -166,7 +158,7 @@ public abstract class MixinGameRenderer {
 
     private HitResult modifyHit(HitResult hit) {
 
-        ReachModule reach = MODULE_MANAGER.getStorage().getByClass(ReachModule.class);
+        ReachFeature reach = FEATURE_SERVICE.getStorage().getByClass(ReachFeature.class);
         if (reach == null || !reach.isEnabled() || !reach.noEntityTrace.get())
             return hit;
 
@@ -197,14 +189,14 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobView(PoseStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noBob.get()) {
+        if (FEATURE_SERVICE.getStorage() != null && FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class) != null && FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class).isEnabled() && FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class).noBob.get()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true)
     private void tiltViewWhenHurt(PoseStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MODULE_MANAGER.getStorage() != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class) != null && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).isEnabled() && MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class).noTilt.get()) {
+        if (FEATURE_SERVICE.getStorage() != null && FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class) != null && FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class).isEnabled() && FEATURE_SERVICE.getStorage().getByClass(NoRenderFeature.class).noTilt.get()) {
             ci.cancel();
         }
     }

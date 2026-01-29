@@ -4,17 +4,15 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.kiriyaga.nami.event.impl.LedgeClipEvent;
 import me.kiriyaga.nami.event.impl.LiquidPushEvent;
 import me.kiriyaga.nami.event.impl.SprintResetEvent;
-import me.kiriyaga.nami.feature.module.impl.exploits.ReachModule;
+import me.kiriyaga.nami.impl.feature.impl.exploits.ReachFeature;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -29,7 +27,7 @@ public abstract class MixinPlayer extends LivingEntity {
     @Inject(method = "isStayingOnGroundSurface", at = @At("HEAD"), cancellable = true)
     private void clipAtLedge(CallbackInfoReturnable<Boolean> cir) {
         LedgeClipEvent ledgeClipEvent = new LedgeClipEvent();
-        EVENT_MANAGER.post(ledgeClipEvent);
+        EVENT_SERVICE.post(ledgeClipEvent);
 
         if (ledgeClipEvent.isCancelled()) {
             cir.setReturnValue(ledgeClipEvent.getClipped());
@@ -41,7 +39,7 @@ public abstract class MixinPlayer extends LivingEntity {
         if ((Object)this != MC.player) return;
 
         SprintResetEvent sprintResetEvent = new SprintResetEvent();
-        EVENT_MANAGER.post(sprintResetEvent);
+        EVENT_SERVICE.post(sprintResetEvent);
 
         if (!sprintResetEvent.isCancelled()) {
             this.setDeltaMovement(this.getDeltaMovement().multiply(0.6, 1.0, 0.6));
@@ -55,7 +53,7 @@ public abstract class MixinPlayer extends LivingEntity {
             return;
 
         LiquidPushEvent pushFluidsEvent = new LiquidPushEvent();
-        EVENT_MANAGER.post(pushFluidsEvent);
+        EVENT_SERVICE.post(pushFluidsEvent);
         if (pushFluidsEvent.isCancelled()) {
             cir.setReturnValue(false);
             cir.cancel();
@@ -64,17 +62,17 @@ public abstract class MixinPlayer extends LivingEntity {
 
     @ModifyReturnValue(method = "blockInteractionRange", at = @At("RETURN"))
     private double getBlockInteractionRange(double d) {
-        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null || !MODULE_MANAGER.getStorage().getByClass(ReachModule.class).isEnabled())
+        if (FEATURE_SERVICE == null || FEATURE_SERVICE.getStorage() == null || FEATURE_SERVICE.getStorage().getByClass(ReachFeature.class) == null || !FEATURE_SERVICE.getStorage().getByClass(ReachFeature.class).isEnabled())
             return d;
 
-        return MODULE_MANAGER.getStorage().getByClass(ReachModule.class).block.get() + d;
+        return FEATURE_SERVICE.getStorage().getByClass(ReachFeature.class).block.get() + d;
     }
 
     @ModifyReturnValue(method = "entityInteractionRange", at = @At("RETURN"))
     private double getEntityInteractionRange(double d) {
-        if (MODULE_MANAGER == null || MODULE_MANAGER.getStorage() == null || MODULE_MANAGER.getStorage().getByClass(ReachModule.class) == null || !MODULE_MANAGER.getStorage().getByClass(ReachModule.class).isEnabled())
+        if (FEATURE_SERVICE == null || FEATURE_SERVICE.getStorage() == null || FEATURE_SERVICE.getStorage().getByClass(ReachFeature.class) == null || !FEATURE_SERVICE.getStorage().getByClass(ReachFeature.class).isEnabled())
             return d;
 
-        return MODULE_MANAGER.getStorage().getByClass(ReachModule.class).entity.get() + d;
+        return FEATURE_SERVICE.getStorage().getByClass(ReachFeature.class).entity.get() + d;
     }
 }

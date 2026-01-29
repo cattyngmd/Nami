@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.miscellaneous.AutoReconnectModule;
+import me.kiriyaga.nami.impl.feature.impl.miscellaneous.AutoReconnectFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static me.kiriyaga.nami.Nami.LAST_CONNECTION;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 
 @Mixin(DisconnectedScreen.class)
 public abstract class MixinDisconnectedScreen extends Screen {
@@ -31,19 +31,19 @@ public abstract class MixinDisconnectedScreen extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo info) {
-        AutoReconnectModule module = MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class);
-        if (module == null) return;
+        AutoReconnectFeature Feature = FEATURE_SERVICE.getStorage().getByClass(AutoReconnectFeature.class);
+        if (Feature == null) return;
 
-        if (LAST_CONNECTION != null || !module.hardHide.get()) {
-            reconnectButton = Button.builder(Component.literal(getReconnectText(module)), button -> tryReconnect())
+        if (LAST_CONNECTION != null || !Feature.hardHide.get()) {
+            reconnectButton = Button.builder(Component.literal(getReconnectText(Feature)), button -> tryReconnect())
                     .width(200)
                     .build();
 
-            toggleButton = Button.builder(Component.literal(getToggleText(module)), button -> {
-                module.toggle();
-                toggleButton.setMessage(Component.literal(getToggleText(module)));
-                reconnectButton.setMessage(Component.literal(getReconnectText(module)));
-                time = module.delay.get() * 20;
+            toggleButton = Button.builder(Component.literal(getToggleText(Feature)), button -> {
+                Feature.toggle();
+                toggleButton.setMessage(Component.literal(getToggleText(Feature)));
+                reconnectButton.setMessage(Component.literal(getReconnectText(Feature)));
+                time = Feature.delay.get() * 20;
             }).width(200).build();
 
             int centerX = this.width / 2;
@@ -59,34 +59,34 @@ public abstract class MixinDisconnectedScreen extends Screen {
 
     @Override
     public void tick() {
-        AutoReconnectModule module = MODULE_MANAGER.getStorage().getByClass(AutoReconnectModule.class);
-        if (module == null) return;
+        AutoReconnectFeature Feature = FEATURE_SERVICE.getStorage().getByClass(AutoReconnectFeature.class);
+        if (Feature == null) return;
 
-        if (!module.isEnabled() || LAST_CONNECTION == null || module.hardHide.get()) return;
+        if (!Feature.isEnabled() || LAST_CONNECTION == null || Feature.hardHide.get()) return;
 
         if (time <= 0) {
             tryReconnect();
         } else {
             time--;
             if (reconnectButton != null) {
-                reconnectButton.setMessage(Component.literal(getReconnectText(module)));
+                reconnectButton.setMessage(Component.literal(getReconnectText(Feature)));
             }
         }
     }
 
     @Unique
-    private String getReconnectText(AutoReconnectModule module) {
+    private String getReconnectText(AutoReconnectFeature Feature) {
         String text = "Reconnect";
-        if (module != null && module.isEnabled()) {
+        if (Feature != null && Feature.isEnabled()) {
             text += " " + String.format("(" + ChatFormatting.WHITE + "%.1fs" + ChatFormatting.RESET + ")", time / 20.0);
         }
         return text;
     }
 
     @Unique
-    private String getToggleText(AutoReconnectModule module) {
-        if (module == null) return ChatFormatting.RED + "AutoReconnect";
-        return (module.isEnabled() ? ChatFormatting.WHITE : ChatFormatting.RED) + "AutoReconnect";
+    private String getToggleText(AutoReconnectFeature Feature) {
+        if (Feature == null) return ChatFormatting.RED + "AutoReconnect";
+        return (Feature.isEnabled() ? ChatFormatting.WHITE : ChatFormatting.RED) + "AutoReconnect";
     }
 
     @Unique

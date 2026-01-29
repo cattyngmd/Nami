@@ -1,7 +1,7 @@
 package me.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import me.kiriyaga.nami.feature.module.impl.visuals.FreecamModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.item.properties.numeric.CompassAngleState;
 import net.minecraft.world.entity.ItemOwner;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import static me.kiriyaga.nami.Nami.MC;
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+import static me.kiriyaga.nami.Nami.FEATURE_SERVICE;
 
 @Mixin(CompassAngleState.class)
 public abstract class MixinCompassAngleState {
@@ -21,7 +21,7 @@ public abstract class MixinCompassAngleState {
             at = @At("RETURN")
     )
     private static float nami$overrideBodyYaw(float original, ItemOwner context) {
-        FreecamModule freecam = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        FreecamFeature freecam = FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class);
         if (freecam != null && freecam.isEnabled()
                 && MC != null
                 && MC.gameRenderer != null
@@ -38,7 +38,7 @@ public abstract class MixinCompassAngleState {
             at = @At("RETURN")
     )
     private static double nami$overrideAngleTo(double original, ItemOwner context, BlockPos pos) {
-        FreecamModule freecam = MODULE_MANAGER.getStorage().getByClass(FreecamModule.class);
+        FreecamFeature freecam = FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class);
         if (freecam != null && freecam.isEnabled()
                 && MC != null
                 && MC.gameRenderer != null

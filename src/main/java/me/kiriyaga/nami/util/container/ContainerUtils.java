@@ -4,14 +4,11 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.ARGB;
 
 import java.util.*;
-
-import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
 
 public class ContainerUtils {
 

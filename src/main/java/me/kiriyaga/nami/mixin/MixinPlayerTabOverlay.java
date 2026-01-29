@@ -1,6 +1,6 @@
 package me.kiriyaga.nami.mixin;
 
-import me.kiriyaga.nami.feature.module.impl.miscellaneous.BetterTabModule;
+import me.kiriyaga.nami.impl.feature.impl.miscellaneous.BetterTabFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
@@ -40,7 +40,7 @@ public abstract class MixinPlayerTabOverlay {
 
     @Inject(method = "getPlayerInfos", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntries(CallbackInfoReturnable<List<PlayerInfo>> info) {
-        BetterTabModule betterTab = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class) : null;
+        BetterTabFeature betterTab = FEATURE_SERVICE.getStorage() != null ? FEATURE_SERVICE.getStorage().getByClass(BetterTabFeature.class) : null;
         if (betterTab == null || !betterTab.isEnabled()) return;
         if (minecraft == null || minecraft.player == null || minecraft.player.connection == null) return;
 
@@ -52,7 +52,7 @@ public abstract class MixinPlayerTabOverlay {
             long now = System.currentTimeMillis();
             if (now - lastFriendCacheUpdate > friendCacheInterval) {
                 cachedFriends.clear();
-                FRIEND_MANAGER.getFriends().forEach(friend -> cachedFriends.add(friend.toLowerCase()));
+                FRIEND_SERVICE.getFriends().forEach(friend -> cachedFriends.add(friend.toLowerCase()));
                 lastFriendCacheUpdate = now;
             }
 
@@ -81,12 +81,12 @@ public abstract class MixinPlayerTabOverlay {
 
     @Inject(method = "getNameForDisplay", at = @At("HEAD"), cancellable = true)
     private void getPlayerName(PlayerInfo entry, CallbackInfoReturnable<Component> info) {
-        BetterTabModule betterTab = MODULE_MANAGER.getStorage() != null ? MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class) : null;
+        BetterTabFeature betterTab = FEATURE_SERVICE.getStorage() != null ? FEATURE_SERVICE.getStorage().getByClass(BetterTabFeature.class) : null;
         if (betterTab == null || !betterTab.isEnabled()) return;
 
         boolean highlightFriends = betterTab.highlighFriends.get();
         String playerName = entry.getProfile().name();
-        boolean isFriend = FRIEND_MANAGER.isFriend(playerName);
+        boolean isFriend = FRIEND_SERVICE.isFriend(playerName);
 
         if (highlightFriends && isFriend) {
             MutableComponent formattedName = Component.empty();
@@ -113,7 +113,7 @@ public abstract class MixinPlayerTabOverlay {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void render(GuiGraphics drawContext, int width, Scoreboard scoreboard, @Nullable Objective objective, CallbackInfo ci) {
-        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
+        BetterTabFeature betterTab = FEATURE_SERVICE.getStorage().getByClass(BetterTabFeature.class);
         if (betterTab != null && betterTab.isEnabled()) {
             float scale = betterTab.scale.get().floatValue();
 
@@ -130,7 +130,7 @@ public abstract class MixinPlayerTabOverlay {
 
     @Inject(method = "render", at = @At("RETURN"))
     private void render2(GuiGraphics drawContext, int width, Scoreboard scoreboard, @Nullable Objective objective, CallbackInfo ci) {
-        BetterTabModule betterTab = MODULE_MANAGER.getStorage().getByClass(BetterTabModule.class);
+        BetterTabFeature betterTab = FEATURE_SERVICE.getStorage().getByClass(BetterTabFeature.class);
         if (betterTab != null && betterTab.isEnabled()) {
             drawContext.pose().popMatrix();
         }

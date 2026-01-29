@@ -1,11 +1,9 @@
 package me.kiriyaga.nami.mixin;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import me.kiriyaga.nami.feature.module.impl.visuals.ViewModelModule;
+import me.kiriyaga.nami.impl.feature.impl.visuals.ViewModelFeature;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -13,9 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.util.Mth;
 import com.mojang.math.Axis;
-import org.joml.Quaternionfc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,8 +41,8 @@ public abstract class MixinItemInHandRenderer {
 
     @ModifyArg(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F", ordinal = 2), index = 0)
     private float modifyEquipProgressMainhand(float value) {
-        ViewModelModule viewModelModule = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
-        boolean isOldAnimationsEnabled = viewModelModule != null && viewModelModule.isEnabled() && viewModelModule.oldAnimation.get();
+        ViewModelFeature viewModelFeature = FEATURE_SERVICE.getStorage().getByClass(ViewModelFeature.class);
+        boolean isOldAnimationsEnabled = viewModelFeature != null && viewModelFeature.isEnabled() && viewModelFeature.oldAnimation.get();
 
         float attackCooldown = MC.player.getAttackStrengthScale(1f);
         float modifiedValue = isOldAnimationsEnabled ? 1f : attackCooldown * attackCooldown * attackCooldown;
@@ -59,7 +55,7 @@ public abstract class MixinItemInHandRenderer {
     @Inject(method = "renderArmWithItem", at = @At("HEAD"))
     private void onRenderItem(AbstractClientPlayer abstractClientPlayerEntity, float f, float g, InteractionHand hand, float h, ItemStack itemStack, float i, PoseStack matrices, SubmitNodeCollector orderedRenderCommandQueue, int j, CallbackInfo ci) {
 
-        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        ViewModelFeature vm = FEATURE_SERVICE.getStorage().getByClass(ViewModelFeature.class);
         boolean isMainHand = hand == InteractionHand.MAIN_HAND;
 
         if (vm != null && vm.isEnabled() && !(isMainHand && itemStack.isEmpty() && !vm.hand.get())) {
@@ -92,7 +88,7 @@ public abstract class MixinItemInHandRenderer {
 //    private void scaleItems(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand,
 //                            float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
 //                            VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-//        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+//        ViewModelFeature vm = Feature_SERVICE.getStorage().getByClass(ViewModelFeature.class);
 //        if (vm != null && vm.isEnabled()) {
 //            float s = vm.scale.get().floatValue();
 //            matrices.scale(s, s, s);
@@ -101,7 +97,7 @@ public abstract class MixinItemInHandRenderer {
 
     @Inject(method = "renderArmWithItem", at = @At("TAIL"))
     private void matricesPop(AbstractClientPlayer abstractClientPlayerEntity, float f, float g, InteractionHand hand, float h, ItemStack item, float i, PoseStack matrices, SubmitNodeCollector orderedRenderCommandQueue, int j, CallbackInfo ci) {
-        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        ViewModelFeature vm = FEATURE_SERVICE.getStorage().getByClass(ViewModelFeature.class);
         boolean isMainHand = hand == InteractionHand.MAIN_HAND;
 
         if (vm != null && vm.isEnabled() && !(isMainHand && item.isEmpty() && !vm.hand.get())) {
@@ -111,7 +107,7 @@ public abstract class MixinItemInHandRenderer {
 
     @Inject(method = "applyEatTransform", at = @At("HEAD"), cancellable = true)
     private void applyEatOrDrinkTransformation(PoseStack matrixStack, float tickDelta, HumanoidArm arm, ItemStack stack, Player player, CallbackInfo ci) {
-        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        ViewModelFeature vm = FEATURE_SERVICE.getStorage().getByClass(ViewModelFeature.class);
         if (vm != null && vm.isEnabled() && !vm.eating.get())
             ci.cancel();
     }
@@ -120,7 +116,7 @@ public abstract class MixinItemInHandRenderer {
             method = "applyEatTransform(Lcom/mojang/blaze3d/vertex/PoseStack;FLnet/minecraft/world/entity/HumanoidArm;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;)V",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void applyEatOrDrinkTransformation2(PoseStack matrices, float x, float y, float z, Operation<Void> original) {
-        ViewModelModule vm = MODULE_MANAGER.getStorage().getByClass(ViewModelModule.class);
+        ViewModelFeature vm = FEATURE_SERVICE.getStorage().getByClass(ViewModelFeature.class);
         if (vm != null && vm.isEnabled() && vm.eating.get()) {
             if (x == 0.0F && z == 0.0F) {
                 double mul = vm.eatingBob.get();

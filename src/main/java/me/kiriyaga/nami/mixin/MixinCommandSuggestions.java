@@ -37,17 +37,17 @@ public abstract class MixinCommandSuggestions {
     )
     private void onRefresh(CallbackInfo ci, @Local StringReader reader) {
         String text = this.input.getValue();
-        String prefix = Nami.COMMAND_MANAGER.getExecutor().getPrefix();
+        String prefix = Nami.COMMAND_SERVICE.getExecutor().getPrefix();
 
         if (text.startsWith(prefix) && reader.getCursor() == 0) {
             reader.setCursor(prefix.length());
 
             SharedSuggestionProvider source = this.minecraft.getConnection().getSuggestionsProvider();
-            this.currentParse = Nami.COMMAND_MANAGER.getSuggester().getDispatcher().parse(reader, source);
+            this.currentParse = Nami.COMMAND_SERVICE.getSuggester().getDispatcher().parse(reader, source);
 
             int cursor = this.input.getCursorPosition();
             if (cursor >= prefix.length() && (this.suggestions == null || !this.keepSuggestions)) {
-                this.pendingSuggestions = Nami.COMMAND_MANAGER.getSuggester().getDispatcher().getCompletionSuggestions(this.currentParse, cursor);
+                this.pendingSuggestions = Nami.COMMAND_SERVICE.getSuggester().getDispatcher().getCompletionSuggestions(this.currentParse, cursor);
                 this.pendingSuggestions.thenRun(() -> {
                     if (this.pendingSuggestions.isDone()) {
                         this.updateUsageInfo();
