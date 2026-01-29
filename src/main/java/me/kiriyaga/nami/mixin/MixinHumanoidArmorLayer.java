@@ -1,0 +1,27 @@
+package me.kiriyaga.nami.mixin;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import me.kiriyaga.nami.feature.module.impl.visuals.NoRenderModule;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.world.entity.EntityType;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static me.kiriyaga.nami.Nami.MODULE_MANAGER;
+
+@Mixin(HumanoidArmorLayer.class)
+public abstract class MixinHumanoidArmorLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>, A extends HumanoidModel<S>> {
+
+    @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;" + "Lnet/minecraft/client/renderer/SubmitNodeCollector;" + "ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;FF)V",at = @At("HEAD"), cancellable = true)
+    private void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, S renderState, float f, float g, CallbackInfo ci) {
+        NoRenderModule nr = MODULE_MANAGER.getStorage().getByClass(NoRenderModule.class);
+
+        if (nr != null && nr.isEnabled() && nr.noArmor.get() && renderState.entityType == EntityType.PLAYER)
+            ci.cancel();
+    }
+}
