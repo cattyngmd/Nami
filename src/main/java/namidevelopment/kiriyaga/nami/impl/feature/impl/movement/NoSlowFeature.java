@@ -3,29 +3,38 @@ package namidevelopment.kiriyaga.nami.impl.feature.impl.movement;
 import namidevelopment.kiriyaga.nami.event.EventPriority;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.impl.ItemUseSlowEvent;
+import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.util.Mth;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
 
 @RegisterFeature
 public class NoSlowFeature extends Feature {
-    public enum SlowMode {
-        NONE, VANILLA, GRIMV3
+    public enum Mode {
+        NONE, VANILLA, GRIMV3, GRIM
     }
 
     public enum InvMove {
         NONE, WAIT, STOP
     }
 
-    public final EnumSetting<SlowMode> mode = addSetting(new EnumSetting<>("Mode", SlowMode.VANILLA));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.VANILLA));
+    public final BoolSetting items = addSetting(new BoolSetting("Items", true));
     public final EnumSetting<InvMove> invMove = addSetting(new EnumSetting<>("MultiAction", InvMove.NONE));
     public final BoolSetting fastCrawl = addSetting(new BoolSetting("FastCrawl", false));
     //private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
@@ -34,29 +43,48 @@ public class NoSlowFeature extends Feature {
 
     public NoSlowFeature() {
         super("NoSlow", "Reduces slowdown effect caused on player.", FeatureCategory.of("Movement"), "noslow");
+        items.setShowCondition(()-> mode.get() != Mode.NONE);
+        onlyOnGround.setShowCondition(()-> mode.get() != Mode.NONE);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    private void onSlow(ItemUseSlowEvent ev){
-        if (MC.player == null || MC.level == null || !MC.player.isUsingItem() || MC.player.isFallFlying() || MC.player.isHandsBusy())
+    private void onItemUseSlowEvent(ItemUseSlowEvent ev){
+        if (!items.get() || MC.player == null || MC.level == null || !MC.player.isUsingItem() || MC.player.isFallFlying() || MC.player.isHandsBusy())
             return;
 
         if (onlyOnGround.get() && !MC.player.onGround())
             return;
 
-        if (mode.get() == SlowMode.VANILLA){
+        if (mode.get() == Mode.VANILLA){
             ev.cancel();
             return;
         }
 
         boolean boost = true; //cattyngmd
-        if (mode.get() == SlowMode.GRIMV3){
+        if (mode.get() == Mode.GRIMV3){
             boost = MC.player.tickCount % 3 == 0 || MC.player.tickCount % 4 == 0;
             //if (MC.player.age % 12 == 0) boost = false;
 
             if (boost){
                 ev.cancel();
                 return;
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    private void onPreTick(PreTickEvent event) {
+        if (mode.get() == Mode.GRIM && MC.player.isUsingItem() && !MC.player.isShiftKeyDown() && items.get()) {
+
+            if (isFood(MC.player.getActiveItem())) {
+                float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
+                float pitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
+
+                if (MC.player.getUsedItemHand() == InteractionHand.MAIN_HAND)
+                    sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.OFF_HAND, id, yaw, pitch));
+                else
+                    sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, yaw, pitch));
+
             }
         }
     }
@@ -96,5 +124,35 @@ public class NoSlowFeature extends Feature {
         }
 
         return null;
+    }
+
+    private boolean isFood(ItemStack stack) {
+        if (stack.isEmpty())
+            return false;
+
+        Item item = stack.getItem();
+
+        if (!item.components().has(DataComponents.FOOD))
+            return false;
+
+        if (!isPoisonedFood(item))
+            return false;
+
+        if (!isGapple(item))
+            return false;
+
+        return true;
+    }
+
+    private boolean isGapple(Item item) {
+        return item == Items.GOLDEN_APPLE
+                || item == Items.ENCHANTED_GOLDEN_APPLE;
+    }
+
+    private boolean isPoisonedFood(Item item) {
+        return item == Items.ROTTEN_FLESH
+                || item == Items.PUFFERFISH
+                || item == Items.SPIDER_EYE
+                || item == Items.CHORUS_FRUIT;
     }
 }
