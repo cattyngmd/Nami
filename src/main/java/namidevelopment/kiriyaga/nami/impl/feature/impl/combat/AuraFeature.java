@@ -111,7 +111,7 @@ public class AuraFeature extends Feature {
         ItemStack stack = MC.player.getMainHandItem();
         Entity target = TargetUtils.getTarget();
 
-        if (target == null || !isItemAWeapon(stack)) {
+        if (target == null || swap.get() == Swap.REQUIRE && !isItemAWeapon(stack)) {
             currentTarget = null;
             this.clearDisplayInfo();
             return;

@@ -62,7 +62,6 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting breakRotate = addSetting(new BoolSetting("BreakRotate","Rotate", true));
     public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
     public final BoolSetting breakMultitask = addSetting(new BoolSetting("BreakMultitask","Multitask", true));
-    public final BoolSetting breakPredict = addSetting(new BoolSetting("BreakPredict","Predict", false));
     public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
 
     //damages
@@ -88,7 +87,6 @@ public class AutoCrystalFeature extends Feature {
         breakSwing.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakMultitask.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakAge.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
-        breakPredict.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
 
         doPlace.setShowCondition(() -> page.get() == Page.PLACE);
         placeRange.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
@@ -170,10 +168,6 @@ public class AutoCrystalFeature extends Feature {
         if (!canBreak(target.crystal)) return;
 
         MC.gameMode.attack(MC.player, target.crystal);
-
-        if (breakPredict.get())
-            MC.level.removeEntity(target.crystal.getId(), Entity.RemovalReason.DISCARDED);
-        //TODO: removed client side crystals can be marked and stored somewhere, then we can validate their removing by receiving an packet (or, if they dont, just spawn them back)
 
         if (breakSwing.get())
             MC.player.swing(InteractionHand.MAIN_HAND);

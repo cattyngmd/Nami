@@ -49,13 +49,13 @@ public class NoSlowFeature extends Feature {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     private void onItemUseSlowEvent(ItemUseSlowEvent ev){
-        if (!items.get() || MC.player == null || MC.level == null || !MC.player.isUsingItem() || MC.player.isFallFlying() || MC.player.isHandsBusy())
+        if (!items.get() || MC.player == null || MC.level == null || !MC.player.isUsingItem() || MC.player.isFallFlying() || MC.player.isHandsBusy() || MC.player.isShiftKeyDown())
             return;
 
         if (onlyOnGround.get() && !MC.player.onGround())
             return;
 
-        if (mode.get() == Mode.VANILLA){
+        if (mode.get() == Mode.VANILLA || mode.get() == Mode.GRIM){
             ev.cancel();
             return;
         }
@@ -132,27 +132,6 @@ public class NoSlowFeature extends Feature {
 
         Item item = stack.getItem();
 
-        if (!item.components().has(DataComponents.FOOD))
-            return false;
-
-        if (!isPoisonedFood(item))
-            return false;
-
-        if (!isGapple(item))
-            return false;
-
-        return true;
-    }
-
-    private boolean isGapple(Item item) {
-        return item == Items.GOLDEN_APPLE
-                || item == Items.ENCHANTED_GOLDEN_APPLE;
-    }
-
-    private boolean isPoisonedFood(Item item) {
-        return item == Items.ROTTEN_FLESH
-                || item == Items.PUFFERFISH
-                || item == Items.SPIDER_EYE
-                || item == Items.CHORUS_FRUIT;
+        return item.components().has(DataComponents.FOOD);
     }
 }
