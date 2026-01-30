@@ -6,6 +6,7 @@ import namidevelopment.kiriyaga.nami.event.impl.PacketSendEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
+import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
 import namidevelopment.kiriyaga.nami.mixininterface.IPlayerInteractEntityC2SPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
@@ -15,44 +16,52 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.decoration.ItemFrame;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isPhased;
 
 @RegisterFeature
 public class CriticalsFeature extends Feature {
 
-    public enum CritMode { PACKET }
+    public enum Mode { PACKET, GRIM}
 
-    private final EnumSetting<CritMode> mode = addSetting(new EnumSetting<>("Mode", CritMode.PACKET));
+    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.PACKET));
+    private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
+    private final BoolSetting onlyStandingStill = addSetting(new BoolSetting("OnlyStandingStill", true));
 
     public CriticalsFeature() {
         super("Criticals", "Changes player movement for always critting.", FeatureCategory.of("Combat"));
+        onlyPhased.setShowCondition(() -> mode.get() == Mode.GRIM);
+        onlyStandingStill.setShowCondition(() -> mode.get() == Mode.GRIM);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void PacketSendEvent(PacketSendEvent event) {
-        if (!(event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet)) return;
-        if (packet.getType() != ServerboundInteractPacket.ActionType.ATTACK) return;
+        if (!(event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet))
+            return;
+        if (packet.getType() != ServerboundInteractPacket.ActionType.ATTACK)
+            return;
 
-        if (!isValidAttackContext()) return;
-
-        Entity target = packet.getEntity();
-        if (!(target instanceof LivingEntity living) || !living.isAlive()) return;
-
-        if (MC.player.isHandsBusy()) {
-            handleRidingAttack(target);
+        if (MC.player == null || MC.level == null || MC.player.isHandsBusy() || MC.player.isFallFlying() || MC.player.isInWater() || MC.player.isInLava() || MC.player.isSuppressingSlidingDownLadder() || MC.player.hasEffect(MobEffects.BLINDNESS)) {
             return;
         }
 
-        handleGroundedAttack();
+        Entity target = packet.getEntity();
+
+        if (!(target instanceof LivingEntity living) || !living.isAlive() || target instanceof EndCrystal || target instanceof ItemFrame) return;
+
+        if (MC.player.isHandsBusy()) {
+            ridingAttack(target);
+            return;
+        }
+
+        onGroundAttack();
     }
 
-    private boolean isValidAttackContext() {
-        return MC.player != null && MC.level != null && !MC.player.isHandsBusy() && !MC.player.isFallFlying() && !MC.player.isInWater() && !MC.player.isInLava() && !MC.player.isSuppressingSlidingDownLadder() && !MC.player.hasEffect(MobEffects.BLINDNESS);
-    }
-
-    private void handleRidingAttack(Entity target) {
-        if (mode.get() == CritMode.PACKET) {
+    private void ridingAttack(Entity target) {
+        if (mode.get() == Mode.PACKET) {
             for (int i = 0; i < 5; i++) {
                 MC.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, MC.player.isShiftKeyDown()));
                 MC.getConnection().send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
@@ -60,24 +69,40 @@ public class CriticalsFeature extends Feature {
         }
     }
 
-    private void handleGroundedAttack() {
-        spoofCritical();
-    }
-
-    private void spoofCritical() {
+    private void onGroundAttack() {
         double x = MC.player.getX();
         double y = MC.player.getY();
         double z = MC.player.getZ();
 
         switch (mode.get()) {
-            case PACKET -> spoofPacketCrit(x, y, z);
+            case PACKET -> packetCrit(x, y, z);
+            case GRIM -> grimCrit(x, y, z);
         }
     }
 
-    private void spoofPacketCrit(double x, double y, double z) {
-        if (!MC.player.onGround()) return;
+    private void packetCrit(double x, double y, double z) {
+        if (!MC.player.onGround())
+            return;
 
         MC.getConnection().send(new ServerboundMovePlayerPacket.Pos(x, y + 0.0625, z, false, false));
         MC.getConnection().send(new ServerboundMovePlayerPacket.Pos(x, y, z, false, false));
+    }
+
+    private void grimCrit(double x, double y, double z) {
+        if (!MC.player.onGround())
+            return;
+
+        if (onlyPhased.get() && !isPhased(MC.player))
+            return;
+
+        if (onlyStandingStill.get() && INPUT_SERVICE.hasAnyInput())
+            return;
+
+        float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
+        float pitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
+
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 0.0625, z, yaw, pitch, false, false));
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 0.0625013579, z, yaw, pitch, false, false));
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 1.3579e-6, z, yaw, pitch, false,false));
     }
 }
