@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static namidevelopment.kiriyaga.nami.Nami.CHAT_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @RegisterFeature
@@ -27,13 +28,15 @@ public class PatchFeature extends Feature {
     public final BoolSetting preventUpdateSlot = addSetting(new BoolSetting("PreventUpdateSlot", true));
     public final BoolSetting slotDragDesync = addSetting(new BoolSetting("SlotDragDesync", true));
     public final BoolSetting silentSwapFix = addSetting(new BoolSetting("SilentSwapFix", true));
+    public final BoolSetting setSlotDebug = addSetting(new BoolSetting("SetSlotDebug", false));
 
-    public final AtomicBoolean b = new AtomicBoolean(false);
+   // public final AtomicBoolean b = new AtomicBoolean(false);
 
     public PatchFeature() {
         super("Patch", "Any kind of hotfixes you should apply based on what server and ac u on.", FeatureCategory.of("Client"));
         if (!this.isEnabled())
             this.toggle();
+        setSlotDebug.setShow(false);
     }
 
     @Override
@@ -52,17 +55,34 @@ public class PatchFeature extends Feature {
     public void onPacketReceiveEvent(PacketReceiveEvent event) {
         Packet<?> p = event.getPacket();
 
-        if (b.get() && silentSwapFix.get() && p instanceof ClientboundContainerSetSlotPacket packet) {
+        if (silentSwapFix.get() && p instanceof ClientboundContainerSetSlotPacket packet) {
             if (MC.player != null) {
+                if (setSlotDebug.get()) {
+                MC.execute(() -> {
+                    CHAT_SERVICE.sendPersistent("ContainerID: ", "ContainerID: " +packet.getContainerId()+"");
+                    CHAT_SERVICE.sendPersistent("StateID: ", "StateID: " +packet.getStateId()+"");
+                    CHAT_SERVICE.sendPersistent("Item: ", "Item: " +packet.getItem()+"");
+                    CHAT_SERVICE.sendPersistent("Slot: ", "Slot: " +packet.getSlot()+"");
+                    CHAT_SERVICE.sendPersistent("Type: ", "Type: " +packet.type()+"");
+
+                });
+
+                }
                 if (packet.getContainerId() == 0) { // only player inventory, syncid of player inventory is always 0
                     int slot = packet.getSlot();
 
-                    if (slot >= 0 && slot <= 8) { // onlu hotbar
+                    if (slot >= 36 && slot <= 44) { // onlu hotbar
                         ItemStack packetStack = packet.getItem();
                         ItemStack handStack = MC.player.getMainHandItem();
 
                         if (!packetStack.isEmpty() && !handStack.isEmpty()) {
                             if (ItemStack.isSameItem(packetStack, handStack) && packetStack.getCount() == handStack.getCount()) {
+                                if (setSlotDebug.get()) {
+
+                                    MC.execute(() -> {
+                                        CHAT_SERVICE.sendPersistent("1", "canceled yo");
+                                    });
+                                }
                                 event.cancel(); // TODO: maybe delay it to 2 ticks instead of canceling, like in mio
                                 return;
                             }
@@ -70,7 +90,7 @@ public class PatchFeature extends Feature {
                     }
                 }
             }
-            b.set(false);
+         //   b.set(false);
         }
 
         if (preventUpdateSlot.get() && p instanceof ClientboundBundlePacket packet) {
