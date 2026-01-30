@@ -173,6 +173,7 @@ public class AutoCrystalFeature extends Feature {
 
         if (breakPredict.get())
             MC.level.removeEntity(target.crystal.getId(), Entity.RemovalReason.DISCARDED);
+        //TODO: removed client side crystals can be marked and stored somewhere, then we can validate their removing by receiving an packet (or, if they dont, just spawn them back)
 
         if (breakSwing.get())
             MC.player.swing(InteractionHand.MAIN_HAND);

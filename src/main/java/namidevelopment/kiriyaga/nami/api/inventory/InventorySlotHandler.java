@@ -1,5 +1,6 @@
 package namidevelopment.kiriyaga.nami.api.inventory;
 
+import namidevelopment.kiriyaga.nami.impl.feature.impl.client.PatchFeature;
 import namidevelopment.kiriyaga.nami.mixininterface.IClientPlayerInteractionManager;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
@@ -17,5 +18,8 @@ public class InventorySlotHandler {
 
     public void syncSelectedSlot(){
         ((IClientPlayerInteractionManager)MC.gameMode).updateSlot(); // this one is the same as mc default one
+
+        if (FEATURE_SERVICE.getStorage().getByClass(PatchFeature.class).silentSwapFix.get())
+            FEATURE_SERVICE.getStorage().getByClass(PatchFeature.class).b.set(true);
     }
 }
