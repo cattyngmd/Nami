@@ -30,7 +30,7 @@ public class PatchFeature extends Feature {
     public final BoolSetting silentSwapFix = addSetting(new BoolSetting("SilentSwapFix", true));
     public final BoolSetting setSlotDebug = addSetting(new BoolSetting("SetSlotDebug", false));
 
-   // public final AtomicBoolean b = new AtomicBoolean(false);
+    public final AtomicBoolean b = new AtomicBoolean(false);
 
     public PatchFeature() {
         super("Patch", "Any kind of hotfixes you should apply based on what server and ac u on.", FeatureCategory.of("Client"));
@@ -55,7 +55,7 @@ public class PatchFeature extends Feature {
     public void onPacketReceiveEvent(PacketReceiveEvent event) {
         Packet<?> p = event.getPacket();
 
-        if (silentSwapFix.get() && p instanceof ClientboundContainerSetSlotPacket packet) {
+        if (b.get() && silentSwapFix.get() && p instanceof ClientboundContainerSetSlotPacket packet) {
             if (MC.player != null) {
                 if (setSlotDebug.get()) {
                 MC.execute(() -> {
@@ -90,7 +90,7 @@ public class PatchFeature extends Feature {
                     }
                 }
             }
-         //   b.set(false);
+            b.set(false);
         }
 
         if (preventUpdateSlot.get() && p instanceof ClientboundBundlePacket packet) {

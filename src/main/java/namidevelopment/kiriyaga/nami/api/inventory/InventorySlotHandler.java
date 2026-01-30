@@ -19,7 +19,7 @@ public class InventorySlotHandler {
     public void syncSelectedSlot(){
         ((IClientPlayerInteractionManager)MC.gameMode).updateSlot(); // this one is the same as mc default one
 
-/*        if (FEATURE_SERVICE.getStorage().getByClass(PatchFeature.class).silentSwapFix.get())
-            FEATURE_SERVICE.getStorage().getByClass(PatchFeature.class).b.set(true);*/
+        if (FEATURE_SERVICE.getStorage().getByClass(PatchFeature.class).silentSwapFix.get())
+            FEATURE_SERVICE.getStorage().getByClass(PatchFeature.class).b.set(true);
     }
 }
