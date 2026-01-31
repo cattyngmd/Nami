@@ -21,11 +21,11 @@ import static namidevelopment.kiriyaga.nami.util.InteractionUtils.interactWithEn
 @RegisterFeature
 public class AutoNametagFeature extends Feature {
 
-    private final BoolSetting nametagged = addSetting(new BoolSetting("Nametagged", false));
-    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 10.0));
-    private final IntSetting delay = addSetting(new IntSetting("Delay", 10, 1, 20));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    public final BoolSetting nametagged = addSetting(new BoolSetting("Nametagged", false));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 10.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 10, 1, 20));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
     private int swapCooldown = 0;
 

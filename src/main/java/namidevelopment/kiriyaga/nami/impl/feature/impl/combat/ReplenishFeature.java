@@ -21,9 +21,9 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 @RegisterFeature
 public class ReplenishFeature extends Feature {
 
-    private final IntSetting percentage = addSetting(new IntSetting("Percentage", 20, 10, 50));
-    private final BoolSetting alternative = addSetting(new BoolSetting("Alternative", true));
-    private final BoolSetting inScreen = addSetting(new BoolSetting("InScreen", false));
+    public final IntSetting percentage = addSetting(new IntSetting("Percentage", 20, 10, 50));
+    public final BoolSetting alternative = addSetting(new BoolSetting("Alternative", true));
+    public final BoolSetting inScreen = addSetting(new BoolSetting("InScreen", false));
 
     private final Map<Integer, Integer> hotbarTicks = new HashMap<>();
     private final Map<Integer, Item> lastHotbarItems = new HashMap<>();

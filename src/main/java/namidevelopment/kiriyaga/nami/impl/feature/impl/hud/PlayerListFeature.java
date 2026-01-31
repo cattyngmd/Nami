@@ -21,9 +21,9 @@ public class PlayerListFeature extends HudElementFeature {
 
     public enum SortMode { ASCENDING, DESCENDING }
 
-    private final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
-    private final BoolSetting showDistance = addSetting(new BoolSetting("Distance", true));
-    private final BoolSetting showHealth = addSetting(new BoolSetting("Health", true));
+    public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
+    public final BoolSetting showDistance = addSetting(new BoolSetting("Distance", true));
+    public final BoolSetting showHealth = addSetting(new BoolSetting("Health", true));
 
     private final List<TextElement> elements = new ArrayList<>();
     private final DecimalFormat dec = new DecimalFormat("0.#");

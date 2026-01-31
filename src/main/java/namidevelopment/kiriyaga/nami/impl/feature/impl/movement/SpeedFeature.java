@@ -22,8 +22,8 @@ public class SpeedFeature extends Feature {
         ROTATION
     }
 
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.ROTATION));
-    private final BoolSetting inLiquid = addSetting(new BoolSetting("InWater", true));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.ROTATION));
+    public final BoolSetting inLiquid = addSetting(new BoolSetting("InWater", true));
 
     public SpeedFeature() {
         super("Speed", "Increases movement speed.", FeatureCategory.of("Movement"));

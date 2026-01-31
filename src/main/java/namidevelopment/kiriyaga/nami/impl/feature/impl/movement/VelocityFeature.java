@@ -41,17 +41,17 @@ public class VelocityFeature extends Feature {
 
     private enum Mode { VANILLA, WALLS, GRIM }
 
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.WALLS));
-    private final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("Horizontal", 100.0, 0.0, 100.0));
-    private final DoubleSetting verticalPercent = addSetting(new DoubleSetting("Vertical", 100.0, 0.0, 100.0));
-    private final BoolSetting handleKnockback = addSetting(new BoolSetting("Knockback", true));
-    private final BoolSetting handleExplosions = addSetting(new BoolSetting("Explosion", true));
-    private final BoolSetting concealMotion = addSetting(new BoolSetting("Conceal", false));
-    private final BoolSetting requireGround = addSetting(new BoolSetting("GroundOnly", false));
-    private final BoolSetting cancelEntityPush = addSetting(new BoolSetting("EntityPush", true));
-    private final BoolSetting cancelBlockPush = addSetting(new BoolSetting("BlockPush", true));
-    private final BoolSetting cancelLiquidPush = addSetting(new BoolSetting("LiquidPush", true));
-    private final BoolSetting cancelFishHook = addSetting(new BoolSetting("RodPush", false));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.WALLS));
+    public final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("Horizontal", 100.0, 0.0, 100.0));
+    public final DoubleSetting verticalPercent = addSetting(new DoubleSetting("Vertical", 100.0, 0.0, 100.0));
+    public final BoolSetting handleKnockback = addSetting(new BoolSetting("Knockback", true));
+    public final BoolSetting handleExplosions = addSetting(new BoolSetting("Explosion", true));
+    public final BoolSetting concealMotion = addSetting(new BoolSetting("Conceal", false));
+    public final BoolSetting requireGround = addSetting(new BoolSetting("GroundOnly", false));
+    public final BoolSetting cancelEntityPush = addSetting(new BoolSetting("EntityPush", true));
+    public final BoolSetting cancelBlockPush = addSetting(new BoolSetting("BlockPush", true));
+    public final BoolSetting cancelLiquidPush = addSetting(new BoolSetting("LiquidPush", true));
+    public final BoolSetting cancelFishHook = addSetting(new BoolSetting("RodPush", false));
 
     private boolean pendingConcealment = false;
     private boolean pendingVelocity = false;

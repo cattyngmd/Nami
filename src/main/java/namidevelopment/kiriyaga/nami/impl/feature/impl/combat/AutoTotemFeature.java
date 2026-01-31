@@ -31,15 +31,15 @@ public class AutoTotemFeature extends Feature {
 
     private enum Offhand { CRYSTAL, GAPPLE, ITEMFRAME, MENDING, TOTEM}
 
-    private final IntSetting health = addSetting(new IntSetting("Health", 12, 2, 36));
-    private final BoolSetting offhandOverride = addSetting(new BoolSetting("Override", false));
-    private final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("Item", Offhand.CRYSTAL));
-    private final BoolSetting swordGap = addSetting(new BoolSetting("SwordGap", true));
-    private final BoolSetting fastSwap = addSetting(new BoolSetting("Alternative", false));
-    private final BoolSetting mainhand = addSetting(new BoolSetting("Mainhand", false));
-    private final BoolSetting mainhandGapple = addSetting(new BoolSetting("MainhandGapple", false));
-    private final IntSetting mainhandSlot = addSetting(new IntSetting("Slot", 8, 0, 8));
-    private final BoolSetting deathLog = addSetting(new BoolSetting("Log", false));
+    public final IntSetting health = addSetting(new IntSetting("Health", 12, 2, 36));
+    public final BoolSetting offhandOverride = addSetting(new BoolSetting("Override", false));
+    public final EnumSetting<Offhand> overrideItem = addSetting(new EnumSetting<>("Item", Offhand.CRYSTAL));
+    public final BoolSetting swordGap = addSetting(new BoolSetting("SwordGap", true));
+    public final BoolSetting fastSwap = addSetting(new BoolSetting("Alternative", false));
+    public final BoolSetting mainhand = addSetting(new BoolSetting("Mainhand", false));
+    public final BoolSetting mainhandGapple = addSetting(new BoolSetting("MainhandGapple", false));
+    public final IntSetting mainhandSlot = addSetting(new IntSetting("Slot", 8, 0, 8));
+    public final BoolSetting deathLog = addSetting(new BoolSetting("Log", false));
 
     private final Map<String, String> deathReasons = new ConcurrentHashMap<>();
 

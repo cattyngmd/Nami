@@ -37,8 +37,8 @@ public class NoSlowFeature extends Feature {
     public final BoolSetting items = addSetting(new BoolSetting("Items", true));
     public final EnumSetting<InvMove> invMove = addSetting(new EnumSetting<>("MultiAction", InvMove.NONE));
     public final BoolSetting fastCrawl = addSetting(new BoolSetting("FastCrawl", false));
-    //private final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
-    private final BoolSetting onlyOnGround = addSetting(new BoolSetting("OnlyOnGround", true));
+    //public final BoolSetting fastWeb = addSetting(new BoolSetting("fast web", false));
+    public final BoolSetting onlyOnGround = addSetting(new BoolSetting("OnlyOnGround", true));
 
 
     public NoSlowFeature() {

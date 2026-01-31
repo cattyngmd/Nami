@@ -37,18 +37,18 @@ import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isReplaceable;
 public class SelfTrapFeature extends Feature {
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
-    private final BoolSetting face = addSetting(new BoolSetting("Face", true));
-    private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
-    private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
-    private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
-    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
-    private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    private final BoolSetting extension = addSetting(new BoolSetting("Extension", false));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
-    private final BoolSetting render = addSetting(new BoolSetting("Render", true));
-    private final BoolSetting jumpDisable = addSetting(new BoolSetting("JumpDisable", false));
-    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", false));
+    public final BoolSetting face = addSetting(new BoolSetting("Face", true));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
+    public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
+    public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
+    public final BoolSetting extension = addSetting(new BoolSetting("Extension", false));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
+    public final BoolSetting jumpDisable = addSetting(new BoolSetting("JumpDisable", false));
+    public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", false));
 
     private int cooldown = 0;
     private List<BlockPos> surroundPositions = new ArrayList<>();

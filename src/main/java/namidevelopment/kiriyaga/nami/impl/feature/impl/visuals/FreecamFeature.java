@@ -22,9 +22,9 @@ import static namidevelopment.kiriyaga.nami.Nami.ROTATION_SERVICE;
 
 @RegisterFeature
 public class FreecamFeature extends Feature {
-    private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 0.5, 0.1, 5.0));
-    private final DoubleSetting accelerate = addSetting(new DoubleSetting("Accelerate", 2.3, 1.0, 3.0));
-    private final BoolSetting look = addSetting(new BoolSetting("Look", true));
+    public final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 0.5, 0.1, 5.0));
+    public final DoubleSetting accelerate = addSetting(new DoubleSetting("Accelerate", 2.3, 1.0, 3.0));
+    public final BoolSetting look = addSetting(new BoolSetting("Look", true));
 
     @SuppressWarnings("FieldCanBeLocal")
     private double currentFactor = 1.0;

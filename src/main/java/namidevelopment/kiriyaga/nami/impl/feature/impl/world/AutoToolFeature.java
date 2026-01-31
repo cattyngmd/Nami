@@ -25,7 +25,7 @@ public class AutoToolFeature extends Feature {
     public enum EchestPriority {FORTUNE, SILK}
 
     public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
-    private final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
+    public final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
     public AutoToolFeature() {
         super("AutoTool", "Auto selects the currently best mining tool from your hotbar.", FeatureCategory.of("World"), "autotool");

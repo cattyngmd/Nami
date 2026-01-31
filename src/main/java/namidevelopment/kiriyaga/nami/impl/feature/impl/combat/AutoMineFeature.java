@@ -29,9 +29,9 @@ import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isPhased;
 public class AutoMineFeature extends Feature {
     public enum Mode {GRIM }
 
-    private final BoolSetting doubleMime = addSetting(new BoolSetting("DoubleMine", true));
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Logic", Mode.GRIM));
-    private final BoolSetting face = addSetting(new BoolSetting("face", true));
+    public final BoolSetting doubleMime = addSetting(new BoolSetting("DoubleMine", true));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Logic", Mode.GRIM));
+    public final BoolSetting face = addSetting(new BoolSetting("face", true));
 
     public AutoMineFeature() {
         super("AutoMine", "Manages which blocks shoulf SpeedMine Feature mine.", FeatureCategory.of("Combat"));

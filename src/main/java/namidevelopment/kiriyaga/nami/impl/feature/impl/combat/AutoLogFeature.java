@@ -27,13 +27,13 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 @RegisterFeature
 public class AutoLogFeature extends Feature {
 
-    private final IntSetting health = addSetting(new IntSetting("OnHealth", 12, 0, 36));
-    private final BoolSetting onRender = addSetting(new BoolSetting("OnRender", false));
-    private final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
-    private final BoolSetting onPop = addSetting(new BoolSetting("OnPop", false));
-    private final IntSetting onLevel = addSetting(new IntSetting("OnLevel", 0, 0, 15000));
-    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
-    private final BoolSetting reconnectToggle = addSetting(new BoolSetting("ReconnectToggle", true));
+    public final IntSetting health = addSetting(new IntSetting("OnHealth", 12, 0, 36));
+    public final BoolSetting onRender = addSetting(new BoolSetting("OnRender", false));
+    public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
+    public final BoolSetting onPop = addSetting(new BoolSetting("OnPop", false));
+    public final IntSetting onLevel = addSetting(new IntSetting("OnLevel", 0, 0, 15000));
+    public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
+    public final BoolSetting reconnectToggle = addSetting(new BoolSetting("ReconnectToggle", true));
 
     private boolean triggeredLevel = false;
     private boolean loggingOut = false;

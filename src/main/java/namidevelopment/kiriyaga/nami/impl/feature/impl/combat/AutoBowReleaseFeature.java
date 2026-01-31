@@ -21,8 +21,8 @@ import static namidevelopment.kiriyaga.nami.util.PacketUtils.sendSequencedPacket
 public class AutoBowReleaseFeature extends Feature {
     public enum TpsMode {NONE, LATEST, AVERAGE}
 
-    private final IntSetting ticks = addSetting(new IntSetting("Delay", 3, 0, 25));
-    private final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
+    public final IntSetting ticks = addSetting(new IntSetting("Delay", 3, 0, 25));
+    public final EnumSetting<TpsMode> tpsMode = addSetting(new EnumSetting<>("TPS", TpsMode.NONE));
 
     private float ticker = 0f;
 

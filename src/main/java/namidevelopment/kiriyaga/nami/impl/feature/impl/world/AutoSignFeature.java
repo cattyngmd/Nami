@@ -23,8 +23,8 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 @RegisterFeature
 public class AutoSignFeature extends Feature {
 
-    private final IntSetting delay = addSetting(new IntSetting("Delay", 5, 1, 20));
-    private final BoolSetting timestamp = addSetting(new BoolSetting("Timestamp", false));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 5, 1, 20));
+    public final BoolSetting timestamp = addSetting(new BoolSetting("Timestamp", false));
 
     private String[] cachedText = null;
     private AbstractSignEditScreen currentScreen = null;

@@ -14,7 +14,7 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 @RegisterFeature
 public class SprintFeature extends Feature {
 
-    private final BoolSetting inLiquid = addSetting(new BoolSetting("InLiquid", true));
+    public final BoolSetting inLiquid = addSetting(new BoolSetting("InLiquid", true));
 /*
     public final BoolSetting twobtwot = addSetting(new BoolSetting("2b2t", false));
 */

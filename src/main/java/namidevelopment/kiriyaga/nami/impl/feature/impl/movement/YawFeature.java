@@ -14,7 +14,7 @@ import static namidevelopment.kiriyaga.nami.util.RotationUtils.alignYaw;
 @RegisterFeature
 public class YawFeature extends Feature {
 
-    private final IntSetting directions = addSetting(new IntSetting("Directions", 8, 4, 16));
+    public final IntSetting directions = addSetting(new IntSetting("Directions", 8, 4, 16));
 
     public YawFeature() {
         super("Yaw", "Snap player yaw to nearest fixed angle.", FeatureCategory.of("Movement"));

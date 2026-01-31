@@ -15,7 +15,7 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 @RegisterFeature
 public class FastFallFeature extends Feature {
 
-    private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.00, 0.10, 5.00));
+    public final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.00, 0.10, 5.00));
 
     public FastFallFeature() {
         super("FastFall", "Fall from blocks faster.", FeatureCategory.of("Movement"), "fastfall");

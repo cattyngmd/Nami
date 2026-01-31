@@ -17,7 +17,7 @@ import static namidevelopment.kiriyaga.nami.Nami.SERVER_SERVICE;
 @RegisterFeature
 public class AutoWalkFeature extends Feature {
 
-    private final BoolSetting setbackStop = addSetting(new BoolSetting("SetbackStop", true));
+    public final BoolSetting setbackStop = addSetting(new BoolSetting("SetbackStop", true));
 
     public AutoWalkFeature() {
         super("AutoWalk", "Automatically makes you walk.", FeatureCategory.of("Movement"),"autowalk");

@@ -30,10 +30,10 @@ import static namidevelopment.kiriyaga.nami.util.ColorUtils.COLOR_ITEM;
 public class ItemSearchFeature extends Feature {
 
     private final WhitelistSetting itemWhitelist = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.ENTITY));
-    private final BoolSetting renderBoxes = addSetting(new BoolSetting("Render", true));
-    private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
-    private final BoolSetting itemFrames = addSetting(new BoolSetting("ItemFrames", false));
-    private final BoolSetting chatFeedback = addSetting(new BoolSetting("ChatFeedback", false));
+    public final BoolSetting renderBoxes = addSetting(new BoolSetting("Render", true));
+    public final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
+    public final BoolSetting itemFrames = addSetting(new BoolSetting("ItemFrames", false));
+    public final BoolSetting chatFeedback = addSetting(new BoolSetting("ChatFeedback", false));
 
     private final Set<Integer> sent = new HashSet<>();
     public ItemSearchFeature() {

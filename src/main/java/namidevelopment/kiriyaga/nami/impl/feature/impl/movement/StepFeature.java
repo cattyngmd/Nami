@@ -25,8 +25,8 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 @RegisterFeature
 public class StepFeature extends Feature {
 
-    private final DoubleSetting height = addSetting(new DoubleSetting("Height", 1.0, 0.5, 2.5));
-    private final BoolSetting teleport = addSetting(new BoolSetting("Teleport", false));
+    public final DoubleSetting height = addSetting(new DoubleSetting("Height", 1.0, 0.5, 2.5));
+    public final BoolSetting teleport = addSetting(new BoolSetting("Teleport", false));
 
     private double lastY;
 

@@ -33,17 +33,17 @@ public class AutoWebFeature extends Feature {
     public enum Item { COBWEB, SCAFFOLD }
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
-    private final EnumSetting<PlaceMode> placeMode = addSetting(new EnumSetting<>("PlaceMode", PlaceMode.LEGS));
-    private final EnumSetting<Item> item = addSetting(new EnumSetting<>("Item", Item.COBWEB));
-    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
-    private final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 5));
-    private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
-    private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
-    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
-    private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    private final BoolSetting render = addSetting(new BoolSetting("Render", false));
+    public final EnumSetting<PlaceMode> placeMode = addSetting(new EnumSetting<>("PlaceMode", PlaceMode.LEGS));
+    public final EnumSetting<Item> item = addSetting(new EnumSetting<>("Item", Item.COBWEB));
+    public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 5));
+    public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
+    public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;

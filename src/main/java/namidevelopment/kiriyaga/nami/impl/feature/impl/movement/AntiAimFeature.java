@@ -16,8 +16,8 @@ import static namidevelopment.kiriyaga.nami.Nami.ROTATION_SERVICE;
 @RegisterFeature
 public class AntiAimFeature extends Feature {
 
-    private final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("Speed", 5.0, 0.1, 50.0));
-    private final DoubleSetting pitchSetting = addSetting(new DoubleSetting("Pitch", 0.0, -90.0, 90.0));
+    public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("Speed", 5.0, 0.1, 50.0));
+    public final DoubleSetting pitchSetting = addSetting(new DoubleSetting("Pitch", 0.0, -90.0, 90.0));
 
     private float currentYaw = 0.0f;
 

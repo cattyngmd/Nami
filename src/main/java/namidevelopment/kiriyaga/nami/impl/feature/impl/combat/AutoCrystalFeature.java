@@ -44,7 +44,7 @@ import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 public class AutoCrystalFeature extends Feature {
     public enum Page {PLACE, BREAK, DAMAGES, RENDER}
 
-    private final EnumSetting<Page> page = addSetting(new EnumSetting<>("Page", Page.PLACE));
+    public final EnumSetting<Page> page = addSetting(new EnumSetting<>("Page", Page.PLACE));
 
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));

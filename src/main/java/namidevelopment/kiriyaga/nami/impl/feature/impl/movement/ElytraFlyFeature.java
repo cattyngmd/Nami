@@ -36,28 +36,28 @@ public class ElytraFlyFeature extends Feature {
     public final EnumSetting<FlyMode> mode = addSetting(new EnumSetting<>("Mode", FlyMode.BOUNCE));
 
     // GLIDE
-    private final IntSetting targetY = addSetting(new IntSetting("TargetY", 180, 60, 600));
-    private final IntSetting vLow = addSetting(new IntSetting("MinSpeed", 14, 6, 40));
-    private final IntSetting vHigh = addSetting(new IntSetting("MaxSpeed", 27, 10, 60));
-    private final IntSetting climbPitch = addSetting(new IntSetting("ClimbPitch", 40, 0, 60));
-    private final IntSetting divePitch = addSetting(new IntSetting("DivePitch", 38, 20, 60));
-    private final IntSetting cruiseMin = addSetting(new IntSetting("CruiseMin", 4, 0, 20));
-    private final IntSetting cruiseMax = addSetting(new IntSetting("CruiseMax", 12, 2, 25));
-    private final BoolSetting allowRockets = addSetting(new BoolSetting("AllowRockets", true));
+    public final IntSetting targetY = addSetting(new IntSetting("TargetY", 180, 60, 600));
+    public final IntSetting vLow = addSetting(new IntSetting("MinSpeed", 14, 6, 40));
+    public final IntSetting vHigh = addSetting(new IntSetting("MaxSpeed", 27, 10, 60));
+    public final IntSetting climbPitch = addSetting(new IntSetting("ClimbPitch", 40, 0, 60));
+    public final IntSetting divePitch = addSetting(new IntSetting("DivePitch", 38, 20, 60));
+    public final IntSetting cruiseMin = addSetting(new IntSetting("CruiseMin", 4, 0, 20));
+    public final IntSetting cruiseMax = addSetting(new IntSetting("CruiseMax", 12, 2, 25));
+    public final BoolSetting allowRockets = addSetting(new BoolSetting("AllowRockets", true));
     @SuppressWarnings("FieldCanBeLocal")
-    private final IntSetting rocketSpeed = addSetting(new IntSetting("RocketBelow", 9, 0, 30));
-    private final BoolSetting setbackStop = addSetting(new BoolSetting("SetbackStop", true));
+    public final IntSetting rocketSpeed = addSetting(new IntSetting("RocketBelow", 9, 0, 30));
+    public final BoolSetting setbackStop = addSetting(new BoolSetting("SetbackStop", true));
 
     //
     // CONTROL
-    //private final BoolSetting midAirFreeze = addSetting(new BoolSetting("mid air freeze", false));
-    private final BoolSetting lockPitch = addSetting(new BoolSetting("LockPitch", true));
+    //public final BoolSetting midAirFreeze = addSetting(new BoolSetting("mid air freeze", false));
+    public final BoolSetting lockPitch = addSetting(new BoolSetting("LockPitch", true));
 
     // BOOST
-    //private final BoolSetting boost = addSetting(new BoolSetting("Boost", false));
-    //private final BoolSetting newBoost = addSetting(new BoolSetting("NewBoost", false));
-    private final BoolSetting pitch = addSetting(new BoolSetting("Pitch", true));
-    private final IntSetting pitchDegree = addSetting(new IntSetting("Pitch", 75, 0, 90));
+    //public final BoolSetting boost = addSetting(new BoolSetting("Boost", false));
+    //public final BoolSetting newBoost = addSetting(new BoolSetting("NewBoost", false));
+    public final BoolSetting pitch = addSetting(new BoolSetting("Pitch", true));
+    public final IntSetting pitchDegree = addSetting(new IntSetting("Pitch", 75, 0, 90));
 
     private enum GlideState { DIVE, CRUISE, CLIMB }
     private GlideState glideState = GlideState.CRUISE;

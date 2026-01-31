@@ -16,7 +16,7 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 @RegisterFeature
 public class InvCleanerFeature extends Feature {
 
-    private final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 20));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 20));
     private final WhitelistSetting whitelist = addSetting(new WhitelistSetting("Whitelist", false, WhitelistSetting.Type.ITEM));
     private final WhitelistSetting blacklist = addSetting(new WhitelistSetting("Blacklist", true, WhitelistSetting.Type.ITEM));
 

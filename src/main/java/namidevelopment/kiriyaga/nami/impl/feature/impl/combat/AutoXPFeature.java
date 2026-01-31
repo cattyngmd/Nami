@@ -30,15 +30,15 @@ public class AutoXPFeature extends Feature {
 
     public enum SwapMode {NORMAL, SILENT }
 
-    private final IntSetting durability = addSetting(new IntSetting("Durability", 80, 70, 99));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
-    private final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
-    private final IntSetting packetShift = addSetting(new IntSetting("ShiftTicks", 3, 1, 6));
-    private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
-    private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
-    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
-    private final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
-    private final BoolSetting is1_12 = addSetting(new BoolSetting("1.12", false));
+    public final IntSetting durability = addSetting(new IntSetting("Durability", 80, 70, 99));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
+    public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
+    public final IntSetting packetShift = addSetting(new IntSetting("ShiftTicks", 3, 1, 6));
+    public final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
+    public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
+    public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
+    public final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
+    public final BoolSetting is1_12 = addSetting(new BoolSetting("1.12", false));
 
     public AutoXPFeature() {
         super("AutoXP", "Automatically repair armor with XP bottles.", FeatureCategory.of("Combat"), "autoxp");

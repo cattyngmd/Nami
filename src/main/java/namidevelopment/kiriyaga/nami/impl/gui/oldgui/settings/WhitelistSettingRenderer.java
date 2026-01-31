@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
 
 public class WhitelistSettingRenderer implements SettingRenderer<WhitelistSetting> {
-    private final BoolSettingRenderer boolRenderer = new BoolSettingRenderer();
+    public final BoolSettingRenderer boolRenderer = new BoolSettingRenderer();
 
     @Override
     public void render(GuiGraphics context, Font textRenderer, WhitelistSetting setting, int x, int y, int mouseX, int mouseY) {

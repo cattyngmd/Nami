@@ -28,8 +28,8 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 public class EntitySearchFeature extends Feature {
 
     private final WhitelistSetting entityWhitelist = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.ENTITY));
-    private final BoolSetting renderBoxes = addSetting(new BoolSetting("Render", true));
-    private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
+    public final BoolSetting renderBoxes = addSetting(new BoolSetting("Render", true));
+    public final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
 
     public EntitySearchFeature() {
         super("EntitySearch", "Searchs for specified entities.", FeatureCategory.of("Render"));

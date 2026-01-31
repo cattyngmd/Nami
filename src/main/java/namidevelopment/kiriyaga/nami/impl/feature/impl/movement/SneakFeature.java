@@ -33,9 +33,9 @@ public class SneakFeature extends Feature {
 
     private final Map<BlockPos, Color> checkedBlocks = new HashMap<>();
 
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.ALWAYS));
-    //private final BoolSetting render = addSetting(new BoolSetting("render", false));
-    //private final DoubleSetting edgeThreshold = addSetting(new DoubleSetting("EDGE_THRESHOLD", 0.2, 0.2, 1.4));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.ALWAYS));
+    //public final BoolSetting render = addSetting(new BoolSetting("render", false));
+    //public final DoubleSetting edgeThreshold = addSetting(new DoubleSetting("EDGE_THRESHOLD", 0.2, 0.2, 1.4));
 
     private static final double EDGE_THRESHOLD = 0.55;
     private static final int CHECK_RADIUS = 1;

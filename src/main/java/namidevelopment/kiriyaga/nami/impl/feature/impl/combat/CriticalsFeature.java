@@ -27,9 +27,9 @@ public class CriticalsFeature extends Feature {
 
     public enum Mode { PACKET, GRIM}
 
-    private final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.PACKET));
-    private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
-    private final BoolSetting onlyStandingStill = addSetting(new BoolSetting("OnlyStandingStill", true));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.PACKET));
+    public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
+    public final BoolSetting onlyStandingStill = addSetting(new BoolSetting("OnlyStandingStill", true));
 
     public CriticalsFeature() {
         super("Criticals", "Changes player movement for always critting.", FeatureCategory.of("Combat"));

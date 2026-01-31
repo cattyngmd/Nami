@@ -28,11 +28,11 @@ public class ClickActionFeature extends Feature {
 
     public enum GlidingAction  { NONE, FIREWORK, WIND}
 
-    private final EnumSetting<GroundAction> groundAction = addSetting(new EnumSetting<>("Ground", GroundAction.NONE));
-    private final EnumSetting<GlidingAction> glidingAction = addSetting(new EnumSetting<>("Gliding", GlidingAction.FIREWORK));
-    private final BoolSetting checkCooldown = addSetting(new BoolSetting("CheckCooldown", true));
-    private final BoolSetting entityCheck = addSetting(new BoolSetting("EntityCheck", true));
-    private final KeyBindSetting useKey = addSetting(new KeyBindSetting("Use", KeyBindSetting.KEY_NONE));
+    public final EnumSetting<GroundAction> groundAction = addSetting(new EnumSetting<>("Ground", GroundAction.NONE));
+    public final EnumSetting<GlidingAction> glidingAction = addSetting(new EnumSetting<>("Gliding", GlidingAction.FIREWORK));
+    public final BoolSetting checkCooldown = addSetting(new BoolSetting("CheckCooldown", true));
+    public final BoolSetting entityCheck = addSetting(new BoolSetting("EntityCheck", true));
+    public final KeyBindSetting useKey = addSetting(new KeyBindSetting("Use", KeyBindSetting.KEY_NONE));
 
     public ClickActionFeature() {
         super("ClickAction", "Uses configured item when pressing key.", FeatureCategory.of("Combat"), "clickpearl");

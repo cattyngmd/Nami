@@ -33,17 +33,17 @@ import static namidevelopment.kiriyaga.nami.util.InteractionUtils.*;
 public class ScaffoldFeature extends Feature {
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
-    private final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
-    private final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
-    private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
-    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
-    private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
+    public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
+    public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
-    private final BoolSetting singleBlock = addSetting(new BoolSetting("SingleBlock", true));
-    private final BoolSetting lookBack = addSetting(new BoolSetting("LookBack", true));
-    private final BoolSetting render = addSetting(new BoolSetting("Render", false));
+    public final BoolSetting singleBlock = addSetting(new BoolSetting("SingleBlock", true));
+    public final BoolSetting lookBack = addSetting(new BoolSetting("LookBack", true));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;

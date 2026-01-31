@@ -43,12 +43,12 @@ public class LiquidFillFeature extends Feature {
     }
 
     // TODO: shift ticks, or maybe not?
-    private final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 10));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
-    private final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
-    private final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("Liquid", LiquidType.BOTH));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
+    public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
+    public final EnumSetting<LiquidType> liquidType = addSetting(new EnumSetting<>("Liquid", LiquidType.BOTH));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;

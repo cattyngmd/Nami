@@ -28,7 +28,7 @@ public class AnnouncerFeature extends Feature {
     public final BoolSetting friends = addSetting(new BoolSetting("Friends", true));
     public final BoolSetting joinAnnounce = addSetting(new BoolSetting("JoinAnnounce", false));
     public final BoolSetting visualRange = addSetting(new BoolSetting("VisualRange", false));
-    private final EnumSetting<VisualRangeMode> soundMode = addSetting(new EnumSetting<>("Sound", VisualRangeMode.NONE));
+    public final EnumSetting<VisualRangeMode> soundMode = addSetting(new EnumSetting<>("Sound", VisualRangeMode.NONE));
 
     public AnnouncerFeature() {
         super("Announcer", "Announces in chat when a certain action happened.", FeatureCategory.of("Miscellaneous"), "joinannounce", "joins", "announce", "visualrange");

@@ -24,11 +24,11 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 @RegisterFeature
 public class AutoEatFeature extends Feature {
 
-    private final IntSetting swapDelayTicksSetting = addSetting(new IntSetting("Delay", 5, 1, 20));
-    private final DoubleSetting minHunger = addSetting(new DoubleSetting("Hunger", 19.0, 0.0, 19.0));
-    private final DoubleSetting minHealth = addSetting(new DoubleSetting("Health", 0.0, 0.0, 19.0));
-    private final BoolSetting allowGapples = addSetting(new BoolSetting("Gapples", true));
-    private final BoolSetting allowPoisoned = addSetting(new BoolSetting("Poisoned", false));
+    public final IntSetting swapDelayTicksSetting = addSetting(new IntSetting("Delay", 5, 1, 20));
+    public final DoubleSetting minHunger = addSetting(new DoubleSetting("Hunger", 19.0, 0.0, 19.0));
+    public final DoubleSetting minHealth = addSetting(new DoubleSetting("Health", 0.0, 0.0, 19.0));
+    public final BoolSetting allowGapples = addSetting(new BoolSetting("Gapples", true));
+    public final BoolSetting allowPoisoned = addSetting(new BoolSetting("Poisoned", false));
 
     public final AtomicBoolean eating = new AtomicBoolean(false);
     private volatile int swapCooldown = 0;

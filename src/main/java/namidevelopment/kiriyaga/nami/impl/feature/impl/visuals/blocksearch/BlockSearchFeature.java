@@ -34,9 +34,9 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 public class BlockSearchFeature extends Feature {
 
     private final WhitelistSetting blockList = addSetting(new WhitelistSetting("Whitelist", true, WhitelistSetting.Type.BLOCK));
-    private final BoolSetting fill = addSetting(new BoolSetting("Fill", true));
-    private final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
-    private final BoolSetting notAtSpawn = addSetting(new BoolSetting("NotAtSpawn", false));
+    public final BoolSetting fill = addSetting(new BoolSetting("Fill", true));
+    public final BoolSetting tracers = addSetting(new BoolSetting("Tracers", false));
+    public final BoolSetting notAtSpawn = addSetting(new BoolSetting("NotAtSpawn", false));
 
     private Set<Identifier> candidateIds = new HashSet<>();
     private final BlockingQueue<ChunkSnapshot> snapshotQueue = new LinkedBlockingQueue<>();

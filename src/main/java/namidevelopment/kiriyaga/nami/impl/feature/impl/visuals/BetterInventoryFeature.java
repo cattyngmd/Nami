@@ -32,8 +32,8 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 public class BetterInventoryFeature extends Feature {
 
     private final WhitelistSetting highlightSlots = addSetting(new WhitelistSetting("HighlightSlots", true, WhitelistSetting.Type.ITEM));
-    private final BoolSetting shulkerFillBar = addSetting(new BoolSetting("ShulkerFill", true));
-    private final BoolSetting dominantItem = addSetting(new BoolSetting("DominantItem", false));
+    public final BoolSetting shulkerFillBar = addSetting(new BoolSetting("ShulkerFill", true));
+    public final BoolSetting dominantItem = addSetting(new BoolSetting("DominantItem", false));
 
     public BetterInventoryFeature() {
         super("BetterInventory", "Quality of life features to improve inventory managment.", FeatureCategory.of("Render"), "betterinventory");

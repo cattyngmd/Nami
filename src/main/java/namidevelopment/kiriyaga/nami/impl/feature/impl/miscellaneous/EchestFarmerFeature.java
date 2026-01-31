@@ -28,11 +28,11 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 public class EchestFarmerFeature extends Feature {
 
     public final DoubleSetting distance = addSetting(new DoubleSetting("Range", 3.0, 1.0, 6.0));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
-    private final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
-    private final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
-    private final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    private final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
+    public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 

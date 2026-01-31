@@ -29,7 +29,7 @@ public class AgroFeature extends Feature {
         CREAKING
     }
 
-    private final EnumSetting<Mode> modeSetting = new EnumSetting<>("Mode", Mode.ENDERMAN);
+    public final EnumSetting<Mode> modeSetting = new EnumSetting<>("Mode", Mode.ENDERMAN);
 
     public AgroFeature() {
         super("Agro", "Automatically looks at certain mobs.", FeatureCategory.of("Miscellaneous"));

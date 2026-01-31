@@ -16,9 +16,9 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 @RegisterFeature
 public class FastAccelFeature extends Feature {
 
-    private final BoolSetting inAir = addSetting(new BoolSetting("InAir", false));
-    private final BoolSetting inWater = addSetting(new BoolSetting("InWater", false));
-    private final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.0, 0.1, 5.0));
+    public final BoolSetting inAir = addSetting(new BoolSetting("InAir", false));
+    public final BoolSetting inWater = addSetting(new BoolSetting("InWater", false));
+    public final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.0, 0.1, 5.0));
     private static final double DEFAULT_SPEED = 0.2873;
 
     public FastAccelFeature() {
