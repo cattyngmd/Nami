@@ -10,10 +10,12 @@ import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.impl.client.RotationsFeature;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
+import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
 import namidevelopment.kiriyaga.nami.util.Timer;
 import namidevelopment.kiriyaga.nami.util.entity.TargetUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -35,13 +37,14 @@ public class AutoPotFeature extends Feature { // TODO: refactor this
     public enum SwapMode { NORMAL, SILENT }
     public enum ThrowMode { ABOVE, UNDER }
 
-    private final EnumSetting<Pot> potEffect = addSetting(new EnumSetting<>("Effect", Pot.RESISTANCE));
-    private final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
-    private final EnumSetting<ThrowMode> throwMode = addSetting(new EnumSetting<>("Throw", ThrowMode.UNDER));
-    private final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
-    private final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
-    private final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
-    private final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
+    public final EnumSetting<Pot> potEffect = addSetting(new EnumSetting<>("Effect", Pot.RESISTANCE));
+    public final IntSetting amplifier = addSetting(new IntSetting("Amplifier", 1, 0, 4));
+    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
+    public final EnumSetting<ThrowMode> throwMode = addSetting(new EnumSetting<>("Throw", ThrowMode.UNDER));
+    public final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
+    public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
+    public final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
+    public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
 
     private final Timer throwTimer = new Timer();
 
@@ -52,9 +55,8 @@ public class AutoPotFeature extends Feature { // TODO: refactor this
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onPreTick(PreTickEvent ev) {
-        if (!isEnabled() || MC.player == null || MC.level == null) return;
-
-        if (MC.player.hasEffect(potEffect.get().getEffect())) {
+        if (MC.player == null || MC.level == null) return;
+        if (MC.player.getEffect(potEffect.get().getEffect()) != null && MC.player.getEffect(potEffect.get().getEffect()).getAmplifier() >= amplifier.get()) {
             if (selfToggle.get())
                 toggle();
             return;
@@ -74,7 +76,7 @@ public class AutoPotFeature extends Feature { // TODO: refactor this
         }
 
         int potSlot = getSlot(potEffect.get());
-        int potInvSlot = getSlotInInventory(potEffect.get());
+        int potInvSlot = findPot(potEffect.get());
         int prev = MC.player.getInventory().getSelectedSlot();
         if (potSlot == -1) {
             if (potInvSlot != -1) {
@@ -163,15 +165,15 @@ public class AutoPotFeature extends Feature { // TODO: refactor this
     }
 
     private int getSlot(Pot targetEffect) {
+        int requiredAmp = amplifier.get();
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.isEmpty() || stack.getItem() != Items.SPLASH_POTION) continue;
-
             PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
             if (contents == null) continue;
 
             for (MobEffectInstance inst : contents.getAllEffects()) {
-                if (inst.getEffect() == targetEffect.getEffect()) {
+                if (inst.getEffect() == targetEffect.getEffect() && inst.getAmplifier() >= requiredAmp) {
                     return i;
                 }
             }
@@ -188,18 +190,16 @@ public class AutoPotFeature extends Feature { // TODO: refactor this
         INVENTORY_SERVICE.getClickHandler().pickupSlot(realInv);
     }
 
-    private int getSlotInInventory(AutoPotFeature.Pot targetEffect) {
-        LocalPlayer player = MC.player;
-
+    private int findPot(Pot targetEffect) {
+        int requiredAmp = amplifier.get();
         for (int i = 0; i < 36; i++) {
-            ItemStack stack = player.getInventory().getItem(i);
+            ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.isEmpty() || stack.getItem() != Items.SPLASH_POTION) continue;
-
             PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
             if (contents == null) continue;
 
             for (MobEffectInstance inst : contents.getAllEffects()) {
-                if (inst.getEffect() == targetEffect.getEffect()) {
+                if (inst.getEffect() == targetEffect.getEffect() && inst.getAmplifier() >= requiredAmp) {
                     return i;
                 }
             }
@@ -207,26 +207,21 @@ public class AutoPotFeature extends Feature { // TODO: refactor this
         return -1;
     }
 
+
     public enum Pot {
-        STRENGTH(MobEffects.STRENGTH, Items.SPLASH_POTION),
-        SPEED(MobEffects.SPEED, Items.SPLASH_POTION),
-        JUMP_BOOST(MobEffects.JUMP_BOOST, Items.SPLASH_POTION),
-        RESISTANCE(MobEffects.RESISTANCE, Items.SPLASH_POTION);
+        STRENGTH(MobEffects.STRENGTH),
+        SPEED(MobEffects.SPEED),
+        JUMP_BOOST(MobEffects.JUMP_BOOST),
+        RESISTANCE(MobEffects.RESISTANCE);
 
-        private final Holder effect;
-        private final Item item;
+        private final Holder<MobEffect> effect;
 
-        Pot(Holder effect, Item item) {
+        Pot(Holder<MobEffect> effect) {
             this.effect = effect;
-            this.item = item;
         }
 
-        public Holder getEffect() {
+        public Holder<MobEffect> getEffect() {
             return effect;
-        }
-
-        public Item getItem() {
-            return item;
         }
     }
 
