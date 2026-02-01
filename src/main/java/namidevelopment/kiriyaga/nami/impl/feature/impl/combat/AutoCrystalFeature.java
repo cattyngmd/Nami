@@ -139,7 +139,7 @@ public class AutoCrystalFeature extends Feature {
 
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private void onPacketReceiveEvent(PacketReceiveEvent event) {
+    private void onAddEntityEvent(AddEntityEvent event) {
         if (breakSequential.get() != Sequential.FULL) return;
 
         if (event.getPacket() instanceof ClientboundAddEntityPacket packet) {
