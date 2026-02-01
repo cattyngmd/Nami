@@ -30,11 +30,11 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: Get version from Gradle
+      - name: Get version
         id: version
         run: echo "version=$(./gradlew -q printVersion)" >> $GITHUB_OUTPUT
 
-      - name: Create tag if not exists
+      - name: Create tag
         id: tag
         run: |
           TAG="${{ steps.version.outputs.version }}"
@@ -53,10 +53,33 @@ jobs:
             echo "tag_exists=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Generate release body
+        id: release_body
+        run: |
+          # last tag (before current)
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          # current tag
+          TAG="${{ steps.version.outputs.version }}"
+          if [[ "$TAG" != v* ]]; then
+            TAG="v$TAG"
+          fi
+
+          # commits list
+          if [[ -z "$LAST_TAG" ]]; then
+            COMMITS=$(git log --pretty=format:'- %s by @%an' "$TAG")
+          else
+            COMMITS=$(git log "$LAST_TAG..$TAG" --pretty=format:'- %s by @%an')
+          fi
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Build
         run: ./gradlew clean build remapJar --stacktrace
 
-      - name: Rename JARs
+      - name: Rename JAR
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           for jar in build/libs/*.jar; do
@@ -64,13 +87,13 @@ jobs:
             mv "$jar" "build/libs/nami-${VERSION}-${BASENAME}"
           done
 
-      - name: Create GitHub Release & upload assets
+      - name: Upload release
         if: steps.tag.outputs.tag_exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.version }}
           name: ${{ steps.version.outputs.version }}
-          body: "${{ steps.version.outputs.version }}"
+          body: ${{ steps.release_body.outputs.body }}
           files: build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
