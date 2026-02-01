@@ -291,7 +291,10 @@ public class AutoCrystalFeature extends Feature {
 
         float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
 
-        if (selfDamage > maxSelfDamage.get() || (noSelfPop.get() && selfDamage >= (MC.player.getHealth() + MC.player.getAbsorptionAmount())))
+        if (selfDamage > maxSelfDamage.get())
+            return -1f;
+
+        if (selfDamage + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
             return -1f;
 
 
@@ -422,9 +425,12 @@ public class AutoCrystalFeature extends Feature {
     private float calculatePlaceDamage(Vec3 crystalPos) {
         float totalDamage = 0f;
 
-        float self = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
+        float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
 
-        if (self > maxSelfDamage.get() || (noSelfPop.get() && self > MC.player.getHealth() + MC.player.getAbsorptionAmount()))
+        if (selfDamage > maxSelfDamage.get())
+            return -1f;
+
+        if (selfDamage + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
             return -1f;
 
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 15)) {
