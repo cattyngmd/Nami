@@ -126,7 +126,7 @@ public class AutoCrystalFeature extends Feature {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private void onPacketReceive(AddEntityEvent event) {
+    private void onAddEntityEvent(AddEntityEvent event) {
         if (MC.player == null || MC.level == null) {
 /*            MC.execute(()-> {
                 CHAT_SERVICE.sendPersistent("c2134412123a", "Return bevcause of level or player = null");
