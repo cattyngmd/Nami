@@ -1,6 +1,9 @@
-name: build_upload_release
+name: Build and Release
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -27,39 +30,47 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
+      - name: Get version from Gradle
+        id: version
+        run: echo "version=$(./gradlew -q printVersion)" >> $GITHUB_OUTPUT
+
+      - name: Create tag if not exists
+        id: tag
+        run: |
+          TAG="${{ steps.version.outputs.version }}"
+          if [[ "$TAG" != v* ]]; then
+            TAG="v$TAG"
+          fi
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG already exists"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "$TAG"
+            git push origin "$TAG"
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build
         run: ./gradlew clean build remapJar --stacktrace
 
-      - name: Set safe branch name
-        run: |
-          SAFE_BRANCH="${{ github.ref_name }}"
-          SAFE_BRANCH="${SAFE_BRANCH//./-}"
-          echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
-
       - name: Rename JARs
         run: |
+          VERSION="${{ steps.version.outputs.version }}"
           for jar in build/libs/*.jar; do
             BASENAME=$(basename "$jar")
-            mv "$jar" "build/libs/nami-${SAFE_BRANCH}-${BASENAME}"
+            mv "$jar" "build/libs/nami-${VERSION}-${BASENAME}"
           done
 
-      - name: Create Release
-        id: create_release
+      - name: Create GitHub Release & upload assets
+        if: steps.tag.outputs.tag_exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.SAFE_BRANCH }}
-          name: ${{ env.SAFE_BRANCH }}
-          body: "Automated release from branch `${{ github.ref_name }}`"
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.SAFE_BRANCH }}
-          name: ${{ env.SAFE_BRANCH }}
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          body: "${{ steps.version.outputs.version }}"
           files: build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -116,3 +116,8 @@ tasks.named("remapJar") {
     inputFile.set(tasks.named("jar").get().archiveFile)
 }
 
+tasks.register("printVersion") {
+    doLast {
+        println project.version
+    }
+}
