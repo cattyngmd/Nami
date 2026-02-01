@@ -3,10 +3,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.impl.combat;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.RemoveEntityEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.nami.event.impl.*;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
@@ -141,21 +138,12 @@ public class AutoCrystalFeature extends Feature {
     }
 
 
-/*    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private void onAddEntityEvent(AddEntityEvent event) {
-        if (MC.player == null || MC.level == null) {
-*//*            MC.execute(()-> {
-                CHAT_SERVICE.sendPersistent("c2134412123a", "Return bevcause of level or player = null");
-            });*//*
-            return;
-        }
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    private void onPacketReceiveEvent(PacketReceiveEvent event) {
         if (breakSequential.get() != Sequential.FULL) return;
 
         if (event.getPacket() instanceof ClientboundAddEntityPacket packet) {
             if (packet.getType() != EntityType.END_CRYSTAL) {
-*//*                MC.execute(()-> {
-                    CHAT_SERVICE.sendPersistent("c21232133123a", "Return bevcause of EntytiType check");
-                });*//*
                 return;
             }
 
@@ -166,7 +154,7 @@ public class AutoCrystalFeature extends Feature {
 
             doBreakOnNetty(fake);
         }
-    }*/
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTickEvent(PreTickEvent event) {
@@ -205,18 +193,10 @@ public class AutoCrystalFeature extends Feature {
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
     }
 
-    private void doBreakOnNetty(EndCrystal crystal) {
-        if (MC.player == null || MC.level == null)  {
-/*            MC.execute(()-> {
-                CHAT_SERVICE.sendPersistent("ca1", "Return because of mc level or player null");
-            });*/
-            return;
-        }
+    private void doBreakOnNetty(EndCrystal crystal) { // we are not on netty actually
+
 
         if (!breakMultitask.get() && MC.player.isUsingItem())  {
-/*            MC.execute(()-> {
-                CHAT_SERVICE.sendPersistent("casd", "return because of multitask");
-            });*/
             return;
         }
 
@@ -230,16 +210,10 @@ public class AutoCrystalFeature extends Feature {
         }
 
         if (!canBreak(crystal)) {
-/*            MC.execute(()-> {
-                CHAT_SERVICE.sendPersistent("c213123a", "Return bevcause of CanBreak");
-            });*/
             return;
         }
 
         MC.player.connection.send(ServerboundInteractPacket.createAttackPacket(crystal, MC.player.isShiftKeyDown()));
-/*        MC.execute(()-> {
-            CHAT_SERVICE.sendPersistent("ca", "Sended break from netty");
-        });*/
 
         if (breakSwing.get())
             MC.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
