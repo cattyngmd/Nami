@@ -79,8 +79,8 @@ public class AuraFeature extends Feature {
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onTick(PreTickEvent event) {
-        if (MC.player == null || MC.level == null) return;
+    public void onPreTickEvent(PreTickEvent event) {
+        if (MC.player == null || MC.level == null || MC.player.isDeadOrDying()) return;
         this.clearDisplayInfo();
 
         AutoCrystalFeature ac = FEATURE_SERVICE.getStorage().getByClass(AutoCrystalFeature.class);
@@ -285,7 +285,7 @@ public class AuraFeature extends Feature {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRender3D(Render3DEvent event) {
-        if (!render.get() || currentTarget == null) return;
+        if (!render.get() || currentTarget == null || MC.player == null || MC.player.isDeadOrDying()) return;
 
         AutoCrystalFeature ac = FEATURE_SERVICE.getStorage().getByClass(AutoCrystalFeature.class);
         if (ac.isEnabled() && ac.lastTotalDamage >= ac.minDamage.get())

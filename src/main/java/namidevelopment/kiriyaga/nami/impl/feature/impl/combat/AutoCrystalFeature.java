@@ -154,7 +154,7 @@ public class AutoCrystalFeature extends Feature {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTickEvent(PreTickEvent event) {
-        if (MC.player == null) return;
+        if (MC.player == null || MC.player.isDeadOrDying()) return;
         lastCalcTimeMs = 0;
 
         if (doBreak.get()) {
