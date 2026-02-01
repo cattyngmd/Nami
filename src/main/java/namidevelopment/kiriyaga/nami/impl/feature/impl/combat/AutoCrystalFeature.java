@@ -160,18 +160,17 @@ public class AutoCrystalFeature extends Feature {
         if (doBreak.get()) {
             if (breakTimer > 0) {
                 breakTimer--;
-                return;
-            }
-            doBreak();
+            } else
+                doBreak();
         }
 
         if (doPlace.get()) {
             if (placeTimer > 0) {
                 placeTimer--;
-                return;
+            } else {
+                lastTotalDamage = 0;
+                doPlace();
             }
-            lastTotalDamage = 0;
-            doPlace();
         }
 
         this.clearDisplayInfo();
