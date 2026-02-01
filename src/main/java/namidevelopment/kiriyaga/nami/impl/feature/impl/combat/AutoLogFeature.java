@@ -3,8 +3,8 @@ package namidevelopment.kiriyaga.nami.impl.feature.impl.combat;
 import namidevelopment.kiriyaga.nami.api.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.nami.event.EventPriority;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
+import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
 import namidevelopment.kiriyaga.nami.event.impl.DissconectEvent;
-import namidevelopment.kiriyaga.nami.event.impl.EntitySpawnEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
@@ -101,10 +101,10 @@ public class AutoLogFeature extends Feature {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onEntitySpawn(EntitySpawnEvent event) {
+    public void onEntitySpawn(AddEntityEvent event) {
         if (MC.player == null || MC.level == null || !packet.get() || !onRender.get()) return;
 
-        if (event.getEntity() instanceof Player player) {
+        if (MC.level.getEntity(event.getPacket().getId()) instanceof Player player) {
 
             if (player == MC.player)
                 return;

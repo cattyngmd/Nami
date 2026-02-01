@@ -1,10 +1,12 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
+import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
 import namidevelopment.kiriyaga.nami.event.impl.ChatMessageEvent;
 import namidevelopment.kiriyaga.nami.event.impl.ChunkDataEvent;
 import namidevelopment.kiriyaga.nami.event.impl.WorldTimeUpdateEvent;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -29,6 +31,12 @@ public class MixinClientPacketListener {
         if (event.isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "handleAddEntity", at = @At("TAIL"))
+    private void onHandleAddEntity(ClientboundAddEntityPacket packet, CallbackInfo ci) {
+        AddEntityEvent event = new AddEntityEvent(packet);
+        EVENT_SERVICE.post(event);
     }
 
     @Inject(method = "handleLevelChunkWithLight", at = @At("TAIL"))

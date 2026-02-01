@@ -2,6 +2,8 @@ package namidevelopment.kiriyaga.nami.impl.feature.impl.combat;
 
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.EventPriority;
+import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
+import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
@@ -19,6 +21,10 @@ import namidevelopment.kiriyaga.nami.util.entity.DamageUtils;
 import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,6 +49,7 @@ import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 @RegisterFeature
 public class AutoCrystalFeature extends Feature {
     public enum Page {PLACE, BREAK, DAMAGES, RENDER}
+    public enum Sequential {NONE, FULL }
 
     public final EnumSetting<Page> page = addSetting(new EnumSetting<>("Page", Page.PLACE));
 
@@ -63,6 +70,7 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
     public final BoolSetting breakMultitask = addSetting(new BoolSetting("BreakMultitask","Multitask", true));
     public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
+    public final EnumSetting<Sequential> sequential = addSetting(new EnumSetting<>("Sequential", Sequential.NONE));
 
     //damages
     public final BoolSetting assumeBestArmor = addSetting(new BoolSetting("AssumeBestArmor", true));
@@ -87,6 +95,7 @@ public class AutoCrystalFeature extends Feature {
         breakSwing.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakMultitask.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakAge.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        sequential.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
 
         doPlace.setShowCondition(() -> page.get() == Page.PLACE);
         placeRange.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
@@ -111,6 +120,33 @@ public class AutoCrystalFeature extends Feature {
         placeTimer = 0;
         lastTotalDamage = 0;
         lastCalcTimeMs = 0;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    private void onPacketReceive(AddEntityEvent event) {
+        if (MC.player == null || MC.level == null) {
+/*            MC.execute(()-> {
+                CHAT_SERVICE.sendPersistent("c2134412123a", "Return bevcause of level or player = null");
+            });*/
+            return;
+        }
+        if (sequential.get() != Sequential.FULL) return;
+
+        if (event.getPacket() instanceof ClientboundAddEntityPacket packet) {
+            if (packet.getType() != EntityType.END_CRYSTAL) {
+/*                MC.execute(()-> {
+                    CHAT_SERVICE.sendPersistent("c21232133123a", "Return bevcause of EntytiType check");
+                });*/
+                return;
+            }
+
+            Vec3 pos = new Vec3(packet.getX(), packet.getY(), packet.getZ());
+            EndCrystal fake = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
+            fake.setPos(pos);
+            fake.setId(packet.getId());
+
+            doBreakOnNetty(fake);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -149,6 +185,48 @@ public class AutoCrystalFeature extends Feature {
         Color color = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor();
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
+    }
+
+    private void doBreakOnNetty(EndCrystal crystal) {
+        if (MC.player == null || MC.level == null)  {
+/*            MC.execute(()-> {
+                CHAT_SERVICE.sendPersistent("ca1", "Return because of mc level or player null");
+            });*/
+            return;
+        }
+
+        if (!breakMultitask.get() && MC.player.isUsingItem())  {
+/*            MC.execute(()-> {
+                CHAT_SERVICE.sendPersistent("casd", "return because of multitask");
+            });*/
+            return;
+        }
+
+/*        if (breakRotate.get()) {
+            Vec3 hit = getClosestPointToEye(MC.player.getEyePosition(), crystal.getBoundingBox());
+
+            float yaw = (float) getYawToVec(MC.player, hit);
+            float pitch = (float) getPitchToVec(MC.player, hit);
+
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 9, yaw, pitch));
+        }*/
+
+        if (!canBreak(crystal)) {
+/*            MC.execute(()-> {
+                CHAT_SERVICE.sendPersistent("c213123a", "Return bevcause of CanBreak");
+            });*/
+            return;
+        }
+
+        MC.player.connection.send(ServerboundInteractPacket.createAttackPacket(crystal, MC.player.isShiftKeyDown()));
+/*        MC.execute(()-> {
+            CHAT_SERVICE.sendPersistent("ca", "Sended break from netty");
+        });*/
+
+        if (breakSwing.get())
+            MC.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
+
+        //breakTimer = breakDelay.get();
     }
 
     private void doBreak() {
@@ -234,23 +312,11 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private boolean canBreak(EndCrystal crystal) {
-        Vec3 eyePos = MC.player.getEyePosition(1.0f);
-        Vec3 hitVec = getClosestPointToEye(eyePos, crystal.getBoundingBox());
-
-        float idealYaw = (float) getYawToVec(MC.player, hitVec);
-        float idealPitch = (float) getPitchToVec(MC.player, hitVec);
-
-        EntityHitResult distanceCheck = raycastTarget(MC.player, crystal, breakRange.get(), idealYaw, idealPitch);
-
-        boolean insideBox = crystal.getBoundingBox().contains(eyePos);
-        if (!insideBox && distanceCheck == null)
-            return false;
-
         if (!breakRotate.get())
             return true;
 
       //  ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 5, idealYaw, idealPitch));
-
+        boolean insideBox = crystal.getBoundingBox().contains(MC.player.getEyePosition(1.0f));
         EntityHitResult serverCheck = raycastTarget(MC.player, crystal, breakRange.get(), ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
         return serverCheck != null || insideBox;
     }

@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.impl.miscellaneous;
 
 import namidevelopment.kiriyaga.nami.event.EventPriority;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.EntitySpawnEvent;
+import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
@@ -72,10 +72,10 @@ public class AnnouncerFeature extends Feature {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onEntitySpawn(EntitySpawnEvent event) {
+    public void onEntitySpawn(AddEntityEvent event) {
         if (MC.player == null || MC.level == null || !visualRange.get()) return;
 
-        if (event.getEntity() instanceof Player player) {
+        if (MC.level.getEntity(event.getPacket().getId()) instanceof Player player) {
 
             if (player == MC.player)
                 return;
