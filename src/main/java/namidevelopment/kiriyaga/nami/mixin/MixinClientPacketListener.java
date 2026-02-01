@@ -1,13 +1,11 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
-import namidevelopment.kiriyaga.nami.event.impl.ChatMessageEvent;
-import namidevelopment.kiriyaga.nami.event.impl.ChunkDataEvent;
-import namidevelopment.kiriyaga.nami.event.impl.WorldTimeUpdateEvent;
+import namidevelopment.kiriyaga.nami.event.impl.*;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,6 +34,12 @@ public class MixinClientPacketListener {
     @Inject(method = "handleAddEntity", at = @At("TAIL"))
     private void onHandleAddEntity(ClientboundAddEntityPacket packet, CallbackInfo ci) {
         AddEntityEvent event = new AddEntityEvent(packet);
+        EVENT_SERVICE.post(event);
+    }
+
+    @Inject(method = "handleRemoveEntities", at = @At("TAIL"))
+    private void onHandleRemoveEntities(ClientboundRemoveEntitiesPacket packet, CallbackInfo ci) {
+        RemoveEntityEvent event = new RemoveEntityEvent(packet);
         EVENT_SERVICE.post(event);
     }
 

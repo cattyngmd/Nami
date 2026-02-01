@@ -1,9 +1,11 @@
 package namidevelopment.kiriyaga.nami.impl.feature.impl.combat;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.EventPriority;
 import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.nami.event.impl.RemoveEntityEvent;
 import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
@@ -21,6 +23,7 @@ import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.world.entity.Entity;
@@ -37,7 +40,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.EntityHitResult;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
@@ -63,7 +68,7 @@ public class AutoCrystalFeature extends Feature {
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));
     public final DoubleSetting breakRange = addSetting(new DoubleSetting("BreakRange","Range", 3.0, 1.0, 7.0));
-    public final IntSetting breakInhibit = addSetting(new IntSetting("Inhibit", 1, 1, 6));
+    public final IntSetting breakInhibit = addSetting(new IntSetting("Inhibit", 4, 1, 20));
     public final IntSetting breakDelay = addSetting(new IntSetting("BreakDelay","Delay", 0, 0, 20));
     public final BoolSetting breakRotate = addSetting(new BoolSetting("BreakRotate","Rotate", true));
     public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
@@ -84,6 +89,7 @@ public class AutoCrystalFeature extends Feature {
     private int breakTimer, placeTimer = 0; // i love it
     private PlaceTarget placeTarget = null;
     float lastTotalDamage, lastCalcTimeMs = 0;
+    private final Int2IntOpenHashMap crystalMap = new Int2IntOpenHashMap();
 
     public AutoCrystalFeature() {
         super("AutoCrystal", "Automatically places and break crystals to kill people, if you are good enough!.", FeatureCategory.of("Combat"), "autocrystal", "ac", "crystalaura");
@@ -124,21 +130,32 @@ public class AutoCrystalFeature extends Feature {
         lastCalcTimeMs = 0;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent
+    private void onRemoveEntityEvent(RemoveEntityEvent event) {
+        ClientboundRemoveEntitiesPacket packet = event.getPacket();
+        for (int id : packet.getEntityIds()) {
+            if (crystalMap.containsKey(id)) {
+                crystalMap.remove(id);
+            }
+        }
+    }
+
+
+/*    @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onAddEntityEvent(AddEntityEvent event) {
         if (MC.player == null || MC.level == null) {
-/*            MC.execute(()-> {
+*//*            MC.execute(()-> {
                 CHAT_SERVICE.sendPersistent("c2134412123a", "Return bevcause of level or player = null");
-            });*/
+            });*//*
             return;
         }
         if (breakSequential.get() != Sequential.FULL) return;
 
         if (event.getPacket() instanceof ClientboundAddEntityPacket packet) {
             if (packet.getType() != EntityType.END_CRYSTAL) {
-/*                MC.execute(()-> {
+*//*                MC.execute(()-> {
                     CHAT_SERVICE.sendPersistent("c21232133123a", "Return bevcause of EntytiType check");
-                });*/
+                });*//*
                 return;
             }
 
@@ -149,7 +166,7 @@ public class AutoCrystalFeature extends Feature {
 
             doBreakOnNetty(fake);
         }
-    }
+    }*/
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTickEvent(PreTickEvent event) {
@@ -246,12 +263,19 @@ public class AutoCrystalFeature extends Feature {
 
         if (!canBreak(target.crystal)) return;
 
-        for (int i = 0; i < breakInhibit.get(); i++) {
-            MC.gameMode.attack(MC.player, target.crystal);
+        int id = target.crystal.getId();
+        int hits = crystalMap.get(id);
 
-            if (breakSwing.get())
-                MC.player.swing(InteractionHand.MAIN_HAND);
-        }
+        if (hits >= breakInhibit.get() && target.crystal.tickCount < 20)
+            return;
+
+        MC.gameMode.attack(MC.player, target.crystal);
+
+        if (breakSwing.get())
+            MC.player.swing(InteractionHand.MAIN_HAND);
+
+        crystalMap.put(id, hits + 1);
+
 
         breakTimer = breakDelay.get();
     }
