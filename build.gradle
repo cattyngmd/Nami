@@ -33,7 +33,7 @@ static def getGitBranch() {
 }
 
 // versions
-version = "v1.1.0_${getGitBranch()}"
+version = "v1.1.0"
 //version = "beta.2.4.5_${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
 //version = "v1.0.1_${getCommitsCount()}"
 
