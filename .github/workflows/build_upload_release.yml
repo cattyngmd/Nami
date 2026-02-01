@@ -1,28 +1,18 @@
-permissions:
-  contents: write
-
-name: build upload release
+name: build_upload_release
 
 on:
   workflow_dispatch:
-#  push:
-#    branches:
-#      - '**'
 
 jobs:
-  build:
-    if: github.actor == 'Kiriyaga7615'
+  build_and_release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch: [mc.1.21.11, mc.1.21.8]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: true
-          ref: ${{ matrix.branch }}
+          fetch-depth: 0
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -37,75 +27,39 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: Build client
+      - name: Build
         run: ./gradlew clean build remapJar --stacktrace
-
-      - name: List files in build/libs
-        run: ls -l build/libs/
 
       - name: Set safe branch name
         run: |
-          SAFE_BRANCH="${{ matrix.branch }}"
+          SAFE_BRANCH="${{ github.ref_name }}"
           SAFE_BRANCH="${SAFE_BRANCH//./-}"
           echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
 
-      - name: Rename JAR to include branch
+      - name: Rename JARs
         run: |
           for jar in build/libs/*.jar; do
             BASENAME=$(basename "$jar")
             mv "$jar" "build/libs/nami-${SAFE_BRANCH}-${BASENAME}"
           done
 
-      - name: Upload built JAR
-        uses: actions/upload-artifact@v4
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
         with:
-          name: nami-${{ env.SAFE_BRANCH }}
-          path: build/libs/*.jar
-
-  release:
-    needs: build
-    if: github.actor == 'Kiriyaga7615'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository for release
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Set version for release
-        run: |
-          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
-          echo "VERSION=multi-branch-latest-${SHORT_SHA}" >> $GITHUB_ENV
-
-      - name: Download all branch artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifact
-
-      - name: List downloaded files
-        run: ls -l ./artifact
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.VERSION }}
-          name: Nami ${{ env.VERSION }}
-          body: |
-            release
+          tag_name: ${{ env.SAFE_BRANCH }}
+          name: ${{ env.SAFE_BRANCH }}
+          body: "Automated release from branch `${{ github.ref_name }}`"
+          draft: false
+          prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload all JARs to Release
-        run: |
-          shopt -s nullglob
-          JAR_FILES=(./artifact/*/*.jar)
-          if [ ${#JAR_FILES[@]} -eq 0 ]; then
-            echo "No JAR files found, exiting"
-            exit 1
-          fi
-          for file in "${JAR_FILES[@]}"; do
-            echo "Uploading $file to release tag ${{ env.VERSION }}"
-            gh release upload ${{ env.VERSION }} "$file" --clobber
-          done
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.SAFE_BRANCH }}
+          name: ${{ env.SAFE_BRANCH }}
+          files: build/libs/*.jar
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
