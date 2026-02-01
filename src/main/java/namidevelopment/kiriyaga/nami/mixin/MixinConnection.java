@@ -16,9 +16,11 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @Mixin(Connection.class)
 public abstract class MixinConnection {
+    private boolean b = false;
 
     @Inject(method = "channelRead0", at = @At("HEAD"), cancellable = true)
     public void onPacketReceive(ChannelHandlerContext ctx, Packet<?> packet, CallbackInfo ci) {
+        if (b) return;
         PacketReceiveEvent event = new PacketReceiveEvent(packet);
         EVENT_SERVICE.post(event);
 
@@ -26,13 +28,16 @@ public abstract class MixinConnection {
             ci.cancel();
             return;
         }
-
         if (event.getPacket() != packet) {
             ci.cancel();
-            ctx.fireChannelRead(event.getPacket());
-            return;
-        }
 
+            b = true;
+            try {
+                ctx.fireChannelRead(event.getPacket());
+            } finally {
+                b = false;
+            }
+        }
     }
 
     @Inject(method = "sendPacket", at = @At("HEAD"), cancellable = true)

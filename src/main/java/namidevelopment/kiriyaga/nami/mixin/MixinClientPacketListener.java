@@ -1,12 +1,11 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import namidevelopment.kiriyaga.nami.event.impl.*;
+import namidevelopment.kiriyaga.nami.impl.feature.impl.exploits.NoRotateFeature;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,8 +17,8 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @Mixin(ClientPacketListener.class)
 public class MixinClientPacketListener {
-    @Shadow
-    private ClientLevel level;
+    private float prevYaw;
+    private float prevPitch;
 
     @Inject(method = "sendChat", at = @At("HEAD"), cancellable = true)
     public void onSendChatMessage(String message, CallbackInfo ci) {
@@ -45,9 +44,9 @@ public class MixinClientPacketListener {
 
     @Inject(method = "handleLevelChunkWithLight", at = @At("TAIL"))
     private void onChunkData(ClientboundLevelChunkWithLightPacket packet, CallbackInfo info) {
-        if (level == null) return;
+        if (MC.level == null) return;
 
-        LevelChunk chunk = level.getChunk(packet.getX(), packet.getZ());
+        LevelChunk chunk = MC.level.getChunk(packet.getX(), packet.getZ());
         if (chunk == null || chunk.isEmpty()) return;
 
         EVENT_SERVICE.post(new ChunkDataEvent(chunk));
@@ -59,5 +58,25 @@ public class MixinClientPacketListener {
         EVENT_SERVICE.post(event);
 
         if (event.isCancelled()) ci.cancel();
+    }
+
+    @Inject(method = "handleMovePlayer", at = @At("HEAD"))
+    private void beforeHandleMovePlayer(ClientboundPlayerPositionPacket packet, CallbackInfo ci) {
+        if (MC.player == null || FEATURE_SERVICE.getStorage().getByClass(NoRotateFeature.class) == null)
+            return;
+
+        prevYaw = MC.player.getYRot();
+        prevPitch = MC.player.getXRot();
+    }
+
+    @Inject(method = "handleMovePlayer", at = @At("TAIL"))
+    private void afterHandleMovePlayer(ClientboundPlayerPositionPacket packet, CallbackInfo ci) {
+        if (MC.player == null || FEATURE_SERVICE.getStorage().getByClass(NoRotateFeature.class) == null)
+            return;
+
+        if (FEATURE_SERVICE.getStorage().getByClass(NoRotateFeature.class).isEnabled()) {
+            MC.player.setYRot(prevYaw);
+            MC.player.setXRot(prevPitch);
+        }
     }
 }
