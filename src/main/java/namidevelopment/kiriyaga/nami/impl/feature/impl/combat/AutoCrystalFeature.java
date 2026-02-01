@@ -292,7 +292,7 @@ public class AutoCrystalFeature extends Feature {
 
         float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
 
-        if (selfDamage > maxSelfDamage.get() || (noSelfPop.get() && selfDamage > (MC.player.getHealth() + MC.player.getAbsorptionAmount())))
+        if (selfDamage > maxSelfDamage.get() || (noSelfPop.get() && selfDamage >= (MC.player.getHealth() + MC.player.getAbsorptionAmount())))
             return -1f;
 
 
