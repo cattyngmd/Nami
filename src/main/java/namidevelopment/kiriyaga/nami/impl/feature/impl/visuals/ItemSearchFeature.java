@@ -71,8 +71,9 @@ public class ItemSearchFeature extends Feature {
                     RenderUtil.drawLine(start, box.getCenter(), COLOR_ITEM, 1.5f);
                 }
 
-                if (chatFeedback.get()) {
-                    Integer entId = entity.getId();
+                Integer entId = entity.getId();
+
+                if (!sent.contains(entId) && chatFeedback.get()) {
                     Component message = CAT_FORMAT.format("Item: {g}" + item.getItem().getHoverName().getString() + " {reset} found.");
                     CHAT_SERVICE.sendPersistent(entId.toString(), message);
                     sent.add(entId);
@@ -101,8 +102,9 @@ public class ItemSearchFeature extends Feature {
                     RenderUtil.drawLine(start, box.getCenter(), COLOR_ITEM, 1.5f);
                 }
 
-                if (chatFeedback.get()) {
-                    Integer entId = entity.getId();
+                Integer entId = entity.getId();
+
+                if (!sent.contains(entId) && chatFeedback.get()) {
                     Component message = CAT_FORMAT.format("Item: {g}" + frame.getItem().getItemName() + " {reset} found.");
                     CHAT_SERVICE.sendPersistent(entId.toString(), message);
                     sent.add(entId);
