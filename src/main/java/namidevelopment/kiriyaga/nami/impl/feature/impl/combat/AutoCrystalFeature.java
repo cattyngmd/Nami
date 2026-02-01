@@ -62,8 +62,8 @@ public class AutoCrystalFeature extends Feature {
 
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));
-    public final IntSetting breakInhibit = addSetting(new IntSetting("Inhibit", 1, 1, 6));
     public final DoubleSetting breakRange = addSetting(new DoubleSetting("BreakRange","Range", 3.0, 1.0, 7.0));
+    public final IntSetting breakInhibit = addSetting(new IntSetting("Inhibit", 1, 1, 6));
     public final IntSetting breakDelay = addSetting(new IntSetting("BreakDelay","Delay", 0, 0, 20));
     public final BoolSetting breakRotate = addSetting(new BoolSetting("BreakRotate","Rotate", true));
     public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
@@ -203,14 +203,14 @@ public class AutoCrystalFeature extends Feature {
             return;
         }
 
-/*        if (breakRotate.get()) {
+        if (breakRotate.get()) {
             Vec3 hit = getClosestPointToEye(MC.player.getEyePosition(), crystal.getBoundingBox());
 
             float yaw = (float) getYawToVec(MC.player, hit);
             float pitch = (float) getPitchToVec(MC.player, hit);
 
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 9, yaw, pitch));
-        }*/
+        }
 
         if (!canBreak(crystal)) {
 /*            MC.execute(()-> {
