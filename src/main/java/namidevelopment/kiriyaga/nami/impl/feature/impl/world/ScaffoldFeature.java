@@ -15,6 +15,8 @@ import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;
 import namidevelopment.kiriyaga.nami.util.PredictMovementUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -37,6 +39,7 @@ public class ScaffoldFeature extends Feature {
     public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", false));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
@@ -73,11 +76,6 @@ public class ScaffoldFeature extends Feature {
         }
         BlockPos[] corners = getPlacements();
         int blocksPlaced = 0;
-        int slot = getSlot();
-        if (slot == -1) {
-            renderPos = null;
-            return;
-        }
 
         renderPos = null;
         for (BlockPos pos : corners) {
@@ -88,7 +86,7 @@ public class ScaffoldFeature extends Feature {
 
             renderPos = targetPos;
 
-            if (placeBlock(targetPos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get()))
+            if (placeBlock(targetPos, getSlot(),swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get()))
                 blocksPlaced++;
 
             if (blocksPlaced >= shiftTicks.get()) break;
@@ -115,33 +113,34 @@ public class ScaffoldFeature extends Feature {
 
     }
 
-    private int getSlot() {
-        int selectedSlot = MC.player.getInventory().getSelectedSlot();
-
-        if (!MC.player.getInventory().getItem(selectedSlot).isEmpty()) {
-            Block block = Block.byItem(MC.player.getInventory().getItem(selectedSlot).getItem());
+    private Item getSlot() {
+        if (MC.player == null) return null;
+        ItemStack offhand = MC.player.getOffhandItem();
+        if (!offhand.isEmpty()) {
+            Block block = Block.byItem(offhand.getItem());
             if (block != Blocks.AIR) {
                 Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
                 if (!whitelist.get() || whitelist.isWhitelisted(blockId)) {
-                    return selectedSlot;
+                    return offhand.getItem();
                 }
             }
         }
-
         for (int i = 0; i < 9; i++) {
-            if (MC.player.getInventory().getItem(i).isEmpty()) continue;
+            ItemStack stack = MC.player.getInventory().getItem(i);
+            if (stack.isEmpty()) continue;
 
-            Block block = Block.byItem(MC.player.getInventory().getItem(i).getItem());
+            Block block = Block.byItem(stack.getItem());
             if (block == Blocks.AIR) continue;
 
             Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
             if (whitelist.get() && !whitelist.isWhitelisted(blockId)) continue;
 
-            return i;
+            return stack.getItem();
         }
 
-        return -1;
+        return null;
     }
+
 
     private BlockPos[] getPlacements() {
         double minX = MC.player.getBoundingBox().minX;

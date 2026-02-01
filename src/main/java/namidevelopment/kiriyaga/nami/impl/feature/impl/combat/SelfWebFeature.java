@@ -14,6 +14,7 @@ import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
 import namidevelopment.kiriyaga.nami.util.InteractionUtils;
 import namidevelopment.kiriyaga.nami.util.entity.TargetUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,6 +36,7 @@ public class SelfWebFeature extends Feature {
     public final EnumSetting<PlaceMode> placeMode = addSetting(new EnumSetting<>("PlaceMode", PlaceMode.LEGS));
     public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
     public final BoolSetting onlyTarget = addSetting(new BoolSetting("OnlyTarget", false));
+    public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 5));
     public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
@@ -66,20 +68,14 @@ public class SelfWebFeature extends Feature {
             return;
         }
 
-        int slot = findSlot();
-        if (slot == -1) {
-            renderPos = null;
-            return;
-        }
-
         List<BlockPos> positions = getPositions(MC.player);
         int placed = 0;
 
         for (BlockPos pos : positions) {
             if (MC.level.getBlockState(pos).isAir()) {
                 renderPos = pos;
-                InteractionUtils.placeBlock(pos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get());
-                placed++;
+                if (InteractionUtils.placeBlock(pos, Items.COBWEB, swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get()))
+                    placed++;
                 if (placed >= shiftTicks.get()) break;
             }
         }
@@ -101,16 +97,6 @@ public class SelfWebFeature extends Feature {
         AABB box = new AABB(renderPos);
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
-    }
-
-    private int findSlot() {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getItem(i);
-            if (!stack.isEmpty() && stack.getItem() == Blocks.COBWEB.asItem()) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private List<BlockPos> getPositions(Player player) {

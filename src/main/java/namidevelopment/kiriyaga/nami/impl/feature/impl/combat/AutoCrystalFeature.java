@@ -33,6 +33,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.EndCrystalItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -60,6 +61,7 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting placeRotate = addSetting(new BoolSetting("PlaceRotate","Rotate", true));
     public final BoolSetting placeSwing = addSetting(new BoolSetting("PlaceSwing","Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
+    public final BoolSetting placeSwapBack = addSetting(new BoolSetting("PlaceSwapBack","SwapBack", true));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("PlaceMultitask","Multitask", false));
 
     //break
@@ -70,7 +72,7 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
     public final BoolSetting breakMultitask = addSetting(new BoolSetting("BreakMultitask","Multitask", true));
     public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
-    public final EnumSetting<Sequential> sequential = addSetting(new EnumSetting<>("Sequential", Sequential.NONE));
+    public final EnumSetting<Sequential> sequential = addSetting(new EnumSetting<>("BreakSequential","Sequential", Sequential.NONE));
 
     //damages
     public final BoolSetting assumeBestArmor = addSetting(new BoolSetting("AssumeBestArmor", true));
@@ -104,6 +106,7 @@ public class AutoCrystalFeature extends Feature {
         placeSwing.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeIgnoreItems.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeMultitask.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeSwapBack.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
@@ -322,15 +325,11 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private void doPlace() {
-        if (!placeMultitask.get() && MC.player.isUsingItem()) return;
-
         placeTarget = findBestPlace();
         if (placeTarget == null) return;
         if (placeTarget.totalDamage < minDamage.get()) return;
 
-        int crystalSlot = findHotbarItem(stack -> stack.getItem() instanceof EndCrystalItem);
-        if (crystalSlot == -1) return;
-        InteractionUtils.interactBlockAt(placeTarget.pos.below(), crystalSlot, placeRange.get(), placeRotate.get(), false, false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
+        InteractionUtils.interactBlockAt(placeTarget.pos.below(), Items.END_CRYSTAL, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), false, false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
 
         placeTimer = placeDelay.get();
     }
@@ -449,26 +448,6 @@ public class AutoCrystalFeature extends Feature {
             totalDamage += dmg;
         }
         return totalDamage;
-    }
-
-
-    private int findHotbarItem(Predicate<ItemStack> predicate) {
-        if (MC.player == null)
-            return -1;
-
-/*        if (predicate.test(MC.player.getInventory().getSelectedItem()))
-            return MC.player.getInventory().getSelectedSlot();*/
-
-        for (int slot = 0; slot < 9; slot++) {
-            ItemStack stack = MC.player.getInventory().getItem(slot);
-            if (stack.isEmpty())
-                continue;
-
-            if (predicate.test(stack))
-                return slot;
-        }
-
-        return -1;
     }
 
     private record PlaceTarget(BlockPos pos, float totalDamage) {}

@@ -13,6 +13,7 @@ import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
 import namidevelopment.kiriyaga.nami.util.InteractionUtils;
 import namidevelopment.kiriyaga.nami.util.entity.TargetUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -44,6 +45,7 @@ public class AutoTrapFeature extends Feature {
     public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
     public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", false));
@@ -90,15 +92,13 @@ public class AutoTrapFeature extends Feature {
             if (MC.level.getBlockState(pos).canBeReplaced()) {
                 BlockPos foundation = pos.below();
                 if (MC.level.getBlockState(foundation).canBeReplaced()) {
-                    int slot = getSlot();
-                    if (slot != -1 && InteractionUtils.placeBlock(foundation, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
+                    if (InteractionUtils.placeBlock(foundation, getSlot(), swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
                         blocksPlaced++;
                         if (blocksPlaced >= shiftTicks.get()) break;
                     }
                 }
 
-                int slotTop = getSlot();
-                if (slotTop != -1 && InteractionUtils.placeBlock(pos, slotTop, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
+                if (InteractionUtils.placeBlock(pos, getSlot(),swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
                     blocksPlaced++;
                     if (blocksPlaced >= shiftTicks.get()) break;
                 }
@@ -206,17 +206,26 @@ public class AutoTrapFeature extends Feature {
         positions.addAll(extra);
     }
 
-    private int getSlot() {
+    private Item getSlot() {
+        if (MC.player == null) return null;
+
+        if (MC.player.getOffhandItem().getItem() instanceof BlockItem b){
+            if (b.getBlock().getExplosionResistance() >= 600.00f)
+                return MC.player.getOffhandItem().getItem();
+        }
+
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.isEmpty()) continue;
 
-            if (stack.getItem() instanceof BlockItem blockItem) {
+            Item item = stack.getItem();
+            if (item instanceof BlockItem blockItem) {
                 Block block = blockItem.getBlock();
-                if (block.getExplosionResistance() >= 600.0f)
-                    return i;
+                if (block.getExplosionResistance() >= 600.0f) {
+                    return item;
+                }
             }
         }
-        return -1;
+        return null;
     }
 }

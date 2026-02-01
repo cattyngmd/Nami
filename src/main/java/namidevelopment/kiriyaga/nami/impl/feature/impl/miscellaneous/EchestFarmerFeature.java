@@ -30,6 +30,7 @@ public class EchestFarmerFeature extends Feature {
     public final DoubleSetting distance = addSetting(new DoubleSetting("Range", 3.0, 1.0, 6.0));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
@@ -52,20 +53,7 @@ public class EchestFarmerFeature extends Feature {
         Block blockAt = MC.level.getBlockState(targetPos).getBlock();
 
         if (MC.level.isEmptyBlock(targetPos)) {
-            int echestSlot = findEchestInHotbar();
-            if (echestSlot != -1) {
-                InteractionUtils.placeBlock(
-                        targetPos,
-                        echestSlot,
-                        distance.get(),
-                        rotate.get(),
-                        strictDirection.get(),
-                        simulate.get(),
-                        swing.get(),
-                        this.name+"break",
-                        multiTask.get()
-                );
-            }
+                InteractionUtils.placeBlock(targetPos, Items.ENDER_CHEST, swapBack.get(), distance.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name+"break", multiTask.get());
         }
 
         if (blockAt == Blocks.ENDER_CHEST) {
@@ -93,15 +81,5 @@ public class EchestFarmerFeature extends Feature {
         AABB box = new AABB(renderPos);
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
-    }
-
-    private int findEchestInHotbar() {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getItem(i);
-            if (stack.getItem() == Items.ENDER_CHEST) {
-                return i;
-            }
-        }
-        return -1;
     }
 }

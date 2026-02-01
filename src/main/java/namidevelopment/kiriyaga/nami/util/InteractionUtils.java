@@ -6,6 +6,9 @@ import namidevelopment.kiriyaga.nami.mixin.DuckMultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.EndCrystalItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,10 +26,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.function.Predicate;
+
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
 import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 import static net.minecraft.world.InteractionHand.MAIN_HAND;
+import static net.minecraft.world.InteractionHand.OFF_HAND;
 
 public class InteractionUtils {
 
@@ -79,11 +85,19 @@ public class InteractionUtils {
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId, boolean multiTask) {
+    public static boolean placeBlock(BlockPos pos, Item item, boolean swapBack, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId, boolean multiTask) {
         if (!MC.level.getBlockState(pos).canBeReplaced())
             return false;
 
         if (!multiTask && MC.player.isUsingItem())
+            return false;
+
+        boolean isOffhand = false;
+        if (MC.player.getOffhandItem().is(item))
+            isOffhand = true;
+
+        int slot = findHotbarItem(stack -> stack.is(item));
+        if (slot == -1 && !isOffhand)
             return false;
 
         Direction direction = getBlockPlaceDir(pos);
@@ -184,30 +198,56 @@ public class InteractionUtils {
 
         boolean result = false;
         if (canPlace) {
-            int prev = MC.player.getInventory().getSelectedSlot();
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
 
-            if (simulate)
-                MC.gameMode.useItemOn(MC.player, MAIN_HAND, hitResult);
-            else
-                sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hitResult, id));
+            if (!isOffhand) {
+                int prev = MC.player.getInventory().getSelectedSlot();
+                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
 
-            if (swing)
-                MC.player.swing(MAIN_HAND);
+                if (simulate)
+                    MC.gameMode.useItemOn(MC.player, MAIN_HAND, hitResult);
+                else
+                    sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hitResult, id));
 
-            result = true;
+                if (swing)
+                    MC.player.swing(MAIN_HAND);
 
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+                result = true;
+
+                if (swapBack)
+                    INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+            }
+            else {
+                if (simulate)
+                    MC.gameMode.useItemOn(MC.player, OFF_HAND, hitResult);
+                else
+                    sendSequencedPacket(id -> new ServerboundUseItemOnPacket(OFF_HAND, hitResult, id));
+
+                if (swing)
+                    MC.player.swing(OFF_HAND);
+
+                result = true;
+            }
         }
 
         return result;
     }
 
-    public static boolean interactBlockAt(BlockPos pos, int slot, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
+    public static boolean interactBlockAt(BlockPos pos, Item item, boolean swapBack, boolean multiTask, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
         Vec3 eyePos = MC.player.getEyePosition();
         Vec3 hitVec = Vec3.atCenterOf(pos);
 
         Direction clickFace = getBlockInteractDir(pos);
+
+        if (!multiTask && MC.player.isUsingItem())
+            return false;
+
+        boolean isOffhand = false;
+        if (MC.player.getOffhandItem().is(item))
+            isOffhand = true;
+
+        int slot = findHotbarItem(stack -> stack.is(item));
+        if (slot == -1 && !isOffhand)
+            return false;
 
         if (strictDirection) {
             boolean flag = switch (clickFace) {
@@ -268,18 +308,28 @@ public class InteractionUtils {
             return false;
         }
 
-        int prev = MC.player.getInventory().getSelectedSlot();
-        INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
+        if (!isOffhand) {
+            int prev = MC.player.getInventory().getSelectedSlot();
+            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
 
-        if (simulate)
-            MC.gameMode.useItemOn(MC.player, MAIN_HAND, hit);
-        else
-            sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hit, id));
+            if (simulate)
+                MC.gameMode.useItemOn(MC.player, MAIN_HAND, hit);
+            else
+                sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hit, id));
 
-        if (swing)
-            MC.player.swing(MAIN_HAND);
+            if (swing)
+                MC.player.swing(MAIN_HAND);
+            if (swapBack)
+                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+        } else {
+            if (simulate)
+                MC.gameMode.useItemOn(MC.player, OFF_HAND, hit);
+            else
+                sendSequencedPacket(id -> new ServerboundUseItemOnPacket(OFF_HAND, hit, id));
 
-        INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+            if (swing)
+                MC.player.swing(OFF_HAND);
+        }
 
         //CHAT_SERVICE.sendRaw("interactBlockAt: success");
         return true;
@@ -476,8 +526,30 @@ public class InteractionUtils {
         return block instanceof BedBlock;
     }
 
+    public static int findHotbarItem(Predicate<ItemStack> predicate) {
+        if (MC.player == null)
+            return -1;
 
-    private static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
+/*        if (predicate.test(MC.player.getInventory().getSelectedItem()))
+            return MC.player.getInventory().getSelectedSlot();*/
+
+        ItemStack selected = MC.player.getInventory().getSelectedItem();
+        if (!selected.isEmpty() && predicate.test(selected))
+            return MC.player.getInventory().getSelectedSlot();
+
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack stack = MC.player.getInventory().getItem(slot);
+            if (stack.isEmpty())
+                continue;
+
+            if (predicate.test(stack))
+                return slot;
+        }
+
+        return -1;
+    }
+
+    public static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
         float f = (float) Math.cos(-yaw * 0.017453292F - Math.PI);
         float g = (float) Math.sin(-yaw * 0.017453292F - Math.PI);
         float h = - (float) Math.cos(-pitch * 0.017453292F);

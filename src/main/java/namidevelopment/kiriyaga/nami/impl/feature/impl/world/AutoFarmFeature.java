@@ -6,7 +6,6 @@ import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.*;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
@@ -14,6 +13,7 @@ import namidevelopment.kiriyaga.nami.util.InteractionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -32,6 +32,7 @@ public class AutoFarmFeature extends Feature {
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
     public final IntSetting radius = addSetting(new IntSetting("Radius", 4, 1, 8));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
+    public final BoolSetting swapBack  = addSetting(new BoolSetting("SwapBack", true));
     public final BoolSetting swing  = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
     public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
@@ -68,12 +69,9 @@ public class AutoFarmFeature extends Feature {
 
         if (bestTarget == null) return;
 
-        int slot = getSlot(bestTarget);
-        if (slot == -1) return;
-
         BlockPos placePos = bestTarget.above();
 
-        InteractionUtils.placeBlock(placePos, slot, range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get());
+        InteractionUtils.placeBlock(placePos, getSlot(placePos),swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get());
     }
 
     private boolean isPlantable(BlockPos pos) {
@@ -87,14 +85,42 @@ public class AutoFarmFeature extends Feature {
         return above.isAir();
     }
 
-    private int getSlot(BlockPos base) {
+    private Item getSlot(BlockPos base) {
+        if (MC.player == null || MC.level == null) return null;
+
         Block block = MC.level.getBlockState(base).getBlock();
+
+        ItemStack offhand = MC.player.getOffhandItem();
+        if (!offhand.isEmpty()) {
+            Item offhandItem = offhand.getItem();
+
+            if (block == Blocks.FARMLAND) {
+                if (offhandItem instanceof BlockItem bi && bi.getBlock() instanceof CropBlock)
+                    return offhandItem;
+
+                if (offhandItem == Items.CARROT
+                        || offhandItem == Items.POTATO
+                        || offhandItem == Items.BEETROOT_SEEDS
+                        || offhandItem == Items.MELON_SEEDS
+                        || offhandItem == Items.WHEAT_SEEDS
+                        || offhandItem == Items.PUMPKIN_SEEDS
+                        || offhandItem == Items.TORCHFLOWER_SEEDS
+                        || offhandItem == Items.PITCHER_POD)
+                    return offhandItem;
+            }
+
+            if (block == Blocks.SOUL_SAND) {
+                if (offhandItem == Items.NETHER_WART)
+                    return offhandItem;
+            }
+        }
 
         if (block == Blocks.FARMLAND) {
             for (int i = 0; i < 9; i++) {
                 Item item = MC.player.getInventory().getItem(i).getItem();
+
                 if (item instanceof BlockItem bi && bi.getBlock() instanceof CropBlock)
-                    return i;
+                    return item;
 
                 if (item == Items.CARROT
                         || item == Items.POTATO
@@ -104,19 +130,20 @@ public class AutoFarmFeature extends Feature {
                         || item == Items.PUMPKIN_SEEDS
                         || item == Items.TORCHFLOWER_SEEDS
                         || item == Items.PITCHER_POD)
-                    return i;
+                    return item;
             }
-            return -1;
+            return null;
         }
 
         if (block == Blocks.SOUL_SAND) {
             for (int i = 0; i < 9; i++) {
-                if (MC.player.getInventory().getItem(i).getItem() == Items.NETHER_WART)
-                    return i;
+                Item item = MC.player.getInventory().getItem(i).getItem();
+                if (item == Items.NETHER_WART)
+                    return item;
             }
-            return -1;
+            return null;
         }
 
-        return -1;
+        return null;
     }
 }
