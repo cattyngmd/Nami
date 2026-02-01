@@ -65,13 +65,21 @@ public class VelocityFeature extends Feature {
 
     @Override
     public void onDisable() {
-        flushPendingVelocity();
+        if (!pendingVelocity) return;
+        if (mode.get() == Mode.GRIM) {
+            sendRotationFix();
+        }
+        pendingVelocity = false;
         pendingConcealment = false;
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTick(PreTickEvent event) {
-        flushPendingVelocity();
+        if (!pendingVelocity) return;
+        if (mode.get() == Mode.GRIM) {
+            sendRotationFix();
+        }
+        pendingVelocity = false;
         pendingConcealment = false;
     }
 
@@ -122,7 +130,7 @@ public class VelocityFeature extends Feature {
     private void handleVelocityPacket(PacketReceiveEvent event, ClientboundSetEntityMotionPacket packet) {
         if (packet.getId() != MC.player.getId()) return;
 
-        if (pendingConcealment && isZeroVelocity(packet)) {
+        if (pendingConcealment && packet.getMovement().x == 0 && packet.getMovement().y == 0 && packet.getMovement().z == 0) {
             pendingConcealment = false;
             return;
         }
@@ -166,12 +174,7 @@ public class VelocityFeature extends Feature {
     }
 
     private void processVelocityVanilla(PacketReceiveEvent event, ClientboundSetEntityMotionPacket packet) {
-        if (isNoVelocityConfigured()) {
-            event.cancel();
-        } else {
-
             scaleVelocityPacket(packet);
-        }
     }
 
     private void processVelocityWalls(PacketReceiveEvent event, ClientboundSetEntityMotionPacket packet) {
@@ -186,11 +189,7 @@ public class VelocityFeature extends Feature {
     }
 
     private void processExplosionVanilla(PacketReceiveEvent event, ClientboundExplodePacket packet) {
-        if (isNoVelocityConfigured()) {
-            event.cancel();
-        } else {
             scaleExplosionPacket(packet);
-        }
     }
 
     private void processExplosionWalls(PacketReceiveEvent event, ClientboundExplodePacket packet) {
@@ -207,13 +206,15 @@ public class VelocityFeature extends Feature {
     private void processBundleExplosion(List<Packet<?>> filtered, ClientboundExplodePacket packet) {
         switch (mode.get()) {
             case VANILLA -> {
-                if (!isNoVelocityConfigured()) scaleExplosionPacket(packet);
-                else return;
+                 scaleExplosionPacket(packet);
             }
             case WALLS -> {
-                if (!isPhased(MC.player)) { filtered.add(packet); return; }
-                if (!isNoVelocityConfigured()) scaleExplosionPacket(packet);
-                else return;
+                if (!isPhased(MC.player)) {
+                    filtered.add(packet);
+                    return;
+                }
+
+                scaleExplosionPacket(packet);
             }
             case GRIM -> {
                 if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
@@ -232,16 +233,14 @@ public class VelocityFeature extends Feature {
 
         switch (mode.get()) {
             case VANILLA -> {
-                if (!isNoVelocityConfigured()) scaleVelocityPacket(packet);
-                else return;
+                scaleVelocityPacket(packet);
             }
             case WALLS -> {
                 if (!isPhased(MC.player) || (requireGround.get() && !MC.player.onGround())) {
                     filtered.add(packet);
                     return;
                 }
-                if (!isNoVelocityConfigured())  scaleVelocityPacket(packet);
-                else return;
+                scaleVelocityPacket(packet);
             }
             case GRIM -> {
                 if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
@@ -251,14 +250,6 @@ public class VelocityFeature extends Feature {
         }
 
         filtered.add(packet);
-    }
-
-    private void flushPendingVelocity() {
-        if (!pendingVelocity) return;
-        if (mode.get() == Mode.GRIM) {
-            sendRotationFix();
-        }
-        pendingVelocity = false;
     }
 
     private void sendRotationFix() { // somehow it happens, needs tests on grim v2 asap
@@ -271,14 +262,6 @@ public class VelocityFeature extends Feature {
                 MC.player.isVisuallyCrawling() ? MC.player.blockPosition() : MC.player.blockPosition().above(),
                 Direction.DOWN
         ));
-    }
-
-    private boolean isZeroVelocity(ClientboundSetEntityMotionPacket packet) {
-        return packet.getMovement().x == 0 && packet.getMovement().y == 0 && packet.getMovement().z == 0;
-    }
-
-    private boolean isNoVelocityConfigured() {
-        return horizontalPercent.get() == 0 && verticalPercent.get() == 0;
     }
 
     private void scaleVelocityPacket(ClientboundSetEntityMotionPacket packet) {
