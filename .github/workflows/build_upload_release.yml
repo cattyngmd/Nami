@@ -56,25 +56,38 @@ jobs:
       - name: Generate release body
         id: release_body
         run: |
-          # last tag (before current)
-          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-
-          # current tag
           TAG="${{ steps.version.outputs.version }}"
           if [[ "$TAG" != v* ]]; then
             TAG="v$TAG"
           fi
 
-          # commits list
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
           if [[ -z "$LAST_TAG" ]]; then
-            COMMITS=$(git log --pretty=format:'- %s by @%an' "$TAG")
+            COMMITS=$(git log "$TAG" --pretty=format:'%H|%s')
           else
-            COMMITS=$(git log "$LAST_TAG..$TAG" --pretty=format:'- %s by @%an')
+            COMMITS=$(git log "$LAST_TAG..$TAG" --pretty=format:'%H|%s')
           fi
 
+          BODY=""
+
+          while IFS="|" read -r SHA MSG; do
+            EMAIL=$(git show -s --format='%ae' $SHA)
+
+            LOGIN=$(gh api search/users -q "$EMAIL in:email" --jq '.items[0].login' 2>/dev/null || true)
+
+            if [[ -z "$LOGIN" || "$LOGIN" == "null" ]]; then
+              NAME=$(git show -s --format='%an' $SHA)
+              BODY+="- ${MSG} by ${NAME}\n"
+            else
+              BODY+="- ${MSG} by @${LOGIN}\n"
+            fi
+          done <<< "$COMMITS"
+
           echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo -e "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+
 
       - name: Build
         run: ./gradlew clean build remapJar --stacktrace
