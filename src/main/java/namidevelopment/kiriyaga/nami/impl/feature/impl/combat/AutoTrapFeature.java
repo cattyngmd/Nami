@@ -13,6 +13,7 @@ import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
 import namidevelopment.kiriyaga.nami.util.InteractionUtils;
 import namidevelopment.kiriyaga.nami.util.entity.TargetUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.entity.Entity;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.nami.util.BlockUtils.getSurround;
 import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isPlaceable;
 import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isReplaceable;
 
@@ -37,7 +39,6 @@ import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isReplaceable;
 public class AutoTrapFeature extends Feature {
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
-    public final BoolSetting legs = addSetting(new BoolSetting("Legs", false));
     public final BoolSetting face = addSetting(new BoolSetting("Face", true));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
     public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
@@ -81,7 +82,7 @@ public class AutoTrapFeature extends Feature {
         }
 
         int blocksPlaced = 0;
-        surroundPositions = getSurround(target);
+        surroundPositions = getSurround((Player) target, face.get() ? 1 : 0, false);
 
         if (surroundPositions.isEmpty() && selfToggle.get()) {
             this.toggle();
@@ -121,89 +122,6 @@ public class AutoTrapFeature extends Feature {
             AABB box = new AABB(pos);
             RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
         }
-    }
-
-    private List<BlockPos> getSurround(Entity entity) {
-        Set<BlockPos> positions = new HashSet<>();
-
-        AABB bb = entity.getBoundingBox();
-        int yLegs = (int) Math.floor(entity.getY());
-        List<BlockPos> inside = new ArrayList<>();
-        for (int x = (int) Math.floor(bb.minX); x < Math.ceil(bb.maxX); x++) {
-            for (int z = (int) Math.floor(bb.minZ); z < Math.ceil(bb.maxZ); z++) {
-                inside.add(new BlockPos(x, yLegs, z));
-            }
-        }
-
-        if (legs.get())
-            for (BlockPos base : inside)
-                addSurroundForBase(base, positions);
-
-        if (face.get()) {
-            int yFace = yLegs + 1;
-            List<BlockPos> faceLevel = new ArrayList<>();
-            for (int x = (int) Math.floor(bb.minX); x < Math.ceil(bb.maxX); x++) {
-                for (int z = (int) Math.floor(bb.minZ); z < Math.ceil(bb.maxZ); z++) {
-                    faceLevel.add(new BlockPos(x, yFace, z));
-                }
-            }
-            for (BlockPos base : faceLevel)
-                addSurroundForBase(base, positions);
-        }
-
-        expand(positions, entity);
-
-        List<BlockPos> result = new ArrayList<>();
-        for (BlockPos pos : positions)
-            if (!isPlaceable(pos))
-                result.add(pos);
-
-        return result;
-    }
-
-    private void addSurroundForBase(BlockPos base, Set<BlockPos> positions) {
-        BlockPos below = base.below();
-        addIfValid(below, positions);
-
-        BlockPos north = base.north();
-        BlockPos south = base.south();
-        BlockPos east  = base.east();
-        BlockPos west  = base.west();
-
-        addIfValid(north, positions);
-        addIfValid(south, positions);
-        addIfValid(east, positions);
-        addIfValid(west, positions);
-    }
-
-    private void addIfValid(BlockPos pos, Set<BlockPos> positions) {
-        if (isReplaceable(pos)) {
-            positions.add(pos);
-        }
-    }
-
-    private void expand(Set<BlockPos> positions, Entity entity) {
-        Set<BlockPos> extra = new HashSet<>();
-        for (BlockPos pos : positions) {
-            AABB blockBox = new AABB(pos);
-            for (Entity e : MC.level.entitiesForRendering()) {
-                if (e.distanceToSqr(entity) > 50) continue;
-                if (e instanceof EndCrystal) continue;
-                if (e instanceof ItemEntity) continue;
-
-                if (e.getBoundingBox().intersects(blockBox)) {
-                    int entY = (int) Math.floor(e.getY());
-                    AABB entBox = e.getBoundingBox();
-                    for (int x = (int) Math.floor(entBox.minX); x < Math.ceil(entBox.maxX); x++) {
-                        for (int z = (int) Math.floor(entBox.minZ); z < Math.ceil(entBox.maxZ); z++) {
-                            BlockPos entBase = new BlockPos(x, entY, z);
-                            addSurroundForBase(entBase, extra);
-                        }
-                    }
-                }
-            }
-        }
-        positions.addAll(extra);
     }
 
     private Item getSlot() {

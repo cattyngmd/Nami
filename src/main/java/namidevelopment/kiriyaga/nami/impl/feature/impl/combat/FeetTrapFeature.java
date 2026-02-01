@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.nami.util.BlockUtils.getSurround;
 import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isPlaceable;
 import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isReplaceable;
 
@@ -90,7 +91,7 @@ public class FeetTrapFeature extends Feature {
 
         int blocksPlaced = 0;
 
-        surroundPositions = getSurround(MC.player);
+        surroundPositions = getSurround(MC.player, 0, extension.get());
 
         for (BlockPos pos : surroundPositions) {
             if (MC.level.getBlockState(pos).canBeReplaced()) {
@@ -127,82 +128,6 @@ public class FeetTrapFeature extends Feature {
             AABB box = new AABB(pos);
             RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
         }
-    }
-
-    private List<BlockPos> getSurround(Player player) {
-        Set<BlockPos> positions = new HashSet<>();
-
-        AABB bb = player.getBoundingBox();
-        int yLegs = (int) Math.floor(player.getY());
-        List<BlockPos> inside = new ArrayList<>();
-        for (int x = (int) Math.floor(bb.minX); x < Math.ceil(bb.maxX); x++) {
-            for (int z = (int) Math.floor(bb.minZ); z < Math.ceil(bb.maxZ); z++) {
-                inside.add(new BlockPos(x, yLegs, z));
-            }
-        }
-
-        for (BlockPos base : inside)
-            addSurroundForBase(base, positions);
-
-        expand(positions, player);
-
-        List<BlockPos> result = new ArrayList<>();
-        for (BlockPos pos : positions)
-            if (!isPlaceable(pos))
-                result.add(pos);
-
-        return result;
-    }
-
-    private void addSurroundForBase(BlockPos base, Set<BlockPos> positions) {
-        BlockPos below = base.below();
-        addIfValid(below, positions);
-
-        BlockPos north = base.north();
-        BlockPos south = base.south();
-        BlockPos east  = base.east();
-        BlockPos west  = base.west();
-
-        addIfValid(north, positions);
-        addIfValid(south, positions);
-        addIfValid(east, positions);
-        addIfValid(west, positions);
-    }
-
-    private void addIfValid(BlockPos pos, Set<BlockPos> positions) {
-        if (isReplaceable(pos)) {
-            positions.add(pos);
-        }
-    }
-
-
-    private void expand(Set<BlockPos> positions, Player player) {
-        if (!extension.get())
-            return;
-
-        Set<BlockPos> extra = new HashSet<>();
-
-        for (BlockPos pos : positions) {
-            AABB blockBox = new AABB(pos);
-            for (Entity entity : MC.level.entitiesForRendering()) {
-                if (entity.distanceToSqr(player) > 10) continue;
-                if (entity instanceof EndCrystal) continue;
-                if (entity instanceof ItemEntity) continue;
-
-                if (entity.getBoundingBox().intersects(blockBox)) {
-                    int entY = (int) Math.floor(entity.getY());
-                    AABB entBox = entity.getBoundingBox();
-                    for (int x = (int) Math.floor(entBox.minX); x < Math.ceil(entBox.maxX); x++) {
-                        for (int z = (int) Math.floor(entBox.minZ); z < Math.ceil(entBox.maxZ); z++) {
-                            BlockPos entBase = new BlockPos(x, entY, z);
-                            addSurroundForBase(entBase, extra);
-                        }
-                    }
-                }
-            }
-        }
-
-        positions.addAll(extra);
     }
 
     private Item getSlot() {
