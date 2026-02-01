@@ -3,7 +3,6 @@ package namidevelopment.kiriyaga.nami.impl.feature.impl.combat;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.EventPriority;
 import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
@@ -21,7 +20,6 @@ import namidevelopment.kiriyaga.nami.util.entity.DamageUtils;
 import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
@@ -31,8 +29,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.EndCrystalItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,7 +38,6 @@ import net.minecraft.world.phys.EntityHitResult;
 
 import java.awt.*;
 import java.util.Locale;
-import java.util.function.Predicate;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
@@ -60,19 +55,21 @@ public class AutoCrystalFeature extends Feature {
     public final IntSetting placeDelay = addSetting(new IntSetting("PlaceDelay","Delay", 0, 0, 20));
     public final BoolSetting placeRotate = addSetting(new BoolSetting("PlaceRotate","Rotate", true));
     public final BoolSetting placeSwing = addSetting(new BoolSetting("PlaceSwing","Swing", true));
-    public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("IgnoreItems", true));
+    public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("PlaceIgnoreItems","IgnoreItems", true));
+    public final BoolSetting placeIgnoreCrystals = addSetting(new BoolSetting("PlaceIgnoreCrystals","IgnoreCrystals", true));
     public final BoolSetting placeSwapBack = addSetting(new BoolSetting("PlaceSwapBack","SwapBack", true));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("PlaceMultitask","Multitask", false));
 
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));
+    public final IntSetting breakInhibit = addSetting(new IntSetting("Inhibit", 1, 1, 6));
     public final DoubleSetting breakRange = addSetting(new DoubleSetting("BreakRange","Range", 3.0, 1.0, 7.0));
     public final IntSetting breakDelay = addSetting(new IntSetting("BreakDelay","Delay", 0, 0, 20));
     public final BoolSetting breakRotate = addSetting(new BoolSetting("BreakRotate","Rotate", true));
     public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
     public final BoolSetting breakMultitask = addSetting(new BoolSetting("BreakMultitask","Multitask", true));
     public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
-    public final EnumSetting<Sequential> sequential = addSetting(new EnumSetting<>("BreakSequential","Sequential", Sequential.NONE));
+    public final EnumSetting<Sequential> breakSequential = addSetting(new EnumSetting<>("BreakSequential","Sequential", Sequential.NONE));
 
     //damages
     public final BoolSetting assumeBestArmor = addSetting(new BoolSetting("AssumeBestArmor", true));
@@ -97,7 +94,8 @@ public class AutoCrystalFeature extends Feature {
         breakSwing.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakMultitask.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakAge.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
-        sequential.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        breakSequential.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
+        breakInhibit.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
 
         doPlace.setShowCondition(() -> page.get() == Page.PLACE);
         placeRange.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
@@ -107,6 +105,7 @@ public class AutoCrystalFeature extends Feature {
         placeIgnoreItems.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeMultitask.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeSwapBack.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeIgnoreCrystals.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
@@ -133,7 +132,7 @@ public class AutoCrystalFeature extends Feature {
             });*/
             return;
         }
-        if (sequential.get() != Sequential.FULL) return;
+        if (breakSequential.get() != Sequential.FULL) return;
 
         if (event.getPacket() instanceof ClientboundAddEntityPacket packet) {
             if (packet.getType() != EntityType.END_CRYSTAL) {
@@ -247,10 +246,12 @@ public class AutoCrystalFeature extends Feature {
 
         if (!canBreak(target.crystal)) return;
 
-        MC.gameMode.attack(MC.player, target.crystal);
+        for (int i = 0; i < breakInhibit.get(); i++) {
+            MC.gameMode.attack(MC.player, target.crystal);
 
-        if (breakSwing.get())
-            MC.player.swing(InteractionHand.MAIN_HAND);
+            if (breakSwing.get())
+                MC.player.swing(InteractionHand.MAIN_HAND);
+        }
 
         breakTimer = breakDelay.get();
     }
@@ -401,6 +402,7 @@ public class AutoCrystalFeature extends Feature {
 
         for (Entity e : MC.level.getEntities(null, checkIntersects)) {
             if (placeIgnoreItems.get() && e instanceof ItemEntity && ((ItemEntity) e).getAge() > 3) continue;
+            if (placeIgnoreCrystals.get() && e instanceof EndCrystal crystal && crystal.tickCount < 5) continue;
             if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
             fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
             return false;
