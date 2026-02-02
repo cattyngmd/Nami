@@ -39,14 +39,14 @@ jobs:
 
       - name: Rename JARs
         run: |
-          for jar in build/libs/*.jar; do
+          for jar in client/build/libs/*.jar; do
             BASENAME=$(basename "$jar")
-            mv "$jar" "build/libs/nami-${SAFE_BRANCH}-${BASENAME}"
+            mv "$jar" "client/build/libs/nami-${SAFE_BRANCH}-${BASENAME}"
           done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nami-${{ env.SAFE_BRANCH }}
-          path: build/libs/*.jar
+          path: client/build/libs/*.jar
           retention-days: 14

@@ -95,9 +95,9 @@ jobs:
       - name: Rename JAR
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          for jar in build/libs/*.jar; do
+          for jar in client/build/libs/*.jar; do
             BASENAME=$(basename "$jar")
-            mv "$jar" "build/libs/nami-${VERSION}-${BASENAME}"
+            mv "$jar" "client/build/libs/nami-${VERSION}-${BASENAME}"
           done
 
       - name: Upload release
@@ -107,6 +107,6 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           name: ${{ steps.version.outputs.version }}
           body: ${{ steps.release_body.outputs.body }}
-          files: build/libs/*.jar
+          files: client/build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
