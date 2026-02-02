@@ -1,9 +1,9 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
 import namidevelopment.kiriyaga.nami.api.executable.model.ExecutableThreadType;
-import namidevelopment.kiriyaga.nami.impl.command.Command;
-import namidevelopment.kiriyaga.nami.impl.command.CommandArgument;
-import namidevelopment.kiriyaga.nami.impl.command.RegisterCommand;
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 import namidevelopment.kiriyaga.nami.util.container.ContainerUtils;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.ItemStack;

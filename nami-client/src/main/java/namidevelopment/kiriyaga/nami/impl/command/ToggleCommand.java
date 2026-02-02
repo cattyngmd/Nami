@@ -1,10 +1,10 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
 import namidevelopment.kiriyaga.nami.api.executable.model.ExecutableThreadType;
-import namidevelopment.kiriyaga.nami.impl.command.Command;
-import namidevelopment.kiriyaga.nami.impl.command.RegisterCommand;
-import namidevelopment.kiriyaga.nami.impl.command.CommandArgument;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
 
 @RegisterCommand
 public class ToggleCommand extends Command {

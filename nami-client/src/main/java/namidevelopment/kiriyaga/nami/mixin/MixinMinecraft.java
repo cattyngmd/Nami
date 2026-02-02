@@ -12,7 +12,7 @@ import namidevelopment.kiriyaga.nami.impl.feature.exploits.AirPlaceFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.world.AutoEatFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.world.FastPlaceFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.exploits.NoHitDelayFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.KeyBindSetting;
+import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashSet;

@@ -1,10 +1,12 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
-import namidevelopment.kiriyaga.nami.impl.command.Command;
-import namidevelopment.kiriyaga.nami.impl.command.CommandArgument;
-import namidevelopment.kiriyaga.nami.impl.command.RegisterCommand;
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 import namidevelopment.kiriyaga.nami.mixininterface.ISimpleOption;
 
+import static namidevelopment.kiriyaga.api.NamiApi.CAT_FORMAT;
+import static namidevelopment.kiriyaga.api.NamiApi.CHAT_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @RegisterCommand

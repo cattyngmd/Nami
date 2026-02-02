@@ -1,11 +1,13 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
 import com.mojang.authlib.GameProfile;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.impl.command.Command;
-import namidevelopment.kiriyaga.nami.impl.command.CommandArgument;
-import namidevelopment.kiriyaga.nami.impl.command.RegisterCommand;
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -13,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @RegisterCommand

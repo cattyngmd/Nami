@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.impl.gui.oldgui.components;
 
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings.*;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.setting.Setting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.input.MouseButtonEvent;

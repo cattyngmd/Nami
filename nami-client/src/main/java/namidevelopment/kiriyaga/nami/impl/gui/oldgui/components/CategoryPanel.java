@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.impl.gui.oldgui.components;
 
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.PanelRenderer;
-import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import namidevelopment.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.gui.Font;

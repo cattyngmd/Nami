@@ -2,8 +2,8 @@ package namidevelopment.kiriyaga.nami.impl.feature.miscellaneous;
 
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;

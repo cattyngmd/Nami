@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.impl.feature.hud;
 
 import namidevelopment.kiriyaga.nami.impl.feature.HudElementFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
