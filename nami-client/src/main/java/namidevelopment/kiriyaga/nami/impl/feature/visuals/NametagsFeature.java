@@ -10,15 +10,15 @@ https://github.com/NamiDevelopment/mint/blob/master/LICENSE
 
 package namidevelopment.kiriyaga.nami.impl.feature.visuals;
 
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render2DEvent;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render2DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.util.ColorUtils;
-import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.util.ColorUtils;
+import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -35,9 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.entity.EntityUtils.getRenderPos;
-import static namidevelopment.kiriyaga.nami.util.render.RenderUtil.project;
-import static namidevelopment.kiriyaga.nami.util.render.RenderUtil.projectionVisible;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.EntityUtils.getRenderPos;
+import static namidevelopment.kiriyaga.api.util.render.RenderUtil.project;
+import static namidevelopment.kiriyaga.api.util.render.RenderUtil.projectionVisible;
 
 @RegisterFeature
 public class NametagsFeature extends Feature {

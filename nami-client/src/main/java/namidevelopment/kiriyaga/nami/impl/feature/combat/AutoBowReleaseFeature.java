@@ -1,12 +1,12 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
@@ -14,8 +14,10 @@ import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
+import static namidevelopment.kiriyaga.api.NamiApi.ROTATION_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.SERVER_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.PacketUtils.sendSequencedPacket;
 
 @RegisterFeature
 public class AutoBowReleaseFeature extends Feature {

@@ -2,10 +2,10 @@ package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import namidevelopment.kiriyaga.nami.api.macro.model.Macro;
-import namidevelopment.kiriyaga.nami.event.impl.DissconectEvent;
-import namidevelopment.kiriyaga.nami.event.impl.EntityDeathEvent;
-import namidevelopment.kiriyaga.nami.event.impl.InteractionEvent;
-import namidevelopment.kiriyaga.nami.event.impl.OpenScreenEvent;
+import namidevelopment.kiriyaga.api.event.impl.DissconectEvent;
+import namidevelopment.kiriyaga.api.event.impl.EntityDeathEvent;
+import namidevelopment.kiriyaga.api.event.impl.InteractionEvent;
+import namidevelopment.kiriyaga.api.event.impl.OpenScreenEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.combat.AuraFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.ESPFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.exploits.AirPlaceFeature;
@@ -40,7 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
     @Shadow

@@ -1,15 +1,15 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.nami.api.executable.model.ExecutableThreadType;
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
+import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.StartBreakingBlockEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.EnchantmentUtils;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.ItemStack;
@@ -17,7 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.GameType;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isBroken;
 
 @RegisterFeature
 public class AutoToolFeature extends Feature {
@@ -68,7 +68,7 @@ public class AutoToolFeature extends Feature {
             }
 
             if (prioritySlot != -1) {
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prioritySlot);
+                InventoryUtils.attemptSwitch(prioritySlot);
                 return;
             }
 
@@ -92,7 +92,7 @@ public class AutoToolFeature extends Feature {
             }
 
             if (bestSlot != -1)
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(bestSlot);
+                InventoryUtils.attemptSwitch(bestSlot);
         }, 0, ExecutableThreadType.PRE_TICK);
     }
 }

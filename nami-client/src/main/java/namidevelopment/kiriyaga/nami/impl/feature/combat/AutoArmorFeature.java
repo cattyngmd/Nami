@@ -1,16 +1,16 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PostTickEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PostTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.EnchantmentUtils;
-import namidevelopment.kiriyaga.nami.util.entity.TargetUtils;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
+import namidevelopment.kiriyaga.api.util.entity.TargetUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,8 +21,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 
 import java.util.*;
 
+import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isBroken;
 
 @RegisterFeature
 public class AutoArmorFeature extends Feature {

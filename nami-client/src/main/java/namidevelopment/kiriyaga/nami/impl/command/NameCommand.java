@@ -4,7 +4,8 @@ import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
 import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class NameCommand extends Command {

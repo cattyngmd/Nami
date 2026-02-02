@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class FriendScreen extends NamiScreen {
     private ConsolePanelComponent<FriendEntry> console;
     private long lastOnlineUpdate;

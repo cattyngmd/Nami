@@ -1,13 +1,13 @@
 package namidevelopment.kiriyaga.nami.impl.feature.visuals;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.WorldTimeUpdateEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.WorldTimeUpdateEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 
 import static namidevelopment.kiriyaga.nami.Nami.MC;
 

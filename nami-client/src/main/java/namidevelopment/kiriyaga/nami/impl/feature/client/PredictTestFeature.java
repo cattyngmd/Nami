@@ -1,15 +1,15 @@
 package namidevelopment.kiriyaga.nami.impl.feature.client;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
-import namidevelopment.kiriyaga.nami.util.PredictMovementUtils;
-import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
+import namidevelopment.kiriyaga.api.util.PredictMovementUtils;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +20,7 @@ import java.awt.*;
 import java.util.List;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 //@RegisterFeature
 public class PredictTestFeature extends Feature {
 

@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(ItemInHandRenderer.class)
 public abstract class MixinItemInHandRenderer {
 

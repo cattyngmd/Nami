@@ -1,14 +1,15 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
-import namidevelopment.kiriyaga.nami.api.executable.model.ExecutableThreadType;
+import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
+import namidevelopment.kiriyaga.api.util.container.ContainerUtils;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
 import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
-import namidevelopment.kiriyaga.nami.util.container.ContainerUtils;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.ItemStack;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.EXECUTABLE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class PeekCommand extends Command {

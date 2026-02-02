@@ -16,7 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class FakePlayerCommand extends Command {

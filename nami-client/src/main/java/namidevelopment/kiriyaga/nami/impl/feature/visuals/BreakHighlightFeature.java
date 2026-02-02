@@ -2,8 +2,8 @@ package namidevelopment.kiriyaga.nami.impl.feature.visuals;
 
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 
 @RegisterFeature
 public class BreakHighlightFeature extends Feature {

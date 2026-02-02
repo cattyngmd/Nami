@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.ReceiveMessageEvent;
+import namidevelopment.kiriyaga.api.event.impl.ReceiveMessageEvent;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.network.chat.MessageSignature;

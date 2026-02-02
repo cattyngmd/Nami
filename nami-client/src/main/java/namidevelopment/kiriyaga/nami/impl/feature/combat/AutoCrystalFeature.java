@@ -1,22 +1,26 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.impl.AddEntityEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.RemoveEntityEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.api.rotation.model.RotationRequest;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.InteractionUtils;
-import namidevelopment.kiriyaga.nami.util.RotationUtils;
-import namidevelopment.kiriyaga.nami.util.entity.DamageUtils;
-import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
-import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.InteractionUtils;
+import namidevelopment.kiriyaga.api.util.RotationUtils;
+import namidevelopment.kiriyaga.api.util.entity.DamageUtils;
+import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -38,8 +42,10 @@ import net.minecraft.world.phys.EntityHitResult;
 import java.awt.*;
 import java.util.Locale;
 
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class AutoCrystalFeature extends Feature {
     public enum Page {PLACE, BREAK, DAMAGES, RENDER}
@@ -380,7 +386,7 @@ public class AutoCrystalFeature extends Feature {
         Vec3 eyePos = MC.player.getEyePosition();
 
         AABB blockBox = new AABB(pos);
-        Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
+        Vec3 point = getClosestPointToEye(eyePos, blockBox);
         float yaw = (float) getYawToVec(MC.player, point);
         float pitch = (float) getPitchToVec(MC.player, point);
 

@@ -1,16 +1,16 @@
 package namidevelopment.kiriyaga.nami.impl.feature.movement;
 
-import namidevelopment.kiriyaga.nami.api.rotation.model.RotationRequest;
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
 
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.nami.mixin.DuckBundlePacket;
 import namidevelopment.kiriyaga.nami.mixin.DuckClientboundExplodePacket;
 import namidevelopment.kiriyaga.nami.mixininterface.IClientboundSetEntityMotionPacket;
@@ -31,7 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isPhased;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isPhased;
 
 @RegisterFeature
 public class VelocityFeature extends Feature {

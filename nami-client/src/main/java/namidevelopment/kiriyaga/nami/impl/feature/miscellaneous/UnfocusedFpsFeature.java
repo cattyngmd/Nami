@@ -2,8 +2,8 @@ package namidevelopment.kiriyaga.nami.impl.feature.miscellaneous;
 
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 
 @RegisterFeature
 public class UnfocusedFpsFeature extends Feature {

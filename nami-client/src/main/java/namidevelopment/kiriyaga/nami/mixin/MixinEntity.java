@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.EntityPushEvent;
+import namidevelopment.kiriyaga.api.event.impl.EntityPushEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.ESPFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreeLookFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreecamFeature;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(Entity.class)
 public abstract class MixinEntity {
 

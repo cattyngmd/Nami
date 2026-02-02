@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings;
 
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.ColorSetting;
-import namidevelopment.kiriyaga.nami.util.render.RectangleRenderState;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.model.setting.ColorSetting;
+import namidevelopment.kiriyaga.api.util.render.RectangleRenderState;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix3x2f;
@@ -10,7 +10,7 @@ import org.joml.Matrix3x2f;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     private boolean draggingHue = false;
     private boolean draggingSV = false;

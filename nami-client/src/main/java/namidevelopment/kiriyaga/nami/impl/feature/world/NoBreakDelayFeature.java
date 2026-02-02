@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.world;
 
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 
 @RegisterFeature
 public class NoBreakDelayFeature extends Feature {

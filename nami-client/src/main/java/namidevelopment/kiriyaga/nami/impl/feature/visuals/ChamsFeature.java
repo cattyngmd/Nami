@@ -2,12 +2,12 @@ package namidevelopment.kiriyaga.nami.impl.feature.visuals;
 
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.ColorUtils;
-import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.ColorUtils;
+import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 

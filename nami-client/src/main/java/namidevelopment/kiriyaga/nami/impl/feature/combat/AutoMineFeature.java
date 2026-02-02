@@ -1,16 +1,16 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.StartBreakingBlockEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.world.SpeedMineFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.util.entity.TargetUtils;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.util.entity.TargetUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -21,9 +21,11 @@ import net.minecraft.util.Mth;
 
 import java.util.*;
 
+import static namidevelopment.kiriyaga.api.NamiApi.EVENT_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isPlaceable;
-import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isPhased;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.InteractionUtils.isPlaceable;
+import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isPhased;
 
 @RegisterFeature
 public class AutoMineFeature extends Feature {

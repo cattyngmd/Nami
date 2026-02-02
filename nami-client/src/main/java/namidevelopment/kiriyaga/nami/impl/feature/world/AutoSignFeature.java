@@ -1,15 +1,15 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.OpenScreenEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PacketSendEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.OpenScreenEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketSendEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.nami.mixin.DuckSignEditScreen;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;

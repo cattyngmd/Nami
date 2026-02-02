@@ -1,9 +1,9 @@
 package namidevelopment.kiriyaga.nami.impl.feature.hud;
 
-import namidevelopment.kiriyaga.nami.impl.feature.HudElementFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterFeature
 public class CoordinatesFeature extends HudElementFeature {

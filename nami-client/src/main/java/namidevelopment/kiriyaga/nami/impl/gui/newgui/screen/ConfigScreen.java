@@ -13,7 +13,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class ConfigScreen extends NamiScreen {
 
     private ConsolePanelComponent<ConfigEntry> console;

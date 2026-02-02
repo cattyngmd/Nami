@@ -1,14 +1,14 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
@@ -18,7 +18,7 @@ import net.minecraft.world.InteractionHand;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static namidevelopment.kiriyaga.nami.Nami.INVENTORY_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @RegisterFeature
@@ -72,7 +72,7 @@ public class AutoEatFeature extends Feature {
             if (swapCooldown > 0) {
                 swapCooldown--;
             } else {
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(bestSlot);
+                InventoryUtils.attemptSwitch(bestSlot);
                 swapCooldown = swapDelayTicksSetting.get();
             }
             eating.set(false);

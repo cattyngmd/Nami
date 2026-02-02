@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-import static namidevelopment.kiriyaga.nami.Nami.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @Mixin(ChatScreen.class)
 public abstract class MixinChatScreen extends Screen {

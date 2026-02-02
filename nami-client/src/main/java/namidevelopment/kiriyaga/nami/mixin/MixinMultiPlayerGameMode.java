@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.BreakBlockEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PlaceBlockEvent;
-import namidevelopment.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
+import namidevelopment.kiriyaga.api.event.impl.BreakBlockEvent;
+import namidevelopment.kiriyaga.api.event.impl.PlaceBlockEvent;
+import namidevelopment.kiriyaga.api.event.impl.StartBreakingBlockEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.world.NoBreakDelayFeature;
 import namidevelopment.kiriyaga.nami.mixininterface.IClientPlayerInteractionManager;
 import net.minecraft.client.player.LocalPlayer;
@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(MultiPlayerGameMode.class)
 public abstract class MixinMultiPlayerGameMode {
     @Shadow

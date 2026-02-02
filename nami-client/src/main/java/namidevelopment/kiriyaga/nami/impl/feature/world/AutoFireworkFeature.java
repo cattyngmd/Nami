@@ -1,19 +1,19 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.InteractionHand;
 
-import static namidevelopment.kiriyaga.nami.Nami.INVENTORY_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @RegisterFeature
@@ -64,9 +64,9 @@ public class AutoFireworkFeature extends Feature {
 
         if (hotbarSlot != -1) {
             int prevSlot = MC.player.getInventory().getSelectedSlot();
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(hotbarSlot);
+            InventoryUtils.attemptSwitch(hotbarSlot);
             MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prevSlot);
+            InventoryUtils.attemptSwitch(prevSlot);
             return true;
         }
 

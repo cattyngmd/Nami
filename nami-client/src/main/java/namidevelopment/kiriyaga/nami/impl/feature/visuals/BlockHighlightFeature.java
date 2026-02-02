@@ -1,18 +1,18 @@
 package namidevelopment.kiriyaga.nami.impl.feature.visuals;
 
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 import static namidevelopment.kiriyaga.nami.Nami.MC;
-import static namidevelopment.kiriyaga.nami.Nami.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @RegisterFeature
 public class BlockHighlightFeature extends Feature {

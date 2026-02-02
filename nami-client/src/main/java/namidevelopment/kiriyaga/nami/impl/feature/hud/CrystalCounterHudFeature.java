@@ -1,13 +1,13 @@
 package namidevelopment.kiriyaga.nami.impl.feature.hud;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.AddEntityEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.HudElementFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.AddEntityEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
+import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
@@ -17,6 +17,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 
 @RegisterFeature

@@ -1,14 +1,14 @@
 package namidevelopment.kiriyaga.nami.impl.feature.movement;
 
-import namidevelopment.kiriyaga.nami.api.rotation.model.RotationRequest;
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 
 import static namidevelopment.kiriyaga.nami.Nami.MC;
 import static namidevelopment.kiriyaga.nami.Nami.ROTATION_SERVICE;

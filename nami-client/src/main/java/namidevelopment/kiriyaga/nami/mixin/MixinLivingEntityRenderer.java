@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
-import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.ChamsFeature;
 import namidevelopment.kiriyaga.nami.mixininterface.IEntityRenderState;
 import net.minecraft.client.model.EntityModel;
@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(LivingEntityRenderer.class)
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> {
 

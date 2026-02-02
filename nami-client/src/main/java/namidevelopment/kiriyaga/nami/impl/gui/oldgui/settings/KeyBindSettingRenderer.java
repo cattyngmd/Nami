@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings;
 
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
 import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
-import namidevelopment.kiriyaga.nami.util.KeyUtils;
+import namidevelopment.kiriyaga.api.util.KeyUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import org.lwjgl.glfw.GLFW;
@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
     private static KeyBindSetting waitingForKeyBind = null;
 

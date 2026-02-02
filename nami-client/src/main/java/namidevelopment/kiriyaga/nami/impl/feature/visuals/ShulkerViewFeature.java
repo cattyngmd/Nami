@@ -5,20 +5,20 @@
 */
 package namidevelopment.kiriyaga.nami.impl.feature.visuals;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.MouseScrollEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.RenderScreenEvent;
-import namidevelopment.kiriyaga.nami.event.impl.RenderTooltipEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.MouseScrollEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.RenderScreenEvent;
+import namidevelopment.kiriyaga.api.event.impl.RenderTooltipEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
-import namidevelopment.kiriyaga.nami.util.container.ShulkerInfo;
+import namidevelopment.kiriyaga.api.util.container.ShulkerInfo;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.util.ARGB;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.container.ContainerUtils.DyeColorToARGB;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.container.ContainerUtils.DyeColorToARGB;
 
 @RegisterFeature
 public class ShulkerViewFeature extends Feature {

@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-import static namidevelopment.kiriyaga.nami.Nami.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @Mixin(Camera.class)
 public abstract class MixinCamera implements ICamera {

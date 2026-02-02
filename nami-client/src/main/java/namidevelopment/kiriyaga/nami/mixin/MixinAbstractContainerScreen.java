@@ -1,9 +1,9 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.MouseClickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.MouseScrollEvent;
-import namidevelopment.kiriyaga.nami.event.impl.RenderSlotsEvent;
-import namidevelopment.kiriyaga.nami.event.impl.RenderTooltipEvent;
+import namidevelopment.kiriyaga.api.event.impl.MouseClickEvent;
+import namidevelopment.kiriyaga.api.event.impl.MouseScrollEvent;
+import namidevelopment.kiriyaga.api.event.impl.RenderSlotsEvent;
+import namidevelopment.kiriyaga.api.event.impl.RenderTooltipEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.client.PatchFeature;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(AbstractContainerScreen.class)
 public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> {
     @Shadow

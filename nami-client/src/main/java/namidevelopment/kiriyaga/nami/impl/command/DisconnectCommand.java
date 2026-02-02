@@ -6,7 +6,7 @@ import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
 import net.minecraft.network.chat.Component;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class DisconnectCommand extends Command {

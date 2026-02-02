@@ -1,14 +1,14 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PacketSendEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PlaceBlockEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketSendEvent;
+import namidevelopment.kiriyaga.api.event.impl.PlaceBlockEvent;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.WhitelistSetting;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.player.LocalPlayer;
@@ -24,7 +24,7 @@ import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import java.util.Map;
 
 import static namidevelopment.kiriyaga.nami.Nami.MC;
-import static namidevelopment.kiriyaga.nami.util.InteractionUtils.isBed;
+import static namidevelopment.kiriyaga.api.util.InteractionUtils.isBed;
 
 @RegisterFeature
 public class NoInteractFeature extends Feature {

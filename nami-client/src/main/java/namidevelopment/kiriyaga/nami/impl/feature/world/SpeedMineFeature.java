@@ -1,21 +1,21 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.nami.api.rotation.model.RotationRequest;
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
-import namidevelopment.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
+import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.event.impl.StartBreakingBlockEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.EnchantmentUtils;
-import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -39,8 +39,8 @@ import net.minecraft.world.level.BlockGetter;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
-import static namidevelopment.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isBroken;
+import static namidevelopment.kiriyaga.api.util.PacketUtils.sendSequencedPacket;
 
 @RegisterFeature
 public class SpeedMineFeature extends Feature {
@@ -90,7 +90,7 @@ public class SpeedMineFeature extends Feature {
             return;
 
         if (shouldSwapBack != -1)
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(shouldSwapBack);
+            InventoryUtils.attemptSwitch(shouldSwapBack);
 
         shouldSwapBack = -1;
 
@@ -261,12 +261,12 @@ public class SpeedMineFeature extends Feature {
                     return;
 
                 shouldSwapBack = MC.player.getInventory().getSelectedSlot();
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
+                InventoryUtils.attemptSwitch(slot);
             }
         }
 
 //        if (swap.get() == Swap.SILENT) {
-//            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+//            InventoryUtils.attemptSwitch(prev);
 //            shouldSwapBack = -1;
 //        }
     }
@@ -275,7 +275,7 @@ public class SpeedMineFeature extends Feature {
         if (task.getBlockState().isAir()) return;
 
         if (swap.get() == Swap.NORMAL)
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(getSlot(task.getBlockState()));
+            InventoryUtils.attemptSwitch(getSlot(task.getBlockState()));
 
         if (grim.get())
             sendDestroyPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, task);
@@ -324,7 +324,7 @@ public class SpeedMineFeature extends Feature {
                     if (swap.get() != Swap.SILENT)
                         shouldSwapBack = MC.player.getInventory().getSelectedSlot();
 
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
+                InventoryUtils.attemptSwitch(slot);
             }
         }
 
@@ -338,12 +338,12 @@ public class SpeedMineFeature extends Feature {
         //MC.level.destroyBlock(task.blockPos, false, MC.player, 512);
 
         if (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) {
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+            InventoryUtils.attemptSwitch(prev);
 
         }
 
         if (swap.get() == Swap.SILENT && shouldSwapBack == -1)
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+            InventoryUtils.attemptSwitch(prev);
 
         currentTask.markLastBroken();
     }

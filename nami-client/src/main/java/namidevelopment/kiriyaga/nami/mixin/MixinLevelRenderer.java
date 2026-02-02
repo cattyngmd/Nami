@@ -2,10 +2,10 @@ package namidevelopment.kiriyaga.nami.mixin;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoWeatherFeature;
-import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;

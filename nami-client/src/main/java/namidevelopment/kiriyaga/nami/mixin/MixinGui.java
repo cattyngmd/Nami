@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.Render2DEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render2DEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static namidevelopment.kiriyaga.nami.Nami.EVENT_SERVICE;
-import static namidevelopment.kiriyaga.nami.Nami.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @Mixin(Gui.class)
 public class MixinGui {

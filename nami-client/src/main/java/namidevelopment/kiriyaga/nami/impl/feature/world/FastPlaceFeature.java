@@ -2,9 +2,9 @@ package namidevelopment.kiriyaga.nami.impl.feature.world;
 
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.model.setting.WhitelistSetting;
 
 @RegisterFeature
 public class FastPlaceFeature extends Feature {

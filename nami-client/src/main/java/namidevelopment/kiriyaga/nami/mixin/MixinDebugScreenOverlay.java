@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static namidevelopment.kiriyaga.nami.Nami.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @Mixin(DebugScreenOverlay.class)
 public class MixinDebugScreenOverlay {

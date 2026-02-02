@@ -2,8 +2,8 @@ package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import namidevelopment.kiriyaga.nami.event.impl.GlidingEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.event.impl.GlidingEvent;
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.HighJumpFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.exploits.NoJumpDelayFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.NoLevitationFeature;
@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {

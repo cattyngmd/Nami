@@ -1,17 +1,17 @@
 package namidevelopment.kiriyaga.nami.impl.feature.visuals;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;
-import namidevelopment.kiriyaga.nami.util.ColorUtils;
-import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
-import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.WhitelistSetting;
+import namidevelopment.kiriyaga.api.util.ColorUtils;
+import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -23,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class EntitySearchFeature extends Feature {
 

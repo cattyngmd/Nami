@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static namidevelopment.kiriyaga.nami.Nami.LAST_CONNECTION;
-import static namidevelopment.kiriyaga.nami.Nami.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @Mixin(DisconnectedScreen.class)
 public abstract class MixinDisconnectedScreen extends Screen {

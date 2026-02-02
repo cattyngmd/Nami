@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings;
 
 import namidevelopment.kiriyaga.nami.Nami;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.model.setting.WhitelistSetting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 

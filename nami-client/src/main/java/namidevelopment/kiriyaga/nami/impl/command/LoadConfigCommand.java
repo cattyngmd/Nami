@@ -1,8 +1,11 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
+import namidevelopment.kiriyaga.api.core.config.ConfigMode;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
 import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
+
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class LoadConfigCommand extends Command {

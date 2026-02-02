@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.impl.gui.newgui.base;
 
 
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -11,7 +11,7 @@ import java.awt.*;
 
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.ColorUtils.toRGBA;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.ColorUtils.toRGBA;
 
 
 public class PanelRenderer {

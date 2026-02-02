@@ -5,10 +5,10 @@ import namidevelopment.kiriyaga.nami.impl.gui.oldgui.components.FeaturePanel;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.components.SettingPanel;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.HudElementFeature;
+import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.util.ChatAnimationHelper;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.util.ChatAnimationHelper;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -19,7 +19,7 @@ import java.awt.Point;
 import java.util.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class HudEditorScreen extends Screen {
 
     private final Map<FeatureCategory, Point> categoryPositions = new HashMap<>();

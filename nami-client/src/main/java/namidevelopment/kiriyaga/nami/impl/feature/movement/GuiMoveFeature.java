@@ -1,15 +1,15 @@
 package namidevelopment.kiriyaga.nami.impl.feature.movement;
 
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.KeyInputEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.KeyInputEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreecamFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.nami.mixin.DuckKeyMapping;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import net.minecraft.client.gui.screens.inventory.AbstractCommandBlockEditScreen;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -28,7 +28,7 @@ import net.minecraft.network.protocol.game.ClientboundContainerClosePacket;
 import org.lwjgl.glfw.GLFW;
 
 import static namidevelopment.kiriyaga.nami.Nami.MC;
-import static namidevelopment.kiriyaga.nami.Nami.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @RegisterFeature
 public class GuiMoveFeature extends Feature {

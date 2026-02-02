@@ -1,11 +1,11 @@
 package namidevelopment.kiriyaga.nami.impl.feature.hud;
 
-import namidevelopment.kiriyaga.nami.impl.feature.HudElementFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;
-import namidevelopment.kiriyaga.nami.util.entity.EntityUtils;
+import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.WhitelistSetting;
+import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,6 +15,7 @@ import net.minecraft.resources.Identifier;
 import java.util.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterFeature
 public class EntityListFeature extends HudElementFeature {

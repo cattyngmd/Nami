@@ -1,14 +1,15 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
+import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,8 +19,10 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.ROTATION_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.RotationUtils.getLookVectorFromYawPitch;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.RotationUtils.getLookVectorFromYawPitch;
 
 @RegisterFeature
 public class ClickActionFeature extends Feature {
@@ -111,9 +114,9 @@ public class ClickActionFeature extends Feature {
 
         if (hotbarSlot != -1) {
             int prevSlot = MC.player.getInventory().getSelectedSlot();
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(hotbarSlot);
+            InventoryUtils.attemptSwitch(hotbarSlot);
             MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prevSlot);
+            InventoryUtils.attemptSwitch(prevSlot);
             return;
         }
 

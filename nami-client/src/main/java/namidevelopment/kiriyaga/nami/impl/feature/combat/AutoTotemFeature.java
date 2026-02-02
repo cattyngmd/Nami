@@ -1,17 +1,18 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.nami.api.executable.model.ExecutableThreadType;
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.EnchantmentUtils;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
+import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.ItemStack;
@@ -23,8 +24,9 @@ import net.minecraft.network.chat.Component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isItemAWeapon;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isItemAWeapon;
 
 @RegisterFeature
 public class AutoTotemFeature extends Feature {
@@ -143,7 +145,7 @@ public class AutoTotemFeature extends Feature {
 
 
             if (MC.player.getHealth() + MC.player.getAbsorptionAmount() <= health.get() && MC.player.getInventory().getItem(mainhandSlot.get()).getItem() == Items.TOTEM_OF_UNDYING)
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(mainhandSlot.get());
+                InventoryUtils.attemptSwitch(mainhandSlot.get());
         }
 
         int targetSlot;

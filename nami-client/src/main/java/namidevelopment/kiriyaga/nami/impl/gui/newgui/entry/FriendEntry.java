@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import java.util.Collection;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class FriendEntry extends BaseEntry {
     private final String name;
     private boolean online;

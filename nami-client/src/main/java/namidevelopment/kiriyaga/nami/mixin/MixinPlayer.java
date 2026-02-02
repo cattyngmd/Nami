@@ -1,9 +1,9 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import namidevelopment.kiriyaga.nami.event.impl.LedgeClipEvent;
-import namidevelopment.kiriyaga.nami.event.impl.LiquidPushEvent;
-import namidevelopment.kiriyaga.nami.event.impl.SprintResetEvent;
+import namidevelopment.kiriyaga.api.event.impl.LedgeClipEvent;
+import namidevelopment.kiriyaga.api.event.impl.LiquidPushEvent;
+import namidevelopment.kiriyaga.api.event.impl.SprintResetEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.exploits.ReachFeature;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(Player.class)
 public abstract class MixinPlayer extends LivingEntity {
     protected MixinPlayer(EntityType<? extends LivingEntity> entityType, Level world) {

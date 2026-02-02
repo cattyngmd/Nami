@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.impl.gui.newgui.component;
 
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.screen.ClickGuiScreen;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.PanelRenderer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.ColorUtils.toRGBA;
+import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.ColorUtils.toRGBA;
 
 public class NavigatePanelComponent {
     private static final int HEIGHT = 14;

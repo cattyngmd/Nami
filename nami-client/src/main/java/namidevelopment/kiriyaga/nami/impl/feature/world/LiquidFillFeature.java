@@ -1,18 +1,18 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.nami.api.rotation.model.RotationRequest;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -30,10 +30,10 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static namidevelopment.kiriyaga.nami.util.InteractionUtils.airPlace;
+import static namidevelopment.kiriyaga.api.util.InteractionUtils.airPlace;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class LiquidFillFeature extends Feature {
 
@@ -122,14 +122,14 @@ public class LiquidFillFeature extends Feature {
 
                 int currentSlot = MC.player.getInventory().getSelectedSlot();
                 if (currentSlot != blockSlot)
-                    INVENTORY_SERVICE.getSlotHandler().attemptSwitch(blockSlot);
+                    InventoryUtils.attemptSwitch(blockSlot);
 
                 BlockHitResult hit = new BlockHitResult(Vec3.atLowerCornerOf(pos).add(0.5,0.5,0.5), Direction.UP, pos, false);
 
                 airPlace(hit, grim.get(), swing.get());
 
                 if (currentSlot != MC.player.getInventory().getSelectedSlot())
-                    INVENTORY_SERVICE.getSlotHandler().attemptSwitch(currentSlot);
+                    InventoryUtils.attemptSwitch(currentSlot);
 
                 cooldown = delay.get();
                 placed = true;

@@ -1,14 +1,14 @@
 package namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings;
 
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class DoubleSettingRenderer implements SettingRenderer<DoubleSetting> {
     private boolean dragging = false;
     private int lastSliderX, lastSliderY, lastSliderWidth, lastSliderHeight;

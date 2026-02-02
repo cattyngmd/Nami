@@ -1,10 +1,12 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
-import namidevelopment.kiriyaga.nami.api.macro.model.Macro;
+import namidevelopment.kiriyaga.api.core.macro.model.Macro;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
 import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 import namidevelopment.kiriyaga.api.util.KeyUtils;
+
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class MacroCommand extends Command {

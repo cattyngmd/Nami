@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.NoSlowFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(LocalPlayer.class)
 public abstract class MixinLocalPlayer {
 

@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.KeyInputEvent;
+import namidevelopment.kiriyaga.api.event.impl.KeyInputEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
 import net.minecraft.client.KeyboardHandler;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(KeyboardHandler.class)
 public abstract class MixinKeyboardHandler {
 

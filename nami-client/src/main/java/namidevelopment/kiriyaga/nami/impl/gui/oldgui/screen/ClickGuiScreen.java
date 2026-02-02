@@ -6,7 +6,7 @@ import namidevelopment.kiriyaga.nami.impl.gui.oldgui.components.SettingPanel;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
@@ -21,7 +21,7 @@ import java.util.*;
 import java.awt.Point;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class ClickGuiScreen extends Screen {
     private final Map<FeatureCategory, Point> categoryPositions = new HashMap<>();
     private final Map<FeatureCategory, CategoryPanel> categoryPanels = new HashMap<>();

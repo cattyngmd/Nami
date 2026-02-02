@@ -7,7 +7,7 @@ import namidevelopment.kiriyaga.nami.mixininterface.ISimpleOption;
 
 import static namidevelopment.kiriyaga.api.NamiApi.CAT_FORMAT;
 import static namidevelopment.kiriyaga.api.NamiApi.CHAT_SERVICE;
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class FovCommand extends Command {
