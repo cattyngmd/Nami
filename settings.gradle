@@ -5,3 +5,7 @@ pluginManagement {
     }
 }
 
+rootProject.name = "nami"
+
+include(":client")
+//include(":api")

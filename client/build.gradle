@@ -1,0 +1,123 @@
+plugins {
+    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'maven-publish'
+}
+
+group = "me.kiriyaga"
+
+// git functions
+static def getGitHash() {
+    def proc = "git rev-parse --short HEAD".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
+}
+
+static def getLastTag() {
+    def proc = "git describe --tags --abbrev=0".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
+}
+
+def getCommitsCount() {
+    def tag = getLastTag()
+    if (!tag) return "0"
+    def proc = "git rev-list --count ${tag}..HEAD".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
+}
+
+static def getGitBranch() {
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.waitFor()
+    return proc.in.text.trim()
+}
+
+// versions
+version = "v1.1.1"
+//version = "beta.2.4.5_${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
+//version = "v1.1.0_${getCommitsCount()}"
+
+// java version
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// repository
+repositories {
+    maven { url = uri("https://maven.fabricmc.net/") }
+    maven { url = uri("https://repo.spongepowered.org/maven") }
+    maven {
+        url = uri("https://api.modrinth.com/maven")
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
+    maven { url = uri("https://jitpack.io") }
+}
+
+// config
+configurations {
+    includeResolved {
+        canBeResolved = true
+        canBeConsumed = false
+        extendsFrom(configurations.include)
+    }
+}
+
+// dependency
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.11"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:0.18.2"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.140.0+1.21.11"
+
+    modImplementation("maven.modrinth:sodium:mc1.21.11-0.8.2-fabric") {
+        transitive = false
+    }
+
+    modImplementation("com.github.cattyngmd.catformat:catformat-core:2.1.0")
+    include("com.github.cattyngmd.catformat:catformat-core:2.1.0")
+}
+
+// loom
+loom {
+    accessWidenerPath = file("src/main/resources/META-INF/nami.accesswidener")
+}
+
+// process
+tasks.processResources {
+    inputs.property("version", project.version)
+    filesMatching("fabric.mod.json") {
+        expand("version": project.version)
+    }
+}
+
+// fat jar
+tasks.jar {
+    archiveBaseName.set("nami-unremapped")
+    archiveClassifier.set("")
+    archiveVersion.set(project.version)
+
+    from(sourceSets.main.output)
+
+    from({
+        configurations.includeResolved.collect { zipTree(it) }
+    })
+}
+
+// remap
+tasks.build {
+    dependsOn(tasks.jar)
+}
+
+tasks.named("remapJar") {
+    dependsOn(tasks.named("jar"))
+    inputFile.set(tasks.named("jar").get().archiveFile)
+}
+
+tasks.register("printVersion") {
+    doLast {
+        println project.version
+    }
+}

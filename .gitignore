@@ -44,3 +44,4 @@ bin/
 /.idea
 /main/.idea
 /run
+/client/run/
