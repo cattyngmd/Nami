@@ -41,7 +41,6 @@ import java.awt.*;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isBroken;
 import static namidevelopment.kiriyaga.nami.util.PacketUtils.sendSequencedPacket;
-import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterFeature
 public class SpeedMineFeature extends Feature {

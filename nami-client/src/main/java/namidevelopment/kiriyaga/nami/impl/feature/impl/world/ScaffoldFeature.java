@@ -29,7 +29,6 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.InteractionUtils.*;
 
 @RegisterFeature
 public class ScaffoldFeature extends Feature {

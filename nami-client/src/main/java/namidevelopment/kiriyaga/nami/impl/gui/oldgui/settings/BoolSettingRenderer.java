@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.ColorUtils.*;
 
 public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {
 

@@ -31,7 +31,6 @@ import java.util.*;
 import java.util.List;
 
 import static namidevelopment.kiriyaga.nami.util.InteractionUtils.airPlace;
-import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
 

@@ -10,7 +10,6 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.ColorUtils.*;
 
 public class KeyBindSettingRenderer implements SettingRenderer<KeyBindSetting> {
     private static KeyBindSetting waitingForKeyBind = null;

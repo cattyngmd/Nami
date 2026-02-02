@@ -24,7 +24,6 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterFeature
 public class BowAimFeature extends Feature {

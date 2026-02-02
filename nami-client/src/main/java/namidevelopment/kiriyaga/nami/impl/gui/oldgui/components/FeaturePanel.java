@@ -9,7 +9,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.ColorUtils.*;
 
 public class FeaturePanel {
     public static final int WIDTH = 100 - CategoryPanel.BORDER_WIDTH * 2 - SettingPanel.INNER_PADDING * 2;

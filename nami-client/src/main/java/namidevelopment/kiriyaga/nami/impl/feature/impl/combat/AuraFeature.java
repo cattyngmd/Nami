@@ -21,7 +21,6 @@ import namidevelopment.kiriyaga.nami.util.entity.TargetUtils;
 import namidevelopment.kiriyaga.nami.util.render.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.TridentItem;
@@ -43,7 +42,6 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 import static namidevelopment.kiriyaga.nami.util.entity.PlayerUtils.isItemAWeapon;
 
 @RegisterFeature

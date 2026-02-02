@@ -10,7 +10,7 @@
   "environment": "*",
 
   "entrypoints": {
-    "main": [
+    "client": [
       "namidevelopment.kiriyaga.api.NamiApi"
     ]
   },

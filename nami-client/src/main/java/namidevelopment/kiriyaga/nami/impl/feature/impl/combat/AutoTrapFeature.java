@@ -17,8 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
@@ -26,9 +24,7 @@ import net.minecraft.world.phys.AABB;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.nami.util.BlockUtils.getSurround;

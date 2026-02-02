@@ -18,7 +18,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 import static namidevelopment.kiriyaga.nami.util.entity.HostileUtils.isAggressiveNow;
 
 @RegisterFeature

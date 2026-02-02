@@ -37,12 +37,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.EntityHitResult;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.nami.util.RotationUtils.*;
 
 @RegisterFeature
 public class AutoCrystalFeature extends Feature {

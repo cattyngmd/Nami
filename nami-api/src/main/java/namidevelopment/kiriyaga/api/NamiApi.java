@@ -1,10 +1,84 @@
 package namidevelopment.kiriyaga.api;
 
-import net.fabricmc.api.ModInitializer;
+import namidevelopment.kiriyaga.api.api.*;
+import namidevelopment.kiriyaga.api.api.breakprediction.BreakPredictionService;
+import namidevelopment.kiriyaga.api.api.cat.FabricCatFormat;
+import namidevelopment.kiriyaga.api.api.command.CommandService;
+import namidevelopment.kiriyaga.api.api.config.ConfigService;
+import namidevelopment.kiriyaga.api.api.executable.ExecutableService;
+import namidevelopment.kiriyaga.api.api.feature.FeatureService;
+import namidevelopment.kiriyaga.api.api.font.FontService;
+import namidevelopment.kiriyaga.api.api.inventory.InventoryService;
+import namidevelopment.kiriyaga.api.api.macro.MacroService;
+import namidevelopment.kiriyaga.api.api.rotation.RotationService;
+import namidevelopment.kiriyaga.api.util.CatStyles;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.util.Tuple;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class NamiApi implements ModInitializer {
+public class NamiApi implements ClientModInitializer {
+
+    public static String API_NAME = "NamiAPI";
+    public static final Logger API_LOGGER = LogManager.getLogger(API_NAME);
+    public static final Minecraft API_MC = Minecraft.getInstance();
+    public static final String API_VERSION;
+    static {
+        ModContainer mod = FabricLoader.getInstance().getModContainer("nami-api").orElse(null);
+        if (mod != null) {
+            API_VERSION = mod.getMetadata().getVersion().getFriendlyString();
+        } else {
+            API_VERSION = "dev-environment";
+        }
+    }
+
+    public static final EventService EVENT_SERVICE = new EventService();
+    public static final MacroService MACRO_SERVICE = new MacroService();
+    public static final ConfigService CONFIG_SERVICE = new ConfigService();
+    public static final FeatureService FEATURE_SERVICE = new FeatureService();
+    public static final FontService FONT_SERVICE = new FontService();
+    public static final ExecutableService EXECUTABLE_SERVICE = new ExecutableService();
+    public static final CommandService COMMAND_SERVICE = new CommandService();
+    public static final ChatService CHAT_SERVICE = new ChatService();
+    public static final FriendService FRIEND_SERVICE = new FriendService(CONFIG_SERVICE);
+    public static final RotationService ROTATION_SERVICE = new RotationService();
+    public static final InventoryService INVENTORY_SERVICE = new InventoryService();
+    public static final ServerService SERVER_SERVICE = new ServerService();
+    public static final InputService INPUT_SERVICE = new InputService();
+    public static final BreakPredictionService BREAK_SERVICE = new BreakPredictionService();
+
+    public static Tuple<ServerAddress, ServerData> LAST_CONNECTION = null;
+    public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
 
     @Override
-    public void onInitialize() {
+    public void onInitializeClient() {
+
+        FEATURE_SERVICE.init();
+        COMMAND_SERVICE.init();
+        COMMAND_SERVICE.getSuggester().updateDispatcher();
+        //FONT_SERVICE.init();
+        ROTATION_SERVICE.init();
+        INVENTORY_SERVICE.init();
+        EXECUTABLE_SERVICE.init();
+        SERVER_SERVICE.init();
+        CHAT_SERVICE.init();
+        INPUT_SERVICE.init();
+        BREAK_SERVICE.init();
+
+        CAT_FORMAT.add(new CatStyles());
+
+        FRIEND_SERVICE.load();
+
+        API_LOGGER.info(API_NAME + "\n " + API_VERSION + " has been initialized\n");
+
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            FONT_SERVICE.init(); // font is making glyph textures, it should be after game loaded not on initialize
+        });
     }
 }

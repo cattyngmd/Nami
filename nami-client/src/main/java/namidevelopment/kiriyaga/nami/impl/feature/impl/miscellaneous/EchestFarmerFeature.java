@@ -15,7 +15,6 @@ import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;

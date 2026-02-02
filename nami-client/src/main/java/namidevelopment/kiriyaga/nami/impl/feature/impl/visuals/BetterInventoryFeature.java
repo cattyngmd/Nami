@@ -7,7 +7,6 @@ import namidevelopment.kiriyaga.nami.impl.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.*;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.WhitelistSetting;
 import namidevelopment.kiriyaga.nami.util.container.ShulkerInfo;
