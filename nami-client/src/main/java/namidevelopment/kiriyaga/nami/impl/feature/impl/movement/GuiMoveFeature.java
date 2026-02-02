@@ -1,7 +1,6 @@
 package namidevelopment.kiriyaga.nami.impl.feature.impl.movement;
 
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.*;
 import namidevelopment.kiriyaga.nami.event.impl.KeyInputEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.nami.event.impl.Render3DEvent;

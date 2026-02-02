@@ -3,7 +3,6 @@ package namidevelopment.kiriyaga.nami.impl.feature.impl.combat;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
 import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.impl.*;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;

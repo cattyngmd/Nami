@@ -1,8 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import namidevelopment.kiriyaga.nami.event.impl.*;
-import namidevelopment.kiriyaga.nami.event.impl.*;
 import namidevelopment.kiriyaga.nami.impl.feature.impl.client.RotationsFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.impl.movement.NoSlowFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;

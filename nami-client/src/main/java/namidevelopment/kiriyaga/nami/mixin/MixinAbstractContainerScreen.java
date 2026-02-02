@@ -1,6 +1,5 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.event.impl.*;
 import namidevelopment.kiriyaga.nami.event.impl.MouseClickEvent;
 import namidevelopment.kiriyaga.nami.event.impl.MouseScrollEvent;
 import namidevelopment.kiriyaga.nami.event.impl.RenderSlotsEvent;
