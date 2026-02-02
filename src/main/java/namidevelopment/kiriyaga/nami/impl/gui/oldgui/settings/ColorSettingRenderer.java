@@ -2,8 +2,10 @@ package namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings;
 
 import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.ColorSetting;
+import namidevelopment.kiriyaga.nami.util.render.RectangleRenderState;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import org.joml.Matrix3x2f;
 
 import java.awt.*;
 
@@ -15,7 +17,7 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
 
     private static final int SV_SIZE = WIDTH - PADDING * 2;
     private static final int HUE_HEIGHT = SLIDER_HEIGHT;
-    private static final int RENDER_STEP = 2; // i mean yeah we can render sv image instead but whatever its blockgame cheat
+    private static final int RENDER_STEP = 5; // i mean yeah we can render sv image instead but whatever its blockgame cheat
     private static final int HUE_CLICK_PADDING = 4;
 
     private static final int SV_HUE_PADDING = 6;
@@ -40,6 +42,8 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         int textY = y + (HEIGHT - 8) / 2;
         FONT_SERVICE.drawText(context, setting.getName(), textX, textY, textColorInt, true);
 
+        context.nextStratum();
+
         lastSvX = x + PADDING;
         lastSvY = y + HEIGHT;
         renderSVSquare(context, lastSvX, lastSvY, SV_SIZE, SV_SIZE, setting);
@@ -47,6 +51,8 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         lastHueX = lastSvX;
         lastHueY = lastSvY + SV_SIZE + SV_HUE_PADDING + 3;
         renderHueSlider(context, lastHueX, lastHueY, SV_SIZE, HUE_HEIGHT, setting);
+
+        context.nextStratum();
 
         String hex = String.format("#%02X%02X%02X", setting.getRed(), setting.getGreen(), setting.getBlue());
         FONT_SERVICE.drawText(
@@ -68,18 +74,25 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
         float hue = hsb[0];
 
+        float pixelStep = 1f / SV_SIZE;
+
         for (int i = 0; i < w; i += RENDER_STEP) {
             for (int j = 0; j < h; j += RENDER_STEP) {
-                float sat = i / (float) w;
-                float bri = 1f - j / (float) h;
-                Color c = Color.getHSBColor(hue, sat, bri);
-                context.fill(x + i, y + j, x + i + RENDER_STEP, y + j + RENDER_STEP, CLICK_GUI_SCREEN.applyFade(toRGBA(c)));
+                float sat1 = i * pixelStep;
+                float sat2 = (i + RENDER_STEP) * pixelStep;
+                float bri1 = 1f - j * pixelStep;
+                float bri2 = 1f - (j + RENDER_STEP) * pixelStep;
+                int c1 = CLICK_GUI_SCREEN.applyFade(toRGBA(Color.getHSBColor(hue, sat1, bri1)));
+                int c2 = CLICK_GUI_SCREEN.applyFade(toRGBA(Color.getHSBColor(hue, sat1, bri2)));
+                int c3 = CLICK_GUI_SCREEN.applyFade(toRGBA(Color.getHSBColor(hue, sat2, bri2)));
+                int c4 = CLICK_GUI_SCREEN.applyFade(toRGBA(Color.getHSBColor(hue, sat2, bri1)));
+                fade(context, x + i, y + j, x + i + RENDER_STEP, y + j + RENDER_STEP, c1, c2, c3, c4);
             }
         }
 
         int cursorX = (int) (hsb[1] * w);
         int cursorY = (int) ((1 - hsb[2]) * h);
-        context.fill(x + cursorX - 2, y + cursorY - 2,
+        fill(context, x + cursorX - 2, y + cursorY - 2,
                 x + cursorX + 2, y + cursorY + 2,
                 CLICK_GUI_SCREEN.applyFade(toRGBA(Color.WHITE)));
     }
@@ -87,14 +100,26 @@ public class ColorSettingRenderer implements SettingRenderer<ColorSetting> {
     private void renderHueSlider(GuiGraphics context, int x, int y, int width, int height, ColorSetting setting) {
         float[] hsb = Color.RGBtoHSB(setting.getRed(), setting.getGreen(), setting.getBlue(), null);
 
+        float pixelStep = 1f / width;
+
         for (int i = 0; i < width; i++) {
-            float h = i / (float) width;
-            Color c = Color.getHSBColor(h, 1f, 1f);
-            context.fill(x + i, y, x + i + 1, y + height, CLICK_GUI_SCREEN.applyFade(toRGBA(c)));
+            float h1 = i * pixelStep;
+            float h2 = (i + 1) * pixelStep;
+            int c1 = CLICK_GUI_SCREEN.applyFade(toRGBA(Color.getHSBColor(h1, 1f, 1f)));
+            int c2 = CLICK_GUI_SCREEN.applyFade(toRGBA(Color.getHSBColor(h2, 1f, 1f)));
+            fade(context, x + i, y, x + i + 1, y + height, c1, c2, c2, c1);
         }
 
         int huePos = (int) (hsb[0] * width);
-        context.fill(x + huePos - 2, y - 1, x + huePos + 2, y + height + 1, CLICK_GUI_SCREEN.applyFade(toRGBA(Color.WHITE)));
+        fill(context, x + huePos - 2, y - 1, x + huePos + 2, y + height + 1, CLICK_GUI_SCREEN.applyFade(toRGBA(Color.WHITE)));
+    }
+
+    private void fill(GuiGraphics context, int x1, int y1, int x2, int y2, int color) {
+        context.guiRenderState.submitGlyphToCurrentLayer(new RectangleRenderState(new Matrix3x2f(context.pose()), x1, y1, x2, y2, color, color, color, color, context.scissorStack.peek()));
+    }
+
+    private void fade(GuiGraphics context, int x1, int y1, int x2, int y2, int c1, int c2, int c3, int c4) {
+        context.guiRenderState.submitGlyphToCurrentLayer(new RectangleRenderState(new Matrix3x2f(context.pose()), x1, y1, x2, y2, c1, c2, c3, c4, context.scissorStack.peek()));
     }
 
     @Override
