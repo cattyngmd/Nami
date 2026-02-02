@@ -7,5 +7,5 @@ pluginManagement {
 
 rootProject.name = "nami"
 
-include(":client")
-//include(":api")
+include("client")
+//include("nami-api")
