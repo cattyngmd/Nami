@@ -29,7 +29,9 @@ processResources {
 
 group = project.maven_group
 version = project.mod_version
-archivesBaseName = project.archives_base_name
+base {
+    archivesName = project.archives_base_name
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
