@@ -1,5 +1,6 @@
 plugins {
     id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'maven-publish'
 }
 
 repositories {
@@ -28,6 +29,7 @@ processResources {
 
 group = project.maven_group
 version = project.mod_version
+archivesBaseName = project.archives_base_name
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -37,4 +39,25 @@ dependencies {
 
     modImplementation("com.github.cattyngmd.catformat:catformat-core:2.1.0")
     include("com.github.cattyngmd.catformat:catformat-core:2.1.0")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifactId = project.archives_base_name
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/NamiDevelopment/nami")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
