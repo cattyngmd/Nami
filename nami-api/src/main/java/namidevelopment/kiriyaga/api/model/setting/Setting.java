@@ -1,7 +1,7 @@
-package namidevelopment.kiriyaga.nami.impl.setting;
+package namidevelopment.kiriyaga.api.model.setting;
 
 import com.google.gson.JsonElement;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
 
 import java.util.function.BooleanSupplier;
 

@@ -1,5 +1,6 @@
 package namidevelopment.kiriyaga.api.util;
 
+import namidevelopment.kiriyaga.api.mixin.DuckClientLevel;
 import net.minecraft.client.multiplayer.prediction.BlockStatePredictionHandler;
 import net.minecraft.client.multiplayer.prediction.PredictiveAction;
 

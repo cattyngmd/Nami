@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import namidevelopment.kiriyaga.nami.event.impl.RenderScreenEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,8 +1,7 @@
-package namidevelopment.kiriyaga.nami.impl.setting.impl;
+package namidevelopment.kiriyaga.api.model.setting;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import namidevelopment.kiriyaga.nami.impl.setting.Setting;
 
 import java.awt.*;
 

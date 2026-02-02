@@ -4,7 +4,7 @@ import namidevelopment.kiriyaga.nami.event.impl.MouseClickEvent;
 import namidevelopment.kiriyaga.nami.event.impl.MouseScrollEvent;
 import namidevelopment.kiriyaga.nami.event.impl.RenderSlotsEvent;
 import namidevelopment.kiriyaga.nami.event.impl.RenderTooltipEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.PatchFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.PatchFeature;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

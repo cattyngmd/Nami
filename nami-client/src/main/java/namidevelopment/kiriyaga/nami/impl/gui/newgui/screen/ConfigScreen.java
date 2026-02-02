@@ -5,7 +5,7 @@ import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.NamiScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.ConsolePanelComponent;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.entry.ConfigEntry;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.widget.ActionItem;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ClickGuiFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;

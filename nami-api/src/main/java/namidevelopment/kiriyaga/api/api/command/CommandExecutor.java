@@ -1,6 +1,11 @@
 package namidevelopment.kiriyaga.api.api.command;
 
 
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.ChatMessageEvent;
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+
 import java.util.ArrayList;
 import java.util.List;
 import static namidevelopment.kiriyaga.api.NamiApi.*;

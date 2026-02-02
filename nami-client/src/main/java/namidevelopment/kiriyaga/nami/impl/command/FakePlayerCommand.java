@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.command.impl;
+package namidevelopment.kiriyaga.nami.impl.command;
 
 import com.mojang.authlib.GameProfile;
 import namidevelopment.kiriyaga.nami.event.SubscribeEvent;

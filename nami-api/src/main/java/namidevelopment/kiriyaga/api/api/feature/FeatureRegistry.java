@@ -1,5 +1,9 @@
 package namidevelopment.kiriyaga.api.api.feature;
 
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.util.ClasspathScanner;
+
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 

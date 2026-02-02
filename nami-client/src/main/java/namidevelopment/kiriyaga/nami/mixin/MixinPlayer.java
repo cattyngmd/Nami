@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import namidevelopment.kiriyaga.nami.event.impl.LedgeClipEvent;
 import namidevelopment.kiriyaga.nami.event.impl.LiquidPushEvent;
 import namidevelopment.kiriyaga.nami.event.impl.SprintResetEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.exploits.ReachFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.exploits.ReachFeature;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.command;
+package namidevelopment.kiriyaga.api.model.command;
 
 public abstract class Command {
     protected final String name;

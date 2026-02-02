@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreecamFeature;
 import net.minecraft.client.renderer.debug.ChunkBorderRenderer;
 import net.minecraft.core.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,15 +1,14 @@
-package namidevelopment.kiriyaga.nami.impl.feature;
+package namidevelopment.kiriyaga.api.model.feature;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ClickGuiFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.Setting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.KeyBindSetting;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
+import namidevelopment.kiriyaga.api.model.setting.Setting;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public abstract class Feature {
 
@@ -69,7 +68,7 @@ public abstract class Feature {
 
         }
 
-        if (MC.level != null && FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).FeatureChatFeedback.get()) {
+        if (API_MC.level != null) {
             Component message = CAT_FORMAT.format("{g}"+name + "{reset} toggled" + (enabled ? " {green}on" : " {red}off") + "{reset}.");
             CHAT_SERVICE.sendPersistent(name, message);
         }

@@ -1,5 +1,7 @@
 package namidevelopment.kiriyaga.api.api.breakprediction;
 
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
+import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -42,12 +44,12 @@ public class PlayerBreakState {
         doubleMine.onTick();
     }
 
-    public void render(Render3DEvent event) {
-        if (current.isActive()) renderProgress(event, current);
-        if (doubleMine.isActive()) renderProgress(event, doubleMine);
+    public void render(Render3DEvent event, boolean fill) {
+        if (current.isActive()) renderProgress(event, current, fill);
+        if (doubleMine.isActive()) renderProgress(event, doubleMine, fill);
     }
 
-    private void renderProgress(Render3DEvent event, BreakTask task) {
+    private void renderProgress(Render3DEvent event, BreakTask task, boolean fill) {
         BlockPos pos = task.getBlockPos();
         BlockState state = task.getBlockState();
 
@@ -68,19 +70,17 @@ public class PlayerBreakState {
 
         AABB box = new AABB(center, center).inflate(dx * scale, dy * scale, dz * scale);
 
-        RenderUtil.drawBoxLines(box, new Color(200, 150, 0, 255), FEATURE_SERVICE.getStorage().getByClass(BreakHighlightFeature.class).fill.get(), true, 1.5f);
+        RenderUtil.drawBoxLines(box, new Color(200, 150, 0, 255), fill, true, 1.5f);
     }
 
     public void startBreak(BlockPos pos, Direction face, float speed) {
         if (current.isActive() && !current.pos.equals(pos)) {
-            if (FEATURE_SERVICE.getStorage().getByClass(SpeedMineFeature.class).doubleMine.get()) {
                 if (!doubleMine.isActive()) {
                     doubleMine.copyFrom(current);
                     doubleMine.setTargetSpeed(1.0f);
                 }
                 current.reset();
             }
-        }
 
         if (!current.isActive() || !current.pos.equals(pos)) {
             current.start(pos, face, speed);

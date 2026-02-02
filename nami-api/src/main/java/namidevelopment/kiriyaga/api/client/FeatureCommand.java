@@ -1,12 +1,14 @@
-package namidevelopment.kiriyaga.nami.impl.command;
+package namidevelopment.kiriyaga.api.client;
 
-import namidevelopment.kiriyaga.nami.impl.command.Command;
-import namidevelopment.kiriyaga.nami.impl.command.CommandArgument;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.setting.Setting;
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.setting.*;
 import net.minecraft.resources.Identifier;
 
 import java.util.Arrays;
+
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 // no god below anymore
 public class FeatureCommand extends Command {

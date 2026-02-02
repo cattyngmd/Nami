@@ -1,8 +1,7 @@
-package namidevelopment.kiriyaga.nami.impl.setting.impl;
+package namidevelopment.kiriyaga.api.model.setting;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import namidevelopment.kiriyaga.nami.impl.setting.Setting;
 
 public class EnumSetting<T extends Enum<T>> extends Setting<T> {
 

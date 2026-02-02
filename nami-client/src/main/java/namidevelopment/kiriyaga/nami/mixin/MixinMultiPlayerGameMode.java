@@ -3,7 +3,7 @@ package namidevelopment.kiriyaga.nami.mixin;
 import namidevelopment.kiriyaga.nami.event.impl.BreakBlockEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PlaceBlockEvent;
 import namidevelopment.kiriyaga.nami.event.impl.StartBreakingBlockEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.world.NoBreakDelayFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.world.NoBreakDelayFeature;
 import namidevelopment.kiriyaga.nami.mixininterface.IClientPlayerInteractionManager;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -22,18 +22,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @Mixin(MultiPlayerGameMode.class)
-public abstract class MixinMultiPlayerGameMode implements IClientPlayerInteractionManager {
+public abstract class MixinMultiPlayerGameMode {
     @Shadow
     private int destroyDelay;
 
     private float savedYaw, savedPitch;
-
-    @Shadow protected abstract void ensureHasSentCarriedItem();
-
-    @Override
-    public void updateSlot() {
-        this.ensureHasSentCarriedItem();
-    }
 
     @Inject(method = "useItem", at = @At("HEAD"))
     private void interactItem1(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {

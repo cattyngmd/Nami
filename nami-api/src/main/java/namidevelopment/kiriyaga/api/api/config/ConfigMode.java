@@ -1,5 +1,9 @@
 package namidevelopment.kiriyaga.api.api.config;
 
+import namidevelopment.kiriyaga.api.model.setting.ColorSetting;
+import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
+import namidevelopment.kiriyaga.api.model.setting.Setting;
+
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public enum ConfigMode {

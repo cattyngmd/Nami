@@ -1,5 +1,8 @@
 package namidevelopment.kiriyaga.api.api.feature;
 
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
+
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 import java.util.*;

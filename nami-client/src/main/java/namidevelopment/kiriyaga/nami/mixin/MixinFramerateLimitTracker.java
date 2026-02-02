@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.miscellaneous.UnfocusedFpsFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.miscellaneous.UnfocusedFpsFeature;
 import com.mojang.blaze3d.platform.FramerateLimitTracker;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

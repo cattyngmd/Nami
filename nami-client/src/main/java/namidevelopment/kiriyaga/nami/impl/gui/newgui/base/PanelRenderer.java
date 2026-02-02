@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.impl.gui.newgui.base;
 
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ClickGuiFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 

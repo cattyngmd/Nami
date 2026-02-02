@@ -1,12 +1,13 @@
-package namidevelopment.kiriyaga.nami.impl.feature.client;
+package namidevelopment.kiriyaga.api.client;
 
-import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
+
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 
 @RegisterFeature
 public class RotationsFeature extends Feature {

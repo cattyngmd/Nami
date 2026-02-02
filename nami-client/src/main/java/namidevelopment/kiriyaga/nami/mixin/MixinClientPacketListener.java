@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.exploits.NoRotateFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.exploits.NoRotateFeature;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.world.level.chunk.LevelChunk;

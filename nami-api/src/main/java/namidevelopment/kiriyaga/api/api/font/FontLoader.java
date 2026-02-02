@@ -1,6 +1,7 @@
 package namidevelopment.kiriyaga.api.api.font;
 
 import com.mojang.blaze3d.font.GlyphProvider;
+import namidevelopment.kiriyaga.api.client.FontFeature;
 import net.minecraft.client.gui.font.FontOption;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.font.GlyphStitcher;

@@ -1,8 +1,7 @@
-package namidevelopment.kiriyaga.nami.impl.feature;
+package namidevelopment.kiriyaga.api.model.feature;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.HudFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.DoubleSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.EnumSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -12,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import java.awt.*;
 import java.util.List;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 //TODO: refactor
 public abstract class HudElementFeature extends Feature {
@@ -124,17 +123,17 @@ public abstract class HudElementFeature extends Feature {
     }
 
     public int getAbsoluteX() {
-        int screenWidth = MC.getWindow().getGuiScaledWidth();
+        int screenWidth = API_MC.getWindow().getGuiScaledWidth();
         return (int)(x.get() * screenWidth);
     }
 
     public int getAbsoluteY() {
-        int screenHeight = MC.getWindow().getGuiScaledHeight();
+        int screenHeight = API_MC.getWindow().getGuiScaledHeight();
         return (int)(y.get() * screenHeight);
     }
 
     public int getRenderX() {
-        int screenWidth = MC.getWindow().getGuiScaledWidth();
+        int screenWidth = API_MC.getWindow().getGuiScaledWidth();
         int posX = getAbsoluteX();
         Rectangle bounds = getBoundingBox();
 
@@ -155,7 +154,7 @@ public abstract class HudElementFeature extends Feature {
     }
 
     public int getRenderY() {
-        int screenHeight = MC.getWindow().getGuiScaledHeight();
+        int screenHeight = API_MC.getWindow().getGuiScaledHeight();
         int posY = getAbsoluteY();
         Rectangle bounds = getBoundingBox();
 
@@ -169,8 +168,8 @@ public abstract class HudElementFeature extends Feature {
     }
 
     public void renderItems(GuiGraphics context) {
-        ItemRenderer itemRenderer = MC.getItemRenderer();
-        Font textRenderer = MC.font;
+        ItemRenderer itemRenderer = API_MC.getItemRenderer();
+        Font textRenderer = API_MC.font;
         int baseY = getRenderY();
 
         for (ItemElement element : getItemElements()) {
@@ -187,7 +186,7 @@ public abstract class HudElementFeature extends Feature {
             int drawY = baseY + element.offsetY();
 
             context.renderItem(element.stack(), drawX, drawY);
-            context.renderItemDecorations(MC.font, element.stack(), drawX, drawY, null);
+            context.renderItemDecorations(API_MC.font, element.stack(), drawX, drawY, null);
 
             Component label = element.label();
             int labelWidth = FONT_SERVICE.getWidth(label);
@@ -238,7 +237,7 @@ public abstract class HudElementFeature extends Feature {
             context.pose().translate(labelX, labelY);
             context.pose().scale(scale, scale);
 
-            FONT_SERVICE.drawText(context, label, 0, 0, FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).shadow.get());
+            FONT_SERVICE.drawText(context, label, 0, 0, true);
             context.pose().popMatrix();
         }
     }

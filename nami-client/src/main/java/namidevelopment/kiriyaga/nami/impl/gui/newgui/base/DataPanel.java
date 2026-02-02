@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.impl.gui.newgui.base;
 
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.widget.ActionWidget;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,8 +10,6 @@ import net.minecraft.network.chat.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import static namidevelopment.kiriyaga.nami.Nami.*;
 
 public class DataPanel<T extends BaseEntry> {
     protected final List<T> entries = new ArrayList<>();

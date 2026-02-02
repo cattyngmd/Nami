@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.setting.impl;
+package namidevelopment.kiriyaga.api.model.setting;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

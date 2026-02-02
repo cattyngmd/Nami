@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

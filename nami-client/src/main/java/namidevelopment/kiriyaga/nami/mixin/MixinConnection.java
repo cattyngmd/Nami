@@ -4,7 +4,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import namidevelopment.kiriyaga.nami.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.nami.event.impl.PacketSendEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.miscellaneous.NoPacketKick;
+import namidevelopment.kiriyaga.nami.impl.feature.miscellaneous.NoPacketKick;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import org.spongepowered.asm.mixin.Mixin;

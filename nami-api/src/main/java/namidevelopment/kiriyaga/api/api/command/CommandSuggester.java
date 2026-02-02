@@ -11,6 +11,13 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 import namidevelopment.kiriyaga.api.api.executable.model.ExecutableThreadType;
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.setting.Setting;
+import namidevelopment.kiriyaga.api.model.setting.WhitelistSetting;
+import namidevelopment.kiriyaga.api.util.BlockUtils;
+import namidevelopment.kiriyaga.api.util.KeyUtils;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;

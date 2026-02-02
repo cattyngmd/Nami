@@ -1,5 +1,7 @@
 package namidevelopment.kiriyaga.api.api.font;
 
+import namidevelopment.kiriyaga.api.client.FontFeature;
+
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public class FontMetrics {

@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.HudFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.HudFeature;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;

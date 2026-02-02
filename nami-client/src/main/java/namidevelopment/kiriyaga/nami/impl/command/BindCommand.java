@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.command.impl;
+package namidevelopment.kiriyaga.nami.impl.command;
 
 import namidevelopment.kiriyaga.nami.impl.command.Command;
 import namidevelopment.kiriyaga.nami.impl.command.RegisterCommand;

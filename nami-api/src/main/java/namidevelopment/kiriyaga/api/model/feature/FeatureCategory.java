@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.feature;
+package namidevelopment.kiriyaga.api.model.feature;
 
 import java.util.*;
 

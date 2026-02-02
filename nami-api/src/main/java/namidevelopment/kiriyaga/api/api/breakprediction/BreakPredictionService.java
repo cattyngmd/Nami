@@ -1,5 +1,10 @@
 package namidevelopment.kiriyaga.api.api.breakprediction;
 
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
@@ -8,8 +13,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
-
-import static namidevelopment.kiriyaga.nami.Nami.*;
 
 public class BreakPredictionService {
 
@@ -39,7 +42,7 @@ public class BreakPredictionService {
             Player player = (Player) API_MC.level.getEntity(entityId);
             if (player == null) return;
             UUID uuid = player.getUUID();
-            float speed = FEATURE_SERVICE.getStorage().getByClass(SpeedMineFeature.class).speed.get().floatValue();
+            float speed = 0.7f;
             this.get(uuid).startBreak(pos, Direction.UP, speed);
         }
         });
@@ -54,12 +57,12 @@ public class BreakPredictionService {
         }
     }
 
-    @SubscribeEvent
+/*    @SubscribeEvent
     public void onRender3DEvent(Render3DEvent event) {
         if (FEATURE_SERVICE.getStorage().getByClass(BreakHighlightFeature.class).isEnabled()) {
             for (PlayerBreakState state : players.values()) {
                 state.render(event);
             }
         }
-    }
+    }*/
 }

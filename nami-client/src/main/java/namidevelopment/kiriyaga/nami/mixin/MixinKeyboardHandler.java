@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import namidevelopment.kiriyaga.nami.event.impl.KeyInputEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ClickGuiFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import namidevelopment.kiriyaga.nami.impl.setting.impl.KeyBindSetting;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.gui.components.MultilineTextField;

@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.miscellaneous.BetterTabFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.miscellaneous.BetterTabFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
@@ -22,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @Mixin(PlayerTabOverlay.class)
 public abstract class MixinPlayerTabOverlay {

@@ -3,6 +3,8 @@ package namidevelopment.kiriyaga.api.api.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.setting.Setting;
 
 import java.io.File;
 import java.io.FileWriter;

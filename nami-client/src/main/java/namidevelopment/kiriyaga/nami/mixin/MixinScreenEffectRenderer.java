@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -10,8 +10,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @Mixin(ScreenEffectRenderer.class)
 public class MixinScreenEffectRenderer {

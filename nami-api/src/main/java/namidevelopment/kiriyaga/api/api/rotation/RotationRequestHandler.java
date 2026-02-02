@@ -2,6 +2,9 @@ package namidevelopment.kiriyaga.api.api.rotation;
 
 import namidevelopment.kiriyaga.api.api.rotation.model.RotationRequest;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.yawDifference;
+
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.util.Mth;
 

@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.api.api.command;
 
-import static namidevelopment.kiriyaga.api.NamiApi.*;
+import namidevelopment.kiriyaga.api.model.command.Command;
 
 import java.util.ArrayList;
 import java.util.Collections;

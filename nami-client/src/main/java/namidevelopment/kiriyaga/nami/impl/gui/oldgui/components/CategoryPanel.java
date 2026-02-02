@@ -3,14 +3,13 @@ package namidevelopment.kiriyaga.nami.impl.gui.oldgui.components;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.PanelRenderer;
 import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ClickGuiFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import namidevelopment.kiriyaga.nami.util.render.ScissorUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.List;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.nami.impl.gui.oldgui.components.FeaturePanel.Feature_SPACING;
 
 public class CategoryPanel {

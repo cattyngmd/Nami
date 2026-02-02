@@ -3,7 +3,7 @@ package namidevelopment.kiriyaga.nami.impl.gui.newgui.screen;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.NamiScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.entry.FriendEntry;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.widget.ActionItem;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ClickGuiFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.ConsolePanelComponent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;

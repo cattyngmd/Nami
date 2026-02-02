@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;

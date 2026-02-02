@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.miscellaneous.NameProtectFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.miscellaneous.NameProtectFeature;
 import net.minecraft.util.StringDecomposer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

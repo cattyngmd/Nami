@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreecamFeature;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.item.properties.numeric.CompassAngleState;
 import net.minecraft.world.entity.ItemOwner;

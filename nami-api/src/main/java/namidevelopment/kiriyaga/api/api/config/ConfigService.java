@@ -2,6 +2,8 @@ package namidevelopment.kiriyaga.api.api.config;
 
 import com.google.gson.*;
 import namidevelopment.kiriyaga.api.api.config.model.ConfigMeta;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 import java.io.File;

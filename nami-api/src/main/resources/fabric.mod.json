@@ -6,14 +6,15 @@
   "name": "Nami API",
   "description": "The API for nami client.",
   "license": "MIT",
-
   "environment": "*",
-
   "entrypoints": {
     "client": [
       "namidevelopment.kiriyaga.api.NamiApi"
     ]
   },
+  "mixins": [
+    "nami-api.mixins.json"
+  ],
 
   "depends": {
     "fabricloader": ">=${loader_version}",

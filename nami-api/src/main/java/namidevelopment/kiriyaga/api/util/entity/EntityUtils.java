@@ -1,5 +1,7 @@
 package namidevelopment.kiriyaga.api.util.entity;
 
+import namidevelopment.kiriyaga.api.mixin.DuckAgeableMob;
+import namidevelopment.kiriyaga.api.mixin.DuckAnimal;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.ClientLevel;

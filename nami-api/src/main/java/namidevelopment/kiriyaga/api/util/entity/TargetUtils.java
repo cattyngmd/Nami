@@ -1,5 +1,6 @@
 package namidevelopment.kiriyaga.api.util.entity;
 
+import namidevelopment.kiriyaga.api.client.TargetFeature;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;

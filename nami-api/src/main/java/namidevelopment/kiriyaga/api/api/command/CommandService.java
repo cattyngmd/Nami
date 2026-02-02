@@ -1,6 +1,8 @@
 package namidevelopment.kiriyaga.api.api.command;
 
 
+import namidevelopment.kiriyaga.api.model.command.Command;
+
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public class CommandService {

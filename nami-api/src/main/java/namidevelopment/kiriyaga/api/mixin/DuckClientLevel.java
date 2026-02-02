@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.mixin;
+package namidevelopment.kiriyaga.api.mixin;
 
 import net.minecraft.client.multiplayer.prediction.BlockStatePredictionHandler;
 import net.minecraft.client.multiplayer.ClientLevel;

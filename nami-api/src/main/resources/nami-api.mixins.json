@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "namidevelopment.kiriyaga.api.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "DuckChatComponent",
+    "DuckClientLevel",
+    "DuckFont",
+    "DuckMultiPlayerGameMode",
+    "MixinMultiPlayerGameMode"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "DuckAgeableMob",
+    "DuckAnimal"
+  ]
+}

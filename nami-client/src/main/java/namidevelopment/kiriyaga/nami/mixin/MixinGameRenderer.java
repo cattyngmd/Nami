@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.exploits.ReachFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.exploits.ReachFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreecamFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;

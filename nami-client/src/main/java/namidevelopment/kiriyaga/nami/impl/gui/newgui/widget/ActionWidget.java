@@ -1,14 +1,12 @@
 package namidevelopment.kiriyaga.nami.impl.gui.newgui.widget;
 
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.PanelRenderer;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static namidevelopment.kiriyaga.nami.Nami.*;
 
 public class ActionWidget {
     private final List<ActionItem> items = new ArrayList<>();

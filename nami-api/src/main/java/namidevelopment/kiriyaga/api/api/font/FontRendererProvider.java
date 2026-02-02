@@ -1,5 +1,7 @@
 package namidevelopment.kiriyaga.api.api.font;
 
+import namidevelopment.kiriyaga.api.client.FontFeature;
+import namidevelopment.kiriyaga.api.mixin.DuckFont;
 import net.minecraft.client.gui.font.glyphs.EffectGlyph;
 import net.minecraft.client.gui.GlyphSource;
 import net.minecraft.client.gui.Font;

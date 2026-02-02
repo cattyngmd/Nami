@@ -1,6 +1,9 @@
 package namidevelopment.kiriyaga.api.api.font;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+
+import namidevelopment.kiriyaga.api.client.FontFeature;
+import namidevelopment.kiriyaga.api.util.ColorUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 

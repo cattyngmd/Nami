@@ -1,9 +1,9 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.client.RotationsFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.movement.NoSlowFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.movement.NoSlowFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;

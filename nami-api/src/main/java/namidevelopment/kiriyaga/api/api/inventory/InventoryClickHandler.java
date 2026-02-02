@@ -54,7 +54,8 @@ public class InventoryClickHandler {
     private boolean click(int slot, int button, ClickType type, boolean skipGeneric) {
         if (slot < 0) return false;
 
-        NoSlowFeature noSlow = FEATURE_SERVICE.getStorage().getByClass(NoSlowFeature.class);
+        // this is garbage check and it didnt make it to v3 blah blah flags vanilla i dont care
+/*        NoSlowFeature noSlow = FEATURE_SERVICE.getStorage().getByClass(NoSlowFeature.class);
 
         if (noSlow != null && noSlow.isEnabled()){
             if (noSlow.invMove.get() == NoSlowFeature.InvMove.WAIT && INPUT_SERVICE.hasAnyInput()) {
@@ -70,7 +71,7 @@ public class InventoryClickHandler {
                     return false;
                 }
             }
-        }
+        }*/
 
         if (API_MC.screen instanceof ShulkerBoxScreen
                 || API_MC.screen instanceof AnvilScreen
@@ -88,7 +89,6 @@ public class InventoryClickHandler {
                 || API_MC.screen instanceof StonecutterScreen
                 || (API_MC.screen instanceof ContainerScreen && !skipGeneric)
                 || API_MC.screen instanceof CreativeModeInventoryScreen) {
-            FEATURE_SERVICE.getStorage().getByClass(AutoTotemFeature.class).addDeathReason("invfail", "Inventory Fail");
             return false;
         }
 

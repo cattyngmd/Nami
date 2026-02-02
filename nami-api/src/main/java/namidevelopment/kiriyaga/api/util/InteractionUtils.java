@@ -1,5 +1,8 @@
 package namidevelopment.kiriyaga.api.util;
 
+import namidevelopment.kiriyaga.api.api.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.mixin.DuckMultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -197,7 +200,7 @@ public class InteractionUtils {
 
             if (!isOffhand) {
                 int prev = API_MC.player.getInventory().getSelectedSlot();
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
+                InventoryUtils.attemptSwitch(slot);
 
                 if (simulate)
                     API_MC.gameMode.useItemOn(API_MC.player, MAIN_HAND, hitResult);
@@ -210,7 +213,7 @@ public class InteractionUtils {
                 result = true;
 
                 if (swapBack)
-                    INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+                    InventoryUtils.attemptSwitch(prev);
             }
             else {
                 if (simulate)
@@ -306,7 +309,7 @@ public class InteractionUtils {
 
         if (!isOffhand) {
             int prev = API_MC.player.getInventory().getSelectedSlot();
-            INVENTORY_SERVICE.getSlotHandler().attemptSwitch(slot);
+            InventoryUtils.attemptSwitch(slot);
 
             if (simulate)
                 API_MC.gameMode.useItemOn(API_MC.player, MAIN_HAND, hit);
@@ -316,7 +319,7 @@ public class InteractionUtils {
             if (swing)
                 API_MC.player.swing(MAIN_HAND);
             if (swapBack)
-                INVENTORY_SERVICE.getSlotHandler().attemptSwitch(prev);
+                InventoryUtils.attemptSwitch(prev);
         } else {
             if (simulate)
                 API_MC.gameMode.useItemOn(API_MC.player, OFF_HAND, hit);

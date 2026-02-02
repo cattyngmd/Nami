@@ -1,21 +1,10 @@
 package namidevelopment.kiriyaga.nami;
 
-import namidevelopment.kiriyaga.nami.api.breakprediction.BreakPredictionService;
-import namidevelopment.kiriyaga.nami.api.cat.FabricCatFormat;
-import namidevelopment.kiriyaga.nami.api.command.CommandService;
-import namidevelopment.kiriyaga.nami.api.config.ConfigService;
-import namidevelopment.kiriyaga.nami.api.executable.ExecutableService;
-import namidevelopment.kiriyaga.nami.api.font.FontService;
-import namidevelopment.kiriyaga.nami.api.inventory.InventoryService;
-import namidevelopment.kiriyaga.nami.api.macro.MacroService;
-import namidevelopment.kiriyaga.nami.api.rotation.RotationService;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.NavigatePanelComponent;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.ConfigScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.screen.ClickGuiScreen;
-import namidevelopment.kiriyaga.nami.api.feature.FeatureService;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.FriendScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.screen.HudEditorScreen;
-import namidevelopment.kiriyaga.nami.util.CatStyles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -26,6 +15,9 @@ import net.minecraft.client.multiplayer.ServerData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraft.util.Tuple;
+
+import static namidevelopment.kiriyaga.api.NamiApi.COMMAND_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.CONFIG_SERVICE;
 
 public class Nami implements ClientModInitializer {
     public static String NAME = "nami";

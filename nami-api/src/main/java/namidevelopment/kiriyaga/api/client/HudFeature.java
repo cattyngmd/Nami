@@ -1,23 +1,23 @@
-package namidevelopment.kiriyaga.nami.impl.feature.client;
+package namidevelopment.kiriyaga.api.client;
 
-import namidevelopment.kiriyaga.nami.event.EventPriority;
-import namidevelopment.kiriyaga.nami.event.SubscribeEvent;
-import namidevelopment.kiriyaga.nami.event.impl.PreTickEvent;
-import namidevelopment.kiriyaga.nami.event.impl.Render2DEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.HudElementFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.Feature;
-import namidevelopment.kiriyaga.nami.impl.feature.FeatureCategory;
-import namidevelopment.kiriyaga.nami.impl.feature.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.BoolSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.ColorSetting;
-import namidevelopment.kiriyaga.nami.impl.setting.impl.IntSetting;
-import namidevelopment.kiriyaga.nami.util.ChatAnimationHelper;
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.Render2DEvent;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
+import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.ColorSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.ChatAnimationHelper;
 import net.minecraft.client.gui.screens.ChatScreen;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterFeature
 public class HudFeature extends Feature {
@@ -65,7 +65,7 @@ public class HudFeature extends Feature {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender2D(Render2DEvent event) {
-        boolean chatOpen = MC.screen instanceof ChatScreen;
+        boolean chatOpen = API_MC.screen instanceof ChatScreen;
         ChatAnimationHelper.setChatOpen(chatOpen);
         ChatAnimationHelper.tick();
 
@@ -74,19 +74,19 @@ public class HudFeature extends Feature {
             if (offset > 0) {
                 event.getDrawContext().fill(
                         2,
-                        MC.getWindow().getGuiScaledHeight() - offset,
-                        MC.getWindow().getGuiScaledWidth() - 2,
-                        MC.getWindow().getGuiScaledHeight() - 2,
-                        MC.options.getBackgroundColor(Integer.MIN_VALUE)
+                        API_MC.getWindow().getGuiScaledHeight() - offset,
+                        API_MC.getWindow().getGuiScaledWidth() - 2,
+                        API_MC.getWindow().getGuiScaledHeight() - 2,
+                        API_MC.options.getBackgroundColor(Integer.MIN_VALUE)
                 );
             }
         }
 
-        int screenHeight = MC.getWindow().getGuiScaledHeight();
+        int screenHeight = API_MC.getWindow().getGuiScaledHeight();
         int chatZoneTop = screenHeight - (screenHeight / 8);
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
 
-        if (MC.level == null || MC.getDebugOverlay().showDebugScreen() || MC.options.hideGui)
+        if (API_MC.level == null || API_MC.getDebugOverlay().showDebugScreen() || API_MC.options.hideGui)
             return;
 
         for (Feature Feature : FEATURE_SERVICE.getStorage().getAll()) {
@@ -97,7 +97,7 @@ public class HudFeature extends Feature {
                     int drawX = hudElement.getRenderXForElement(element);
                     int drawY = baseY + element.offsetY();
 
-                    boolean isInChatZone = (drawY + MC.font.lineHeight) >= chatZoneTop;
+                    boolean isInChatZone = (drawY + API_MC.font.lineHeight) >= chatZoneTop;
                     if (isInChatZone) {
                         drawY -= chatAnimationOffset;
                     }

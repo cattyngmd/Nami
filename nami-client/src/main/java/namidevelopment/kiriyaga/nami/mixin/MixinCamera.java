@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.FreeLookFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.ViewClipFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreeLookFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreecamFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.ViewClipFeature;
 import namidevelopment.kiriyaga.nami.mixininterface.ICamera;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;

@@ -1,9 +1,9 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import namidevelopment.kiriyaga.nami.event.impl.EntityPushEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.ESPFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.FreeLookFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.FreecamFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.ESPFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreeLookFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.FreecamFeature;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,6 +1,11 @@
 package namidevelopment.kiriyaga.api.api;
 
 import namidevelopment.kiriyaga.api.api.executable.model.ExecutableThreadType;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.mixin.DuckChatComponent;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
@@ -183,11 +188,11 @@ public class ChatService {
 
     private GuiMessageTag indicator() {
         int global = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
-        return new GuiMessageTag(global, null, Component.literal(DISPLAY_NAME), API_NAME);
+        return new GuiMessageTag(global, null, Component.literal(NAME), NAME);
     }
 
     private Component prefix() {
-        return CAT_FORMAT.format("{s}[{g}" + API_NAME + "{s}] {reset}");
+        return CAT_FORMAT.format("{s}[{g}" + NAME + "{s}] {reset}");
     }
 
     public void removeByText(String text) {

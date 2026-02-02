@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import namidevelopment.kiriyaga.api.api.config.model.ConfigMeta;
+import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.setting.Setting;
 
 import java.io.File;
 import java.io.FileReader;

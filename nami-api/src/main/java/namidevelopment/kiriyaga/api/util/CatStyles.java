@@ -1,6 +1,9 @@
 package namidevelopment.kiriyaga.api.util;
 
 import dev.cattyn.catformat.stylist.annotations.Style;
+import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.api.client.HudFeature;
+
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 

@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.ViewModelFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.ViewModelFeature;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.ItemInHandRenderer;

@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import namidevelopment.kiriyaga.nami.event.impl.Render2DEvent;
-import namidevelopment.kiriyaga.nami.impl.feature.impl.visuals.NoRenderFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.visuals.NoRenderFeature;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.DeltaTracker;

@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.feature;
+package namidevelopment.kiriyaga.api.annotation;
 
 import java.lang.annotation.*;
 

@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.command;
+package namidevelopment.kiriyaga.api.model.command;
 
 import java.util.Arrays;
 import java.util.Locale;

@@ -1,5 +1,11 @@
 package namidevelopment.kiriyaga.api.api;
 
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.KeyInputEvent;
+import namidevelopment.kiriyaga.api.event.impl.PacketSendEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.util.InputCache;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractCommandBlockEditScreen;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
@@ -185,9 +191,9 @@ public class InputService {
     }
 
     private boolean canMove() {
-        if (FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class).isEnabled()) return false;
+        if (FEATURE_SERVICE.getStorage().getByName("Freecam")!= null && FEATURE_SERVICE.getStorage().getByName("Freecam").isEnabled()) return false;
         if (API_MC.screen == null) return true;
-        if (API_MC.screen != null && !FEATURE_SERVICE.getStorage().getByClass(GuiMoveFeature.class).isEnabled()) return false;
+        if (API_MC.screen != null && FEATURE_SERVICE.getStorage().getByName("GuiMove") != null && FEATURE_SERVICE.getStorage().getByName("GuiMove").isEnabled()) return false;
         if (API_MC.screen instanceof ChatScreen
                 || API_MC.screen instanceof SignEditScreen
                 || API_MC.screen instanceof AnvilScreen

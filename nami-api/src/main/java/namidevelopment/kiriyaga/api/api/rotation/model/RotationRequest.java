@@ -1,11 +1,13 @@
 package namidevelopment.kiriyaga.api.api.rotation.model;
 
+import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Supplier;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
 
 /**
  * Rotation request. Used for prioritizing, and controlling motion rotations

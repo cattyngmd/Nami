@@ -1,12 +1,11 @@
-package namidevelopment.kiriyaga.nami.impl.setting.impl;
+package namidevelopment.kiriyaga.api.model.setting;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import namidevelopment.kiriyaga.nami.impl.setting.Setting;
-import namidevelopment.kiriyaga.nami.util.KeyUtils;
+import namidevelopment.kiriyaga.api.util.KeyUtils;
 import org.lwjgl.glfw.GLFW;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.API_MC;
 
 public class KeyBindSetting extends Setting<Integer> {
 
@@ -48,16 +47,16 @@ public class KeyBindSetting extends Setting<Integer> {
         if (value == KEY_NONE) return false;
 
         if (value == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            return MC.mouseHandler.isLeftPressed();
+            return API_MC.mouseHandler.isLeftPressed();
         }
         if (value == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            return MC.mouseHandler.isRightPressed();
+            return API_MC.mouseHandler.isRightPressed();
         }
         if (value == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
-            return MC.mouseHandler.isMiddlePressed();
+            return API_MC.mouseHandler.isMiddlePressed();
         }
 
-        return GLFW.glfwGetKey(MC.getWindow().handle(), value) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetKey(API_MC.getWindow().handle(), value) == GLFW.GLFW_PRESS;
     }
 
     public String getKeyName() {
