@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.api.util;
 
-import namidevelopment.kiriyaga.api.api.rotation.model.RotationRequest;
+import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import namidevelopment.kiriyaga.api.mixin.DuckMultiPlayerGameMode;
 import net.minecraft.core.BlockPos;

@@ -40,7 +40,11 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation project(":nami-api")
+
+    modImplementation project(
+            path: ":nami-api",
+            configuration: "namedElements"
+    )
 
     modImplementation("com.github.cattyngmd.catformat:catformat-core:2.1.0")
     include("com.github.cattyngmd.catformat:catformat-core:2.1.0")

@@ -1,5 +1,6 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
+import namidevelopment.kiriyaga.api.client.FeatureCommand;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
 import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
@@ -7,6 +8,8 @@ import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 @RegisterCommand
 public class HelpCommand extends Command {

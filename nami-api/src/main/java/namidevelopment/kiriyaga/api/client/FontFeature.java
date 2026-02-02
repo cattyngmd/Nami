@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.api.client;
 
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
-import namidevelopment.kiriyaga.api.api.font.FontType;
+import namidevelopment.kiriyaga.api.core.font.FontType;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;

@@ -1,16 +1,16 @@
 package namidevelopment.kiriyaga.api;
 
-import namidevelopment.kiriyaga.api.api.*;
-import namidevelopment.kiriyaga.api.api.breakprediction.BreakPredictionService;
-import namidevelopment.kiriyaga.api.api.cat.FabricCatFormat;
-import namidevelopment.kiriyaga.api.api.command.CommandService;
-import namidevelopment.kiriyaga.api.api.config.ConfigService;
-import namidevelopment.kiriyaga.api.api.executable.ExecutableService;
-import namidevelopment.kiriyaga.api.api.feature.FeatureService;
-import namidevelopment.kiriyaga.api.api.font.FontService;
-import namidevelopment.kiriyaga.api.api.inventory.InventoryService;
-import namidevelopment.kiriyaga.api.api.macro.MacroService;
-import namidevelopment.kiriyaga.api.api.rotation.RotationService;
+import namidevelopment.kiriyaga.api.core.*;
+import namidevelopment.kiriyaga.api.core.breakprediction.BreakPredictionService;
+import namidevelopment.kiriyaga.api.core.cat.FabricCatFormat;
+import namidevelopment.kiriyaga.api.core.command.CommandService;
+import namidevelopment.kiriyaga.api.core.config.ConfigService;
+import namidevelopment.kiriyaga.api.core.executable.ExecutableService;
+import namidevelopment.kiriyaga.api.core.feature.FeatureService;
+import namidevelopment.kiriyaga.api.core.font.FontService;
+import namidevelopment.kiriyaga.api.core.inventory.InventoryService;
+import namidevelopment.kiriyaga.api.core.macro.MacroService;
+import namidevelopment.kiriyaga.api.core.rotation.RotationService;
 import namidevelopment.kiriyaga.api.util.CatStyles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
