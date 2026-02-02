@@ -1,0 +1,22 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "ChatAnimation": true,
+    "Shadow": true,
+    "Bounce": false,
+    "Speed": 5,
+    "Intensity": 30,
+    "Accent": false,
+    "Color": {
+      "r": 170,
+      "g": 170,
+      "b": 170,
+      "a": 255
+    }
+  }
+}

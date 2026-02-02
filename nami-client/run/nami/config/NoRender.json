@@ -1,0 +1,35 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "NoTilt": true,
+    "NoBob": true,
+    "TileEntity": 0,
+    "PortalGui": true,
+    "NoFire": true,
+    "NoBackground": true,
+    "NoPopParticle": false,
+    "NoPotParticle": false,
+    "NoFirework": false,
+    "NoWaterParticle": true,
+    "NoExplosion": true,
+    "NoBreakParticle": false,
+    "NoLiquid": false,
+    "NoWall": false,
+    "NoVignette": true,
+    "NoTotem": true,
+    "NoBoss": true,
+    "NoPortalGui": true,
+    "NoPotIcon": true,
+    "NoDarkness": true,
+    "NoFog": true,
+    "NoArmor": true,
+    "NoNausea": true,
+    "NoPumpkin": false,
+    "NoPowdered": false
+  }
+}

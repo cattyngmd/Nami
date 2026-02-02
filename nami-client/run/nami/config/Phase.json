@@ -1,0 +1,20 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Mode": "PEARL",
+    "Phased": "CRAWL",
+    "Pitch": 81,
+    "CheckCooldown": true,
+    "EntityCheck": true,
+    "Grim": true,
+    "Use": {
+      "value": -1,
+      "holdMode": false
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Delay": 1,
+    "StartDelay": 10,
+    "WhiteList": {
+      "enabled": false,
+      "items": [],
+      "types": [
+        "ANY"
+      ]
+    },
+    "BlackList": {
+      "enabled": false,
+      "items": [],
+      "types": [
+        "ANY"
+      ]
+    }
+  }
+}

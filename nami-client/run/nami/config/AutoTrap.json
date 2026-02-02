@@ -1,0 +1,22 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Range": 3.0,
+    "Face": true,
+    "Delay": 0,
+    "ShiftTicks": 1,
+    "Rotate": true,
+    "StrictDirection": false,
+    "Simulate": false,
+    "Swing": false,
+    "SwapBack": true,
+    "MultiTask": false,
+    "Render": true,
+    "SelfToggle": false
+  }
+}

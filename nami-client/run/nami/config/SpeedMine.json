@@ -1,0 +1,22 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Range": 4.5,
+    "Speed": 1.0,
+    "Swap": "NORMAL",
+    "Rotate": "NORMAL",
+    "Grim": false,
+    "DoubleMine": false,
+    "Instant": true,
+    "Swing": false,
+    "Async": true,
+    "Multitask": false,
+    "Echest": "SILK",
+    "Durability": 3
+  }
+}

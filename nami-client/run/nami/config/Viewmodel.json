@@ -1,0 +1,21 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Hand": false,
+    "Eating": true,
+    "EatingBob": 1.0,
+    "OldAnimation": false,
+    "Scale": 1.0,
+    "PosX": 0.0,
+    "PosY": 0.0,
+    "PosZ": 0.0,
+    "RotX": 0.0,
+    "RotY": 0.0,
+    "RotZ": 0.0
+  }
+}

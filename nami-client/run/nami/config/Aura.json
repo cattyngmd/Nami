@@ -1,0 +1,19 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Range": 3.0,
+    "Delay": 0.92,
+    "Swap": "REQUIRE",
+    "TPS": "AVERAGE",
+    "Multitask": true,
+    "Sprinting": "NONE",
+    "Rotate": "NORMAL",
+    "Swing": true,
+    "Render": true
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "x": 0.0,
+    "y": 0.0,
+    "Label": "TOP",
+    "Alignment": "LEFT",
+    "Mode": "REAL",
+    "Grey": true
+  }
+}

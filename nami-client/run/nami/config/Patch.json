@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "GrimAttackVelocity": true,
+    "PreventUpdateSlot": true,
+    "SlotDragDesync": true,
+    "SilentSwapFix": true,
+    "SetSlotDebug": false
+  }
+}

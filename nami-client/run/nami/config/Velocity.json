@@ -1,0 +1,21 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Mode": "WALLS",
+    "Horizontal": 100.0,
+    "Vertical": 100.0,
+    "Knockback": true,
+    "Explosion": true,
+    "Conceal": false,
+    "GroundOnly": false,
+    "EntityPush": true,
+    "BlockPush": true,
+    "LiquidPush": true,
+    "RodPush": false
+  }
+}

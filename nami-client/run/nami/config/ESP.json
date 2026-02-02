@@ -1,0 +1,20 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Players": true,
+    "Peacefuls": true,
+    "Neutrals": false,
+    "Hostiles": false,
+    "Items": true,
+    "ItemBoundingBox": true,
+    "MobSpawn": false,
+    "SpawnLight": 7,
+    "Mode": "OUTLINE",
+    "Distance": 52.0
+  }
+}

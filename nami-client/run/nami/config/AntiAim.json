@@ -1,0 +1,12 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Speed": 5.0,
+    "Pitch": 0.0
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Mode": "BOUNCE",
+    "TargetY": 180,
+    "MinSpeed": 14,
+    "MaxSpeed": 27,
+    "ClimbPitch": 40,
+    "DivePitch": 38,
+    "CruiseMin": 4,
+    "CruiseMax": 12,
+    "AllowRockets": true,
+    "RocketBelow": 9,
+    "SetbackStop": true,
+    "LockPitch": true,
+    "Pitch": 75
+  }
+}

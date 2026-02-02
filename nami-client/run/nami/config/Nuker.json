@@ -1,0 +1,26 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Mode": "SPHERE",
+    "Range": 3.0,
+    "Rotate": true,
+    "Swing": true,
+    "Grim": false,
+    "StrictDirection": false,
+    "SafeOnly": false,
+    "Flatten": true,
+    "DoubleMine": false,
+    "Whitelist": {
+      "enabled": true,
+      "items": [],
+      "types": [
+        "BLOCK"
+      ]
+    }
+  }
+}

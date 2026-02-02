@@ -1,0 +1,16 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Head": true,
+    "Body": false,
+    "Arms": false,
+    "Legs": false,
+    "Speed": 1.0,
+    "Random": false
+  }
+}

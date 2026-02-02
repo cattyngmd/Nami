@@ -1,0 +1,14 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Font": "VERDANAPRO",
+    "ShadowDarken": 75,
+    "Size": 9,
+    "Oversample": 2
+  }
+}

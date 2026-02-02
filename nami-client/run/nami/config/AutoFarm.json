@@ -1,0 +1,18 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Range": 5.0,
+    "Radius": 4,
+    "Rotate": true,
+    "SwapBack": true,
+    "Swing": true,
+    "Simulate": false,
+    "StrictDirection": false,
+    "MultiTask": false
+  }
+}

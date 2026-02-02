@@ -1,0 +1,16 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Self": true,
+    "Arrows": false,
+    "Pearls": true,
+    "Width": 1.5,
+    "Delay": 2,
+    "Fade": 60
+  }
+}

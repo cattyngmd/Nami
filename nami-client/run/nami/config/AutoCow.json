@@ -1,0 +1,14 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Range": 2.5,
+    "Delay": 5,
+    "Swing": true,
+    "Rotate": false
+  }
+}

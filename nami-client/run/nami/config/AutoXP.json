@@ -1,0 +1,19 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Durability": 80,
+    "Rotate": false,
+    "Packet": false,
+    "ShiftTicks": 3,
+    "NoTarget": false,
+    "OnlyPhased": true,
+    "SelfToggle": true,
+    "Swap": "NORMAL",
+    "1.12": false
+  }
+}

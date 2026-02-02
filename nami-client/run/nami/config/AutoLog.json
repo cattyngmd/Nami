@@ -1,0 +1,17 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "OnHealth": 12,
+    "OnRender": false,
+    "Packet": false,
+    "OnPop": false,
+    "OnLevel": 0,
+    "SelfToggle": true,
+    "ReconnectToggle": true
+  }
+}

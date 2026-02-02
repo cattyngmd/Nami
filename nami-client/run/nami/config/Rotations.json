@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Rotation": "MOTION",
+    "Speed": 360.0,
+    "Ease": 1.0,
+    "Threshold": 5.0,
+    "Hold": 0,
+    "Jitter": true,
+    "MoveFix": true,
+    "Render": false
+  }
+}

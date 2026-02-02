@@ -1,0 +1,17 @@
+{
+  "enabled": false,
+  "settings": {
+    "Bind": {
+      "value": -1,
+      "holdMode": false
+    },
+    "Drawn": true,
+    "Mode": "FARM",
+    "Range": 5.0,
+    "Rotate": true,
+    "Swing": true,
+    "Grim": false,
+    "StrictDirection": false,
+    "Radius": 3
+  }
+}
