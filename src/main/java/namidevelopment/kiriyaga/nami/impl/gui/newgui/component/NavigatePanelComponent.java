@@ -65,7 +65,7 @@ public class NavigatePanelComponent {
                     context,
                     name,
                     offsetX,
-                    (y + (HEIGHT - FONT_SERVICE.getHeight()) / 2),
+                    (y + Math.ceilDiv(HEIGHT - FONT_SERVICE.getHeight(), 2)),
                     CLICK_GUI_SCREEN.applyFade(toRGBA(textCol)),
                     true
             );
