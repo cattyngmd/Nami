@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.api.core.breakprediction;
 
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import net.minecraft.core.BlockPos;

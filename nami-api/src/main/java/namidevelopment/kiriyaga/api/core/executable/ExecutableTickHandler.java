@@ -3,7 +3,7 @@ package namidevelopment.kiriyaga.api.core.executable;
 import namidevelopment.kiriyaga.api.core.executable.model.ExecutableRequest;
 import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PostTickEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.event.impl.Render2DEvent;

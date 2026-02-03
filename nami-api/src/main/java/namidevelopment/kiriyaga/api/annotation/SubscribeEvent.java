@@ -1,4 +1,6 @@
-package namidevelopment.kiriyaga.api.event;
+package namidevelopment.kiriyaga.api.annotation;
+
+import namidevelopment.kiriyaga.api.event.EventPriority;
 
 import java.lang.annotation.*;
 

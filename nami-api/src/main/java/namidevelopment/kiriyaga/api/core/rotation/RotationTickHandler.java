@@ -4,7 +4,7 @@ import namidevelopment.kiriyaga.api.contract.FeatureContractService;
 import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.util.InputCache;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;

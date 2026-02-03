@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.api.core.command;
 
 
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.ChatMessageEvent;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;

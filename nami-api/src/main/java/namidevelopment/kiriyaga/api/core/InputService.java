@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.api.core;
 
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.KeyInputEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketSendEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;

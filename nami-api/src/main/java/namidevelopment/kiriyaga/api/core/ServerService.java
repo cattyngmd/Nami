@@ -2,9 +2,8 @@ package namidevelopment.kiriyaga.api.core;
 
 import namidevelopment.kiriyaga.api.contract.FeatureContractService;
 import namidevelopment.kiriyaga.api.contract.feature.LatencyFeatureConfig;
-import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;

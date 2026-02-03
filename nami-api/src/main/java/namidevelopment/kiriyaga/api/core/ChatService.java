@@ -4,7 +4,7 @@ import namidevelopment.kiriyaga.api.contract.FeatureContractService;
 import namidevelopment.kiriyaga.api.contract.feature.ColorFeatureConfig;
 import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.mixin.DuckChatComponent;
 import net.minecraft.client.gui.components.ChatComponent;

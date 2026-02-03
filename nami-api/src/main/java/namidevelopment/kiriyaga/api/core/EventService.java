@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.api.core;
 
 import namidevelopment.kiriyaga.api.event.Event;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
