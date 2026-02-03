@@ -13,4 +13,4 @@ pluginManagement {
 }
 
 include(":nami-api")
-//include(":nami-client")
+include(":nami-client")
