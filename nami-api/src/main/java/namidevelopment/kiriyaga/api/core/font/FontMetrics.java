@@ -1,6 +1,7 @@
 package namidevelopment.kiriyaga.api.core.font;
 
-import namidevelopment.kiriyaga.api.client.FontFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.FontFeatureConfig;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
@@ -13,9 +14,9 @@ public class FontMetrics {
     }
 
     public int getHeight() {
-        FontFeature fontFeature = FEATURE_SERVICE.getStorage().getByClass(FontFeature.class);
+        FontFeatureConfig fontFeature = FeatureContractService.get(FontFeatureConfig.class);
         if (!fontFeature.isEnabled())
             return rendererProvider.getRenderer().lineHeight;
-        return Math.round(fontFeature.glyphSize.get() * 0.85f);
+        return Math.round(fontFeature.getGlyphSize() * 0.85f);
     }
 }

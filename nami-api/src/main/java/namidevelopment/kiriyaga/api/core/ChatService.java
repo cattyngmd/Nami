@@ -1,7 +1,8 @@
 package namidevelopment.kiriyaga.api.core;
 
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.ColorFeatureConfig;
 import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
-import namidevelopment.kiriyaga.api.client.ColorFeature;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.event.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
@@ -187,7 +188,7 @@ public class ChatService {
     }
 
     private GuiMessageTag indicator() {
-        int global = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
+        int global = FeatureContractService.get(ColorFeatureConfig.class).getStyledGlobalColor().getRGB() & 0x00FFFFFF;
         return new GuiMessageTag(global, null, Component.literal(NAME), NAME);
     }
 

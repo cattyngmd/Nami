@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.api.client;
+package namidevelopment.kiriyaga.nami.impl.feature.client;
 
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.event.EventPriority;
@@ -11,8 +11,6 @@ import namidevelopment.kiriyaga.api.model.setting.ColorSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 
 import java.awt.*;
-
-import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 
 @RegisterFeature

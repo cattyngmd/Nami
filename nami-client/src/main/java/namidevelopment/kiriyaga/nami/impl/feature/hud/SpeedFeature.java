@@ -85,7 +85,7 @@ public class SpeedFeature extends HudElementFeature {
 
     @Override
     public Component getDisplayText() {
-        if (MC.player == null) return CAT_FORMAT.format("{bg}NaN");
+        if (MC.player == null) return CAT_FORMAT.format("{g}NaN");
 
         String speedStr;
         if (mode.get() == SpeedMode.BPS) {
@@ -100,7 +100,7 @@ public class SpeedFeature extends HudElementFeature {
         height = FONT_SERVICE.getHeight();
 
         if (displayLabel.get()) {
-            return CAT_FORMAT.format("{bg}Speed: {bw}" + speedStr);
+            return CAT_FORMAT.format("{g}Speed: {w}" + speedStr);
         } else {
             return Component.literal(textStr);
         }

@@ -30,7 +30,7 @@ public class TimeFeature extends HudElementFeature {
     @Override
     public Component getDisplayText() {
         Minecraft mc = MC;
-        if (mc.level == null) return CAT_FORMAT.format("{bg}NaN");
+        if (mc.level == null) return CAT_FORMAT.format("{g}NaN");
 
         String timeText;
 
@@ -50,8 +50,8 @@ public class TimeFeature extends HudElementFeature {
         height = FONT_SERVICE.getHeight();
 
         if (!grey.get())
-            return CAT_FORMAT.format("{bg}" + timeText);
+            return CAT_FORMAT.format("{g}" + timeText);
         else
-            return CAT_FORMAT.format("{bgr}" + timeText);
+            return CAT_FORMAT.format("{gray}" + timeText);
     }
 }

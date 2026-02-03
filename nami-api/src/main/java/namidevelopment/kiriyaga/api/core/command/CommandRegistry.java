@@ -22,17 +22,4 @@ public class CommandRegistry {
             }
         }
     }
-
-    public static void registerFeatureCommands(CommandStorage storage) {
-        FEATURE_SERVICE.getStorage().getAll().forEach(Feature -> {
-            try {
-                String name = Feature.getName().replace(" ", "");
-                if (storage.getCommandByNameOrAlias(name) == null) {
-                    storage.addCommand(new FeatureCommand(Feature));
-                }
-            } catch (Exception e) {
-                API_LOGGER.error("Failed to initiate command for Feature: " + Feature.getName(), e);
-            }
-        });
-    }
 }

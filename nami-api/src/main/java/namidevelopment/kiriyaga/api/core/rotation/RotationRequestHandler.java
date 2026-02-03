@@ -1,10 +1,11 @@
 package namidevelopment.kiriyaga.api.core.rotation;
 
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.util.RotationUtils.yawDifference;
 
-import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.util.Mth;
 
@@ -50,7 +51,7 @@ public class RotationRequestHandler {
     public void submit(RotationRequest request) {
 //        RotationFeature.RotationMode mode = Feature_SERVICE.getStorage().getByClass(RotationFeature.class).rotation.get();
 
-        if (request.rotationMode == RotationsFeature.RotationMode.SILENT) {
+        if (request.rotationMode == RotationsFeatureConfig.RotationMode.SILENT) {
             performSilent(request);
             stateHandler.setSilentSyncRequired(true);
             return;
@@ -82,10 +83,10 @@ public class RotationRequestHandler {
      * @return {@code true}, yaw + pitch is close enough to target (enough = threshold)
      */
     public boolean isCompleted(String id) {
+        RotationsFeatureConfig rotationsFeatureConfig = FeatureContractService.get(RotationsFeatureConfig.class);
+
         return isCompleted(
-                id,
-                FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class)
-                        .rotationThreshold.get().floatValue()
+                id, rotationsFeatureConfig.getRotationThreshold()
         );
     }
 
@@ -96,8 +97,10 @@ public class RotationRequestHandler {
      * @param threshold allowed degree loss
      * @return {@code true}, if yaw pitch is close enough to target
      */
-    public boolean isCompleted(String id, float threshold) {
-        if (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.SILENT && stateHandler.getSilentSyncRequired())
+    public boolean isCompleted(String id, double threshold) {
+        RotationsFeatureConfig rotationsFeatureConfig = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        if (rotationsFeatureConfig.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && stateHandler.getSilentSyncRequired())
             return true; // TODO: find better solution
         return requests.stream()
                 .filter(r -> r.id.equals(id))
@@ -137,12 +140,14 @@ public class RotationRequestHandler {
     }
 
     private void performSilent(RotationRequest req) {
+        RotationsFeatureConfig rotationsFeatureConfig = FeatureContractService.get(RotationsFeatureConfig.class);
+
         float targetYaw = req.targetYaw;
         float targetPitch = req.targetPitch;
 
-        if (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).jitter.get()) {
-            float minJitter = (float) (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotationThreshold.get() / 4f);
-            float maxJitter = (float) (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotationThreshold.get() / 2);
+        if (rotationsFeatureConfig.isJitterEnabled()) {
+            float minJitter = (float) (rotationsFeatureConfig.getRotationThreshold() / 4f);
+            float maxJitter = (float) (rotationsFeatureConfig.getRotationThreshold() / 2);
             float jitterYaw = minJitter + (float) (Math.random() * (maxJitter - minJitter));
             float jitterPitch = minJitter + (float) (Math.random() * (maxJitter - minJitter));
             jitterYaw *= Math.random() < 0.5 ? -1 : 1;

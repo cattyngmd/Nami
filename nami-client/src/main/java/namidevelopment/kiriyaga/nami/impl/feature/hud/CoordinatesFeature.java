@@ -34,7 +34,7 @@ public class CoordinatesFeature extends HudElementFeature {
         if (layout.get() == LayoutMode.VERTICAL) return null; // use getTextElements()
 
         if (MC.player == null || MC.level == null) {
-            return CAT_FORMAT.format("{bg}XYZ: {bw}NaN");
+            return CAT_FORMAT.format("{g}XYZ: {w}NaN");
         }
 
         double x = MC.player.getX();
@@ -50,15 +50,15 @@ public class CoordinatesFeature extends HudElementFeature {
         String formatted = "";
 
         if (displayLabel.get()) {
-            formatted += "{bg}XYZ: ";
+            formatted += "{g}XYZ: ";
         }
 
-        formatted += "{bw}" + formatNumber(x) + "{bg}, {bw}"
-                + formatNumber(y) + "{bg}, {bw}"
+        formatted += "{w}" + formatNumber(x) + "{g}, {w}"
+                + formatNumber(y) + "{g}, {w}"
                 + formatNumber(z);
 
         if ((isOverworld || isNether) && altCords.get()) {
-            formatted += " {bg}[{bw}" + formatNumber(xAlt) + "{bg}, {bw}" + formatNumber(zAlt) + "{bg}]";
+            formatted += " {g}[{w}" + formatNumber(xAlt) + "{g}, {w}" + formatNumber(zAlt) + "{g}]";
         }
 
         width = FONT_SERVICE.getWidth(formatted.replaceAll("\\{.*?}", ""));
@@ -76,7 +76,7 @@ public class CoordinatesFeature extends HudElementFeature {
         List<TextElement> lines = new ArrayList<>();
 
         if (MC.player == null || MC.level == null) {
-            lines.add(new TextElement(CAT_FORMAT.format("{bg}XYZ: {bw}NaN"), 0, 0));
+            lines.add(new TextElement(CAT_FORMAT.format("{g}XYZ: {w}NaN"), 0, 0));
             return lines;
         }
 
@@ -93,20 +93,20 @@ public class CoordinatesFeature extends HudElementFeature {
         int lineHeight = FONT_SERVICE.getHeight() + 1;
         int offsetY = 0;
 
-        String fx = "{bg}X: {bw}" + formatNumber(x);
+        String fx = "{g}X: {w}" + formatNumber(x);
         if ((isOverworld || isNether) && altCords.get()) {
-            fx += " {bg}[{bw}" + formatNumber(xAlt) + "{bg}]";
+            fx += " {g}[{w}" + formatNumber(xAlt) + "{g}]";
         }
 
         lines.add(new TextElement(CAT_FORMAT.format(fx), 0, offsetY));
         offsetY += lineHeight;
 
-        lines.add(new TextElement(CAT_FORMAT.format("{bg}Y: {bw}" + formatNumber(y)), 0, offsetY));
+        lines.add(new TextElement(CAT_FORMAT.format("{g}Y: {w}" + formatNumber(y)), 0, offsetY));
         offsetY += lineHeight;
 
-        String fz = "{bg}Z: {bw}" + formatNumber(z);
+        String fz = "{g}Z: {w}" + formatNumber(z);
         if ((isOverworld || isNether) && altCords.get()) {
-            fz += " {bg}[{bw}" + formatNumber(zAlt) + "{bg}]";
+            fz += " {g}[{w}" + formatNumber(zAlt) + "{g}]";
         }
 
         lines.add(new TextElement(CAT_FORMAT.format(fz), 0, offsetY));

@@ -52,7 +52,7 @@ public class ArmorHudFeature extends HudElementFeature {
                 int max = stack.getMaxDamage();
                 int remaining = max - stack.getDamageValue();
                 int percent = (int) ((remaining / (float) max) * 100);
-                labelText = CAT_FORMAT.format("{bg}" + percent + "%");
+                labelText = CAT_FORMAT.format("{g}" + percent + "%");
             }
 
             int offsetX = orientation.get() == Orientation.HORIZONTAL ? i * (itemSize + spacing) : 0;

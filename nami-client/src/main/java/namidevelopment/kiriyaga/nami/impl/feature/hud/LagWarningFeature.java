@@ -28,6 +28,6 @@ public class LagWarningFeature extends HudElementFeature {
         width = FONT_SERVICE.getWidth(warningText);
         height = FONT_SERVICE.getHeight();
 
-        return CAT_FORMAT.format("{bg}" + warningText);
+        return CAT_FORMAT.format("{g}" + warningText);
     }
 }

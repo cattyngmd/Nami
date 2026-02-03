@@ -32,7 +32,7 @@ public class FpsFeature extends HudElementFeature {
         height = FONT_SERVICE.getHeight();
 
         if (displayLabel.get()) {
-            return CAT_FORMAT.format("{bg}FPS: {bw}" + fps);
+            return CAT_FORMAT.format("{g}FPS: {w}" + fps);
         } else {
             return Component.literal(textStr);
         }

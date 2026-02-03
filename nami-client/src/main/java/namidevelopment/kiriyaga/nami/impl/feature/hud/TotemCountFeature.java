@@ -47,9 +47,9 @@ public class TotemCountFeature extends HudElementFeature {
         Component label;
 
         if (white.get())
-            label = CAT_FORMAT.format("{bw}"+totemCount);
+            label = CAT_FORMAT.format("{w}"+totemCount);
         else
-            label = CAT_FORMAT.format("{bg}"+totemCount);
+            label = CAT_FORMAT.format("{g}"+totemCount);
 
         width = 16;
         height = 16;

@@ -13,7 +13,6 @@ public class CommandService {
 
     public void init() {
         CommandRegistry.registerAnnotatedCommands(storage);
-        CommandRegistry.registerFeatureCommands(storage);
         suggester.updateDispatcher();
         EVENT_SERVICE.register(executor);
         API_LOGGER.info("Registered " + storage.size() + " commands.");

@@ -18,7 +18,7 @@ public class WeatherFeature extends HudElementFeature {
 
     @Override
     public Component getDisplayText() {
-        if (MC.level == null) return CAT_FORMAT.format("{bg}NaN");
+        if (MC.level == null) return CAT_FORMAT.format("{g}NaN");
 
         String weather;
 
@@ -34,12 +34,12 @@ public class WeatherFeature extends HudElementFeature {
 
         String text;
         if (displayLabel.get()) {
-            text = "{bg}Weather: {bw}" + weather;
+            text = "{g}Weather: {w}" + weather;
         } else {
-            text = "{bw}" + weather;
+            text = "{w}" + weather;
         }
 
-        width = FONT_SERVICE.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
+        width = FONT_SERVICE.getWidth(text.replace("{g}", "").replace("{w}", ""));
         height = FONT_SERVICE.getHeight();
 
         return CAT_FORMAT.format(text);

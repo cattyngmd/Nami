@@ -1,5 +1,6 @@
-package namidevelopment.kiriyaga.api.client;
+package namidevelopment.kiriyaga.nami.impl.command;
 
+import namidevelopment.kiriyaga.api.core.command.CommandStorage;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
@@ -250,5 +251,18 @@ public class FeatureCommand extends Command {
     @SuppressWarnings({"unchecked", "rawtypes"}) // god i love theese compiler errors in clear java
     private static <E extends Enum<E>> void setEnumValue(EnumSetting<?> setting, Enum<?> value) {
         ((EnumSetting) setting).set(value);
+    }
+
+    public static void registerFeatureCommands(CommandStorage storage) {
+        FEATURE_SERVICE.getStorage().getAll().forEach(Feature -> {
+            try {
+                String name = Feature.getName().replace(" ", "");
+                if (storage.getCommandByNameOrAlias(name) == null) {
+                    storage.addCommand(new FeatureCommand(Feature));
+                }
+            } catch (Exception e) {
+                API_LOGGER.error("Failed to initiate command for Feature: " + Feature.getName(), e);
+            }
+        });
     }
 }

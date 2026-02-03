@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.api.client;
+package namidevelopment.kiriyaga.nami.impl.feature.client;
 
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.feature.Feature;

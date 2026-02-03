@@ -1,6 +1,8 @@
 package namidevelopment.kiriyaga.api.core;
 
-import namidevelopment.kiriyaga.api.client.LatencyFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.LatencyFeatureConfig;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.event.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
@@ -15,6 +17,7 @@ import net.minecraft.util.debugchart.LocalSampleLogger;
 import java.util.Arrays;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.contract.feature.LatencyFeatureConfig.Mode.*;
 
 public class ServerService {
 
@@ -83,20 +86,20 @@ public class ServerService {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPacketReceive3(PacketReceiveEvent packet) {
-        LatencyFeature config = FEATURE_SERVICE.getStorage().getByClass(LatencyFeature.class);
+        LatencyFeatureConfig config = FeatureContractService.get(LatencyFeatureConfig.class);
 
-        if (config.fastLatencyMode.get() != LatencyFeature.mode.OLD)
+        if (config.getMode() != OLD)
             return;
 
         if (packet.getPacket() instanceof ClientboundKeepAlivePacket) {
             long now = System.currentTimeMillis();
-            int keepAliveInterval = config != null ? config.keepAliveInterval.get() : 1000;
+            int keepAliveInterval = config != null ? config.getKeepAliveInterval() : 1000;
 
             if (lastReceiveTime != -1) {
                 long interval = now - lastReceiveTime;
                 int ping = (int) Math.max(0, interval - keepAliveInterval);
 
-                int smoothingStrength = config != null ? config.smoothingStrength.get() : 10;
+                int smoothingStrength = config != null ? config.getSmoothingStrength() : 10;
                 if (pingHistory.length != smoothingStrength) {
                     int[] newHistory = new int[smoothingStrength];
                     for (int i = 0; i < Math.min(countPing, smoothingStrength); i++) {
@@ -181,10 +184,10 @@ public class ServerService {
     }
 
     public void updatePing() {
-        LatencyFeature config = FEATURE_SERVICE.getStorage().getByClass(LatencyFeature.class);
+        LatencyFeatureConfig config = FeatureContractService.get(LatencyFeatureConfig.class);
         if (config == null) ping = lastPing;
 
-        switch (config.fastLatencyMode.get()) {
+        switch (config.getMode()) {
             case OLD:
                 ping = lastPing;
                 break;
@@ -214,10 +217,10 @@ public class ServerService {
     }
 
     public boolean isConnectionUnstable() {
-        LatencyFeature config = FEATURE_SERVICE.getStorage().getByClass(LatencyFeature.class);
+        LatencyFeatureConfig config = FeatureContractService.get(LatencyFeatureConfig.class);
         if (config == null) return false;
 
-        int timeoutMillis = config.unstableConnectionTimeout.get() * 1000;
+        int timeoutMillis = config.getUnstableTimeout() * 1000;
 
         if (lastUpdated == -1) {
             return true;

@@ -1,6 +1,7 @@
 package namidevelopment.kiriyaga.api.core.font;
 
-import namidevelopment.kiriyaga.api.client.FontFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.FontFeatureConfig;
 import namidevelopment.kiriyaga.api.mixin.DuckFont;
 import net.minecraft.client.gui.font.glyphs.EffectGlyph;
 import net.minecraft.client.gui.GlyphSource;
@@ -22,7 +23,7 @@ public class FontRendererProvider {
     }
 
     public Font getRenderer() {
-        FontFeature fontFeature = FEATURE_SERVICE.getStorage().getByClass(FontFeature.class);
+        FontFeatureConfig fontFeature = FeatureContractService.get(FontFeatureConfig.class);
 
         if (!fontFeature.isEnabled()) {
             return API_MC.font;

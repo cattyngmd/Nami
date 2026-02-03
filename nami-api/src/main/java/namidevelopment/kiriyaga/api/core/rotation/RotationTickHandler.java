@@ -1,7 +1,8 @@
 package namidevelopment.kiriyaga.api.core.rotation;
 
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
-import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.event.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
@@ -41,13 +42,13 @@ public class RotationTickHandler {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
         if (API_MC.player == null) return;
+        RotationsFeatureConfig rotationsFeatureConfig = FeatureContractService.get(RotationsFeatureConfig.class);
 
-        RotationsFeature Feature = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
-        loadSettings(Feature);
+        loadSettings(rotationsFeatureConfig);
         stateHandler.updateRealRotation(API_MC.player.getYRot(), API_MC.player.getXRot());
 
         RotationRequest active = requestHandler.getActiveRequest();
-        if (Feature.rotation.get() == RotationsFeature.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
+        if (rotationsFeatureConfig.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
             //performSilent(active); // actually this can be skipped if we somehow simulate client rotation packet sending idk
             //stateHandler.setSilentSyncRequired(false);
             //resetRotationToReal();
@@ -64,7 +65,7 @@ public class RotationTickHandler {
             idleReset();
         }
 
-        if (Feature.moveFix.get() && stateHandler.isRotating())
+        if (rotationsFeatureConfig.isMoveFixEnabled() && stateHandler.isRotating())
             fixMovementForSpoof();
     }
 
@@ -115,12 +116,12 @@ public class RotationTickHandler {
         }
     }
 
-    private void loadSettings(RotationsFeature Feature) {
-        rotationSpeed = Feature.rotationSpeed.get().floatValue();
-        rotationEaseFactor = Feature.rotationEaseFactor.get().floatValue();
-        rotationThreshold = Feature.rotationThreshold.get().floatValue();
-        ticksBeforeRelease = Feature.ticksBeforeRelease.get();
-        rotationJitter = Feature.jitter.get();
+    private void loadSettings(RotationsFeatureConfig Feature) {
+        rotationSpeed = (float) Feature.getRotationSpeed();
+        rotationEaseFactor = (float) Feature.getRotationEase();
+        rotationThreshold = (float) Feature.getRotationThreshold();
+        ticksBeforeRelease = Feature.getHoldTicks();
+        rotationJitter = Feature.isJitterEnabled();
     }
 
     private void processRequest(RotationRequest request) {

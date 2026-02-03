@@ -65,10 +65,10 @@ public class CrystalCounterHudFeature extends HudElementFeature {
         String formatted = "";
 
         if (displayLabel.get()) {
-            formatted += "{bg}CPS: ";
+            formatted += "{g}CPS: ";
         }
 
-        formatted += "{bw}" + formatNumber(cps);
+        formatted += "{w}" + formatNumber(cps);
 
         width = FONT_SERVICE.getWidth(formatted.replaceAll("\\{.*?}", ""));
         height = FONT_SERVICE.getHeight();

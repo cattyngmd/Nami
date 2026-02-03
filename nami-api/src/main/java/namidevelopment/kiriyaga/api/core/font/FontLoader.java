@@ -1,7 +1,8 @@
 package namidevelopment.kiriyaga.api.core.font;
 
 import com.mojang.blaze3d.font.GlyphProvider;
-import namidevelopment.kiriyaga.api.client.FontFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.FontFeatureConfig;
 import net.minecraft.client.gui.font.FontOption;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.font.GlyphStitcher;
@@ -22,12 +23,12 @@ public class FontLoader {
     private FontType lastFont = null;
 
     public void init() {
-        FontFeature fontFeature = FEATURE_SERVICE.getStorage().getByClass(FontFeature.class);
+        FontFeatureConfig fontFeature = FeatureContractService.get(FontFeatureConfig.class);
         if (fontFeature == null) return;
 
-        int newSize = fontFeature.glyphSize.get();
-        int newOversample = fontFeature.oversample.get();
-        FontType selectedFont = fontFeature.fontType.get();
+        int newSize = fontFeature.getGlyphSize();
+        int newOversample = fontFeature.getOversample();
+        FontType selectedFont = fontFeature.getFontType();
 
         if (storage != null && currentSize == newSize && currentOversample == newOversample
                 && selectedFont == lastFont) return;

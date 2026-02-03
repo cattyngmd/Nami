@@ -1,5 +1,6 @@
 package namidevelopment.kiriyaga.nami;
 
+import namidevelopment.kiriyaga.nami.impl.command.FeatureCommand;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.NavigatePanelComponent;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.ConfigScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.screen.ClickGuiScreen;
@@ -54,6 +55,8 @@ public class Nami implements ClientModInitializer {
         FRIEND_SCREEN = new FriendScreen();
         CONFIG_SCREEN = new ConfigScreen();
         NAVIGATE_PANEL = new NavigatePanelComponent();
+
+        FeatureCommand.registerFeatureCommands(COMMAND_SERVICE.getStorage());
 
         LOGGER.info(NAME + "\n " + VERSION + " has been initialized\n");
 

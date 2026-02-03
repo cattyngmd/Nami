@@ -19,12 +19,12 @@ public class WatermarkFeature extends HudElementFeature {
     public Component getDisplayText() {
         String watermarkStr = DISPLAY_NAME + " " + VERSION;
         if (watermarkStr.isEmpty()) {
-            return CAT_FORMAT.format("{bg}NaN");
+            return CAT_FORMAT.format("{g}NaN");
         }
 
         width = FONT_SERVICE.getWidth(watermarkStr);
         height = FONT_SERVICE.getHeight();
 
-        return plain.get() ? CAT_FORMAT.format("{bg}" + DISPLAY_NAME + " "+ VERSION) : CAT_FORMAT.format("{bg}" + DISPLAY_NAME + " {bw}"+ VERSION);
+        return plain.get() ? CAT_FORMAT.format("{g}" + DISPLAY_NAME + " "+ VERSION) : CAT_FORMAT.format("{g}" + DISPLAY_NAME + " {w}"+ VERSION);
     }
 }

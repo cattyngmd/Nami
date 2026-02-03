@@ -2,7 +2,8 @@ package namidevelopment.kiriyaga.api.core.font;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
-import namidevelopment.kiriyaga.api.client.FontFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.FontFeatureConfig;
 import namidevelopment.kiriyaga.api.util.ColorUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -19,12 +20,16 @@ public class FontService {
         fontLoader.init();
     }
 
+    private FontFeatureConfig font() {
+        return FeatureContractService.get(FontFeatureConfig.class);
+    }
+    
     public void drawText(GuiGraphics context, Component text, int x, int y, boolean shadow, int color) {
         if (shadow) {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(translate, translate);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), FEATURE_SERVICE.getStorage().getByClass(FontFeature.class).shadowDarken.get()).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), font().getShadowDarken()).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -36,7 +41,7 @@ public class FontService {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(translate, translate);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), FEATURE_SERVICE.getStorage().getByClass(FontFeature.class).shadowDarken.get()).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), font().getShadowDarken()).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -48,7 +53,7 @@ public class FontService {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(translate, translate);
-            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, FEATURE_SERVICE.getStorage().getByClass(FontFeature.class).shadowDarken.get()), x, y, 0xFFFFFFFF, false);
+            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, font().getShadowDarken()), x, y, 0xFFFFFFFF, false);
             matrices.popMatrix();
         }
 
@@ -60,7 +65,7 @@ public class FontService {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(translate, translate);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(0xFFFFFFFF), FEATURE_SERVICE.getStorage().getByClass(FontFeature.class).shadowDarken.get()).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(0xFFFFFFFF), font().getShadowDarken()).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -72,7 +77,7 @@ public class FontService {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(translate, translate);
-            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, FEATURE_SERVICE.getStorage().getByClass(FontFeature.class).shadowDarken.get()), x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), ColorUtils.darken(text, font().getShadowDarken()), x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), 100).getRGB(), false);
             matrices.popMatrix();
         }
 
@@ -84,7 +89,7 @@ public class FontService {
             var matrices = context.pose();
             matrices.pushMatrix();
             matrices.translate(translate, translate);
-            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), FEATURE_SERVICE.getStorage().getByClass(FontFeature.class).shadowDarken.get()).getRGB(), false);
+            context.drawString(rendererProvider.getRenderer(), text, x, y, ColorUtils.darken(ColorUtils.fromRGBA(color), font().getShadowDarken()).getRGB(), false);
             matrices.popMatrix();
         }
 

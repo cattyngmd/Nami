@@ -31,13 +31,13 @@ public class DirectionFeature extends HudElementFeature {
         }
 
         if (precise.get())
-        dirText = String.format(Locale.US, "%.3f {bg}[{bw}%.3f{bg}]", yaw, pitch); // locale is wild
+        dirText = String.format(Locale.US, "%.3f {g}[{w}%.3f{g}]", yaw, pitch); // locale is wild
         else
-            dirText = String.format(Locale.US, "%.0f {bg}[{bw}%.0f{bg}]", yaw, pitch); // locale is wild
+            dirText = String.format(Locale.US, "%.0f {g}[{w}%.0f{g}]", yaw, pitch); // locale is wild
 
-        String text = displayLabel.get() ? "{bg}Direction: {bw}" + dirText : "{bw}" + dirText;
+        String text = displayLabel.get() ? "{g}Direction: {w}" + dirText : "{w}" + dirText;
 
-        width = FONT_SERVICE.getWidth(text.replace("{bg}", "").replace("{bw}", ""));
+        width = FONT_SERVICE.getWidth(text.replace("{g}", "").replace("{w}", ""));
         height = FONT_SERVICE.getHeight();
 
         return CAT_FORMAT.format(text);

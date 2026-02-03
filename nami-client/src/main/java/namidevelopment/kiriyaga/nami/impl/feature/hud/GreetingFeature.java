@@ -55,7 +55,7 @@ public class GreetingFeature extends HudElementFeature {
     public Component getDisplayText() {
         if (MC.player == null) {
             resetGreeting();
-            return CAT_FORMAT.format("{bg}NaN");
+            return CAT_FORMAT.format("{g}NaN");
         }
 
         long now = System.currentTimeMillis();
@@ -102,7 +102,7 @@ public class GreetingFeature extends HudElementFeature {
 
         if (currentGreeting.isEmpty()) return Component.empty();
 
-        String formattedText = "{bg}" + currentGreeting;
+        String formattedText = "{g}" + currentGreeting;
 
         width = FONT_SERVICE.getWidth(currentGreeting);
         height = FONT_SERVICE.getHeight();

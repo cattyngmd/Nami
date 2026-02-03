@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.api.util;
 
 import dev.cattyn.catformat.stylist.annotations.Style;
-import namidevelopment.kiriyaga.api.client.ColorFeature;
-import namidevelopment.kiriyaga.api.client.HudFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.ColorFeatureConfig;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
@@ -13,19 +13,19 @@ public class CatStyles {
 
     @Style("g")
     Color global() {
-        Color gc = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor();
+        Color gc = FeatureContractService.get(ColorFeatureConfig.class).getStyledGlobalColor();
         return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
     @Style("friend")
     Color friend() {
-        Color gc = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getFriendColor();
+        Color gc = FeatureContractService.get(ColorFeatureConfig.class).getFriendColor();
         return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
     @Style("s")
     Color secondary() {
-        Color gs = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledSecondColor();
+        Color gs = FeatureContractService.get(ColorFeatureConfig.class).getStyledSecondColor();
         return new Color(gs.getRed(), gs.getGreen(), gs.getBlue(), 255);
     }
 
@@ -39,27 +39,13 @@ public class CatStyles {
         return new Color(110, 0, 0);
     }
 
-    @Style("bg")
-    Color bounceGlobal() {
-        Color gc = FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).accent.get() ? FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).globalColor.get() : FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor();
-
-        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
+    @Style("w")
+    Color whitee() {
+        return new Color(255, 255,255);
     }
 
-    @Style("bf")
-    Color bounceFriend() {
-        Color gc = FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).accent.get() ? FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).globalColor.get() : FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getFriendColor();
-
-        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255));
-    }
-
-    @Style("bw")
-    Color bounceWhite() {
-        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(255, 255,255));
-    }
-
-    @Style("bgr")
-    Color bounceGray() {
-        return FEATURE_SERVICE.getStorage().getByClass(HudFeature.class).getPulsingColor(new Color(77,77,77));
+    @Style("gray")
+    Color grayy() {
+        return new Color(77,77,77);
     }
 }

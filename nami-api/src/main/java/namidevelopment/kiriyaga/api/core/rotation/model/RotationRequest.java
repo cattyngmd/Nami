@@ -1,6 +1,8 @@
 package namidevelopment.kiriyaga.api.core.rotation.model;
 
-import namidevelopment.kiriyaga.api.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.FontFeatureConfig;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -62,7 +64,7 @@ public class RotationRequest {
     /**
      * Rotation mode (default = settinga)
      */
-    public final RotationsFeature.RotationMode rotationMode;
+    public final RotationsFeatureConfig.RotationMode rotationMode;
 
     @Override
     public boolean equals(Object o) {
@@ -98,7 +100,7 @@ public class RotationRequest {
      * @param pitch         static pitch value
      * @param rotationMode  override rotation mode
      */
-    public RotationRequest(String id, int priority, float yaw, float pitch, RotationsFeature.RotationMode rotationMode) {
+    public RotationRequest(String id, int priority, float yaw, float pitch, RotationsFeatureConfig.RotationMode rotationMode) {
         this.id = id;
         this.priority = priority;
         this.dynamic = false;
@@ -130,7 +132,7 @@ public class RotationRequest {
      * @param pitchSupplier  dynamic pitch supplier
      * @param rotationMode   override rotation mode
      */
-    public RotationRequest(String id, int priority, Supplier<Float> yawSupplier, Supplier<Float> pitchSupplier, RotationsFeature.RotationMode rotationMode) {
+    public RotationRequest(String id, int priority, Supplier<Float> yawSupplier, Supplier<Float> pitchSupplier, RotationsFeatureConfig.RotationMode rotationMode) {
         this.id = id;
         this.priority = priority;
         this.dynamic = true;
@@ -151,7 +153,7 @@ public class RotationRequest {
     public RotationRequest(String id, int priority, LivingEntity player, Vec3 pos) {
         this.id = id;
         this.priority = priority;
-        this.rotationMode = RotationsFeature.RotationMode.MOTION;
+        this.rotationMode = RotationsFeatureConfig.RotationMode.MOTION;
 
         Vec3 predictedEye = predictMotion(player);
 
@@ -178,8 +180,8 @@ public class RotationRequest {
         }
     }
 
-    private static RotationsFeature.RotationMode getDefaultRotationMode() {
-        RotationsFeature Feature = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
-        return Feature != null ? Feature.rotation.get() : RotationsFeature.RotationMode.MOTION;
+    private static RotationsFeatureConfig.RotationMode getDefaultRotationMode() {
+        RotationsFeatureConfig rotationsFeatureConfig = FeatureContractService.get(RotationsFeatureConfig.class);
+        return rotationsFeatureConfig != null ? rotationsFeatureConfig.getRotationMode() : RotationsFeatureConfig.RotationMode.MOTION;
     }
 }
