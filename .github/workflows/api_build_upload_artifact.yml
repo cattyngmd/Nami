@@ -11,6 +11,10 @@ on:
       - "nami-api/**"
 
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
