@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 public class NamiApi implements ClientModInitializer {
 
     public static String API_NAME = "NamiAPI";
-    public static String NAME = "nami";
+    public static String NAME = "Nami";
     public static final Logger API_LOGGER = LogManager.getLogger(API_NAME);
     public static final Minecraft API_MC = Minecraft.getInstance();
     public static final String API_VERSION;

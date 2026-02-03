@@ -1,7 +1,8 @@
 package namidevelopment.kiriyaga.api.util;
 
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
-import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import namidevelopment.kiriyaga.api.mixin.DuckMultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -370,9 +371,10 @@ public class InteractionUtils {
         return null;
     }
 
-    private static RotationsFeature.RotationMode getDefaultRotationMode() {
-        RotationsFeature Feature = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
-        return Feature != null ? Feature.rotation.get() : RotationsFeature.RotationMode.MOTION;
+    private static RotationsFeatureConfig.RotationMode getDefaultRotationMode() {
+        RotationsFeatureConfig Feature = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        return Feature != null ? Feature.getRotationMode() : RotationsFeatureConfig.RotationMode.MOTION;
     }
 
     public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {

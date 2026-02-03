@@ -1,6 +1,7 @@
 package namidevelopment.kiriyaga.api.util.entity;
 
-import namidevelopment.kiriyaga.api.client.TargetFeature;
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.TargetFeatureConfig;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
@@ -16,7 +17,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public class TargetUtils {
     public static Entity getTarget() {
-        TargetFeature targetFeature = FEATURE_SERVICE.getStorage().getByClass(TargetFeature.class);
+        TargetFeatureConfig targetFeature = FeatureContractService.get(TargetFeatureConfig.class);
         if (API_MC.player == null || API_MC.level == null || targetFeature == null)
             return null;
 
@@ -26,17 +27,17 @@ public class TargetUtils {
                     if (e instanceof LivingEntity) {
                         LivingEntity le = (LivingEntity) e;
                         if (!le.isAlive()) return false;
-                        if (e.tickCount < targetFeature.minTicksExisted.get().intValue()) return false;
+                        if (e.tickCount < targetFeature.getMinTicksExisted()) return false;
                         double distSq = e.distanceToSqr(API_MC.player);
-                        if (distSq > targetFeature.targetRange.get() * targetFeature.targetRange.get()) return false;
+                        if (distSq > targetFeature.getTargetRange() * targetFeature.getTargetRange()) return false;
 
-                        return (targetFeature.targetPlayers.get() && e instanceof Player && !FRIEND_SERVICE.isFriend(e.getName().getString()))
-                                || (targetFeature.targetHostiles.get() && HostileUtils.isHostile(e))
-                                || (targetFeature.targetNeutrals.get() && HostileUtils.isNeutral(e))
-                                || (targetFeature.targetPassives.get() && HostileUtils.isPassive(e));
+                        return (targetFeature.targetPlayers() && e instanceof Player && !FRIEND_SERVICE.isFriend(e.getName().getString()))
+                                || (targetFeature.targetHostiles() && HostileUtils.isHostile(e))
+                                || (targetFeature.targetNeutrals() && HostileUtils.isNeutral(e))
+                                || (targetFeature.targetPassives() && HostileUtils.isPassive(e));
                     }
 
-                    if (targetFeature.targetPrijectiles.get()) {
+                    if (targetFeature.targetProjectiles()) {
                         return (e instanceof ShulkerBullet) || (e instanceof LargeFireball);
                     }
 
@@ -44,7 +45,7 @@ public class TargetUtils {
                 })
                 .collect(Collectors.toList());
 
-        switch (targetFeature.priority.get()) {
+        switch (targetFeature.getPriority()) {
             case HEALTH:
                 return candidates.stream()
                         .filter(e -> e instanceof LivingEntity)
