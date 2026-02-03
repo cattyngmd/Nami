@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.api.client;
+package namidevelopment.kiriyaga.nami.impl.feature.client;
 
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.event.EventPriority;
@@ -9,13 +9,8 @@ import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static namidevelopment.kiriyaga.api.NamiApi.API_MC;
 import static namidevelopment.kiriyaga.api.NamiApi.CHAT_SERVICE;

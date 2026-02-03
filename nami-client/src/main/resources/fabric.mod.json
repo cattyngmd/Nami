@@ -22,6 +22,7 @@
   "depends": {
     "fabricloader": ">=0.18.2",
     "fabric": "*",
-    "minecraft": "1.21.11"
+    "minecraft": "1.21.11",
+    "nami-api": "1.1.1"
   }
 }
