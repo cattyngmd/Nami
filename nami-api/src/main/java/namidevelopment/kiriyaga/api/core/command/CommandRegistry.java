@@ -1,7 +1,6 @@
 package namidevelopment.kiriyaga.api.core.command;
 
 import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
-import namidevelopment.kiriyaga.api.client.FeatureCommand;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.util.ClasspathScanner;
 
