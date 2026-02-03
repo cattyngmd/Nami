@@ -60,9 +60,9 @@ public class NamiApi implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        FEATURE_SERVICE.init();
-        COMMAND_SERVICE.init();
-        COMMAND_SERVICE.getSuggester().updateDispatcher();
+        //  FEATURE_SERVICE.init();
+        //COMMAND_SERVICE.init();
+        //COMMAND_SERVICE.getSuggester().updateDispatcher();
         //FONT_SERVICE.init();
         ROTATION_SERVICE.init();
         INVENTORY_SERVICE.init();
