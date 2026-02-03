@@ -1,0 +1,36 @@
+name: client_build_upload_artifact
+
+on:
+  push:
+    paths:
+      - "nami-client/**"
+      - ".github/workflows/build-client.yml"
+  pull_request:
+    paths:
+      - "nami-client/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Permissions
+        run: chmod +x gradlew
+
+      - name: Build
+        run: ./gradlew :nami-client:build
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: nami-client
+          path: nami-client/build/libs/*.jar

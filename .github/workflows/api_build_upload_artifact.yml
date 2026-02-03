@@ -1,0 +1,36 @@
+name: api_build_upload_artifact
+
+on:
+  push:
+    paths:
+      - "nami-api/**"
+      - ".github/workflows/build-api.yml"
+  pull_request:
+    paths:
+      - "nami-api/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Permissions
+        run: chmod +x gradlew
+
+      - name: Build
+        run: ./gradlew :nami-api:build
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: nami-api
+          path: nami-api/build/libs/*.jar

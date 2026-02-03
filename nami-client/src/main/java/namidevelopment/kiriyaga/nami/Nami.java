@@ -1,5 +1,7 @@
 package namidevelopment.kiriyaga.nami;
 
+import namidevelopment.kiriyaga.api.NamiApi;
+import namidevelopment.kiriyaga.nami.contract.ClientFeatureContracts;
 import namidevelopment.kiriyaga.nami.impl.command.FeatureCommand;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.NavigatePanelComponent;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.ConfigScreen;
@@ -17,14 +19,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraft.util.Tuple;
 
-import static namidevelopment.kiriyaga.api.NamiApi.COMMAND_SERVICE;
-import static namidevelopment.kiriyaga.api.NamiApi.CONFIG_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public class Nami implements ClientModInitializer {
     public static String NAME = "Nami";
     public static String DISPLAY_NAME = "Nami";
     public static long START_TIME = 0;
     public static final String VERSION;
+
     static {
         ModContainer mod = FabricLoader.getInstance().getModContainer("nami-client").orElse(null);
         if (mod != null) {
@@ -50,15 +52,20 @@ public class Nami implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        FEATURE_SERVICE.init();
+        COMMAND_SERVICE.init();
+
+        FeatureCommand.registerFeatureCommands(COMMAND_SERVICE.getStorage());
+
+        ClientFeatureContracts.register(FEATURE_SERVICE.getStorage());
+
         CLICK_GUI_SCREEN = new ClickGuiScreen();
         HUD_EDITOR_SCREEN = new HudEditorScreen();
         FRIEND_SCREEN = new FriendScreen();
         CONFIG_SCREEN = new ConfigScreen();
         NAVIGATE_PANEL = new NavigatePanelComponent();
 
-        FeatureCommand.registerFeatureCommands(COMMAND_SERVICE.getStorage());
-
-        LOGGER.info(NAME + "\n " + VERSION + " has been initialized\n");
+        LOGGER.info(NAME + " " + VERSION + " has been initialized\n");
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             START_TIME = System.currentTimeMillis();

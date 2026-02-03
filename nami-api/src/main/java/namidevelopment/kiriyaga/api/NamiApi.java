@@ -54,7 +54,6 @@ public class NamiApi implements ClientModInitializer {
     public static final InputService INPUT_SERVICE = new InputService();
     public static final BreakPredictionService BREAK_SERVICE = new BreakPredictionService();
 
-    public static Tuple<ServerAddress, ServerData> LAST_CONNECTION = null;
     public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
 
     @Override
@@ -76,7 +75,7 @@ public class NamiApi implements ClientModInitializer {
 
         FRIEND_SERVICE.load();
 
-        API_LOGGER.info(API_NAME + "\n " + API_VERSION + " has been initialized\n");
+        API_LOGGER.info(API_NAME + "" + API_VERSION + " has been initialized\n");
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             FONT_SERVICE.init(); // font is making glyph textures, it should be after game loaded not on initialize

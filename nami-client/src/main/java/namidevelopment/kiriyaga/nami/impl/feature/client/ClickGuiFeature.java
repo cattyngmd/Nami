@@ -18,11 +18,7 @@ public class ClickGuiFeature extends Feature {
     public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 70, 0, 255));
     public final BoolSetting fade = addSetting(new BoolSetting("Fade", true));
     public final BoolSetting blur = addSetting(new BoolSetting("Blur", false));
-    public final BoolSetting panels = addSetting(new BoolSetting("Panels", false));
-    public final BoolSetting FeatureFill = addSetting(new BoolSetting("FeatureFill", true));
-    public final BoolSetting coloredText = addSetting(new BoolSetting("ColoredText", false));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
-    public final BoolSetting FeatureChatFeedback = addSetting(new BoolSetting("FeatureChatFeedback", true));
 
     public ClickGuiFeature() {
         super("ClickGui", "Opens client UI.", FeatureCategory.of("Client"), "clickgui","click", "gui", "menu", "clckgui");

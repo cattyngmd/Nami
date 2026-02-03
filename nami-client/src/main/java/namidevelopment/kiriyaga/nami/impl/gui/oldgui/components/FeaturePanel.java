@@ -31,21 +31,15 @@ public class FeaturePanel {
     public void render(GuiGraphics context, Font textRenderer, int x, int y, int mouseX, int mouseY) {
         boolean hovered = isHovered(mouseX, mouseY, x, y);
 
-        Color textPrimary = getColorFeature().getStyledTextColor(255);
-        Color textSecond = getColorFeature().getStyledTextSecondColor(255);
-        Color textCol = Feature.isEnabled() ? textPrimary : textSecond;
         Color primary = getColorFeature().getStyledGlobalColor();
         Color second = getColorFeature().getStyledGlobalColor(30);
         Color fillCol = Feature.isEnabled() ? primary : second;
+        Color textCol = new Color(255, 255, 255, 255);
 
         if (hovered)
             fillCol = ColorUtils.brighten(fillCol, 20);
 
-        if (FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).FeatureFill.get())
-            context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI_SCREEN.applyFade(toRGBA(fillCol)));
-
-        if (!FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).coloredText.get())
-            textCol = new Color(255, 255, 255, 255);
+         context.fill(x, y, x + WIDTH, y + HEIGHT, CLICK_GUI_SCREEN.applyFade(toRGBA(fillCol)));
 
         int textY = (y + (HEIGHT - 8) / 2 ) +1;
         int baseTextX = x + PADDING + (hovered ? 1 : 0);

@@ -79,22 +79,10 @@ public class CategoryPanel {
             FeaturePanel FeaturePanel = new FeaturePanel(Feature);
 
             int FeatureX = x + BORDER_WIDTH + SettingPanel.INNER_PADDING;
-            int panelOffset = 1;
-            int startY = FeatureY;
 
             int expandedHeight = 0;
             if (Feature.isExpanded()) {
                 expandedHeight = SettingPanel.getSettingsHeight(Feature);
-            }
-
-            if (Feature.isExpanded()) {
-                int panelX = FeatureX - panelOffset + 1;
-                int panelY = startY - panelOffset + 1;
-                int panelHeight = FeaturePanel.HEIGHT + expandedHeight + (panelOffset * 2) - 1;
-                int panelWidth = WIDTH - (BORDER_WIDTH + SettingPanel.INNER_PADDING) * 2 + panelOffset * 2 - 2;
-
-                if (FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).panels.get())
-                    renderer.renderPanel(context, panelX, panelY, panelWidth, panelHeight, 0, false, true);
             }
 
             FeaturePanel.render(context, textRenderer, FeatureX, FeatureY, mouseX, mouseY);
