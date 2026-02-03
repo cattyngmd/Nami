@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
 
+import static namidevelopment.kiriyaga.api.util.ColorUtils.toRGBA;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class BoolSettingRenderer implements SettingRenderer<BoolSetting> {

@@ -8,6 +8,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.util.ArrayList;
 import java.util.List;
 
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+
 public class ActionWidget {
     private final List<ActionItem> items = new ArrayList<>();
     private int x, y;

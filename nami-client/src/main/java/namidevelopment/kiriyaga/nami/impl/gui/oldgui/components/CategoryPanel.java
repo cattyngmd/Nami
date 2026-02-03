@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.util.List;
 
 import static namidevelopment.kiriyaga.nami.impl.gui.oldgui.components.FeaturePanel.Feature_SPACING;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public class CategoryPanel {
     public static final int WIDTH = 100;

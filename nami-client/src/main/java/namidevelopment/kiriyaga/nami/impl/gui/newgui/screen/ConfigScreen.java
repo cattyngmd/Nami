@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.impl.gui.newgui.screen;
 
-import namidevelopment.kiriyaga.nami.api.config.ConfigMode;
+import namidevelopment.kiriyaga.api.core.config.ConfigMode;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.NamiScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.ConsolePanelComponent;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.entry.ConfigEntry;

@@ -22,22 +22,4 @@ public class WhitelistSettingRenderer implements SettingRenderer<WhitelistSettin
     public boolean mouseClicked(WhitelistSetting setting, double mouseX, double mouseY, int button) {
         return boolRenderer.mouseClicked(setting, mouseX, mouseY, button);
     }
-
-    private ColorFeature getColorFeature() {
-        return Nami.FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class);
-    }
-
-    private Color brighten(Color color, float factor) {
-        int r = Math.min((int)(color.getRed() * (1 + factor)), 255);
-        int g = Math.min((int)(color.getGreen() * (1 + factor)), 255);
-        int b = Math.min((int)(color.getBlue() * (1 + factor)), 255);
-        return new Color(r, g, b, color.getAlpha());
-    }
-
-    private int toRGBA(Color color) {
-        return (color.getAlpha() << 24) |
-                (color.getRed() << 16) |
-                (color.getGreen() << 8) |
-                (color.getBlue());
-    }
 }

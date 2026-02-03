@@ -9,6 +9,7 @@ import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.client.RotationsFeature;
+import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.nami.mixin.DuckKeyMapping;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;

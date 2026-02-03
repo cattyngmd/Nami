@@ -10,6 +10,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static namidevelopment.kiriyaga.api.NamiApi.CHAT_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.EVENT_SERVICE;
+
 @Mixin(ChatComponent.class)
 public abstract class MixinChatComponent {
 

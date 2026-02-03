@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+
 public class DataPanel<T extends BaseEntry> {
     protected final List<T> entries = new ArrayList<>();
     protected final Function<T, Component> displayMapper;

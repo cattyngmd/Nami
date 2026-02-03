@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 
 import static namidevelopment.kiriyaga.nami.Nami.MC;
-import static namidevelopment.kiriyaga.nami.Nami.ROTATION_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.ROTATION_SERVICE;
 
 @RegisterFeature
 public class FreecamFeature extends Feature {

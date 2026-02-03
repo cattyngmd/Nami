@@ -23,6 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+
 @Mixin(PlayerTabOverlay.class)
 public abstract class MixinPlayerTabOverlay {
 

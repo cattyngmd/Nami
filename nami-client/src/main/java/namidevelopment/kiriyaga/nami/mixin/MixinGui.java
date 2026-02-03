@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static namidevelopment.kiriyaga.nami.Nami.EVENT_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.EVENT_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @Mixin(Gui.class)

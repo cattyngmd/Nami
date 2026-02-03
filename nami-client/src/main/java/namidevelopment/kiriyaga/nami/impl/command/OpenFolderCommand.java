@@ -9,6 +9,7 @@ import java.io.File;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class OpenFolderCommand extends Command {

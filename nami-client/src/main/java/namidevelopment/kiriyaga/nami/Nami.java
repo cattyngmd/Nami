@@ -20,7 +20,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.COMMAND_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.CONFIG_SERVICE;
 
 public class Nami implements ClientModInitializer {
-    public static String NAME = "nami";
+    public static String NAME = "Nami";
     public static String DISPLAY_NAME = "Nami";
     public static long START_TIME = 0;
     public static final String VERSION;

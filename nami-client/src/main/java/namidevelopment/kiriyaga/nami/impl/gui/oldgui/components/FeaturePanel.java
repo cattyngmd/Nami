@@ -8,8 +8,10 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import java.awt.*;
 
+import static namidevelopment.kiriyaga.api.util.ColorUtils.toRGBA;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+
 public class FeaturePanel {
     public static final int WIDTH = 100 - CategoryPanel.BORDER_WIDTH * 2 - SettingPanel.INNER_PADDING * 2;
     public static final int HEIGHT = 13;

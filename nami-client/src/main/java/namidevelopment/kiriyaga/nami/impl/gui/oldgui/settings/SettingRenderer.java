@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings;
 
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.components.CategoryPanel;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.components.SettingPanel;
-import namidevelopment.kiriyaga.nami.impl.setting.Setting;
+import namidevelopment.kiriyaga.api.model.setting.Setting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 

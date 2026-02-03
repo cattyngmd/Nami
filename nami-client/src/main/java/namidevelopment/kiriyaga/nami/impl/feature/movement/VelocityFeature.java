@@ -3,6 +3,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.movement;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.impl.*;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
@@ -31,7 +32,8 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isPhased;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isPhased;
 
 @RegisterFeature
 public class VelocityFeature extends Feature {

@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 
 import static namidevelopment.kiriyaga.api.NamiApi.EXECUTABLE_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @RegisterCommand
 public class PeekCommand extends Command {

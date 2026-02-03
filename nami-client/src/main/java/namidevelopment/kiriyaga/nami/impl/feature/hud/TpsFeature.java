@@ -7,6 +7,9 @@ import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
 
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.NamiApi.SERVER_SERVICE;
+
 @RegisterFeature
 public class TpsFeature extends HudElementFeature {
 

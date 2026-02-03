@@ -11,7 +11,7 @@ import namidevelopment.kiriyaga.api.client.RotationsFeature;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 
 import static namidevelopment.kiriyaga.nami.Nami.MC;
-import static namidevelopment.kiriyaga.nami.Nami.ROTATION_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.ROTATION_SERVICE;
 
 @RegisterFeature
 public class AntiAimFeature extends Feature {

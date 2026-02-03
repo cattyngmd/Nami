@@ -9,7 +9,7 @@ import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import net.minecraft.world.phys.Vec3;
 
-import static namidevelopment.kiriyaga.nami.Nami.INPUT_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.INPUT_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @RegisterFeature

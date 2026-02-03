@@ -8,6 +8,7 @@ import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
 import namidevelopment.kiriyaga.api.util.KeyUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 

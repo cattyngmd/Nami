@@ -17,6 +17,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
+import static namidevelopment.kiriyaga.api.util.RotationUtils.getPitchToVec;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.getYawToVec;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.HostileUtils.isAggressiveNow;
 

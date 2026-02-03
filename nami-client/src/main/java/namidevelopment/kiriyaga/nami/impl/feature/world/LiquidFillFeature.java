@@ -12,6 +12,7 @@ import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
+import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,6 +33,8 @@ import java.util.List;
 
 import static namidevelopment.kiriyaga.api.util.InteractionUtils.airPlace;
 
+import static namidevelopment.kiriyaga.api.util.RotationUtils.getPitchToVec;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.getYawToVec;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature

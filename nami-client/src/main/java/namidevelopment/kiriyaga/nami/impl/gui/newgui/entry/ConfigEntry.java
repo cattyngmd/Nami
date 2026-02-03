@@ -1,10 +1,10 @@
 package namidevelopment.kiriyaga.nami.impl.gui.newgui.entry;
 
-import namidevelopment.kiriyaga.nami.api.config.model.ConfigMeta;
+import namidevelopment.kiriyaga.api.core.config.model.ConfigMeta;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.base.BaseEntry;
 import net.minecraft.network.chat.Component;
 
-import static namidevelopment.kiriyaga.nami.Nami.CAT_FORMAT;
+import static namidevelopment.kiriyaga.api.NamiApi.CAT_FORMAT;
 
 public class ConfigEntry extends BaseEntry {
 

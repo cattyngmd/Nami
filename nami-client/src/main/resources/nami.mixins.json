@@ -4,14 +4,10 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "DuckAbstractTexture",
-    "namidevelopment.kiriyaga.api.mixin.DuckChatComponent",
     "DuckClientInput",
-    "namidevelopment.kiriyaga.api.mixin.DuckClientLevel",
-    "namidevelopment.kiriyaga.api.mixin.DuckFont",
     "DuckGlyphStitcher",
     "DuckKeyMapping",
     "DuckMinecraft",
-    "namidevelopment.kiriyaga.api.mixin.DuckMultiPlayerGameMode",
     "DuckNearPlane",
     "DuckOptions",
     "DuckSignEditScreen",
@@ -58,8 +54,6 @@
   },
   "mixins": [
     "DuckAbstractContainerMenu",
-    "namidevelopment.kiriyaga.api.mixin.DuckAgeableMob",
-    "namidevelopment.kiriyaga.api.mixin.DuckAnimal",
     "DuckBundlePacket",
     "DuckClientboundExplodePacket",
     "DuckClientboundPlayerPositionPacket",

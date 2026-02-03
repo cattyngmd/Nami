@@ -15,6 +15,7 @@ import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
+import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -38,6 +39,7 @@ import net.minecraft.world.level.BlockGetter;
 
 import java.awt.*;
 
+import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isBroken;
 import static namidevelopment.kiriyaga.api.util.PacketUtils.sendSequencedPacket;

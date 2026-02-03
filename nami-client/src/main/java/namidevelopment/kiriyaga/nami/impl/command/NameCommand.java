@@ -6,6 +6,8 @@ import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.nami.Nami.DISPLAY_NAME;
+import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @RegisterCommand
 public class NameCommand extends Command {

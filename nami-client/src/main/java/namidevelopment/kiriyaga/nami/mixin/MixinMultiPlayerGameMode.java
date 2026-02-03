@@ -4,7 +4,6 @@ import namidevelopment.kiriyaga.api.event.impl.BreakBlockEvent;
 import namidevelopment.kiriyaga.api.event.impl.PlaceBlockEvent;
 import namidevelopment.kiriyaga.api.event.impl.StartBreakingBlockEvent;
 import namidevelopment.kiriyaga.nami.impl.feature.world.NoBreakDelayFeature;
-import namidevelopment.kiriyaga.nami.mixininterface.IClientPlayerInteractionManager;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.entity.player.Player;

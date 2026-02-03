@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import namidevelopment.kiriyaga.nami.api.macro.model.Macro;
+import namidevelopment.kiriyaga.api.core.macro.model.Macro;
 import namidevelopment.kiriyaga.api.event.impl.DissconectEvent;
 import namidevelopment.kiriyaga.api.event.impl.EntityDeathEvent;
 import namidevelopment.kiriyaga.api.event.impl.InteractionEvent;

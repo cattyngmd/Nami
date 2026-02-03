@@ -8,6 +8,7 @@ import namidevelopment.kiriyaga.nami.mixininterface.ISimpleOption;
 import static namidevelopment.kiriyaga.api.NamiApi.CAT_FORMAT;
 import static namidevelopment.kiriyaga.api.NamiApi.CHAT_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @RegisterCommand
 public class GammaCommand extends Command {

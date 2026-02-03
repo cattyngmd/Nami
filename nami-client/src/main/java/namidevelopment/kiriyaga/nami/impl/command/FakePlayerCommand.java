@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @RegisterCommand
 public class FakePlayerCommand extends Command {

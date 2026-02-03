@@ -13,6 +13,9 @@ import net.minecraft.world.entity.player.Player;
 
 import java.awt.*;
 
+import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.FRIEND_SERVICE;
+
 @RegisterFeature
 public class ChamsFeature extends Feature {
 

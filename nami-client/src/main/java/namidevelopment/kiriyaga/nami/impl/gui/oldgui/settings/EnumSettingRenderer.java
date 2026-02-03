@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
+import static namidevelopment.kiriyaga.api.util.ColorUtils.toRGBA;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class EnumSettingRenderer implements SettingRenderer<EnumSetting<?>> {

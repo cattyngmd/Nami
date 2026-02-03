@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.CompletableFuture;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @Mixin(value = CommandSuggestions.class)
 public abstract class MixinCommandSuggestions {
@@ -37,17 +39,17 @@ public abstract class MixinCommandSuggestions {
     )
     private void onRefresh(CallbackInfo ci, @Local StringReader reader) {
         String text = this.input.getValue();
-        String prefix = Nami.COMMAND_SERVICE.getExecutor().getPrefix();
+        String prefix = COMMAND_SERVICE.getExecutor().getPrefix();
 
         if (text.startsWith(prefix) && reader.getCursor() == 0) {
             reader.setCursor(prefix.length());
 
             SharedSuggestionProvider source = this.minecraft.getConnection().getSuggestionsProvider();
-            this.currentParse = Nami.COMMAND_SERVICE.getSuggester().getDispatcher().parse(reader, source);
+            this.currentParse = COMMAND_SERVICE.getSuggester().getDispatcher().parse(reader, source);
 
             int cursor = this.input.getCursorPosition();
             if (cursor >= prefix.length() && (this.suggestions == null || !this.keepSuggestions)) {
-                this.pendingSuggestions = Nami.COMMAND_SERVICE.getSuggester().getDispatcher().getCompletionSuggestions(this.currentParse, cursor);
+                this.pendingSuggestions = COMMAND_SERVICE.getSuggester().getDispatcher().getCompletionSuggestions(this.currentParse, cursor);
                 this.pendingSuggestions.thenRun(() -> {
                     if (this.pendingSuggestions.isDone()) {
                         this.updateUsageInfo();
