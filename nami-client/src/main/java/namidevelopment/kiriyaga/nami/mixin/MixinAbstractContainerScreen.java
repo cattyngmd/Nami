@@ -1,11 +1,10 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
-import namidevelopment.kiriyaga.api.client.PatchFeature;
 import namidevelopment.kiriyaga.api.event.impl.MouseClickEvent;
 import namidevelopment.kiriyaga.api.event.impl.MouseScrollEvent;
 import namidevelopment.kiriyaga.api.event.impl.RenderSlotsEvent;
 import namidevelopment.kiriyaga.api.event.impl.RenderTooltipEvent;
-import namidevelopment.kiriyaga.api.client.PatchFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.PatchFeature;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

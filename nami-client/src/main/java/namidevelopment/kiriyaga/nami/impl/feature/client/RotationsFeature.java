@@ -2,6 +2,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.client;
 
 
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
@@ -10,11 +11,7 @@ import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 
 @RegisterFeature
-public class RotationsFeature extends Feature {
-
-    public enum RotationMode {
-        MOTION, SILENT
-    }
+public class RotationsFeature extends Feature implements RotationsFeatureConfig {
 
     public final EnumSetting<RotationMode> rotation = addSetting(new EnumSetting<>("Rotation",RotationMode.MOTION));
     public final DoubleSetting rotationSpeed = addSetting(new DoubleSetting("Speed", 360, 25, 360));
@@ -46,9 +43,50 @@ public class RotationsFeature extends Feature {
 //        jitterMaxYaw.setShow(false);
 //        jitterMaxPitch.setShow(false);
     }
+
     @Override
     public void onDisable(){
         if (!this.isEnabled())
             this.toggle();
+    }
+
+    @Override
+    public RotationsFeatureConfig.RotationMode getRotationMode() {
+        return rotation.get();
+    }
+
+    @Override
+    public double getRotationSpeed() {
+        return rotationSpeed.get();
+    }
+
+    @Override
+    public double getRotationEase() {
+        return rotationEaseFactor.get();
+    }
+
+    @Override
+    public double getRotationThreshold() {
+        return rotationThreshold.get();
+    }
+
+    @Override
+    public boolean isJitterEnabled() {
+        return jitter.get();
+    }
+
+    @Override
+    public boolean isMoveFixEnabled() {
+        return moveFix.get();
+    }
+
+    @Override
+    public boolean isRenderEnabled() {
+        return render.get();
+    }
+
+    @Override
+    public int getHoldTicks() {
+        return ticksBeforeRelease.get();
     }
 }

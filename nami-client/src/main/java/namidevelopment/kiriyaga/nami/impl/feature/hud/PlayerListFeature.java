@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.impl.feature.hud;
 
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;

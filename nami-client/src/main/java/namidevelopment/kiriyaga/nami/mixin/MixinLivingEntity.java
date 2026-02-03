@@ -3,7 +3,7 @@ package namidevelopment.kiriyaga.nami.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import namidevelopment.kiriyaga.api.event.impl.GlidingEvent;
-import namidevelopment.kiriyaga.api.client.RotationsFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.HighJumpFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.exploits.NoJumpDelayFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.NoLevitationFeature;

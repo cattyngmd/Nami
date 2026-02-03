@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.event.impl.AddEntityEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
@@ -10,7 +10,7 @@ import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
-import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;

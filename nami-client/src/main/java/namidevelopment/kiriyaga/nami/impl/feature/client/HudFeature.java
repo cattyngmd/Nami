@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.client;
 
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.event.impl.Render2DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
@@ -23,44 +23,9 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class HudFeature extends Feature {
 
     public final BoolSetting chatAnimation = addSetting(new BoolSetting("ChatAnimation", true));
-    public final BoolSetting shadow = addSetting(new BoolSetting("Shadow", true));
-    public final BoolSetting bounce = addSetting(new BoolSetting("Bounce", false));
-    public final IntSetting bounceSpeed = addSetting(new IntSetting("Speed", 5, 1, 20));
-    public final IntSetting bounceIntensity = addSetting(new IntSetting("Intensity", 30, 10, 100));
-    public final BoolSetting accent = addSetting(new BoolSetting("Accent", false));
-    public final ColorSetting globalColor = addSetting(new ColorSetting("Color", new Color(170, 170, 170, 255), true));
-
-    private float bounceProgress = 0f;
-    private boolean increasing = true;
 
     public HudFeature() {
         super("HUD", "Renders in-game hud.", FeatureCategory.of("Client"));
-        bounceIntensity.setShowCondition(() -> bounce.get());
-        bounceSpeed.setShowCondition(() -> bounce.get());
-        globalColor.setShowCondition(accent::get);
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void onUpdate(PreTickEvent event) {
-
-        if (bounce.get()) {
-            float step = bounceSpeed.get() / 100f;
-            if (increasing) {
-                bounceProgress += step;
-                if (bounceProgress >= 1f) {
-                    bounceProgress = 1f;
-                    increasing = false;
-                }
-            } else {
-                bounceProgress -= step;
-                if (bounceProgress <= 0f) {
-                    bounceProgress = 0f;
-                    increasing = true;
-                }
-            }
-        } else {
-            bounceProgress = 0f;
-        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -111,31 +76,11 @@ public class HudFeature extends Feature {
 //                            shadow.get()
 //                    );
 
-                    FONT_SERVICE.drawText(event.getDrawContext(), element.text(), drawX, drawY, shadow.get());
+                    FONT_SERVICE.drawText(event.getDrawContext(), element.text(), drawX, drawY, true);
                 }
 
                 hudElement.renderItems(event.getDrawContext());
             }
         }
-    }
-
-    public Color getPulsingColor(Color originalColor) {
-        if (!bounce.get()) return originalColor;
-
-        float intensity = bounceIntensity.get() / 100f;
-        float pulseFactor = (float) Math.sin(bounceProgress * Math.PI);
-
-        float darkenFactor = 1f - intensity * pulseFactor;
-
-        int r = (int) (originalColor.getRed() * darkenFactor);
-        int g = (int) (originalColor.getGreen() * darkenFactor);
-        int b = (int) (originalColor.getBlue() * darkenFactor);
-        int a = originalColor.getAlpha();
-
-        r = Math.max(0, Math.min(255, r));
-        g = Math.max(0, Math.min(255, g));
-        b = Math.max(0, Math.min(255, b));
-
-        return new Color(r, g, b, a);
     }
 }

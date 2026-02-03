@@ -1,8 +1,9 @@
 package namidevelopment.kiriyaga.nami.impl.feature.client;
 
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.contract.feature.ColorFeatureConfig;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.Render2DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
@@ -14,7 +15,7 @@ import java.awt.*;
 
 
 @RegisterFeature
-public class ColorFeature extends Feature {
+public class ColorFeature extends Feature implements ColorFeatureConfig {
 
     public final ColorSetting globalColor = addSetting(new ColorSetting("Global", new Color(255, 135, 151, 255), true));
     public final BoolSetting rainbowEnabled = addSetting(new BoolSetting("Rainbow", false));
@@ -96,8 +97,23 @@ public class ColorFeature extends Feature {
         return getStyledColor(globalColor.get(), 1.00, 0.00);
     }
 
+    @Override
+    public Color getGlobalColor() {
+        return globalColor.get();
+    }
+
     public Color getFriendColor() {
         return getStyledColor(friendColor.get(), 1.00, 0.00);
+    }
+
+    @Override
+    public boolean isRainbowEnabled() {
+        return rainbowEnabled.get();
+    }
+
+    @Override
+    public double getRainbowSpeed() {
+        return rainbowSpeed.get();
     }
 
     public Color getFriendTextColor(int alpha) {

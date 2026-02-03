@@ -1,6 +1,6 @@
 package namidevelopment.kiriyaga.nami.impl.gui.oldgui.settings;
 
-import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
 import namidevelopment.kiriyaga.api.util.KeyUtils;
 import net.minecraft.client.gui.Font;

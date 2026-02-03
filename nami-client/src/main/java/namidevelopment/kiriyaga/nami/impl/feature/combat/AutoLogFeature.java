@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
 import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.event.EventPriority;
-import namidevelopment.kiriyaga.api.event.SubscribeEvent;
+import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.AddEntityEvent;
 import namidevelopment.kiriyaga.api.event.impl.DissconectEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;

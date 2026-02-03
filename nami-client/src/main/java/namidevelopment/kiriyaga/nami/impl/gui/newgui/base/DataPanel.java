@@ -1,7 +1,7 @@
 package namidevelopment.kiriyaga.nami.impl.gui.newgui.base;
 
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.widget.ActionWidget;
-import namidevelopment.kiriyaga.api.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.util.render.ScissorUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

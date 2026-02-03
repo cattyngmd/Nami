@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
-import namidevelopment.kiriyaga.api.client.RotationsFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.visuals.ChamsFeature;
 import namidevelopment.kiriyaga.nami.mixininterface.IEntityRenderState;
 import net.minecraft.client.model.EntityModel;
