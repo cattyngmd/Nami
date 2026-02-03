@@ -3,12 +3,8 @@ name: api_build_upload_artifact
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "nami-api/**"
-      - ".github/workflows/build-api.yml"
   pull_request:
-    paths:
-      - "nami-api/**"
+
 
 
 permissions:

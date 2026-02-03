@@ -3,12 +3,7 @@ name: client_build_upload_artifact
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "nami-client/**"
-      - ".github/workflows/build-client.yml"
   pull_request:
-    paths:
-      - "nami-client/**"
 
 
 permissions:
