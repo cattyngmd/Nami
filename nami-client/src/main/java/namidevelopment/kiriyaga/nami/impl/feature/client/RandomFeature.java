@@ -24,17 +24,17 @@ import static namidevelopment.kiriyaga.api.NamiApi.API_LOGGER;
 import static namidevelopment.kiriyaga.api.NamiApi.CONFIG_SERVICE;
 
 @RegisterFeature
-public class PacketLogFeature extends Feature {
+public class RandomFeature extends Feature {
 
-    public final BoolSetting logReceive = addSetting(new BoolSetting("LogReceive", true));
-    public final BoolSetting logSend = addSetting(new BoolSetting("LogSend", true));
+    public final BoolSetting logReceive = addSetting(new BoolSetting("PacketReceiveLog", true));
+    public final BoolSetting logSend = addSetting(new BoolSetting("PacketSendLog", true));
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private File receiveFile;
     private File sendFile;
-    public PacketLogFeature() {
-        super("PacketLog", "Insane tech.", FeatureCategory.of("Client"));
+    public RandomFeature() {
+        super("RandomFeature", "Insane tech.", FeatureCategory.of("Client"));
     }
 
     @Override
@@ -44,8 +44,8 @@ public class PacketLogFeature extends Feature {
         File logDir = new File(baseDir, "packet_logs");
         if (!logDir.exists()) logDir.mkdirs();
 
-        this.receiveFile = new File(logDir, "packet_receive_log.jsonl");
-        this.sendFile = new File(logDir, "packet_send_log.jsonl");
+        this.receiveFile = new File(logDir, "receive.jsonl");
+        this.sendFile = new File(logDir, "send.jsonl");
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
