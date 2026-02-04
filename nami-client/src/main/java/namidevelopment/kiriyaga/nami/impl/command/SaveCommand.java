@@ -19,10 +19,10 @@ public class SaveCommand extends Command {
         try {
             CONFIG_SERVICE.saveFeatures();
             CHAT_SERVICE.sendPersistent(SaveCommand.class.getName(),
-                    CAT_FORMAT.format("Config has been saved."));
+                    CAT_FORMAT.format("{gray}Config has been saved."));
         } catch (Exception e) {
             CHAT_SERVICE.sendPersistent(SaveCommand.class.getName(),
-                    CAT_FORMAT.format("Config has not been saved: {g}" + e + "{reset}."));
+                    CAT_FORMAT.format("{gray}Config has not been saved: {global}" + e + "{gray}."));
         }
     }
 }

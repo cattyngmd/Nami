@@ -2,7 +2,7 @@ package namidevelopment.kiriyaga.api;
 
 import namidevelopment.kiriyaga.api.core.*;
 import namidevelopment.kiriyaga.api.core.breakprediction.BreakPredictionService;
-import namidevelopment.kiriyaga.api.core.cat.FabricCatFormat;
+import namidevelopment.kiriyaga.api.core.cat.NamiFormatService;
 import namidevelopment.kiriyaga.api.core.command.CommandService;
 import namidevelopment.kiriyaga.api.core.config.ConfigService;
 import namidevelopment.kiriyaga.api.core.executable.ExecutableService;
@@ -17,9 +17,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.multiplayer.resolver.ServerAddress;
-import net.minecraft.util.Tuple;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,7 +51,7 @@ public class NamiApi implements ClientModInitializer {
     public static final InputService INPUT_SERVICE = new InputService();
     public static final BreakPredictionService BREAK_SERVICE = new BreakPredictionService();
 
-    public static FabricCatFormat CAT_FORMAT = new FabricCatFormat();
+    public static NamiFormatService CAT_FORMAT = new NamiFormatService();
 
     @Override
     public void onInitializeClient() {
@@ -75,7 +72,7 @@ public class NamiApi implements ClientModInitializer {
 
         FRIEND_SERVICE.load();
 
-        API_LOGGER.info(API_NAME + "" + API_VERSION + " has been initialized\n");
+        API_LOGGER.info(API_NAME + " " + API_VERSION + " has been initialized\n");
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             FONT_SERVICE.init(); // font is making glyph textures, it should be after game loaded not on initialize

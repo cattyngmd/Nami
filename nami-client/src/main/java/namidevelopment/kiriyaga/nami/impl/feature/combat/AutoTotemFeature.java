@@ -297,12 +297,12 @@ public class AutoTotemFeature extends Feature {
 
         boolean pendingTotem = false;
         Component message = CAT_FORMAT.format(
-                "\n=== {g}AutoTotem{reset} ===\n" +
-                        "Death reasons:\n{g}" + reasonsBuilder.toString() + "{reset}\n" +
-                        "Ping: {g}" + ping + " ms{reset}\n" +
-                        "Totems Available: {g}" + totemCount + "{reset}\n" +
-                        "Pending Totem: {g}" + pendingTotem + "{reset}\n" +
-                        "Last Swap Attempt: {g}" + timeSinceLastSwap + " ms ago{reset}\n" +
+                "\n=== {global}AutoTotem{gray} ===\n" +
+                        "Death reasons:\n{global}" + reasonsBuilder.toString() + "{gray}\n" +
+                        "Ping: {global}" + ping + " ms{gray}\n" +
+                        "Totems Available: {global}" + totemCount + "{gray}\n" +
+                        "Pending Totem: {global}" + pendingTotem + "{gray}\n" +
+                        "Last Swap Attempt: {global}" + timeSinceLastSwap + " ms ago{gray}\n" +
                         "============================"
         );
 

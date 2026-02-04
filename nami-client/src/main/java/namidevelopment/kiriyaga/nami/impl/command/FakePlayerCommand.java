@@ -38,7 +38,7 @@ public class FakePlayerCommand extends Command {
             MC.level.removeEntity(fakePlayer.getId(), Entity.RemovalReason.DISCARDED);
             fakePlayer = null;
 
-            CHAT_SERVICE.sendPersistent(this.name, CAT_FORMAT.format("Fake player has been{red} removed{reset}."));
+            CHAT_SERVICE.sendPersistent(this.name, CAT_FORMAT.format("{gray}Fake player has been{red} removed{gray}."));
             return;
         }
 
@@ -56,7 +56,7 @@ public class FakePlayerCommand extends Command {
         copy(MC.player, fakePlayer);
         MC.level.addEntity(fakePlayer);
 
-        CHAT_SERVICE.sendPersistent(this.name, CAT_FORMAT.format("Fake player has been{green} added{reset}."));
+        CHAT_SERVICE.sendPersistent(this.name, CAT_FORMAT.format("{gray}Fake player has been{green} added{gray}."));
         EVENT_SERVICE.register(this);
     }
 

@@ -29,6 +29,6 @@ public class GammaCommand extends Command {
 
         ((ISimpleOption) (Object) MC.options.gamma()).setValue((double) newGamma);
         CHAT_SERVICE.sendPersistent(GammaCommand.class.getName(),
-                CAT_FORMAT.format("Gamma set to: {g}" + newGamma + "{reset}."));
+                CAT_FORMAT.format("{gray}Gamma set to: {global}" + newGamma + "{gray}."));
     }
 }

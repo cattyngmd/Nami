@@ -32,12 +32,12 @@ public class DrawnCommand extends Command {
 
         if (found == null) {
             CHAT_SERVICE.sendTransient(
-                    CAT_FORMAT.format("Feature {g}" + input + "{reset} not found."));
+                    CAT_FORMAT.format("{gray}Feature {global}" + input + "{gray} not found."));
             return;
         }
 
         found.setDrawn(!found.isDrawn());
         CHAT_SERVICE.sendTransient(
-                CAT_FORMAT.format("Feature {g}" + input + " {reset}drawn changed."));
+                CAT_FORMAT.format("{gray}Feature {global}" + input + " {gray}drawn changed."));
     }
 }

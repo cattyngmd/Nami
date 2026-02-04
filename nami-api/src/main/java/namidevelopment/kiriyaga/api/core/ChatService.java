@@ -193,7 +193,7 @@ public class ChatService {
     }
 
     private Component prefix() {
-        return CAT_FORMAT.format("{s}[{g}" + NAME + "{s}] {reset}");
+        return CAT_FORMAT.format("{secondary}[{global}" + NAME + "{secondary}] {gray}");
     }
 
     public void removeByText(String text) {

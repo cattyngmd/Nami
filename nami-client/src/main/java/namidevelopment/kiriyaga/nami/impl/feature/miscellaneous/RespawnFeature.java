@@ -37,7 +37,7 @@ public class RespawnFeature extends Feature {
         b = true;
         if (sendCords.get()) {
                 String coords = String.format("X: %d Y: %d Z: %d", Math.round(MC.player.position().x), Math.round(MC.player.position().y), Math.round(MC.player.position().z));
-                Component reason = CAT_FORMAT.format("Death coordinates: {g}" + coords+"{reset}.");
+                Component reason = CAT_FORMAT.format("Death coordinates: {global}" + coords+"{gray}.");
             }
     }
 

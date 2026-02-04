@@ -1,51 +1,90 @@
 package namidevelopment.kiriyaga.api.util;
 
-import dev.cattyn.catformat.stylist.annotations.Style;
 import namidevelopment.kiriyaga.api.contract.FeatureContractService;
 import namidevelopment.kiriyaga.api.contract.feature.ColorFeatureConfig;
 
-import static namidevelopment.kiriyaga.api.NamiApi.*;
-
-
-import java.awt.*;
+import java.awt.Color;
 
 public class CatStyles {
 
-    @Style("g")
-    Color global() {
+    public Color global() {
         Color gc = FeatureContractService.get(ColorFeatureConfig.class).getStyledGlobalColor();
         return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
-    @Style("friend")
-    Color friend() {
+    public Color friend() {
         Color gc = FeatureContractService.get(ColorFeatureConfig.class).getFriendColor();
         return new Color(gc.getRed(), gc.getGreen(), gc.getBlue(), 255);
     }
 
-    @Style("s")
-    Color secondary() {
+    public Color secondary() {
         Color gs = FeatureContractService.get(ColorFeatureConfig.class).getStyledSecondColor();
         return new Color(gs.getRed(), gs.getGreen(), gs.getBlue(), 255);
     }
 
-    @Style("namiRed")
-    final Color namiRed() {
-        return new Color(180, 0, 0);
+    // color schemes here https://htmlcolorcodes.com/minecraft-color-codes/
+
+    public static Color black() {
+        return new Color(0x000000);
     }
 
-    @Style("namiDarkRed")
-    final Color namiDarkRed() {
-        return new Color(110, 0, 0);
+    public static Color darkBlue() {
+        return new Color(0x0000AA);
     }
 
-    @Style("w")
-    Color whitee() {
-        return new Color(255, 255,255);
+    public static Color darkGreen() {
+        return new Color(0x00AA00);
     }
 
-    @Style("gray")
-    Color grayy() {
-        return new Color(77,77,77);
+    public static Color darkAqua() {
+        return new Color(0x00AAAA);
+    }
+
+    public static Color darkRed() {
+        return new Color(0xAA0000);
+    }
+
+    public static Color darkPurple() {
+        return new Color(0xAA00AA);
+    }
+
+    public static Color gold() {
+        return new Color(0xFFAA00);
+    }
+
+    public static Color gray() {
+        return new Color(0xAAAAAA);
+    }
+
+    public static Color darkGray() {
+        return new Color(0x555555);
+    }
+
+    public static Color blue() {
+        return new Color(0x5555FF);
+    }
+
+    public static Color green() {
+        return new Color(0x55FF55);
+    }
+
+    public static Color aqua() {
+        return new Color(0x55FFFF);
+    }
+
+    public static Color red() {
+        return new Color(0xFF5555);
+    }
+
+    public static Color lightPurple() {
+        return new Color(0xFF55FF);
+    }
+
+    public static Color yellow() {
+        return new Color(0xFFFF55);
+    }
+
+    public static Color white() {
+        return new Color(0xFFFFFF);
     }
 }

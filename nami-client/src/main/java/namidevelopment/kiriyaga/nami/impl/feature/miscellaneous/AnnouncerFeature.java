@@ -48,7 +48,7 @@ public class AnnouncerFeature extends Feature {
                     boolean isFriend = FRIEND_SERVICE.isFriend(playerName);
 
                     if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                        Component message = CAT_FORMAT.format("{g}" + playerName + " {reset}joined the game.");
+                        Component message = CAT_FORMAT.format("{global}" + playerName + " {gray}joined the game.");
                         CHAT_SERVICE.sendPersistent(playerName, message);
                     }
                 }
@@ -64,7 +64,7 @@ public class AnnouncerFeature extends Feature {
                 boolean isFriend = FRIEND_SERVICE.isFriend(playerName);
 
                 if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
-                    Component message = CAT_FORMAT.format("{g}" + playerName + " {reset}has left the game.");
+                    Component message = CAT_FORMAT.format("{global}" + playerName + " {gray}has left the game.");
                     CHAT_SERVICE.sendPersistent(playerName, message);
                 }
             }
@@ -89,7 +89,7 @@ public class AnnouncerFeature extends Feature {
                 return;
             }
 
-            Component message = CAT_FORMAT.format("{g}" + player.getName().getString() + " {reset}has entered visual range.");
+            Component message = CAT_FORMAT.format("{global}" + player.getName().getString() + " {gray}has entered visual range.");
 
             CHAT_SERVICE.sendPersistent(player.getStringUUID(), message);
 

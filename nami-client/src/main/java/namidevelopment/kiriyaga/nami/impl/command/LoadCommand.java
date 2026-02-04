@@ -20,10 +20,10 @@ public class LoadCommand extends Command {
         try {
             CONFIG_SERVICE.loadFeatures();
             CHAT_SERVICE.sendPersistent(LoadCommand.class.getName(),
-                    CAT_FORMAT.format("Config has been loaded."));
+                    CAT_FORMAT.format("{gray}Config has been loaded."));
         } catch (Exception e) {
             CHAT_SERVICE.sendPersistent(LoadCommand.class.getName(),
-                    CAT_FORMAT.format("Config has not been loaded: {g}" + e.getMessage() + "{reset}."));
+                    CAT_FORMAT.format("{gray}Config has not been loaded: {global}" + e.getMessage() + "{gray}."));
         }
     }
 }

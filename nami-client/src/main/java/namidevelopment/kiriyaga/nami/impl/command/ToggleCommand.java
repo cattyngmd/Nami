@@ -33,10 +33,10 @@ public class ToggleCommand extends Command {
 
         if (found == null) {
             CHAT_SERVICE.sendTransient(
-                    CAT_FORMAT.format("Feature {g}" + input + "{reset} not found."));
+                    CAT_FORMAT.format("{gray}Feature {global}" + input + "{gray} not found."));
             return;
         }
 
-        EXECUTABLE_SERVICE.getRequestHandler().submit(found::toggle, 0, ExecutableThreadType.PRE_TICK);
+        found.toggle();
     }
 }

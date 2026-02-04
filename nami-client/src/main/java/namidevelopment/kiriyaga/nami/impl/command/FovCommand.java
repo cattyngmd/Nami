@@ -30,6 +30,6 @@ public class FovCommand extends Command {
         ((ISimpleOption)(Object) MC.options.fov()).setValue(newFov);
 
         CHAT_SERVICE.sendPersistent(FovCommand.class.getName(),
-                CAT_FORMAT.format("FOV set to: {g}" + newFov + "{reset}."));
+                CAT_FORMAT.format("{gray}FOV set to: {global}" + newFov + "{gray}."));
     }
 }

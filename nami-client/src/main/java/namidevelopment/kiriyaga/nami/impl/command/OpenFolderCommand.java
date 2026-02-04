@@ -26,22 +26,22 @@ public class OpenFolderCommand extends Command {
             File dir = CONFIG_SERVICE.getDirectoryProvider().getBaseDir();
             if (!dir.exists() && !dir.mkdirs()) {
                 CHAT_SERVICE.sendPersistent(OpenFolderCommand.class.getName(),
-                        CAT_FORMAT.format("Failed to create folder: {g}" + dir.getAbsolutePath() + "{reset}."));
+                        CAT_FORMAT.format("{gray}Failed to create folder: {global}" + dir.getAbsolutePath() + "{gray}."));
                 return;
             }
 
             boolean opened = tryDesktopOpen(dir) || tryOsOpen(dir);
             if (opened) {
                 CHAT_SERVICE.sendPersistent(OpenFolderCommand.class.getName(),
-                        CAT_FORMAT.format("Opened folder: {g}" + dir.getAbsolutePath() + "{reset}."));
+                        CAT_FORMAT.format("{gray}Opened folder: {global}" + dir.getAbsolutePath() + "{gray}."));
             } else {
                 CHAT_SERVICE.sendPersistent(OpenFolderCommand.class.getName(),
-                        CAT_FORMAT.format("Could not open folder automatically. Path: {g}" + dir.getAbsolutePath() + "{reset}."));
+                        CAT_FORMAT.format("{gray}Could not open folder automatically. Path: {global}" + dir.getAbsolutePath() + "{gray}."));
             }
         } catch (Exception e) {
             CHAT_SERVICE.sendPersistent(OpenFolderCommand.class.getName(),
-                    CAT_FORMAT.format("Failed to open folder: {g}" + e.getMessage() + "{reset}."));
-            LOGGER.error("Failed to open config folder", e);
+                    CAT_FORMAT.format("{gray}Failed to open folder: {global}" + e.getMessage() + "{gray}."));
+            LOGGER.error("{gray}Failed to open config folder", e);
         }
     }
 

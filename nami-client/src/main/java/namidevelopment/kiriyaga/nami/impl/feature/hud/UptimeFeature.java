@@ -53,22 +53,22 @@ public class UptimeFeature extends HudElementFeature {
 
         StringBuilder sb = new StringBuilder();
 
-        if (displayLabel.get()) sb.append("{g}Uptime: {w}");
+        if (displayLabel.get()) sb.append("{global}Uptime: {white}");
 
         boolean first = true;
 
         if (this.days.get() && displayDays > 0) {
-            sb.append(displayDays).append(" days{g},{w}");
+            sb.append(displayDays).append(" days{global},{white}");
             first = false;
         }
         if (this.hours.get() && displayHours > 0) {
             if (!first) sb.append(" ");
-            sb.append(displayHours).append(" hours{g},{w}");
+            sb.append(displayHours).append(" hours{global},{white}");
             first = false;
         }
         if (this.minutes.get() && displayMinutes > 0) {
             if (!first) sb.append(" ");
-            sb.append(displayMinutes).append(" minutes{g},{w}");
+            sb.append(displayMinutes).append(" minutes{global},{white}");
             first = false;
         }
         if (this.seconds.get() && displaySeconds > 0) {
@@ -77,7 +77,7 @@ public class UptimeFeature extends HudElementFeature {
         }
 
         String formatted = sb.toString();
-        width = FONT_SERVICE.getWidth(formatted.replace("{g}", "").replace("{w}", ""));
+        width = FONT_SERVICE.getWidth(formatted.replace("{global}", "").replace("{white}", ""));
         height = FONT_SERVICE.getHeight();
 
         return CAT_FORMAT.format(formatted);

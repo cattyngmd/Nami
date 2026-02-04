@@ -55,7 +55,7 @@ public class MacroCommand extends Command {
                 int keyCode = KeyUtils.parseKey(keyName);
                 if (keyCode == -1) {
                     CHAT_SERVICE.sendPersistent(getClass().getName(),
-                            CAT_FORMAT.format("Invalid key: {g}" + keyName + "{reset}."));
+                            CAT_FORMAT.format("{gray}Invalid key: {global}" + keyName + "{gray}."));
                     return;
                 }
 
@@ -64,7 +64,7 @@ public class MacroCommand extends Command {
                 CONFIG_SERVICE.saveMacros();
 
                 CHAT_SERVICE.sendPersistent(getClass().getName(),
-                        CAT_FORMAT.format("Macro added: {g}" + keyName + " " + message + "{reset}."));
+                        CAT_FORMAT.format("{gray}Macro added: {global}" + keyName + " " + message + "{gray}."));
             }
 
             case "del" -> {
@@ -72,7 +72,7 @@ public class MacroCommand extends Command {
                 int keyCode = KeyUtils.parseKey(keyName);
                 if (keyCode == -1) {
                     CHAT_SERVICE.sendPersistent(getClass().getName(),
-                            CAT_FORMAT.format("Invalid key: {g}" + keyName + "{reset}."));
+                            CAT_FORMAT.format("{gray}Invalid key: {global}" + keyName + "{gray}."));
                     return;
                 }
 
@@ -80,27 +80,27 @@ public class MacroCommand extends Command {
                 CONFIG_SERVICE.saveMacros();
 
                 CHAT_SERVICE.sendPersistent(getClass().getName(),
-                        CAT_FORMAT.format("Macro removed: {g}" + keyName + "{reset}."));
+                        CAT_FORMAT.format("{gray}Macro removed: {global}" + keyName + "{gray}."));
             }
 
             case "list" -> {
                 if (MACRO_SERVICE.getAll().isEmpty()) {
                     CHAT_SERVICE.sendPersistent(getClass().getName(),
-                            CAT_FORMAT.format("No macros have been added."));
+                            CAT_FORMAT.format("{gray}No macros have been added."));
                     return;
                 }
 
                 StringBuilder builder = new StringBuilder();
-                builder.append("Macros:\n");
+                builder.append("{gray}Macros:\n");
 
                 for (Macro macro : MACRO_SERVICE.getAll()) {
                     String key = KeyUtils.getKeyName(macro.getKeyCode());
                     String msg = macro.getMessage();
-                    builder.append("  {g}")
+                    builder.append("  {global}")
                             .append(key)
                             .append(" ")
                             .append(msg)
-                            .append("{reset}\n");
+                            .append("{gray}\n");
                 }
 
                 CHAT_SERVICE.sendPersistent(
@@ -111,7 +111,7 @@ public class MacroCommand extends Command {
 
             default -> {
                 CHAT_SERVICE.sendPersistent(getClass().getName(),
-                        CAT_FORMAT.format("Unknown action: {g}" + action + "{reset}."));
+                        CAT_FORMAT.format("{gray}Unknown action: {global}" + action + "{gray}."));
             }
         }
     }

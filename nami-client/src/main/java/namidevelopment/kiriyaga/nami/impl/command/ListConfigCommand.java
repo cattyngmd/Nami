@@ -21,11 +21,11 @@ public class ListConfigCommand extends Command {
             var configs = CONFIG_SERVICE.getConfigSerializer().listConfigs();
             if (configs.isEmpty()) {
                 CHAT_SERVICE.sendPersistent(getClass().getName(),
-                        CAT_FORMAT.format("No configs found."));
+                        CAT_FORMAT.format("{gray}No configs found."));
             } else {
                 StringBuilder builder = new StringBuilder("Configs: ");
                 for (int i = 0; i < configs.size(); i++) {
-                    builder.append("{g}").append(configs.get(i)).append("{reset}");
+                    builder.append("{global}").append(configs.get(i)).append("{gray}");
                     if (i < configs.size() - 1) builder.append(", ");
                 }
                 CHAT_SERVICE.sendPersistent(getClass().getName(),
@@ -33,7 +33,7 @@ public class ListConfigCommand extends Command {
             }
         } catch (Exception e) {
             CHAT_SERVICE.sendPersistent(getClass().getName(),
-                    CAT_FORMAT.format("Failed to list configs: {g}" + e + "{reset}."));
+                    CAT_FORMAT.format("{gray}Failed to list configs: {global}" + e + "{gray}."));
         }
     }
 }

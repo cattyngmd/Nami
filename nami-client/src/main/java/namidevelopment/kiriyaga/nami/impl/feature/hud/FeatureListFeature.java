@@ -72,19 +72,19 @@ public class FeatureListFeature extends HudElementFeature {
                         Component info = displayInfos.get(i);
                         if (info == null) continue;
 
-                        sb.append("{w}").append(info.getString());
+                        sb.append("{white}").append(info.getString());
 
                         if (i < displayInfos.size() - 1) {
-                            sb.append("{g},");
+                            sb.append("{global},");
                         }
                     }
-                    sb.append("{g}]");
+                    sb.append("{global}]");
                     rawText = sb.toString();
 
                 } else {
                     rawText = Feature.getName();
                 }
-                Component formattedText = CAT_FORMAT.format("{g}" + rawText);
+                Component formattedText = CAT_FORMAT.format("{global}" + rawText);
                 state.textWidth = FONT_SERVICE.getWidth(formattedText);
                 animationStates.put(name, state);
             }
@@ -120,30 +120,30 @@ public class FeatureListFeature extends HudElementFeature {
                 StringBuilder rawSb = new StringBuilder();
                 rawSb.append(Feature.getName()).append(" [");
                 StringBuilder formattedSb = new StringBuilder();
-                formattedSb.append("{g}").append(Feature.getName()).append(" {g}[");
+                formattedSb.append("{global}").append(Feature.getName()).append(" {global}[");
 
                 for (int i = 0; i < displayInfos.size(); i++) {
                     Component info = displayInfos.get(i);
                     if (info == null) continue;
 
                     rawSb.append(info.getString());
-                    formattedSb.append("{w}").append(info.getString());
+                    formattedSb.append("{white}").append(info.getString());
 
                     if (i < displayInfos.size() - 1) {
                         rawSb.append(",");
-                        formattedSb.append("{g},");
+                        formattedSb.append("{global},");
                     }
                 }
 
                 rawSb.append("]");
-                formattedSb.append("{g}]");
+                formattedSb.append("{global}]");
 
                 rawText = rawSb.toString();
                 formattedTextStr = formattedSb.toString();
 
             } else {
                 rawText = Feature.getName();
-                formattedTextStr = "{g}" + Feature.getName();
+                formattedTextStr = "{global}" + Feature.getName();
             }
             Component formattedText = CAT_FORMAT.format(formattedTextStr);
             int width = FONT_SERVICE.getWidth(formattedText);
@@ -214,7 +214,7 @@ public class FeatureListFeature extends HudElementFeature {
     }
 
     private int getTextWidth(String text) {
-        return FONT_SERVICE.getWidth(CAT_FORMAT.format("{g}" + text));
+        return FONT_SERVICE.getWidth(CAT_FORMAT.format("{global}" + text));
     }
 
     private static class FeatureTextInfo {

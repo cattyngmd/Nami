@@ -27,7 +27,7 @@ public class ChangePrefixCommand extends Command {
         COMMAND_SERVICE.getExecutor().setPrefix(input);
         CONFIG_SERVICE.savePrefix(input);
 
-        Component message = CAT_FORMAT.format("Prefix changed to: {g}" + input + "{reset}.");
+        Component message = CAT_FORMAT.format("{gray}Prefix changed to: {global}" + input + "{gray}.");
         CHAT_SERVICE.sendPersistent(ChangePrefixCommand.class.getName(), message);
     }
 }

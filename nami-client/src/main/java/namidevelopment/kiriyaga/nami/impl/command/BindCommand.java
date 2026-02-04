@@ -37,7 +37,7 @@ public class BindCommand extends Command {
                 .orElse(null);
 
         if (Feature == null) {
-            Component message = CAT_FORMAT.format("Feature {g}" + FeatureName + " {reset}not found.");
+            Component message = CAT_FORMAT.format("{gray}Feature {global}" + FeatureName + " {gray}not found.");
             CHAT_SERVICE.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
@@ -49,7 +49,7 @@ public class BindCommand extends Command {
                 .orElse(null);
 
         if (bindSetting == null) {
-            Component message = CAT_FORMAT.format("Feature {g}" + FeatureName + " {reset}does not have a keybind setting.");
+            Component message = CAT_FORMAT.format("{gray}Feature {global}" + FeatureName + " {gray}does not have a keybind setting.");
             CHAT_SERVICE.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
@@ -57,21 +57,21 @@ public class BindCommand extends Command {
         int keyCode = KeyUtils.parseKey(keyName);
 
         if (keyCode == -1) {
-            Component message = CAT_FORMAT.format("Invalid key name: {g}" + keyName + "{reset}.");
+            Component message = CAT_FORMAT.format("{gray}Invalid key name: {global}" + keyName + "{gray}.");
             CHAT_SERVICE.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
         InputConstants.Key key = InputConstants.Type.KEYSYM.getOrCreate(keyCode);
         if (key == null) {
-            Component message = CAT_FORMAT.format("Invalid key code: {g}" + keyCode + "{reset}.");
+            Component message = CAT_FORMAT.format("{gray}Invalid key code: {global}" + keyCode + "{gray}.");
             CHAT_SERVICE.sendPersistent(BindCommand.class.getName(), message);
             return;
         }
 
         bindSetting.set(keyCode);
 
-        Component message = CAT_FORMAT.format("Bound Feature {g}" + Feature.getName() + " {reset}to key {g}" + keyName + "{reset}.");
+        Component message = CAT_FORMAT.format("{gray}Bound Feature {global}" + Feature.getName() + " {gray}to key {global}" + keyName + "{gray}.");
         CHAT_SERVICE.sendPersistent(BindCommand.class.getName(), message);
     }
 }

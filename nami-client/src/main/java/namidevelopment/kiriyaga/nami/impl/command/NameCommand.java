@@ -30,6 +30,6 @@ public class NameCommand extends Command {
         CONFIG_SERVICE.saveName(newName);
 
         CHAT_SERVICE.sendPersistent(NameCommand.class.getName(),
-                CAT_FORMAT.format("Name set to: {g}" + newName + "{reset}."));
+                CAT_FORMAT.format("{gray}Name set to: {global}" + newName + "{gray}."));
     }
 }

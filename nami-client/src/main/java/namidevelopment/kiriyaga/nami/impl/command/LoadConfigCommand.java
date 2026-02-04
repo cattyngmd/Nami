@@ -44,11 +44,11 @@ public class LoadConfigCommand extends Command {
             CONFIG_SERVICE.loadConfig(configName, mode);
             CHAT_SERVICE.sendPersistent(
                     getClass().getName(),
-                    CAT_FORMAT.format("Config {g}" + configName + "{reset} loaded with mode {g}" + mode.name().toLowerCase() + "{reset}."));
+                    CAT_FORMAT.format("{gray}Config {global}" + configName + "{gray} loaded with mode {global}" + mode.name().toLowerCase() + "{gray}."));
         } catch (Exception e) {
             CHAT_SERVICE.sendPersistent(
                     getClass().getName(),
-                    CAT_FORMAT.format("Failed to load config {g}" + configName + "{reset}: {r}" + e.getMessage() + "{reset}.")
+                    CAT_FORMAT.format("{gray}Failed to load config {global}" + configName + "{gray}: {r}" + e.getMessage() + "{gray}.")
             );
         }
     }

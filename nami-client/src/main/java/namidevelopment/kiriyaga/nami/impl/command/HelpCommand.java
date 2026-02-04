@@ -36,12 +36,12 @@ public class HelpCommand extends Command {
                 .map(this::getDisplay)
                 .collect(Collectors.joining(", "));
 
-        MutableComponent message = CAT_FORMAT.format("Available commands: %s.", displayText);
+        MutableComponent message = CAT_FORMAT.format("{gray}Available commands: " + displayText + "{white}.");
         CHAT_SERVICE.sendPersistent(HelpCommand.class.getName(), message);
     }
 
     private String getDisplay(Command command) {
         String display = command.getName().replace(" ", "");
-        return "{g}" + display + "{reset}";
+        return "{global}" + display + "{gray}";
     }
 }

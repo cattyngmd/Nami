@@ -27,7 +27,7 @@ public class PitchCommand extends Command {
         if (MC.player != null) {
             MC.player.setXRot(pitch);
             CHAT_SERVICE.sendPersistent(PitchCommand.class.getName(),
-                    CAT_FORMAT.format("Pitch set to: {g}" + pitch + "{reset}."));
+                    CAT_FORMAT.format("{gray}Pitch set to: {global}" + pitch + "{gray}."));
         }
     }
 }

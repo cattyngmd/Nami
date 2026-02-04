@@ -22,13 +22,13 @@ public class DurabilityFeature extends HudElementFeature {
     @Override
     public Component getDisplayText() {
         Minecraft mc = MC;
-        if (mc.player == null) return CAT_FORMAT.format("{g}NaN");
+        if (mc.player == null) return CAT_FORMAT.format("{global}NaN");
 
         ItemStack stack = mc.player.getMainHandItem();
         if (stack.isEmpty() || !stack.isDamageableItem()) {
             width = FONT_SERVICE.getWidth("No item");
             height = FONT_SERVICE.getHeight();
-            return CAT_FORMAT.format("{g}No item");
+            return CAT_FORMAT.format("{global}No item");
         }
 
         int maxDamage = stack.getMaxDamage();
@@ -41,12 +41,12 @@ public class DurabilityFeature extends HudElementFeature {
 
         String text;
         if (displayLabel.get()) {
-            text = "{g}Durability: {w}" + durabilityText;
+            text = "{global}Durability: {white}" + durabilityText;
         } else {
-            text = "{w}" + durabilityText;
+            text = "{white}" + durabilityText;
         }
 
-        width = FONT_SERVICE.getWidth(text.replace("{g}", "").replace("{w}", ""));
+        width = FONT_SERVICE.getWidth(text.replace("{global}", "").replace("{white}", ""));
         height = FONT_SERVICE.getHeight();
 
         return CAT_FORMAT.format(text);

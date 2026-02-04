@@ -43,12 +43,12 @@ public class SaveConfigCommand extends Command {
             CONFIG_SERVICE.saveConfig(configName, mode);
             CHAT_SERVICE.sendPersistent(
                     getClass().getName(),
-                    CAT_FORMAT.format("Config {g}" + configName + "{reset} saved with {g}" + mode.name().toLowerCase() + "{reset}."));
+                    CAT_FORMAT.format("{gray}Config {global}" + configName + "{gray} saved with {global}" + mode.name().toLowerCase() + "{gray}."));
         } catch (Exception e) {
             CHAT_SERVICE.sendPersistent(
                     getClass().getName(),
                     CAT_FORMAT.format(
-                            "Failed to save config {g}" + configName + "{reset}: {g}" + e + "{reset}."
+                            "{gray}Failed to save config {global}" + configName + "{gray}: {global}" + e + "{gray}."
                     )
             );
         }

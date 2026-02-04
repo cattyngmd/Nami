@@ -89,7 +89,7 @@ public class FeatureCommand extends Command {
 
         if (setting == null) {
             CHAT_SERVICE.sendPersistent(Feature.getName(),
-                    CAT_FORMAT.format("Setting {g}" + settingNameRaw + "{reset} not found in Feature {g}" + Feature.getName() + "{reset}."));
+                    CAT_FORMAT.format("{gray}Setting {global}" + settingNameRaw + "{gray} not found in Feature {global}" + Feature.getName() + "{gray}."));
             return;
         }
 
@@ -99,8 +99,8 @@ public class FeatureCommand extends Command {
 
             if (action == null) {
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + Feature.getName() +
-                                " {g}" + setting.getName() + " add{reset}/{g}del{reset}/{g}list {g}[item]{reset}."));
+                        CAT_FORMAT.format("{gray}Usage: {secondary}" + prefix + "{global}" + Feature.getName() +
+                                " {global}" + setting.getName() + " add{gray}/{global}del{gray}/{global}list {global}[item]{gray}."));
                 return;
             }
 
@@ -108,65 +108,65 @@ public class FeatureCommand extends Command {
                 case "add" -> {
                     if (item == null || item.isEmpty()) {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + Feature.getName() +
-                                        " {g}" + setting.getName() + " add {s}<{g}item{s}>{reset}."));
+                                CAT_FORMAT.format("{gray}Usage: {secondary}" + prefix + "{global}" + Feature.getName() +
+                                        " {global}" + setting.getName() + " add {secondary}<{global}item{secondary}>{gray}."));
                         return;
                     }
                     if (wlSetting.addToWhitelist(item)) {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("Added: {g}" + item + "{reset} to {g}" +
-                                        setting.getName() + "{reset}."));
+                                CAT_FORMAT.format("{gray}Added: {global}" + item + "{gray} to {global}" +
+                                        setting.getName() + "{gray}."));
                     } else {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("Invalid item id or already added: {g}" +
-                                        item + "{reset}."));
+                                CAT_FORMAT.format("{gray}Invalid item id or already added: {global}" +
+                                        item + "{gray}."));
                     }
                 }
                 case "del" -> {
                     if (item == null || item.isEmpty()) {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("Usage: {s}" + prefix + "{g}" + Feature.getName() +
-                                        " {g}" + setting.getName() + " del {s}<{g}item{s}>{reset}."));
+                                CAT_FORMAT.format("{gray}Usage: {secondary}" + prefix + "{global}" + Feature.getName() +
+                                        " {global}" + setting.getName() + " del {secondary}<{global}item{secondary}>{gray}."));
                         return;
                     }
                     if (wlSetting.removeFromWhitelist(item)) {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("Removed: {g}" + item + "{reset} from {g}" +
-                                        setting.getName() + "{reset}."));
+                                CAT_FORMAT.format("{gray}Removed: {global}" + item + "{gray} from {global}" +
+                                        setting.getName() + "{gray}."));
                     } else {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("Invalid or not in list: {g}" +
-                                        item + "{reset}."));
+                                CAT_FORMAT.format("{gray}Invalid or not in list: {global}" +
+                                        item + "{gray}."));
                     }
                 }
                 case "list" -> {
                     if (wlSetting.getWhitelist().isEmpty()) {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("List {g}" + setting.getName() + "{reset} is empty."));
+                                CAT_FORMAT.format("{gray}List {global}" + setting.getName() + "{gray} is empty."));
                         return;
                     }
                     StringBuilder builder = new StringBuilder();
-                    builder.append("List {g}").append(setting.getName()).append("{reset} items: ");
+                    builder.append("{gray}List {global}").append(setting.getName()).append("{gray} items: ");
                     int i = 0;
                     int size = wlSetting.getWhitelist().size();
                     for (Identifier id : wlSetting.getWhitelist()) {
-                        builder.append("{g}").append(id.toString()).append("{reset}.");
-                        if (i < size - 1) builder.append("{s}, {reset}");
+                        builder.append("{global}").append(id.toString()).append("{gray}.");
+                        if (i < size - 1) builder.append("{secondary}, {gray}");
                         i++;
                     }
                     CHAT_SERVICE.sendPersistent(Feature.getName(), CAT_FORMAT.format(builder.toString()));
                 }
                 default -> {
                     CHAT_SERVICE.sendPersistent(Feature.getName(),
-                            CAT_FORMAT.format("Unknown action: {g}" + action +
-                                    "{reset}. Use {g}add/del/list{reset}."));
+                            CAT_FORMAT.format("{gray}Unknown action: {global}" + action +
+                                    "{gray}. Use {global}add/del/list{gray}."));
                 }
             }
         } else if (setting instanceof BoolSetting boolSetting) {
             if (valueRaw == null) {
                 boolSetting.set(!boolSetting.get());
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} toggled to "+ (boolSetting.get() ? "{green}" : "{red}") + boolSetting.get() + "{reset} for {g}" + Feature.getName() + "{reset}."));
+                        CAT_FORMAT.format("{global}" + setting.getName() + "{gray} toggled to "+ (boolSetting.get() ? "{green}" : "{red}") + boolSetting.get() + "{gray} for {global}" + Feature.getName() + "{gray}."));
             } else {
                 switch (valueRaw.toLowerCase()) {
                     case "true", "on" -> boolSetting.set(true);
@@ -174,53 +174,53 @@ public class FeatureCommand extends Command {
                     case "toggle" -> boolSetting.set(!boolSetting.get());
                     default -> {
                         CHAT_SERVICE.sendPersistent(Feature.getName(),
-                                CAT_FORMAT.format("Invalid bool value {g}" + valueRaw + "{reset}. Use {g}true/false/toggle{reset}."));
+                                CAT_FORMAT.format("{gray}Invalid bool value {global}" + valueRaw + "{gray}. Use {global}true/false/toggle{gray}."));
                         return;
                     }
                 }
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to {g}" + boolSetting.get() + "{reset}."));
+                        CAT_FORMAT.format("{global}" + setting.getName() + "{gray} set to {global}" + boolSetting.get() + "{gray}."));
             }
         } else if (setting instanceof IntSetting intSetting) {
             try {
                 intSetting.set(Integer.parseInt(valueRaw));
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to {g}" + intSetting.get() + "{reset}."));
+                        CAT_FORMAT.format("{global}" + setting.getName() + "{gray} set to {global}" + intSetting.get() + "{gray}."));
             } catch (Exception e) {
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("Invalid integer {g}" + valueRaw + "{reset}."));
+                        CAT_FORMAT.format("{gray}Invalid integer {global}" + valueRaw + "{gray}."));
             }
         } else if (setting instanceof DoubleSetting doubleSetting) {
             try {
                 doubleSetting.set(Double.parseDouble(valueRaw));
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to {g}" + doubleSetting.get() + "{reset}."));
+                        CAT_FORMAT.format("{global}" + setting.getName() + "{gray} set to {global}" + doubleSetting.get() + "{gray}."));
             } catch (Exception e) {
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("Invalid number {g}" + valueRaw + "{reset}."));
+                        CAT_FORMAT.format("{gray}Invalid number {global}" + valueRaw + "{gray}."));
             }
         } else if (setting instanceof KeyBindSetting keyBindSetting) {
             try {
                 keyBindSetting.set(Integer.parseInt(valueRaw));
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to key code {g}" + keyBindSetting.get() + "{reset}."));
+                        CAT_FORMAT.format("{global}" + setting.getName() + "{gray} set to key code {global}" + keyBindSetting.get() + "{gray}."));
             } catch (Exception e) {
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("Invalid keybind {g}" + valueRaw + "{reset}. Must be int key code."));
+                        CAT_FORMAT.format("{gray}Invalid keybind {global}" + valueRaw + "{gray}. Must be int key code."));
             }
         } else if (setting instanceof EnumSetting<?> enumSetting) {
             if (valueRaw == null) {
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} is currently {g}" + enumSetting.get().name() + "{reset}. " +
-                                "Available: {g}" + String.join("{reset}, {g}",
-                                Arrays.stream(enumSetting.getValues()).map(Enum::name).toList()) + "{reset}."));
+                        CAT_FORMAT.format("{global}" + setting.getName() + "{gray} is currently {global}" + enumSetting.get().name() + "{gray}. " +
+                                "Available: {global}" + String.join("{gray}, {global}",
+                                Arrays.stream(enumSetting.getValues()).map(Enum::name).toList()) + "{gray}."));
                 return;
             }
 
             if (valueRaw.equalsIgnoreCase("cycle")) {
                 enumSetting.cycle(true);
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("{g}" + setting.getName() + "{reset} cycled to {g}" + enumSetting.get().name() + "{reset}."));
+                        CAT_FORMAT.format("{global}" + setting.getName() + "{gray} cycled to {global}" + enumSetting.get().name() + "{gray}."));
                 return;
             }
 
@@ -230,21 +230,21 @@ public class FeatureCommand extends Command {
                     setEnumValue(enumSetting, constant);
                     matched = true;
                     CHAT_SERVICE.sendPersistent(Feature.getName(),
-                            CAT_FORMAT.format("{g}" + setting.getName() + "{reset} set to {g}" + constant.name() + "{reset}."));
+                            CAT_FORMAT.format("{global}" + setting.getName() + "{gray} set to {global}" + constant.name() + "{gray}."));
                     break;
                 }
             }
 
             if (!matched) {
                 CHAT_SERVICE.sendPersistent(Feature.getName(),
-                        CAT_FORMAT.format("Invalid value {g}" + valueRaw + "{reset}. Available: {g}" +
-                                String.join(", ", Arrays.stream(enumSetting.getValues()).map(Enum::name).toList()) + "{reset}."));
+                        CAT_FORMAT.format("{gray}Invalid value {global}" + valueRaw + "{gray}. Available: {global}" +
+                                String.join(", ", Arrays.stream(enumSetting.getValues()).map(Enum::name).toList()) + "{gray}."));
             }
         }
 
         else {
             CHAT_SERVICE.sendPersistent(Feature.getName(),
-                    CAT_FORMAT.format("Unsupported setting type for {g}" + setting.getName() + "{reset}."));
+                    CAT_FORMAT.format("{gray}Unsupported setting type for {global}" + setting.getName() + "{gray}."));
         }
     }
 
@@ -261,7 +261,7 @@ public class FeatureCommand extends Command {
                     storage.addCommand(new FeatureCommand(Feature));
                 }
             } catch (Exception e) {
-                API_LOGGER.error("Failed to initiate command for Feature: " + Feature.getName(), e);
+                API_LOGGER.error("{gray}Failed to initiate command for Feature: {global}" + Feature.getName(), e);
             }
         });
     }

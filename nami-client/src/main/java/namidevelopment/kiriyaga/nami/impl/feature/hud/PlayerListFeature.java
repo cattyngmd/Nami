@@ -81,7 +81,7 @@ public class PlayerListFeature extends HudElementFeature {
 
         String name = entity.getName().getString();
         if (FRIEND_SERVICE.isFriend(name)) sb.append("{friend}").append(name);
-        else sb.append("{w}").append(name);
+        else sb.append("{white}").append(name);
 
         if (showDistance.get()) {
             double dist = Math.round(Math.sqrt(MC.player.distanceToSqr(entity)));

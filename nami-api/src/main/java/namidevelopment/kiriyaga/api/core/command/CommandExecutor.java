@@ -47,7 +47,7 @@ public class CommandExecutor {
 
         if (cmdName.isEmpty()) {
             CHAT_SERVICE.sendPersistent(CommandExecutor.class.getName(),
-                    CAT_FORMAT.format("Please specify a command. Use {g}" + prefix + "help{reset} for a list."));
+                    CAT_FORMAT.format("Please specify a command. Use {global}" + prefix + "help{gray} for a list."));
             return;
         }
 
@@ -57,7 +57,7 @@ public class CommandExecutor {
         Command command = storage.getCommandByNameOrAlias(cmdName);
         if (command == null) {
             CHAT_SERVICE.sendPersistent(CommandExecutor.class.getName(),
-                    CAT_FORMAT.format("Unknown command: {g}" + cmdName + "{reset}. Use {g}" + prefix + "help{reset}."));
+                    CAT_FORMAT.format("Unknown command: {global}" + cmdName + "{gray}. Use {global}" + prefix + "help{gray}."));
             return;
         }
 
@@ -100,9 +100,9 @@ public class CommandExecutor {
         } catch (IllegalArgumentException e) {
             StringBuilder argsFormatted = new StringBuilder();
             for (CommandArgument arg : expected) {
-                argsFormatted.append("<{g}").append(arg.getName()).append("{s}> ");
+                argsFormatted.append("<{global}").append(arg.getName()).append("{secondary}> ");
             }
-            String usageMessage = "Wrong input! Usage: {s}" + argsFormatted.toString().trim() + "{reset}.";
+            String usageMessage = "Wrong input! Usage: {secondary}" + argsFormatted.toString().trim() + "{gray}.";
             CHAT_SERVICE.sendPersistent(CommandExecutor.class.getName(), CAT_FORMAT.format(usageMessage));
 
         } catch (Exception e) {

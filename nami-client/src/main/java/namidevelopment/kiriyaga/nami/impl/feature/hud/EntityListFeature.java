@@ -84,7 +84,7 @@ public class EntityListFeature extends HudElementFeature {
 
         for (String name : sortedNames) {
             int count = entityCounts.get(name);
-            Component text = CAT_FORMAT.format("{g}" + name + (count > 1 ? " {w}(x" + count + ")" : ""));
+            Component text = CAT_FORMAT.format("{global}" + name + (count > 1 ? " {white}(x" + count + ")" : ""));
             int textWidth = FONT_SERVICE.getWidth(text);
             elements.add(new TextElement(text, 0, yOffset));
 
@@ -99,7 +99,7 @@ public class EntityListFeature extends HudElementFeature {
     }
 
     private int getTextWidth(String name, int count) {
-        Component text = CAT_FORMAT.format("{g}" + name + (count > 1 ? " {w}(x" + count + ")" : ""));
+        Component text = CAT_FORMAT.format("{global}" + name + (count > 1 ? " {white}(x" + count + ")" : ""));
         return FONT_SERVICE.getWidth(text);
     }
 }

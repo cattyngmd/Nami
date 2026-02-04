@@ -27,6 +27,6 @@ public class YawCommand extends Command {
 
         MC.player.setYRot(yaw);
         CHAT_SERVICE.sendPersistent(getClass().getName(),
-                CAT_FORMAT.format("Yaw set to: {g}" + yaw + "{reset}."));
+                CAT_FORMAT.format("{gray}Yaw set to: {global}" + yaw + "{gray}."));
     }
 }
