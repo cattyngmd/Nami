@@ -7,6 +7,10 @@
     "DuckClientLevel",
     "DuckFont",
     "DuckMultiPlayerGameMode",
+    "MixinCommandSuggestions",
+    "MixinDebugScreenOverlay",
+    "MixinLocalPlayer",
+    "MixinMinecraft",
     "MixinMultiPlayerGameMode"
   ],
   "injectors": {
@@ -14,6 +18,8 @@
   },
   "mixins": [
     "DuckAgeableMob",
-    "DuckAnimal"
+    "DuckAnimal",
+    "MixinEntity",
+    "MixinLivingEntity"
   ]
 }

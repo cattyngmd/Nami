@@ -24,9 +24,6 @@ public abstract class MixinLocalPlayer {
 
     @Shadow public abstract void move(MoverType type, Vec3 movement);
 
-    private float originalSilentPitch;
-    private float originalYaw, originalPitch;
-
     @Inject(method = "tick", at = @At("HEAD"))
     private void tickHookPre(CallbackInfo ci) {
 
@@ -65,64 +62,6 @@ public abstract class MixinLocalPlayer {
         }
     }
 
-    @Inject(method = "sendPosition", at = @At("HEAD"))
-    private void preSendMovementPackets(CallbackInfo ci) {
-        if (!ROTATION_SERVICE.getStateHandler().isRotating()) {
-            ROTATION_SERVICE.getStateHandler().setServerDeltaYaw(0f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
-            return;
-        }
-
-        originalYaw = MC.player.getYRot();
-        originalPitch = MC.player.getXRot();
-
-        float newYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
-        float newPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
-        MC.player.setYRot(newYaw);
-        MC.player.setXRot(newPitch);
-
-        float deltaYaw = newYaw - ROTATION_SERVICE.getStateHandler().getServerYaw();
-        //float deltaPitch = newPitch - ROTATION_SERVICE.getStateHandler().getServerPitch();
-
-        ROTATION_SERVICE.getStateHandler().setServerDeltaYaw(deltaYaw);
-
-        ROTATION_SERVICE.getStateHandler().setServerYaw(newYaw);
-        ROTATION_SERVICE.getStateHandler().setServerPitch(newPitch);
-    }
-
-    @Inject(method = "sendPosition", at = @At("TAIL"))
-    private void postSendMovementPackets(CallbackInfo ci) {
-        ROTATION_SERVICE.getStateHandler().setServerYaw(MC.player.getYRot());
-        ROTATION_SERVICE.getStateHandler().setServerPitch(MC.player.getXRot());
-
-        if (!ROTATION_SERVICE.getStateHandler().isRotating())
-            return;
-
-        MC.player.setYRot(originalYaw);
-        MC.player.setXRot(originalPitch);
-    }
-
-    // Do not ask me exactly why is it so weird, it just works
-    // overall silent rotations sucks, another super cool bypass, works really weirdly
-    // i hope it gets fucking patched in 1.22/1.23
-    @Inject(method = "sendPosition", at = @At("HEAD"))
-    private void sendMovementPackets1(CallbackInfo ci) {
-        if (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.SILENT
-        && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
-            this.originalSilentPitch = MC.player.getXRot();
-            this.xRotLast = -9999;
-            MC.player.setXRot(this.originalSilentPitch + 1f);
-        }
-    }
-
-    @Inject(method = "sendPosition", at = @At("RETURN"))
-    private void sendMovementPackets2(CallbackInfo ci) {
-        if (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.SILENT
-                && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
-            MC.player.setXRot(this.originalSilentPitch);
-            ROTATION_SERVICE.getStateHandler().setSilentSyncRequired(false);
-        }
-    }
-
     @Inject(method = "modifyInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec2;scale(F)Lnet/minecraft/world/phys/Vec2;", ordinal = 1), cancellable = true)    private void onApplyMovementSpeedFactors(Vec2 vec2f, CallbackInfoReturnable<Vec2> cir) {
         LivingEntity self = (LivingEntity)(Object)this;
 
@@ -141,8 +80,6 @@ public abstract class MixinLocalPlayer {
     private static Vec2 modifyInputSpeedForSquareMovement(Vec2 vec2f) {
         throw new AssertionError();
     }
-
-    @Shadow private float xRotLast;
 
     @Inject(method = "isMovingSlowly", at = @At("HEAD"), cancellable = true)
     private void shouldSlowDown(CallbackInfoReturnable<Boolean> info) {

@@ -1,0 +1,77 @@
+package namidevelopment.kiriyaga.api.mixin;
+
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
+import namidevelopment.kiriyaga.api.event.impl.*;
+import net.minecraft.client.player.LocalPlayer;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+@Mixin(LocalPlayer.class)
+public abstract class MixinLocalPlayer {
+    private float originalSilentPitch;
+    private float originalYaw, originalPitch;
+    @Shadow private float xRotLast;
+
+    @Inject(method = "sendPosition", at = @At("HEAD"))
+    private void preSendMovementPackets(CallbackInfo ci) {
+        if (!ROTATION_SERVICE.getStateHandler().isRotating()) {
+            ROTATION_SERVICE.getStateHandler().setServerDeltaYaw(0f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
+            return;
+        }
+
+        originalYaw = API_MC.player.getYRot();
+        originalPitch = API_MC.player.getXRot();
+
+        float newYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
+        float newPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
+        API_MC.player.setYRot(newYaw);
+        API_MC.player.setXRot(newPitch);
+
+        float deltaYaw = newYaw - ROTATION_SERVICE.getStateHandler().getServerYaw();
+        //float deltaPitch = newPitch - ROTATION_SERVICE.getStateHandler().getServerPitch();
+
+        ROTATION_SERVICE.getStateHandler().setServerDeltaYaw(deltaYaw);
+
+        ROTATION_SERVICE.getStateHandler().setServerYaw(newYaw);
+        ROTATION_SERVICE.getStateHandler().setServerPitch(newPitch);
+    }
+
+    @Inject(method = "sendPosition", at = @At("TAIL"))
+    private void postSendMovementPackets(CallbackInfo ci) {
+        ROTATION_SERVICE.getStateHandler().setServerYaw(API_MC.player.getYRot());
+        ROTATION_SERVICE.getStateHandler().setServerPitch(API_MC.player.getXRot());
+
+        if (!ROTATION_SERVICE.getStateHandler().isRotating())
+            return;
+
+        API_MC.player.setYRot(originalYaw);
+        API_MC.player.setXRot(originalPitch);
+    }
+
+    // Do not ask me exactly why is it so weird, it just works
+    // overall silent rotations sucks, another super cool bypass, works really weirdly
+    // i hope it gets fucking patched in 1.22/1.23
+    @Inject(method = "sendPosition", at = @At("HEAD"))
+    private void sendMovementPackets1(CallbackInfo ci) {
+        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        if (config.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
+            this.originalSilentPitch = API_MC.player.getXRot();
+            this.xRotLast = -9999;
+            API_MC.player.setXRot(this.originalSilentPitch + 1f);
+        }
+    }
+
+    @Inject(method = "sendPosition", at = @At("RETURN"))
+    private void sendMovementPackets2(CallbackInfo ci) {
+        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        if (config.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
+            API_MC.player.setXRot(this.originalSilentPitch);
+            ROTATION_SERVICE.getStateHandler().setSilentSyncRequired(false);
+        }
+    }
+}

@@ -16,10 +16,8 @@ import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 public abstract class MixinEntityRenderer<T extends Entity, S extends EntityRenderState> {
 
     @Inject(method = "getNameTag", at = @At("HEAD"), cancellable = true)
-    private void onRenderLabel(T entity, CallbackInfoReturnable<Component> cir) {
-        NametagsFeature nametagsFeature = FEATURE_SERVICE.getStorage() != null
-                ? FEATURE_SERVICE.getStorage().getByClass(NametagsFeature.class)
-                : null;
+    private void getNameTag(T entity, CallbackInfoReturnable<Component> cir) {
+        NametagsFeature nametagsFeature = FEATURE_SERVICE.getStorage() != null ? FEATURE_SERVICE.getStorage().getByClass(NametagsFeature.class) : null;
 
         if (nametagsFeature != null && nametagsFeature.isEnabled()) {
             cir.setReturnValue(null);

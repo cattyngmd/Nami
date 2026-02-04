@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EntityRenderDispatcher.class)
 public abstract class MixinEntityRenderDispatcher {
     @Inject(method = "extractEntity", at = @At("RETURN"))
-    private <E extends Entity> void nami$attachEntity(E entity, float tickDelta, CallbackInfoReturnable<EntityRenderState> cir) {
+    private <E extends Entity> void extractEntity(E entity, float tickDelta, CallbackInfoReturnable<EntityRenderState> cir) {
         EntityRenderState state = cir.getReturnValue();
         if (state != null) {
             ((IEntityRenderState) state).setEntity(entity);

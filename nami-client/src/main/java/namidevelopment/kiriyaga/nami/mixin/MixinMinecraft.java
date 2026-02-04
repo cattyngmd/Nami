@@ -65,50 +65,6 @@ public abstract class MixinMinecraft {
         }
     }
 
-    @Inject(method = "handleKeybinds", at = @At("TAIL"))
-    private void onHandleInputEvents_TAIL(CallbackInfo ci) {
-        if (MC == null || MC.mouseHandler == null || MC.screen != null) return;
-
-        for (Feature Feature : FEATURE_SERVICE.getStorage().getAll()) {
-            if (Feature == null) continue;
-            KeyBindSetting bind = Feature.getKeyBind();
-            if (bind == null) continue;
-
-            if (bind.get() != KeyBindSetting.KEY_NONE) {
-                boolean currentlyPressed = bind.isPressed();
-
-                if (bind.isHoldMode()) {
-                    if (currentlyPressed && !Feature.isEnabled()) {
-                        Feature.setEnabled(true);
-                    } else if (!currentlyPressed && Feature.isEnabled()) {
-                        Feature.setEnabled(false);
-                    }
-                } else {
-                    if (currentlyPressed && !bind.wasPressedLastTick()) {
-                        Feature.toggle();
-                    }
-                }
-
-                bind.setWasPressedLastTick(currentlyPressed);
-            }
-        }
-
-        for (Macro macro : MACRO_SERVICE.getAll()) {
-            int keyCode = macro.getKeyCode();
-            boolean currentlyPressed = MACRO_SERVICE.isKeyPressed(keyCode);
-            boolean wasPressed = MACRO_SERVICE.wasKeyPressedLastTick(keyCode);
-
-            if (currentlyPressed && !wasPressed) {
-                if (MC.player != null) {
-                    MC.player.connection.sendChat(macro.getMessage());
-                }
-            }
-
-            MACRO_SERVICE.setKeyPressedLastTick(keyCode, currentlyPressed);
-        }
-    }
-
-
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isHandsBusy()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void doItemUse(CallbackInfo info) {
 

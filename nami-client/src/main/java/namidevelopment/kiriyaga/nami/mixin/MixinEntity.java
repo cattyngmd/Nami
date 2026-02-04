@@ -75,17 +75,6 @@ public abstract class MixinEntity {
         }
     }*/
 
-    @Inject(method = "getLookAngle()Lnet/minecraft/world/phys/Vec3;", at = @At("HEAD"), cancellable = true)
-    private void onGetRotationVector(CallbackInfoReturnable<Vec3> cir) {
-        if ((Object) this != MC.player) return;
-        if (ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating()) return;
-
-        float spoofYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
-        float spoofPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
-
-        cir.setReturnValue(((Entity) (Object) this).calculateViewVector(spoofPitch, spoofYaw));
-    }
-
 /*    @Inject(method = "lookAt", at = @At("TAIL"))
     private void onLookAt(EntityAnchorArgument.Anchor anchor, Vec3 vec3, CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;

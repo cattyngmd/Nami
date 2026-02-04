@@ -37,11 +37,7 @@ public abstract class MixinGameRenderer {
     @Shadow
     public abstract void pick(float tickDelta);
 
-    @Inject(
-            method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(" +
+    @Inject(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(" +
                             "Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;" +
                             "Lnet/minecraft/client/DeltaTracker;" +
                             "Z" +
@@ -51,27 +47,8 @@ public abstract class MixinGameRenderer {
                             "Lorg/joml/Matrix4f;" +
                             "Lcom/mojang/blaze3d/buffers/GpuBufferSlice;" +
                             "Lorg/joml/Vector4f;" +
-                            "Z)V"
-            ),
-            locals = LocalCapture.CAPTURE_FAILHARD
-    )
-    private void captureMatrices(
-            DeltaTracker deltaTracker,
-            CallbackInfo ci,
-            float f,
-            LocalPlayer localPlayer,
-            ProfilerFiller profilerFiller,
-            boolean bl,
-            float g,
-            Matrix4f projection,      // matrix4f
-            PoseStack poseStack,
-            float h,
-            float i,
-            float j,
-            float k,
-            Quaternionf quaternionf,
-            Matrix4f view             // matrix4f2
-    ) {
+                            "Z)V"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void captureMatrices(DeltaTracker deltaTracker, CallbackInfo ci, float f, LocalPlayer localPlayer, ProfilerFiller profilerFiller, boolean bl, float g, Matrix4f projection, PoseStack poseStack, float h, float i, float j, float k, Quaternionf quaternionf, Matrix4f view) {
         PROJECTION_MATRIX.set(projection);
         MODEL_VIEW_MATRIX.set(view);
     }

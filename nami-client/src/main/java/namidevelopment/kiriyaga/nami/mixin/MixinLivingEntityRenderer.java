@@ -29,47 +29,6 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(LivingEntityRenderer.class)
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> {
 
-    @Unique private float oldHeadYaw;
-    @Unique private float oldPrevHeadYaw;
-    @Unique private float oldPitch;
-    @Unique private float oldPrevPitch;
-
-    @Inject(method = "extractRenderState", at = @At("HEAD"))
-    private void extractRenderState(T livingEntity, S state, float f, CallbackInfo ci) {
-        if (!(livingEntity instanceof LocalPlayer player)) return;
-        if (player != MC.player) return;
-
-        RotationsFeature rotations = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
-        if (!rotations.render.get()) return;
-
-        oldHeadYaw = MC.player.yHeadRot;
-        oldPrevHeadYaw = MC.player.yHeadRotO;
-        oldPitch = MC.player.getXRot();
-        oldPrevPitch = MC.player.xRotO;
-
-        float serverYaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
-        float serverPitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
-
-        MC.player.yHeadRot = serverYaw; //TODO interpolate it
-        MC.player.yHeadRotO = serverYaw;
-        MC.player.setXRot(serverPitch);
-        MC.player.xRotO = serverPitch;
-    }
-
-    @Inject(method = "extractRenderState", at = @At("TAIL"))
-    private void extractRenderState1(T livingEntity, S state, float f, CallbackInfo ci) {
-        if (!(livingEntity instanceof LocalPlayer player)) return;
-        if (player != MC.player) return;
-
-        RotationsFeature rotations = FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class);
-        if (!rotations.render.get()) return;
-
-        MC.player.yHeadRot = oldHeadYaw;
-        MC.player.yHeadRotO = oldPrevHeadYaw;
-        MC.player.setXRot(oldPitch);
-        MC.player.xRotO = oldPrevPitch;
-    }
-
     @WrapWithCondition(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
     private <TState> boolean CrumblingOverlay(SubmitNodeCollector collector, Model<? super TState> model, TState state, PoseStack poseStack, RenderType renderType, int light, int overlay, int packedColor, TextureAtlasSprite sprite, int outlineColor, ModelFeatureRenderer.CrumblingOverlay crumble) {
         ChamsFeature chams = FEATURE_SERVICE.getStorage().getByClass(ChamsFeature.class);

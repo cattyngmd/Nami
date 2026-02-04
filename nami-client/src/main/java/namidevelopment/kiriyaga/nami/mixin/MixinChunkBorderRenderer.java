@@ -13,13 +13,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 @Mixin(ChunkBorderRenderer.class)
 public abstract class MixinChunkBorderRenderer {
 
-    @ModifyExpressionValue(
-            method = "emitGizmos",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;blockPosition()Lnet/minecraft/core/BlockPos;"
-            )
-    )
+    @ModifyExpressionValue(method = "emitGizmos", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;blockPosition()Lnet/minecraft/core/BlockPos;"))
     private BlockPos nami$modifyEntityPos(BlockPos originalPos) {
         FreecamFeature freecamFeature = FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class);
 
@@ -29,18 +23,10 @@ public abstract class MixinChunkBorderRenderer {
 
         float delta = MC.getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
-        double interpolatedX =
-                freecamFeature.prevPos.x +
-                        (freecamFeature.pos.x - freecamFeature.prevPos.x) * delta;
+        double interpolatedX = freecamFeature.prevPos.x + (freecamFeature.pos.x - freecamFeature.prevPos.x) * delta;
 
-        double interpolatedZ =
-                freecamFeature.prevPos.z +
-                        (freecamFeature.pos.z - freecamFeature.prevPos.z) * delta;
+        double interpolatedZ = freecamFeature.prevPos.z + (freecamFeature.pos.z - freecamFeature.prevPos.z) * delta;
 
-        return new BlockPos(
-                (int) Math.floor(interpolatedX),
-                originalPos.getY(),
-                (int) Math.floor(interpolatedZ)
-        );
+        return new BlockPos((int) Math.floor(interpolatedX), originalPos.getY(), (int) Math.floor(interpolatedZ));
     }
 }

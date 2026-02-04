@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static namidevelopment.kiriyaga.nami.Nami.LAST_CONNECTION;
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
+import static namidevelopment.kiriyaga.nami.Nami.MC;
 
 @Mixin(DisconnectedScreen.class)
 public abstract class MixinDisconnectedScreen extends Screen {
@@ -92,13 +93,6 @@ public abstract class MixinDisconnectedScreen extends Screen {
     @Unique
     private void tryReconnect() {
         if (LAST_CONNECTION == null) return;
-        ConnectScreen.startConnecting(
-                new TitleScreen(),
-                Minecraft.getInstance(),
-                LAST_CONNECTION.getA(),
-                LAST_CONNECTION.getB(),
-                false,
-                null
-        );
+        ConnectScreen.startConnecting(new TitleScreen(), MC, LAST_CONNECTION.getA(), LAST_CONNECTION.getB(), false, null);
     }
 }

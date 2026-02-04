@@ -1,10 +1,9 @@
-package namidevelopment.kiriyaga.nami.mixin;
+package namidevelopment.kiriyaga.api.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestions;
-import namidevelopment.kiriyaga.nami.Nami;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
@@ -18,11 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.CompletableFuture;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
-import static namidevelopment.kiriyaga.nami.Nami.*;
 
 @Mixin(value = CommandSuggestions.class)
 public abstract class MixinCommandSuggestions {
-    @Shadow @Final private Minecraft minecraft;
     @Shadow @Final private EditBox input;
     @Shadow private ParseResults<SharedSuggestionProvider> currentParse;
     @Shadow private CompletableFuture<Suggestions> pendingSuggestions;
@@ -32,11 +29,7 @@ public abstract class MixinCommandSuggestions {
     @Shadow
     protected abstract void updateUsageInfo();
 
-    @Inject(
-        method = "updateCommandInfo",
-        at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false),
-        cancellable = true
-    )
+    @Inject(method = "updateCommandInfo", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true)
     private void onRefresh(CallbackInfo ci, @Local StringReader reader) {
         String text = this.input.getValue();
         String prefix = COMMAND_SERVICE.getExecutor().getPrefix();
@@ -44,7 +37,7 @@ public abstract class MixinCommandSuggestions {
         if (text.startsWith(prefix) && reader.getCursor() == 0) {
             reader.setCursor(prefix.length());
 
-            SharedSuggestionProvider source = this.minecraft.getConnection().getSuggestionsProvider();
+            SharedSuggestionProvider source = API_MC.getConnection().getSuggestionsProvider();
             this.currentParse = COMMAND_SERVICE.getSuggester().getDispatcher().parse(reader, source);
 
             int cursor = this.input.getCursorPosition();
