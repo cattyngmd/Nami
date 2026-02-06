@@ -116,7 +116,7 @@ public class InteractionUtils {
         offZ = Mth.clamp(offZ, 0.2, 0.8);
         Vec3 hitVec = Vec3.atCenterOf(neighbor);
 
-        switch (clickFace) { //todo: refactor this
+        switch (clickFace) {
             case UP, DOWN -> hitVec = hitVec.add(
                     offX - 0.5,
                     clickFace == Direction.UP ? 0.5 : -0.5,
@@ -232,11 +232,44 @@ public class InteractionUtils {
         return result;
     }
 
-    public static boolean interactBlockAt(BlockPos pos, Item item, boolean swapBack, boolean multiTask, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
+    public static boolean interactBlockAt(BlockPos pos, Item item, Direction direction, boolean swapBack, boolean multiTask, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
         Vec3 eyePos = API_MC.player.getEyePosition();
+        Vec3 playerPos = API_MC.player.position();
+        Direction clickFace = Direction.UP;
+
+        double offX = playerPos.x - Math.floor(playerPos.x);
+        double offY = playerPos.y - Math.floor(playerPos.y);
+        double offZ = playerPos.z - Math.floor(playerPos.z);
+        offX = Mth.clamp(offX, 0.2, 0.8);
+        offY = Mth.clamp(offY, 0.2, 0.8);
+        offZ = Mth.clamp(offZ, 0.2, 0.8);
         Vec3 hitVec = Vec3.atCenterOf(pos);
 
-        Direction clickFace = getBlockInteractDir(pos);
+        if (strictDirection)
+            clickFace = getBlockInteractDir(pos);
+
+        if (direction != null)
+            clickFace = direction;
+
+        switch (clickFace) {
+            case UP, DOWN -> hitVec = hitVec.add(
+                    offX - 0.5,
+                    clickFace == Direction.UP ? 0.5 : -0.5,
+                    offZ - 0.5
+            );
+
+            case NORTH, SOUTH -> hitVec = hitVec.add(
+                    offX - 0.5,
+                    offY - 0.5,
+                    clickFace == Direction.SOUTH ? 0.5 : -0.5
+            );
+
+            case EAST, WEST -> hitVec = hitVec.add(
+                    clickFace == Direction.EAST ? 0.5 : -0.5,
+                    offY - 0.5,
+                    offZ - 0.5
+            );
+        }
 
         if (!multiTask && API_MC.player.isUsingItem())
             return false;
