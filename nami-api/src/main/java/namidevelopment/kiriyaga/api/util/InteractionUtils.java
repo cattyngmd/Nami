@@ -38,9 +38,20 @@ public class InteractionUtils {
 
     private static BlockPos currentBreakingBlock = null;
 
-    public static boolean interactWithEntity(Entity entity, double range, boolean swing, boolean rotate, String rotationId) {
+    public static boolean interactWithEntity(Entity entity, Item item, boolean swapBack, boolean multitask, double range, boolean swing, boolean rotate, String rotationId) {
         if (API_MC.player == null || API_MC.gameMode == null || entity == null) return false;
 
+        if (!multitask && API_MC.player.isUsingItem())
+            return false;
+
+        boolean isOffhand = false;
+        if (API_MC.player.getOffhandItem().is(item))
+            isOffhand = true;
+
+        int slot = findHotbarItem(stack -> stack.is(item));
+        if (slot == -1 && !isOffhand)
+            return false;
+        
         Vec3 eyePos = API_MC.player.getEyePosition(1.0f);
         Vec3 closestPoint = getClosestPointToEye(eyePos, entity.getBoundingBox());
         float idealYaw = (float) getYawToVec(API_MC.player, closestPoint);
@@ -60,11 +71,34 @@ public class InteractionUtils {
         if (!completed)
             return false;
 
+
         API_MC.gameMode.interactAt(API_MC.player, entity, hitResult, MAIN_HAND);
         API_MC.gameMode.interact(API_MC.player, entity, MAIN_HAND);
 
         if (swing)
             API_MC.player.swing(MAIN_HAND);
+
+
+        if (!isOffhand) {
+            int prev = API_MC.player.getInventory().getSelectedSlot();
+            InventoryUtils.attemptSwitch(slot);
+
+            API_MC.gameMode.interactAt(API_MC.player, entity, hitResult, MAIN_HAND);
+            API_MC.gameMode.interact(API_MC.player, entity, MAIN_HAND);
+
+            if (swing)
+                API_MC.player.swing(MAIN_HAND);
+
+            if (swapBack)
+                InventoryUtils.attemptSwitch(prev);
+        }
+        else {
+            API_MC.gameMode.interactAt(API_MC.player, entity, hitResult, OFF_HAND);
+            API_MC.gameMode.interact(API_MC.player, entity, OFF_HAND);
+
+            if (swing)
+                API_MC.player.swing(OFF_HAND);
+        }
 
         return true;
     }
@@ -85,11 +119,11 @@ public class InteractionUtils {
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
-    public static boolean placeBlock(BlockPos pos, Item item, boolean swapBack, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId, boolean multiTask) {
+    public static boolean placeBlock(BlockPos pos, Item item, boolean swapBack, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId, boolean multitask) {
         if (!API_MC.level.getBlockState(pos).canBeReplaced())
             return false;
 
-        if (!multiTask && API_MC.player.isUsingItem())
+        if (!multitask && API_MC.player.isUsingItem())
             return false;
 
         boolean isOffhand = false;
@@ -232,7 +266,7 @@ public class InteractionUtils {
         return result;
     }
 
-    public static boolean interactBlockAt(BlockPos pos, Item item, Direction direction, boolean swapBack, boolean multiTask, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
+    public static boolean interactBlockAt(BlockPos pos, Item item, Direction direction, boolean swapBack, boolean multitask, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
         Vec3 eyePos = API_MC.player.getEyePosition();
         Vec3 playerPos = API_MC.player.position();
         Direction clickFace = Direction.UP;
@@ -271,7 +305,7 @@ public class InteractionUtils {
             );
         }
 
-        if (!multiTask && API_MC.player.isUsingItem())
+        if (!multitask && API_MC.player.isUsingItem())
             return false;
 
         boolean isOffhand = false;
