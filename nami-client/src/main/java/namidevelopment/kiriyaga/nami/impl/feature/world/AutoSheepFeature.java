@@ -23,6 +23,8 @@ public class AutoSheepFeature extends Feature {
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 2, 1.0, 5.0));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 5, 1, 20));
+    public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
+    public final BoolSetting multitask = addSetting(new BoolSetting("multitask", true));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
@@ -45,28 +47,10 @@ public class AutoSheepFeature extends Feature {
             if (!(entity instanceof Sheep sheep)) continue;
             if (!sheep.isAlive() || sheep.isSheared() || sheep.isBaby()) continue;
 
-            int shearsSlot = getShearsSlot();
-            if (shearsSlot == -1) continue;
-
-            int currentSlot = MC.player.getInventory().getSelectedSlot();
-            if (currentSlot != shearsSlot) {
-                InventoryUtils.attemptSwitch(shearsSlot);
+            if (interactWithEntity(entity, Items.SHEARS, swapBack.get(), multitask.get(), range.get(), swing.get(), rotate.get(), this.name)) {
                 swapCooldown = delay.get();
-                return;
+                break;
             }
-
-            interactWithEntity(entity, range.get(), swing.get(), rotate.get(), this.name);
-
-            swapCooldown = delay.get();
-            break;
         }
-    }
-
-    private int getShearsSlot() {
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getItem(i);
-            if (stack.getItem() == Items.SHEARS) return i;
-        }
-        return -1;
     }
 }

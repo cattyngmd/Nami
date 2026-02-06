@@ -11,6 +11,7 @@ import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.InteractionUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -69,9 +70,7 @@ public class AutoFarmFeature extends Feature {
 
         if (bestTarget == null) return;
 
-        BlockPos placePos = bestTarget.above();
-
-        InteractionUtils.interactBlockAt(placePos, getSlot(bestTarget), swapBack.get(), multiTask.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
+        InteractionUtils.interactBlockAt(bestTarget, getSlot(bestTarget), Direction.UP, swapBack.get(), multiTask.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
     }
 
     private boolean isPlantable(BlockPos pos) {

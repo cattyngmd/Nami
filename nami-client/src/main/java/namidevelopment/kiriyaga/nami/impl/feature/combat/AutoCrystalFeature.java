@@ -334,7 +334,7 @@ public class AutoCrystalFeature extends Feature {
         if (placeTarget == null) return;
         if (placeTarget.totalDamage < minDamage.get()) return;
 
-        InteractionUtils.interactBlockAt(placeTarget.pos.below(), Items.END_CRYSTAL, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), placeStrictDirection.get(), false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
+        InteractionUtils.interactBlockAt(placeTarget.pos.below(), Items.END_CRYSTAL, null, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), placeStrictDirection.get(), false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
 
         placeTimer = placeDelay.get();
     }
