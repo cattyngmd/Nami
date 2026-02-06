@@ -71,7 +71,7 @@ public class AutoFarmFeature extends Feature {
 
         BlockPos placePos = bestTarget.above();
 
-        InteractionUtils.placeBlock(placePos, getSlot(placePos),swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get());
+        InteractionUtils.interactBlockAt(placePos, getSlot(bestTarget), swapBack.get(), multiTask.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name);
     }
 
     private boolean isPlantable(BlockPos pos) {
