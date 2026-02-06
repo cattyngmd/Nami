@@ -45,7 +45,6 @@ public class ScaffoldFeature extends Feature {
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
     public final WhitelistSetting whitelist = addSetting(new WhitelistSetting("WhiteList", false, WhitelistSetting.Type.BLOCK));
     public final BoolSetting singleBlock = addSetting(new BoolSetting("SingleBlock", true));
-    public final BoolSetting lookBack = addSetting(new BoolSetting("LookBack", true));
     public final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
     private int cooldown = 0;
@@ -91,9 +90,6 @@ public class ScaffoldFeature extends Feature {
 
             if (blocksPlaced >= shiftTicks.get()) break;
         }
-
-        if (lookBack.get() && INPUT_SERVICE.hasAnyInput() && FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.MOTION)
-            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name+"hold", 3, INPUT_SERVICE.getDirection() - 180, 81));
 
         if (blocksPlaced > 0) cooldown = delay.get();
     }
