@@ -61,6 +61,7 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting placeSwing = addSetting(new BoolSetting("PlaceSwing","Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("PlaceIgnoreItems","IgnoreItems", true));
     public final BoolSetting placeIgnoreCrystals = addSetting(new BoolSetting("PlaceIgnoreCrystals","IgnoreCrystals", true));
+    public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("PlaceStrictDirection","StrictDirection", false));
     public final BoolSetting placeSwapBack = addSetting(new BoolSetting("PlaceSwapBack","SwapBack", true));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("PlaceMultitask","Multitask", false));
 
@@ -111,6 +112,7 @@ public class AutoCrystalFeature extends Feature {
         placeMultitask.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeSwapBack.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeIgnoreCrystals.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeStrictDirection.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
@@ -332,7 +334,7 @@ public class AutoCrystalFeature extends Feature {
         if (placeTarget == null) return;
         if (placeTarget.totalDamage < minDamage.get()) return;
 
-        InteractionUtils.interactBlockAt(placeTarget.pos.below(), Items.END_CRYSTAL, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), false, false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
+        InteractionUtils.interactBlockAt(placeTarget.pos.below(), Items.END_CRYSTAL, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), placeStrictDirection.get(), false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
 
         placeTimer = placeDelay.get();
     }
