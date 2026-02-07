@@ -164,6 +164,6 @@ public class RotationRequestHandler {
         ROTATION_SERVICE.getStateHandler().setServerYaw(targetYaw);
         ROTATION_SERVICE.getStateHandler().setServerPitch(targetPitch);
 
-        API_MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(API_MC.player.getX(), API_MC.player.getY(), API_MC.player.getZ(), targetYaw, targetPitch, API_MC.player.onGround(), true));
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(MC.player.getX(), MC.player.getY(), MC.player.getZ(), targetYaw, targetPitch, MC.player.onGround(), true));
     }
 }

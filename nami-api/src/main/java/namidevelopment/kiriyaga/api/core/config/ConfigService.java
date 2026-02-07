@@ -98,7 +98,7 @@ public class ConfigService {
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
         } catch (Exception e) {
-            API_LOGGER.error("Failed to save name.json", e);
+            LOGGER.error("Failed to save name.json", e);
         }
     }
 
@@ -110,7 +110,7 @@ public class ConfigService {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
             return json.has("name") ? json.get("name").getAsString() : null;
         } catch (Exception e) {
-            API_LOGGER.error("Failed to load name.json", e);
+            LOGGER.error("Failed to load name.json", e);
             return null;
         }
     }
@@ -123,7 +123,7 @@ public class ConfigService {
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
         } catch (Exception e) {
-            API_LOGGER.error("Failed to save prefix.json", e);
+            LOGGER.error("Failed to save prefix.json", e);
         }
     }
 
@@ -135,7 +135,7 @@ public class ConfigService {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
             return json.has("prefix") ? json.get("prefix").getAsString() : null;
         } catch (Exception e) {
-            API_LOGGER.error("Failed to load prefix.json", e);
+            LOGGER.error("Failed to load prefix.json", e);
             return null;
         }
     }

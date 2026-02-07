@@ -22,9 +22,9 @@ public class CommandExecutor {
     public void setPrefix(String prefix) {
         if (prefix != null && !prefix.isEmpty()) {
             this.prefix = prefix;
-            API_LOGGER.info("Command prefix changed to: " + prefix);
+            LOGGER.info("Command prefix changed to: " + prefix);
         } else {
-            API_LOGGER.warn("Attempted to set empty or null prefix.");
+            LOGGER.warn("Attempted to set empty or null prefix.");
         }
     }
 
@@ -106,7 +106,7 @@ public class CommandExecutor {
             CHAT_SERVICE.sendPersistent(CommandExecutor.class.getName(), CAT_FORMAT.format(usageMessage));
 
         } catch (Exception e) {
-            API_LOGGER.error("Error executing command " + command.getName(), e);
+            LOGGER.error("Error executing command " + command.getName(), e);
         }
     }
 

@@ -33,7 +33,7 @@ public class FontService {
             matrices.popMatrix();
         }
 
-        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(API_MC.font));
+        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(MC.font));
     }
 
     public void drawText(GuiGraphics context, String text, int x, int y, boolean shadow, int color) {
@@ -45,7 +45,7 @@ public class FontService {
             matrices.popMatrix();
         }
 
-        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(API_MC.font));
+        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(MC.font));
     }
 
     public void drawText(GuiGraphics context, Component text, int x, int y, boolean shadow) {
@@ -57,7 +57,7 @@ public class FontService {
             matrices.popMatrix();
         }
 
-        context.drawString(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, rendererProvider.getRenderer().equals(API_MC.font));
+        context.drawString(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, rendererProvider.getRenderer().equals(MC.font));
     }
 
     public void drawText(GuiGraphics context, String text, int x, int y, boolean shadow) {
@@ -69,7 +69,7 @@ public class FontService {
             matrices.popMatrix();
         }
 
-        context.drawString(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, rendererProvider.getRenderer().equals(API_MC.font));
+        context.drawString(rendererProvider.getRenderer(), text, x, y, 0xFFFFFFFF, rendererProvider.getRenderer().equals(MC.font));
     }
 
     public void drawText(GuiGraphics context, Component text, int x, int y, int color, boolean shadow) {
@@ -81,7 +81,7 @@ public class FontService {
             matrices.popMatrix();
         }
 
-        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(API_MC.font));
+        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(MC.font));
     }
 
     public void drawText(GuiGraphics context, String text, int x, int y, int color, boolean shadow) {
@@ -93,7 +93,7 @@ public class FontService {
             matrices.popMatrix();
         }
 
-        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(API_MC.font));
+        context.drawString(rendererProvider.getRenderer(), text, x, y, color, rendererProvider.getRenderer().equals(MC.font));
     }
 
     public int getWidth(Component text) {

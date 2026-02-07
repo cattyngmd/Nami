@@ -41,11 +41,11 @@ public class RotationTickHandler {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreTick(PreTickEvent event) {
-        if (API_MC.player == null) return;
+        if (MC.player == null) return;
         RotationsFeatureConfig rotationsFeatureConfig = FeatureContractService.get(RotationsFeatureConfig.class);
 
         loadSettings(rotationsFeatureConfig);
-        stateHandler.updateRealRotation(API_MC.player.getYRot(), API_MC.player.getXRot());
+        stateHandler.updateRealRotation(MC.player.getYRot(), MC.player.getXRot());
 
         RotationRequest active = requestHandler.getActiveRequest();
         if (rotationsFeatureConfig.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && stateHandler.getSilentSyncRequired()) {
@@ -70,9 +70,9 @@ public class RotationTickHandler {
     }
 
     private void fixMovementForSpoof() {
-        if (API_MC.player == null || INPUT_SERVICE.isFrozen()) return;
+        if (MC.player == null || INPUT_SERVICE.isFrozen()) return;
 
-        float realYaw = API_MC.player.getYRot();
+        float realYaw = MC.player.getYRot();
         float spoofYaw = stateHandler.getRotationYaw();
         float delta = Mth.wrapDegrees(realYaw - spoofYaw);
 
@@ -92,10 +92,10 @@ public class RotationTickHandler {
         float inputX = (right ? 1 : 0) - (left ? 1 : 0);
         float inputZ = (forward ? 1 : 0) - (back ? 1 : 0);
 
-        API_MC.options.keyUp.setDown(false);
-        API_MC.options.keyDown.setDown(false);
-        API_MC.options.keyLeft.setDown(false);
-        API_MC.options.keyRight.setDown(false);
+        MC.options.keyUp.setDown(false);
+        MC.options.keyDown.setDown(false);
+        MC.options.keyLeft.setDown(false);
+        MC.options.keyRight.setDown(false);
 
         if (inputX == 0 && inputZ == 0) return;
 
@@ -105,14 +105,14 @@ public class RotationTickHandler {
 
         // i hate myself its 02:28
         switch (sector) {
-            case 0: API_MC.options.keyUp.setDown(true); break;
-            case 1: API_MC.options.keyUp.setDown(true); API_MC.options.keyRight.setDown(true); break;
-            case 2: API_MC.options.keyRight.setDown(true); break;
-            case 3: API_MC.options.keyDown.setDown(true); API_MC.options.keyRight.setDown(true); break;
-            case 4: API_MC.options.keyDown.setDown(true); break;
-            case 5: API_MC.options.keyDown.setDown(true); API_MC.options.keyLeft.setDown(true); break;
-            case 6: API_MC.options.keyLeft.setDown(true); break;
-            case 7: API_MC.options.keyUp.setDown(true); API_MC.options.keyLeft.setDown(true); break;
+            case 0: MC.options.keyUp.setDown(true); break;
+            case 1: MC.options.keyUp.setDown(true); MC.options.keyRight.setDown(true); break;
+            case 2: MC.options.keyRight.setDown(true); break;
+            case 3: MC.options.keyDown.setDown(true); MC.options.keyRight.setDown(true); break;
+            case 4: MC.options.keyDown.setDown(true); break;
+            case 5: MC.options.keyDown.setDown(true); MC.options.keyLeft.setDown(true); break;
+            case 6: MC.options.keyLeft.setDown(true); break;
+            case 7: MC.options.keyUp.setDown(true); MC.options.keyLeft.setDown(true); break;
         }
     }
 
@@ -163,7 +163,7 @@ public class RotationTickHandler {
     private void resetRotationToReal() {
         float targetYaw = alignYaw(stateHandler.getRealYaw(), stateHandler.getRotationYaw());
         stateHandler.updateRealRotation(targetYaw, stateHandler.getRealPitch());
-        API_MC.player.setYRot(targetYaw);
+        MC.player.setYRot(targetYaw);
         stateHandler.setRotationYaw(stateHandler.getRealYaw());
         stateHandler.setRotationPitch(stateHandler.getRealPitch());
         currentYawSpeed = 0f;
@@ -183,7 +183,7 @@ public class RotationTickHandler {
         if (backReached) {
             returning = false;
             stateHandler.updateRealRotation(targetYaw, stateHandler.getRealPitch());
-            API_MC.player.setYRot(targetYaw);
+            MC.player.setYRot(targetYaw);
             stateHandler.setRotationYaw(stateHandler.getRealYaw());
             stateHandler.setRotationPitch(stateHandler.getRealPitch());
             requestHandler.clearLastActiveId();
@@ -275,8 +275,8 @@ public class RotationTickHandler {
     }
 
     private void performSilent(RotationRequest req) {
-        float targetYaw = API_MC.player.getYRot();
-        float targetPitch = API_MC.player.getXRot();
+        float targetYaw = MC.player.getYRot();
+        float targetPitch = MC.player.getXRot();
         // AimModulo360 seems fixable here but due to race condition it fucks a little bit screen, maybe ill fix it someday but now we just left it with flag
 //        ROTATION_SERVICE.getStateHandler().setRotationYaw(targetYaw);
 //        ROTATION_SERVICE.getStateHandler().setRotationPitch(targetPitch);
@@ -289,7 +289,7 @@ public class RotationTickHandler {
 //        requestHandler.clearLastActiveId();
 //        requestHandler.removeActiveRequest();
 
-        API_MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(API_MC.player.getX(), API_MC.player.getY(), API_MC.player.getZ(), targetYaw, targetPitch, API_MC.player.onGround(), true));
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(MC.player.getX(), MC.player.getY(), MC.player.getZ(), targetYaw, targetPitch, MC.player.onGround(), true));
     }
 
     private float lerp(float from, float to, float factor) {

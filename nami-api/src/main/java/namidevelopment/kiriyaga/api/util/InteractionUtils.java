@@ -39,26 +39,26 @@ public class InteractionUtils {
     private static BlockPos currentBreakingBlock = null;
 
     public static boolean interactWithEntity(Entity entity, Item item, boolean swapBack, boolean multitask, double range, boolean swing, boolean rotate, String rotationId) {
-        if (API_MC.player == null || API_MC.gameMode == null || entity == null) return false;
+        if (MC.player == null || MC.gameMode == null || entity == null) return false;
 
-        if (!multitask && API_MC.player.isUsingItem())
+        if (!multitask && MC.player.isUsingItem())
             return false;
 
         boolean isOffhand = false;
-        if (API_MC.player.getOffhandItem().is(item))
+        if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
         int slot = findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
         
-        Vec3 eyePos = API_MC.player.getEyePosition(1.0f);
+        Vec3 eyePos = MC.player.getEyePosition(1.0f);
         Vec3 closestPoint = getClosestPointToEye(eyePos, entity.getBoundingBox());
-        float idealYaw = (float) getYawToVec(API_MC.player, closestPoint);
-        float idealPitch = (float) getPitchToVec(API_MC.player, closestPoint);
+        float idealYaw = (float) getYawToVec(MC.player, closestPoint);
+        float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
 
-        boolean insideBox = entity.getBoundingBox().contains(API_MC.player.getEyePosition());
-        EntityHitResult hitResult = raycastTarget(API_MC.player, entity, range, idealYaw, idealPitch);
+        boolean insideBox = entity.getBoundingBox().contains(MC.player.getEyePosition());
+        EntityHitResult hitResult = raycastTarget(MC.player, entity, range, idealYaw, idealPitch);
         if (!insideBox && hitResult == null) {
             return false;
         }
@@ -72,32 +72,32 @@ public class InteractionUtils {
             return false;
 
 
-        API_MC.gameMode.interactAt(API_MC.player, entity, hitResult, MAIN_HAND);
-        API_MC.gameMode.interact(API_MC.player, entity, MAIN_HAND);
+        MC.gameMode.interactAt(MC.player, entity, hitResult, MAIN_HAND);
+        MC.gameMode.interact(MC.player, entity, MAIN_HAND);
 
         if (swing)
-            API_MC.player.swing(MAIN_HAND);
+            MC.player.swing(MAIN_HAND);
 
 
         if (!isOffhand) {
-            int prev = API_MC.player.getInventory().getSelectedSlot();
+            int prev = MC.player.getInventory().getSelectedSlot();
             InventoryUtils.attemptSwitch(slot);
 
-            API_MC.gameMode.interactAt(API_MC.player, entity, hitResult, MAIN_HAND);
-            API_MC.gameMode.interact(API_MC.player, entity, MAIN_HAND);
+            MC.gameMode.interactAt(MC.player, entity, hitResult, MAIN_HAND);
+            MC.gameMode.interact(MC.player, entity, MAIN_HAND);
 
             if (swing)
-                API_MC.player.swing(MAIN_HAND);
+                MC.player.swing(MAIN_HAND);
 
             if (swapBack)
                 InventoryUtils.attemptSwitch(prev);
         }
         else {
-            API_MC.gameMode.interactAt(API_MC.player, entity, hitResult, OFF_HAND);
-            API_MC.gameMode.interact(API_MC.player, entity, OFF_HAND);
+            MC.gameMode.interactAt(MC.player, entity, hitResult, OFF_HAND);
+            MC.gameMode.interact(MC.player, entity, OFF_HAND);
 
             if (swing)
-                API_MC.player.swing(OFF_HAND);
+                MC.player.swing(OFF_HAND);
         }
 
         return true;
@@ -108,26 +108,26 @@ public class InteractionUtils {
     }
 
     public static void startUsingItem(InteractionHand hand) {
-        if (!API_MC.player.isUsingItem())
-            API_MC.player.startUsingItem(hand);
+        if (!MC.player.isUsingItem())
+            MC.player.startUsingItem(hand);
     }
 
     public static void stopUsingItem() {
-        if (API_MC.player.isUsingItem())
-            API_MC.player.releaseUsingItem();
+        if (MC.player.isUsingItem())
+            MC.player.releaseUsingItem();
     }
 
     // TODO: figure out how to place on interactable blocks without manually sneaking
 
     public static boolean placeBlock(BlockPos pos, Item item, boolean swapBack, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId, boolean multitask) {
-        if (!API_MC.level.getBlockState(pos).canBeReplaced())
+        if (!MC.level.getBlockState(pos).canBeReplaced())
             return false;
 
-        if (!multitask && API_MC.player.isUsingItem())
+        if (!multitask && MC.player.isUsingItem())
             return false;
 
         boolean isOffhand = false;
-        if (API_MC.player.getOffhandItem().is(item))
+        if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
         int slot = findHotbarItem(stack -> stack.is(item));
@@ -141,7 +141,7 @@ public class InteractionUtils {
         BlockPos neighbor = pos.relative(direction.getOpposite());
         Direction clickFace = direction;
 
-        Vec3 playerPos = API_MC.player.position();
+        Vec3 playerPos = MC.player.position();
         double offX = playerPos.x - Math.floor(playerPos.x);
         double offY = playerPos.y - Math.floor(playerPos.y);
         double offZ = playerPos.z - Math.floor(playerPos.z);
@@ -173,7 +173,7 @@ public class InteractionUtils {
         // Simplified grim v2 PlacePosition check
         // we do not use all possible eye positions because its just unnecessary
         if (strictDirection) { // todo something while phased
-            Vec3 eyePos = API_MC.player.getEyePosition();
+            Vec3 eyePos = MC.player.getEyePosition();
 
             boolean flag = switch (clickFace) { // https://github.com/GrimAnticheat/Grim/blob/fb926ab0fbca081ad765389c541880a4a435fabb/common/src/main/java/ac/grim/grimac/checks/impl/scaffolding/PositionPlace.java#L49
                 case NORTH -> eyePos.z <= neighbor.getZ() + 1e-3;
@@ -190,13 +190,13 @@ public class InteractionUtils {
             }
         }
 
-        Vec3 eyePos = API_MC.player.getEyePosition();
+        Vec3 eyePos = MC.player.getEyePosition();
             AABB blockBox = new AABB(pos);
             Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
-            float idealYaw = (float) getYawToVec(API_MC.player, point);
-            float idealPitch = (float) getPitchToVec(API_MC.player, point);
+            float idealYaw = (float) getYawToVec(MC.player, point);
+            float idealPitch = (float) getPitchToVec(MC.player, point);
 
-            if (RotationUtils.raycastAABBFromPlayer(API_MC.player, blockBox, range, idealYaw, idealPitch) == null) {
+            if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
                 return false;
             }
 
@@ -204,8 +204,8 @@ public class InteractionUtils {
         boolean canPlace = true;
 
         if (rotate) {
-            float yaw = (float) getYawToVec(API_MC.player, neighbor.getCenter());
-            float pitch = (float) getPitchToVec(API_MC.player, neighbor.getCenter());
+            float yaw = (float) getYawToVec(MC.player, neighbor.getCenter());
+            float pitch = (float) getPitchToVec(MC.player, neighbor.getCenter());
 
          //   if (getDefaultRotationMode() == RotationFeature.RotationMode.SILENT)
                 ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
@@ -216,10 +216,10 @@ public class InteractionUtils {
 
             // for some reason grim checks if you look at block, you gonna place, not on a block you click (i see logic here but still)
             AABB b = new AABB(neighbor);
-            boolean insideBox = b.contains(API_MC.player.getEyePosition());
+            boolean insideBox = b.contains(MC.player.getEyePosition());
 
             EntityHitResult serverCheck = raycastAABBFromPlayer(
-                    API_MC.player,
+                    MC.player,
                     b,
                     range,
                     ROTATION_SERVICE.getStateHandler().getServerYaw(),
@@ -234,16 +234,16 @@ public class InteractionUtils {
         if (canPlace) {
 
             if (!isOffhand) {
-                int prev = API_MC.player.getInventory().getSelectedSlot();
+                int prev = MC.player.getInventory().getSelectedSlot();
                 InventoryUtils.attemptSwitch(slot);
 
                 if (simulate)
-                    API_MC.gameMode.useItemOn(API_MC.player, MAIN_HAND, hitResult);
+                    MC.gameMode.useItemOn(MC.player, MAIN_HAND, hitResult);
                 else
                     sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hitResult, id));
 
                 if (swing)
-                    API_MC.player.swing(MAIN_HAND);
+                    MC.player.swing(MAIN_HAND);
 
                 result = true;
 
@@ -252,12 +252,12 @@ public class InteractionUtils {
             }
             else {
                 if (simulate)
-                    API_MC.gameMode.useItemOn(API_MC.player, OFF_HAND, hitResult);
+                    MC.gameMode.useItemOn(MC.player, OFF_HAND, hitResult);
                 else
                     sendSequencedPacket(id -> new ServerboundUseItemOnPacket(OFF_HAND, hitResult, id));
 
                 if (swing)
-                    API_MC.player.swing(OFF_HAND);
+                    MC.player.swing(OFF_HAND);
 
                 result = true;
             }
@@ -267,8 +267,8 @@ public class InteractionUtils {
     }
 
     public static boolean interactBlockAt(BlockPos pos, Item item, Direction direction, boolean swapBack, boolean multitask, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId) {
-        Vec3 eyePos = API_MC.player.getEyePosition();
-        Vec3 playerPos = API_MC.player.position();
+        Vec3 eyePos = MC.player.getEyePosition();
+        Vec3 playerPos = MC.player.position();
         Direction clickFace = Direction.UP;
 
         double offX = playerPos.x - Math.floor(playerPos.x);
@@ -305,11 +305,11 @@ public class InteractionUtils {
             );
         }
 
-        if (!multitask && API_MC.player.isUsingItem())
+        if (!multitask && MC.player.isUsingItem())
             return false;
 
         boolean isOffhand = false;
-        if (API_MC.player.getOffhandItem().is(item))
+        if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
         int slot = findHotbarItem(stack -> stack.is(item));
@@ -333,10 +333,10 @@ public class InteractionUtils {
 
             AABB blockBox = new AABB(pos);
             Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
-            float idealYaw = (float) getYawToVec(API_MC.player, point);
-            float idealPitch = (float) getPitchToVec(API_MC.player, point);
+            float idealYaw = (float) getYawToVec(MC.player, point);
+            float idealPitch = (float) getPitchToVec(MC.player, point);
 
-            if (RotationUtils.raycastAABBFromPlayer(API_MC.player, blockBox, range, idealYaw, idealPitch) == null) {
+            if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
                 return false;
             }
 
@@ -345,8 +345,8 @@ public class InteractionUtils {
         boolean canInteract = true;
 
         if (rotate) {
-            float yaw = (float) getYawToVec(API_MC.player, pos.getCenter());
-            float pitch = (float) getPitchToVec(API_MC.player, pos.getCenter());
+            float yaw = (float) getYawToVec(MC.player, pos.getCenter());
+            float pitch = (float) getPitchToVec(MC.player, pos.getCenter());
 
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
             // else
@@ -356,10 +356,10 @@ public class InteractionUtils {
 
             // for some reason grim checks if you look at block, you gonna place, not on a block you click (i see logic here but still)
             AABB b = new AABB(pos);
-            boolean insideBox = b.contains(API_MC.player.getEyePosition());
+            boolean insideBox = b.contains(MC.player.getEyePosition());
 
             EntityHitResult serverCheck = raycastAABBFromPlayer(
-                    API_MC.player,
+                    MC.player,
                     b,
                     range,
                     ROTATION_SERVICE.getStateHandler().getServerYaw(),
@@ -376,26 +376,26 @@ public class InteractionUtils {
         }
 
         if (!isOffhand) {
-            int prev = API_MC.player.getInventory().getSelectedSlot();
+            int prev = MC.player.getInventory().getSelectedSlot();
             InventoryUtils.attemptSwitch(slot);
 
             if (simulate)
-                API_MC.gameMode.useItemOn(API_MC.player, MAIN_HAND, hit);
+                MC.gameMode.useItemOn(MC.player, MAIN_HAND, hit);
             else
                 sendSequencedPacket(id -> new ServerboundUseItemOnPacket(MAIN_HAND, hit, id));
 
             if (swing)
-                API_MC.player.swing(MAIN_HAND);
+                MC.player.swing(MAIN_HAND);
             if (swapBack)
                 InventoryUtils.attemptSwitch(prev);
         } else {
             if (simulate)
-                API_MC.gameMode.useItemOn(API_MC.player, OFF_HAND, hit);
+                MC.gameMode.useItemOn(MC.player, OFF_HAND, hit);
             else
                 sendSequencedPacket(id -> new ServerboundUseItemOnPacket(OFF_HAND, hit, id));
 
             if (swing)
-                API_MC.player.swing(OFF_HAND);
+                MC.player.swing(OFF_HAND);
         }
 
         //CHAT_SERVICE.sendRaw("interactBlockAt: success");
@@ -403,7 +403,7 @@ public class InteractionUtils {
     }
 
     public static Direction getBlockInteractDir(BlockPos blockPos) {
-        Vec3 playerPos = API_MC.player.getEyePosition();
+        Vec3 playerPos = MC.player.getEyePosition();
         Vec3 blockCenter = Vec3.atCenterOf(blockPos);
 
         double dx = playerPos.x - blockCenter.x;
@@ -426,7 +426,7 @@ public class InteractionUtils {
 
     public static Direction getBlockPlaceDir(BlockPos blockPos) {
         for (final Direction direction : Direction.values()) {
-            final BlockState state = API_MC.level.getBlockState(blockPos.relative(direction));
+            final BlockState state = MC.level.getBlockState(blockPos.relative(direction));
             if (state.isAir() || !state.getFluidState().isEmpty()) {
                 continue;
             }
@@ -446,25 +446,25 @@ public class InteractionUtils {
 
     public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {
         if (grim) {
-            API_MC.getConnection().send(new ServerboundPlayerActionPacket(
+            MC.getConnection().send(new ServerboundPlayerActionPacket(
                     ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
 
-            API_MC.gameMode.useItemOn(API_MC.player, InteractionHand.OFF_HAND, target);
+            MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, target);
             if (swing)
-                API_MC.player.swing(InteractionHand.MAIN_HAND, false);
+                MC.player.swing(InteractionHand.MAIN_HAND, false);
 
-            API_MC.getConnection().send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
-            API_MC.getConnection().send(new ServerboundPlayerActionPacket(
+            MC.getConnection().send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
+            MC.getConnection().send(new ServerboundPlayerActionPacket(
                     ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
         } else {
-            API_MC.gameMode.useItemOn(API_MC.player, InteractionHand.MAIN_HAND, target);
+            MC.gameMode.useItemOn(MC.player, InteractionHand.MAIN_HAND, target);
             if (swing)
-                API_MC.player.swing(InteractionHand.MAIN_HAND);
+                MC.player.swing(InteractionHand.MAIN_HAND);
         }
     }
 
     public static boolean breakBlock(BlockPos pos, double range, boolean rotate, boolean swing, boolean grim, boolean strictDirection, String rotationId) {
-        if (API_MC.player == null || API_MC.gameMode == null)
+        if (MC.player == null || MC.gameMode == null)
             return false;
 
         //CHAT_SERVICE.sendRaw(((ClientPlayerInteractionSERVICEAccessor) MC.interactionSERVICE).getBlockBreakingCooldown()+"");
@@ -476,7 +476,7 @@ public class InteractionUtils {
             return false;
         }
 
-        Vec3 eyePos = API_MC.player.getEyePosition();
+        Vec3 eyePos = MC.player.getEyePosition();
         AABB blockBox = new AABB(pos);
         Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
         Vec3 reachEnd = eyePos.add(lookDir.scale(range));
@@ -525,8 +525,8 @@ public class InteractionUtils {
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(
                     rotationId,
                     3,
-                    (float) getYawToVec(API_MC.player, center),
-                    (float) getPitchToVec(API_MC.player, center)
+                    (float) getYawToVec(MC.player, center),
+                    (float) getPitchToVec(MC.player, center)
             ));
 
             if (!ROTATION_SERVICE.getRequestHandler().isCompleted(rotationId)) {
@@ -534,11 +534,11 @@ public class InteractionUtils {
             }
         }
 
-        boolean success = API_MC.gameMode.continueDestroyBlock(pos, direction);
+        boolean success = MC.gameMode.continueDestroyBlock(pos, direction);
         if (swing)
-            API_MC.player.swing(MAIN_HAND);
+            MC.player.swing(MAIN_HAND);
 
-        if (grim && ((DuckMultiPlayerGameMode) API_MC.gameMode).getDestroyDelay() != 0) // https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/FastBreak.java#L28
+        if (grim && ((DuckMultiPlayerGameMode) MC.gameMode).getDestroyDelay() != 0) // https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/FastBreak.java#L28
             return false;
 
         if (isBlockAirOrFluid(pos)) {  // somehow it happens https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/AirLiquidBreak.java#L18
@@ -548,7 +548,7 @@ public class InteractionUtils {
 
         if (currentBreakingBlock == null || !currentBreakingBlock.equals(pos)) {
             currentBreakingBlock = pos;
-            API_MC.gameMode.startDestroyBlock(pos, direction);
+            MC.gameMode.startDestroyBlock(pos, direction);
         } else {
             if (!success) {
                 currentBreakingBlock = null;
@@ -560,10 +560,10 @@ public class InteractionUtils {
     }
 
     private static boolean isBlockAirOrFluid(BlockPos pos) {
-        if (API_MC.level.getBlockState(pos).isAir()) {
+        if (MC.level.getBlockState(pos).isAir()) {
             return true;
         }
-        FluidState fluidState = API_MC.level.getFluidState(pos);
+        FluidState fluidState = MC.level.getFluidState(pos);
         return !fluidState.isEmpty();
     }
 
@@ -573,8 +573,8 @@ public class InteractionUtils {
 
     public static boolean isPlaceable(BlockPos pos, int distance) {
         AABB blockBox = new AABB(pos);
-        for (Entity entity : API_MC.level.entitiesForRendering()) {
-            if (entity.distanceToSqr(API_MC.player) > distance) continue;
+        for (Entity entity : MC.level.entitiesForRendering()) {
+            if (entity.distanceToSqr(MC.player) > distance) continue;
             if (entity instanceof EndCrystal) continue;
             if (entity instanceof ItemEntity) continue;
             if (entity instanceof Arrow) continue;
@@ -587,7 +587,7 @@ public class InteractionUtils {
     }
 
     public static boolean isReplaceable(BlockPos pos) {
-        return API_MC.level.getBlockState(pos).canBeReplaced();
+        return MC.level.getBlockState(pos).canBeReplaced();
     }
 
     public static boolean isBed(Block block) {
@@ -595,18 +595,18 @@ public class InteractionUtils {
     }
 
     public static int findHotbarItem(Predicate<ItemStack> predicate) {
-        if (API_MC.player == null)
+        if (MC.player == null)
             return -1;
 
 /*        if (predicate.test(MC.player.getInventory().getSelectedItem()))
             return MC.player.getInventory().getSelectedSlot();*/
 
-        ItemStack selected = API_MC.player.getInventory().getSelectedItem();
+        ItemStack selected = MC.player.getInventory().getSelectedItem();
         if (!selected.isEmpty() && predicate.test(selected))
-            return API_MC.player.getInventory().getSelectedSlot();
+            return MC.player.getInventory().getSelectedSlot();
 
         for (int slot = 0; slot < 9; slot++) {
-            ItemStack stack = API_MC.player.getInventory().getItem(slot);
+            ItemStack stack = MC.player.getInventory().getItem(slot);
             if (stack.isEmpty())
                 continue;
 

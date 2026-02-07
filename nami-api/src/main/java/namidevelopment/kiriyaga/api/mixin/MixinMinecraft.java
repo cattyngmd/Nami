@@ -22,7 +22,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "handleKeybinds", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
-        if (API_MC == null || API_MC.mouseHandler == null || API_MC.screen != null) return;
+        if (MC == null || MC.mouseHandler == null || MC.screen != null) return;
 
         for (Feature Feature : FEATURE_SERVICE.getStorage().getAll()) {
             if (Feature == null) continue;
@@ -54,8 +54,8 @@ public abstract class MixinMinecraft {
             boolean wasPressed = MACRO_SERVICE.wasKeyPressedLastTick(keyCode);
 
             if (currentlyPressed && !wasPressed) {
-                if (API_MC.player != null) {
-                    API_MC.player.connection.sendChat(macro.getMessage());
+                if (MC.player != null) {
+                    MC.player.connection.sendChat(macro.getMessage());
                 }
             }
 

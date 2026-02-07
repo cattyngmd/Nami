@@ -123,17 +123,17 @@ public abstract class HudElementFeature extends Feature {
     }
 
     public int getAbsoluteX() {
-        int screenWidth = API_MC.getWindow().getGuiScaledWidth();
+        int screenWidth = MC.getWindow().getGuiScaledWidth();
         return (int)(x.get() * screenWidth);
     }
 
     public int getAbsoluteY() {
-        int screenHeight = API_MC.getWindow().getGuiScaledHeight();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
         return (int)(y.get() * screenHeight);
     }
 
     public int getRenderX() {
-        int screenWidth = API_MC.getWindow().getGuiScaledWidth();
+        int screenWidth = MC.getWindow().getGuiScaledWidth();
         int posX = getAbsoluteX();
         Rectangle bounds = getBoundingBox();
 
@@ -154,7 +154,7 @@ public abstract class HudElementFeature extends Feature {
     }
 
     public int getRenderY() {
-        int screenHeight = API_MC.getWindow().getGuiScaledHeight();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
         int posY = getAbsoluteY();
         Rectangle bounds = getBoundingBox();
 
@@ -168,8 +168,8 @@ public abstract class HudElementFeature extends Feature {
     }
 
     public void renderItems(GuiGraphics context) {
-        ItemRenderer itemRenderer = API_MC.getItemRenderer();
-        Font textRenderer = API_MC.font;
+        ItemRenderer itemRenderer = MC.getItemRenderer();
+        Font textRenderer = MC.font;
         int baseY = getRenderY();
 
         for (ItemElement element : getItemElements()) {
@@ -186,7 +186,7 @@ public abstract class HudElementFeature extends Feature {
             int drawY = baseY + element.offsetY();
 
             context.renderItem(element.stack(), drawX, drawY);
-            context.renderItemDecorations(API_MC.font, element.stack(), drawX, drawY, null);
+            context.renderItemDecorations(MC.font, element.stack(), drawX, drawY, null);
 
             Component label = element.label();
             int labelWidth = FONT_SERVICE.getWidth(label);

@@ -15,7 +15,7 @@ public class CommandService {
         CommandRegistry.registerAnnotatedCommands(storage);
         suggester.updateDispatcher();
         EVENT_SERVICE.register(executor);
-        API_LOGGER.info("Registered " + storage.size() + " commands.");
+        LOGGER.info("Registered " + storage.size() + " commands.");
     }
 
     public CommandStorage getStorage() {

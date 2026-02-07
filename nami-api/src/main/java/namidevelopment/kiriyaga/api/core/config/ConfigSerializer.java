@@ -33,9 +33,9 @@ public class ConfigSerializer {
         JsonObject root = new JsonObject();
 
         JsonObject meta = new JsonObject();
-        meta.addProperty("author", API_MC.getUser().getName());
+        meta.addProperty("author", MC.getUser().getName());
         meta.addProperty("createdAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        meta.addProperty("client", API_NAME);
+        meta.addProperty("client", NAME);
         meta.addProperty("version", API_VERSION);
         meta.addProperty("mode", mode.name());
         root.add("meta", meta);
@@ -63,14 +63,14 @@ public class ConfigSerializer {
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             gson.toJson(root, writer);
         } catch (Exception e) {
-            API_LOGGER.error("Failed to save config " + configName, e);
+            LOGGER.error("Failed to save config " + configName, e);
         }
     }
 
     public void load(String configName, ConfigMode mode) {
         File file = new File(dirs.getConfigSaveDir(), configName + ".json");
         if (!file.exists()) {
-            API_LOGGER.warn("Config file not found: " + configName);
+            LOGGER.warn("Config file not found: " + configName);
             return;
         }
 
@@ -101,14 +101,14 @@ public class ConfigSerializer {
                 }
             }
         } catch (Exception e) {
-            API_LOGGER.error("Failed to load config " + configName, e);
+            LOGGER.error("Failed to load config " + configName, e);
         }
     }
 
     public boolean delete(String configName) {
         File file = new File(dirs.getConfigSaveDir(), configName + ".json");
         if (!file.exists()) {
-            API_LOGGER.warn("Config file not found for delete: " + configName);
+            LOGGER.warn("Config file not found for delete: " + configName);
             return false;
         }
         return file.delete();
@@ -142,7 +142,7 @@ public class ConfigSerializer {
 
             return new ConfigMeta(meta.has("author") ? meta.get("author").getAsString() : "unknown", meta.has("version") ? meta.get("version").getAsString() : "unknown", meta.has("createdAt") ? LocalDateTime.parse(meta.get("createdAt").getAsString()) : null, mode);
         } catch (Exception e) {
-            API_LOGGER.error("Failed to read meta for " + configName, e);
+            LOGGER.error("Failed to read meta for " + configName, e);
             return null;
         }
     }

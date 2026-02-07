@@ -36,7 +36,7 @@ public class PlayerBreakState {
     }
 
     public Player getPlayer() {
-        return API_MC.level.getPlayerByUUID(playerId);
+        return MC.level.getPlayerByUUID(playerId);
     }
 
     public void onTick() {
@@ -55,7 +55,7 @@ public class PlayerBreakState {
 
         if (state.isAir()) return;
 
-        VoxelShape shape = task.isInstant() ? Shapes.block() : state.getShape(API_MC.level, pos);
+        VoxelShape shape = task.isInstant() ? Shapes.block() : state.getShape(MC.level, pos);
         if (shape.isEmpty()) shape = Shapes.block();
 
         AABB bb = shape.bounds();
@@ -147,9 +147,9 @@ public class PlayerBreakState {
         }
 
         public void onTick() {
-            if (!active || API_MC.level == null) return;
+            if (!active || MC.level == null) return;
 
-            Player player = API_MC.level.getPlayerByUUID(playerId);
+            Player player = MC.level.getPlayerByUUID(playerId);
             if (player == null) {
                 reset();
                 return;
@@ -161,7 +161,7 @@ public class PlayerBreakState {
                 return;
             }
 
-            float delta = calculateBlockDamage(state, API_MC.level, pos, player);
+            float delta = calculateBlockDamage(state, MC.level, pos, player);
             prevProgress = progress;
             progress += delta;
 
@@ -179,7 +179,7 @@ public class PlayerBreakState {
         }
 
         public BlockState getBlockState() {
-            return API_MC.level.getBlockState(pos);
+            return MC.level.getBlockState(pos);
         }
 
         public float getTargetSpeed() {

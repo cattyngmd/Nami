@@ -11,7 +11,7 @@ public class ConfigDirectoryProvider {
     private final File baseDir;
 
     public ConfigDirectoryProvider() {
-        this.baseDir = new File(FabricLoader.getInstance().getGameDir().toFile(), API_NAME);
+        this.baseDir = new File(FabricLoader.getInstance().getGameDir().toFile(), NAME);
     }
 
     public File getFeatureConfigDir() {

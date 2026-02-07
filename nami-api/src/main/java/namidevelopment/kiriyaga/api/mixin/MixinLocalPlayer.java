@@ -2,7 +2,6 @@ package namidevelopment.kiriyaga.api.mixin;
 
 import namidevelopment.kiriyaga.api.contract.FeatureContractService;
 import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
-import namidevelopment.kiriyaga.api.event.impl.*;
 import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
@@ -22,13 +21,13 @@ public abstract class MixinLocalPlayer {
             return;
         }
 
-        originalYaw = API_MC.player.getYRot();
-        originalPitch = API_MC.player.getXRot();
+        originalYaw = MC.player.getYRot();
+        originalPitch = MC.player.getXRot();
 
         float newYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
         float newPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
-        API_MC.player.setYRot(newYaw);
-        API_MC.player.setXRot(newPitch);
+        MC.player.setYRot(newYaw);
+        MC.player.setXRot(newPitch);
 
         float deltaYaw = newYaw - ROTATION_SERVICE.getStateHandler().getServerYaw();
         //float deltaPitch = newPitch - ROTATION_SERVICE.getStateHandler().getServerPitch();
@@ -41,14 +40,14 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "sendPosition", at = @At("TAIL"))
     private void postSendMovementPackets(CallbackInfo ci) {
-        ROTATION_SERVICE.getStateHandler().setServerYaw(API_MC.player.getYRot());
-        ROTATION_SERVICE.getStateHandler().setServerPitch(API_MC.player.getXRot());
+        ROTATION_SERVICE.getStateHandler().setServerYaw(MC.player.getYRot());
+        ROTATION_SERVICE.getStateHandler().setServerPitch(MC.player.getXRot());
 
         if (!ROTATION_SERVICE.getStateHandler().isRotating())
             return;
 
-        API_MC.player.setYRot(originalYaw);
-        API_MC.player.setXRot(originalPitch);
+        MC.player.setYRot(originalYaw);
+        MC.player.setXRot(originalPitch);
     }
 
     // Do not ask me exactly why is it so weird, it just works
@@ -59,9 +58,9 @@ public abstract class MixinLocalPlayer {
         RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
 
         if (config.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
-            this.originalSilentPitch = API_MC.player.getXRot();
+            this.originalSilentPitch = MC.player.getXRot();
             this.xRotLast = -9999;
-            API_MC.player.setXRot(this.originalSilentPitch + 1f);
+            MC.player.setXRot(this.originalSilentPitch + 1f);
         }
     }
 
@@ -70,7 +69,7 @@ public abstract class MixinLocalPlayer {
         RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
 
         if (config.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
-            API_MC.player.setXRot(this.originalSilentPitch);
+            MC.player.setXRot(this.originalSilentPitch);
             ROTATION_SERVICE.getStateHandler().setSilentSyncRequired(false);
         }
     }

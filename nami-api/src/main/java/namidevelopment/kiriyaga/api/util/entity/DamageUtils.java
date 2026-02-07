@@ -27,9 +27,9 @@ import static namidevelopment.kiriyaga.api.util.RotationUtils.getClosestPointToE
 public class DamageUtils {
 
     public static final BlockRaycastProvider BLOCK_CHECK = (ctx, pos) -> {
-        BlockState state = API_MC.level.getBlockState(pos);
+        BlockState state = MC.level.getBlockState(pos);
         if (state.getBlock().getExplosionResistance() < 600) return null;
-        return state.getCollisionShape(API_MC.level, pos).clip(ctx.start(), ctx.end(), pos);
+        return state.getCollisionShape(MC.level, pos).clip(ctx.start(), ctx.end(), pos);
     };
 
     public static float crystalDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor) {
@@ -55,12 +55,12 @@ public class DamageUtils {
         double impact = (1 - (distance / strength)) * exposure;
         float baseDamage = (float) ((impact * impact + impact) / 2 * 7 * 12 + 1);
 
-        return applyReductions(baseDamage, target, API_MC.level.damageSources().explosion(null), assumeBestArmor);
+        return applyReductions(baseDamage, target, MC.level.damageSources().explosion(null), assumeBestArmor);
     }
 
     public static float applyReductions(float damage, Entity entity, DamageSource source, boolean assumeBestArmor) {
         if (source.scalesWithDifficulty()) {
-            switch (API_MC.level.getDifficulty()) {
+            switch (MC.level.getDifficulty()) {
                 case EASY -> damage = Math.min(damage / 2 + 1, damage);
                 case HARD -> damage *= 1.5f;
             }

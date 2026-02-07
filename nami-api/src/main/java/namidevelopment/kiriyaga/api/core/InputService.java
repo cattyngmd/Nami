@@ -17,7 +17,6 @@ import net.minecraft.client.Options;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
@@ -48,10 +47,10 @@ public class InputService {
         int scancode = event.scancode;
         int action = event.action;
 
-        updateHeld(API_MC.options.keyUp, key, scancode, action, v -> forwardPressed = v);
-        updateHeld(API_MC.options.keyLeft,    key, scancode, action, v -> leftPressed = v);
-        updateHeld(API_MC.options.keyDown,    key, scancode, action, v -> backPressed = v);
-        updateHeld(API_MC.options.keyRight,   key, scancode, action, v -> rightPressed = v);
+        updateHeld(MC.options.keyUp, key, scancode, action, v -> forwardPressed = v);
+        updateHeld(MC.options.keyLeft,    key, scancode, action, v -> leftPressed = v);
+        updateHeld(MC.options.keyDown,    key, scancode, action, v -> backPressed = v);
+        updateHeld(MC.options.keyRight,   key, scancode, action, v -> rightPressed = v);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -67,9 +66,9 @@ public class InputService {
             this.sneaking = input.shift();
             this.sprinting = input.sprint();
         } else if (event.getPacket() instanceof ServerboundMovePlayerPacket packet1_20) { // todo: VFP check here
-            double x = packet1_20.getX(API_MC.player.getX());
-            double y = packet1_20.getY(API_MC.player.getY());
-            double z = packet1_20.getZ(API_MC.player.getZ());
+            double x = packet1_20.getX(MC.player.getX());
+            double y = packet1_20.getY(MC.player.getY());
+            double z = packet1_20.getZ(MC.player.getZ());
 
             if (!hasLastPos) {
                 lastX = x;
@@ -147,7 +146,7 @@ public class InputService {
     }
 
     private void saveKeys() {
-        Options opt = API_MC.options;
+        Options opt = MC.options;
         savedForward = opt.keyUp.isDown();
         savedBack = opt.keyDown.isDown();
         savedLeft = opt.keyLeft.isDown();
@@ -158,7 +157,7 @@ public class InputService {
     }
 
     private void disableAllKeys() {
-        Options opt = API_MC.options;
+        Options opt = MC.options;
         setPressed(opt.keyUp, false);
         setPressed(opt.keyDown, false);
         setPressed(opt.keyLeft, false);
@@ -169,7 +168,7 @@ public class InputService {
     }
 
     private void restoreKeys() {
-        Options opt = API_MC.options;
+        Options opt = MC.options;
         setPressed(opt.keyUp, savedForward);
         setPressed(opt.keyDown, savedBack);
         setPressed(opt.keyLeft, savedLeft);
@@ -195,7 +194,7 @@ public class InputService {
 
 
     public float getDirection() {
-        float realYaw = API_MC.player.getYRot();
+        float realYaw = MC.player.getYRot();
 
         boolean forward = InputCache.forward;
         boolean back = InputCache.back;
@@ -222,14 +221,14 @@ public class InputService {
 
     private boolean canMove() {
         if (FEATURE_SERVICE.getStorage().getByName("Freecam")!= null && FEATURE_SERVICE.getStorage().getByName("Freecam").isEnabled()) return false;
-        if (API_MC.screen == null) return true;
-        if (API_MC.screen != null && FEATURE_SERVICE.getStorage().getByName("GuiMove") != null && FEATURE_SERVICE.getStorage().getByName("GuiMove").isEnabled()) return false;
-        if (API_MC.screen instanceof ChatScreen
-                || API_MC.screen instanceof SignEditScreen
-                || API_MC.screen instanceof AnvilScreen
-                || API_MC.screen instanceof AbstractCommandBlockEditScreen
-                || API_MC.screen instanceof StructureBlockEditScreen
-                || API_MC.screen instanceof CreativeModeInventoryScreen) {
+        if (MC.screen == null) return true;
+        if (MC.screen != null && FEATURE_SERVICE.getStorage().getByName("GuiMove") != null && FEATURE_SERVICE.getStorage().getByName("GuiMove").isEnabled()) return false;
+        if (MC.screen instanceof ChatScreen
+                || MC.screen instanceof SignEditScreen
+                || MC.screen instanceof AnvilScreen
+                || MC.screen instanceof AbstractCommandBlockEditScreen
+                || MC.screen instanceof StructureBlockEditScreen
+                || MC.screen instanceof CreativeModeInventoryScreen) {
             return false;
         }
         return true;

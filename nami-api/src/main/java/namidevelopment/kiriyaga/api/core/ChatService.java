@@ -64,7 +64,7 @@ public class ChatService {
 
     public void sendRaw(Component message, boolean prefix) {
         retry(() -> {
-            if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+            if (MC == null || MC.gui == null || getChatHud() == null) return;
             Component text = prefix ? prefix().copy().append(message) : message;
             getChatHud().addMessage(text);
         });
@@ -85,7 +85,7 @@ public class ChatService {
 
     public void sendPersistent(String key, Component message, boolean prefix) {
         retry(() -> {
-        if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+        if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         ChatComponent chatHud = getChatHud();
 
@@ -116,7 +116,7 @@ public class ChatService {
 
     public void sendTransient(Component message, boolean prefix) {
         retry(() -> {
-            if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+            if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         ChatComponent chatHud = getChatHud();
 
@@ -135,7 +135,7 @@ public class ChatService {
     }
 
     public void removePersistent(String key) {
-        if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+        if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         if (persistentMessages.containsKey(key)) {
             removeSilently(persistentMessages.get(key));
@@ -144,7 +144,7 @@ public class ChatService {
     }
 
     public void clear() {
-        if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+        if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         ChatComponent chatHud = getChatHud();
         for (MessageSignature sig : persistentMessages.values()) {
@@ -162,13 +162,13 @@ public class ChatService {
     }
 
     private ChatComponent getChatHud() {
-        return API_MC.gui.getChat();
+        return MC.gui.getChat();
     }
 
     public void removeSilently(MessageSignature signature) {
-        if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+        if (MC == null || MC.gui == null || getChatHud() == null) return;
 
-        ChatComponent hud = API_MC.gui.getChat();
+        ChatComponent hud = MC.gui.getChat();
         DuckChatComponent accessor = (DuckChatComponent) hud;
 
         accessor.getAllMessages().removeIf(line -> signature.equals(line.signature()));
@@ -196,7 +196,7 @@ public class ChatService {
     }
 
     public void removeByText(String text) {
-        if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+        if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         ChatComponent hud = getChatHud();
         DuckChatComponent accessor = (DuckChatComponent) hud;
@@ -210,10 +210,10 @@ public class ChatService {
 
     private void retry(Runnable task) {
         boolean b =
-                API_MC == null || API_MC.level == null || API_MC.player == null || API_MC.player.isDeadOrDying() || API_MC.screen instanceof net.minecraft.client.gui.screens.DeathScreen;
+                MC == null || MC.level == null || MC.player == null || MC.player.isDeadOrDying() || MC.screen instanceof net.minecraft.client.gui.screens.DeathScreen;
 
         if (b) {
-            API_MC.execute(() -> retry(task));
+            MC.execute(() -> retry(task));
             return;
         }
         task.run();
@@ -221,7 +221,7 @@ public class ChatService {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTick(PreTickEvent ev) {
-        if (API_MC == null || API_MC.gui == null || getChatHud() == null) return;
+        if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         ChatComponent hud = getChatHud();
         DuckChatComponent accessor = (DuckChatComponent) hud;

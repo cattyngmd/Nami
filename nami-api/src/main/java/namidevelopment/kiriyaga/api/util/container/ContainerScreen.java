@@ -29,8 +29,8 @@ public class ContainerScreen extends ShulkerBoxScreen {
     private static final Deque<Screen> screenStack = new ArrayDeque<>();
 
     public ContainerScreen(ItemStack containerStack, ItemStack[] contents) {
-        super(new ShulkerBoxMenu(0, API_MC.player.getInventory(), new SimpleContainer(contents)),
-                API_MC.player.getInventory(),
+        super(new ShulkerBoxMenu(0, MC.player.getInventory(), new SimpleContainer(contents)),
+                MC.player.getInventory(),
                 Component.translatable(containerStack.getItemName().getString()));
         this.containerStack = containerStack;
         this.contents = contents;
@@ -50,18 +50,18 @@ public class ContainerScreen extends ShulkerBoxScreen {
     }
 
     public static void open(ItemStack stack, ItemStack[] contents) {
-        Screen current = API_MC.screen;
+        Screen current = MC.screen;
         if (current != null && !(current instanceof ContainerScreen)) {
             screenStack.push(current);
         }
 
-        API_MC.setScreen(new ContainerScreen(stack, contents));
+        MC.setScreen(new ContainerScreen(stack, contents));
     }
 
     @Override
     public void onClose() {
         if (!screenStack.isEmpty()) {
-            API_MC.setScreen(screenStack.pop());
+            MC.setScreen(screenStack.pop());
         } else
             super.onClose();
     }
@@ -77,7 +77,7 @@ public class ContainerScreen extends ShulkerBoxScreen {
 
      @Override
      public boolean keyPressed(KeyEvent keyInput) {
-         KeyMapping keyBindEscape = API_MC.options.keyInventory;
+         KeyMapping keyBindEscape = MC.options.keyInventory;
          int escKey = keyBindEscape.getDefaultKey().getValue();
 
          int keyCode = keyInput.input();

@@ -45,12 +45,12 @@ public class CommandSuggester {
 
     public CommandSuggester(CommandStorage storage) {
         this.storage = storage;
-        API_MC.execute(() -> {
-            if (API_MC.getConnection() == null) {
+        MC.execute(() -> {
+            if (MC.getConnection() == null) {
                 if (!playerListCache.isEmpty()) playerListCache.clear();
                 return;
             }
-            List<String> currentNames = API_MC.getConnection().getOnlinePlayers()
+            List<String> currentNames = MC.getConnection().getOnlinePlayers()
                     .stream()
                     .map(p -> p.getProfile().name())
                     .toList();
@@ -117,7 +117,7 @@ public class CommandSuggester {
             try {
                 configNameCache.addAll(CONFIG_SERVICE.getConfigSerializer().listConfigs());
             } catch (Exception e) {
-                API_LOGGER.warn("Failed to load config names for suggestions", e);
+                LOGGER.warn("Failed to load config names for suggestions", e);
             }
 
             // Other registries useful for whitelists
@@ -146,7 +146,7 @@ public class CommandSuggester {
             generalIdCache.addAll(ids);
 
                 } catch (RuntimeException e) {
-            API_LOGGER.warn("Failed to build identifier caches for suggestions", e);
+            LOGGER.warn("Failed to build identifier caches for suggestions", e);
         }
         identifierCacheBuilt = true;
     }

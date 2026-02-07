@@ -120,10 +120,10 @@ public class HostileUtils {
     }
 
     public static boolean isAggressiveNow(Entity e) {
-        LocalPlayer player = API_MC.player;
-        if (player == null || API_MC.level == null) return false;
+        LocalPlayer player = MC.player;
+        if (player == null || MC.level == null) return false;
 
-        long timeOfDay = API_MC.level.getDayTime() % 24000;
+        long timeOfDay = MC.level.getDayTime() % 24000;
         boolean isNight = timeOfDay >= 13000 && timeOfDay <= 23000;
 
         if (e instanceof EnderMan enderman) return enderman.isCreepy();

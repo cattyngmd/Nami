@@ -46,7 +46,7 @@ public class ServerService {
 
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
-        if (API_MC.level == null ||  API_MC.getConnection() == null)
+        if (MC.level == null ||  MC.getConnection() == null)
             return;
 
         updatePing();
@@ -191,16 +191,16 @@ public class ServerService {
                 ping = lastPing;
                 break;
             case OFF:
-                if (API_MC.getConnection() != null && API_MC.player != null) {
-                    ping = API_MC.getConnection().getPlayerInfo(API_MC.player.getUUID()).getLatency();
+                if (MC.getConnection() != null && MC.player != null) {
+                    ping = MC.getConnection().getPlayerInfo(MC.player.getUUID()).getLatency();
                 } else {
                     ping = -1;
                 }
                 break;
             case NEW:
                 try {
-                    if (API_MC.getDebugOverlay() != null && API_MC.getDebugOverlay().getPingLogger() != null) {
-                        LocalSampleLogger pingLog = API_MC.getDebugOverlay().getPingLogger();
+                    if (MC.getDebugOverlay() != null && MC.getDebugOverlay().getPingLogger() != null) {
+                        LocalSampleLogger pingLog = MC.getDebugOverlay().getPingLogger();
                         int count = pingLog.size();
                         if (count == 0) ping = -1;
 

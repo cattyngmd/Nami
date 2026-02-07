@@ -18,17 +18,17 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class TargetUtils {
     public static Entity getTarget() {
         TargetFeatureConfig targetFeature = FeatureContractService.get(TargetFeatureConfig.class);
-        if (API_MC.player == null || API_MC.level == null || targetFeature == null)
+        if (MC.player == null || MC.level == null || targetFeature == null)
             return null;
 
         List<Entity> candidates = EntityUtils.getAllEntities().stream()
-                .filter(e -> e != API_MC.player)
+                .filter(e -> e != MC.player)
                 .filter(e -> {
                     if (e instanceof LivingEntity) {
                         LivingEntity le = (LivingEntity) e;
                         if (!le.isAlive()) return false;
                         if (e.tickCount < targetFeature.getMinTicksExisted()) return false;
-                        double distSq = e.distanceToSqr(API_MC.player);
+                        double distSq = e.distanceToSqr(MC.player);
                         if (distSq > targetFeature.getTargetRange() * targetFeature.getTargetRange()) return false;
 
                         return (targetFeature.targetPlayers() && e instanceof Player && !FRIEND_SERVICE.isFriend(e.getName().getString()))
@@ -54,28 +54,28 @@ public class TargetUtils {
 
             case DISTANCE:
                 return candidates.stream()
-                        .min(Comparator.comparingDouble(e -> e.distanceToSqr(API_MC.player)))
+                        .min(Comparator.comparingDouble(e -> e.distanceToSqr(MC.player)))
                         .orElse(null);
 
             case SMART:
                 List<Entity> players = candidates.stream()
                         .filter(e -> e instanceof Player && !FRIEND_SERVICE.isFriend(e.getName().getString()))
-                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(API_MC.player)))
+                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(MC.player)))
                         .toList();
 
                 if (!players.isEmpty()) return players.get(0);
 
                 List<Entity> creepers = candidates.stream()
                         .filter(e -> e instanceof Creeper)
-                        .filter(e -> e.distanceToSqr(API_MC.player) <= 3 * 3) // yeah its not accurate at all, but its not required here i guess?
-                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(API_MC.player)))
+                        .filter(e -> e.distanceToSqr(MC.player) <= 3 * 3) // yeah its not accurate at all, but its not required here i guess?
+                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(MC.player)))
                         .toList();
 
                 if (!creepers.isEmpty()) return creepers.get(0);
 
                 List<Entity> projectiles = candidates.stream()
                         .filter(e -> e instanceof ShulkerBullet || e instanceof LargeFireball)
-                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(API_MC.player)))
+                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(MC.player)))
                         .toList();
 
                 if (!projectiles.isEmpty()) return projectiles.get(0);
@@ -87,7 +87,7 @@ public class TargetUtils {
                         .toList();
 
                 return others.stream()
-                        .min(Comparator.comparingDouble(e -> e.distanceToSqr(API_MC.player)))
+                        .min(Comparator.comparingDouble(e -> e.distanceToSqr(MC.player)))
                         .orElse(null);
         }
 

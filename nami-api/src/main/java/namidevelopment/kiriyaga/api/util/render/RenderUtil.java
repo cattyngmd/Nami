@@ -150,7 +150,7 @@ public class RenderUtil {
     }
 
     private static AABB cameraTransform(AABB box) {
-        Vec3 camera = API_MC.gameRenderer.getMainCamera().position();
+        Vec3 camera = MC.gameRenderer.getMainCamera().position();
         return new AABB(box.minX - camera.x(),
                 box.minY - camera.y(),
                 box.minZ - camera.z(),
@@ -160,7 +160,7 @@ public class RenderUtil {
     }
 
     private static Vec3 cameraTransform(Vec3 vec3d) {
-        Vec3 camera = API_MC.gameRenderer.getMainCamera().position();
+        Vec3 camera = MC.gameRenderer.getMainCamera().position();
         return new Vec3(vec3d.x - camera.x(),
                 vec3d.y - camera.y(),
                 vec3d.z - camera.z());
@@ -169,7 +169,7 @@ public class RenderUtil {
     public static Vec3 project(Vec3 vec3d) {
         vec3d = cameraTransform(vec3d);
 
-        int displayHeight = API_MC.getWindow().getHeight();
+        int displayHeight = MC.getWindow().getHeight();
         int[] viewport = new int[4];
         GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
         Vector3f target = new Vector3f();
@@ -179,7 +179,7 @@ public class RenderUtil {
         Matrix4f matrixModel = new Matrix4f(MODEL_VIEW_MATRIX);
         matrixProj.mul(matrixModel).project(transformedCoordinates.x(), transformedCoordinates.y(), transformedCoordinates.z(), viewport, target);
 
-        double scale = API_MC.getWindow().getGuiScale();
+        double scale = MC.getWindow().getGuiScale();
 
         return new Vec3(target.x / scale, (displayHeight - target.y) / scale, target.z);
     }

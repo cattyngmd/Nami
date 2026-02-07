@@ -274,7 +274,7 @@ public class BlockUtils {
         Set<BlockPos> extra = new HashSet<>();
         for (BlockPos pos : positions) {
             AABB blockBox = new AABB(pos);
-            for (Entity entity : API_MC.level.entitiesForRendering()) {
+            for (Entity entity : MC.level.entitiesForRendering()) {
                 if (entity.distanceToSqr(player) > 10) continue;
                 if (entity instanceof EndCrystal) continue;
                 if (entity instanceof ItemEntity) continue;

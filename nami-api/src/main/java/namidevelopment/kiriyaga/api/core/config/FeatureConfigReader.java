@@ -21,7 +21,7 @@ public class FeatureConfigReader {
     public void loadFeature(Feature Feature) {
         File file = new File(dirs.getFeatureConfigDir(), Feature.getIdentifier() + ".json");
         if (!file.exists()) {
-            API_LOGGER.warn("Feature config not found: " + Feature.getIdentifier());
+            LOGGER.warn("Feature config not found: " + Feature.getIdentifier());
             return;
         }
 
@@ -46,7 +46,7 @@ public class FeatureConfigReader {
             }
 
         } catch (Exception e) {
-            API_LOGGER.error("Failed to load Feature config: " + Feature.getIdentifier(), e);
+            LOGGER.error("Failed to load Feature config: " + Feature.getIdentifier(), e);
         }
     }
 }

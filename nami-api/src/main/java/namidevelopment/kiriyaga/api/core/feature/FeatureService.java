@@ -11,7 +11,7 @@ public class FeatureService {
 
     public void init() {
         FeatureRegistry.registerAnnotatedFeatures(storage);
-        API_LOGGER.info("Registered " + storage.size() + " Features.");
+        LOGGER.info("Registered " + storage.size() + " Features.");
     }
 
     public FeatureStorage getStorage() {

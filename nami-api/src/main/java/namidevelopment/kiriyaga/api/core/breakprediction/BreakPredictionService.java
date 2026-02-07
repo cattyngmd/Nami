@@ -30,7 +30,7 @@ public class BreakPredictionService {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceive(PacketReceiveEvent event) {
-        API_MC.execute(() -> {
+        MC.execute(() -> {
         if (event.getPacket() instanceof ClientboundBlockDestructionPacket packet) {
 //            if (packet.getProgress() != 0)
 //                return;
@@ -38,7 +38,7 @@ public class BreakPredictionService {
             int entityId = packet.getId();
             BlockPos pos = packet.getPos();
 
-            Player player = (Player) API_MC.level.getEntity(entityId);
+            Player player = (Player) MC.level.getEntity(entityId);
             if (player == null) return;
             UUID uuid = player.getUUID();
             float speed = 0.7f;
@@ -49,7 +49,7 @@ public class BreakPredictionService {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTickEvent(PreTickEvent event) {
-        if (API_MC.level == null) return;
+        if (MC.level == null) return;
 
         for (PlayerBreakState state : players.values()) {
             state.onTick();

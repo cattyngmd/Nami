@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -37,7 +36,7 @@ public abstract class MixinCommandSuggestions {
         if (text.startsWith(prefix) && reader.getCursor() == 0) {
             reader.setCursor(prefix.length());
 
-            SharedSuggestionProvider source = API_MC.getConnection().getSuggestionsProvider();
+            SharedSuggestionProvider source = MC.getConnection().getSuggestionsProvider();
             this.currentParse = COMMAND_SERVICE.getSuggester().getDispatcher().parse(reader, source);
 
             int cursor = this.input.getCursorPosition();

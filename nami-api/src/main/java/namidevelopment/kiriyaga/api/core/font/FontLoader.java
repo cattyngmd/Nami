@@ -44,8 +44,8 @@ public class FontLoader {
         );
 
         try {
-            GlyphProvider font = loader.unpack().orThrow().load(API_MC.getResourceManager());
-            GlyphStitcher glyphBaker = new GlyphStitcher(API_MC.getTextureManager(),
+            GlyphProvider font = loader.unpack().orThrow().load(MC.getResourceManager());
+            GlyphStitcher glyphBaker = new GlyphStitcher(MC.getTextureManager(),
                     Identifier.fromNamespaceAndPath("nami", selectedFont.getFileName() + "_storage"));
 
 

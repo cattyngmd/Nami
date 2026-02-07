@@ -26,7 +26,7 @@ public class FontRendererProvider {
         FontFeatureConfig fontFeature = FeatureContractService.get(FontFeatureConfig.class);
 
         if (!fontFeature.isEnabled()) {
-            return API_MC.font;
+            return MC.font;
         }
 
         fontLoader.init();
@@ -37,7 +37,7 @@ public class FontRendererProvider {
             return cachedRenderer;
         }
 
-        EffectGlyph rectangle = ((DuckFont) API_MC.font).getProvider().effect();
+        EffectGlyph rectangle = ((DuckFont) MC.font).getProvider().effect();
 
         cachedRenderer = new Font(new Font.Provider() {
             @Override

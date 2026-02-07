@@ -49,9 +49,9 @@ public class EntityUtils {
     }
 
     public static List<Entity> getEntities(EntityTypeCategory category, double range, boolean sortByDistance, Predicate<Entity> extraFilter) {
-        if (API_MC.player == null || API_MC.level == null) return List.of();
+        if (MC.player == null || MC.level == null) return List.of();
 
-        Vec3 playerPos = API_MC.player.position();
+        Vec3 playerPos = MC.player.position();
         List<Entity> all = getEntitiesBase(category);
 
         return all.stream()
@@ -76,14 +76,14 @@ public class EntityUtils {
     }
 
     public static List<Entity> getAllEntities() {
-        ClientLevel world = API_MC.level;
+        ClientLevel world = MC.level;
         return world != null
                 ? StreamSupport.stream(world.entitiesForRendering().spliterator(), false).collect(Collectors.toList())
                 : List.of();
     }
 
     public static List<Player> getPlayers() {
-        ClientLevel world = API_MC.level;
+        ClientLevel world = MC.level;
         if (world == null) return List.of();
 
         return StreamSupport.stream(world.entitiesForRendering().spliterator(), false)
@@ -93,7 +93,7 @@ public class EntityUtils {
     }
 
     public static List<Player> getOtherPlayers() {
-        LocalPlayer self = API_MC.player;
+        LocalPlayer self = MC.player;
         return getPlayers().stream()
                 .filter(p -> !p.isRemoved() && p != self)
                 .collect(Collectors.toList());
@@ -118,14 +118,14 @@ public class EntityUtils {
     }
 
     public static GameType getGameMode(Player player) {
-        PlayerInfo playerListEntry = API_MC.getConnection().getPlayerInfo(player.getUUID());
+        PlayerInfo playerListEntry = MC.getConnection().getPlayerInfo(player.getUUID());
         return playerListEntry == null ? GameType.CREATIVE : playerListEntry.getGameMode();
     }
 
     public static int getLatency(Player player) {
-        if (player == null || API_MC.getConnection() == null) return -1;
+        if (player == null || MC.getConnection() == null) return -1;
 
-        PlayerInfo entry = API_MC.getConnection().getPlayerInfo(player.getUUID());
+        PlayerInfo entry = MC.getConnection().getPlayerInfo(player.getUUID());
         return entry != null ? entry.getLatency() : -1;
     }
 

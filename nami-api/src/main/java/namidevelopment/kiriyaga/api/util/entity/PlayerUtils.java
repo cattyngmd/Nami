@@ -52,7 +52,7 @@ public class PlayerUtils {
     }
 
     public static boolean isPhased(Entity e) {
-        if (e == null || API_MC.level == null) return false;
+        if (e == null || MC.level == null) return false;
 
         AABB box = e.getBoundingBox();
         int minX = Mth.floor(box.minX);
@@ -66,7 +66,7 @@ public class PlayerUtils {
             for (int y = minY; y < maxY; y++) {
                 for (int z = minZ; z < maxZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    VoxelShape shape = API_MC.level.getBlockState(pos).getCollisionShape(API_MC.level, pos);
+                    VoxelShape shape = MC.level.getBlockState(pos).getCollisionShape(MC.level, pos);
                     if (!shape.isEmpty() && shape.bounds().move(pos).intersects(box)) {
                         return true;
                     }

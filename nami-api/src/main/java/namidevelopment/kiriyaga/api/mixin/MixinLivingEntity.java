@@ -32,7 +32,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "travel", at = @At("HEAD"))
     private void travelPreHook(Vec3 movementInput, CallbackInfo ci) {
-        if (API_MC == null || API_MC.player != (Object)this) return;
+        if (MC == null || MC.player != (Object)this) return;
         if (FEATURE_SERVICE.getStorage() == null) return;
         RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
         if (config == null || !config.isMoveFixEnabled()) return;
@@ -50,7 +50,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "travel", at = @At("TAIL"))
     private void travelPostHook(Vec3 movementInput, CallbackInfo ci) {
-        if (API_MC == null || API_MC.player != (Object)this) return;
+        if (MC == null || MC.player != (Object)this) return;
         if (ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating()) return;
 
         if (FEATURE_SERVICE.getStorage() == null) return;
@@ -63,7 +63,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @ModifyExpressionValue(method = "jumpFromGround", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getYRot()F"))
     private float jumpFix(float originalYaw) {
-        if ((Object)this != API_MC.player) return originalYaw;
+        if ((Object)this != MC.player) return originalYaw;
         return ROTATION_SERVICE.getStateHandler().isRotating() ? ROTATION_SERVICE.getStateHandler().getRotationYaw() : originalYaw;
     }
 }

@@ -49,7 +49,7 @@ public class RotationUtils {
     public static double getClosestEyeDistance(Vec3 eyePos, AABB box) {
         Vec3 closest;
 
-        if (API_MC.player.isFallFlying()) {
+        if (MC.player.isFallFlying()) {
             closest = box.getCenter();
         } else {
             closest = getClosestPointToEye(eyePos, box);

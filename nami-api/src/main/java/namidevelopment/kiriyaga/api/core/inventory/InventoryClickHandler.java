@@ -73,32 +73,32 @@ public class InventoryClickHandler {
             }
         }*/
 
-        if (API_MC.screen instanceof ShulkerBoxScreen
-                || API_MC.screen instanceof AnvilScreen
-                || API_MC.screen instanceof BrewingStandScreen
-                || API_MC.screen instanceof CartographyTableScreen
-                || API_MC.screen instanceof CrafterScreen
-                || API_MC.screen instanceof EnchantmentScreen
-                || API_MC.screen instanceof FurnaceScreen
-                || API_MC.screen instanceof GrindstoneScreen
-                || API_MC.screen instanceof HopperScreen
-                || API_MC.screen instanceof HorseInventoryScreen
-                || API_MC.screen instanceof MerchantScreen
-                || API_MC.screen instanceof SmithingScreen
-                || API_MC.screen instanceof SmokerScreen
-                || API_MC.screen instanceof StonecutterScreen
-                || (API_MC.screen instanceof ContainerScreen && !skipGeneric)
-                || API_MC.screen instanceof CreativeModeInventoryScreen) {
+        if (MC.screen instanceof ShulkerBoxScreen
+                || MC.screen instanceof AnvilScreen
+                || MC.screen instanceof BrewingStandScreen
+                || MC.screen instanceof CartographyTableScreen
+                || MC.screen instanceof CrafterScreen
+                || MC.screen instanceof EnchantmentScreen
+                || MC.screen instanceof FurnaceScreen
+                || MC.screen instanceof GrindstoneScreen
+                || MC.screen instanceof HopperScreen
+                || MC.screen instanceof HorseInventoryScreen
+                || MC.screen instanceof MerchantScreen
+                || MC.screen instanceof SmithingScreen
+                || MC.screen instanceof SmokerScreen
+                || MC.screen instanceof StonecutterScreen
+                || (MC.screen instanceof ContainerScreen && !skipGeneric)
+                || MC.screen instanceof CreativeModeInventoryScreen) {
             return false;
         }
 
-        AbstractContainerMenu handler = API_MC.player.containerMenu;
+        AbstractContainerMenu handler = MC.player.containerMenu;
 
         NonNullList<Slot> slots = handler.slots;
         List<ItemStack> before = Lists.newArrayListWithCapacity(slots.size());
         for (Slot s : slots) before.add(s.getItem().copy());
 
-        API_MC.gameMode.handleInventoryMouseClick(handler.containerId, slot, button, type, API_MC.player);
+        MC.gameMode.handleInventoryMouseClick(handler.containerId, slot, button, type, MC.player);
         return true;
     }
 }

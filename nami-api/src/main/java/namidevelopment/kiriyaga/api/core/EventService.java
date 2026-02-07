@@ -87,7 +87,7 @@ public class EventService {
                         listener.invoke(event);
                         if (event.isCancelled()) return;
                     } catch (Exception e) {
-                        API_LOGGER.error("Error invoking event listener: ", e);
+                        LOGGER.error("Error invoking event listener: ", e);
                     }
                 }
             }

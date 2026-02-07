@@ -37,7 +37,7 @@ public class FeatureConfigWriter {
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             gson.toJson(json, writer);
         } catch (Exception e) {
-            API_LOGGER.error("Failed to save Feature config: " + Feature.getIdentifier(), e);
+            LOGGER.error("Failed to save Feature config: " + Feature.getIdentifier(), e);
         }
     }
 }

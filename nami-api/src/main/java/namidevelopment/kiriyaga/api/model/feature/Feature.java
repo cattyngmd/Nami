@@ -68,7 +68,7 @@ public abstract class Feature {
 
         }
 
-        if (API_MC.level != null) {
+        if (MC.level != null) {
             Component message = CAT_FORMAT.format("{global}"+name + "{gray} toggled" + (enabled ? " {green}on" : " {red}off") + "{gray}.");
             CHAT_SERVICE.sendPersistent(name, message);
         }

@@ -31,7 +31,7 @@ public class FriendStorage {
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             gson.toJson(array, writer);
         } catch (Exception e) {
-            API_LOGGER.error("Failed to save friends.json", e);
+            LOGGER.error("Failed to save friends.json", e);
         }
     }
 
@@ -51,7 +51,7 @@ public class FriendStorage {
                 }
             }
         } catch (Exception e) {
-            API_LOGGER.error("Failed to load friends.json", e);
+            LOGGER.error("Failed to load friends.json", e);
         }
 
         return friends;

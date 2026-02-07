@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import namidevelopment.kiriyaga.api.util.KeyUtils;
 import org.lwjgl.glfw.GLFW;
 
-import static namidevelopment.kiriyaga.api.NamiApi.API_MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 public class KeyBindSetting extends Setting<Integer> {
 
@@ -47,16 +47,16 @@ public class KeyBindSetting extends Setting<Integer> {
         if (value == KEY_NONE) return false;
 
         if (value == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            return API_MC.mouseHandler.isLeftPressed();
+            return MC.mouseHandler.isLeftPressed();
         }
         if (value == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            return API_MC.mouseHandler.isRightPressed();
+            return MC.mouseHandler.isRightPressed();
         }
         if (value == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
-            return API_MC.mouseHandler.isMiddlePressed();
+            return MC.mouseHandler.isMiddlePressed();
         }
 
-        return GLFW.glfwGetKey(API_MC.getWindow().handle(), value) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetKey(MC.getWindow().handle(), value) == GLFW.GLFW_PRESS;
     }
 
     public String getKeyName() {

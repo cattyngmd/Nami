@@ -17,7 +17,7 @@ public class CommandRegistry {
                 Command command = clazz.getDeclaredConstructor().newInstance();
                 storage.addCommand(command);
             } catch (Exception e) {
-                API_LOGGER.error("Failed to instantiate command: " + clazz.getName(), e);
+                LOGGER.error("Failed to instantiate command: " + clazz.getName(), e);
             }
         }
     }

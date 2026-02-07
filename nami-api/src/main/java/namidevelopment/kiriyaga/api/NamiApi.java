@@ -21,10 +21,9 @@ import org.apache.logging.log4j.Logger;
 
 public class NamiApi implements ClientModInitializer {
 
-    public static String API_NAME = "NamiAPI";
     public static String NAME = "Nami";
-    public static final Logger API_LOGGER = LogManager.getLogger(API_NAME);
-    public static final Minecraft API_MC = Minecraft.getInstance();
+    public static final Logger LOGGER = LogManager.getLogger(NAME);
+    public static final Minecraft MC = Minecraft.getInstance();
     public static final String API_VERSION;
     static {
         ModContainer mod = FabricLoader.getInstance().getModContainer("nami-api").orElse(null);
@@ -68,8 +67,6 @@ public class NamiApi implements ClientModInitializer {
         CAT_FORMAT.add(new CatStyles());
 
         FRIEND_SERVICE.load();
-
-        API_LOGGER.info(API_NAME + " " + API_VERSION + " has been initialized\n");
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             FONT_SERVICE.init(); // font is making glyph textures, it should be after game loaded not on initialize
