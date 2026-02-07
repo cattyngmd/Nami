@@ -9,10 +9,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterCommand
 public class LoadCommand extends Command {
 
-    public LoadCommand() {
-        super("load",
-                new CommandArgument[] {},
-                "l", "laod", "lad", "lod");
+    public LoadCommand() {super("load", new CommandArgument[] {});
     }
 
     @Override

@@ -13,11 +13,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterCommand
 public class HelpCommand extends Command {
 
-    public HelpCommand() {
-        super("help",
-                new CommandArgument[] {},
-                "h", "?", "hlp", "halp", "hilp", "heil", "commands", "command");
-    }
+    public HelpCommand() {super("help", new CommandArgument[] {});}
 
     @Override
     public void execute(Object[] args) {

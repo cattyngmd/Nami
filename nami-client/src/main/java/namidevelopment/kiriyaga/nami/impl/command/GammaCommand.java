@@ -14,13 +14,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 public class GammaCommand extends Command {
 
     public GammaCommand() {
-        super(
-                "gamma",
-                new CommandArgument[]{
-                        new CommandArgument.IntArg("value", 0, 420)
-                },
-                "light", "brightens", "bright"
-        );
+        super("gamma", new CommandArgument[]{new CommandArgument.IntArg("value", 0, 420)});
     }
 
     @Override

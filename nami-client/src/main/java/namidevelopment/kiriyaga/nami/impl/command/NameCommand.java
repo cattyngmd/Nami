@@ -13,13 +13,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 public class NameCommand extends Command {
 
     public NameCommand() {
-        super(
-                "name",
-                new CommandArgument[] {
-                        new CommandArgument.StringArg("name", 1, 24)
-                },
-                "n", "nam", "mne", "nome", "brand", "changename"
-        );
+        super("name", new CommandArgument[] {new CommandArgument.StringArg("name", 1, 24)});
     }
 
     @Override

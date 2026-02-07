@@ -11,13 +11,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 public class YawCommand extends Command {
 
     public YawCommand() {
-        super(
-                "yaw",
-                new CommandArgument[] {
-                        new CommandArgument.DoubleArg("value", -180, 180)
-                },
-                "y"
-        );
+        super("yaw", new CommandArgument[] {new CommandArgument.DoubleArg("value", -180, 180)});
     }
 
     @Override

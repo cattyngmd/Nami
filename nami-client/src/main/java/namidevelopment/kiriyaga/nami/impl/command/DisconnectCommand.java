@@ -13,11 +13,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 public class DisconnectCommand extends Command {
 
     public DisconnectCommand() {
-        super(
-                "disconnect",
-                new CommandArgument[0],
-                "dis", "discnect", "dissconnect", "logout"
-        );
+        super("disconnect", new CommandArgument[0]);
     }
 
     @Override

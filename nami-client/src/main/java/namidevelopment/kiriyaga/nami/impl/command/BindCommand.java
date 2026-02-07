@@ -16,14 +16,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class BindCommand extends Command {
 
     public BindCommand() {
-        super(
-                "bind",
-                new CommandArgument[] {
-                        new CommandArgument.FeatureArg("Feature"),
-                        new CommandArgument.KeyBindArg("key")
-                },
-                "b"
-        );
+        super("bind", new CommandArgument[] {new CommandArgument.FeatureArg("Feature"), new CommandArgument.KeyBindArg("key")});
     }
 
     @Override

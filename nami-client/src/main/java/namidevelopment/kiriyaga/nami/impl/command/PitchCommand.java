@@ -11,13 +11,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 public class PitchCommand extends Command {
 
     public PitchCommand() {
-        super(
-                "pitch",
-                new CommandArgument[] {
-                        new CommandArgument.IntArg("value", -90, 90)
-                },
-                "p"
-        );
+        super("pitch", new CommandArgument[] {new CommandArgument.IntArg("value", -90, 90)});
     }
 
     @Override

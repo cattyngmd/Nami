@@ -25,7 +25,7 @@ public class FakePlayerCommand extends Command {
     private RemotePlayer fakePlayer;
 
     public FakePlayerCommand() {
-        super("fakeplayer", new CommandArgument[] {new CommandArgument.StringArg("name", 0, 25), new CommandArgument.DoubleArg("health", 0, 20)}, "fp");
+        super("fakeplayer", new CommandArgument[] {new CommandArgument.StringArg("name", 0, 25), new CommandArgument.DoubleArg("health", 0, 20)});
     }
 
     @Override

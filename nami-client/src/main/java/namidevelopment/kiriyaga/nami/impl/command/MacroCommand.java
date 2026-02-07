@@ -16,7 +16,7 @@ public class MacroCommand extends Command {
                 "macro",
                 new CommandArgument[]{
                         new CommandArgument.ActionArg("add/del/list", "add", "del", "list"),
-                        new CommandArgument.StringArg("key", 1, 16){
+                        new CommandArgument.KeyBindArg("key"){
                             @Override
                             public boolean isRequired() {
                                 return false;
@@ -38,9 +38,7 @@ public class MacroCommand extends Command {
                                 return builder.toString();
                             }
                         }
-                },
-                "mac", "m"
-        );
+                });
     }
 
     @Override

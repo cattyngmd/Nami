@@ -9,10 +9,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterCommand
 public class ListConfigCommand extends Command {
 
-    public ListConfigCommand() {
-        super("listconfig",
-                new CommandArgument[] {},
-                "configlist", "lc");
+    public ListConfigCommand() {super("listconfig", new CommandArgument[] {});
     }
 
     @Override

@@ -14,11 +14,7 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 public class PeekCommand extends Command {
 
     public PeekCommand() {
-        super(
-                "peek",
-                new CommandArgument[0],
-                "p"
-        );
+        super("peek", new CommandArgument[0]);
     }
 
     @Override

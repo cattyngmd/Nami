@@ -43,6 +43,19 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
         }
     }
 
+    public boolean setByName(String name) {
+        if (name == null) return false;
+
+        for (T constant : values) {
+            if (constant.name().equalsIgnoreCase(name)) {
+                set(constant);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public JsonElement toJson() {
         return new JsonPrimitive(value.name());
     }

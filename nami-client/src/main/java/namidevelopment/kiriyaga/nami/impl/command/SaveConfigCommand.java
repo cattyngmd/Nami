@@ -27,9 +27,7 @@ public class SaveConfigCommand extends Command {
                                 return false;
                             }
                         }
-                },
-                "savecfg", "scfg"
-        );
+                });
     }
 
     @Override

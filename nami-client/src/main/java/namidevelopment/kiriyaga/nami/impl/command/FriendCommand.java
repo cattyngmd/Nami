@@ -12,19 +12,11 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class FriendCommand extends Command {
 
     public FriendCommand() {
-        super(
-                "friend",
-                new CommandArgument[]{
-                        new CommandArgument.ActionArg("add/del/list", "add", "del", "list"),
-                        new CommandArgument.FriendNameArg("name", 1, 32) {
+        super("friend", new CommandArgument[]{new CommandArgument.ActionArg("add/del/list", "add", "del", "list"), new CommandArgument.FriendNameArg("name", 1, 32) {
                             @Override
                             public boolean isRequired() {
                                 return false;
-                            }
-                        }
-                },
-                "f", "friends"
-        );
+                            }}});
     }
 
     @Override

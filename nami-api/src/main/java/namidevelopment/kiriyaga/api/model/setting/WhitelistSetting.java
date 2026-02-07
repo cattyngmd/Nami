@@ -66,13 +66,13 @@ public class WhitelistSetting extends BoolSetting {
     }
 
     public boolean addToWhitelist(String idStr) {
-        Identifier id = Identifier.tryParse(idStr);
+        Identifier id = Identifier.tryParse(normalize(idStr));
         if (id == null) return false;
         return whitelist.add(id);
     }
 
     public boolean removeFromWhitelist(String idStr) {
-        Identifier id = Identifier.tryParse(idStr);
+        Identifier id = Identifier.tryParse(normalize(idStr));
         if (id == null) return false;
         return whitelist.remove(id);
     }
@@ -122,5 +122,15 @@ public class WhitelistSetting extends BoolSetting {
         for (Type t : allowedTypes) types.add(t.name());
         obj.add("types", types);
         return obj;
+    }
+
+    private String normalize(String idStr) {
+        idStr = idStr.trim().toLowerCase();
+
+        if (!idStr.contains(":")) {
+            idStr = "minecraft:" + idStr;
+        }
+
+        return idStr;
     }
 }

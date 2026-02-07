@@ -17,7 +17,7 @@ public class CommandSuggester {
         dispatcher.getRoot().getChildren().clear();
 
         for (Command cmd : storage.getCommands()) {
-            BrigadierCommandAdapter.register(dispatcher, cmd);
+            cmd.register(dispatcher);
         }
     }
 

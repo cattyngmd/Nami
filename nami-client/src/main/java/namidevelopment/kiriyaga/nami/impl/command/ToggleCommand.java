@@ -11,12 +11,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class ToggleCommand extends Command {
 
     public ToggleCommand() {
-        super("toggle",
-                new CommandArgument[] {
-                        new CommandArgument.FeatureArg("name")
-                },
-                "on", "off", "switch", "togle", "turnon", "turnoff", "tggle");
-    }
+        super("toggle", new CommandArgument[] {new CommandArgument.FeatureArg("name")});}
 
     @Override
     public void execute(Object[] args) {

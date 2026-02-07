@@ -10,8 +10,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class SaveCommand extends Command {
 
     public SaveCommand() {
-        super("save",
-                new CommandArgument[0], "s", "save", "seva", "sv");
+        super("save", new CommandArgument[0]);
     }
 
     @Override

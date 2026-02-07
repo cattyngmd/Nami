@@ -11,11 +11,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class DrawnCommand extends Command {
 
     public DrawnCommand() {
-        super("drawn",
-                new CommandArgument[] {
-                        new CommandArgument.FeatureArg("FeatureName")
-                },
-                "draw", "drawFeature", "Featuredraw");
+        super("drawn", new CommandArgument[] {new CommandArgument.FeatureArg("FeatureName")});
     }
 
     @Override

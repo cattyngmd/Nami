@@ -63,11 +63,9 @@ public class ChatService {
     }
 
     public void sendRaw(Component message, boolean prefix) {
-        retry(() -> {
             if (MC == null || MC.gui == null || getChatHud() == null) return;
             Component text = prefix ? prefix().copy().append(message) : message;
             getChatHud().addMessage(text);
-        });
     }
 
 
@@ -84,7 +82,6 @@ public class ChatService {
     }
 
     public void sendPersistent(String key, Component message, boolean prefix) {
-        retry(() -> {
         if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         ChatComponent chatHud = getChatHud();
@@ -99,7 +96,6 @@ public class ChatService {
 
         chatHud.addMessage(text, signature, indicator);
         persistentMessages.put(key, signature);
-        });
     }
 
     public void sendTransient(String message) {
@@ -115,7 +111,6 @@ public class ChatService {
     }
 
     public void sendTransient(Component message, boolean prefix) {
-        retry(() -> {
             if (MC == null || MC.gui == null || getChatHud() == null) return;
 
         ChatComponent chatHud = getChatHud();
@@ -131,7 +126,6 @@ public class ChatService {
 
         chatHud.addMessage(text, signature, indicator);
         transientSignature = signature;
-        });
     }
 
     public void removePersistent(String key) {
@@ -206,17 +200,6 @@ public class ChatService {
         accessor.getTrimmedMessages().removeIf(visible -> visible.content().toString().equals(text));
 
         allMessages.removeIf(t -> t.getString().equals(text));
-    }
-
-    private void retry(Runnable task) {
-        boolean b =
-                MC == null || MC.level == null || MC.player == null || MC.player.isDeadOrDying() || MC.screen instanceof net.minecraft.client.gui.screens.DeathScreen;
-
-        if (b) {
-            MC.execute(() -> retry(task));
-            return;
-        }
-        task.run();
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

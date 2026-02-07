@@ -11,25 +11,14 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class LoadConfigCommand extends Command {
 
     public LoadConfigCommand() {
-        super(
-                "loadconfig",
-                new CommandArgument[]{
-                        new CommandArgument.ConfigNameArg("configName"),
-                        new CommandArgument.ActionArg(
-                                "mode",
-                                "all",
-                                "settings",
-                                "keybind",
-                                "color"
-                        ) {
+        super("loadconfig", new CommandArgument[]{
+                new CommandArgument.ConfigNameArg("configName"),
+                new CommandArgument.ActionArg("mode", "all", "settings", "keybind", "color") {
                             @Override
                             public boolean isRequired() {
                                 return false;
                             }
-                        }
-                },
-                "loadcfg", "lcfg"
-        );
+                        }});
     }
 
     @Override

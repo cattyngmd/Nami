@@ -11,13 +11,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class ChangePrefixCommand extends Command {
 
     public ChangePrefixCommand() {
-        super(
-                "prefix",
-                new CommandArgument[] {
-                        new CommandArgument.StringArg("char", 1, 1)
-                },
-                "changeprefix"
-        );
+        super("prefix", new CommandArgument[] {new CommandArgument.StringArg("char", 1, 1)});
     }
 
     @Override

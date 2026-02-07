@@ -15,9 +15,7 @@ import static namidevelopment.kiriyaga.nami.Nami.*;
 public class OpenFolderCommand extends Command {
 
     public OpenFolderCommand() {
-        super("openfolder",
-                new CommandArgument[] {},
-                "of", "folder", "openf", "opendir");
+        super("openfolder", new CommandArgument[] {});
     }
 
     @Override

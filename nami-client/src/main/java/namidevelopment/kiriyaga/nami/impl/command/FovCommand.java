@@ -14,13 +14,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 public class FovCommand extends Command {
 
     public FovCommand() {
-        super(
-                "fov",
-                new CommandArgument[]{
-                        new CommandArgument.IntArg("value", 0, 162)
-                },
-                "fav", "fv"
-        );
+        super("fov", new CommandArgument[]{new CommandArgument.IntArg("value", 0, 162)});
     }
 
     @Override

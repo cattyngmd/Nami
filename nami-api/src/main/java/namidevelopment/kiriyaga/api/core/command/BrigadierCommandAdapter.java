@@ -28,15 +28,6 @@ public class BrigadierCommandAdapter {
 
         LiteralArgumentBuilder<CommandSource> root = LiteralArgumentBuilder.literal(literalName);
 
-        for (String alias : cmd.getAliases()) {
-            if (alias == null || alias.isBlank()) continue;
-
-            dispatcher.register(
-                    LiteralArgumentBuilder.<CommandSource>literal(normalize(alias))
-                            .redirect(dispatcher.getRoot().getChild(literalName))
-            );
-        }
-
         CommandArgument[] args = cmd.getArguments();
 
         if (args.length == 0) {
@@ -107,7 +98,6 @@ public class BrigadierCommandAdapter {
             return DoubleArgumentType.getDouble(ctx, name);
         }
 
-        // greedy / word
         if (arg instanceof CommandArgument.StringArg) {
             return StringArgumentType.getString(ctx, name);
         }
@@ -206,7 +196,6 @@ public class BrigadierCommandAdapter {
 
     private static void applySuggestions(RequiredArgumentBuilder<CommandSource, ?> builder, CommandArgument arg) {
 
-        // actions
         if (arg instanceof CommandArgument.ActionArg actionArg) {
             builder.suggests((ctx, sb) -> {
                 for (String v : actionArg.getAllowedValues()) {
@@ -227,7 +216,16 @@ public class BrigadierCommandAdapter {
 
         if (arg instanceof CommandArgument.SettingArg) {
             builder.suggests((ctx, sb) -> {
-                String featureName = tryGetPreviousString(ctx, "feature");
+
+                String featureName = null;
+
+                var nodes = ctx.getNodes();
+                if (nodes.size() >= 2) {
+                    String prevName = nodes.get(nodes.size() - 2).getNode().getName();
+                    try {
+                        featureName = ctx.getArgument(prevName, String.class);
+                    } catch (Exception ignored) {}
+                }
 
                 if (featureName != null) {
                     var feature = FEATURE_SERVICE.getStorage().getByName(featureName);
@@ -305,6 +303,6 @@ public class BrigadierCommandAdapter {
     }
 
     private static String normalize(String s) {
-        return s == null ? "" : s.replaceAll("\\s+", "").toLowerCase(Locale.ROOT);
+        return s == null ? "" : s.replaceAll("\\s+", "");
     }
 }
