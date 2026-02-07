@@ -49,7 +49,9 @@ public class AnnouncerFeature extends Feature {
 
                     if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
                         Component message = CAT_FORMAT.format("{global}" + playerName + " {gray}joined the game.");
-                        CHAT_SERVICE.sendPersistent(playerName, message);
+                        MC.execute(() -> {
+                            CHAT_SERVICE.sendPersistent(playerName, message);
+                        });
                     }
                 }
             }
@@ -65,7 +67,9 @@ public class AnnouncerFeature extends Feature {
 
                 if ((everyone.get() && !isFriend) || (friends.get() && isFriend)) {
                     Component message = CAT_FORMAT.format("{global}" + playerName + " {gray}has left the game.");
-                    CHAT_SERVICE.sendPersistent(playerName, message);
+                    MC.execute(() -> {
+                        CHAT_SERVICE.sendPersistent(playerName, message);
+                    });
                 }
             }
         }
@@ -91,7 +95,9 @@ public class AnnouncerFeature extends Feature {
 
             Component message = CAT_FORMAT.format("{global}" + player.getName().getString() + " {gray}has entered visual range.");
 
-            CHAT_SERVICE.sendPersistent(player.getStringUUID(), message);
+            MC.execute(() -> {
+                CHAT_SERVICE.sendPersistent(player.getStringUUID(), message);
+            });
 
             switch (soundMode.get()) {
                 case BELL -> MC.player.playSound(SoundEvents.BELL_BLOCK, 1.0f, 1.0f);
