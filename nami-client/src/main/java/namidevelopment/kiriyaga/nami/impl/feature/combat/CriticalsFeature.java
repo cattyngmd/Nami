@@ -31,8 +31,6 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopme
 @RegisterFeature
 public class CriticalsFeature extends Feature {
 
-    private Vec3 lastPos = null;
-
     public enum Mode { PACKET, GRIM}
 
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.PACKET));
@@ -43,22 +41,6 @@ public class CriticalsFeature extends Feature {
         super("Criticals", "Changes player movement for always critting.", FeatureCategory.of("Combat"));
         onlyPhased.setShowCondition(() -> mode.get() == Mode.GRIM);
         onlyStandingStill.setShowCondition(() -> mode.get() == Mode.GRIM);
-    }
-
-    AtomicBoolean b = new AtomicBoolean();
-
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onPreTick(PreTickEvent event) {
-        if (MC.player == null)
-            return;
-
-        if (lastPos == null)
-            lastPos = MC.player.position();
-
-        if (lastPos == MC.player.position())
-            b.set(true);
-        else
-            b.set(false);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -119,7 +101,7 @@ public class CriticalsFeature extends Feature {
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
 
-        if (onlyStandingStill.get() && !b.get())
+        if (onlyStandingStill.get() && MC.player.getDeltaMovement().lengthSqr() > 1.0E-6)
             return;
 
         float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
