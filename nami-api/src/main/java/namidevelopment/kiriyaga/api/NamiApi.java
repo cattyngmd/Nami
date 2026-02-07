@@ -5,7 +5,6 @@ import namidevelopment.kiriyaga.api.core.breakprediction.BreakPredictionService;
 import namidevelopment.kiriyaga.api.core.cat.NamiFormatService;
 import namidevelopment.kiriyaga.api.core.command.CommandService;
 import namidevelopment.kiriyaga.api.core.config.ConfigService;
-import namidevelopment.kiriyaga.api.core.executable.ExecutableService;
 import namidevelopment.kiriyaga.api.core.feature.FeatureService;
 import namidevelopment.kiriyaga.api.core.font.FontService;
 import namidevelopment.kiriyaga.api.core.inventory.InventoryService;
@@ -41,7 +40,6 @@ public class NamiApi implements ClientModInitializer {
     public static final ConfigService CONFIG_SERVICE = new ConfigService();
     public static final FeatureService FEATURE_SERVICE = new FeatureService();
     public static final FontService FONT_SERVICE = new FontService();
-    public static final ExecutableService EXECUTABLE_SERVICE = new ExecutableService();
     public static final CommandService COMMAND_SERVICE = new CommandService();
     public static final ChatService CHAT_SERVICE = new ChatService();
     public static final FriendService FRIEND_SERVICE = new FriendService(CONFIG_SERVICE);
@@ -62,7 +60,6 @@ public class NamiApi implements ClientModInitializer {
         //FONT_SERVICE.init();
         ROTATION_SERVICE.init();
         INVENTORY_SERVICE.init();
-        EXECUTABLE_SERVICE.init();
         SERVER_SERVICE.init();
         CHAT_SERVICE.init();
         INPUT_SERVICE.init();

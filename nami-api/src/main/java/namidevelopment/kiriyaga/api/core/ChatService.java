@@ -2,7 +2,6 @@ package namidevelopment.kiriyaga.api.core;
 
 import namidevelopment.kiriyaga.api.contract.FeatureContractService;
 import namidevelopment.kiriyaga.api.contract.feature.ColorFeatureConfig;
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
@@ -214,7 +213,7 @@ public class ChatService {
                 API_MC == null || API_MC.level == null || API_MC.player == null || API_MC.player.isDeadOrDying() || API_MC.screen instanceof net.minecraft.client.gui.screens.DeathScreen;
 
         if (b) {
-            EXECUTABLE_SERVICE.getRequestHandler().submit(() -> retry(task), 1, ExecutableThreadType.PRE_TICK);
+            API_MC.execute(() -> retry(task));
             return;
         }
         task.run();

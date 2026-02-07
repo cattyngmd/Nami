@@ -10,7 +10,6 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
@@ -46,7 +45,7 @@ public class CommandSuggester {
 
     public CommandSuggester(CommandStorage storage) {
         this.storage = storage;
-        EXECUTABLE_SERVICE.getRequestHandler().submitRepeating(() -> {
+        API_MC.execute(() -> {
             if (API_MC.getConnection() == null) {
                 if (!playerListCache.isEmpty()) playerListCache.clear();
                 return;
@@ -59,7 +58,7 @@ public class CommandSuggester {
                 playerListCache.clear();
                 playerListCache.addAll(currentNames);
             }
-        }, 20, ExecutableThreadType.PRE_TICK);
+        });
     }
 
     private synchronized void ensureIdentifierCache() {
