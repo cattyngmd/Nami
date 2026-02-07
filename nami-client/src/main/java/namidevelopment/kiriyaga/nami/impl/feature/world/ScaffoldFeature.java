@@ -2,6 +2,8 @@ package namidevelopment.kiriyaga.nami.impl.feature.world;
 
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
+import namidevelopment.kiriyaga.api.event.EventPriority;
+import namidevelopment.kiriyaga.api.event.impl.LedgeClipEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
@@ -15,6 +17,7 @@ import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.model.setting.WhitelistSetting;
 import namidevelopment.kiriyaga.api.util.PredictMovementUtils;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
+import namidevelopment.kiriyaga.nami.impl.feature.movement.component.SafeWalkComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -47,17 +50,20 @@ public class ScaffoldFeature extends Feature {
     public final BoolSetting singleBlock = addSetting(new BoolSetting("SingleBlock", true));
     public final BoolSetting render = addSetting(new BoolSetting("Render", false));
 
+    private final SafeWalkComponent safeWalk = new SafeWalkComponent();
     private int cooldown = 0;
     private BlockPos renderPos = null;
 
     public ScaffoldFeature() {
         super("Scaffold", "Automatically scaffolds using specified blocks.", FeatureCategory.of("World"));
+        safeWalk.register(this);
     }
 
     @Override
     public void onDisable() {
         cooldown = 0;
         renderPos = null;
+        safeWalk.onDisable();
     }
 
     @SubscribeEvent
@@ -67,6 +73,8 @@ public class ScaffoldFeature extends Feature {
             renderPos = null;
             return;
         }
+
+        safeWalk.onTick();
 
         if (cooldown > 0) {
             cooldown--;
@@ -107,6 +115,11 @@ public class ScaffoldFeature extends Feature {
 
         RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
 
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onLedgeClip(LedgeClipEvent event) {
+        safeWalk.onLedgeClip(event);
     }
 
     private Item getSlot() {
