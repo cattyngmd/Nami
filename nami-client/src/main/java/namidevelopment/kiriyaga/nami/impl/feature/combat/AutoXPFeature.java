@@ -36,11 +36,11 @@ public class AutoXPFeature extends Feature {
     public final IntSetting durability = addSetting(new IntSetting("Durability", 80, 70, 99));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", false));
     public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
-    public final IntSetting packetShift = addSetting(new IntSetting("ShiftTicks", 3, 1, 6));
+    public final IntSetting packetShift = addSetting(new IntSetting("ShiftTicks", 2, 1, 6));
     public final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
-    public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
+    public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
     public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
-    public final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
+    public final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.SILENT));
     public final BoolSetting is1_12 = addSetting(new BoolSetting("1.12", false));
 
     public AutoXPFeature() {

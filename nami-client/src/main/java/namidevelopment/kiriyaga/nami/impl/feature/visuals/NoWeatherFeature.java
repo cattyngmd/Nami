@@ -12,11 +12,6 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class NoWeatherFeature extends Feature {
-    public float cameraYaw;
-    public float cameraPitch;
-
-    private CameraType previousPerspective; // todo this shit broke
-
     public NoWeatherFeature() {
         super("NoWeather", "Disables rendering of weather.", FeatureCategory.of("Render"), "noweather", "nowether", "nowather");
     }

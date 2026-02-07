@@ -12,7 +12,7 @@ import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 public class FontFeature extends Feature implements FontFeatureConfig {
 
     public final EnumSetting<FontType> fontType = addSetting(new EnumSetting<>("Font", FontType.VERDANAPRO));
-    public final IntSetting shadowDarken = addSetting(new IntSetting("ShadowDarken", 75, 60, 100));
+    public final IntSetting shadowDarken = addSetting(new IntSetting("ShadowDarken", 65, 60, 85));
     public final IntSetting glyphSize = addSetting(new IntSetting("Size", 9, 6, 24));
     public final IntSetting oversample = addSetting(new IntSetting("Oversample", 2, 2, 8));
 

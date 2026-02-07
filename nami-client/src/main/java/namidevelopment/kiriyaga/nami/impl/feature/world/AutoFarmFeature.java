@@ -30,13 +30,13 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class AutoFarmFeature extends Feature {
 
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
-    public final IntSetting radius = addSetting(new IntSetting("Radius", 4, 1, 8));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.5, 1.0, 6.0));
+    public final IntSetting radius = addSetting(new IntSetting("Radius", 6, 1, 8));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting swapBack  = addSetting(new BoolSetting("SwapBack", true));
     public final BoolSetting swing  = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
 
     public AutoFarmFeature() {

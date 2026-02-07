@@ -45,7 +45,7 @@ public class AutoPotFeature extends Feature { // TODO: refactor this
     public final EnumSetting<ThrowMode> throwMode = addSetting(new EnumSetting<>("Throw", ThrowMode.UNDER));
     public final BoolSetting whenNoTarget = addSetting(new BoolSetting("NoTarget", false));
     public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
-    public final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.NORMAL));
+    public final EnumSetting<SwapMode> swapMode = addSetting(new EnumSetting<>("Swap", SwapMode.SILENT));
     public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
 
     private final Timer throwTimer = new Timer();

@@ -55,13 +55,13 @@ public class AutoCrystalFeature extends Feature {
 
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));
-    public final DoubleSetting placeRange = addSetting(new DoubleSetting("PlaceRange","Range", 5.0, 1.0, 7.0));
+    public final DoubleSetting placeRange = addSetting(new DoubleSetting("PlaceRange","Range", 6.0, 1.0, 6.0));
     public final IntSetting placeDelay = addSetting(new IntSetting("PlaceDelay","Delay", 0, 0, 20));
     public final BoolSetting placeRotate = addSetting(new BoolSetting("PlaceRotate","Rotate", true));
     public final BoolSetting placeSwing = addSetting(new BoolSetting("PlaceSwing","Swing", true));
     public final BoolSetting placeIgnoreItems = addSetting(new BoolSetting("PlaceIgnoreItems","IgnoreItems", true));
     public final BoolSetting placeIgnoreCrystals = addSetting(new BoolSetting("PlaceIgnoreCrystals","IgnoreCrystals", true));
-    public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("PlaceStrictDirection","StrictDirection", false));
+    public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("PlaceStrictDirection","StrictDirection", true));
     public final BoolSetting placeSwapBack = addSetting(new BoolSetting("PlaceSwapBack","SwapBack", true));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("PlaceMultitask","Multitask", false));
 
@@ -72,16 +72,16 @@ public class AutoCrystalFeature extends Feature {
     public final IntSetting breakDelay = addSetting(new IntSetting("BreakDelay","Delay", 0, 0, 20));
     public final BoolSetting breakRotate = addSetting(new BoolSetting("BreakRotate","Rotate", true));
     public final BoolSetting breakSwing = addSetting(new BoolSetting("BreakSwing","Swing", true));
-    public final BoolSetting breakMultitask = addSetting(new BoolSetting("BreakMultitask","Multitask", true));
+    public final BoolSetting breakMultitask = addSetting(new BoolSetting("BreakMultitask","Multitask", false));
     public final IntSetting breakAge = addSetting(new IntSetting("Age", 0, 0, 20));
     public final EnumSetting<Sequential> breakSequential = addSetting(new EnumSetting<>("BreakSequential","Sequential", Sequential.NONE));
 
     //damages
     public final BoolSetting assumeBestArmor = addSetting(new BoolSetting("AssumeBestArmor", true));
     public final BoolSetting noSelfPop = addSetting(new BoolSetting("NoSelfPop", true));
-    public final DoubleSetting minDamage = addSetting(new DoubleSetting("MinDamage", 2.0, 0.0, 36.0));
-    public final DoubleSetting maxSelfDamage = addSetting(new DoubleSetting("MaxSelfDamage", 4.0, 0.0, 36.0));
-    public final DoubleSetting maxFriendDamage = addSetting(new DoubleSetting("MaxFriendDamage", 2.0, 0.0, 36.0));
+    public final DoubleSetting minDamage = addSetting(new DoubleSetting("MinDamage", 4.0, 0.0, 36.0));
+    public final DoubleSetting maxSelfDamage = addSetting(new DoubleSetting("MaxSelfDamage", 12.0, 0.0, 36.0));
+    public final DoubleSetting maxFriendDamage = addSetting(new DoubleSetting("MaxFriendDamage", 12.0, 0.0, 36.0));
 
     //render
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));

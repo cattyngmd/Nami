@@ -16,7 +16,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class RespawnFeature extends Feature {
 
-    public final BoolSetting sendCords = addSetting(new BoolSetting("LogCords", true));
+    public final BoolSetting sendCords = addSetting(new BoolSetting("LogCords", true)); //todo: this doesnt work
     public final BoolSetting autoRespawn = addSetting(new BoolSetting("AutoRespawn", false));
 
     public RespawnFeature() {

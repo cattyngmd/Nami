@@ -32,21 +32,19 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class AutoWebFeature extends Feature {
 
     public enum PlaceMode { LEGS, HEAD, BOTH }
-    public enum ItemEnum { COBWEB, SCAFFOLD }
 
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.50, 1.0, 6.0));
     public final EnumSetting<PlaceMode> placeMode = addSetting(new EnumSetting<>("PlaceMode", PlaceMode.LEGS));
-    public final EnumSetting<ItemEnum> item = addSetting(new EnumSetting<>("Item", ItemEnum.COBWEB));
     public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 5));
     public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
-    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", true));
     public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    public final BoolSetting render = addSetting(new BoolSetting("Render", false));
+    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
 
     private int cooldown = 0;
     private BlockPos renderPos = null;
@@ -130,7 +128,6 @@ public class AutoWebFeature extends Feature {
 
         return null;
     }
-
 
     private List<BlockPos> getPositions(Entity target) {
         double minX = target.getBoundingBox().minX;

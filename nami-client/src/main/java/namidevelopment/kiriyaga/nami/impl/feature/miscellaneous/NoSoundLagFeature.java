@@ -25,7 +25,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class NoSoundLagFeature extends Feature { // TODO whitelist sounds
-
+// todo: rewrite this garbage
     public final BoolSetting always = addSetting(new BoolSetting("Always", false));
     public final BoolSetting armor = addSetting(new BoolSetting("Armor", true));
     public final BoolSetting withers = addSetting(new BoolSetting("Withers", true));

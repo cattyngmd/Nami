@@ -22,10 +22,10 @@ import static namidevelopment.kiriyaga.api.util.InteractionUtils.interactWithEnt
 public class AutoNametagFeature extends Feature {
 
     public final BoolSetting nametagged = addSetting(new BoolSetting("Nametagged", false));
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 10.0));
-    public final IntSetting delay = addSetting(new IntSetting("Delay", 10, 1, 20));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.0, 1.0, 10.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 20));
     public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
-    public final BoolSetting multitask = addSetting(new BoolSetting("multitask", true));
+    public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 

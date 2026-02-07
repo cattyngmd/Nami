@@ -28,13 +28,7 @@ public class ParkourFeature extends Feature {
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
 
-        boolean shouldJump =
-                MC.player.onGround()
-                        && !MC.player.isShiftKeyDown()
-                        && MC.level.noCollision(MC.player,
-                        MC.player.getBoundingBox()
-                                .move(0.0, -0.5, 0.0)
-                                .inflate(-0.001, 0.0, -0.001));
+        boolean shouldJump = MC.player.onGround() && !MC.player.isShiftKeyDown() && MC.level.noCollision(MC.player, MC.player.getBoundingBox().move(0.0, -0.5, 0.0).inflate(-0.001, 0.0, -0.001));
 
         setJumpHeld(shouldJump);
     }

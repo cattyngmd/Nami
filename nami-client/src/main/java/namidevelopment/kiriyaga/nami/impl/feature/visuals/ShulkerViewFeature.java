@@ -41,7 +41,7 @@ public class ShulkerViewFeature extends Feature {
 
     public enum Mode { MULTI, SINGLE }
 
-    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.MULTI));
+    public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.SINGLE));
     public final BoolSetting tooltip = addSetting(new BoolSetting("Tooltip", true));
     public final BoolSetting compact = addSetting(new BoolSetting("Compact", false));
     public final BoolSetting bothSides = addSetting(new BoolSetting("BothSides", true));

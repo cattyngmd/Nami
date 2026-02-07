@@ -41,8 +41,8 @@ public class VelocityFeature extends Feature {
     private enum Mode { VANILLA, WALLS, GRIM }
 
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.WALLS));
-    public final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("Horizontal", 100.0, 0.0, 100.0));
-    public final DoubleSetting verticalPercent = addSetting(new DoubleSetting("Vertical", 100.0, 0.0, 100.0));
+    public final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("Horizontal", 0.00, 0.00, 100.00));
+    public final DoubleSetting verticalPercent = addSetting(new DoubleSetting("Vertical", 0.00, 0.00, 100.00));
     public final BoolSetting handleKnockback = addSetting(new BoolSetting("Knockback", true));
     public final BoolSetting handleExplosions = addSetting(new BoolSetting("Explosion", true));
     public final BoolSetting concealMotion = addSetting(new BoolSetting("Conceal", false));

@@ -31,7 +31,6 @@ import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isPhased;
 public class AutoMineFeature extends Feature {
     public enum Mode {GRIM }
 
-    public final BoolSetting doubleMime = addSetting(new BoolSetting("DoubleMine", true));
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Logic", Mode.GRIM));
     public final BoolSetting face = addSetting(new BoolSetting("Face", true));
 
@@ -72,7 +71,7 @@ public class AutoMineFeature extends Feature {
             return;
         }
 
-        if (doubleMime.get() && b && blocks.size() > 1 && isPhased(target) || !m.instant.get()) {
+        if (FEATURE_SERVICE.getStorage().getByClass(SpeedMineFeature.class).doubleMine.get() && b && blocks.size() > 1 && isPhased(target) || !m.instant.get()) {
             sendToSpeedMine(blocks.get(1));
         }
     }

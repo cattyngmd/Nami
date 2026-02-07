@@ -33,7 +33,6 @@ public class AutoLogFeature extends Feature {
     public final BoolSetting onPop = addSetting(new BoolSetting("OnPop", false));
     public final IntSetting onLevel = addSetting(new IntSetting("OnLevel", 0, 0, 15000));
     public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", true));
-    public final BoolSetting reconnectToggle = addSetting(new BoolSetting("ReconnectToggle", true));
 
     private boolean triggeredLevel = false;
     private boolean loggingOut = false;
@@ -138,7 +137,7 @@ public class AutoLogFeature extends Feature {
         if (selfToggle.get())
             this.toggle();
 
-        if (reconnectToggle.get() && FEATURE_SERVICE.getStorage().getByClass(AutoReconnectFeature.class).isEnabled())
+        if (FEATURE_SERVICE.getStorage().getByClass(AutoReconnectFeature.class).isEnabled())
             FEATURE_SERVICE.getStorage().getByClass(AutoReconnectFeature.class).toggle();
     }
 }

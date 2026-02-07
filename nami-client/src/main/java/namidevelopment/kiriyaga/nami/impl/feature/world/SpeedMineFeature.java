@@ -57,7 +57,7 @@ public class SpeedMineFeature extends Feature {
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
     public final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
     public final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
-    public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting async = addSetting(new BoolSetting("Async", true));
     public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
     public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));

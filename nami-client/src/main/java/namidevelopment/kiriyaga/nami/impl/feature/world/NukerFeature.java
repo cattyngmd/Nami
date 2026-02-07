@@ -34,11 +34,11 @@ public class NukerFeature extends Feature {
 
     public enum NukerMode { SPHERE, SELECTIVE}
     public final EnumSetting<NukerMode> mode = addSetting(new EnumSetting<>("Mode", NukerMode.SPHERE));
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.0, 1.0, 6.0));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.5, 1.0, 6.0));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
-    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", true));
     public final BoolSetting safeOnly = addSetting(new BoolSetting("SafeOnly", false));
     public final BoolSetting flatten = addSetting(new BoolSetting("Flatten", true));
     public final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));

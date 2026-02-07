@@ -45,7 +45,7 @@ public class LiquidFillFeature extends Feature {
     }
 
     // TODO: shift ticks, or maybe not?
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.5, 1.0, 6.0));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 4, 1, 10));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));

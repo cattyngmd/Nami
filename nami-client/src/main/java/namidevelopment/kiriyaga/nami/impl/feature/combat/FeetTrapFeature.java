@@ -33,15 +33,15 @@ import static namidevelopment.kiriyaga.api.util.InteractionUtils.isReplaceable;
 @RegisterFeature
 public class FeetTrapFeature extends Feature {
 
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.50, 1.0, 6.0));
     public final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
     public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
-    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", true));
     public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
     public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
     public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    public final BoolSetting swing = addSetting(new BoolSetting("Swing", false));
+    public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting extension = addSetting(new BoolSetting("Extension", false));
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
     public final BoolSetting jumpDisable = addSetting(new BoolSetting("JumpDisable", false));

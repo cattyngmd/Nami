@@ -38,11 +38,11 @@ public class FuckerFeature extends Feature {
     }
 
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.FARM));
-    public final DoubleSetting distance = addSetting(new DoubleSetting("Range", 5.0, 1.0, 6.0));
+    public final DoubleSetting distance = addSetting(new DoubleSetting("Range", 4.5, 1.0, 6.0));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
-    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", false));
+    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", true));
     public final IntSetting radius = addSetting(new IntSetting("Radius", 3, 1, 6));
 
     private final Set<BlockPos> s = new HashSet<>();

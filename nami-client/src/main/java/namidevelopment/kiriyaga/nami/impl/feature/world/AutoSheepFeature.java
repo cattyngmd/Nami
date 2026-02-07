@@ -21,10 +21,10 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopme
 @RegisterFeature
 public class AutoSheepFeature extends Feature {
 
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 2, 1.0, 5.0));
-    public final IntSetting delay = addSetting(new IntSetting("Delay", 5, 1, 20));
+    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 3.00, 1.0, 6.0));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 1, 0, 20));
     public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
-    public final BoolSetting multitask = addSetting(new BoolSetting("multitask", true));
+    public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
 
