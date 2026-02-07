@@ -1,6 +1,9 @@
 package namidevelopment.kiriyaga.api.util;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class KeyUtils {
     public static int parseKey(String keyName) {
         keyName = keyName.toUpperCase();
@@ -108,4 +111,43 @@ public class KeyUtils {
         return "KEY_" + keyCode;
     }
 
+    public static List<String> getAllKeyNames() {
+        List<String> list = new ArrayList<>();
+
+        list.add("NONE");
+        list.add("MOUSELEFT");
+        list.add("MOUSERIGHT");
+        list.add("MOUSEMIDDLE");
+        list.add("MOUSE4");
+        list.add("MOUSE5");
+        list.add("LCTRL");
+        list.add("RCTRL");
+        list.add("LSHIFT");
+        list.add("RSHIFT");
+        list.add("LALT");
+        list.add("RALT");
+        list.add("SPACE");
+        list.add("ENTER");
+        list.add("TAB");
+        list.add("ESC");
+        list.add("UP");
+        list.add("DOWN");
+        list.add("LEFT");
+        list.add("RIGHT");
+        list.add("BACKSPACE");
+        list.add("DELETE");
+        list.add("INSERT");
+        list.add("HOME");
+        list.add("END");
+        list.add("PAGEUP");
+        list.add("PAGEDOWN");
+        for (char c = 'A'; c <= 'Z'; c++) {
+            list.add(String.valueOf(c));
+        }
+        for (char c = '0'; c <= '9'; c++) {
+            list.add(String.valueOf(c));
+        }
+
+        return list;
+    }
 }

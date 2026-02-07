@@ -1,0 +1,310 @@
+package namidevelopment.kiriyaga.api.core.command;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
+import namidevelopment.kiriyaga.api.model.command.Command;
+import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.model.command.CommandSource;
+
+import namidevelopment.kiriyaga.api.util.KeyUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.Locale;
+
+import static com.mojang.brigadier.arguments.StringArgumentType.*;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+
+public class BrigadierCommandAdapter {
+
+    public static void register(CommandDispatcher<CommandSource> dispatcher, Command cmd) {
+
+        String literalName = normalize(cmd.getName());
+
+        LiteralArgumentBuilder<CommandSource> root = LiteralArgumentBuilder.literal(literalName);
+
+        for (String alias : cmd.getAliases()) {
+            if (alias == null || alias.isBlank()) continue;
+
+            dispatcher.register(
+                    LiteralArgumentBuilder.<CommandSource>literal(normalize(alias))
+                            .redirect(dispatcher.getRoot().getChild(literalName))
+            );
+        }
+
+        CommandArgument[] args = cmd.getArguments();
+
+        if (args.length == 0) {
+            root.executes(ctx -> execute(cmd, ctx));
+            dispatcher.register(root);
+            return;
+        }
+
+        var chain = buildArgumentChain(cmd, args, 0);
+
+        root.then(chain);
+        dispatcher.register(root);
+    }
+
+    private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSource, ?>
+    buildArgumentChain(Command cmd, CommandArgument[] args, int index) {
+
+        CommandArgument arg = args[index];
+        boolean isLast = index == args.length - 1;
+
+        RequiredArgumentBuilder<CommandSource, ?> builder =
+                RequiredArgumentBuilder.argument(arg.getName(), toBrigadierType(arg, isLast));
+
+        applySuggestions(builder, arg);
+
+        if (isLast) {
+            builder.executes(ctx -> execute(cmd, ctx));
+        } else {
+            builder.then(buildArgumentChain(cmd, args, index + 1));
+        }
+
+        return builder;
+    }
+
+    private static int execute(Command cmd, CommandContext<CommandSource> ctx) {
+        try {
+            CommandArgument[] expected = cmd.getArguments();
+            Object[] parsed = new Object[expected.length];
+
+            for (int i = 0; i < expected.length; i++) {
+                CommandArgument arg = expected[i];
+
+                if (!ctx.getNodes().stream().anyMatch(n -> n.getNode().getName().equals(arg.getName()))) {
+                    parsed[i] = null;
+                    continue;
+                }
+
+                parsed[i] = readArg(ctx, arg);
+            }
+
+            cmd.execute(parsed);
+            return 1;
+
+        } catch (Exception e) {
+            LOGGER.error("Error executing command: " + cmd.getName(), e);
+            return 0;
+        }
+    }
+
+    private static Object readArg(CommandContext<CommandSource> ctx, CommandArgument arg) {
+        String name = arg.getName();
+
+        if (arg instanceof CommandArgument.IntArg) {
+            return IntegerArgumentType.getInteger(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.DoubleArg) {
+            return DoubleArgumentType.getDouble(ctx, name);
+        }
+
+        // greedy / word
+        if (arg instanceof CommandArgument.StringArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.ActionArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.FeatureArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.SettingArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.KeyBindArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.ConfigNameArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.IdentifierArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.OnlinePlayerArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.FriendArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        if (arg instanceof CommandArgument.FriendNameArg) {
+            return StringArgumentType.getString(ctx, name);
+        }
+
+        return StringArgumentType.getString(ctx, name);
+    }
+
+    private static ArgumentType<?> toBrigadierType(CommandArgument arg, boolean last) {
+
+        if (arg instanceof CommandArgument.IntArg) {
+            return IntegerArgumentType.integer();
+        }
+
+        if (arg instanceof CommandArgument.DoubleArg) {
+            return DoubleArgumentType.doubleArg();
+        }
+
+        if (arg instanceof CommandArgument.StringArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.ActionArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.FeatureArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.SettingArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.KeyBindArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.ConfigNameArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.IdentifierArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.OnlinePlayerArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.FriendArg) {
+            return last ? greedyString() : word();
+        }
+
+        if (arg instanceof CommandArgument.FriendNameArg) {
+            return last ? greedyString() : word();
+        }
+
+        return last ? greedyString() : word();
+    }
+
+    private static void applySuggestions(RequiredArgumentBuilder<CommandSource, ?> builder, CommandArgument arg) {
+
+        // actions
+        if (arg instanceof CommandArgument.ActionArg actionArg) {
+            builder.suggests((ctx, sb) -> {
+                for (String v : actionArg.getAllowedValues()) {
+                    sb.suggest(v);
+                }
+                return sb.buildFuture();
+            });
+            return;
+        }
+
+        if (arg instanceof CommandArgument.FeatureArg) {
+            builder.suggests((ctx, sb) -> {
+                FEATURE_SERVICE.getStorage().getAll().forEach(f -> sb.suggest(f.getName()));
+                return sb.buildFuture();
+            });
+            return;
+        }
+
+        if (arg instanceof CommandArgument.SettingArg) {
+            builder.suggests((ctx, sb) -> {
+                String featureName = tryGetPreviousString(ctx, "feature");
+
+                if (featureName != null) {
+                    var feature = FEATURE_SERVICE.getStorage().getByName(featureName);
+                    if (feature != null) {
+                        feature.getSettings().forEach(s -> sb.suggest(s.getName()));
+                        return sb.buildFuture();
+                    }
+                }
+
+                FEATURE_SERVICE.getStorage().getAll().forEach(f ->
+                        f.getSettings().forEach(s -> sb.suggest(s.getName()))
+                );
+
+                return sb.buildFuture();
+            });
+            return;
+        }
+
+        if (arg instanceof CommandArgument.KeyBindArg) {
+            builder.suggests((ctx, sb) -> {
+                String rem = sb.getRemaining().toLowerCase();
+
+                for (String key : KeyUtils.getAllKeyNames()) {
+                    if (key.toLowerCase().startsWith(rem)) {
+                        sb.suggest(key);
+                    }
+                }
+                return sb.buildFuture();
+            });
+        }
+
+        if (arg instanceof CommandArgument.OnlinePlayerArg) {
+            builder.suggests((ctx, sb) -> {
+                if (MC.getConnection() != null) {
+                    for (var info : MC.getConnection().getOnlinePlayers()) {
+                        sb.suggest(info.getProfile().name());
+                    }
+                }
+                return sb.buildFuture();
+            });
+            return;
+        }
+
+
+        if (arg instanceof CommandArgument.IdentifierArg idArg) {
+            builder.suggests((ctx, sb) -> {
+                suggestIdentifiers(sb, idArg.getTarget());
+                return sb.buildFuture();
+            });
+            return;
+        }
+    }
+
+    private static void suggestIdentifiers(SuggestionsBuilder sb, CommandArgument.IdentifierArg.Target target) {
+        if (target == CommandArgument.IdentifierArg.Target.ANY || target == CommandArgument.IdentifierArg.Target.ITEM) {
+            BuiltInRegistries.ITEM.keySet().forEach(id -> sb.suggest(id.toString()));
+        }
+        if (target == CommandArgument.IdentifierArg.Target.ANY || target == CommandArgument.IdentifierArg.Target.BLOCK) {
+            BuiltInRegistries.BLOCK.keySet().forEach(id -> sb.suggest(id.toString()));
+        }
+        if (target == CommandArgument.IdentifierArg.Target.ANY || target == CommandArgument.IdentifierArg.Target.SOUND) {
+            BuiltInRegistries.SOUND_EVENT.keySet().forEach(id -> sb.suggest(id.toString()));
+        }
+        if (target == CommandArgument.IdentifierArg.Target.ANY || target == CommandArgument.IdentifierArg.Target.PARTICLE) {
+            BuiltInRegistries.PARTICLE_TYPE.keySet().forEach(id -> sb.suggest(id.toString()));
+        }
+    }
+
+    private static String tryGetPreviousString(CommandContext<CommandSource> ctx, String name) {
+        try {
+            return StringArgumentType.getString(ctx, name);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static String normalize(String s) {
+        return s == null ? "" : s.replaceAll("\\s+", "").toLowerCase(Locale.ROOT);
+    }
+}

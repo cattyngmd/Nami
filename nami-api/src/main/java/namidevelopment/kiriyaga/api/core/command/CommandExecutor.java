@@ -5,6 +5,7 @@ import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.ChatMessageEvent;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
+import namidevelopment.kiriyaga.api.model.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,127 +13,31 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public class CommandExecutor {
 
-    private final CommandStorage storage;
+    private final CommandSuggester suggester;
     private String prefix = "-";
 
-    public CommandExecutor(CommandStorage storage) {
-        this.storage = storage;
-    }
-
-    public void setPrefix(String prefix) {
-        if (prefix != null && !prefix.isEmpty()) {
-            this.prefix = prefix;
-            LOGGER.info("Command prefix changed to: " + prefix);
-        } else {
-            LOGGER.warn("Attempted to set empty or null prefix.");
-        }
-    }
-
-    public String getPrefix() {
-        return prefix;
+    public CommandExecutor(CommandSuggester suggester) {
+        this.suggester = suggester;
     }
 
     @SubscribeEvent
     public void onChatMessage(ChatMessageEvent event) {
         String message = event.getMessage();
-
         if (!message.startsWith(prefix)) return;
 
         event.setCancelled(true);
 
-        String[] parts = tokenize(message);
-        if (parts.length == 0) return;
-
-        String cmdName = parts[0].substring(prefix.length());
-
-        if (cmdName.isEmpty()) {
-            CHAT_SERVICE.sendPersistent(CommandExecutor.class.getName(),
-                    CAT_FORMAT.format("Please specify a command. Use {global}" + prefix + "help{gray} for a list."));
-            return;
-        }
-
-        String[] args = new String[parts.length - 1];
-        System.arraycopy(parts, 1, args, 0, args.length);
-
-        Command command = storage.getCommandByNameOrAlias(cmdName);
-        if (command == null) {
-            CHAT_SERVICE.sendPersistent(CommandExecutor.class.getName(),
-                    CAT_FORMAT.format("Unknown command: {global}" + cmdName + "{gray}. Use {global}" + prefix + "help{gray}."));
-            return;
-        }
-
-        CommandArgument[] expected = command.getArguments();
-        Object[] parsed = new Object[expected.length];
+        String input = message.substring(prefix.length()).trim();
+        if (input.isEmpty()) return;
 
         try {
-            int requiredCount = 0;
-            for (CommandArgument arg : expected) {
-                if (arg.isRequired()) requiredCount++;
-            }
-            if (args.length < requiredCount) {
-                throw new IllegalArgumentException("Missing required arguments.");
-            }
-
-            for (int i = 0; i < expected.length; i++) {
-                CommandArgument arg = expected[i];
-
-                if (i >= args.length) {
-                    if (!arg.isRequired()) {
-                        parsed[i] = null;
-                        continue;
-                    } else {
-                        throw new IllegalArgumentException("Missing argument: " + arg.getName());
-                    }
-                }
-
-                if (i == expected.length - 1 && arg instanceof CommandArgument.StringArg stringArg) {
-                    String remaining = String.join(" ", java.util.Arrays.copyOfRange(args, i, args.length));
-                    parsed[i] = stringArg.parse(remaining);
-                    break;
-                }
-
-                String input = args[i];
-                parsed[i] = arg.parse(input);
-            }
-
-            command.execute(parsed);
-
-        } catch (IllegalArgumentException e) {
-            StringBuilder argsFormatted = new StringBuilder();
-            for (CommandArgument arg : expected) {
-                argsFormatted.append("<{global}").append(arg.getName()).append("{secondary}> ");
-            }
-            String usageMessage = "Wrong input! Usage: {secondary}" + argsFormatted.toString().trim() + "{gray}.";
-            CHAT_SERVICE.sendPersistent(CommandExecutor.class.getName(), CAT_FORMAT.format(usageMessage));
-
+            suggester.getDispatcher().execute(input, new CommandSource());
         } catch (Exception e) {
-            LOGGER.error("Error executing command " + command.getName(), e);
+            CHAT_SERVICE.sendPersistent("CommandExecutor",
+                    CAT_FORMAT.format("{red}Invalid command input: " + e.getMessage()));
         }
     }
 
-    // Tokenize a command string into parts, respecting double quotes so tokens like "search list" are kept together
-    private static String[] tokenize(String input) {
-        List<String> tokens = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        boolean inQuotes = false;
-
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            if (c == '"') {
-                inQuotes = !inQuotes;
-                continue; // don't include the quote character
-            }
-            if (Character.isWhitespace(c) && !inQuotes) {
-                if (!current.isEmpty()) {
-                    tokens.add(current.toString());
-                    current.setLength(0);
-                }
-            } else {
-                current.append(c);
-            }
-        }
-        if (!current.isEmpty()) tokens.add(current.toString());
-
-        return tokens.toArray(new String[0]);
-    }
+    public String getPrefix() { return prefix; }
+    public void setPrefix(String prefix) { this.prefix = prefix; }
 }

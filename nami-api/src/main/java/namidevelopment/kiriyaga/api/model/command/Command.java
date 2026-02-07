@@ -12,9 +12,7 @@ public abstract class Command {
     }
 
     public String getName() { return name; }
-
     public String[] getAliases() { return aliases; }
-
     public CommandArgument[] getArguments() { return args; }
 
     public boolean matches(String input) {

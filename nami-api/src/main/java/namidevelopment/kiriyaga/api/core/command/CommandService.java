@@ -8,36 +8,26 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public class CommandService {
 
     private final CommandStorage storage = new CommandStorage();
-    private final CommandExecutor executor = new CommandExecutor(storage);
     private final CommandSuggester suggester = new CommandSuggester(storage);
+    private final CommandExecutor executor = new CommandExecutor(suggester);
 
     public void init() {
         CommandRegistry.registerAnnotatedCommands(storage);
-        suggester.updateDispatcher();
+        suggester.rebuild();
         EVENT_SERVICE.register(executor);
-        LOGGER.info("Registered " + storage.size() + " commands.");
     }
 
-    public CommandStorage getStorage() {
-        return storage;
+    public void addCommand(Command cmd) {
+        storage.addCommand(cmd);
+        suggester.rebuild();
     }
 
-    public CommandExecutor getExecutor() {
-        return executor;
+    public void removeCommand(Command cmd) {
+        storage.removeCommand(cmd);
+        suggester.rebuild();
     }
 
-    public CommandSuggester getSuggester() {
-        return suggester;
-    }
-
-    public void addCommand(Command command) {
-        storage.addCommand(command);
-        suggester.updateDispatcher();
-    }
-
-    public void removeCommand(Command command) {
-        storage.removeCommand(command);
-        suggester.updateDispatcher();
-    }
-
+    public CommandStorage getStorage() { return storage; }
+    public CommandExecutor getExecutor() { return executor; }
+    public CommandSuggester getSuggester() { return suggester; }
 }

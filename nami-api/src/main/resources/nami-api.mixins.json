@@ -7,7 +7,6 @@
     "DuckClientLevel",
     "DuckFont",
     "DuckMultiPlayerGameMode",
-    "MixinCommandSuggestions",
     "MixinDebugScreenOverlay",
     "MixinLocalPlayer",
     "MixinMinecraft",
