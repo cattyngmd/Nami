@@ -14,12 +14,16 @@ import static namidevelopment.kiriyaga.nami.Nami.MC;
 public abstract class MixinServerboundInteractPacket implements IPlayerInteractEntityC2SPacket {
 
     @Shadow @Final private int entityId;
+    @Shadow @Final private ServerboundInteractPacket.Action action;
+
+    @Override
+    public ServerboundInteractPacket.ActionType getType() {
+        return this.action.getType();
+    }
 
     @Override
     public Entity getEntity() {
-        if (MC.level == null)
-            return null;
-
+        if (MC.level == null) return null;
         return MC.level.getEntity(entityId);
     }
 }
