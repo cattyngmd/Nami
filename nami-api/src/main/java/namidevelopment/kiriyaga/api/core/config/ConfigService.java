@@ -129,14 +129,22 @@ public class ConfigService {
 
     public String loadPrefix() {
         File file = new File(dirProvider.getBaseDir(), "prefix.json");
-        if (!file.exists()) return null;
+
+        if (!file.exists()) {
+            savePrefix(COMMAND_SERVICE.getExecutor().getPrefix());
+            return COMMAND_SERVICE.getExecutor().getPrefix();
+        }
 
         try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-            return json.has("prefix") ? json.get("prefix").getAsString() : null;
+            String p = json.has("prefix") ? json.get("prefix").getAsString() : ".";
+
+            if (p == null || p.isBlank()) return ".";
+
+            return p;
         } catch (Exception e) {
             LOGGER.error("Failed to load prefix.json", e);
-            return null;
+            return COMMAND_SERVICE.getExecutor().getPrefix();
         }
     }
 

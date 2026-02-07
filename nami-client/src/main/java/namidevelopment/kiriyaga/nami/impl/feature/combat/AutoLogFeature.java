@@ -1,6 +1,5 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.AddEntityEvent;
@@ -88,7 +87,7 @@ public class AutoLogFeature extends Feature {
         if (!(event.getPacket() instanceof ClientboundEntityEventPacket packet))
             return;
 
-        EXECUTABLE_SERVICE.getRequestHandler().submit(() -> {
+        MC.execute(() -> {
             if (MC.player == null || MC.level == null)
                 return;
 
@@ -98,7 +97,7 @@ public class AutoLogFeature extends Feature {
 
                 logOut("AutoLog: totem got popped.");
             }
-        }, 0, ExecutableThreadType.PRE_TICK);
+        });
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

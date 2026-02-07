@@ -8,7 +8,7 @@ import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import net.minecraft.client.CameraType;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class NoWeatherFeature extends Feature {

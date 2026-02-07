@@ -39,5 +39,11 @@ public class CommandExecutor {
     }
 
     public String getPrefix() { return prefix; }
-    public void setPrefix(String prefix) { this.prefix = prefix; }
+    public void setPrefix(String prefix) {
+        if (prefix == null || prefix.isBlank()) {
+            this.prefix = "-";
+        } else {
+            this.prefix = prefix;
+        }
+    }
 }

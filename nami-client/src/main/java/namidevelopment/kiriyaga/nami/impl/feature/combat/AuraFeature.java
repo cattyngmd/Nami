@@ -1,6 +1,5 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
@@ -269,7 +268,7 @@ public class AuraFeature extends Feature {
         if (!(ev.getPacket() instanceof ServerboundSetCarriedItemPacket)) return;
         if (MC.player == null || MC.level == null) return;
 
-        EXECUTABLE_SERVICE.getRequestHandler().submit(() -> {
+        MC.execute(() -> {
             ItemStack stack = MC.player.getMainHandItem();
             if (stack == null || stack.isEmpty()) return;
 
@@ -281,7 +280,7 @@ public class AuraFeature extends Feature {
             }
 
             attackCooldownTicks = getBaseCooldownTicks(stack, tps);
-        }, 0, ExecutableThreadType.PRE_TICK);
+        });
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -12,7 +12,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.visuals;
     import net.minecraft.world.effect.MobEffectInstance;
     import net.minecraft.world.effect.MobEffects;
 
-    import static namidevelopment.kiriyaga.nami.Nami.MC;
+    import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
     @RegisterFeature
     public class FullbrightFeature extends Feature {

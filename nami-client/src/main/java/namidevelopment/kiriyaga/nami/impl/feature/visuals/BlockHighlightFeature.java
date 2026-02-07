@@ -11,7 +11,7 @@ import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @RegisterFeature

@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.util.RotationUtils.getClosestPointToEye;
 
 @RegisterFeature

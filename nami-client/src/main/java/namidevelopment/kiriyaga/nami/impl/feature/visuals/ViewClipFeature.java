@@ -10,7 +10,7 @@ import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import net.minecraft.client.CameraType;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class ViewClipFeature extends Feature {

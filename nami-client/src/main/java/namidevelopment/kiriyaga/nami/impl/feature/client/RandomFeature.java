@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static namidevelopment.kiriyaga.api.NamiApi.API_LOGGER;
+import static namidevelopment.kiriyaga.api.NamiApi.LOGGER;
 import static namidevelopment.kiriyaga.api.NamiApi.CONFIG_SERVICE;
 
 @RegisterFeature
@@ -107,7 +107,7 @@ public class RandomFeature extends Feature {
             writeJsonLine(file, json);
 
         } catch (Exception e) {
-            API_LOGGER.error("Failed to log packet " + packet.getClass().getName(), e);
+            LOGGER.error("Failed to log packet " + packet.getClass().getName(), e);
         }
     }
 
@@ -116,7 +116,7 @@ public class RandomFeature extends Feature {
             writer.write(gson.toJson(json));
             writer.write("\n");
         } catch (Exception e) {
-            API_LOGGER.error("Failed to write packet log file: " + file.getName(), e);
+            LOGGER.error("Failed to write packet log file: " + file.getName(), e);
         }
     }
 

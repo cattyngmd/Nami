@@ -30,7 +30,7 @@ public class HudFeature extends Feature {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender2D(Render2DEvent event) {
-        boolean chatOpen = API_MC.screen instanceof ChatScreen;
+        boolean chatOpen = MC.screen instanceof ChatScreen;
         ChatAnimationHelper.setChatOpen(chatOpen);
         ChatAnimationHelper.tick();
 
@@ -39,19 +39,19 @@ public class HudFeature extends Feature {
             if (offset > 0) {
                 event.getDrawContext().fill(
                         2,
-                        API_MC.getWindow().getGuiScaledHeight() - offset,
-                        API_MC.getWindow().getGuiScaledWidth() - 2,
-                        API_MC.getWindow().getGuiScaledHeight() - 2,
-                        API_MC.options.getBackgroundColor(Integer.MIN_VALUE)
+                        MC.getWindow().getGuiScaledHeight() - offset,
+                        MC.getWindow().getGuiScaledWidth() - 2,
+                        MC.getWindow().getGuiScaledHeight() - 2,
+                        MC.options.getBackgroundColor(Integer.MIN_VALUE)
                 );
             }
         }
 
-        int screenHeight = API_MC.getWindow().getGuiScaledHeight();
+        int screenHeight = MC.getWindow().getGuiScaledHeight();
         int chatZoneTop = screenHeight - (screenHeight / 8);
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
 
-        if (API_MC.level == null || API_MC.getDebugOverlay().showDebugScreen() || API_MC.options.hideGui)
+        if (MC.level == null || MC.getDebugOverlay().showDebugScreen() || MC.options.hideGui)
             return;
 
         for (Feature Feature : FEATURE_SERVICE.getStorage().getAll()) {
@@ -62,7 +62,7 @@ public class HudFeature extends Feature {
                     int drawX = hudElement.getRenderXForElement(element);
                     int drawY = baseY + element.offsetY();
 
-                    boolean isInChatZone = (drawY + API_MC.font.lineHeight) >= chatZoneTop;
+                    boolean isInChatZone = (drawY + MC.font.lineHeight) >= chatZoneTop;
                     if (isInChatZone) {
                         drawY -= chatAnimationOffset;
                     }

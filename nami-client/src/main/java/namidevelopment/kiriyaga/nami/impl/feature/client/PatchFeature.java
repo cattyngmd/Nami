@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.world.item.ItemStack;
 
-import static namidevelopment.kiriyaga.api.NamiApi.API_MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.NamiApi.CHAT_SERVICE;
 
 
@@ -48,9 +48,9 @@ public class PatchFeature extends Feature {
         Packet<?> p = event.getPacket();
 
         if (silentSwapFix.get() && p instanceof ClientboundContainerSetSlotPacket packet) {
-            if (API_MC.player != null) {
+            if (MC.player != null) {
                 if (setSlotDebug.get()) {
-                API_MC.execute(() -> {
+                MC.execute(() -> {
                     CHAT_SERVICE.sendPersistent("ContainerID: ", "ContainerID: " +packet.getContainerId()+"");
                     CHAT_SERVICE.sendPersistent("StateID: ", "StateID: " +packet.getStateId()+"");
                     CHAT_SERVICE.sendPersistent("Item: ", "Item: " +packet.getItem()+"");
@@ -65,13 +65,13 @@ public class PatchFeature extends Feature {
 
                     if (slot >= 36 && slot <= 44) { // onlu hotbar
                         ItemStack packetStack = packet.getItem();
-                        ItemStack handStack = API_MC.player.getMainHandItem();
+                        ItemStack handStack = MC.player.getMainHandItem();
 
                         if (!packetStack.isEmpty() && !handStack.isEmpty()) {
                             if (ItemStack.isSameItem(packetStack, handStack) && packetStack.getCount() == handStack.getCount()) {
                                 if (setSlotDebug.get()) {
 
-                                    API_MC.execute(() -> {
+                                    MC.execute(() -> {
                                         CHAT_SERVICE.sendPersistent("1", "canceled yo");
                                     });
                                 }

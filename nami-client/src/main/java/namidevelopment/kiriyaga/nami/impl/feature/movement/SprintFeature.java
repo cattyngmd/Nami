@@ -9,7 +9,7 @@ import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import net.minecraft.client.player.LocalPlayer;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 // some crazy shit happened here
 @RegisterFeature
 public class SprintFeature extends Feature {

@@ -1,6 +1,5 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
@@ -81,7 +80,7 @@ public class AutoTotemFeature extends Feature {
 
         if (event.getPacket() instanceof ClientboundEntityEventPacket packet) {
             if (packet.getEntity(MC.level) == MC.player && packet.getEventId() == 3 && deathLog.get()) {
-                EXECUTABLE_SERVICE.getRequestHandler().submit(this::logDeathData, 20, ExecutableThreadType.PRE_TICK);
+                MC.execute(this::logDeathData);
             }
         }
     }

@@ -11,7 +11,7 @@ import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.phys.Vec3;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class FastAccelFeature extends Feature {

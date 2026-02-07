@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.util.HashMap;
 import java.util.Map;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 public class SettingPanel {
     public static final int INNER_PADDING = 1;

@@ -15,7 +15,7 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class SkinBlinkFeature extends Feature {

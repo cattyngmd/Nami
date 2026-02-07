@@ -31,7 +31,6 @@ public class HelpCommand extends Command {
 
         // TODO: when addon impl, rewrite theese to dynamic
         String displayText = cmds.stream()
-                .filter(c -> !(c instanceof FeatureCommand))
                 .filter(c -> c.getName() != null)
                 .map(this::getDisplay)
                 .collect(Collectors.joining(", "));

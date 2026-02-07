@@ -1,6 +1,5 @@
 package namidevelopment.kiriyaga.nami.impl.feature.world;
 
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.StartBreakingBlockEvent;
@@ -38,7 +37,7 @@ public class AutoToolFeature extends Feature {
             return;
         }
 
-        EXECUTABLE_SERVICE.getRequestHandler().submit(() -> { // we are not on main thread!
+        MC.execute(() -> { // we are not on main thread!
             BlockPos targetPos = event.blockPos;
             BlockState targetState = MC.level.getBlockState(targetPos);
 
@@ -94,6 +93,6 @@ public class AutoToolFeature extends Feature {
 
             if (bestSlot != -1)
                 InventoryUtils.attemptSwitch(bestSlot);
-        }, 0, ExecutableThreadType.PRE_TICK);
+        });
     }
 }

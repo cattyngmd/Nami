@@ -1,6 +1,5 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.util.container.ContainerUtils;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;
@@ -8,7 +7,6 @@ import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.ItemStack;
 
-import static namidevelopment.kiriyaga.api.NamiApi.EXECUTABLE_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 
@@ -25,7 +23,7 @@ public class PeekCommand extends Command {
 
     @Override
     public void execute(Object[] parsedArgs) {
-        EXECUTABLE_SERVICE.getRequestHandler().submit(() -> {
+        MC.execute(() -> {
             ItemStack main = MC.player.getMainHandItem();
             ItemStack off = MC.player.getOffhandItem();
 
@@ -34,6 +32,6 @@ public class PeekCommand extends Command {
             if (MC.crosshairPickEntity instanceof ItemFrame entity) {
                 ContainerUtils.openContainer(entity.getItem());
             }
-        }, 5, ExecutableThreadType.PRE_TICK);
+        });
     }
 }

@@ -1,8 +1,6 @@
 package namidevelopment.kiriyaga.nami;
 
-import namidevelopment.kiriyaga.api.NamiApi;
 import namidevelopment.kiriyaga.nami.contract.ClientFeatureContracts;
-import namidevelopment.kiriyaga.nami.impl.command.FeatureCommand;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.NavigatePanelComponent;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.ConfigScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.screen.ClickGuiScreen;
@@ -12,17 +10,13 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.multiplayer.ServerData;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import net.minecraft.util.Tuple;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 
 public class Nami implements ClientModInitializer {
-    public static String NAME = "Nami";
     public static String DISPLAY_NAME = "Nami";
     public static long START_TIME = 0;
     public static final String VERSION;
@@ -35,10 +29,6 @@ public class Nami implements ClientModInitializer {
             VERSION = "dev-environment";
         }
     }
-
-    public static final Minecraft MC = Minecraft.getInstance();
-
-    public static final Logger LOGGER = LogManager.getLogger(NAME);
 
     public static Tuple<ServerAddress, ServerData> LAST_CONNECTION = null;
 
@@ -54,8 +44,6 @@ public class Nami implements ClientModInitializer {
     public void onInitializeClient() {
         FEATURE_SERVICE.init();
         COMMAND_SERVICE.init();
-
-        FeatureCommand.registerFeatureCommands(COMMAND_SERVICE.getStorage());
 
         ClientFeatureContracts.register(FEATURE_SERVICE.getStorage());
 

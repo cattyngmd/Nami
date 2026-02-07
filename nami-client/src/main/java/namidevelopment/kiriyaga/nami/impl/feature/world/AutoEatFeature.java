@@ -20,7 +20,7 @@ import net.minecraft.world.InteractionHand;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class AutoEatFeature extends Feature {

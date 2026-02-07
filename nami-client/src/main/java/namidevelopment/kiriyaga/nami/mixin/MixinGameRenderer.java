@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 import static namidevelopment.kiriyaga.api.util.render.RenderUtil.MODEL_VIEW_MATRIX;
 import static namidevelopment.kiriyaga.api.util.render.RenderUtil.PROJECTION_MATRIX;

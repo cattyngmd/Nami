@@ -1,6 +1,5 @@
 package namidevelopment.kiriyaga.nami.impl.command;
 
-import namidevelopment.kiriyaga.api.core.executable.model.ExecutableThreadType;
 import namidevelopment.kiriyaga.api.model.command.Command;
 import namidevelopment.kiriyaga.api.annotation.RegisterCommand;
 import namidevelopment.kiriyaga.api.model.command.CommandArgument;

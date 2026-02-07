@@ -27,7 +27,7 @@ import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket;
 import org.lwjgl.glfw.GLFW;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 
 @RegisterFeature

@@ -10,7 +10,7 @@ import namidevelopment.kiriyaga.nami.mixin.DuckKeyMapping;
 import net.minecraft.client.KeyMapping;
 import com.mojang.blaze3d.platform.InputConstants;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class ParkourFeature extends Feature {

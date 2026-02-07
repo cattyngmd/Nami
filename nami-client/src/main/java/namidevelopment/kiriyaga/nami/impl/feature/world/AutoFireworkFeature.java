@@ -15,7 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.InteractionHand;
 
 import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class AutoFireworkFeature extends Feature {

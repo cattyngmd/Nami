@@ -23,7 +23,7 @@ import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 
 import java.util.Map;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.util.InteractionUtils.isBed;
 
 @RegisterFeature

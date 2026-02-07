@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.Color;
 import java.util.*;
 
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 import static namidevelopment.kiriyaga.api.util.render.RenderUtil.drawLine;
 

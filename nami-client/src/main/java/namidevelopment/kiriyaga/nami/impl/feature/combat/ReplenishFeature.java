@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
-import static namidevelopment.kiriyaga.nami.Nami.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
 public class ReplenishFeature extends Feature {
