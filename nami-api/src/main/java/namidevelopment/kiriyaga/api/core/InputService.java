@@ -33,6 +33,9 @@ public class InputService {
     private boolean savedForward, savedBack, savedLeft, savedRight;
     private boolean savedJump, savedSneak, savedSprint;
 
+    private double lastX, lastY, lastZ;
+    private boolean hasLastPos = false;
+
     public void init() {
         EVENT_SERVICE.register(this);
     }
@@ -63,9 +66,36 @@ public class InputService {
             this.jumping = input.jump();
             this.sneaking = input.shift();
             this.sprinting = input.sprint();
-        } else if (event.getPacket() instanceof ServerboundMoveVehiclePacket) {
-            // TODO: finish this
-        } else if (event.getPacket() instanceof ServerboundMovePlayerPacket) {
+        } else if (event.getPacket() instanceof ServerboundMovePlayerPacket packet1_20) { // todo: VFP check here
+            double x = packet1_20.getX(API_MC.player.getX());
+            double y = packet1_20.getY(API_MC.player.getY());
+            double z = packet1_20.getZ(API_MC.player.getZ());
+
+            if (!hasLastPos) {
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+                hasLastPos = true;
+                return;
+            }
+
+            double dx = x - lastX;
+            double dz = z - lastZ;
+            double dy = y - lastY;
+
+            boolean movedXZ = (dx * dx + dz * dz) > 1.0E-7;
+            boolean movedY = Math.abs(dy) > 1.0E-7;
+
+            boolean moved = movedXZ;
+
+            this.forward = moved;
+            this.backward = false;
+            this.left = false;
+            this.right = false;
+
+            lastX = x;
+            lastY = y;
+            lastZ = z;
         }
     }
 
