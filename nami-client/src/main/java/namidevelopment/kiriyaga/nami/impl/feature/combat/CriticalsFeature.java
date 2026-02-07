@@ -3,6 +3,7 @@ package namidevelopment.kiriyaga.nami.impl.feature.combat;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketSendEvent;
+import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
@@ -18,6 +19,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static namidevelopment.kiriyaga.api.NamiApi.INPUT_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.ROTATION_SERVICE;
@@ -26,6 +30,8 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopme
 
 @RegisterFeature
 public class CriticalsFeature extends Feature {
+
+    private Vec3 lastPos = null;
 
     public enum Mode { PACKET, GRIM}
 
@@ -39,8 +45,24 @@ public class CriticalsFeature extends Feature {
         onlyStandingStill.setShowCondition(() -> mode.get() == Mode.GRIM);
     }
 
+    AtomicBoolean b = new AtomicBoolean();
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onPreTick(PreTickEvent event) {
+        if (MC.player == null)
+            return;
+
+        if (lastPos == null)
+            lastPos = MC.player.position();
+
+        if (lastPos == MC.player.position())
+            b.set(true);
+        else
+            b.set(false);
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void PacketSendEvent(PacketSendEvent event) {
+    public void onPacketSend(PacketSendEvent event) {
         if (!(event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet))
             return;
         if (packet.getType() != ServerboundInteractPacket.ActionType.ATTACK)
@@ -97,7 +119,7 @@ public class CriticalsFeature extends Feature {
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
 
-        if (onlyStandingStill.get() && INPUT_SERVICE.hasAnyInput())
+        if (onlyStandingStill.get() && !b.get())
             return;
 
         float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
