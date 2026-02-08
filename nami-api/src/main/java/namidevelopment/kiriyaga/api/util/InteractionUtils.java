@@ -457,6 +457,9 @@ public class InteractionUtils {
 
         boolean isOffhand = MC.player.getOffhandItem().is(item);
 
+        if (grim)
+            isOffhand = false;
+
         int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
@@ -472,7 +475,7 @@ public class InteractionUtils {
             return false;
         }
 
-        boolean canPlace = false;
+        boolean canPlace = true;
         if (rotate) {
             float yaw = (float) getYawToVec(MC.player, center);
             float pitch = (float) getPitchToVec(MC.player, center);
@@ -498,7 +501,10 @@ public class InteractionUtils {
                 if (grim) {
                     MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
 
-                    MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
+                    if (simulate)
+                        MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
+                    else
+                        sendSequencedPacket(id -> new ServerboundUseItemOnPacket(InteractionHand.OFF_HAND, hitResult, id));
 
                     if (swing)
                         MC.player.swing(InteractionHand.MAIN_HAND, false);
@@ -524,20 +530,6 @@ public class InteractionUtils {
                     InventoryUtils.attemptSwitch(prev);
 
             } else {
-                if (grim) {
-                    MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
-
-                    MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
-
-                    if (swing)
-                        MC.player.swing(InteractionHand.MAIN_HAND, false);
-
-                    MC.getConnection().send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
-
-                    MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
-
-                    result = true;
-                } else {
                     if (simulate)
                         MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
                     else
@@ -547,7 +539,6 @@ public class InteractionUtils {
                         MC.player.swing(InteractionHand.OFF_HAND);
 
                     result = true;
-                }
             }
         }
         return result;
