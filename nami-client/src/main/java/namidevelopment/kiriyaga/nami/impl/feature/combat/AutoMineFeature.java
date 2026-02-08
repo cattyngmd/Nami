@@ -34,6 +34,9 @@ public class AutoMineFeature extends Feature {
 
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Logic", Mode.GRIM));
     public final BoolSetting face = addSetting(new BoolSetting("Face", true));
+    public final BoolSetting antiCrawl = addSetting(new BoolSetting("AntiCrawl", false));
+    public final BoolSetting always = addSetting(new BoolSetting("Always", true));
+    public final BoolSetting matchTargetY = addSetting(new BoolSetting("MatchTargetY", true));
 
     public AutoMineFeature() {
         super("AutoMine", "Manages which blocks shoulf SpeedMine Feature mine.", FeatureCategory.of("Combat"));
@@ -82,12 +85,65 @@ public class AutoMineFeature extends Feature {
     }
 
     private final List<PriorityTask> priority = List.of(
+            this::antiCrawlTask,
             this::standsShouldMinePhase,
             this::crouchingShouldMinePhase,
             this::surroundFeet,
             this::surroundFace
 
     );
+
+    private List<BlockPos> antiCrawlTask(Entity target) {
+        if (target == null) return Collections.emptyList();
+        if (!antiCrawl.get()) return Collections.emptyList();
+
+        if (MC.player == null) return Collections.emptyList();
+
+        boolean crawling = MC.player.isVisuallyCrawling();
+
+        if (!always.get() && !crawling) return Collections.emptyList();
+
+        BlockPos feet = MC.player.blockPosition();
+        BlockPos up = feet.above();
+        BlockPos down = feet.below();
+        BlockPos down2 = feet.below(2);
+
+        List<BlockPos> blocks = new ArrayList<>();
+
+        if (!matchTargetY.get()) {
+            if (!MC.level.getBlockState(up).isAir())
+                blocks.add(up);
+            return blocks;
+        }
+
+        double playerY = MC.player.getY();
+        double targetY = target.getY();
+
+        if (playerY <= targetY) {
+            if (!MC.level.getBlockState(up).isAir()) {
+                blocks.add(up);
+            } else {}
+
+            if (!blocks.isEmpty() && !canBreak(blocks.get(0))) {
+                blocks.clear();
+                if (!MC.level.getBlockState(down).isAir() && canBreak(down))
+                    blocks.add(down);
+                if (!MC.level.getBlockState(down2).isAir() && canBreak(down2))
+                    blocks.add(down2);
+            }
+
+            return blocks;
+        }
+
+        if (!MC.level.getBlockState(down).isAir() && canBreak(down))
+            blocks.add(down);
+
+        if (!MC.level.getBlockState(down2).isAir() && canBreak(down2))
+            blocks.add(down2);
+
+        return blocks;
+    }
+
 
     private List<BlockPos> standsShouldMinePhase(Entity target) {
         if (target.isCrouching() || !isPhased(target)) return Collections.emptyList();
@@ -243,5 +299,14 @@ public class AutoMineFeature extends Feature {
         }
 
         return false;
+    }
+
+    private boolean canBreak(BlockPos pos) {
+        BlockState state = MC.level.getBlockState(pos);
+
+        if (state.isAir()) return false;
+        if (state.getDestroySpeed(MC.level, pos) < 0) return false;
+
+        return true;
     }
 }

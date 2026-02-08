@@ -25,11 +25,11 @@ public class AnnouncerFeature extends Feature {
     }
 
     public final BoolSetting joinAnnounce = addSetting(new BoolSetting("JoinAnnounce", false));
-    public final BoolSetting joinEveryone = addSetting(new BoolSetting("JoinEveryone", false));
-    public final BoolSetting joinFriends = addSetting(new BoolSetting("JoinFriends", true));
+    public final BoolSetting joinEveryone = addSetting(new BoolSetting("Others", false));
+    public final BoolSetting joinFriends = addSetting(new BoolSetting("Friends", true));
     public final BoolSetting visualRange = addSetting(new BoolSetting("VisualRange", false));
-    public final BoolSetting rangeEveryone = addSetting(new BoolSetting("RangeEveryone", false));
-    public final BoolSetting rangeFriends = addSetting(new BoolSetting("RangeFriends", true));
+    public final BoolSetting rangeEveryone = addSetting(new BoolSetting("Others", false));
+    public final BoolSetting rangeFriends = addSetting(new BoolSetting("Friends", true));
 
     public final EnumSetting<VisualRangeMode> soundMode =
             addSetting(new EnumSetting<>("Sound", VisualRangeMode.NONE));
