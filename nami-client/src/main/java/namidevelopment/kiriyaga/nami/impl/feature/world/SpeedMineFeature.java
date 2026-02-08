@@ -61,6 +61,7 @@ public class SpeedMineFeature extends Feature {
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting async = addSetting(new BoolSetting("Async", true));
     public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
+    public final BoolSetting allowOffhand = addSetting(new BoolSetting("AllowOffhand", false));
     public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
     public final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
@@ -75,6 +76,7 @@ public class SpeedMineFeature extends Feature {
         super("SpeedMine", "Increases speed of mining.", FeatureCategory.of("World"));
         echestPriority.setShowCondition(()-> swap.get() != Swap.NONE);
         damageThreshold.setShowCondition(()-> swap.get() != Swap.NONE);
+        allowOffhand.setShowCondition(multitask::get);
     }
 
     @Override
@@ -304,7 +306,11 @@ public class SpeedMineFeature extends Feature {
 
     private void finishMining(BlockBreakingTask task) {
         if (!task.isStarted() || task.getBlockState().isAir() && !async.get()) return;
-        if (!multitask.get() && MC.player.isUsingItem())return;
+        if (!multitask.get() && MC.player.isUsingItem()) {
+            if (!(allowOffhand.get() && MC.player.getUsedItemHand() == InteractionHand.OFF_HAND)) { // yo somehow on some paper servers we can do it
+                return;
+            }
+        }
 
         if (currentTask.lastBrokenCount == currentTask.brokenCount && !async.get())
             return;
