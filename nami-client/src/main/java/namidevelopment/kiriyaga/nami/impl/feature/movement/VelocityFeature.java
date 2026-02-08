@@ -31,7 +31,6 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isPhased;
 
@@ -43,19 +42,21 @@ public class VelocityFeature extends Feature {
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.WALLS));
     public final DoubleSetting horizontalPercent = addSetting(new DoubleSetting("Horizontal", 0.00, 0.00, 100.00));
     public final DoubleSetting verticalPercent = addSetting(new DoubleSetting("Vertical", 0.00, 0.00, 100.00));
-    public final BoolSetting handleKnockback = addSetting(new BoolSetting("Knockback", true));
-    public final BoolSetting handleExplosions = addSetting(new BoolSetting("Explosion", true));
     public final BoolSetting concealMotion = addSetting(new BoolSetting("Conceal", false));
-    public final BoolSetting requireGround = addSetting(new BoolSetting("GroundOnly", false));
-    public final BoolSetting cancelEntityPush = addSetting(new BoolSetting("EntityPush", true));
-    public final BoolSetting cancelBlockPush = addSetting(new BoolSetting("BlockPush", true));
-    public final BoolSetting cancelLiquidPush = addSetting(new BoolSetting("LiquidPush", true));
-    public final BoolSetting cancelFishHook = addSetting(new BoolSetting("RodPush", false));
+    public final BoolSetting cancel = addSetting(new BoolSetting("Cancel", false));
+    public final BoolSetting onlyOnGround = addSetting(new BoolSetting("OnlyOnGround", false));
+    public final BoolSetting entityPush = addSetting(new BoolSetting("Entity", true));
+    public final BoolSetting blockPush = addSetting(new BoolSetting("Block", true));
+    public final BoolSetting liquidPush = addSetting(new BoolSetting("Liquid", true));
+    public final BoolSetting fishingRod = addSetting(new BoolSetting("FishingRod", false));
 
     private boolean pendingConcealment = false;
     private boolean pendingVelocity = false;
 
-    public VelocityFeature() {super("Velocity", "Reduces incoming velocity effects.", FeatureCategory.of("Movement"), "antiknockback");}
+    public VelocityFeature() {super("Velocity", "Reduces incoming velocity effects.", FeatureCategory.of("Movement"), "antiknockback");
+        horizontalPercent.setShowCondition(()-> !cancel.get());
+        verticalPercent.setShowCondition(()-> !cancel.get());
+    }
 
     @Override
     public void onEnable() {
@@ -92,36 +93,36 @@ public class VelocityFeature extends Feature {
             pendingConcealment = true;
         }
 
-        if (packet instanceof ClientboundSetEntityMotionPacket vel && handleKnockback.get()) {
+        if (packet instanceof ClientboundSetEntityMotionPacket vel) {
             handleVelocityPacket(event, vel);
-        } else if (packet instanceof ClientboundExplodePacket explosion && handleExplosions.get()) {
+        } else if (packet instanceof ClientboundExplodePacket explosion) {
             handleExplosionPacket(event, explosion);
         } else if (packet instanceof ClientboundBundlePacket bundle) {
             handleBundlePacket(event, bundle);
         } else if (packet instanceof ClientboundEntityEventPacket status
                 && status.getEventId() == EntityEvent.FISHING_ROD_REEL_IN
-                && cancelFishHook.get()) {
+                && fishingRod.get()) {
             handleFishHookPacket(event, status);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onEntityPush(EntityPushEvent event) {
-        if (cancelEntityPush.get() && event.getTarget().equals(MC.player)) {
+        if (entityPush.get() && event.getTarget().equals(MC.player)) {
             event.cancel();
         }
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onBlockPush(BlockPushEvent event) {
-        if (cancelBlockPush.get()) {
+        if (blockPush.get()) {
             event.cancel();
         }
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onFluidPush(LiquidPushEvent event) {
-        if (cancelLiquidPush.get()) {
+        if (liquidPush.get()) {
             event.cancel();
         }
     }
@@ -153,9 +154,9 @@ public class VelocityFeature extends Feature {
         List<Packet<?>> filtered = new ArrayList<>();
 
         for (Packet<?> packet : bundle.subPackets()) {
-            if (packet instanceof ClientboundExplodePacket exp && handleExplosions.get()) {
-                processBundleExplosion(filtered, exp);
-            } else if (packet instanceof ClientboundSetEntityMotionPacket vel && handleKnockback.get()) {
+            if (packet instanceof ClientboundExplodePacket exp) {
+                processBundleExplosion(filtered, exp, event);
+            } else if (packet instanceof ClientboundSetEntityMotionPacket vel) {
                 processBundleVelocity(filtered, vel, event);
             } else {
                 filtered.add(packet);
@@ -173,11 +174,22 @@ public class VelocityFeature extends Feature {
     }
 
     private void processVelocityVanilla(PacketReceiveEvent event, ClientboundSetEntityMotionPacket packet) {
-            scaleVelocityPacket(packet);
+        if(cancel.get()) {
+            event.cancel();
+            return;
+        }
+
+        scaleVelocityPacket(packet);
     }
 
     private void processVelocityWalls(PacketReceiveEvent event, ClientboundSetEntityMotionPacket packet) {
-        if (!isPhased(MC.player) || (requireGround.get() && !MC.player.onGround())) return;
+        if (!isPhased(MC.player) || (onlyOnGround.get() && !MC.player.onGround())) return;
+
+        if(cancel.get()) {
+            event.cancel();
+            return;
+        }
+
         processVelocityVanilla(event, packet);
     }
 
@@ -188,11 +200,22 @@ public class VelocityFeature extends Feature {
     }
 
     private void processExplosionVanilla(PacketReceiveEvent event, ClientboundExplodePacket packet) {
-            scaleExplosionPacket(packet);
+        if(cancel.get()) {
+            event.cancel();
+            return;
+        }
+
+        scaleExplosionPacket(packet);
     }
 
     private void processExplosionWalls(PacketReceiveEvent event, ClientboundExplodePacket packet) {
         if (!isPhased(MC.player)) return;
+
+        if(cancel.get()) {
+            event.cancel();
+            return;
+        }
+
         processExplosionVanilla(event, packet);
     }
 
@@ -202,14 +225,25 @@ public class VelocityFeature extends Feature {
         pendingVelocity = true;
     }
 
-    private void processBundleExplosion(List<Packet<?>> filtered, ClientboundExplodePacket packet) {
+    private void processBundleExplosion(List<Packet<?>> filtered, ClientboundExplodePacket packet, PacketReceiveEvent event) {
         switch (mode.get()) {
             case VANILLA -> {
+                if(cancel.get()) {
+                    event.cancel();
+                    return;
+                }
+
                  scaleExplosionPacket(packet);
             }
             case WALLS -> {
                 if (!isPhased(MC.player)) {
+
                     filtered.add(packet);
+                    return;
+                }
+
+                if(cancel.get()) {
+                    event.cancel();
                     return;
                 }
 
@@ -232,13 +266,24 @@ public class VelocityFeature extends Feature {
 
         switch (mode.get()) {
             case VANILLA -> {
+                if(cancel.get()) {
+                    event.cancel();
+                    return;
+                }
+
                 scaleVelocityPacket(packet);
             }
             case WALLS -> {
-                if (!isPhased(MC.player) || (requireGround.get() && !MC.player.onGround())) {
+                if (!isPhased(MC.player) || (onlyOnGround.get() && !MC.player.onGround())) {
                     filtered.add(packet);
                     return;
                 }
+
+                if(cancel.get()) {
+                    event.cancel();
+                    return;
+                }
+
                 scaleVelocityPacket(packet);
             }
             case GRIM -> {
