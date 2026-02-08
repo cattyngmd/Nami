@@ -1,146 +1,69 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat;
 
+import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
-import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
-import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
-import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
-import namidevelopment.kiriyaga.api.model.setting.IntSetting;
-import namidevelopment.kiriyaga.api.util.InteractionUtils;
 import namidevelopment.kiriyaga.api.util.entity.TargetUtils;
-import namidevelopment.kiriyaga.api.util.render.RenderUtil;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.AABB;
+import namidevelopment.kiriyaga.nami.impl.feature.combat.component.TrapComponent;
 
-import java.awt.*;
-import java.util.ArrayList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+
 import java.util.List;
 
-import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
-import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.BlockUtils.getSurround;
-import static namidevelopment.kiriyaga.api.util.InteractionUtils.isPlaceable;
-import static namidevelopment.kiriyaga.api.util.InteractionUtils.isReplaceable;
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
+import static namidevelopment.kiriyaga.api.util.BlockUtils.getSurround;
 
 @RegisterFeature
 public class AutoTrapFeature extends Feature {
 
-    public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.50, 1.0, 6.0));
     public final BoolSetting face = addSetting(new BoolSetting("Face", true));
-    public final IntSetting delay = addSetting(new IntSetting("Delay", 0, 0, 5));
-    public final IntSetting shiftTicks = addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
-    public final BoolSetting rotate = addSetting(new BoolSetting("Rotate", true));
-    public final BoolSetting strictDirection = addSetting(new BoolSetting("StrictDirection", true));
-    public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", false));
-    public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
-    public final BoolSetting swapBack = addSetting(new BoolSetting("SwapBack", true));
-    public final BoolSetting multiTask = addSetting(new BoolSetting("MultiTask", false));
-    public final BoolSetting render = addSetting(new BoolSetting("Render", true));
     public final BoolSetting selfToggle = addSetting(new BoolSetting("SelfToggle", false));
 
-    private int cooldown = 0;
-    private List<BlockPos> surroundPositions = new ArrayList<>();
+    private final TrapComponent trap;
 
     public AutoTrapFeature() {
         super("AutoTrap", "Traps your target to prevent their movement.", FeatureCategory.of("Combat"), "autotrap");
+        this.trap = new TrapComponent(this);
     }
 
     @Override
     public void onDisable() {
-        cooldown = 0;
-        surroundPositions.clear();
+        trap.onDisable();
     }
 
     @SubscribeEvent
     public void onTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
+
         this.clearDisplayInfo();
 
         Entity target = TargetUtils.getTarget();
-        if (target == null) {
-            surroundPositions.clear();
+        if (!(target instanceof Player player)) {
+            trap.getTargetPositions().clear();
             return;
         }
-
-        this.addDisplayInfo(surroundPositions.size()+"");
-        if (cooldown > 0) {
-            cooldown--;
-            return;
-        }
-
-        int blocksPlaced = 0;
-        surroundPositions = getSurround((Player) target, face.get() ? 1 : 0, false);
-
-        if (surroundPositions.isEmpty() && selfToggle.get()) {
+        List<BlockPos> targets = getTrapTargets(player);
+        this.addDisplayInfo(targets.size() + "");
+        if (targets.isEmpty() && selfToggle.get()) {
             this.toggle();
             return;
         }
 
-        for (BlockPos pos : surroundPositions) {
-            if (MC.level.getBlockState(pos).canBeReplaced()) {
-                BlockPos foundation = pos.below();
-                if (MC.level.getBlockState(foundation).canBeReplaced()) {
-                    if (InteractionUtils.placeBlock(foundation, getSlot(), swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
-                        blocksPlaced++;
-                        if (blocksPlaced >= shiftTicks.get()) break;
-                    }
-                }
-
-                if (InteractionUtils.placeBlock(pos, getSlot(),swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), this.name, multiTask.get())) {
-                    blocksPlaced++;
-                    if (blocksPlaced >= shiftTicks.get()) break;
-                }
-            }
-        }
-
-        if (blocksPlaced > 0) {
-            cooldown = delay.get();
-        }
+        trap.onTick(event, this, targets);
     }
 
     @SubscribeEvent
     public void onRender(Render3DEvent event) {
-        if (MC.player == null || MC.level == null || surroundPositions.isEmpty() || !render.get()) return;
-
-        ColorFeature colorFeature = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class);
-        Color color = colorFeature.getStyledGlobalColor();
-
-        for (BlockPos pos : surroundPositions) {
-            AABB box = new AABB(pos);
-            RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
-        }
+        trap.onRender(event);
     }
 
-    private Item getSlot() {
-        if (MC.player == null) return null;
-
-        if (MC.player.getOffhandItem().getItem() instanceof BlockItem b){
-            if (b.getBlock().getExplosionResistance() >= 600.00f)
-                return MC.player.getOffhandItem().getItem();
-        }
-
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = MC.player.getInventory().getItem(i);
-            if (stack.isEmpty()) continue;
-
-            Item item = stack.getItem();
-            if (item instanceof BlockItem blockItem) {
-                Block block = blockItem.getBlock();
-                if (block.getExplosionResistance() >= 600.0f) {
-                    return item;
-                }
-            }
-        }
-        return null;
+    private List<BlockPos> getTrapTargets(Player target) {
+        return getSurround(target, face.get() ? 1 : 0, false);
     }
 }
