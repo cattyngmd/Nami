@@ -32,7 +32,7 @@ public class FriendEntry extends BaseEntry {
 
         if (nowOnline != online || displayText == null) {
             online = nowOnline;
-            displayText = CAT_FORMAT.format(name + " [" + (online ? "{green}Online" : "{red}Offline") + "{gray}]");
+            displayText = CAT_FORMAT.format(name + " {gray}[" + (online ? "{green}Online" : "{red}Offline") + "{gray}]");
         }
     }
 }

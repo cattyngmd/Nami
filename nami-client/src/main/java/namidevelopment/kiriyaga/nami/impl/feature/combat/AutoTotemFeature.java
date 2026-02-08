@@ -296,7 +296,7 @@ public class AutoTotemFeature extends Feature {
 
         boolean pendingTotem = false;
         Component message = CAT_FORMAT.format(
-                "\n=== {global}AutoTotem{gray} ===\n" +
+                "\n{gray}=== {global}AutoTotem{gray} ===\n" +
                         "Death reasons:\n{global}" + reasonsBuilder.toString() + "{gray}\n" +
                         "Ping: {global}" + ping + " ms{gray}\n" +
                         "Totems Available: {global}" + totemCount + "{gray}\n" +
