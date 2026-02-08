@@ -6,10 +6,12 @@ import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 
 import java.awt.*;
@@ -19,8 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
-import static namidevelopment.kiriyaga.api.util.InteractionUtils.isPlaceable;
-import static namidevelopment.kiriyaga.api.util.InteractionUtils.isReplaceable;
+import static namidevelopment.kiriyaga.api.util.BlockUtils.isPlaceable;
 
 
 public class BlockUtils {
@@ -543,4 +544,39 @@ public class BlockUtils {
                     return Color.WHITE;
             }
         }
+
+    static boolean isBlockAirOrFluid(BlockPos pos) {
+        if (MC.level.getBlockState(pos).isAir()) {
+            return true;
+        }
+        FluidState fluidState = MC.level.getFluidState(pos);
+        return !fluidState.isEmpty();
+    }
+
+    public static boolean isPlaceable(BlockPos pos) {
+        return isPlaceable(pos, 10);
+    }
+
+    public static boolean isPlaceable(BlockPos pos, int distance) {
+        AABB blockBox = new AABB(pos);
+        for (Entity entity : MC.level.entitiesForRendering()) {
+            if (entity.distanceToSqr(MC.player) > distance) continue;
+            if (entity instanceof EndCrystal) continue;
+            if (entity instanceof ItemEntity) continue;
+            if (entity instanceof Arrow) continue;
+
+            if (entity.getBoundingBox().intersects(blockBox)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isReplaceable(BlockPos pos) {
+        return MC.level.getBlockState(pos).canBeReplaced();
+    }
+
+    public static boolean isBed(Block block) {
+        return block instanceof BedBlock;
+    }
 }

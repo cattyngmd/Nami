@@ -46,18 +46,6 @@ public class RotationUtils {
         return new Vec3(centerX, centerY, centerZ);
     }
 
-    public static double getClosestEyeDistance(Vec3 eyePos, AABB box) {
-        Vec3 closest;
-
-        if (MC.player.isFallFlying()) {
-            closest = box.getCenter();
-        } else {
-            closest = getClosestPointToEye(eyePos, box);
-        }
-
-        return eyePos.distanceTo(closest);
-    }
-
     public static Vec3 getClosestPointToEye(Vec3 eyePos, AABB box) {
         double x = eyePos.x;
         double y = eyePos.y;
@@ -87,6 +75,14 @@ public class RotationUtils {
         } else if (Math.abs(z - box.maxZ) < EPS) {
             z = Math.max(box.maxZ - VEC, box.minZ + EPS);
         }
+
+        return new Vec3(x, y, z);
+    }
+
+    public static Vec3 getClampClosestPoint(Vec3 eyePos, AABB box) {
+        double x = Mth.clamp(eyePos.x, box.minX, box.maxX);
+        double y = Mth.clamp(eyePos.y, box.minY, box.maxY);
+        double z = Mth.clamp(eyePos.z, box.minZ, box.maxZ);
 
         return new Vec3(x, y, z);
     }
@@ -128,17 +124,6 @@ public class RotationUtils {
         return (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
     }
 
-    public static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
-        float fYaw = (float) Math.toRadians(yaw);
-        float fPitch = (float) Math.toRadians(pitch);
-
-        double x = -Math.cos(fPitch) * Math.sin(fYaw);
-        double y = -Math.sin(fPitch);
-        double z = Math.cos(fPitch) * Math.cos(fYaw);
-
-        return new Vec3(x, y, z).normalize();
-    }
-
     public static EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
         Vec3 eyePos = player.getEyePosition(1.0f);
         Vec3 look = getLookVectorFromYawPitch(yaw, pitch);
@@ -164,5 +149,13 @@ public class RotationUtils {
         Vec3 reachEnd = eyePos.add(lookVec.scale(reach));
 
         return raycastAABB(eyePos, reachEnd, box);
+    }
+
+    public static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
+        float f = (float) Math.cos(-yaw * 0.017453292F - Math.PI);
+        float g = (float) Math.sin(-yaw * 0.017453292F - Math.PI);
+        float h = - (float) Math.cos(-pitch * 0.017453292F);
+        float i = (float) Math.sin(-pitch * 0.017453292F);
+        return new Vec3(g * h, i, f * h);
     }
 }

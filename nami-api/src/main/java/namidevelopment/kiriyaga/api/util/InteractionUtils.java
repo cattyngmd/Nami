@@ -8,15 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.BedBlock;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
-import net.minecraft.world.entity.projectile.arrow.Arrow;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
@@ -25,8 +18,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.function.Predicate;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.util.PacketUtils.sendSequencedPacket;
@@ -48,7 +39,7 @@ public class InteractionUtils {
         if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
-        int slot = findHotbarItem(stack -> stack.is(item));
+        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
         
@@ -130,7 +121,7 @@ public class InteractionUtils {
         if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
-        int slot = findHotbarItem(stack -> stack.is(item));
+        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
 
@@ -312,7 +303,7 @@ public class InteractionUtils {
         if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
-        int slot = findHotbarItem(stack -> stack.is(item));
+        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
 
@@ -438,12 +429,6 @@ public class InteractionUtils {
         return null;
     }
 
-    private static RotationsFeatureConfig.RotationMode getDefaultRotationMode() {
-        RotationsFeatureConfig Feature = FeatureContractService.get(RotationsFeatureConfig.class);
-
-        return Feature != null ? Feature.getRotationMode() : RotationsFeatureConfig.RotationMode.MOTION;
-    }
-
     public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {
         if (grim) {
             MC.getConnection().send(new ServerboundPlayerActionPacket(
@@ -463,13 +448,118 @@ public class InteractionUtils {
         }
     }
 
+    public static boolean airPlace(BlockPos pos, Item item, boolean swapBack, double range, boolean rotate, boolean grim, boolean simulate, boolean swing, String rotationId, boolean multitask) {
+        if (!MC.level.getBlockState(pos).canBeReplaced())
+            return false;
+
+        if (!multitask && MC.player.isUsingItem())
+            return false;
+
+        boolean isOffhand = MC.player.getOffhandItem().is(item);
+
+        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
+        if (slot == -1 && !isOffhand)
+            return false;
+
+        Vec3 eyePos = MC.player.getEyePosition();
+        Vec3 center = pos.getCenter();
+        AABB blockBox = new AABB(pos);
+        Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
+        float idealYaw = (float) getYawToVec(MC.player, point);
+        float idealPitch = (float) getPitchToVec(MC.player, point);
+
+        if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
+            return false;
+        }
+
+        boolean canPlace = false;
+        if (rotate) {
+            float yaw = (float) getYawToVec(MC.player, center);
+            float pitch = (float) getPitchToVec(MC.player, center);
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
+
+            boolean insideBox = blockBox.contains(MC.player.getEyePosition());
+
+            EntityHitResult serverCheck = raycastAABBFromPlayer(MC.player, blockBox, range, ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+
+
+            canPlace = insideBox || serverCheck != null;
+        }
+
+        BlockHitResult hitResult = new BlockHitResult(center, Direction.UP, pos, false);
+
+        boolean result = false;
+
+        if (canPlace) {
+            if (!isOffhand) {
+                int prev = MC.player.getInventory().getSelectedSlot();
+                InventoryUtils.attemptSwitch(slot);
+
+                if (grim) {
+                    MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
+
+                    MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
+
+                    if (swing)
+                        MC.player.swing(InteractionHand.MAIN_HAND, false);
+
+                    MC.getConnection().send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
+
+                    MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
+
+                    result = true;
+                } else {
+                    if (simulate)
+                        MC.gameMode.useItemOn(MC.player, InteractionHand.MAIN_HAND, hitResult);
+                    else
+                        sendSequencedPacket(id -> new ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, hitResult, id));
+
+                    if (swing)
+                        MC.player.swing(InteractionHand.MAIN_HAND);
+
+                    result = true;
+                }
+
+                if (swapBack)
+                    InventoryUtils.attemptSwitch(prev);
+
+            } else {
+                if (grim) {
+                    MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
+
+                    MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
+
+                    if (swing)
+                        MC.player.swing(InteractionHand.MAIN_HAND, false);
+
+                    MC.getConnection().send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
+
+                    MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
+
+                    result = true;
+                } else {
+                    if (simulate)
+                        MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
+                    else
+                        sendSequencedPacket(id -> new ServerboundUseItemOnPacket(InteractionHand.OFF_HAND, hitResult, id));
+
+                    if (swing)
+                        MC.player.swing(InteractionHand.OFF_HAND);
+
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+
     public static boolean breakBlock(BlockPos pos, double range, boolean rotate, boolean swing, boolean grim, boolean strictDirection, String rotationId) {
         if (MC.player == null || MC.gameMode == null)
             return false;
 
         //CHAT_SERVICE.sendRaw(((ClientPlayerInteractionSERVICEAccessor) MC.interactionSERVICE).getBlockBreakingCooldown()+"");
 
-        if (isBlockAirOrFluid(pos)) {
+        if (BlockUtils.isBlockAirOrFluid(pos)) {
             if (currentBreakingBlock != null && currentBreakingBlock.equals(pos)) {
                 currentBreakingBlock = null;
             }
@@ -541,7 +631,7 @@ public class InteractionUtils {
         if (grim && ((DuckMultiPlayerGameMode) MC.gameMode).getDestroyDelay() != 0) // https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/FastBreak.java#L28
             return false;
 
-        if (isBlockAirOrFluid(pos)) {  // somehow it happens https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/AirLiquidBreak.java#L18
+        if (BlockUtils.isBlockAirOrFluid(pos)) {  // somehow it happens https://github.com/GrimAnticheat/Grim/blob/def21633e2bfa52e2dd4afdf91aec3c0ec6d14e7/common/src/main/java/ac/grim/grimac/checks/impl/breaking/AirLiquidBreak.java#L18
             currentBreakingBlock = null;
             return false;
         }
@@ -557,71 +647,5 @@ public class InteractionUtils {
         }
 
         return true;
-    }
-
-    private static boolean isBlockAirOrFluid(BlockPos pos) {
-        if (MC.level.getBlockState(pos).isAir()) {
-            return true;
-        }
-        FluidState fluidState = MC.level.getFluidState(pos);
-        return !fluidState.isEmpty();
-    }
-
-    public static boolean isPlaceable(BlockPos pos) {
-        return isPlaceable(pos, 10);
-    }
-
-    public static boolean isPlaceable(BlockPos pos, int distance) {
-        AABB blockBox = new AABB(pos);
-        for (Entity entity : MC.level.entitiesForRendering()) {
-            if (entity.distanceToSqr(MC.player) > distance) continue;
-            if (entity instanceof EndCrystal) continue;
-            if (entity instanceof ItemEntity) continue;
-            if (entity instanceof Arrow) continue;
-
-            if (entity.getBoundingBox().intersects(blockBox)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isReplaceable(BlockPos pos) {
-        return MC.level.getBlockState(pos).canBeReplaced();
-    }
-
-    public static boolean isBed(Block block) {
-        return block instanceof BedBlock;
-    }
-
-    public static int findHotbarItem(Predicate<ItemStack> predicate) {
-        if (MC.player == null)
-            return -1;
-
-/*        if (predicate.test(MC.player.getInventory().getSelectedItem()))
-            return MC.player.getInventory().getSelectedSlot();*/
-
-        ItemStack selected = MC.player.getInventory().getSelectedItem();
-        if (!selected.isEmpty() && predicate.test(selected))
-            return MC.player.getInventory().getSelectedSlot();
-
-        for (int slot = 0; slot < 9; slot++) {
-            ItemStack stack = MC.player.getInventory().getItem(slot);
-            if (stack.isEmpty())
-                continue;
-
-            if (predicate.test(stack))
-                return slot;
-        }
-
-        return -1;
-    }
-
-    public static Vec3 getLookVectorFromYawPitch(float yaw, float pitch) {
-        float f = (float) Math.cos(-yaw * 0.017453292F - Math.PI);
-        float g = (float) Math.sin(-yaw * 0.017453292F - Math.PI);
-        float h = - (float) Math.cos(-pitch * 0.017453292F);
-        float i = (float) Math.sin(-pitch * 0.017453292F);
-        return new Vec3(g * h, i, f * h);
     }
 }
