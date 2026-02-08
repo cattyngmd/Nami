@@ -83,9 +83,9 @@ public class BlockSearchFeature extends Feature {
         snapshotQueue.offer(makeSnapshot(event.getChunk()));
 
         chunkBlocks.keySet().removeIf(chunkKey -> {
-            int chunkX = ChunkPos.getX(chunkKey);
-            int chunkZ = ChunkPos.getZ(chunkKey);
-            return !MC.level.hasChunk(chunkX, chunkZ);
+            int cx = ChunkPos.getX(chunkKey);
+            int cz = ChunkPos.getZ(chunkKey);
+            return !isLoaded(cx, cz);
         });
     }
 
@@ -156,5 +156,10 @@ public class BlockSearchFeature extends Feature {
                 snapshotQueue.offer(makeSnapshot(MC.level.getChunk(pc.x + dx, pc.z + dz)));
             }
         }
+    }
+
+    private boolean isLoaded(int x, int z) {
+        if (MC.level == null) return false;
+        return MC.level.getChunkSource().getChunk(x, z, false) != null;
     }
 }
