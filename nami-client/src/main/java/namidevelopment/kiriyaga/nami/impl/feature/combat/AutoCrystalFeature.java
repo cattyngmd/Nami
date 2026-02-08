@@ -68,6 +68,7 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("PlaceMultitask","Multitask", false));
     public final BoolSetting placeIgnoreTerrain = addSetting(new BoolSetting("PlaceIgnoreTerrain","IgnoreTerrain", true));
     public final BoolSetting placeAntiFeetTrap = addSetting(new BoolSetting("PlaceAntiFeetTrap", "AntiFeetTrap", true));
+    public final DoubleSetting placeAntiFeetTrapFactor = addSetting(new DoubleSetting("PlaceAntiFeetTrapFactor","Factor", 0.80, 0.5, 1.00));
 
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));
@@ -119,6 +120,7 @@ public class AutoCrystalFeature extends Feature {
         placeStrictDirection.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeIgnoreTerrain.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeAntiFeetTrap.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeAntiFeetTrapFactor.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE && placeAntiFeetTrap.get());
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
@@ -410,11 +412,11 @@ public class AutoCrystalFeature extends Feature {
             SpeedMineFeature sm = FEATURE_SERVICE.getStorage().getByClass(SpeedMineFeature.class);
 
             if (sm != null) {
-                if (sm.currentTask != null && sm.currentTask.getProgress() >= 0.8f) {
+                if (sm.currentTask != null && sm.currentTask.getProgress() >= placeAntiFeetTrapFactor.get()) {
                     ignored.add(sm.currentTask.getBlockPos());
                 }
 
-                if (sm.doubleMineTask != null && sm.doubleMineTask.getProgress() >= 0.8f) {
+                if (sm.doubleMineTask != null && sm.doubleMineTask.getProgress() >= placeAntiFeetTrapFactor.get()) {
                     ignored.add(sm.doubleMineTask.getBlockPos());
                 }
             }
