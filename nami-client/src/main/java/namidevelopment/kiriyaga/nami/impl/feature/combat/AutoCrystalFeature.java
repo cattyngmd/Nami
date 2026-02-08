@@ -578,19 +578,18 @@ public class AutoCrystalFeature extends Feature {
         long start= System.nanoTime();
         float totalDamage = 0f;
 
-        float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
-
-        if (selfDamage > maxSelfDamage.get())
-            return -1f;
-
-        if (selfDamage + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
-            return -1f;
-
-        for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 15)) {
+        for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12)) {
             if (!(e instanceof LivingEntity living)) continue;
-            if (e == MC.player) continue;
 
             float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignoredBlocks(true));
+
+            if (e == MC.player) {
+                if (dmg > maxSelfDamage.get())
+                    return -1f;
+
+                if (dmg + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
+                    return -1f;
+            }
 
             if (FRIEND_SERVICE.isFriend(e.getName().getString())) {
                 if (dmg > maxFriendDamage.get())
