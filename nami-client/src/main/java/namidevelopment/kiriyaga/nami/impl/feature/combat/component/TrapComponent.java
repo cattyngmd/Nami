@@ -29,6 +29,8 @@ public class TrapComponent {
     public final DoubleSetting range;
     public final IntSetting delay;
     public final IntSetting shiftTicks;
+    public final BoolSetting airPlace;
+    public final BoolSetting grim;
     public final BoolSetting rotate;
     public final BoolSetting strictDirection;
     public final BoolSetting swapBack;
@@ -45,6 +47,8 @@ public class TrapComponent {
         range = feature.addSetting(new DoubleSetting("Range", 4.50, 1.0, 6.0));
         delay = feature.addSetting(new IntSetting("Delay", 0, 0, 5));
         shiftTicks = feature.addSetting(new IntSetting("ShiftTicks", 1, 1, 8));
+        airPlace = feature.addSetting(new BoolSetting("AirPlace", false));
+        grim = feature.addSetting(new BoolSetting("Grim", false));
         rotate = feature.addSetting(new BoolSetting("Rotate", true));
         strictDirection = feature.addSetting(new BoolSetting("StrictDirection", true));
         swapBack = feature.addSetting(new BoolSetting("SwapBack", true));
@@ -53,6 +57,9 @@ public class TrapComponent {
         foundation = feature.addSetting(new BoolSetting("Foundation", false));
         swing = feature.addSetting(new BoolSetting("Swing", true));
         render = feature.addSetting(new BoolSetting("Render", true));
+
+        grim.setShowCondition(airPlace::get);
+        strictDirection.setShowCondition(() -> !airPlace.get());
     }
 
     public void onDisable() {
@@ -83,14 +90,14 @@ public class TrapComponent {
             if (foundation.get()) {
                 BlockPos foundation = pos.below();
                 if (MC.level.getBlockState(foundation).canBeReplaced()) {
-                    if (InteractionUtils.placeBlock(foundation, getSlot(), swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName(), multiTask.get())) {
+                    if (place(foundation, getSlot(), airPlace.get(), grim.get(), owner)) {
                         blocksPlaced++;
                         if (blocksPlaced >= shiftTicks.get()) break;
                     }
                 }
             }
 
-            if (InteractionUtils.placeBlock(pos, getSlot(), swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName(), multiTask.get())) {
+            if (place(pos, getSlot(), airPlace.get(), grim.get(), owner)) {
                 blocksPlaced++;
                 if (blocksPlaced >= shiftTicks.get()) break;
             }
@@ -142,5 +149,35 @@ public class TrapComponent {
         }
 
         return null;
+    }
+
+    private boolean place(BlockPos pos, Item item, boolean airPlace, boolean grim, Feature owner) {
+        if (airPlace) {
+            return InteractionUtils.airPlace(
+                    pos,
+                    item,
+                    swapBack.get(),
+                    range.get(),
+                    rotate.get(),
+                    grim,
+                    simulate.get(),
+                    swing.get(),
+                    owner.getName(),
+                    multiTask.get()
+            );
+        }
+
+        return InteractionUtils.placeBlock(
+                pos,
+                item,
+                swapBack.get(),
+                range.get(),
+                rotate.get(),
+                strictDirection.get(),
+                simulate.get(),
+                swing.get(),
+                owner.getName(),
+                multiTask.get()
+        );
     }
 }
