@@ -21,6 +21,7 @@ import namidevelopment.kiriyaga.api.util.RotationUtils;
 import namidevelopment.kiriyaga.api.util.entity.DamageUtils;
 import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
+import namidevelopment.kiriyaga.nami.impl.feature.world.SpeedMineFeature;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -40,12 +41,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.EntityHitResult;
 
 import java.awt.*;
+import java.util.*;
+import java.util.List;
 import java.util.Locale;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
-import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.api.NamiApi.*;
+
 @RegisterFeature
 public class AutoCrystalFeature extends Feature {
     public enum Page {PLACE, BREAK, DAMAGES, RENDER}
@@ -64,6 +66,8 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting placeStrictDirection = addSetting(new BoolSetting("PlaceStrictDirection","StrictDirection", true));
     public final BoolSetting placeSwapBack = addSetting(new BoolSetting("PlaceSwapBack","SwapBack", true));
     public final BoolSetting placeMultitask = addSetting(new BoolSetting("PlaceMultitask","Multitask", false));
+    public final BoolSetting placeIgnoreTerrain = addSetting(new BoolSetting("PlaceIgnoreTerrain","IgnoreTerrain", true));
+    public final BoolSetting placeAntiFeetTrap = addSetting(new BoolSetting("PlaceAntiFeetTrap", "AntiFeetTrap", true));
 
     //break
     public final BoolSetting doBreak = addSetting(new BoolSetting("Break", true));
@@ -113,6 +117,8 @@ public class AutoCrystalFeature extends Feature {
         placeSwapBack.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeIgnoreCrystals.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
         placeStrictDirection.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeIgnoreTerrain.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
+        placeAntiFeetTrap.setShowCondition(() -> doPlace.get() && page.get() == Page.PLACE);
 
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
@@ -304,7 +310,7 @@ public class AutoCrystalFeature extends Feature {
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 15)) {
             if (!(e instanceof LivingEntity living)) continue;
 
-            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
+            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignoredBlocks(false));
 
             if (e == MC.player)
                 continue;
@@ -377,6 +383,46 @@ public class AutoCrystalFeature extends Feature {
         return best; // always null here
     }
 
+    private List<BlockPos> ignoredBlocks(boolean b) {
+        List<BlockPos> ignored = new ArrayList<>();
+
+        if (placeIgnoreTerrain.get()) {
+            int r = placeRange.get().intValue()+2;
+            BlockPos center = MC.player.blockPosition();
+
+            for (int x = -r; x <= r; x++) {
+                for (int y = -r; y <= r; y++) {
+                    for (int z = -r; z <= r; z++) {
+                        BlockPos pos = center.offset(x, y, z);
+
+                        BlockState state = MC.level.getBlockState(pos);
+                        if (state.isAir()) continue;
+
+                        if (state.getBlock().getExplosionResistance() < 600) {
+                            ignored.add(pos);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (b && placeAntiFeetTrap.get()) {
+            SpeedMineFeature sm = FEATURE_SERVICE.getStorage().getByClass(SpeedMineFeature.class);
+
+            if (sm != null) {
+                if (sm.currentTask != null && sm.currentTask.getProgress() >= 0.8f) {
+                    ignored.add(sm.currentTask.getBlockPos());
+                }
+
+                if (sm.doubleMineTask != null && sm.doubleMineTask.getProgress() >= 0.8f) {
+                    ignored.add(sm.doubleMineTask.getBlockPos());
+                }
+            }
+        }
+
+        return ignored;
+    }
+
     private boolean canPlaceAt(BlockPos pos) {
         BlockPos base = pos.below();
 
@@ -441,7 +487,7 @@ public class AutoCrystalFeature extends Feature {
             if (!(e instanceof LivingEntity living)) continue;
             if (e == MC.player) continue;
 
-            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
+            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignoredBlocks(true));
 
             if (FRIEND_SERVICE.isFriend(e.getName().getString())) {
                 if (dmg > maxFriendDamage.get())

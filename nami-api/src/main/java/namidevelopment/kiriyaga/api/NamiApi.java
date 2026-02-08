@@ -46,7 +46,7 @@ public class NamiApi implements ClientModInitializer {
     public static final InventoryService INVENTORY_SERVICE = new InventoryService();
     public static final ServerService SERVER_SERVICE = new ServerService();
     public static final InputService INPUT_SERVICE = new InputService();
-    public static final BreakPredictionService BREAK_SERVICE = new BreakPredictionService();
+    public static final BreakPredictionService BREAKPREDICT_SERVICE = new BreakPredictionService();
 
     public static NamiFormatService CAT_FORMAT = new NamiFormatService();
 
@@ -62,7 +62,7 @@ public class NamiApi implements ClientModInitializer {
         SERVER_SERVICE.init();
         CHAT_SERVICE.init();
         INPUT_SERVICE.init();
-        BREAK_SERVICE.init();
+        BREAKPREDICT_SERVICE.init();
 
         CAT_FORMAT.add(new CatStyles());
 

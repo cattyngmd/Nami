@@ -18,6 +18,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.core.BlockPos;
+import java.util.Collection;
 
 import java.util.function.BiFunction;
 
@@ -31,6 +33,18 @@ public class DamageUtils {
         if (state.getBlock().getExplosionResistance() < 600) return null;
         return state.getCollisionShape(MC.level, pos).clip(ctx.start(), ctx.end(), pos);
     };
+
+    public static float crystalDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor, Collection<BlockPos> ignoredBlocks) {
+        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 12f, wrapProviderWithIgnore(raycastProvider, ignoredBlocks), assumeBestArmor);
+    }
+
+    public static float bedDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor, Collection<BlockPos> ignoredBlocks) {
+        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 10f, wrapProviderWithIgnore(raycastProvider, ignoredBlocks), assumeBestArmor);
+    }
+
+    public static float anchorDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor, Collection<BlockPos> ignoredBlocks) {
+        return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 10f, wrapProviderWithIgnore(raycastProvider, ignoredBlocks), assumeBestArmor);
+    }
 
     public static float crystalDamage(LivingEntity target, Vec3 targetPos, AABB targetBox, Vec3 explosionPos, BlockRaycastProvider raycastProvider, boolean assumeBestArmor) {
         return computeExplosionDamage(target, targetPos, targetBox, explosionPos, 12f, raycastProvider, assumeBestArmor);
@@ -56,6 +70,15 @@ public class DamageUtils {
         float baseDamage = (float) ((impact * impact + impact) / 2 * 7 * 12 + 1);
 
         return applyReductions(baseDamage, target, MC.level.damageSources().explosion(null), assumeBestArmor);
+    }
+
+    private static BlockRaycastProvider wrapProviderWithIgnore(BlockRaycastProvider provider, Collection<BlockPos> ignoredBlocks) {
+        if (ignoredBlocks == null || ignoredBlocks.isEmpty()) return provider;
+
+        return (ctx, pos) -> {
+            if (ignoredBlocks.contains(pos)) return null;
+            return provider.apply(ctx, pos);
+        };
     }
 
     public static float applyReductions(float damage, Entity entity, DamageSource source, boolean assumeBestArmor) {
