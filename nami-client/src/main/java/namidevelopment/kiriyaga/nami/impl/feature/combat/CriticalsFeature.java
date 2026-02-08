@@ -101,7 +101,8 @@ public class CriticalsFeature extends Feature {
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
 
-        if (onlyStandingStill.get() && MC.player.getDeltaMovement().lengthSqr() > 1.0E-6)
+        if (onlyStandingStill.get() && (MC.options.keyUp.isDown() || MC.options.keyDown.isDown()
+                || MC.options.keyLeft.isDown() || MC.options.keyRight.isDown()))
             return;
 
         float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();

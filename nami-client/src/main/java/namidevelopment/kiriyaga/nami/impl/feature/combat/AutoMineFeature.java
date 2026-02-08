@@ -40,7 +40,8 @@ public class AutoMineFeature extends Feature {
 
     public AutoMineFeature() {
         super("AutoMine", "Manages which blocks shoulf SpeedMine Feature mine.", FeatureCategory.of("Combat"));
-        face.setShowCondition(() -> mode.get() == Mode.GRIM );
+        always.setShowCondition(antiCrawl::get);
+        matchTargetY.setShowCondition(antiCrawl::get);
     }
 
     boolean b = false;
