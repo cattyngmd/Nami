@@ -8,7 +8,7 @@ import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 
-import static namidevelopment.kiriyaga.api.NamiApi.BREAK_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.BREAKPREDICT_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 @RegisterFeature
@@ -22,10 +22,10 @@ public class BreakHighlightFeature extends Feature {
 
     @SubscribeEvent
     public void onRender3DEvent(Render3DEvent event) {
-        if (MC.level == null || MC.player == null || BREAK_SERVICE == null)
+        if (MC.level == null || MC.player == null || BREAKPREDICT_SERVICE == null)
             return;
 
-        for (PlayerBreakState state : BREAK_SERVICE.all()) {
+        for (PlayerBreakState state : BREAKPREDICT_SERVICE.all()) {
             state.render(event, fill.get());
         }
     }
