@@ -1,7 +1,6 @@
 package namidevelopment.kiriyaga.nami.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import namidevelopment.kiriyaga.api.core.macro.model.Macro;
 import namidevelopment.kiriyaga.api.event.impl.DissconectEvent;
 import namidevelopment.kiriyaga.api.event.impl.EntityDeathEvent;
 import namidevelopment.kiriyaga.api.event.impl.InteractionEvent;
@@ -12,7 +11,6 @@ import namidevelopment.kiriyaga.nami.impl.feature.exploits.AirPlaceFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.world.AutoEatFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.world.FastPlaceFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.exploits.NoHitDelayFeature;
-import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -33,13 +31,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import namidevelopment.kiriyaga.api.model.feature.Feature;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -171,7 +167,7 @@ public abstract class MixinMinecraft {
     @Inject(method = "shouldEntityAppearGlowing", at = @At("HEAD"), cancellable = true)
     private void onHasOutline(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         ESPFeature esp = FEATURE_SERVICE.getStorage().getByClass(ESPFeature.class);
-        if (esp != null && esp.isEnabled() && esp.renderMode.get() == ESPFeature.RenderMode.OUTLINE) {
+        if (esp != null && esp.isEnabled() && esp.renderMode.get() == ESPFeature.RenderMode.GLOW) {
             if (ESPFeature.getESPColor(entity) != null) {
                 cir.setReturnValue(true);
             }

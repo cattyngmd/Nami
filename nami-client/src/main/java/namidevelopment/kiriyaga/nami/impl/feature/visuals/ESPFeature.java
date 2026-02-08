@@ -36,12 +36,11 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class ESPFeature extends Feature {
 
-    public enum RenderMode {OUTLINE, BOX}
+    public enum RenderMode {GLOW, BOX}
 
     public final BoolSetting showPlayers = addSetting(new BoolSetting("Players", true));
     public final BoolSetting showPeacefuls = addSetting(new BoolSetting("Peacefuls", true));
@@ -51,12 +50,12 @@ public class ESPFeature extends Feature {
     public final BoolSetting itemBoundingBox = addSetting(new BoolSetting("ItemBoundingBox", true));
     public final BoolSetting showMobSpawns = addSetting(new BoolSetting("MobSpawn", false));
     public final IntSetting mobSpawnLightThreshold = addSetting(new IntSetting("SpawnLight", 7, 0, 15));
-    public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("Mode", RenderMode.OUTLINE));
+    public final EnumSetting<RenderMode> renderMode = addSetting(new EnumSetting<>("Mode", RenderMode.GLOW));
     public final DoubleSetting outlineDistance = addSetting(new DoubleSetting("Distance", 52, 15, 256));
 
     public ESPFeature() {
         super("ESP", "Highlights certain entities.", FeatureCategory.of("Render"), "esp", "wh", "boxes");
-        outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.OUTLINE);
+        outlineDistance.setShowCondition(() -> renderMode.get() == RenderMode.GLOW);
         itemBoundingBox.setShowCondition(() -> showItems.get());
         mobSpawnLightThreshold.setShowCondition(showMobSpawns::get);
     }
@@ -77,7 +76,7 @@ public class ESPFeature extends Feature {
             return;
         }
 
-        if (renderMode.get() == RenderMode.OUTLINE) {
+        if (renderMode.get() == RenderMode.GLOW) {
             if (itemBoundingBox.get()) {
                 renderItemBoxes(event);
             }
@@ -106,7 +105,7 @@ public class ESPFeature extends Feature {
         if (showHostiles.get()) entities.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.HOSTILE));
         if (showItems.get()) entities.addAll(EntityUtils.getEntities(EntityUtils.EntityTypeCategory.DROPPED_ITEMS));
 
-        if (renderMode.get() == RenderMode.OUTLINE) {
+        if (renderMode.get() == RenderMode.GLOW) {
             double maxDistSq = outlineDistance.get() * outlineDistance.get();
             entities.removeIf(entity -> MC.player.distanceToSqr(entity) > maxDistSq);
         }
