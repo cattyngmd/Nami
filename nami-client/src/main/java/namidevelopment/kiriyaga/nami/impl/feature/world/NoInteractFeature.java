@@ -24,7 +24,7 @@ import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import java.util.Map;
 
 import static namidevelopment.kiriyaga.api.NamiApi.MC;
-import static namidevelopment.kiriyaga.api.util.InteractionUtils.isBed;
+import static namidevelopment.kiriyaga.api.util.BlockUtils.isBed;
 
 @RegisterFeature
 public class NoInteractFeature extends Feature {

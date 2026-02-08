@@ -31,6 +31,8 @@ import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 
+import static namidevelopment.kiriyaga.api.util.BlockUtils.isPlaceable;
+import static namidevelopment.kiriyaga.api.util.BlockUtils.isReplaceable;
 import static namidevelopment.kiriyaga.api.util.InteractionUtils.*;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;

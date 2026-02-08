@@ -24,7 +24,8 @@ import java.util.*;
 import static namidevelopment.kiriyaga.api.NamiApi.EVENT_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.InteractionUtils.isPlaceable;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.BlockUtils.isPlaceable;
 import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isPhased;
 
 @RegisterFeature
