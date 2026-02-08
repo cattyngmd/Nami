@@ -125,6 +125,7 @@ public class ScaffoldFeature extends Feature {
     private Item getSlot() {
         if (MC.player == null) return null;
         ItemStack offhand = MC.player.getOffhandItem();
+        ItemStack mainhand = MC.player.getOffhandItem();
         if (!offhand.isEmpty()) {
             Block block = Block.byItem(offhand.getItem());
             if (block != Blocks.AIR) {
@@ -134,6 +135,17 @@ public class ScaffoldFeature extends Feature {
                 }
             }
         }
+
+        if (!mainhand.isEmpty()) {
+            Block block = Block.byItem(mainhand.getItem());
+            if (block != Blocks.AIR) {
+                Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
+                if (!whitelist.get() || whitelist.isWhitelisted(blockId)) {
+                    return mainhand.getItem();
+                }
+            }
+        }
+
         for (int i = 0; i < 9; i++) {
             ItemStack stack = MC.player.getInventory().getItem(i);
             if (stack.isEmpty()) continue;
