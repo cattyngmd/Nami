@@ -19,7 +19,6 @@ import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.InteractionUtils;
-import namidevelopment.kiriyaga.api.util.RotationUtils;
 import namidevelopment.kiriyaga.api.util.entity.DamageUtils;
 import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
@@ -347,7 +346,7 @@ public class AutoCrystalFeature extends Feature {
 
             if (!insideBox && perfect == null) continue;
 
-            float totalDamage = damageOthers(crystal);
+            float totalDamage = calculateDamage(crystal.position(), false);
             if (totalDamage <= -0.9f)
                 continue;
 
@@ -367,47 +366,6 @@ public class AutoCrystalFeature extends Feature {
             });
         }
         return best;
-    }
-
-    private float damageOthers(EndCrystal crystal) {
-        long start = System.nanoTime();
-        Vec3 pos = crystal.position();
-        float totalDamage = 0f;
-
-        float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
-
-        if (selfDamage > maxSelfDamage.get())
-            return -1f;
-
-        if (selfDamage + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
-            return -1f;
-
-
-        for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 15)) {
-            if (!(e instanceof LivingEntity living)) continue;
-
-            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), pos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignoredBlocks(false));
-
-            if (e == MC.player)
-                continue;
-
-            if (FRIEND_SERVICE.isFriend(e.getName().getString())) {
-                if (dmg > maxFriendDamage.get())
-                    return -1f;
-            } else {
-                totalDamage += dmg;
-            }
-        }
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#damageOthers",
-                        String.format(Locale.US, "damageOthers: %.4f ms", ms));
-            });
-        }
-        return totalDamage;
     }
 
     private boolean canBreak(EndCrystal crystal) {
@@ -463,8 +421,7 @@ public class AutoCrystalFeature extends Feature {
 
                     Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
 
-                    float totalDamage = calculatePlaceDamage(crystalPos);
-
+                    float totalDamage = calculateDamage(crystalPos, true);
                     if (totalDamage < minDamage.get()) continue;
                     lastTotalDamage = totalDamage;
                     if (best == null || totalDamage > best.totalDamage)
@@ -556,8 +513,11 @@ public class AutoCrystalFeature extends Feature {
             return false;
 
         Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
-        AABB crystalBox = new AABB(crystalPos.x - 1.0, crystalPos.y - 1.0, crystalPos.z - 1.0, crystalPos.x + 1.0, crystalPos.y + 1.0, crystalPos.z + 1.0);
+        AABB crystalBox = new AABB(crystalPos.x - 1.0, crystalPos.y, crystalPos.z - 1.0, crystalPos.x + 1.0, crystalPos.y + 2.0, crystalPos.z + 1.0);
         if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > placeRange.get())
+            return false;
+
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > breakRange.get())
             return false;
 
         AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 2, base.getZ() + 1);
@@ -573,23 +533,23 @@ public class AutoCrystalFeature extends Feature {
     }
 
 
-    private float calculatePlaceDamage(Vec3 crystalPos) {
+    private float calculateDamage(Vec3 crystalPos, boolean b) {
         long start= System.nanoTime();
         float totalDamage = 0f;
+        List<BlockPos> ignored = ignoredBlocks(b);
 
-        float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
-
-        if (selfDamage > maxSelfDamage.get())
-            return -1f;
-
-        if (selfDamage + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
-            return -1f;
-
-        for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 15)) {
+        for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12)) {
             if (!(e instanceof LivingEntity living)) continue;
-            if (e == MC.player) continue;
 
-            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignoredBlocks(true));
+            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignored);
+
+            if (e == MC.player) {
+                if (dmg > maxSelfDamage.get())
+                    return -1f;
+
+                if (dmg + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
+                    return -1f;
+            }
 
             if (FRIEND_SERVICE.isFriend(e.getName().getString())) {
                 if (dmg > maxFriendDamage.get())
