@@ -461,10 +461,10 @@ public class AutoCrystalFeature extends Feature {
 
                     if (!canPlaceAt(pos)) continue;
 
-                    EndCrystal fakeCrystal = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
-                    fakeCrystal.setPos(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
+                    Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
 
-                    float totalDamage = calculatePlaceDamage(fakeCrystal.position());
+                    float totalDamage = calculatePlaceDamage(crystalPos);
+
                     if (totalDamage < minDamage.get()) continue;
                     lastTotalDamage = totalDamage;
                     if (best == null || totalDamage > best.totalDamage)
@@ -555,8 +555,10 @@ public class AutoCrystalFeature extends Feature {
         if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > placeRange.get())
             return false;
 
-        EndCrystal fakeCrystal = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
-        fakeCrystal.setPos(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
+        Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
+        AABB crystalBox = new AABB(crystalPos.x - 1.0, crystalPos.y - 1.0, crystalPos.z - 1.0, crystalPos.x + 1.0, crystalPos.y + 1.0, crystalPos.z + 1.0);
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > placeRange.get())
+            return false;
 
         AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 2, base.getZ() + 1);
 
@@ -566,9 +568,6 @@ public class AutoCrystalFeature extends Feature {
             if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
             return false;
         }
-
-        if (eyePos.distanceTo(getClampClosestPoint(eyePos, fakeCrystal.getBoundingBox())) > placeRange.get())
-            return false;
 
         return true;
     }
