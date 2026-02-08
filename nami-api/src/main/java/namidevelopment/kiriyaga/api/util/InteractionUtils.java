@@ -48,16 +48,16 @@ public class InteractionUtils {
         float idealYaw = (float) getYawToVec(MC.player, closestPoint);
         float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
 
-        boolean insideBox = entity.getBoundingBox().contains(MC.player.getEyePosition());
-        EntityHitResult hitResult = raycastTarget(MC.player, entity, range, idealYaw, idealPitch);
-        if (!insideBox && hitResult == null) {
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, entity.getBoundingBox())) > range)
             return false;
-        }
 
         if (rotate)
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 4, idealYaw, idealPitch));
 
-        boolean completed = !rotate || ROTATION_SERVICE.getRequestHandler().isCompleted(rotationId);
+        boolean insideBox = entity.getBoundingBox().contains(MC.player.getEyePosition());
+        EntityHitResult hitResult = raycastTarget(MC.player, entity, range, ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+
+        boolean completed = !rotate || insideBox || hitResult != null;
 
         if (!completed)
             return false;
@@ -117,6 +117,12 @@ public class InteractionUtils {
         if (!multitask && MC.player.isUsingItem())
             return false;
 
+        Vec3 eyePos = MC.player.getEyePosition();
+        AABB blockBox = new AABB(pos);
+
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > range)
+            return false;
+
         boolean isOffhand = false;
         if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
@@ -129,6 +135,7 @@ public class InteractionUtils {
         if (direction == null) {
             return false;
         }
+
         BlockPos neighbor = pos.relative(direction.getOpposite());
         Direction clickFace = direction;
 
@@ -164,8 +171,6 @@ public class InteractionUtils {
         // Simplified grim v2 PlacePosition check
         // we do not use all possible eye positions because its just unnecessary
         if (strictDirection) { // todo something while phased
-            Vec3 eyePos = MC.player.getEyePosition();
-
             boolean flag = switch (clickFace) { // https://github.com/GrimAnticheat/Grim/blob/fb926ab0fbca081ad765389c541880a4a435fabb/common/src/main/java/ac/grim/grimac/checks/impl/scaffolding/PositionPlace.java#L49
                 case NORTH -> eyePos.z <= neighbor.getZ() + 1e-3;
                 case SOUTH -> eyePos.z >= neighbor.getZ() + 1 - 1e-3;
@@ -180,16 +185,6 @@ public class InteractionUtils {
                 return false;
             }
         }
-
-        Vec3 eyePos = MC.player.getEyePosition();
-            AABB blockBox = new AABB(pos);
-            Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
-            float idealYaw = (float) getYawToVec(MC.player, point);
-            float idealPitch = (float) getPitchToVec(MC.player, point);
-
-            if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
-                return false;
-            }
 
         BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, neighbor, false);
         boolean canPlace = true;
@@ -262,6 +257,22 @@ public class InteractionUtils {
         Vec3 playerPos = MC.player.position();
         Direction clickFace = Direction.UP;
 
+        AABB blockBox = new AABB(pos);
+
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > range)
+            return false;
+
+        if (!multitask && MC.player.isUsingItem())
+            return false;
+
+        boolean isOffhand = false;
+        if (MC.player.getOffhandItem().is(item))
+            isOffhand = true;
+
+        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
+        if (slot == -1 && !isOffhand)
+            return false;
+
         double offX = playerPos.x - Math.floor(playerPos.x);
         double offY = playerPos.y - Math.floor(playerPos.y);
         double offZ = playerPos.z - Math.floor(playerPos.z);
@@ -296,17 +307,6 @@ public class InteractionUtils {
             );
         }
 
-        if (!multitask && MC.player.isUsingItem())
-            return false;
-
-        boolean isOffhand = false;
-        if (MC.player.getOffhandItem().is(item))
-            isOffhand = true;
-
-        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
-        if (slot == -1 && !isOffhand)
-            return false;
-
         if (strictDirection) {
             boolean flag = switch (clickFace) {
                 case NORTH -> eyePos.z <= pos.getZ() + 1e-3;
@@ -321,15 +321,6 @@ public class InteractionUtils {
                 return false;
             }
         }
-
-            AABB blockBox = new AABB(pos);
-            Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
-            float idealYaw = (float) getYawToVec(MC.player, point);
-            float idealPitch = (float) getPitchToVec(MC.player, point);
-
-            if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
-                return false;
-            }
 
         BlockHitResult hit = new BlockHitResult(hitVec, clickFace, pos, false);
 
@@ -467,13 +458,9 @@ public class InteractionUtils {
         Vec3 eyePos = MC.player.getEyePosition();
         Vec3 center = pos.getCenter();
         AABB blockBox = new AABB(pos);
-        Vec3 point = RotationUtils.getClosestPointToEye(eyePos, blockBox);
-        float idealYaw = (float) getYawToVec(MC.player, point);
-        float idealPitch = (float) getPitchToVec(MC.player, point);
 
-        if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, range, idealYaw, idealPitch) == null) {
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > range)
             return false;
-        }
 
         boolean canPlace = true;
         if (rotate) {
@@ -559,10 +546,8 @@ public class InteractionUtils {
 
         Vec3 eyePos = MC.player.getEyePosition();
         AABB blockBox = new AABB(pos);
-        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3 reachEnd = eyePos.add(lookDir.scale(range));
 
-        if (blockBox.clip(eyePos, reachEnd).isEmpty())
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > range)
             return false;
 
         double dx = eyePos.x - blockBox.getCenter().x;

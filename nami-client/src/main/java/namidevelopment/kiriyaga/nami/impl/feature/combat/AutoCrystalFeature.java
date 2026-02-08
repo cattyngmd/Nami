@@ -92,7 +92,8 @@ public class AutoCrystalFeature extends Feature {
 
     //render
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
-    public final BoolSetting debug = addSetting(new BoolSetting("Debug", true));
+
+    public final BoolSetting debug = addSetting(new BoolSetting("Debug", false));
 
     private int breakTimer, placeTimer = 0; // i love it
     private PlaceTarget placeTarget = null;
@@ -102,6 +103,8 @@ public class AutoCrystalFeature extends Feature {
 
     public AutoCrystalFeature() {
         super("AutoCrystal", "Automatically places and break crystals to kill people, if you are good enough!.", FeatureCategory.of("Combat"), "autocrystal", "ac", "crystalaura");
+        debug.setShow(false);
+
         doBreak.setShowCondition(() -> page.get() == Page.BREAK);
         breakRange.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
         breakDelay.setShowCondition(() -> doBreak.get() && page.get() == Page.BREAK);
@@ -548,40 +551,25 @@ public class AutoCrystalFeature extends Feature {
         Vec3 eyePos = MC.player.getEyePosition();
 
         AABB blockBox = new AABB(pos);
-        Vec3 point = getClosestPointToEye(eyePos, blockBox);
-        float yaw = (float) getYawToVec(MC.player, point);
-        float pitch = (float) getPitchToVec(MC.player, point);
 
-        if (RotationUtils.raycastAABBFromPlayer(MC.player, blockBox, placeRange.get(), yaw, pitch) == null) {
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > placeRange.get())
             return false;
-        }
 
         EndCrystal fakeCrystal = new EndCrystal(EntityType.END_CRYSTAL, MC.level);
         fakeCrystal.setPos(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
-        MC.level.addFreshEntity(fakeCrystal); //  thats crazy how raycast works
 
-        AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 3, base.getZ() + 1);
+        AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 2, base.getZ() + 1);
 
         for (Entity e : MC.level.getEntities(null, checkIntersects)) {
             if (placeIgnoreItems.get() && e instanceof ItemEntity item && item.getAge() <= 5) continue;
             if (placeIgnoreCrystals.get() && e instanceof EndCrystal crystal && crystal.tickCount < 5) continue;
             if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
-            fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
             return false;
         }
 
-            Vec3 hitVec = getClosestPointToEye(eyePos, fakeCrystal.getBoundingBox());
-            float idealYaw = (float) getYawToVec(MC.player, hitVec);
-            float idealPitch = (float) getPitchToVec(MC.player, hitVec);
-            EntityHitResult distanceCheck = raycastTarget(MC.player, fakeCrystal, breakRange.get(), idealYaw, idealPitch);
-            boolean insideBox = fakeCrystal.getBoundingBox().contains(eyePos);
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, fakeCrystal.getBoundingBox())) > placeRange.get())
+            return false;
 
-            if (!insideBox && distanceCheck == null) {
-                fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
-                return false;
-            }
-
-        fakeCrystal.remove(Entity.RemovalReason.DISCARDED);
         return true;
     }
 
