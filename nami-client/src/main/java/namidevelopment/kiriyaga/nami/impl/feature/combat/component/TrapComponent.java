@@ -34,6 +34,7 @@ public class TrapComponent {
     public final BoolSetting swapBack;
     public final BoolSetting multiTask;
     public final BoolSetting simulate;
+    public final BoolSetting foundation;
     public final BoolSetting swing;
     public final BoolSetting render;
 
@@ -49,6 +50,7 @@ public class TrapComponent {
         swapBack = feature.addSetting(new BoolSetting("SwapBack", true));
         multiTask = feature.addSetting(new BoolSetting("MultiTask", false));
         simulate = feature.addSetting(new BoolSetting("Simulate", false));
+        foundation = feature.addSetting(new BoolSetting("Foundation", false));
         swing = feature.addSetting(new BoolSetting("Swing", true));
         render = feature.addSetting(new BoolSetting("Render", true));
     }
@@ -78,11 +80,13 @@ public class TrapComponent {
         for (BlockPos pos : targetPositions) {
             if (!MC.level.getBlockState(pos).canBeReplaced()) continue;
 
-            BlockPos foundation = pos.below();
-            if (MC.level.getBlockState(foundation).canBeReplaced()) {
-                if (InteractionUtils.placeBlock(foundation, getSlot(), swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName(), multiTask.get())) {
-                    blocksPlaced++;
-                    if (blocksPlaced >= shiftTicks.get()) break;
+            if (foundation.get()) {
+                BlockPos foundation = pos.below();
+                if (MC.level.getBlockState(foundation).canBeReplaced()) {
+                    if (InteractionUtils.placeBlock(foundation, getSlot(), swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName(), multiTask.get())) {
+                        blocksPlaced++;
+                        if (blocksPlaced >= shiftTicks.get()) break;
+                    }
                 }
             }
 
