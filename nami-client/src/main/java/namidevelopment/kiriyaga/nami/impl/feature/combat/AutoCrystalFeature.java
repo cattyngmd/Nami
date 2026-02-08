@@ -92,6 +92,7 @@ public class AutoCrystalFeature extends Feature {
 
     //render
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
+    public final BoolSetting debug = addSetting(new BoolSetting("Debug", true));
 
     private int breakTimer, placeTimer = 0; // i love it
     private PlaceTarget placeTarget = null;
@@ -146,17 +147,27 @@ public class AutoCrystalFeature extends Feature {
 
     @SubscribeEvent
     private void onRemoveEntityEvent(RemoveEntityEvent event) {
+        long start = System.nanoTime();
         ClientboundRemoveEntitiesPacket packet = event.getPacket();
         for (int id : packet.getEntityIds()) {
             if (crystalHits.containsKey(id)) {
                 crystalHits.remove(id);
             }
         }
-    }
 
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#onRemoveEntityEvent",
+                        String.format(Locale.US, "onRemoveEntityEvent: %.4f ms", ms));
+            });
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onAddEntityEvent(AddEntityEvent event) {
+        long start = System.nanoTime();
         if (breakSequential.get() != Sequential.FULL) return;
 
         if (event.getPacket() instanceof ClientboundAddEntityPacket packet) {
@@ -171,10 +182,19 @@ public class AutoCrystalFeature extends Feature {
 
             doBreakOnNetty(fake);
         }
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#onAddEntityEvent",
+                        String.format(Locale.US, "onAddEntityEvent: %.4f ms", ms));
+            });
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTickEvent(PreTickEvent event) {
+        long start = System.nanoTime();
         if (MC.player == null || MC.player.isDeadOrDying()) return;
         lastCalcTimeMs = 0;
 
@@ -199,6 +219,15 @@ public class AutoCrystalFeature extends Feature {
         this.clearDisplayInfo();
         this.addDisplayInfo(String.format(Locale.US, "%.2f", lastTotalDamage));
         this.addDisplayInfo(String.format(Locale.US, "%.4f", lastCalcTimeMs));
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#onPreTickEvent",
+                        String.format(Locale.US, "onPreTickEvent: %.4f ms", ms));
+            });
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -213,7 +242,7 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private void doBreakOnNetty(EndCrystal crystal) { // we are not on netty actually
-
+        long start = System.nanoTime();
 
         if (!breakMultitask.get() && MC.player.isUsingItem())  {
             return;
@@ -238,9 +267,19 @@ public class AutoCrystalFeature extends Feature {
             MC.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
 
         //breakTimer = breakDelay.get();
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#doBreakOnNetty",
+                        String.format(Locale.US, "doBreakOnNetty: %.4f ms", ms));
+            });
+        }
     }
 
     private void doBreak() {
+        long start = System.nanoTime();
         BreakTarget target = bestCrystal();
         if (target == null) return;
 
@@ -270,9 +309,19 @@ public class AutoCrystalFeature extends Feature {
         crystalHits.put(id, hits + 1);
 
         breakTimer = breakDelay.get();
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#doBreak",
+                        String.format(Locale.US, "doBreak: %.4f ms", ms));
+            });
+        }
     }
 
     private BreakTarget bestCrystal() {
+        long start = System.nanoTime();
         BreakTarget best = null;
 
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.END_CRYSTALS, 10)) {
@@ -306,10 +355,19 @@ public class AutoCrystalFeature extends Feature {
         if (best != null && best.totalDamage < minDamage.get()/2)
             return null;
 
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#bestCrystal",
+                        String.format(Locale.US, "bestCrystal: %.4f ms", ms));
+            });
+        }
         return best;
     }
 
     private float damageOthers(EndCrystal crystal) {
+        long start = System.nanoTime();
         Vec3 pos = crystal.position();
         float totalDamage = 0f;
 
@@ -337,6 +395,15 @@ public class AutoCrystalFeature extends Feature {
                 totalDamage += dmg;
             }
         }
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#damageOthers",
+                        String.format(Locale.US, "damageOthers: %.4f ms", ms));
+            });
+        }
         return totalDamage;
     }
 
@@ -351,6 +418,8 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private void doPlace() {
+        long start = System.nanoTime();
+
         placeTarget = findBestPlace();
         if (placeTarget == null) return;
         if (placeTarget.totalDamage < minDamage.get()) return;
@@ -360,10 +429,19 @@ public class AutoCrystalFeature extends Feature {
         crystalPlaces.put(placeTarget.pos.asLong(), 0);
 
         placeTimer = placeDelay.get();
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#doPlace",
+                        String.format(Locale.US, "doPlace: %.4f ms", ms));
+            });
+        }
     }
 
     private PlaceTarget findBestPlace() {
-        long startTime = System.nanoTime();
+        long start= System.nanoTime();
         PlaceTarget best = null;
         BlockPos playerPos = MC.player.blockPosition();
         int r = (int) Math.ceil(placeRange.get());
@@ -392,15 +470,25 @@ public class AutoCrystalFeature extends Feature {
             }
         }
 
-        lastCalcTimeMs = (System.nanoTime() - startTime) / 1_000_000f;
+        lastCalcTimeMs = (System.nanoTime() - start) / 1_000_000f;
         if (best != null) {
             PlaceTarget ret = new PlaceTarget(best.pos, best.totalDamage);
             return ret;
+        }
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#findBestPlace",
+                        String.format(Locale.US, "findBestPlace: %.4f ms", ms));
+            });
         }
         return best; // always null here
     }
 
     private List<BlockPos> ignoredBlocks(boolean b) {
+        long start= System.nanoTime();
         List<BlockPos> ignored = new ArrayList<>();
 
         if (placeIgnoreTerrain.get()) {
@@ -435,6 +523,15 @@ public class AutoCrystalFeature extends Feature {
                     ignored.add(sm.doubleMineTask.getBlockPos());
                 }
             }
+        }
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#ignoredBlocks",
+                        String.format(Locale.US, "ignoredBlocks: %.4f ms", ms));
+            });
         }
 
         return ignored;
@@ -490,6 +587,7 @@ public class AutoCrystalFeature extends Feature {
 
 
     private float calculatePlaceDamage(Vec3 crystalPos) {
+        long start= System.nanoTime();
         float totalDamage = 0f;
 
         float selfDamage = DamageUtils.crystalDamage(MC.player, MC.player.position(), MC.player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get());
@@ -518,6 +616,15 @@ public class AutoCrystalFeature extends Feature {
                 return -1f;
 
             totalDamage += dmg;
+        }
+
+        if (debug.get()) {
+            MC.execute(() -> {
+                float ms = (System.nanoTime() - start) / 1_000_000f;
+                CHAT_SERVICE.sendPersistent(
+                        "AutoCrystalFeature#calculatePlaceDamage",
+                        String.format(Locale.US, "calculatePlaceDamagea: %.4f ms", ms));
+            });
         }
         return totalDamage;
     }
