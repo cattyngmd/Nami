@@ -1,5 +1,6 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat.component;
 
+import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
@@ -10,19 +11,24 @@ import namidevelopment.kiriyaga.api.util.InteractionUtils;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import com.mojang.blaze3d.vertex.PoseStack;
+import namidevelopment.kiriyaga.nami.impl.feature.combat.autocrystal.AutoCrystalFeature;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
-import static namidevelopment.kiriyaga.api.NamiApi.MC;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
 
 public class TrapComponent {
 
@@ -39,6 +45,11 @@ public class TrapComponent {
     public final BoolSetting foundation;
     public final BoolSetting swing;
     public final BoolSetting render;
+    public final BoolSetting attack;
+    public final DoubleSetting attackRange;
+    public final BoolSetting attackRotate;
+    public final BoolSetting attackMultiTask;
+    public final BoolSetting attackSwing;
 
     private int cooldown = 0;
     private final List<BlockPos> targetPositions = new ArrayList<>();
@@ -58,8 +69,20 @@ public class TrapComponent {
         swing = feature.addSetting(new BoolSetting("Swing", true));
         render = feature.addSetting(new BoolSetting("Render", true));
 
+        attack = feature.addSetting(new BoolSetting("Attack", false));
+        attackRotate = feature.addSetting(new BoolSetting("AttackRotate","Rotate", true));
+        attackRange = feature.addSetting(new DoubleSetting("AttackRange","Range", 3.00, 1.0, 6.0));
+        attackMultiTask = feature.addSetting(new BoolSetting("AttackMultitask","Multitask", true));
+        attackSwing = feature.addSetting(new BoolSetting("AttackSwing","Swing", true));
+
+
         grim.setShowCondition(airPlace::get);
         strictDirection.setShowCondition(() -> !airPlace.get());
+
+        attackRotate.setShowCondition(attack::get);
+        attackRange.setShowCondition(attack::get);
+        attackMultiTask.setShowCondition(attack::get);
+        attackSwing.setShowCondition(attack::get);
     }
 
     public void onDisable() {
@@ -80,6 +103,19 @@ public class TrapComponent {
         if (cooldown > 0) {
             cooldown--;
             return;
+        }
+
+        if (attack.get() && !targetPositions.isEmpty()) {
+            for (EndCrystal crystal : MC.level.getEntitiesOfClass(EndCrystal.class, new AABB(MC.player.blockPosition()).inflate(range.get() + 6.0))) {
+                AABB crystalBox = crystal.getBoundingBox();
+                for (BlockPos pos : targetPositions) {
+                    AABB blockBox = new AABB(pos);
+                    if (blockBox.intersects(crystalBox)) {
+                        doBreak(crystal);
+                        break;
+                    }
+                }
+            }
         }
 
         int blocksPlaced = 0;
@@ -152,32 +188,39 @@ public class TrapComponent {
     }
 
     private boolean place(BlockPos pos, Item item, boolean airPlace, boolean grim, Feature owner) {
-        if (airPlace) {
-            return InteractionUtils.airPlace(
-                    pos,
-                    item,
-                    swapBack.get(),
-                    range.get(),
-                    rotate.get(),
-                    grim,
-                    simulate.get(),
-                    swing.get(),
-                    owner.getName(),
-                    multiTask.get()
-            );
+        if (airPlace)
+            return InteractionUtils.airPlace(pos, item, swapBack.get(), range.get(), rotate.get(), grim, simulate.get(), swing.get(), owner.getName(), multiTask.get());
+
+        return InteractionUtils.placeBlock(pos, item, swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName(), multiTask.get());
+    }
+
+    private void doBreak(EndCrystal target) {
+        if (target == null) return;
+
+        if (!attackMultiTask.get() && MC.player.isUsingItem()) return;
+
+        boolean rotated = false;
+
+        if (attackRotate.get()) {
+            Vec3 pos = getClosestPointToEye(MC.player.getEyePosition(), target.getBoundingBox());
+            float yaw = (float) getYawToVec(MC.player, pos);
+            float pitch = (float) getPitchToVec(MC.player, pos);
+
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 9, yaw, pitch));
+
+            rotated = true;
         }
 
-        return InteractionUtils.placeBlock(
-                pos,
-                item,
-                swapBack.get(),
-                range.get(),
-                rotate.get(),
-                strictDirection.get(),
-                simulate.get(),
-                swing.get(),
-                owner.getName(),
-                multiTask.get()
-        );
+        if (rotated) {
+            boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePosition(1.0f));
+            EntityHitResult serverCheck = raycastTarget(MC.player, target, attackRange.get(), ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+            if (serverCheck == null && !insideBox) return;
+        }
+
+        MC.gameMode.attack(MC.player, target);
+
+        if (attackSwing.get()) {
+            MC.player.swing(InteractionHand.MAIN_HAND);
+        }
     }
 }
