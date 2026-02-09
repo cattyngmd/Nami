@@ -141,4 +141,13 @@ public class ColorUtils {
         if (health >= 6) return "{red}";
         return "{dark_red}";
     }
+
+    public static String getTotemColor(int totems) {
+        if (totems <= 0) return "{dark_red}";
+
+        if (totems <= 2) return "{green}";
+        if (totems <= 4) return "{yellow}";
+        if (totems <= 7) return "{gold}";
+        return "{red}";
+    }
 }

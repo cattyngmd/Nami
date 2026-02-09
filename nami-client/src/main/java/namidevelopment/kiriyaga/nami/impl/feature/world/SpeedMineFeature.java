@@ -76,7 +76,7 @@ public class SpeedMineFeature extends Feature {
         super("SpeedMine", "Increases speed of mining.", FeatureCategory.of("World"));
         echestPriority.setShowCondition(()-> swap.get() != Swap.NONE);
         damageThreshold.setShowCondition(()-> swap.get() != Swap.NONE);
-        allowOffhand.setShowCondition(multitask::get);
+        allowOffhand.setShowCondition(()-> !multitask.get());
     }
 
     @Override

@@ -99,15 +99,29 @@ public class NametagsFeature extends Feature {
             if (health.get())
                 text += " " + EntityUtils.getHealthNumber(ent);
 
+            if (totemPops.get()) {
+                int pops = TOTEMCOUNTER_SERVICE.getPoppedTotemCount(ent.getId());
+
+                if (pops > 0)
+                    text += " -" + pops;
+            }
+
             float width = FONT_SERVICE.getWidth(text);
 
             String colored = FRIEND_SERVICE.isFriend(ign) ? "{friend}" + text : text;
 
-            if (health.get()) colored = colored.replace(" " + EntityUtils.getHealthNumber(ent), " " + ColorUtils.getHealthColor(ent) + EntityUtils.getHealthNumber(ent));
+            if (health.get())
+                colored = colored.replace(" " + EntityUtils.getHealthNumber(ent),
+                        " " + ColorUtils.getHealthColor(ent) + EntityUtils.getHealthNumber(ent));
+
+            if (totemPops.get()) {
+                int pops = TOTEMCOUNTER_SERVICE.getPoppedTotemCount(ent.getId());
+
+                if (pops > 0)
+                    colored = colored.replace(" -" + pops, " " + ColorUtils.getTotemColor(pops) + "-" + pops);
+            }
 
             Component display = CAT_FORMAT.format(colored);
-
-
             float scale = 1.0f;if (dynamicScale.get()) {
                 float dist = MC.getCameraEntity().distanceTo(ent);
                 scale = Math.max(0.5f, Math.min(1.0f, 20.0f / dist));
