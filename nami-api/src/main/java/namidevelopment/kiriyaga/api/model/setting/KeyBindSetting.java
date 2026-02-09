@@ -46,35 +46,13 @@ public class KeyBindSetting extends Setting<Integer> {
     public boolean isPressed() {
         if (value == KEY_NONE) return false;
 
-        if (value == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            return MC.mouseHandler.isLeftPressed();
-        }
-        if (value == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            return MC.mouseHandler.isRightPressed();
-        }
-        if (value == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
-            return MC.mouseHandler.isMiddlePressed();
+        long window = MC.getWindow().handle();
+
+        if (value >= GLFW.GLFW_MOUSE_BUTTON_1 && value <= GLFW.GLFW_MOUSE_BUTTON_8) {
+            return GLFW.glfwGetMouseButton(window, value) == GLFW.GLFW_PRESS;
         }
 
-        return GLFW.glfwGetKey(MC.getWindow().handle(), value) == GLFW.GLFW_PRESS;
-    }
-
-    public String getKeyName() {
-        if (value == KEY_NONE) return "none";
-
-        switch (value) {
-            case GLFW.GLFW_MOUSE_BUTTON_LEFT: return "MOUSE_LEFT";
-            case GLFW.GLFW_MOUSE_BUTTON_RIGHT: return "MOUSE_RIGHT";
-            case GLFW.GLFW_MOUSE_BUTTON_MIDDLE: return "MOUSE_MIDDLE";
-            case GLFW.GLFW_MOUSE_BUTTON_4: return "MOUSE_4";
-            case GLFW.GLFW_MOUSE_BUTTON_5: return "MOUSE_5";
-            case GLFW.GLFW_MOUSE_BUTTON_6: return "MOUSE_6";
-            case GLFW.GLFW_MOUSE_BUTTON_7: return "MOUSE_7";
-            case GLFW.GLFW_MOUSE_BUTTON_8: return "MOUSE_8";
-        }
-
-        String keyName = GLFW.glfwGetKeyName(value, 0);
-        return keyName != null ? keyName.toUpperCase() : "KEY_" + value;
+        return GLFW.glfwGetKey(window, value) == GLFW.GLFW_PRESS;
     }
 
     public boolean isHoldMode() {
