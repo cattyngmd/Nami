@@ -29,6 +29,7 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -37,12 +38,15 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.EntityHitResult;
 
@@ -385,25 +389,22 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private AutoCrystalSnapshot doSnapshot(long tickId, AutoCrystalSnapshot.AsyncDebugInfo dbg) {
-        var player = MC.player;
-        var level = MC.level;
-
-        Vec3 eyePos = player.getEyePosition();
-        BlockPos playerPos = player.blockPosition();
+        Vec3 eyePos = MC.player.getEyePosition();
+        BlockPos playerPos = MC.player.blockPosition();
 
         double pr = placeRange.get();
         double br = breakRange.get();
         double minDmg = minDamage.get();
 
-        List<LivingEntity> entities = EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12).stream().filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity) e).toList();
+        List<Player> entities = EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12).stream().filter(e -> e instanceof LivingEntity).map(e -> (Player) e).toList();
         dbg.targetsTotal = entities.size();
 
         ArrayList<AutoCrystalSnapshot.TargetData> targets = new ArrayList<>();
 
-        for (LivingEntity e : entities) {
-            if (e == player)
-                continue;
+        for (Player e : entities) {
             if (e.isDeadOrDying())
+                continue;
+            if (FRIEND_SERVICE.isFriend(e.getName().getString()))
                 continue;
 
             dbg.targetsValid++;
@@ -450,13 +451,13 @@ public class AutoCrystalFeature extends Feature {
                     BlockPos pos = playerPos.offset(x, y, z);
                     BlockPos base = pos.below();
 
-                    BlockState baseState = level.getBlockState(base);
+                    BlockState baseState = MC.level.getBlockState(base);
                     if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK)) {
                         dbg.candidatesBadBase++;
                         continue;
                     }
 
-                    if (!level.getBlockState(pos).isAir()) {
+                    if (!MC.level.getBlockState(pos).isAir()) {
                         dbg.candidatesNotAir++;
                         continue;
                     }
@@ -499,7 +500,7 @@ public class AutoCrystalFeature extends Feature {
             }
         }
 
-        return new AutoCrystalSnapshot(tickId, MC.player.getId(), eyePos, playerPos, pr, br, minDmg, assumeBestArmor.get(), targets.toArray(new AutoCrystalSnapshot.TargetData[0]), candidates.toArray(new BlockPos[0]));
+        return new AutoCrystalSnapshot(tickId, MC.player.getId(), eyePos, playerPos, pr, br, minDmg, assumeBestArmor.get(), MC.level.getDifficulty(), true, MC.level, targets.toArray(new AutoCrystalSnapshot.TargetData[0]), candidates.toArray(new BlockPos[0]));
     }
 
     private PlaceTarget findNextPlaceTargetForSnapshot(AutoCrystalSnapshot snap, AutoCrystalSnapshot.AsyncDebugInfo dbg) {
@@ -530,11 +531,14 @@ public class AutoCrystalFeature extends Feature {
             double dist = t.pos().distanceTo(explosionPos);
             if (dist > 12.0) continue;
 
-            double impact = 1.0 - (dist / 12.0);
+            double exposure = calculateExposureForSnapshot(explosionPos, t.box(), snap);
+            if (exposure <= 0.0) continue;
+
+            double impact = (1.0 - (dist / 12.0)) * exposure;
             if (impact <= 0.0) continue;
 
             float baseDamage = (float)((impact * impact + impact) / 2.0 * 7.0 * 12.0 + 1.0);
-            float dmg = applyResistanceForSnapshot(baseDamage, t, snap.assumeBestArmor());
+            float dmg = applyReductionsForSnapshot(baseDamage, t, snap);
 
             if (t.id() == snap.selfId()) {
                 if (dmg > maxSelfDamage.get()) {
@@ -551,39 +555,91 @@ public class AutoCrystalFeature extends Feature {
             }
             if (dmg < snap.minDamage()) {
                 dbg.dmgRejectedMin++;
-                return -1f;
+                continue;
             }
             total += dmg;
         }
-
         return total;
     }
 
-    private float applyResistanceForSnapshot(float damage, AutoCrystalSnapshot.TargetData t, boolean assumeBestArmor) {
+    private float applyReductionsForSnapshot(float damage, AutoCrystalSnapshot.TargetData t, AutoCrystalSnapshot snap) {
+        if (snap.scalesWithDifficulty()) {
+            switch (snap.difficulty()) {
+                case EASY -> damage = Math.min(damage / 2f + 1f, damage);
+                case HARD -> damage *= 1.5f;
+            }
+        }
 
-        damage *= 1.5f; // it should be hard level, but idk, we leave it at 1.5f, which means it always difficulty: hard for calculations
-
+        damage = getDamageAfterAbsorbForSnapshot(damage, t.armor(), t.toughness());
         if (t.resistanceAmp() >= 0) {
             damage *= 1.0f - 0.2f * (t.resistanceAmp() + 1);
         }
+        damage = reduceByProtectionForSnapshot(damage, t, snap.assumeBestArmor());
+        return Math.max(damage, 0.0f);
+    }
 
+    private float reduceByProtectionForSnapshot(float damage, AutoCrystalSnapshot.TargetData t, boolean assumeBestArmor) {
         int totalProtection = 0;
-
         if (assumeBestArmor) {
             if ((t.armorMask() & 1) != 0) totalProtection += 4;
             if ((t.armorMask() & 2) != 0) totalProtection += 4;
             if ((t.armorMask() & 8) != 0) totalProtection += 4;
-
             if ((t.armorMask() & 4) != 0) totalProtection += 8;
-
         } else {
             totalProtection += t.prot();
             totalProtection += 2 * t.blastProt();
         }
 
-        damage = CombatRules.getDamageAfterMagicAbsorb(damage, (float) totalProtection);
+        return CombatRules.getDamageAfterMagicAbsorb(damage, totalProtection);
+    }
+    private float calculateExposureForSnapshot(Vec3 source, AABB box, AutoCrystalSnapshot snap) {
+        double dx = box.getXsize();
+        double dy = box.getYsize();
+        double dz = box.getZsize();
 
-        return Math.max(damage, 0.0f);
+        int steps = 2;
+        int hits = 0;
+        int misses = 0;
+
+        for (double x = 0; x <= dx; x += dx / steps) {
+            for (double y = 0; y <= dy; y += dy / steps) {
+                for (double z = 0; z <= dz; z += dz / steps) {
+
+                    Vec3 pos = new Vec3(box.minX + x, box.minY + y, box.minZ + z);
+
+                    if (raycastForSnapshot(pos, source, snap) == null) {
+                        misses++;
+                    }
+
+                    hits++;
+                }
+            }
+        }
+
+        return hits == 0 ? 0f : (float) misses / hits;
+    }
+
+    private BlockHitResult raycastForSnapshot(Vec3 start, Vec3 end, AutoCrystalSnapshot snap) {
+        return BlockGetter.traverseBlocks(
+                start, end,
+                new DamageUtils.ExposureContext(start, end),
+                (ctx, pos) -> {
+                    BlockState state = snap.level().getBlockState(pos);
+
+                    if (state.getBlock().getExplosionResistance() < 600 && placeIgnoreTerrain.get()) return null;
+
+                    return state.getCollisionShape(snap.level(), pos)
+                            .clip(ctx.start(), ctx.end(), pos);
+                },
+                ctx -> null
+        );
+    }
+
+    public static float getDamageAfterAbsorbForSnapshot(float damage, float armor, float toughness) {  //package net.minecraft.world.damagesource;  class CombatRules
+        float i = 2.0F + toughness / 4.0F;
+        float j = Mth.clamp(armor - damage / i, armor * 0.2F, 20.0F);
+        float k = j / 25.0F;
+        return damage * (1.0F - k);
     }
 
     private Set<BlockPos> ignoredBlocks(boolean b) {
@@ -646,7 +702,7 @@ public class AutoCrystalFeature extends Feature {
             if (FRIEND_SERVICE.isFriend(e.getName().getString())) continue;
 
             if (dmg < minDamage.get())
-                return -1f;
+                continue;
 
             totalDamage += dmg;
         }
