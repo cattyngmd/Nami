@@ -87,7 +87,9 @@ public abstract class MixinMinecraft {
         float yaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
         float pitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
         targetRotation.set(new Vec2(yaw, pitch));
-        targetRotationPriority.set(new Vector2i(ROTATION_SERVICE.getRequestHandler().getActiveRequest().priority, ROTATION_SERVICE.getRequestHandler().getActiveRequest().priority));
+        Integer priority = ROTATION_SERVICE.getRequestHandler().getActiveRequest().priority;
+        int p = (priority == null) ? Integer.MIN_VALUE : priority;
+        targetRotationPriority.set(new Vector2i(p, p));
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=gameRenderer"))
