@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.feature.combat.AutoCrystal;
+package namidevelopment.kiriyaga.nami.impl.feature.combat.autocrystal;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;

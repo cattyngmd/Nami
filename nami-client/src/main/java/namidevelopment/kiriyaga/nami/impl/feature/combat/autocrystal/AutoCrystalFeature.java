@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.feature.combat.AutoCrystal;
+package namidevelopment.kiriyaga.nami.impl.feature.combat.autocrystal;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;

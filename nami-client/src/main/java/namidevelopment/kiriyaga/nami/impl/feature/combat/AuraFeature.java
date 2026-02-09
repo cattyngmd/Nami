@@ -12,7 +12,7 @@ import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
 import namidevelopment.kiriyaga.api.util.InventoryUtils;
-import namidevelopment.kiriyaga.nami.impl.feature.combat.AutoCrystal.AutoCrystalFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.combat.autocrystal.AutoCrystalFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.SprintFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
