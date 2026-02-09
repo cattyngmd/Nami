@@ -176,18 +176,18 @@ public class AutoCrystalFeature extends Feature {
             runningTask = calcExecutor.submit(() -> {
                 PlaceTarget best = findNextPlaceTargetForSnapshot(snap, dbg);
                 asyncBest.set(best);
+
+                if (debug.get()) {
+                    float ms = (System.nanoTime() - dbg.startNs) / 1_000_000f;
+
+                    MC.execute(() -> {
+                        CHAT_SERVICE.sendPersistent(
+                                "AutoCrystalFeature#asyncCalc",
+                                dbg.buildMessage(ms)
+                        );
+                    });
+                }
             });
-
-            if (debug.get()) {
-                float ms = (System.nanoTime() - dbg.startNs) / 1_000_000f;
-
-                MC.execute(() -> {
-                    CHAT_SERVICE.sendPersistent(
-                            "AutoCrystalFeature#asyncCalc",
-                            dbg.buildMessage(ms)
-                    );
-                });
-            }
         }
 
         if (this.asyncBest.get() != null) {
