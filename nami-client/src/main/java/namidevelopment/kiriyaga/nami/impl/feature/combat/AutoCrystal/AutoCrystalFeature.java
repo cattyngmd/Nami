@@ -700,6 +700,8 @@ public class AutoCrystalFeature extends Feature {
 
     private void update() {
         lastPlaceTarget = null;
+        lastTotalDamage = 0;
+        lastCalcTimeMs = 0;
 
         LongIterator it = crystalPlaces.keySet().iterator();
         while (it.hasNext()) {
