@@ -59,7 +59,7 @@ public abstract class MixinLivingEntity extends Entity {
 
     @ModifyExpressionValue(method = "jumpFromGround", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getYRot()F"))
     private float jumpFix(float originalYaw) {
-        if ((Object)this != MC.player) return originalYaw;
+        if ((Object)this != MC.player || !FeatureContractService.get(RotationsFeatureConfig.class).isMoveFixEnabled()) return originalYaw;
         return ROTATION_SERVICE.getStateHandler().isRotating() ? ROTATION_SERVICE.getStateHandler().getRotationYaw() : originalYaw;
     }
 }
