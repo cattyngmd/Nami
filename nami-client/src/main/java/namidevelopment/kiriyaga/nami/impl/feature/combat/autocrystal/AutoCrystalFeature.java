@@ -170,11 +170,24 @@ public class AutoCrystalFeature extends Feature {
         long tickId = MC.level.getGameTime();
 
         if (runningTask == null || runningTask.isDone()) {
-            AutoCrystalSnapshot snap = doSnapshot(tickId);
+            AutoCrystalSnapshot.AsyncDebugInfo dbg = new AutoCrystalSnapshot.AsyncDebugInfo(tickId);
+
+            AutoCrystalSnapshot snap = doSnapshot(tickId, dbg);
             runningTask = calcExecutor.submit(() -> {
-                PlaceTarget best = findNextPlaceTargetForSnapshot(snap);
+                PlaceTarget best = findNextPlaceTargetForSnapshot(snap, dbg);
                 asyncBest.set(best);
             });
+
+            if (debug.get()) {
+                float ms = (System.nanoTime() - dbg.startNs) / 1_000_000f;
+
+                MC.execute(() -> {
+                    CHAT_SERVICE.sendPersistent(
+                            "AutoCrystalFeature#asyncCalc",
+                            dbg.buildMessage(ms)
+                    );
+                });
+            }
         }
 
         if (this.asyncBest.get() != null) {
@@ -217,27 +230,16 @@ public class AutoCrystalFeature extends Feature {
 
     @SubscribeEvent
     private void onRemoveEntityEvent(RemoveEntityEvent event) {
-        long start = System.nanoTime();
         ClientboundRemoveEntitiesPacket packet = event.getPacket();
         for (int id : packet.getEntityIds()) {
             if (crystalHits.containsKey(id)) {
                 crystalHits.remove(id);
             }
         }
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#onRemoveEntityEvent",
-                        String.format(Locale.US, "onRemoveEntityEvent: %.4f ms", ms));
-            });
-        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onAddEntityEvent(AddEntityEvent event) {
-        long start = System.nanoTime();
         if (breakSequential.get() != Sequential.FULL) return;
 
         if (event.getPacket() instanceof ClientboundAddEntityPacket packet) {
@@ -251,14 +253,6 @@ public class AutoCrystalFeature extends Feature {
             fake.setId(packet.getId());
 
             doBreakOnNetty(fake);
-        }
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#onAddEntityEvent",
-                        String.format(Locale.US, "onAddEntityEvent: %.4f ms", ms));
-            });
         }
     }
 
@@ -274,8 +268,6 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private void doBreakOnNetty(EndCrystal crystal) { // we are not on netty actually
-        long start = System.nanoTime();
-
         if (!breakMultitask.get() && MC.player.isUsingItem())  {
             return;
         }
@@ -299,19 +291,9 @@ public class AutoCrystalFeature extends Feature {
             MC.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
 
         //breakTimer = breakDelay.get();
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#doBreakOnNetty",
-                        String.format(Locale.US, "doBreakOnNetty: %.4f ms", ms));
-            });
-        }
     }
 
     private void doBreak() {
-        long start = System.nanoTime();
         BreakTarget target = bestCrystal();
         if (target == null) return;
 
@@ -341,19 +323,9 @@ public class AutoCrystalFeature extends Feature {
         crystalHits.put(id, hits + 1);
 
         breakTimer = breakDelay.get();
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#doBreak",
-                        String.format(Locale.US, "doBreak: %.4f ms", ms));
-            });
-        }
     }
 
     private BreakTarget bestCrystal() {
-        long start = System.nanoTime();
         BreakTarget best = null;
 
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.END_CRYSTALS, 10)) {
@@ -387,14 +359,6 @@ public class AutoCrystalFeature extends Feature {
         if (best != null && best.totalDamage < minDamage.get()/2)
             return null;
 
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#bestCrystal",
-                        String.format(Locale.US, "bestCrystal: %.4f ms", ms));
-            });
-        }
         return best;
     }
 
@@ -409,8 +373,6 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private void doPlace(PlaceTarget target) {
-        long start = System.nanoTime();
-
         if (target == null) return;
         if (target.totalDamage < minDamage.get()) return;
 
@@ -420,18 +382,9 @@ public class AutoCrystalFeature extends Feature {
 
         crystalPlaces.put(target.pos.asLong(), 0);
         placeTimer = placeDelay.get();
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#doPlace",
-                        String.format(Locale.US, "doPlace: %.4f ms", ms));
-            });
-        }
     }
 
-    private AutoCrystalSnapshot doSnapshot(long tickId) {
+    private AutoCrystalSnapshot doSnapshot(long tickId, AutoCrystalSnapshot.AsyncDebugInfo dbg) {
         var player = MC.player;
         var level = MC.level;
 
@@ -443,6 +396,7 @@ public class AutoCrystalFeature extends Feature {
         double minDmg = minDamage.get();
 
         List<LivingEntity> entities = EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12).stream().filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity) e).toList();
+        dbg.targetsTotal = entities.size();
 
         ArrayList<AutoCrystalSnapshot.TargetData> targets = new ArrayList<>();
 
@@ -451,6 +405,8 @@ public class AutoCrystalFeature extends Feature {
                 continue;
             if (e.isDeadOrDying())
                 continue;
+
+            dbg.targetsValid++;
 
             int resistanceAmp = -1;
             MobEffectInstance eff = e.getEffect(MobEffects.RESISTANCE);
@@ -495,26 +451,34 @@ public class AutoCrystalFeature extends Feature {
                     BlockPos base = pos.below();
 
                     BlockState baseState = level.getBlockState(base);
-                    if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK))
+                    if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK)) {
+                        dbg.candidatesBadBase++;
                         continue;
-                    if (!level.getBlockState(pos).isAir())
-                        continue;
+                    }
 
+                    if (!level.getBlockState(pos).isAir()) {
+                        dbg.candidatesNotAir++;
+                        continue;
+                    }
 
                     AABB blockBox = new AABB(pos);
-
-                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > placeRange.get())
+                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > pr) {
+                        dbg.candidatesOutPlaceRange++;
                         continue;
+                    }
 
                     Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
-                    AABB crystalBox = new AABB(crystalPos.x - 1.0, crystalPos.y, crystalPos.z - 1.0, crystalPos.x + 1.0, crystalPos.y + 2.0, crystalPos.z + 1.0);
-                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > placeRange.get())
-                        continue;
+                    AABB crystalBox = new AABB(crystalPos.x-1, crystalPos.y, crystalPos.z-1, crystalPos.x+1, crystalPos.y + 2.0, crystalPos.z + 1.0);
 
-                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > breakRange.get())
+                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > br) {
+                        dbg.candidatesOutBreakRange++;
                         continue;
+                    }
 
-                    AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 2, base.getZ() + 1);
+                    AABB checkIntersects = new AABB(
+                            base.getX(), base.getY() + 1, base.getZ(),
+                            base.getX() + 1, base.getY() + 2, base.getZ() + 1
+                    );
 
                     boolean blocked = false;
                     for (Entity e : MC.level.getEntities(null, checkIntersects)) {
@@ -525,16 +489,20 @@ public class AutoCrystalFeature extends Feature {
                         break;
                     }
 
-                    if (blocked)
+                    if (blocked) {
+                        dbg.candidatesBlocked++;
                         continue;
+                    }
+                    dbg.candidatesTotal++;
                     candidates.add(pos);
                 }
             }
         }
+
         return new AutoCrystalSnapshot(tickId, MC.player.getId(), eyePos, playerPos, pr, br, minDmg, assumeBestArmor.get(), targets.toArray(new AutoCrystalSnapshot.TargetData[0]), candidates.toArray(new BlockPos[0]));
     }
 
-    private PlaceTarget findNextPlaceTargetForSnapshot(AutoCrystalSnapshot snap) {
+    private PlaceTarget findNextPlaceTargetForSnapshot(AutoCrystalSnapshot snap, AutoCrystalSnapshot.AsyncDebugInfo dbg) {
         PlaceTarget best = null;
 
         for (BlockPos pos : snap.candidatePos()) {
@@ -542,7 +510,7 @@ public class AutoCrystalFeature extends Feature {
 
             Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
 
-            float dmg = calculateDamageForSnapshot(crystalPos, snap);
+            float dmg = calculateDamageForSnapshot(crystalPos, snap, dbg);
             if (dmg < snap.minDamage()) continue;
 
             if (best == null || dmg > best.totalDamage) {
@@ -550,10 +518,12 @@ public class AutoCrystalFeature extends Feature {
             }
         }
 
+        if (best != null)
+            dbg.bestFound = 1;
         return best;
     }
 
-    private float calculateDamageForSnapshot(Vec3 explosionPos, AutoCrystalSnapshot snap) {
+    private float calculateDamageForSnapshot(Vec3 explosionPos, AutoCrystalSnapshot snap, AutoCrystalSnapshot.AsyncDebugInfo dbg) {
         float total = 0.0f;
 
         for (var t : snap.targets()) {
@@ -567,22 +537,27 @@ public class AutoCrystalFeature extends Feature {
             float dmg = applyResistanceForSnapshot(baseDamage, t, snap.assumeBestArmor());
 
             if (t.id() == snap.selfId()) {
-                if (dmg > maxSelfDamage.get())
+                if (dmg > maxSelfDamage.get()) {
+                    dbg.dmgRejectedSelf++;
                     return -1f;
+                }
 
-                if (noSelfPop.get() && dmg + 1.5f >= t.health() + t.absorption())
+                if (noSelfPop.get() && dmg + 1.5f >= t.health() + t.absorption()) {
+                    dbg.dmgRejectedNoSelfPop++;
                     return -1f;
+                }
 
                 continue;
             }
-            if (dmg < snap.minDamage())
+            if (dmg < snap.minDamage()) {
+                dbg.dmgRejectedMin++;
                 return -1f;
+            }
             total += dmg;
         }
 
         return total;
     }
-
 
     private float applyResistanceForSnapshot(float damage, AutoCrystalSnapshot.TargetData t, boolean assumeBestArmor) {
 
@@ -612,7 +587,6 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private Set<BlockPos> ignoredBlocks(boolean b) {
-        long start= System.nanoTime();
         Set<BlockPos> ignored = new HashSet<>();
 
         if (placeIgnoreTerrain.get()) {
@@ -649,20 +623,10 @@ public class AutoCrystalFeature extends Feature {
             }
         }
 
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#ignoredBlocks",
-                        String.format(Locale.US, "ignoredBlocks: %.4f ms", ms));
-            });
-        }
-
         return ignored;
     }
 
     private float calculateDamage(Vec3 crystalPos, boolean b) {
-        long start= System.nanoTime();
         float totalDamage = 0f;
         Set<BlockPos> ignored = ignoredBlocks(b);
 
@@ -685,15 +649,6 @@ public class AutoCrystalFeature extends Feature {
                 return -1f;
 
             totalDamage += dmg;
-        }
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#calculatePlaceDamage",
-                        String.format(Locale.US, "calculatePlaceDamagea: %.4f ms", ms));
-            });
         }
         return totalDamage;
     }
