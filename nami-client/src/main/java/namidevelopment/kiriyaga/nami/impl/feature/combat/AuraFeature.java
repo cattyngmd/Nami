@@ -84,7 +84,7 @@ public class AuraFeature extends Feature {
         this.clearDisplayInfo();
 
         AutoCrystalFeature ac = FEATURE_SERVICE.getStorage().getByClass(AutoCrystalFeature.class);
-        if (ac.isEnabled() && ac.lastTotalDamage >= ac.minDamage.get())
+        if (ac.isEnabled() && ac.lastTotalDamage > 0.00f)
             return;
 
         float tps;

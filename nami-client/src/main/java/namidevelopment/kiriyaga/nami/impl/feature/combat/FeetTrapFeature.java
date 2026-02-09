@@ -10,18 +10,24 @@ import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.nami.impl.feature.combat.component.TrapComponent;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.MC;
 import static namidevelopment.kiriyaga.api.util.BlockUtils.getSurround;
+import static namidevelopment.kiriyaga.api.util.BlockUtils.isPlaceable;
 
 @RegisterFeature
 public class FeetTrapFeature extends Feature {
 
     public final BoolSetting extension = addSetting(new BoolSetting("Extension", false));
     public final BoolSetting jumpDisable = addSetting(new BoolSetting("JumpDisable", false));
+    public final BoolSetting corners = addSetting(new BoolSetting("Corners", false));
 
     private final TrapComponent trap;
 
@@ -60,6 +66,29 @@ public class FeetTrapFeature extends Feature {
     }
 
     private List<BlockPos> getTrapTargets() {
-        return getSurround(MC.player, 0, extension.get());
+        Set<BlockPos> targets = new HashSet<>(getSurround(MC.player, 0, extension.get()));
+        if (corners.get()) {
+            AABB bb = MC.player.getBoundingBox();
+            int y = (int) Math.floor(MC.player.getY());
+
+            for (int x = (int) Math.floor(bb.minX); x < Math.ceil(bb.maxX); x++) {
+                for (int z = (int) Math.floor(bb.minZ); z < Math.ceil(bb.maxZ); z++) {
+                    BlockPos base = new BlockPos(x, y, z);
+
+                    BlockPos[] corners = new BlockPos[]{
+                            base.north().east(),
+                            base.north().west(),
+                            base.south().east(),
+                            base.south().west()};
+
+                    for (BlockPos b : corners) {
+                        if (MC.level.getBlockState(b).canBeReplaced() && !isPlaceable(b)) {
+                            targets.add(b);
+                        }
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(targets);
     }
 }
