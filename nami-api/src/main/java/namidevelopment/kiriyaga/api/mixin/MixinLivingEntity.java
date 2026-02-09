@@ -20,10 +20,6 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public abstract class MixinLivingEntity extends Entity {
 
     private float originalYaw;
-    @Shadow
-    private int noJumpDelay;
-    @Shadow
-    public float yHeadRot;
     private float originalPitch;
 
     public MixinLivingEntity(EntityType<?> type, Level world) {

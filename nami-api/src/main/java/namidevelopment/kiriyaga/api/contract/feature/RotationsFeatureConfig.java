@@ -12,6 +12,7 @@ public interface RotationsFeatureConfig {
     boolean isMoveFixEnabled();
     boolean isRenderEnabled();
     int getHoldTicks();
+    boolean isFutureRotations();
 
     enum RotationMode {
         MOTION, SILENT

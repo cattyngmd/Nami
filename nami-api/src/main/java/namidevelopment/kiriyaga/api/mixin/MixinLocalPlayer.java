@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
-@Mixin(LocalPlayer.class)
+@Mixin(value = LocalPlayer.class, priority = Integer.MAX_VALUE)
 public abstract class MixinLocalPlayer {
     private float originalSilentPitch;
     private float originalYaw, originalPitch;
@@ -20,7 +20,9 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "sendPosition", at = @At("HEAD"))
     private void preSendMovementPackets(CallbackInfo ci) {
-        if (!ROTATION_SERVICE.getStateHandler().isRotating()) {
+        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        if (!ROTATION_SERVICE.getStateHandler().isRotating() || config.isFutureRotations()) {
             ROTATION_SERVICE.getStateHandler().setServerDeltaYaw(0f); // delta without rotations almost always lower then 30, its almost impossible without hacks to reach
             return;
         }
@@ -47,8 +49,11 @@ public abstract class MixinLocalPlayer {
         ROTATION_SERVICE.getStateHandler().setServerYaw(MC.player.getYRot());
         ROTATION_SERVICE.getStateHandler().setServerPitch(MC.player.getXRot());
 
-        if (!ROTATION_SERVICE.getStateHandler().isRotating())
+        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        if (!ROTATION_SERVICE.getStateHandler().isRotating() || config.isFutureRotations()) {
             return;
+        }
 
         MC.player.setYRot(originalYaw);
         MC.player.setXRot(originalPitch);
@@ -87,7 +92,9 @@ public abstract class MixinLocalPlayer {
                                                   @Share(namespace = "shared_rotations", value = "target_rotation_priority")
                                                   final LocalRef<Vector2i> targetRotationPriority
     ) {
-        if (!ROTATION_SERVICE.getStateHandler().isRotating()) {
+        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        if (!ROTATION_SERVICE.getStateHandler().isRotating() || !config.isFutureRotations()) {
             return;
         }
         float yaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();

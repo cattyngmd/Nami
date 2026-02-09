@@ -25,6 +25,7 @@ public class RotationsFeature extends Feature implements RotationsFeatureConfig 
     public final BoolSetting jitter = addSetting(new BoolSetting("Jitter", true));
     public final BoolSetting moveFix = addSetting(new BoolSetting("MoveFix", true));
     public final BoolSetting render = addSetting(new BoolSetting("Render", false));
+    public final BoolSetting futureRotations = addSetting(new BoolSetting("FutureRotations", false));
 
     public RotationsFeature() {
         super("Rotations", "Client rotations configuration.", FeatureCategory.of("Client"), "rotate", "rotationSERVICE", "roate", "toationSERVICE");
@@ -88,5 +89,10 @@ public class RotationsFeature extends Feature implements RotationsFeatureConfig 
     @Override
     public int getHoldTicks() {
         return ticksBeforeRelease.get();
+    }
+
+    @Override
+    public boolean isFutureRotations() {
+        return futureRotations.get();
     }
 }

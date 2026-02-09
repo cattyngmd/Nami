@@ -1,5 +1,7 @@
 package namidevelopment.kiriyaga.api.mixin;
 
+import namidevelopment.kiriyaga.api.contract.FeatureContractService;
+import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,8 +14,10 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 public abstract class MixinEntity {
     @Inject(method = "getLookAngle()Lnet/minecraft/world/phys/Vec3;", at = @At("HEAD"), cancellable = true)
     private void onGetRotationVector(CallbackInfoReturnable<Vec3> cir) {
+        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
+
         if ((Object) this != MC.player) return;
-        if (ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating()) return;
+        if (ROTATION_SERVICE == null || !ROTATION_SERVICE.getStateHandler().isRotating() || config.isFutureRotations()) return;
 
         float spoofYaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
         float spoofPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
