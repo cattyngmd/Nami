@@ -61,6 +61,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
+import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isBroken;
 
 @RegisterFeature
 public class AutoCrystalFeature extends Feature {
@@ -100,6 +101,9 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting noSelfPop = addSetting(new BoolSetting("NoSelfPop", true));
     public final DoubleSetting minDamage = addSetting(new DoubleSetting("MinDamage", 4.0, 0.0, 36.0));
     public final DoubleSetting maxSelfDamage = addSetting(new DoubleSetting("MaxSelfDamage", 12.0, 0.0, 36.0));
+    public final IntSetting balance = addSetting(new IntSetting("Balance", 4, 2, 6));
+    public final DoubleSetting healthBalance = addSetting(new DoubleSetting("HealthBalance", 0.20, 0.00, 1.00));
+    public final DoubleSetting armorBalance = addSetting(new DoubleSetting("ArmorBalance", 0.20, 0.00, 1.00));
 
     //render
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
@@ -149,6 +153,9 @@ public class AutoCrystalFeature extends Feature {
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
         maxSelfDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
         assumeBestArmor.setShowCondition(() -> page.get() == Page.DAMAGES);
+        balance.setShowCondition(() -> page.get() == Page.DAMAGES);
+        healthBalance.setShowCondition(() -> page.get() == Page.DAMAGES);
+        armorBalance.setShowCondition(() -> page.get() == Page.DAMAGES);
 
         render.setShowCondition(() -> page.get() == Page.RENDER);
     }
@@ -201,7 +208,8 @@ public class AutoCrystalFeature extends Feature {
             Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
 
             float realDamage = calculateDamage(crystalPos, true);
-            if (realDamage >= minDamage.get()) {
+
+            if (realDamage > 0.0f) {
                 bestPlace = new PlaceTarget(pos, realDamage);
                 lastTotalDamage = realDamage;
             } else {
@@ -360,7 +368,7 @@ public class AutoCrystalFeature extends Feature {
                 best = new BreakTarget(crystal, totalDamage);
         }
 
-        if (best != null && best.totalDamage < minDamage.get()/2)
+        if (best != null && best.totalDamage <= 0.0f)
             return null;
 
         return best;
@@ -378,7 +386,7 @@ public class AutoCrystalFeature extends Feature {
 
     private void doPlace(PlaceTarget target) {
         if (target == null) return;
-        if (target.totalDamage < minDamage.get()) return;
+        if (target.totalDamage < 0) return;
 
         InteractionUtils.interactBlockAt(target.pos.below(), Items.END_CRYSTAL, null, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), placeStrictDirection.get(), false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
 
@@ -433,7 +441,20 @@ public class AutoCrystalFeature extends Feature {
                 }
             }
 
-            targets.add(new AutoCrystalSnapshot.TargetData(e.getId(), e.position(), e.getBoundingBox(), (float) Math.floor(e.getAttributeValue(Attributes.ARMOR)), (float) e.getAttributeValue(Attributes.ARMOR_TOUGHNESS), resistanceAmp, mask, prot, blastProt, e.getHealth(), e.getAbsorptionAmount()));
+            boolean broken = false;
+            int threshold = (int) (armorBalance.get() * 100.0);
+
+            for (EquipmentSlot slot : EquipmentSlotGroup.ARMOR) {
+                ItemStack stack = e.getItemBySlot(slot);
+                if (stack.isEmpty()) continue;
+
+                if (isBroken(stack, threshold)) {
+                    broken = true;
+                    break;
+                }
+            }
+
+            targets.add(new AutoCrystalSnapshot.TargetData(e.getId(), e.position(), e.getBoundingBox(), (float) Math.floor(e.getAttributeValue(Attributes.ARMOR)), (float) e.getAttributeValue(Attributes.ARMOR_TOUGHNESS), resistanceAmp, mask, prot, blastProt, e.getHealth(), e.getAbsorptionAmount(), broken));
         }
 
         int r = (int) Math.ceil(pr);
@@ -512,7 +533,7 @@ public class AutoCrystalFeature extends Feature {
             Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
 
             float dmg = calculateDamageForSnapshot(crystalPos, snap, dbg);
-            if (dmg < snap.minDamage()) continue;
+            if (dmg < 0) continue;
 
             if (best == null || dmg > best.totalDamage) {
                 best = new PlaceTarget(pos, dmg);
@@ -526,6 +547,7 @@ public class AutoCrystalFeature extends Feature {
 
     private float calculateDamageForSnapshot(Vec3 explosionPos, AutoCrystalSnapshot snap, AutoCrystalSnapshot.AsyncDebugInfo dbg) {
         float total = 0.0f;
+        boolean any = false;
 
         for (var t : snap.targets()) {
             double dist = t.pos().distanceTo(explosionPos);
@@ -553,13 +575,17 @@ public class AutoCrystalFeature extends Feature {
 
                 continue;
             }
-            if (dmg < snap.minDamage()) {
+            double dynMin = getMinDamage(t.health(), t.absorption(), t.armorBroken());
+
+            if (dmg < dynMin) {
                 dbg.dmgRejectedMin++;
                 continue;
             }
+
             total += dmg;
+            any = true;
         }
-        return total;
+        return any ? total : -1.0f;
     }
 
     private float applyReductionsForSnapshot(float damage, AutoCrystalSnapshot.TargetData t, AutoCrystalSnapshot snap) {
@@ -683,13 +709,14 @@ public class AutoCrystalFeature extends Feature {
     }
 
     private float calculateDamage(Vec3 crystalPos, boolean b) {
-        float totalDamage = 0f;
+        float total = -1f;
+         boolean any = false;
         Set<BlockPos> ignored = ignoredBlocks(b);
 
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12)) {
-            if (!(e instanceof LivingEntity living)) continue;
+            if (!(e instanceof Player player)) continue;
 
-            float dmg = DamageUtils.crystalDamage(living, living.position(), living.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignored);
+            float dmg = DamageUtils.crystalDamage(player, player.position(), player.getBoundingBox(), crystalPos, DamageUtils.BLOCK_CHECK, assumeBestArmor.get(), ignored);
 
             if (e == MC.player) {
                 if (dmg > maxSelfDamage.get())
@@ -701,12 +728,17 @@ public class AutoCrystalFeature extends Feature {
 
             if (FRIEND_SERVICE.isFriend(e.getName().getString())) continue;
 
-            if (dmg < minDamage.get())
+            boolean armorBroken = isAnyArmorBroken(player);
+            double dynMin = getMinDamage(player.getHealth(), player.getAbsorptionAmount(), armorBroken);
+
+            if (dmg < dynMin)
                 continue;
 
-            totalDamage += dmg;
+
+            total += dmg;
+            any = true;
         }
-        return totalDamage;
+        return any ? total : -1.0f;
     }
 
     private void update() {
@@ -725,6 +757,37 @@ public class AutoCrystalFeature extends Feature {
                 crystalPlaces.put(key, age);
             }
         }
+    }
+
+    private double getMinDamage(float health, float absorption, boolean armorBroken) {
+        double min = minDamage.get();
+        int div = Math.max(1, balance.get());
+
+        float hp = health + absorption;
+        float hpPercent = hp / 36.0f;
+
+        if (hpPercent <= healthBalance.get()) {
+            min /= div;
+        }
+
+        if (armorBroken) {
+            min /= div;
+        }
+
+        return min;
+    }
+
+    private boolean isAnyArmorBroken(Player p) {
+        int threshold = (int) (armorBalance.get() * 100.0);
+
+        for (EquipmentSlot slot : EquipmentSlotGroup.ARMOR) {
+            ItemStack stack = p.getItemBySlot(slot);
+            if (stack.isEmpty()) continue;
+
+            if (isBroken(stack, threshold))
+                return true;
+        }
+        return false;
     }
 
     private record PlaceTarget(BlockPos pos, float totalDamage) {}
