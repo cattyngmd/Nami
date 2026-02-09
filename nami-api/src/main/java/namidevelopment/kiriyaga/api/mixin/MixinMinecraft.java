@@ -9,6 +9,7 @@ import namidevelopment.kiriyaga.api.model.setting.KeyBindSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
@@ -69,11 +70,11 @@ public abstract class MixinMinecraft {
         }
     }
 
-    // For future client compatibility
+    // For futre rotations
     @Inject(method = "tick", at = @At("HEAD"))
     private void tick$exportNamiRotationsToShared(CallbackInfo ci,
                                                   @Share(namespace = "shared_rotations", value = "target_rotation")
-                                                  final LocalRef<Vector2f> targetRotation,
+                                                  final LocalRef<Vec2> targetRotation,
 
                                                   @Share(namespace = "shared_rotations", value = "target_rotation_priority")
                                                   final LocalRef<Vector2i> targetRotationPriority
@@ -85,20 +86,20 @@ public abstract class MixinMinecraft {
         }
         float yaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
         float pitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
-        targetRotation.set(new Vector2f(yaw, pitch));
+        targetRotation.set(new Vec2(yaw, pitch));
         targetRotationPriority.set(new Vector2i(ROTATION_SERVICE.getRequestHandler().getActiveRequest().priority, ROTATION_SERVICE.getRequestHandler().getActiveRequest().priority));
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=gameRenderer"))
     private void tick$postInputTick(CallbackInfo ci,
                                     @Share(namespace = "shared_rotations", value = "target_rotation")
-                                    final LocalRef<Vector2f> _targetRotation) {
+                                    final LocalRef<Vec2> _targetRotation) {
         RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
 
         if (!config.isFutureRotations() || _targetRotation == null || !ROTATION_SERVICE.getStateHandler().isRotating())
             return;
 
-        Vector2f rot = _targetRotation.get();
+        Vec2 rot = _targetRotation.get();
 
         if (rot == null) {
             return;

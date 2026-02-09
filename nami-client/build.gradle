@@ -39,7 +39,7 @@ processResources {
     }
 }
 version = project.mod_version
-def namiApiVersion = "1.3.7"
+def namiApiVersion = "1.3.9"
 
 tasks.register("printVersion") {
     doLast {
