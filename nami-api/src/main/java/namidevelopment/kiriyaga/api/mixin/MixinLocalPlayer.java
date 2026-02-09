@@ -1,8 +1,12 @@
 package namidevelopment.kiriyaga.api.mixin;
 
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import namidevelopment.kiriyaga.api.contract.FeatureContractService;
 import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import net.minecraft.client.player.LocalPlayer;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -72,5 +76,23 @@ public abstract class MixinLocalPlayer {
             MC.player.setXRot(this.originalSilentPitch);
             ROTATION_SERVICE.getStateHandler().setSilentSyncRequired(false);
         }
+    }
+
+    // For future client compatibility
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void tick$exportNamiRotationsToShared(CallbackInfo ci,
+                                                  @Share(namespace = "shared_rotations", value = "target_rotation")
+                                                  final LocalRef<Vector2f> targetRotation,
+
+                                                  @Share(namespace = "shared_rotations", value = "target_rotation_priority")
+                                                  final LocalRef<Vector2i> targetRotationPriority
+    ) {
+        if (!ROTATION_SERVICE.getStateHandler().isRotating()) {
+            return;
+        }
+        float yaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
+        float pitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
+        targetRotation.set(new Vector2f(yaw, pitch));
+        targetRotationPriority.set(new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE));
     }
 }
