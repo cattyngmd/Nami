@@ -25,6 +25,6 @@ public class WatermarkFeature extends HudElementFeature {
         width = FONT_SERVICE.getWidth(watermarkStr);
         height = FONT_SERVICE.getHeight();
 
-        return plain.get() ? CAT_FORMAT.format("{global}" + DISPLAY_NAME + " "+ VERSION) : CAT_FORMAT.format("{global}" + DISPLAY_NAME + " {white}"+ VERSION);
+        return plain.get() ? CAT_FORMAT.format("{global}" + DISPLAY_NAME + " v"+ VERSION) : CAT_FORMAT.format("{global}" + DISPLAY_NAME + " {white}v"+ VERSION);
     }
 }
