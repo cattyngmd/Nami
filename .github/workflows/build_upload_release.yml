@@ -34,19 +34,34 @@ jobs:
       - name: Generate changelog
         id: changelog
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          TAG="v$VERSION"
-
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-
           if [[ -z "$LAST_TAG" ]]; then
-            LOG=$(git log --pretty=format:'- %s')
+            COMMITS=$(git rev-list HEAD)
           else
-            LOG=$(git log "$LAST_TAG..HEAD" --pretty=format:'- %s')
+            COMMITS=$(git rev-list ${LAST_TAG}..HEAD)
           fi
 
+          BODY=""
+
+          for SHA in $COMMITS; do
+            MSG=$(git show -s --format=%s $SHA)
+            AUTHOR_NAME=$(git show -s --format=%an $SHA)
+
+            LOGIN=$(curl -s \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/${{ github.repository }}/commits/$SHA \
+              | jq -r '.author.login // empty')
+
+            if [[ -n "$LOGIN" ]]; then
+              BODY+="- ${MSG} by [@${LOGIN}](https://github.com/${LOGIN})\n"
+            else
+              BODY+="- ${MSG} by ${AUTHOR_NAME}\n"
+            fi
+          done
+
           echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$LOG" >> $GITHUB_OUTPUT
+          echo -e "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Build
