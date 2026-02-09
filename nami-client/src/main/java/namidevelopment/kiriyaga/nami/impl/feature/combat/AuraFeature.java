@@ -12,6 +12,7 @@ import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
 import namidevelopment.kiriyaga.api.util.InventoryUtils;
+import namidevelopment.kiriyaga.nami.impl.feature.combat.AutoCrystal.AutoCrystalFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.SprintFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
@@ -43,8 +44,7 @@ import java.awt.*;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
-import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isItemAWeapon;
+import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isItemAWeapon;
 
 @RegisterFeature
 public class AuraFeature extends Feature {
@@ -164,27 +164,18 @@ public class AuraFeature extends Feature {
         if (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.SILENT)
             preRotate = 0.00; // rotation silent are instant and do not require pre rotate to reduce attack delay
 
-        // RayCast as main distance check
         if ((skipCooldown || attackCooldownTicks <= preRotate * tps)) {
             Vec3 eyePos = MC.player.getEyePosition(1.0f);
             Vec3 closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
             float idealYaw = (float) getYawToVec(MC.player, closestPoint);
             float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
-
-            EntityHitResult distanceCheck = raycastTarget(
-                    MC.player,
-                    target,
-                    attackRange.get() + (FEATURE_SERVICE.getStorage().getByClass(RotationsFeature.class).rotation.get() == RotationsFeature.RotationMode.MOTION ? 0.10 : 0.00),
-                    idealYaw,
-                    idealPitch
-            );
-
             boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePosition());
 
-            if (!insideBox && distanceCheck == null) {
+            if (eyePos.distanceTo(getClampClosestPoint(eyePos, target.getBoundingBox())) > attackRange.get()) {
                 currentTarget = null;
                 return;
             }
+
             boolean canAttack = rotate.get() == Rotate.NONE;
 
             if (rotate.get() != Rotate.NONE) {

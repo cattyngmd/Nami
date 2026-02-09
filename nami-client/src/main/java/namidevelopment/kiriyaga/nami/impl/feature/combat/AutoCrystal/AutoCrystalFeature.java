@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.feature.combat;
+package namidevelopment.kiriyaga.nami.impl.feature.combat.AutoCrystal;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
@@ -12,6 +12,7 @@ import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
@@ -28,13 +29,17 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.damagesource.CombatRules;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -45,6 +50,10 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
@@ -87,18 +96,22 @@ public class AutoCrystalFeature extends Feature {
     public final BoolSetting noSelfPop = addSetting(new BoolSetting("NoSelfPop", true));
     public final DoubleSetting minDamage = addSetting(new DoubleSetting("MinDamage", 4.0, 0.0, 36.0));
     public final DoubleSetting maxSelfDamage = addSetting(new DoubleSetting("MaxSelfDamage", 12.0, 0.0, 36.0));
-    public final DoubleSetting maxFriendDamage = addSetting(new DoubleSetting("MaxFriendDamage", 12.0, 0.0, 36.0));
 
     //render
     public final BoolSetting render = addSetting(new BoolSetting("Render", true));
-
     public final BoolSetting debug = addSetting(new BoolSetting("Debug", false));
 
     private int breakTimer, placeTimer = 0; // i love it
-    private PlaceTarget placeTarget = null;
-    float lastTotalDamage, lastCalcTimeMs = 0;
+    private PlaceTarget lastPlaceTarget = null;
+    public float lastTotalDamage;
+    float lastCalcTimeMs = 0;
     private final Int2IntOpenHashMap crystalHits = new Int2IntOpenHashMap();
     private final Long2IntOpenHashMap crystalPlaces = new Long2IntOpenHashMap();
+    private final ExecutorService calcExecutor = Executors.newSingleThreadExecutor();
+    private volatile Future<?> runningTask;
+    private final AtomicReference<PlaceTarget> asyncBest = new AtomicReference<>();
+    private volatile PlaceTarget bestPlace;
+
 
     public AutoCrystalFeature() {
         super("AutoCrystal", "Automatically places and break crystals to kill people, if you are good enough!.", FeatureCategory.of("Combat"), "autocrystal", "ac", "crystalaura");
@@ -131,7 +144,6 @@ public class AutoCrystalFeature extends Feature {
         noSelfPop.setShowCondition(() ->  page.get() == Page.DAMAGES);
         minDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
         maxSelfDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
-        maxFriendDamage.setShowCondition(() -> page.get() == Page.DAMAGES);
         assumeBestArmor.setShowCondition(() -> page.get() == Page.DAMAGES);
 
         render.setShowCondition(() -> page.get() == Page.RENDER);
@@ -143,8 +155,64 @@ public class AutoCrystalFeature extends Feature {
         placeTimer = 0;
         lastTotalDamage = 0;
         lastCalcTimeMs = 0;
+        lastPlaceTarget = null;
         crystalPlaces.clear();
         crystalHits.clear();
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPreTickEvent(PreTickEvent event) {
+        long start = System.nanoTime();
+        if (MC.player == null || MC.player.isDeadOrDying()) return;
+
+        update();
+
+        long tickId = MC.level.getGameTime();
+
+        if (runningTask == null || runningTask.isDone()) {
+            AutoCrystalSnapshot snap = doSnapshot(tickId);
+            runningTask = calcExecutor.submit(() -> {
+                PlaceTarget best = findNextPlaceTargetForSnapshot(snap);
+                asyncBest.set(best);
+            });
+        }
+
+        if (this.asyncBest.get() != null) {
+            BlockPos pos = this.asyncBest.get().pos;
+            BlockPos base = pos.below();
+
+            Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
+
+            float realDamage = calculateDamage(crystalPos, true);
+            if (realDamage >= minDamage.get()) {
+                bestPlace = new PlaceTarget(pos, realDamage);
+                lastTotalDamage = realDamage;
+            } else {
+                bestPlace = null;
+            }
+        } else {
+            bestPlace = null;
+        }
+
+        if (doBreak.get()) {
+            if (breakTimer > 0) breakTimer--;
+            else doBreak();
+        }
+
+        if (doPlace.get()) {
+            if (placeTimer > 0) placeTimer--;
+            else {
+                if (bestPlace != null) {
+                    doPlace(bestPlace);
+                }
+            }
+        }
+
+        lastCalcTimeMs = (System.nanoTime() - start) / 1_000_000f;
+
+        this.clearDisplayInfo();
+        this.addDisplayInfo(String.format(Locale.US, "%.2f", lastTotalDamage));
+        this.addDisplayInfo(String.format(Locale.US, "%.4f", lastCalcTimeMs));
     }
 
     @SubscribeEvent
@@ -194,49 +262,11 @@ public class AutoCrystalFeature extends Feature {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onPreTickEvent(PreTickEvent event) {
-        long start = System.nanoTime();
-        if (MC.player == null || MC.player.isDeadOrDying()) return;
-        lastCalcTimeMs = 0;
-
-        updateMemory();
-
-        if (doBreak.get()) {
-            if (breakTimer > 0) {
-                breakTimer--;
-            } else
-                doBreak();
-        }
-
-        if (doPlace.get()) {
-            if (placeTimer > 0) {
-                placeTimer--;
-            } else {
-                lastTotalDamage = 0;
-                doPlace();
-            }
-        }
-
-        this.clearDisplayInfo();
-        this.addDisplayInfo(String.format(Locale.US, "%.2f", lastTotalDamage));
-        this.addDisplayInfo(String.format(Locale.US, "%.4f", lastCalcTimeMs));
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#onPreTickEvent",
-                        String.format(Locale.US, "onPreTickEvent: %.4f ms", ms));
-            });
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onRender3DEvent(Render3DEvent event) {
-        if (MC.level == null || MC.player == null || placeTarget == null || !render.get()) return;
+        if (MC.level == null || MC.player == null || lastPlaceTarget == null || !render.get()) return;
 
-        BlockPos pos = placeTarget.pos.below();
+        BlockPos pos = lastPlaceTarget.pos.below();
         AABB box = new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
         Color color = FEATURE_SERVICE.getStorage().getByClass(ColorFeature.class).getStyledGlobalColor();
 
@@ -378,17 +408,17 @@ public class AutoCrystalFeature extends Feature {
         return serverCheck != null || insideBox;
     }
 
-    private void doPlace() {
+    private void doPlace(PlaceTarget target) {
         long start = System.nanoTime();
 
-        placeTarget = findBestPlace();
-        if (placeTarget == null) return;
-        if (placeTarget.totalDamage < minDamage.get()) return;
+        if (target == null) return;
+        if (target.totalDamage < minDamage.get()) return;
 
-        InteractionUtils.interactBlockAt(placeTarget.pos.below(), Items.END_CRYSTAL, null, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), placeStrictDirection.get(), false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
+        InteractionUtils.interactBlockAt(target.pos.below(), Items.END_CRYSTAL, null, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), placeStrictDirection.get(), false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
 
-        crystalPlaces.put(placeTarget.pos.asLong(), 0);
+        lastPlaceTarget = target;
 
+        crystalPlaces.put(target.pos.asLong(), 0);
         placeTimer = placeDelay.get();
 
         if (debug.get()) {
@@ -401,55 +431,189 @@ public class AutoCrystalFeature extends Feature {
         }
     }
 
-    private PlaceTarget findBestPlace() {
-        long start= System.nanoTime();
-        PlaceTarget best = null;
-        BlockPos playerPos = MC.player.blockPosition();
-        int r = (int) Math.ceil(placeRange.get());
+    private AutoCrystalSnapshot doSnapshot(long tickId) {
+        var player = MC.player;
+        var level = MC.level;
+
+        Vec3 eyePos = player.getEyePosition();
+        BlockPos playerPos = player.blockPosition();
+
+        double pr = placeRange.get();
+        double br = breakRange.get();
+        double minDmg = minDamage.get();
+
+        List<LivingEntity> entities = EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12).stream().filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity) e).toList();
+
+        ArrayList<AutoCrystalSnapshot.TargetData> targets = new ArrayList<>();
+
+        for (LivingEntity e : entities) {
+            if (e == player)
+                continue;
+            if (e.isDeadOrDying())
+                continue;
+
+            int resistanceAmp = -1;
+            MobEffectInstance eff = e.getEffect(MobEffects.RESISTANCE);
+            if (eff != null) resistanceAmp = eff.getAmplifier();
+
+            byte mask = 0;
+            if (!e.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) mask |= 1;
+            if (!e.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) mask |= 2;
+            if (!e.getItemBySlot(EquipmentSlot.LEGS).isEmpty()) mask |= 4;
+            if (!e.getItemBySlot(EquipmentSlot.FEET).isEmpty()) mask |= 8;
+
+            int prot = 0;
+            int blastProt = 0;
+
+            if (!assumeBestArmor.get()) {
+                for (EquipmentSlot slot : EquipmentSlotGroup.ARMOR) {
+                    ItemStack stack = e.getItemBySlot(slot);
+                    if (stack.isEmpty())
+                        continue;
+
+                    prot += EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.PROTECTION);
+                    blastProt += EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.BLAST_PROTECTION);
+                }
+            }
+
+            targets.add(new AutoCrystalSnapshot.TargetData(e.getId(), e.position(), e.getBoundingBox(), (float) Math.floor(e.getAttributeValue(Attributes.ARMOR)), (float) e.getAttributeValue(Attributes.ARMOR_TOUGHNESS), resistanceAmp, mask, prot, blastProt, e.getHealth(), e.getAbsorptionAmount()));
+        }
+
+        int r = (int) Math.ceil(pr);
+        int rr = r * r;
+
+        ArrayList<BlockPos> candidates = new ArrayList<>();
 
         for (int x = -r; x <= r; x++) {
             for (int y = -r; y <= r; y++) {
                 for (int z = -r; z <= r; z++) {
+
+                    if (x * x + y * y + z * z > rr)
+                        continue;
+
                     BlockPos pos = playerPos.offset(x, y, z);
                     BlockPos base = pos.below();
 
-                    BlockState baseState = MC.level.getBlockState(base);
-                    if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK)) continue;
-                    if (!MC.level.getBlockState(pos).isAir()) continue;
+                    BlockState baseState = level.getBlockState(base);
+                    if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK))
+                        continue;
+                    if (!level.getBlockState(pos).isAir())
+                        continue;
 
-                    if (!canPlaceAt(pos)) continue;
+
+                    AABB blockBox = new AABB(pos);
+
+                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > placeRange.get())
+                        continue;
 
                     Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
+                    AABB crystalBox = new AABB(crystalPos.x - 1.0, crystalPos.y, crystalPos.z - 1.0, crystalPos.x + 1.0, crystalPos.y + 2.0, crystalPos.z + 1.0);
+                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > placeRange.get())
+                        continue;
 
-                    float totalDamage = calculateDamage(crystalPos, true);
-                    if (totalDamage < minDamage.get()) continue;
-                    lastTotalDamage = totalDamage;
-                    if (best == null || totalDamage > best.totalDamage)
-                        best = new PlaceTarget(pos, totalDamage);
+                    if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > breakRange.get())
+                        continue;
+
+                    AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 2, base.getZ() + 1);
+
+                    boolean blocked = false;
+                    for (Entity e : MC.level.getEntities(null, checkIntersects)) {
+                        if (placeIgnoreItems.get() && e instanceof ItemEntity item && item.getAge() <= 5) continue;
+                        if (placeIgnoreCrystals.get() && e instanceof EndCrystal crystal && crystal.tickCount < 5) continue;
+                        if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
+                        blocked = true;
+                        break;
+                    }
+
+                    if (blocked)
+                        continue;
+                    candidates.add(pos);
                 }
             }
         }
-
-        lastCalcTimeMs = (System.nanoTime() - start) / 1_000_000f;
-        if (best != null) {
-            PlaceTarget ret = new PlaceTarget(best.pos, best.totalDamage);
-            return ret;
-        }
-
-        if (debug.get()) {
-            MC.execute(() -> {
-                float ms = (System.nanoTime() - start) / 1_000_000f;
-                CHAT_SERVICE.sendPersistent(
-                        "AutoCrystalFeature#findBestPlace",
-                        String.format(Locale.US, "findBestPlace: %.4f ms", ms));
-            });
-        }
-        return best; // always null here
+        return new AutoCrystalSnapshot(tickId, MC.player.getId(), eyePos, playerPos, pr, br, minDmg, assumeBestArmor.get(), targets.toArray(new AutoCrystalSnapshot.TargetData[0]), candidates.toArray(new BlockPos[0]));
     }
 
-    private List<BlockPos> ignoredBlocks(boolean b) {
+    private PlaceTarget findNextPlaceTargetForSnapshot(AutoCrystalSnapshot snap) {
+        PlaceTarget best = null;
+
+        for (BlockPos pos : snap.candidatePos()) {
+            BlockPos base = pos.below();
+
+            Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
+
+            float dmg = calculateDamageForSnapshot(crystalPos, snap);
+            if (dmg < snap.minDamage()) continue;
+
+            if (best == null || dmg > best.totalDamage) {
+                best = new PlaceTarget(pos, dmg);
+            }
+        }
+
+        return best;
+    }
+
+    private float calculateDamageForSnapshot(Vec3 explosionPos, AutoCrystalSnapshot snap) {
+        float total = 0.0f;
+
+        for (var t : snap.targets()) {
+            double dist = t.pos().distanceTo(explosionPos);
+            if (dist > 12.0) continue;
+
+            double impact = 1.0 - (dist / 12.0);
+            if (impact <= 0.0) continue;
+
+            float baseDamage = (float)((impact * impact + impact) / 2.0 * 7.0 * 12.0 + 1.0);
+            float dmg = applyResistanceForSnapshot(baseDamage, t, snap.assumeBestArmor());
+
+            if (t.id() == snap.selfId()) {
+                if (dmg > maxSelfDamage.get())
+                    return -1f;
+
+                if (noSelfPop.get() && dmg + 1.5f >= t.health() + t.absorption())
+                    return -1f;
+
+                continue;
+            }
+            if (dmg < snap.minDamage())
+                return -1f;
+            total += dmg;
+        }
+
+        return total;
+    }
+
+
+    private float applyResistanceForSnapshot(float damage, AutoCrystalSnapshot.TargetData t, boolean assumeBestArmor) {
+
+        damage *= 1.5f; // it should be hard level, but idk, we leave it at 1.5f, which means it always difficulty: hard for calculations
+
+        if (t.resistanceAmp() >= 0) {
+            damage *= 1.0f - 0.2f * (t.resistanceAmp() + 1);
+        }
+
+        int totalProtection = 0;
+
+        if (assumeBestArmor) {
+            if ((t.armorMask() & 1) != 0) totalProtection += 4;
+            if ((t.armorMask() & 2) != 0) totalProtection += 4;
+            if ((t.armorMask() & 8) != 0) totalProtection += 4;
+
+            if ((t.armorMask() & 4) != 0) totalProtection += 8;
+
+        } else {
+            totalProtection += t.prot();
+            totalProtection += 2 * t.blastProt();
+        }
+
+        damage = CombatRules.getDamageAfterMagicAbsorb(damage, (float) totalProtection);
+
+        return Math.max(damage, 0.0f);
+    }
+
+    private Set<BlockPos> ignoredBlocks(boolean b) {
         long start= System.nanoTime();
-        List<BlockPos> ignored = new ArrayList<>();
+        Set<BlockPos> ignored = new HashSet<>();
 
         if (placeIgnoreTerrain.get()) {
             int r = placeRange.get().intValue()+2;
@@ -497,46 +661,10 @@ public class AutoCrystalFeature extends Feature {
         return ignored;
     }
 
-    private boolean canPlaceAt(BlockPos pos) {
-        BlockPos base = pos.below();
-
-        BlockState baseState = MC.level.getBlockState(base);
-        if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK)) return false;
-
-        if (!MC.level.getBlockState(pos).isAir()) return false;
-
-        Vec3 eyePos = MC.player.getEyePosition();
-
-        AABB blockBox = new AABB(pos);
-
-        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > placeRange.get())
-            return false;
-
-        Vec3 crystalPos = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
-        AABB crystalBox = new AABB(crystalPos.x - 1.0, crystalPos.y, crystalPos.z - 1.0, crystalPos.x + 1.0, crystalPos.y + 2.0, crystalPos.z + 1.0);
-        if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > placeRange.get())
-            return false;
-
-        if (eyePos.distanceTo(getClampClosestPoint(eyePos, crystalBox)) > breakRange.get())
-            return false;
-
-        AABB checkIntersects = new AABB(base.getX(), base.getY() + 1, base.getZ(), base.getX() + 1, base.getY() + 2, base.getZ() + 1);
-
-        for (Entity e : MC.level.getEntities(null, checkIntersects)) {
-            if (placeIgnoreItems.get() && e instanceof ItemEntity item && item.getAge() <= 5) continue;
-            if (placeIgnoreCrystals.get() && e instanceof EndCrystal crystal && crystal.tickCount < 5) continue;
-            if (e instanceof EndCrystal crystal && crystal.blockPosition().equals(pos)) continue;
-            return false;
-        }
-
-        return true;
-    }
-
-
     private float calculateDamage(Vec3 crystalPos, boolean b) {
         long start= System.nanoTime();
         float totalDamage = 0f;
-        List<BlockPos> ignored = ignoredBlocks(b);
+        Set<BlockPos> ignored = ignoredBlocks(b);
 
         for (Entity e : EntityUtils.getEntities(EntityUtils.EntityTypeCategory.PLAYERS, 12)) {
             if (!(e instanceof LivingEntity living)) continue;
@@ -549,12 +677,6 @@ public class AutoCrystalFeature extends Feature {
 
                 if (dmg + 1.5f >= MC.player.getHealth() + MC.player.getAbsorptionAmount())
                     return -1f;
-            }
-
-            if (FRIEND_SERVICE.isFriend(e.getName().getString())) {
-                if (dmg > maxFriendDamage.get())
-                    return -1f;
-                continue;
             }
 
             if (FRIEND_SERVICE.isFriend(e.getName().getString())) continue;
@@ -576,7 +698,9 @@ public class AutoCrystalFeature extends Feature {
         return totalDamage;
     }
 
-    private void updateMemory() {
+    private void update() {
+        lastPlaceTarget = null;
+
         LongIterator it = crystalPlaces.keySet().iterator();
         while (it.hasNext()) {
             long key = it.nextLong();
