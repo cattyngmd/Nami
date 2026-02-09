@@ -1,112 +1,69 @@
-name: build upload release
+name: build_upload_release
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build_and_release:
+  build_release:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: true
           fetch-depth: 0
 
-      - name: Set up Java 21
+      - name: JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-          cache: gradle
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission to gradlew
-        run: chmod +x ./gradlew
+      - name: Permissions
+        run: chmod +x gradlew
 
       - name: Get version
         id: version
         run: echo "version=$(./gradlew -q printVersion)" >> $GITHUB_OUTPUT
 
-      - name: Create tag
-        id: tag
-        run: |
-          TAG="${{ steps.version.outputs.version }}"
-          if [[ "$TAG" != v* ]]; then
-            TAG="v$TAG"
-          fi
-
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "tag_exists=true" >> $GITHUB_OUTPUT
-            echo "Tag $TAG already exists"
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git tag "$TAG"
-            git push origin "$TAG"
-            echo "tag_exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate release body
-        id: release_body
-        run: |
-          TAG="${{ steps.version.outputs.version }}"
-          if [[ "$TAG" != v* ]]; then
-            TAG="v$TAG"
-          fi
-
-          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-
-          if [[ -z "$LAST_TAG" ]]; then
-            COMMITS=$(git log "$TAG" --pretty=format:'%H|%s')
-          else
-            COMMITS=$(git log "$LAST_TAG..$TAG" --pretty=format:'%H|%s')
-          fi
-
-          BODY=""
-
-          while IFS="|" read -r SHA MSG; do
-            EMAIL=$(git show -s --format='%ae' $SHA)
-
-            LOGIN=$(gh api search/users -q "$EMAIL in:email" --jq '.items[0].login' 2>/dev/null || true)
-
-            if [[ -z "$LOGIN" || "$LOGIN" == "null" ]]; then
-              NAME=$(git show -s --format='%an' $SHA)
-              BODY+="- ${MSG} by ${NAME}\n"
-            else
-              BODY+="- ${MSG} by @${LOGIN}\n"
-            fi
-          done <<< "$COMMITS"
-
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-
-      - name: Build
-        run: ./gradlew clean build remapJar --stacktrace
-
-      - name: Rename JAR
+      - name: Generate changelog
+        id: changelog
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          for jar in client/build/libs/*.jar; do
-            BASENAME=$(basename "$jar")
-            mv "$jar" "client/build/libs/nami-${VERSION}-${BASENAME}"
-          done
+          TAG="v$VERSION"
 
-      - name: Upload release
-        if: steps.tag.outputs.tag_exists == 'false'
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [[ -z "$LAST_TAG" ]]; then
+            LOG=$(git log --pretty=format:'- %s')
+          else
+            LOG=$(git log "$LAST_TAG..HEAD" --pretty=format:'- %s')
+          fi
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$LOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build
+        run: ./gradlew :nami-client:build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nami-client
+          path: nami-client/build/libs/*.jar
+
+      - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ steps.version.outputs.version }}
-          body: ${{ steps.release_body.outputs.body }}
-          files: client/build/libs/*.jar
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body: ${{ steps.changelog.outputs.body }}
+          files: nami-client/build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
