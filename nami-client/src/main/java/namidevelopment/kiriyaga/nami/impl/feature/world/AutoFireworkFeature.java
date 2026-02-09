@@ -6,6 +6,7 @@ import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.InventoryUtils;
@@ -20,19 +21,24 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 @RegisterFeature
 public class AutoFireworkFeature extends Feature {
 
+    public final BoolSetting deployLaunch = addSetting(new BoolSetting("DeployLaunch", false));
+    public final BoolSetting autoLaunch = addSetting(new BoolSetting("AutoLaunch", false));
     public final DoubleSetting delaySeconds = addSetting(new DoubleSetting("Delay", 4.5, 0.1, 25.0));
     public final IntSetting onLevel = addSetting(new IntSetting("OnLevel", -64, -64, 360));
 
     private int tickDelay;
     private int lastUseTick = 0;
+    private boolean b;
 
     public AutoFireworkFeature() {
         super("AutoFirework", "Automatically fires fireworks.", FeatureCategory.of("World"), "autofirework");
+        delaySeconds.setShowCondition(autoLaunch::get);
+        onLevel.setShowCondition(autoLaunch::get);
     }
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        b = false;
         if (MC.player != null) {
             lastUseTick = MC.player.tickCount - (int) Math.round(delaySeconds.get() * 20);
         }
@@ -40,8 +46,15 @@ public class AutoFireworkFeature extends Feature {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     private void onTick(PreTickEvent ev) {
-        if (!isEnabled()) return;
         if (MC.level == null || MC.player == null) return;
+
+        boolean isElytra = MC.player.isFallFlying();
+
+        if (deployLaunch.get() && !b && isElytra) useItemAnywhere(Items.FIREWORK_ROCKET);
+
+        b = isElytra;
+
+        if (!autoLaunch.get()) return;
 
         if (MC.player.tickCount < lastUseTick) {
             lastUseTick = MC.player.tickCount - tickDelay;
