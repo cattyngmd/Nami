@@ -46,12 +46,16 @@ public abstract class MixinLocalPlayer {
 
     @Inject(method = "sendPosition", at = @At("TAIL"))
     private void postSendMovementPackets(CallbackInfo ci) {
+        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
+
+        if (config.isFutureRotations())
+            return;
+
         ROTATION_SERVICE.getStateHandler().setServerYaw(MC.player.getYRot());
         ROTATION_SERVICE.getStateHandler().setServerPitch(MC.player.getXRot());
 
-        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
 
-        if (!ROTATION_SERVICE.getStateHandler().isRotating() || config.isFutureRotations()) {
+        if (!ROTATION_SERVICE.getStateHandler().isRotating()) {
             return;
         }
 
@@ -81,25 +85,5 @@ public abstract class MixinLocalPlayer {
             MC.player.setXRot(this.originalSilentPitch);
             ROTATION_SERVICE.getStateHandler().setSilentSyncRequired(false);
         }
-    }
-
-    // For future client compatibility
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void tick$exportNamiRotationsToShared(CallbackInfo ci,
-                                                  @Share(namespace = "shared_rotations", value = "target_rotation")
-                                                  final LocalRef<Vector2f> targetRotation,
-
-                                                  @Share(namespace = "shared_rotations", value = "target_rotation_priority")
-                                                  final LocalRef<Vector2i> targetRotationPriority
-    ) {
-        RotationsFeatureConfig config = FeatureContractService.get(RotationsFeatureConfig.class);
-
-        if (!ROTATION_SERVICE.getStateHandler().isRotating() || !config.isFutureRotations()) {
-            return;
-        }
-        float yaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
-        float pitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
-        targetRotation.set(new Vector2f(yaw, pitch));
-        targetRotationPriority.set(new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE));
     }
 }
