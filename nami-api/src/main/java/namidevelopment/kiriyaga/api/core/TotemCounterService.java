@@ -4,6 +4,7 @@ import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
+import namidevelopment.kiriyaga.api.event.impl.TotemPopEvent;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -59,6 +60,12 @@ public class TotemCounterService {
 
         poppedMap.computeIfAbsent(entityId, k -> new CopyOnWriteArrayList<>()).add(popId);
         lastPopMap.put(entityId, System.currentTimeMillis());
+
+        Entity ent = MC.level.getEntity(entityId);
+        if (ent instanceof Player player) {
+            int pops = getPoppedTotemCount(entityId);
+            EVENT_SERVICE.post(new TotemPopEvent(entityId, player.getName().getString(), player, pops));
+        }
     }
 
     private void death() {

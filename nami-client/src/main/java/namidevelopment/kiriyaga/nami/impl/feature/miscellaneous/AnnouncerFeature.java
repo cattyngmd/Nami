@@ -5,6 +5,7 @@ import namidevelopment.kiriyaga.api.annotation.SubscribeEvent;
 import namidevelopment.kiriyaga.api.event.EventPriority;
 import namidevelopment.kiriyaga.api.event.impl.AddEntityEvent;
 import namidevelopment.kiriyaga.api.event.impl.PacketReceiveEvent;
+import namidevelopment.kiriyaga.api.event.impl.TotemPopEvent;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
@@ -25,14 +26,16 @@ public class AnnouncerFeature extends Feature {
     }
 
     public final BoolSetting joinAnnounce = addSetting(new BoolSetting("JoinAnnounce", false));
-    public final BoolSetting joinEveryone = addSetting(new BoolSetting("Others", false));
-    public final BoolSetting joinFriends = addSetting(new BoolSetting("Friends", true));
+    public final BoolSetting joinFriends = addSetting(new BoolSetting("JoinAnnounceFriends", "Friends", true));
+    public final BoolSetting joinEveryone = addSetting(new BoolSetting("JoinAnnounceOthers", "Others", false));
     public final BoolSetting visualRange = addSetting(new BoolSetting("VisualRange", false));
-    public final BoolSetting rangeEveryone = addSetting(new BoolSetting("Others", false));
-    public final BoolSetting rangeFriends = addSetting(new BoolSetting("Friends", true));
-
-    public final EnumSetting<VisualRangeMode> soundMode =
-            addSetting(new EnumSetting<>("Sound", VisualRangeMode.NONE));
+    public final BoolSetting rangeFriends = addSetting(new BoolSetting("VisualRangeFriends", "Friends", true));
+    public final BoolSetting rangeEveryone = addSetting(new BoolSetting("VisualRangeOthers", "Others", false));
+    public final EnumSetting<VisualRangeMode> soundMode = addSetting(new EnumSetting<>("Sound", VisualRangeMode.NONE));
+    public final BoolSetting totemPopCounter = addSetting(new BoolSetting("TotemPopCounter", false));
+    public final BoolSetting selfPop = addSetting(new BoolSetting("TotemPopCounterSelf", "Self", false));
+    public final BoolSetting friendsPop = addSetting(new BoolSetting("TotemPopCounterFriends", "Friends", false));
+    public final BoolSetting othersPop = addSetting(new BoolSetting("TotemPopCounterOthers", "Others", true));
 
     public AnnouncerFeature() {
         super("Announcer", "Announces in chat when a certain action happened.", FeatureCategory.of("Miscellaneous"), "joinannounce", "joins", "announce", "visualrange");
@@ -41,6 +44,9 @@ public class AnnouncerFeature extends Feature {
         joinFriends.setShowCondition(joinAnnounce::get);
         rangeEveryone.setShowCondition(visualRange::get);
         rangeFriends.setShowCondition(visualRange::get);
+        selfPop.setShowCondition(totemPopCounter::get);
+        friendsPop.setShowCondition(totemPopCounter::get);
+        othersPop.setShowCondition(totemPopCounter::get);
     }
 
     private boolean validateJoin(String name) {
@@ -57,6 +63,16 @@ public class AnnouncerFeature extends Feature {
         if (rangeFriends.get() && b) return true;
         if (rangeEveryone.get() && !b) return true;
         return false;
+    }
+
+    private boolean validateTotemPop(Player player) {
+        if (player == null) return false;
+        if (MC.player == null) return false;
+        if (player == MC.player)
+            return selfPop.get();
+        boolean friend = FRIEND_SERVICE.isFriend(player.getName().getString());
+        if (friend) return friendsPop.get();
+        return othersPop.get();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -118,5 +134,23 @@ public class AnnouncerFeature extends Feature {
             case EXP -> MC.player.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
             default -> {}
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onTotemPop(TotemPopEvent event) {
+        if (!totemPopCounter.get()) return;
+        if (MC.player == null || MC.level == null) return;
+
+        Player player = event.getPlayer();
+        if (player == null) return;
+
+        if (!validateTotemPop(player))
+            return;
+
+        String name = event.getName();
+        int pops = event.getPops();
+
+        Component message = CAT_FORMAT.format("{global}" + name + " {gray}has popped {global}" + pops + " {gray}totem" + (pops == 1 ? "." : "s."));
+        MC.execute(() -> CHAT_SERVICE.sendPersistent("totempop:" + name, message));
     }
 }
