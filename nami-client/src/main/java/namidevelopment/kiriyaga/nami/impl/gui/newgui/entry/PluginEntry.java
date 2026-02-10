@@ -15,7 +15,7 @@ public class PluginEntry extends BaseEntry {
 
         String status = plugin.isEnabled() ? "{green}Loaded" : "{red}Unloaded";
         this.displayText = CAT_FORMAT.format(
-                "Name: {global}" + plugin.getName()
+                "{gray}Name: {global}" + plugin.getName()
                         + " {gray}ID: {global}" + plugin.getId()
                         + " {gray}Status: " + status
                         + " {gray}Modules: {global}" + plugin.getRegisteredFeatures().size()

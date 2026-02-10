@@ -34,6 +34,8 @@ public class PluginScreen extends NamiScreen {
                     20, 20, 600, 300,
 
                     entry -> {
+                        if (entry == null) return;
+
                         if (entry.getPlugin().isEnabled()) {
                             PLUGIN_SERVICE.disablePlugin(entry.getId());
                         } else {
@@ -44,13 +46,17 @@ public class PluginScreen extends NamiScreen {
                         refresh();
                     },
 
+
                     entry -> {
+                        if (entry == null) return;
+
                         PLUGIN_SERVICE.disablePlugin(entry.getId());
                         PLUGIN_SERVICE.unregisterPlugin(entry.getId());
 
                         CONFIG_SERVICE.savePluginsState();
                         refresh();
                     },
+
 
                     entry -> {},
 

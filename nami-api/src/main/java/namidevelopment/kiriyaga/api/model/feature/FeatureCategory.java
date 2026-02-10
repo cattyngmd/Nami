@@ -6,7 +6,7 @@ public class FeatureCategory {
     private static final Map<String, FeatureCategory> CATEGORIES = new LinkedHashMap<>();
 
     private static final List<String> FIXED_ORDER = List.of(
-            "Combat", "Exploits", "Miscellaneous", "Movement", "Render", "World", "HUD", "Client"
+            "Combat", "Exploits", "Miscellaneous", "Movement", "Render", "World", "HUD", "Client", "Other"
     );
 
     private final String name;
@@ -16,7 +16,16 @@ public class FeatureCategory {
     }
 
     public static FeatureCategory of(String name) {
-        return CATEGORIES.computeIfAbsent(name, FeatureCategory::new);
+        if (name == null || name.isBlank())
+            name = "Other";
+
+        for (String fixed : FIXED_ORDER) {
+            if (fixed.equalsIgnoreCase(name)) {
+                return CATEGORIES.computeIfAbsent(fixed, FeatureCategory::new);
+            }
+        }
+
+        return CATEGORIES.computeIfAbsent("Other", FeatureCategory::new);
     }
 
     public static List<FeatureCategory> getAll() {
