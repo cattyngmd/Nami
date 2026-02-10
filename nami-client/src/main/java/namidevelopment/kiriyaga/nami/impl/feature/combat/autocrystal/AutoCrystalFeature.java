@@ -245,6 +245,7 @@ public class AutoCrystalFeature extends Feature {
         if (!(event.getPacket() instanceof ClientboundEntityEventPacket packet)) return;
         if (packet.getEventId() != 3) return;
 
+        // Author: cattyngmd
         MC.execute(() -> {
             Entity e = packet.getEntity(MC.level);
             if (e instanceof LivingEntity living) {
