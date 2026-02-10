@@ -461,6 +461,7 @@ public class AutoCrystalFeature extends Feature {
         int rr = r * r;
 
         ArrayList<BlockPos> candidates = new ArrayList<>();
+        Set<BlockPos> ignored = ignoredBlocks(true);
 
         for (int x = -r; x <= r; x++) {
             for (int y = -r; y <= r; y++) {
@@ -521,7 +522,7 @@ public class AutoCrystalFeature extends Feature {
             }
         }
 
-        return new AutoCrystalSnapshot(tickId, MC.player.getId(), eyePos, playerPos, pr, br, minDmg, assumeBestArmor.get(), MC.level.getDifficulty(), true, MC.level, targets.toArray(new AutoCrystalSnapshot.TargetData[0]), candidates.toArray(new BlockPos[0]));
+        return new AutoCrystalSnapshot(tickId, MC.player.getId(), eyePos, playerPos, pr, br, minDmg, assumeBestArmor.get(), MC.level.getDifficulty(), true, MC.level, targets.toArray(new AutoCrystalSnapshot.TargetData[0]), candidates.toArray(new BlockPos[0]), ignored);
     }
 
     private PlaceTarget findNextPlaceTargetForSnapshot(AutoCrystalSnapshot snap, AutoCrystalSnapshot.AsyncDebugInfo dbg) {
@@ -618,6 +619,7 @@ public class AutoCrystalFeature extends Feature {
 
         return CombatRules.getDamageAfterMagicAbsorb(damage, totalProtection);
     }
+
     private float calculateExposureForSnapshot(Vec3 source, AABB box, AutoCrystalSnapshot snap) {
         double dx = box.getXsize();
         double dy = box.getYsize();
@@ -650,9 +652,11 @@ public class AutoCrystalFeature extends Feature {
                 start, end,
                 new DamageUtils.ExposureContext(start, end),
                 (ctx, pos) -> {
-                    BlockState state = snap.level().getBlockState(pos);
 
-                    if (state.getBlock().getExplosionResistance() < 600 && placeIgnoreTerrain.get()) return null;
+                    if (snap.ignoredBlocks() != null && snap.ignoredBlocks().contains(pos))
+                        return null;
+
+                    BlockState state = snap.level().getBlockState(pos);
 
                     return state.getCollisionShape(snap.level(), pos)
                             .clip(ctx.start(), ctx.end(), pos);
