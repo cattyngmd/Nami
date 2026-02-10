@@ -14,9 +14,6 @@
   <a href="https://github.com/NamiDevelopment/nami/releases">
     <img src="https://img.shields.io/github/v/release/Kiriyaga7615/nami?color=blue&label=Latest%20Release" alt="Latest Release" />
   </a>
-  <a href="https://github.com/NamiDevelopment/nami/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/NamiDevelopment/nami?color=blue" alt="License" />
-  </a>
   <a href="https://discord.gg/auHTtNAqRq">
     <img src="https://img.shields.io/discord/1298742596633497744?color=7289DB&label=Discord" alt="Discord" />
   </a>
@@ -49,6 +46,12 @@ This project started as a clean, open-source alternative aiming to be transparen
 
 ---
 
+## Plugin development
+
+See https://github.com/NamiDevelopment/template-plugin for information
+
+---
+
 ## FAQ
 
 <details>
@@ -71,7 +74,7 @@ The default command prefix is `-`.
 
 - Java 21  
 - Gradle 8+  
-- Minecraft 1.21.8  
+- Minecraft 1.21.11 
 - Fabric loader, API
 
 ---
@@ -84,8 +87,9 @@ The default command prefix is `-`.
     git clone https://github.com/NamiDevelopment/Nami.git  
     cd nami
     ```
+2. In order to get nami-api dependency,you need to configure your PAT-token in your root .gradle/gradle.dependency
 
-2. Build with Gradle:
+3. Build with Gradle:
 
     ```bash
     ./gradlew build
@@ -94,7 +98,7 @@ The default command prefix is `-`.
 The compiled JAR will be located at:  
 `build/libs/nami-<version>.jar`
 
-Do not launch -unremapped!
+nami-client is packaged with nami-api inside of it.
 
 ---
 
