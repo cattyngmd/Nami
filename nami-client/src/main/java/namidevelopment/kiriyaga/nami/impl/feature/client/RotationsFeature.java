@@ -10,6 +10,8 @@ import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 
+import static namidevelopment.kiriyaga.nami.Nami.FUTURE;
+
 @RegisterFeature
 public class RotationsFeature extends Feature implements RotationsFeatureConfig {
 
@@ -93,6 +95,9 @@ public class RotationsFeature extends Feature implements RotationsFeatureConfig 
 
     @Override
     public boolean isFutureRotations() {
-        return futureRotations.get();
+        if (FUTURE)
+            return futureRotations.get();
+
+        return false;
     }
 }
