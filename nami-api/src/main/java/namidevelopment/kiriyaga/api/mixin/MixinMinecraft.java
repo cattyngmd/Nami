@@ -27,15 +27,6 @@ public abstract class MixinMinecraft {
     @Shadow @Nullable public LocalPlayer player;
     @Shadow public ClientLevel level;
 
-    @Unique
-    private static long lastFrameDurationNs = -1;
-
-    @Unique
-    public static int getInstantFPS() {
-        if (lastFrameDurationNs <= 0) return -1;
-        return (int)(1_000_000_000.0 / (double) lastFrameDurationNs);
-    }
-
     @Inject(method = "handleKeybinds", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
         if (MC == null || MC.mouseHandler == null || MC.screen != null) return;
@@ -81,7 +72,7 @@ public abstract class MixinMinecraft {
 
     @ModifyArg(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;logFrameDuration(J)V"),index = 0)
     private long runTick(long frameDurationNs) {
-        lastFrameDurationNs = frameDurationNs;
+        SERVER_SERVICE.setLastFrameDurationNs(frameDurationNs);
         return frameDurationNs;
     }
 

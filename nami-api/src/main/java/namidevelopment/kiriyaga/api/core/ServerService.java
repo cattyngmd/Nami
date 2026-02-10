@@ -39,6 +39,8 @@ public class ServerService {
     private int countPing = 0;
     private volatile long lastUpdated = -1;
 
+    private volatile long lastFrameDurationNs = -1;
+
     public void init() {
         EVENT_SERVICE.register(this);
         Arrays.fill(pendingTransactions, -1);
@@ -240,5 +242,14 @@ public class ServerService {
         if (lastUpdated == -1) return Float.POSITIVE_INFINITY;
         long deltaMillis = System.currentTimeMillis() - lastUpdated;
         return deltaMillis / 1000.0f;
+    }
+
+    public void setLastFrameDurationNs(long ns) {
+        lastFrameDurationNs = ns;
+    }
+
+    public int getInstantFPS() {
+        if (lastFrameDurationNs <= 0) return -1;
+        return (int)(1_000_000_000.0 / (double) lastFrameDurationNs);
     }
 }

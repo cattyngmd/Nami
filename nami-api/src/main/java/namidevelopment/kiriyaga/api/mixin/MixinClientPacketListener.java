@@ -12,13 +12,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static namidevelopment.kiriyaga.api.NamiApi.MC;
+
 @Mixin(ClientPacketListener.class)
 public abstract class MixinClientPacketListener {
 
     @Shadow
     private PingDebugMonitor pingDebugMonitor;
-    @Shadow @Final
-    private Minecraft minecraft;
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tick(CallbackInfo ci) {
@@ -26,7 +26,7 @@ public abstract class MixinClientPacketListener {
         if (c == null || c.getMode() != LatencyFeatureConfig.Mode.NEW)
             return;
 
-        if (!this.minecraft.getDebugOverlay().showNetworkCharts()) {
+        if (!MC.getDebugOverlay().showNetworkCharts()) {
             this.pingDebugMonitor.tick();
         }
     }
