@@ -72,8 +72,8 @@ public abstract class MixinLocalPlayer {
 
         if (config.getRotationMode() == RotationsFeatureConfig.RotationMode.SILENT && ROTATION_SERVICE.getStateHandler().getSilentSyncRequired()) {
             this.originalSilentPitch = MC.player.getXRot();
-            this.xRotLast = -9999;
-            MC.player.setXRot(this.originalSilentPitch + 1f);
+            this.xRotLast -= 4;
+            MC.player.setXRot(this.originalSilentPitch + 0.1f);
         }
     }
 
