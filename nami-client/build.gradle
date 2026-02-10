@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'fabric-loom' version '1.15.3'
     id 'maven-publish'
 }
 
@@ -38,9 +38,9 @@ processResources {
     }
 }
 
-def namiApiVersion = project.nami_api
 group = project.maven_group
 version = project.mod_version
+def namiApiVersion = project.nami_api
 
 tasks.register("printVersion") {
     doLast {

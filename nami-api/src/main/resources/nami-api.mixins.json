@@ -8,9 +8,9 @@
     "DuckFont",
     "DuckMultiPlayerGameMode",
     "MixinCommandSuggestions",
-    "MixinDebugScreenOverlay",
     "MixinLocalPlayer",
     "MixinMinecraft",
+    "MixinClientPacketListener",
     "MixinMultiPlayerGameMode"
   ],
   "injectors": {

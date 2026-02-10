@@ -11,12 +11,13 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 
@@ -26,6 +27,14 @@ public abstract class MixinMinecraft {
     @Shadow @Nullable public LocalPlayer player;
     @Shadow public ClientLevel level;
 
+    @Unique
+    private static long lastFrameDurationNs = -1;
+
+    @Unique
+    public static int getInstantFPS() {
+        if (lastFrameDurationNs <= 0) return -1;
+        return (int)(1_000_000_000.0 / (double) lastFrameDurationNs);
+    }
 
     @Inject(method = "handleKeybinds", at = @At("TAIL"))
     private void onHandleInputEvents_TAIL(CallbackInfo ci) {
@@ -68,6 +77,12 @@ public abstract class MixinMinecraft {
 
             MACRO_SERVICE.setKeyPressedLastTick(keyCode, currentlyPressed);
         }
+    }
+
+    @ModifyArg(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;logFrameDuration(J)V"),index = 0)
+    private long runTick(long frameDurationNs) {
+        lastFrameDurationNs = frameDurationNs;
+        return frameDurationNs;
     }
 
     // For futre rotations
