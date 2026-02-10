@@ -3,6 +3,7 @@ package namidevelopment.kiriyaga.nami;
 import namidevelopment.kiriyaga.nami.contract.ClientFeatureContracts;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.component.NavigatePanelComponent;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.ConfigScreen;
+import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.PluginScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.screen.ClickGuiScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.newgui.screen.FriendScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.oldgui.screen.HudEditorScreen;
@@ -36,9 +37,8 @@ public class Nami implements ClientModInitializer {
     public static HudEditorScreen HUD_EDITOR_SCREEN;
     public static FriendScreen FRIEND_SCREEN;
     public static ConfigScreen CONFIG_SCREEN;
+    public static PluginScreen PLUGIN_SCREEN;
     public static NavigatePanelComponent NAVIGATE_PANEL;
-
-
 
     @Override
     public void onInitializeClient() {
@@ -51,6 +51,8 @@ public class Nami implements ClientModInitializer {
         HUD_EDITOR_SCREEN = new HudEditorScreen();
         FRIEND_SCREEN = new FriendScreen();
         CONFIG_SCREEN = new ConfigScreen();
+        PLUGIN_SCREEN = new PluginScreen();
+
         NAVIGATE_PANEL = new NavigatePanelComponent();
 
         LOGGER.info(NAME + " " + VERSION + " has been initialized\n");
@@ -58,8 +60,11 @@ public class Nami implements ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             START_TIME = System.currentTimeMillis();
 
+            CONFIG_SERVICE.loadPluginsState();
+
             CONFIG_SERVICE.loadFeatures();
             CONFIG_SERVICE.loadFriends();
+
             if (CONFIG_SERVICE.loadName() == null)
                 CONFIG_SERVICE.saveName(DISPLAY_NAME);
             else
@@ -71,7 +76,7 @@ public class Nami implements ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             CONFIG_SERVICE.saveFeatures();
             CONFIG_SERVICE.saveMacros();
+            CONFIG_SERVICE.savePluginsState();
         });
-
     }
 }

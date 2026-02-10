@@ -21,6 +21,7 @@ public class ConfigService {
     private final ConfigSerializer configSerializer = new ConfigSerializer(dirProvider);
     private final FriendStorage friendStorage = new FriendStorage(dirProvider);
     private final MacroStorage macroStorage = new MacroStorage(dirProvider);
+    private final PluginStorage pluginStorage = new PluginStorage(dirProvider);
 
     public ConfigDirectoryProvider getDirectoryProvider() {
         return dirProvider;
@@ -88,6 +89,14 @@ public class ConfigService {
 
     public boolean isFriend(String name) {
         return friendStorage.isFriend(name);
+    }
+
+    public void savePluginsState() {
+        pluginStorage.save(PLUGIN_SERVICE.getPluginsState());
+    }
+
+    public void loadPluginsState() {
+        PLUGIN_SERVICE.applyPluginsState(pluginStorage.load());
     }
 
     public void saveName(String nameValue) {

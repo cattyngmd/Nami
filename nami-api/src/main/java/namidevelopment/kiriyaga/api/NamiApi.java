@@ -46,6 +46,7 @@ public class NamiApi implements ClientModInitializer {
     public static final InventoryService INVENTORY_SERVICE = new InventoryService();
     public static final ServerService SERVER_SERVICE = new ServerService();
     public static final InputService INPUT_SERVICE = new InputService();
+    public static final PluginService PLUGIN_SERVICE = new PluginService();
     public static final BreakPredictionService BREAKPREDICT_SERVICE = new BreakPredictionService();
     public static final TotemCounterService TOTEMCOUNTER_SERVICE = new TotemCounterService();
 
