@@ -50,6 +50,7 @@ public class TrapComponent {
     public final BoolSetting attackRotate;
     public final BoolSetting attackMultiTask;
     public final BoolSetting attackSwing;
+    public final IntSetting attackAge;
 
     private int cooldown = 0;
     private final List<BlockPos> targetPositions = new ArrayList<>();
@@ -72,6 +73,7 @@ public class TrapComponent {
         attack = feature.addSetting(new BoolSetting("Attack", false));
         attackRotate = feature.addSetting(new BoolSetting("AttackRotate","Rotate", true));
         attackRange = feature.addSetting(new DoubleSetting("AttackRange","Range", 3.00, 1.0, 6.0));
+        attackAge = feature.addSetting(new IntSetting("Age", 5, 0, 20));
         attackMultiTask = feature.addSetting(new BoolSetting("AttackMultitask","Multitask", true));
         attackSwing = feature.addSetting(new BoolSetting("AttackSwing","Swing", true));
 
@@ -83,6 +85,7 @@ public class TrapComponent {
         attackRange.setShowCondition(attack::get);
         attackMultiTask.setShowCondition(attack::get);
         attackSwing.setShowCondition(attack::get);
+        attackAge.setShowCondition(attack::get);
     }
 
     public void onDisable() {
@@ -111,7 +114,8 @@ public class TrapComponent {
                 for (BlockPos pos : targetPositions) {
                     AABB blockBox = new AABB(pos);
                     if (blockBox.intersects(crystalBox)) {
-                        doBreak(crystal);
+                        if (crystal.tickCount >= attackAge.get())
+                            doBreak(crystal);
                         break;
                     }
                 }
