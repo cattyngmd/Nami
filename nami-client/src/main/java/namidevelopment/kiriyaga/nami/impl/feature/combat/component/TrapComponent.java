@@ -13,6 +13,7 @@ import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import com.mojang.blaze3d.vertex.PoseStack;
 import namidevelopment.kiriyaga.nami.impl.feature.combat.autocrystal.AutoCrystalFeature;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.item.BlockItem;
@@ -193,7 +194,7 @@ public class TrapComponent {
 
     private boolean place(BlockPos pos, Item item, boolean airPlace, boolean grim, Feature owner) {
         if (airPlace)
-            return InteractionUtils.airPlace(pos, item, swapBack.get(), range.get(), rotate.get(), grim, simulate.get(), swing.get(), owner.getName(), multiTask.get());
+            return InteractionUtils.airPlace(pos, Direction.DOWN, item, swapBack.get(), range.get(), rotate.get(), grim, simulate.get(), swing.get(), owner.getName(), multiTask.get());
 
         return InteractionUtils.placeBlock(pos, item, swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName(), multiTask.get());
     }
