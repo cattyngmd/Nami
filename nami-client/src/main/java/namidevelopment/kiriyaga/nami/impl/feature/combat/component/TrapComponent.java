@@ -1,5 +1,6 @@
 package namidevelopment.kiriyaga.nami.impl.feature.combat.component;
 
+import namidevelopment.kiriyaga.api.core.breakprediction.PlayerBreakState;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.event.impl.PreTickEvent;
 import namidevelopment.kiriyaga.api.event.impl.Render3DEvent;
@@ -43,6 +44,7 @@ public class TrapComponent {
     public final BoolSetting swapBack;
     public final BoolSetting multiTask;
     public final BoolSetting simulate;
+    public final BoolSetting antiBreak;
     public final BoolSetting foundation;
     public final BoolSetting swing;
     public final BoolSetting render;
@@ -68,6 +70,7 @@ public class TrapComponent {
         swapBack = feature.addSetting(new BoolSetting("SwapBack", true));
         multiTask = feature.addSetting(new BoolSetting("MultiTask", false));
         simulate = feature.addSetting(new BoolSetting("Simulate", false));
+        antiBreak = feature.addSetting(new BoolSetting("AntiBreak", false));
         foundation = feature.addSetting(new BoolSetting("Foundation", false));
         swing = feature.addSetting(new BoolSetting("Swing", true));
         render = feature.addSetting(new BoolSetting("Render", true));
@@ -135,18 +138,45 @@ public class TrapComponent {
             }
         }
 
+        if (antiBreak.get() && !targetPositions.isEmpty()) {
+            List<BlockPos> extraTargets = new ArrayList<>();
+            for (BlockPos pos : targetPositions) {
+                boolean breaking = false;
+                for (PlayerBreakState state : BREAKPREDICT_SERVICE.all()) {
+                    if (state == null) continue;
+
+                    if (state.isInBreakProgress(pos)) {
+                        breaking = true;
+                        break;
+                    }
+                }
+
+                if (!breaking) continue;
+
+                for (Direction dir : Direction.values()) {
+                    if (dir == Direction.DOWN) continue;
+
+                    BlockPos around = pos.relative(dir);
+
+                    if (targetPositions.contains(around)) continue;
+                    if (extraTargets.contains(around)) continue;
+
+                    extraTargets.add(around);
+                }
+            }
+
+            targetPositions.addAll(extraTargets);
+        }
+
         int blocksPlaced = 0;
 
         for (BlockPos pos : targetPositions) {
-            if (!MC.level.getBlockState(pos).canBeReplaced()) continue;
 
             if (foundation.get()) {
                 BlockPos foundation = pos.below();
-                if (MC.level.getBlockState(foundation).canBeReplaced()) {
-                    if (place(foundation, getSlot(), airPlace.get(), grim.get(), owner)) {
-                        blocksPlaced++;
-                        if (blocksPlaced >= shiftTicks.get()) break;
-                    }
+                if (place(foundation, getSlot(), airPlace.get(), grim.get(), owner)) {
+                    blocksPlaced++;
+                    if (blocksPlaced >= shiftTicks.get()) break;
                 }
             }
 
