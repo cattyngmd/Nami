@@ -146,7 +146,7 @@ public class TrapComponent {
                 for (PlayerBreakState state : BREAKPREDICT_SERVICE.all()) {
                     if (state == null) continue;
 
-                    if (state.isInBreakProgress(pos)) {
+                    if (state.isBreaking(pos)) {
                         breaking = true;
                         break;
                     }
