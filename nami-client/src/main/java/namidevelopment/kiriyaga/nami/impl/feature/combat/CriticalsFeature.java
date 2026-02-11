@@ -10,9 +10,11 @@ import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.nami.mixininterface.IPlayerInteractEntityC2SPacket;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.effect.MobEffects;
@@ -31,16 +33,18 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopme
 @RegisterFeature
 public class CriticalsFeature extends Feature {
 
-    public enum Mode { PACKET, GRIM}
+    public enum Mode { PACKET, GRIM, GRIMNEW}
 
     public final EnumSetting<Mode> mode = addSetting(new EnumSetting<>("Mode", Mode.PACKET));
     public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", true));
     public final BoolSetting onlyStandingStill = addSetting(new BoolSetting("OnlyStandingStill", true));
+    public final BoolSetting onlyWhenHeadCovered = addSetting(new BoolSetting("HeadCovered", true));
 
     public CriticalsFeature() {
         super("Criticals", "Changes player movement for always critting.", FeatureCategory.of("Combat"));
-        onlyPhased.setShowCondition(() -> mode.get() == Mode.GRIM);
-        onlyStandingStill.setShowCondition(() -> mode.get() == Mode.GRIM);
+        onlyPhased.setShowCondition(() -> mode.get() != Mode.PACKET);
+        onlyStandingStill.setShowCondition(() -> mode.get() != Mode.PACKET);
+        onlyWhenHeadCovered.setShowCondition(() -> mode.get() != Mode.PACKET);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -101,10 +105,20 @@ public class CriticalsFeature extends Feature {
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
 
-        if (onlyStandingStill.get() && MC.player.getDeltaMovement().horizontalDistanceSqr() > 0.01)
+        if (onlyStandingStill.get() && MC.player.getDeltaMovement().x > 0.01 || MC.player.getDeltaMovement().y > 0.01)
             return;
 
+        if (onlyWhenHeadCovered.get()) {
+            BlockPos pos = MC.player.blockPosition();
+            BlockPos target = pos.above(2);
 
+            if (MC.player.isVisuallyCrawling()) {
+                target = pos.above(1);
+            }
+
+            if (MC.level.getBlockState(target).isAir())
+                return;
+        }
 
         float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
         float pitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
@@ -112,5 +126,38 @@ public class CriticalsFeature extends Feature {
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 0.0625, z, yaw, pitch, false, false));
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 0.0625013579, z, yaw, pitch, false, false));
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 1.3579e-6, z, yaw, pitch, false,false));
+    }
+
+    private void grimNewCrit(double x, double y, double z) {
+        if (!MC.player.onGround())
+            return;
+
+        if (onlyPhased.get() && !isPhased(MC.player))
+            return;
+
+        if (onlyStandingStill.get() && MC.player.getDeltaMovement().x > 0.01 || MC.player.getDeltaMovement().y > 0.01)
+            return;
+
+        if (onlyWhenHeadCovered.get()) {
+            BlockPos pos = MC.player.blockPosition();
+            BlockPos target = pos.above(2);
+
+            if (MC.player.isVisuallyCrawling()) {
+                target = pos.above(1);
+            }
+
+            if (MC.level.getBlockState(target).isAir())
+                return;
+        }
+
+        float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
+        float pitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
+
+        float f = (float)((Math.random() * 2.0 - 1.0) * 0.001f);
+        float f2 = Mth.clamp(pitch + f, -90.0F, 90.0F);
+
+        // Author: cattyngmd
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + .0626, z, yaw, f2, false, false));
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + .0455, z, yaw, f2, false, false));
     }
 }
