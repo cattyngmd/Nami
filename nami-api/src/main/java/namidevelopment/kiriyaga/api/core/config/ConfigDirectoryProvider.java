@@ -23,7 +23,7 @@ public class ConfigDirectoryProvider {
     }
 
     public File getSocialsFile() {
-        return new File(baseDir, "friends.json");
+        return new File(baseDir, "socials.json");
     }
 
     public File getBaseDir() {

@@ -58,7 +58,6 @@ public class SpeedMineFeature extends Feature {
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
     public final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
     public final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
-    public final BoolSetting instantHand = addSetting(new BoolSetting("InstantHand", false));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting async = addSetting(new BoolSetting("Async", true));
     public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
@@ -78,7 +77,6 @@ public class SpeedMineFeature extends Feature {
         echestPriority.setShowCondition(()-> swap.get() != Swap.NONE);
         damageThreshold.setShowCondition(()-> swap.get() != Swap.NONE);
         allowOffhand.setShowCondition(()-> !multitask.get());
-        instantHand.setShowCondition(instant::get);
     }
 
     @Override
@@ -326,7 +324,6 @@ public class SpeedMineFeature extends Feature {
         if (rotate.get() == Rotate.NORMAL && !ROTATION_SERVICE.getRequestHandler().isCompleted(this.name))
             return;
 
-        boolean b = task.isInstantRemine() && instantHand.get();
         int prev = MC.player.getInventory().getSelectedSlot();
         if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
             int slot = getSlot(task.getBlockState());
@@ -335,9 +332,7 @@ public class SpeedMineFeature extends Feature {
                     if (swap.get() != Swap.SILENT)
                         shouldSwapBack = MC.player.getInventory().getSelectedSlot();
 
-                if (!b) {
-                    InventoryUtils.attemptSwitch(slot);
-                }
+                InventoryUtils.attemptSwitch(slot);
             }
         }
 
@@ -355,7 +350,7 @@ public class SpeedMineFeature extends Feature {
 
         }
 
-        if (!b && swap.get() == Swap.SILENT && shouldSwapBack == -1)
+        if (swap.get() == Swap.SILENT && shouldSwapBack == -1)
             InventoryUtils.attemptSwitch(prev);
 
         currentTask.markLastBroken();
