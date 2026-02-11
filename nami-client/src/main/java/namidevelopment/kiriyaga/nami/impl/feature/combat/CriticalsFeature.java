@@ -157,6 +157,7 @@ public class CriticalsFeature extends Feature {
         float f2 = Mth.clamp(pitch + f, -90.0F, 90.0F);
 
         // Author: cattyngmd
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y, z, yaw, pitch, true, true));
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + .0626, z, yaw, f2, false, false));
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + .0455, z, yaw, f2, false, false));
     }
