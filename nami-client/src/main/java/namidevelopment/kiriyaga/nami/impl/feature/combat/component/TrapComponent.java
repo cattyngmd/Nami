@@ -201,6 +201,9 @@ public class TrapComponent {
         Color color = colorFeature.getStyledGlobalColor();
 
         for (BlockPos pos : targetPositions) {
+            if (!MC.level.getBlockState(pos).canBeReplaced())
+                continue;
+
             AABB box = new AABB(pos);
             RenderUtil.drawBoxLines(box, color, true, true, 1.5f);
         }

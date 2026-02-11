@@ -82,9 +82,7 @@ public class FeetTrapFeature extends Feature {
                             base.south().west()};
 
                     for (BlockPos b : corners) {
-                        if (MC.level.getBlockState(b).canBeReplaced() && !isPlaceable(b)) {
-                            targets.add(b);
-                        }
+                        targets.add(b);
                     }
                 }
             }
