@@ -17,6 +17,7 @@ import namidevelopment.kiriyaga.nami.mixin.DuckClientboundExplodePacket;
 import namidevelopment.kiriyaga.nami.mixininterface.IClientboundSetEntityMotionPacket;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.projectile.FishingHook;
@@ -137,7 +138,7 @@ public class VelocityFeature extends Feature {
         switch (mode.get()) {
             case VANILLA -> processVelocityVanilla(event, packet);
             case WALLS -> processVelocityWalls(event, packet);
-            case GRIM -> processVelocityGrim(event);
+            case GRIM -> processVelocityGrim(event, packet);
         }
     }
 
@@ -145,7 +146,7 @@ public class VelocityFeature extends Feature {
         switch (mode.get()) {
             case VANILLA -> processExplosionVanilla(event, packet);
             case WALLS -> processExplosionWalls(event, packet);
-            case GRIM -> processExplosionGrim(event);
+            case GRIM -> processExplosionGrim(event, packet);
         }
     }
 
@@ -193,13 +194,13 @@ public class VelocityFeature extends Feature {
         processVelocityVanilla(event, packet);
     }
 
-    private void processVelocityGrim(PacketReceiveEvent event) {
+    private void processVelocityGrim(PacketReceiveEvent event, ClientboundSetEntityMotionPacket packet) {
         if (!SERVER_SERVICE.hasElapsedSinceSetback(100))
             return;
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
 
-        event.cancel();
+        processVelocityVanilla(event, packet);
         pendingVelocity = true;
     }
 
@@ -223,12 +224,12 @@ public class VelocityFeature extends Feature {
         processExplosionVanilla(event, packet);
     }
 
-    private void processExplosionGrim(PacketReceiveEvent event) {
+    private void processExplosionGrim(PacketReceiveEvent event, ClientboundExplodePacket packet) {
         if (!SERVER_SERVICE.hasElapsedSinceSetback(100))
             return;
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
-        event.cancel();
+        processExplosionVanilla(event, packet);
         pendingVelocity = true;
     }
 
@@ -262,6 +263,11 @@ public class VelocityFeature extends Feature {
 
                 if (onlyPhased.get() && !isPhased(MC.player)) {
                     filtered.add(packet);
+                    return;
+                }
+
+                if(cancel.get()) {
+                    event.cancel();
                     return;
                 }
 
@@ -322,7 +328,10 @@ public class VelocityFeature extends Feature {
         float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
         float pitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
 
-        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(MC.player.getX(), MC.player.getY(), MC.player.getZ(), yaw, pitch, MC.player.onGround(), MC.player.horizontalCollision));
+        float f = (float)((Math.random() * 2.0 - 1.0) * 0.001f);
+        float f2 = Mth.clamp(pitch + f, -90.0F, 90.0F);
+
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(MC.player.getX(), MC.player.getY(), MC.player.getZ(), yaw, f2, MC.player.onGround(), MC.player.horizontalCollision));
 
        // ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 0, yaw, pitch, RotationsFeature.RotationMode.SILENT));
         MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, MC.player.isVisuallyCrawling() ? MC.player.blockPosition() : MC.player.blockPosition().above(), Direction.DOWN));

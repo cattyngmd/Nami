@@ -10,6 +10,7 @@ import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.nami.mixininterface.IPlayerInteractEntityC2SPacket;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
@@ -21,7 +22,11 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -133,7 +138,7 @@ public class CriticalsFeature extends Feature {
         if (!MC.player.onGround())
             return;
 
-        if (onlyPhased.get() && !isPhased(MC.player))
+        if (onlyPhased.get() && (!isPhased(MC.player) || !eyesPhased(MC.player)))
             return;
 
         if (onlyStandingStill.get() && MC.player.getDeltaMovement().x > 0.01 || MC.player.getDeltaMovement().y > 0.01)
@@ -161,4 +166,21 @@ public class CriticalsFeature extends Feature {
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + .0626, z, yaw, f2, false, false));
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + .0455, z, yaw, f2, false, false));
     }
+
+    private boolean eyesPhased(Player player) {
+        Vec3 eyePos = player.getEyePosition();
+        BlockPos pos = BlockPos.containing(eyePos);
+        BlockState state = MC.level.getBlockState(pos);
+        if (state.isAir()) return false;
+        VoxelShape shape = state.getCollisionShape(MC.level, pos);
+        if (shape.isEmpty()) return false;
+
+        for (AABB box : shape.toAabbs()) {
+            if (box.move(pos).contains(eyePos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
