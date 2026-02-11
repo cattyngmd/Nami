@@ -55,6 +55,7 @@ public class TrapComponent {
 
     private int cooldown = 0;
     private final List<BlockPos> targetPositions = new ArrayList<>();
+    private final List<BlockPos> placedPositions = new ArrayList<>();
 
     public TrapComponent(Feature feature) {
         range = feature.addSetting(new DoubleSetting("Range", 4.50, 1.0, 6.0));
@@ -92,6 +93,7 @@ public class TrapComponent {
     public void onDisable() {
         cooldown = 0;
         targetPositions.clear();
+        placedPositions.clear();
     }
 
     public List<BlockPos> getTargetPositions() {
@@ -100,6 +102,16 @@ public class TrapComponent {
 
     public void onTick(PreTickEvent event, Feature owner, List<BlockPos> newTargets) {
         if (MC.player == null || MC.level == null) return;
+
+        if (simulate.get() && !placedPositions.isEmpty()) {
+            Item handItem = MC.player.getMainHandItem().getItem();
+
+            for (BlockPos pos : placedPositions) {
+                InteractionUtils.interactBlockAt(pos, handItem, null, swapBack.get(), multiTask.get(), range.get(), rotate.get(), strictDirection.get(), false, swing.get(), owner.getName()+"_interact");
+            }
+
+            placedPositions.clear();
+        }
 
         targetPositions.clear();
         if (newTargets != null) targetPositions.addAll(newTargets);
@@ -116,7 +128,7 @@ public class TrapComponent {
                     AABB blockBox = new AABB(pos);
                     if (blockBox.intersects(crystalBox)) {
                         if (crystal.tickCount >= attackAge.get())
-                            doBreak(crystal);
+                            doBreak(crystal, owner);
                         break;
                     }
                 }
@@ -139,6 +151,7 @@ public class TrapComponent {
             }
 
             if (place(pos, getSlot(), airPlace.get(), grim.get(), owner)) {
+                placedPositions.add(pos);
                 blocksPlaced++;
                 if (blocksPlaced >= shiftTicks.get()) break;
             }
@@ -194,12 +207,12 @@ public class TrapComponent {
 
     private boolean place(BlockPos pos, Item item, boolean airPlace, boolean grim, Feature owner) {
         if (airPlace)
-            return InteractionUtils.airPlace(pos, Direction.DOWN, item, swapBack.get(), range.get(), rotate.get(), grim, simulate.get(), swing.get(), owner.getName(), multiTask.get());
+            return InteractionUtils.airPlace(pos, Direction.DOWN, item, swapBack.get(), range.get(), rotate.get(), grim, simulate.get(), swing.get(), owner.getName()+"_airplace", multiTask.get());
 
-        return InteractionUtils.placeBlock(pos, item, swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName(), multiTask.get());
+        return InteractionUtils.placeBlock(pos, item, swapBack.get(), range.get(), rotate.get(), strictDirection.get(), simulate.get(), swing.get(), owner.getName()+"_place", multiTask.get());
     }
 
-    private void doBreak(EndCrystal target) {
+    private void doBreak(EndCrystal target, Feature owner) {
         if (target == null) return;
 
         if (!attackMultiTask.get() && MC.player.isUsingItem()) return;
@@ -211,7 +224,7 @@ public class TrapComponent {
             float yaw = (float) getYawToVec(MC.player, pos);
             float pitch = (float) getPitchToVec(MC.player, pos);
 
-            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 9, yaw, pitch));
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(owner.getName()+"_attack", 9, yaw, pitch));
 
             rotated = true;
         }
