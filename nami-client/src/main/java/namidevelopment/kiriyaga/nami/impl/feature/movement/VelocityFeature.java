@@ -16,16 +16,11 @@ import namidevelopment.kiriyaga.nami.mixin.DuckBundlePacket;
 import namidevelopment.kiriyaga.nami.mixin.DuckClientboundExplodePacket;
 import namidevelopment.kiriyaga.nami.mixininterface.IClientboundSetEntityMotionPacket;
 import net.minecraft.core.Direction;
-import net.minecraft.network.protocol.game.ClientboundBundlePacket;
-import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
-import net.minecraft.network.protocol.game.ClientboundExplodePacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 
 import net.minecraft.world.phys.Vec3;
 
@@ -49,6 +44,8 @@ public class VelocityFeature extends Feature {
     public final BoolSetting blockPush = addSetting(new BoolSetting("Block", true));
     public final BoolSetting liquidPush = addSetting(new BoolSetting("Liquid", true));
     public final BoolSetting fishingRod = addSetting(new BoolSetting("FishingRod", false));
+    public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
+    public final BoolSetting requirePush = addSetting(new BoolSetting("RequirePush", false));
 
     private boolean pendingConcealment = false;
     private boolean pendingVelocity = false;
@@ -56,6 +53,8 @@ public class VelocityFeature extends Feature {
     public VelocityFeature() {super("Velocity", "Reduces incoming velocity effects.", FeatureCategory.of("Movement"), "antiknockback");
         horizontalPercent.setShowCondition(()-> !cancel.get());
         verticalPercent.setShowCondition(()-> !cancel.get());
+        onlyPhased.setShowCondition(()-> mode.get() == Mode.GRIM);
+        requirePush.setShowCondition(()-> mode.get() == Mode.GRIM);
     }
 
     @Override
@@ -183,7 +182,8 @@ public class VelocityFeature extends Feature {
     }
 
     private void processVelocityWalls(PacketReceiveEvent event, ClientboundSetEntityMotionPacket packet) {
-        if (!isPhased(MC.player) || (onlyOnGround.get() && !MC.player.onGround())) return;
+        if (!isPhased(MC.player) || (onlyOnGround.get() && !MC.player.onGround()))
+            return;
 
         if(cancel.get()) {
             event.cancel();
@@ -194,7 +194,11 @@ public class VelocityFeature extends Feature {
     }
 
     private void processVelocityGrim(PacketReceiveEvent event) {
-        if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) return;
+        if (!SERVER_SERVICE.hasElapsedSinceSetback(100))
+            return;
+        if (onlyPhased.get() && !isPhased(MC.player))
+            return;
+
         event.cancel();
         pendingVelocity = true;
     }
@@ -209,8 +213,8 @@ public class VelocityFeature extends Feature {
     }
 
     private void processExplosionWalls(PacketReceiveEvent event, ClientboundExplodePacket packet) {
-        if (!isPhased(MC.player)) return;
-
+        if (!isPhased(MC.player))
+            return;
         if(cancel.get()) {
             event.cancel();
             return;
@@ -220,7 +224,10 @@ public class VelocityFeature extends Feature {
     }
 
     private void processExplosionGrim(PacketReceiveEvent event) {
-        if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) return;
+        if (!SERVER_SERVICE.hasElapsedSinceSetback(100))
+            return;
+        if (onlyPhased.get() && !isPhased(MC.player))
+            return;
         event.cancel();
         pendingVelocity = true;
     }
@@ -232,7 +239,6 @@ public class VelocityFeature extends Feature {
                     event.cancel();
                     return;
                 }
-
                  scaleExplosionPacket(packet);
             }
             case WALLS -> {
@@ -246,11 +252,19 @@ public class VelocityFeature extends Feature {
                     event.cancel();
                     return;
                 }
-
                 scaleExplosionPacket(packet);
             }
             case GRIM -> {
-                if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
+                if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) {
+                    filtered.add(packet);
+                    return;
+                }
+
+                if (onlyPhased.get() && !isPhased(MC.player)) {
+                    filtered.add(packet);
+                    return;
+                }
+
                 pendingVelocity = true;
                 return;
             }
@@ -287,12 +301,20 @@ public class VelocityFeature extends Feature {
                 scaleVelocityPacket(packet);
             }
             case GRIM -> {
-                if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) { filtered.add(packet); return; }
+                if (!SERVER_SERVICE.hasElapsedSinceSetback(100)) {
+                    filtered.add(packet);
+                    return;
+                }
+
+                if (onlyPhased.get() && !isPhased(MC.player)) {
+                    filtered.add(packet);
+                    return;
+                }
+
                 pendingVelocity = true;
                 return;
             }
         }
-
         filtered.add(packet);
     }
 
@@ -300,12 +322,10 @@ public class VelocityFeature extends Feature {
         float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
         float pitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
 
-        ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 0, yaw, pitch, RotationsFeature.RotationMode.SILENT));
-        MC.getConnection().send(new ServerboundPlayerActionPacket(
-                ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK,
-                MC.player.isVisuallyCrawling() ? MC.player.blockPosition() : MC.player.blockPosition().above(),
-                Direction.DOWN
-        ));
+        MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(MC.player.getX(), MC.player.getY(), MC.player.getZ(), yaw, pitch, MC.player.onGround(), MC.player.horizontalCollision));
+
+       // ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 0, yaw, pitch, RotationsFeature.RotationMode.SILENT));
+        MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, MC.player.isVisuallyCrawling() ? MC.player.blockPosition() : MC.player.blockPosition().above(), Direction.DOWN));
     }
 
     private void scaleVelocityPacket(ClientboundSetEntityMotionPacket packet) {
