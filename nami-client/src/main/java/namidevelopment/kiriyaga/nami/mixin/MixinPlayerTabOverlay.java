@@ -109,41 +109,22 @@ public abstract class MixinPlayerTabOverlay {
     }
 
     @Inject(method = "getNameForDisplay", at = @At("HEAD"), cancellable = true)
-    private void getPlayerName(PlayerInfo entry, CallbackInfoReturnable<Component> info) {
-        BetterTabFeature betterTab = FEATURE_SERVICE.getStorage() != null
-                ? FEATURE_SERVICE.getStorage().getByClass(BetterTabFeature.class)
-                : null;
+    private void getNameForDisplay(PlayerInfo entry, CallbackInfoReturnable<Component> info) {
+        BetterTabFeature betterTab = FEATURE_SERVICE.getStorage() != null ? FEATURE_SERVICE.getStorage().getByClass(BetterTabFeature.class) : null;
 
         if (betterTab == null || !betterTab.isEnabled()) return;
-
-        updateSocialsCache();
-
-        boolean highlightSocials = betterTab.highlight.get();
-        if (!highlightSocials) return;
-
+        if (!betterTab.highlight.get()) return;
         String playerName = entry.getProfile().name();
-        SocialsStatus status = cachedSocials.get(playerName.toLowerCase());
-
+        SocialsStatus status = SOCIALS_SERVICE.getStatus(playerName);
         if (status == null) return;
 
-        String color = getColorByStatus(status);
+        String color = switch (status) {
+            case FRIEND -> "{friend}";
+            case ENEMY -> "{enemy}";
+            default -> "{global}";
+        };
 
-        MutableComponent formattedName = Component.empty();
-
-        if (entry.getTabListDisplayName() != null) {
-            for (Component sibling : entry.getTabListDisplayName().getSiblings()) {
-                String str = sibling.getString();
-
-                if (str.equals(playerName)) {
-                    formattedName.append(CAT_FORMAT.format(color + playerName));
-                }
-                else {
-                    formattedName.append(sibling);
-                }
-            }
-        }
-
-        info.setReturnValue(decorateName(entry, formattedName));
+        info.setReturnValue(decorateName(entry, CAT_FORMAT.format(color + playerName)));
     }
 
     @Inject(method = "render", at = @At("HEAD"))
