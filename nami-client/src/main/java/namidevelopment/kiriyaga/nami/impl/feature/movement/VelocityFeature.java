@@ -334,7 +334,6 @@ public class VelocityFeature extends Feature {
         MC.getConnection().send(new ServerboundMovePlayerPacket.PosRot(MC.player.getX(), MC.player.getY(), MC.player.getZ(), yaw, f2, MC.player.onGround(), MC.player.horizontalCollision));
 
        // ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 0, yaw, pitch, RotationsFeature.RotationMode.SILENT));
-        MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, MC.player.isVisuallyCrawling() ? MC.player.blockPosition() : MC.player.blockPosition().above(), Direction.DOWN));
     }
 
     private void scaleVelocityPacket(ClientboundSetEntityMotionPacket packet) {
