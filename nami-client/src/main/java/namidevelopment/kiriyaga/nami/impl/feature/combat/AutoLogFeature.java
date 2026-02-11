@@ -72,7 +72,7 @@ public class AutoLogFeature extends Feature {
 
         if (onRender.get()) {
             for (Entity other : EntityUtils.getOtherPlayers()) {
-                if (!FRIEND_SERVICE.isFriend(other.getName().getString())) {
+                if (!SOCIALS_SERVICE.isFriend(other.getName().getString())) {
                     double distance = player.distanceTo(other);
                     logOut("Untrusted player in range: " + player.getName().toString() + " (" + String.format("%.1f", distance) + " blocks)");
                     return;
@@ -108,7 +108,7 @@ public class AutoLogFeature extends Feature {
             if (player == MC.player)
                 return;
 
-            if (FRIEND_SERVICE.isFriend(player.getName().getString()))
+            if (SOCIALS_SERVICE.isFriend(player.getName().getString()))
                 return;
 
             double distance = MC.player.distanceTo(player);

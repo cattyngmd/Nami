@@ -50,7 +50,7 @@ public class AnnouncerFeature extends Feature {
     }
 
     private boolean validateJoin(String name) {
-        boolean b = FRIEND_SERVICE.isFriend(name);
+        boolean b = SOCIALS_SERVICE.isFriend(name);
         if (joinEveryone.get() && joinFriends.get()) return true;
         if (joinFriends.get() && b) return true;
         if (joinEveryone.get() && !b) return true;
@@ -58,7 +58,7 @@ public class AnnouncerFeature extends Feature {
     }
 
     private boolean validateVisualRange(String name) {
-        boolean b = FRIEND_SERVICE.isFriend(name);
+        boolean b = SOCIALS_SERVICE.isFriend(name);
         if (rangeEveryone.get() && rangeFriends.get()) return true;
         if (rangeFriends.get() && b) return true;
         if (rangeEveryone.get() && !b) return true;
@@ -70,7 +70,7 @@ public class AnnouncerFeature extends Feature {
         if (MC.player == null) return false;
         if (player == MC.player)
             return selfPop.get();
-        boolean friend = FRIEND_SERVICE.isFriend(player.getName().getString());
+        boolean friend = SOCIALS_SERVICE.isFriend(player.getName().getString());
         if (friend) return friendsPop.get();
         return othersPop.get();
     }
