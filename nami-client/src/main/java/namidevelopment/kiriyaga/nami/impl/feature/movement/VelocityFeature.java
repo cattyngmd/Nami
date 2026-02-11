@@ -15,6 +15,7 @@ import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.nami.mixin.DuckBundlePacket;
 import namidevelopment.kiriyaga.nami.mixin.DuckClientboundExplodePacket;
 import namidevelopment.kiriyaga.nami.mixininterface.IClientboundSetEntityMotionPacket;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.util.Mth;
@@ -46,7 +47,7 @@ public class VelocityFeature extends Feature {
     public final BoolSetting liquidPush = addSetting(new BoolSetting("Liquid", true));
     public final BoolSetting fishingRod = addSetting(new BoolSetting("FishingRod", false));
     public final BoolSetting onlyPhased = addSetting(new BoolSetting("OnlyPhased", false));
-    public final BoolSetting requirePush = addSetting(new BoolSetting("RequirePush", false));
+    public final BoolSetting onlyWhenHeadCovered = addSetting(new BoolSetting("OnlyCoveredHead", false));
 
     private boolean pendingConcealment = false;
     private boolean pendingVelocity = false;
@@ -55,7 +56,7 @@ public class VelocityFeature extends Feature {
         horizontalPercent.setShowCondition(()-> !cancel.get());
         verticalPercent.setShowCondition(()-> !cancel.get());
         onlyPhased.setShowCondition(()-> mode.get() == Mode.GRIM);
-        requirePush.setShowCondition(()-> mode.get() == Mode.GRIM);
+        onlyWhenHeadCovered.setShowCondition(()-> mode.get() == Mode.GRIM);
     }
 
     @Override
@@ -200,6 +201,18 @@ public class VelocityFeature extends Feature {
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
 
+        if (onlyWhenHeadCovered.get()) {
+            BlockPos pos = MC.player.blockPosition();
+            BlockPos target = pos.above(2);
+
+            if (MC.player.isVisuallyCrawling()) {
+                target = pos.above(1);
+            }
+
+            if (MC.level.getBlockState(target).isAir())
+                return;
+        }
+
         processVelocityVanilla(event, packet);
         pendingVelocity = true;
     }
@@ -229,6 +242,17 @@ public class VelocityFeature extends Feature {
             return;
         if (onlyPhased.get() && !isPhased(MC.player))
             return;
+        if (onlyWhenHeadCovered.get()) {
+            BlockPos pos = MC.player.blockPosition();
+            BlockPos target = pos.above(2);
+
+            if (MC.player.isVisuallyCrawling()) {
+                target = pos.above(1);
+            }
+
+            if (MC.level.getBlockState(target).isAir())
+                return;
+        }
         processExplosionVanilla(event, packet);
         pendingVelocity = true;
     }
@@ -264,6 +288,20 @@ public class VelocityFeature extends Feature {
                 if (onlyPhased.get() && !isPhased(MC.player)) {
                     filtered.add(packet);
                     return;
+                }
+
+                if (onlyWhenHeadCovered.get()) {
+                    BlockPos pos = MC.player.blockPosition();
+                    BlockPos target = pos.above(2);
+
+                    if (MC.player.isVisuallyCrawling()) {
+                        target = pos.above(1);
+                    }
+
+                    if (MC.level.getBlockState(target).isAir()) {
+                        filtered.add(packet);
+                        return;
+                    }
                 }
 
                 if(cancel.get()) {
@@ -315,6 +353,20 @@ public class VelocityFeature extends Feature {
                 if (onlyPhased.get() && !isPhased(MC.player)) {
                     filtered.add(packet);
                     return;
+                }
+
+                if (onlyWhenHeadCovered.get()) {
+                    BlockPos pos = MC.player.blockPosition();
+                    BlockPos target = pos.above(2);
+
+                    if (MC.player.isVisuallyCrawling()) {
+                        target = pos.above(1);
+                    }
+
+                    if (MC.level.getBlockState(target).isAir()) {
+                        filtered.add(packet);
+                        return;
+                    }
                 }
 
                 pendingVelocity = true;
