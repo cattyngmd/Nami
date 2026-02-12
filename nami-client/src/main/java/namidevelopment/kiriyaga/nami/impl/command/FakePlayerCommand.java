@@ -25,7 +25,7 @@ public class FakePlayerCommand extends Command {
     private RemotePlayer fakePlayer;
 
     public FakePlayerCommand() {
-        super("fakeplayer", new CommandArgument[] {new CommandArgument.StringArg("name", 0, 25), new CommandArgument.DoubleArg("health", 0, 20)});
+        super("fakeplayer", new CommandArgument[0]);
     }
 
     @Override
@@ -42,11 +42,9 @@ public class FakePlayerCommand extends Command {
             return;
         }
 
-        String name = args[0].toString();
+        String name = "NamiClient";
 
         double health = 20.0f;
-        health = (double) args[1];
-
         fakePlayer = new RemotePlayer(MC.level, new GameProfile(UUID.randomUUID(), name));
         fakePlayer.copyPosition(MC.player);
         fakePlayer.setYRot(MC.player.getYRot());
