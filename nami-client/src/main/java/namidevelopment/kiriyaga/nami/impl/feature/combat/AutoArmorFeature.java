@@ -34,7 +34,7 @@ public class AutoArmorFeature extends Feature {
     public enum BootsPriority { LEATHER, GOLDEN, BEST }
     public enum HelmetPriority { BEST, TURTLE, GOLDEN, PUMPKIN, NONE }
 
-    public final IntSetting delay = addSetting(new IntSetting("delay", 150, 0, 1000));
+    public final IntSetting delay = addSetting(new IntSetting("Delay", 150, 0, 1000));
     public final EnumSetting<ProtectionPriority> protectionPriority = addSetting(new EnumSetting<>("Protection", ProtectionPriority.PROT));
     public final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 1, 15));
     public final EnumSetting<HelmetPriority> helmetSetting = addSetting(new EnumSetting<>("Helmet", HelmetPriority.BEST));
