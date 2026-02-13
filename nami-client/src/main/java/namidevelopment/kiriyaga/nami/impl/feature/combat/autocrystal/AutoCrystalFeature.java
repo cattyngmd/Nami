@@ -404,6 +404,8 @@ public class AutoCrystalFeature extends Feature {
     private void doPlace(PlaceTarget target) {
         if (target == null) return;
         if (target.totalDamage < 0) return;
+        if (MC.player.isUsingItem() && !placeMultitask.get())
+            return;
 
         InteractionUtils.interactBlockAt(target.pos.below(), Items.END_CRYSTAL, null, placeSwapBack.get(), placeMultitask.get(), placeRange.get(), placeRotate.get(), placeStrictDirection.get(), false, placeSwing.get(), AutoCrystalFeature.class.getName() + "_PLACE");
 
