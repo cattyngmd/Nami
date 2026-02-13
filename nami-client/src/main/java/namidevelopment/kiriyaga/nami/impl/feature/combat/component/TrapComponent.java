@@ -163,7 +163,7 @@ public class TrapComponent {
                         continue;
                     if (!MC.level.getBlockState(around).canBeReplaced())
                         continue;
-                    if (!BlockUtils.isPlaceable(around))
+                    if (BlockUtils.isPlaceable(around))
                         continue;
 
                     extraTargets.add(around);
