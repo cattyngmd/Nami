@@ -48,9 +48,6 @@ public class FeetTrapFeature extends Feature {
 
         this.clearDisplayInfo();
 
-        if (FEATURE_SERVICE.getStorage().getByClass(SelfTrapFeature.class).isEnabled())
-            return;
-
         if (jumpDisable.get() && !MC.player.onGround()) {
             this.toggle();
             return;
