@@ -169,7 +169,7 @@ public class ESPFeature extends Feature {
         if (MC.getCameraEntity() != null && MC.getCameraEntity().distanceTo(entity) > maxDist)
             return null;
 
-        if (FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class).getCameraPos().distanceTo(entity.position()) > maxDist)
+        if (FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class).getCameraPos() != null && FEATURE_SERVICE.getStorage().getByClass(FreecamFeature.class).getCameraPos().distanceTo(entity.position()) > maxDist)
             return null;
 
         if (entity instanceof Player player) {

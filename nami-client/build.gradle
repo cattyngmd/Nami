@@ -24,6 +24,7 @@ repositories {
 
 loom {
     accessWidenerPath = file("src/main/resources/META-INF/nami.accesswidener")
+    include "namidevelopment.kiriyaga:nami-api:${namiApiVersion}"
 }
 
 processResources {
