@@ -58,7 +58,6 @@ dependencies {
 
 
     modImplementation "namidevelopment.kiriyaga:nami-api:${namiApiVersion}"
-    include "namidevelopment.kiriyaga:nami-api:${namiApiVersion}"
 }
 
 java {
