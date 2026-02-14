@@ -30,7 +30,7 @@ public class UptimeFeature extends HudElementFeature {
             formatted = String.format("{secondary}({white}%02d{secondary}:{white}%02d{secondary})", hours, minutes);
         }
 
-        width = FONT_SERVICE.getWidth(formatted.replace("{global}", "").replace("{white}", "").replace("{secondarys}", ""));
+        width = FONT_SERVICE.getWidth(formatted.replace("{global}", "").replace("{white}", "").replace("{secondary}", ""));
         height = FONT_SERVICE.getHeight();
         return CAT_FORMAT.format(formatted);
     }
