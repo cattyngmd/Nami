@@ -14,10 +14,11 @@ public class ClickGuiFeature extends Feature {
 
     public final DoubleSetting scale = addSetting(new DoubleSetting("Scale", 1.00, 0.50, 1.50));
     public final BoolSetting lines = addSetting(new BoolSetting("Lines", true));
-    public final BoolSetting descriptions = addSetting(new BoolSetting("Descriptions", true));
+    //public final BoolSetting descriptions = addSetting(new BoolSetting("Descriptions", true));
     public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 70, 0, 255));
     public final BoolSetting blur = addSetting(new BoolSetting("Blur", false));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
+    public final BoolSetting gradientFill = addSetting(new BoolSetting("Gradient", false));
     public final BoolSetting gear = addSetting(new BoolSetting("Gear", true));
 
     public ClickGuiFeature() {

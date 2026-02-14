@@ -93,9 +93,7 @@ public class PluginScreen extends NamiScreen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        ClickGuiFeature clickGuiFeature = FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class);
-
-        if (clickGuiFeature != null && clickGuiFeature.background.get()) {
+        if (FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class) != null && FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).background.get()) {
             renderMenuBackground(context);
         }
 

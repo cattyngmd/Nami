@@ -3,6 +3,8 @@ package namidevelopment.kiriyaga.nami.impl.gui.screen;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
+import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
+import namidevelopment.kiriyaga.nami.impl.gui.base.NamiScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.CategoryPanel;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.FeaturePanel;
 import namidevelopment.kiriyaga.api.util.ChatAnimationHelper;
@@ -16,11 +18,10 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
-import static namidevelopment.kiriyaga.api.NamiApi.FONT_SERVICE;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
 import static namidevelopment.kiriyaga.nami.Nami.NAVIGATE_PANEL;
 
-public class HudEditorScreen extends Screen {
+public class HudEditorScreen extends NamiScreen {
 
     private final Map<FeatureCategory, Point> categoryPositions = new HashMap<>();
     private final Map<FeatureCategory, CategoryPanel> categoryPanels = new HashMap<>();
@@ -57,6 +58,10 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        if (FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class) != null && FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).background.get()) {
+            renderMenuBackground(context);
+        }
+
         NAVIGATE_PANEL.render(context, FONT_SERVICE.rendererProvider.getRenderer(), mouseX, mouseY);
 
         int scaledMouseX = (int) (mouseX / scale);
@@ -78,6 +83,12 @@ public class HudEditorScreen extends Screen {
         renderHudElements(context, mouseX, mouseY);
 
         super.render(context, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics context, int i, int j, float f) {
+        if (MC.level != null && FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).blur.get())
+            this.renderBlurredBackground(context);
     }
 
     private void renderHudElements(GuiGraphics context, int mouseX, int mouseY) {
@@ -144,18 +155,40 @@ public class HudEditorScreen extends Screen {
 
         if (!draggingCategory) {
             for (FeatureCategory category : categoryPanels.keySet()) {
+                Point pos = categoryPositions.get(category);
+                if (pos == null) continue;
+
                 CategoryPanel panel = categoryPanels.get(category);
-                if (panel != null && panel.mouseClicked(scaledMouseX, scaledMouseY, click.button())) {
+
+                if (panel.mouseClicked(scaledMouseX, scaledMouseY, click.button(), pos.x, pos.y)) {
                     return true;
                 }
             }
         }
-
         if (click.button() == 0) {
             tryStartDraggingHudElement(click.x(), click.y());
         }
-
         return false;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        int scaledMouseX = (int) (mouseX / scale);
+        int scaledMouseY = (int) (mouseY / scale);
+        int scaledHeight = (int) (this.height / scale);
+
+        for (FeatureCategory category : FeatureCategory.getAll()) {
+            if (!("hud".equalsIgnoreCase(category.getName()))) continue;
+
+            Point pos = categoryPositions.get(category);
+            if (pos == null) continue;
+            CategoryPanel panel = categoryPanels.get(category);
+            if (panel != null && panel.mouseScrolled(scaledMouseX, scaledMouseY, verticalAmount, pos.x, pos.y)) {
+                return true;
+            }
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     private void tryStartDraggingHudElement(double mouseX, double mouseY) {

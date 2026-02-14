@@ -80,17 +80,8 @@ public class ConfigScreen extends NamiScreen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        ClickGuiFeature clickGuiFeature = FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class);
-
-        if (clickGuiFeature != null && clickGuiFeature.background.get()) {
-            //Identifier.ofVanilla("textures/gui/inworld_menu_background.png")
+        if (FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class) != null && FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class).background.get()) {
             renderMenuBackground(context);
-/*            int alpha = (clickGuiFeature.backgroundAlpha.get() & 0xFF) << 24;
-            int color = alpha |
-                    (Feature_SERVICE.getStorage()
-                            .getByClass(ColorFeature.class)
-                            .getStyledGlobalColor().getRGB() & 0xFFFFFF);
-            context.fill(0, 0, width, height, CLICK_GUI.applyFade(color));*/
         }
 
         NAVIGATE_PANEL.render(context, FONT_SERVICE.rendererProvider.getRenderer(), mouseX, mouseY);
