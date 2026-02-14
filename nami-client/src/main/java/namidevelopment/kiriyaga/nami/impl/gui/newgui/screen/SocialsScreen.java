@@ -36,7 +36,7 @@ public class SocialsScreen extends NamiScreen {
 
         if (console == null) {
             console = new ConsolePanelComponent<>(
-                    "Socials", 20, 20, 300, 200,
+                    "Socials", 20, 20, 300, 400,
                     entry -> {
                         SocialEntry e = (SocialEntry) entry;
                         SOCIALS_SERVICE.setStatus(e.getName(), SocialsStatus.FRIEND);
