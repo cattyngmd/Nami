@@ -1,8 +1,8 @@
 package namidevelopment.kiriyaga.nami.impl.gui.component.panel;
 
-import namidevelopment.kiriyaga.api.util.render.ScissorUtil;
 import namidevelopment.kiriyaga.nami.impl.gui.base.BasePanel;
 import namidevelopment.kiriyaga.nami.impl.gui.base.PanelRenderer;
+import namidevelopment.kiriyaga.api.util.render.ScissorUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -107,7 +107,6 @@ public class CategoryPanel {
 
         return false;
     }
-
 
     public boolean isHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + currentHeight;

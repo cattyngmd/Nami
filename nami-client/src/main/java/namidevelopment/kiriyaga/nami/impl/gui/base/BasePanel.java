@@ -3,10 +3,13 @@ package namidevelopment.kiriyaga.nami.impl.gui.base;
 import namidevelopment.kiriyaga.api.util.ColorUtils;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
+import namidevelopment.kiriyaga.nami.impl.gui.component.panel.CategoryPanel;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static namidevelopment.kiriyaga.api.NamiApi.FEATURE_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.FONT_SERVICE;
@@ -22,8 +25,11 @@ public abstract class BasePanel {
     public int height;
     public boolean expanded;
 
-    protected static final int PADDING = 3;
+    private static final int PADDING = 3;
     private static final int GEAR_PADDING = 5;
+
+    private List<BasePanel> subPanels = new ArrayList<>();
+    private float currentHeight = 0;
 
     public void setBounds(int x, int y, int width, int height) {
         this.x = x;
@@ -31,11 +37,22 @@ public abstract class BasePanel {
         this.width = width;
         this.height = height;
         expanded = false;
+        this.currentHeight = height;
     }
 
-    public boolean isHovered(int mouseX, int mouseY) {
-        return mouseX >= x && mouseX <= x + width &&
-                mouseY >= y && mouseY <= y + height;
+    public void addSubPanel(BasePanel panel) {
+        subPanels.add(panel);
+    }
+
+    public List<BasePanel> getSubPanels() {
+        return subPanels;
+    }
+
+    protected abstract String getName();
+    protected abstract boolean isEnabled();
+
+    protected Color getTextColor() {
+        return new Color(255, 255, 255, 255);
     }
 
     protected ColorFeature getColorFeature() {
@@ -44,13 +61,6 @@ public abstract class BasePanel {
 
     protected ClickGuiFeature getClickGuiFeature() {
         return FEATURE_SERVICE.getStorage().getByClass(ClickGuiFeature.class);
-    }
-
-    protected abstract String getName();
-    protected abstract boolean isEnabled();
-
-    protected Color getTextColor() {
-        return new Color(255, 255, 255, 255);
     }
 
     protected Color getEnabledColor() {
@@ -73,7 +83,6 @@ public abstract class BasePanel {
 
             fade(context, x, y, x + width, y + height, leftColor, leftColor, rightColor, rightColor);
             context.nextStratum();
-
         } else {
             context.fill(x, y, x + width, y + height, toRGBA(baseColor));
         }
@@ -83,11 +92,20 @@ public abstract class BasePanel {
 
         FONT_SERVICE.drawText(context, getName(), textX, textY, toRGBA(getTextColor()), true);
 
-        if (getClickGuiFeature().gear.get()) {
+        if (!subPanels.isEmpty()) {
             String gear = expanded ? "-" : "+";
             int gearWidth = FONT_SERVICE.getWidth(gear) + GEAR_PADDING;
 
-            FONT_SERVICE.drawText(context, gear, textX + width - gearWidth, textY, toRGBA(getTextColor()),true);
+            FONT_SERVICE.drawText(context, gear, textX + width - gearWidth, textY, toRGBA(getTextColor()), true);
+        }
+
+        if (expanded) {
+            int currentY = y + height + PADDING;
+            for (BasePanel panel : subPanels) {
+                panel.setBounds(x, currentY, width, panel.height);
+                panel.render(context, font, mouseX, mouseY);
+                currentY += panel.height + PADDING;
+            }
         }
     }
 
@@ -103,5 +121,19 @@ public abstract class BasePanel {
             case 2 -> onMiddleClick();
         }
         return true;
+    }
+
+    public boolean isHovered(int mouseX, int mouseY) {
+        return mouseX >= x && mouseX <= x + width &&
+                mouseY >= y && mouseY <= y + height;
+    }
+
+    public boolean isSubPanelHovered(int mouseX, int mouseY) {
+        if (expanded) {
+            for (BasePanel subPanel : subPanels) {
+                if (subPanel.isHovered(mouseX, mouseY)) return true;
+            }
+        }
+        return false;
     }
 }
