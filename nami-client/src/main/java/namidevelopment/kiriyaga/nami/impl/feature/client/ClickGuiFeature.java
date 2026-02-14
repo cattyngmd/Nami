@@ -16,7 +16,6 @@ public class ClickGuiFeature extends Feature {
     public final BoolSetting lines = addSetting(new BoolSetting("Lines", true));
     public final BoolSetting descriptions = addSetting(new BoolSetting("Descriptions", true));
     public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 70, 0, 255));
-    public final BoolSetting fade = addSetting(new BoolSetting("Fade", true));
     public final BoolSetting blur = addSetting(new BoolSetting("Blur", false));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
     public final BoolSetting gear = addSetting(new BoolSetting("Gear", true));
@@ -33,7 +32,7 @@ public class ClickGuiFeature extends Feature {
 
         NAVIGATE_PANEL.resetActive();
         CLICK_GUI_SCREEN.scale = this.scale.get().floatValue(); // bad
-        CLICK_GUI_SCREEN.setPreviousScreen(MC.screen);
+        //CLICK_GUI_SCREEN.setPreviousScreen(MC.screen);
 
         MC.setScreen(CLICK_GUI_SCREEN);
         this.toggle();
