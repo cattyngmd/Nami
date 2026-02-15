@@ -75,6 +75,7 @@ public class ColorSettingPanel extends BasePanel {
     }
 
 
+    @Override
     public void onRightClick() {
         expanded = !expanded;
         height = expanded ? HEIGHT + SV_SIZE + HUE_HEIGHT + SV_HUE_PADDING * 2 : HEIGHT;
@@ -88,7 +89,7 @@ public class ColorSettingPanel extends BasePanel {
             return true;
         }
 
-        if (button != 0 || !expanded) return false;
+        if (!expanded || button != 0) return false;
 
         if (mouseX >= lastHueX && mouseX <= lastHueX + (width - PADDING * 2 - ALPHA_WIDTH) && mouseY >= lastHueY && mouseY <= lastHueY + HUE_HEIGHT) {
             updateHue(mouseX);

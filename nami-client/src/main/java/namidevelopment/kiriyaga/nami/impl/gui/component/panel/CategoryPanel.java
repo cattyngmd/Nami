@@ -115,13 +115,13 @@ public class CategoryPanel {
     }
 
     public boolean mouseClicked(int mouseX, int mouseY, int button, int x, int y) {
+        for (BasePanel panel : panels) {
+            if (panel.mouseClicked(mouseX, mouseY, button)) return true;
+        }
+
         if (button == 1 && isHeaderHovered(mouseX, mouseY, x, y)) {
             expanded = !expanded;
             return true;
-        }
-
-        for (BasePanel panel : panels) {
-            if (panel.mouseClicked(mouseX, mouseY, button)) return true;
         }
 
         return false;

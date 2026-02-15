@@ -74,7 +74,9 @@ public class FeaturePanel extends BasePanel {
 
             BasePanel panel = settingPanels.get(setting);
             if (panel == null) {
-                if (setting instanceof BoolSetting boolSetting)
+                if (setting instanceof WhitelistSetting whitelistSetting)
+                    panel = new WhitelistSettingPanel(whitelistSetting);
+                else if (setting instanceof BoolSetting boolSetting)
                     panel = new BoolSettingPanel(boolSetting);
                 else if (setting instanceof IntSetting intSetting)
                     panel = new IntSettingPanel(intSetting);
@@ -84,8 +86,6 @@ public class FeaturePanel extends BasePanel {
                     panel = new KeyBindSettingPanel(keyBindSetting);
                 else if (setting instanceof EnumSetting enumSetting)
                     panel = new EnumSettingPanel(enumSetting);
-                else if (setting instanceof WhitelistSetting whitelistSetting)
-                    panel = new WhitelistSettingPanel(whitelistSetting);
                 else if (setting instanceof ColorSetting colorSetting)
                     panel = new ColorSettingPanel(colorSetting);
 
