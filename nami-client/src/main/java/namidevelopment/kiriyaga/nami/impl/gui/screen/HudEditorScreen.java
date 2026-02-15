@@ -220,9 +220,9 @@ public class HudEditorScreen extends NamiScreen {
     }
 
     @Override
-    public boolean mouseDragged(MouseButtonEvent click, double dx, double dy) {
-        int scaledMouseX = (int) (click.x() / scale);
-        int scaledMouseY = (int) (click.y() / scale);
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        int scaledMouseX = (int) (event.x() / scale);
+        int scaledMouseY = (int) (event.y() / scale);
 
         if (draggingCategory && draggedCategory != null) {
             Point pos = categoryPositions.get(draggedCategory);
@@ -233,12 +233,44 @@ public class HudEditorScreen extends NamiScreen {
             }
         }
 
-        if (click.button() == 0 && draggingElement != null) {
-            dragHudElement(click.x(), click.y());
+        if (event.button() == 0 && draggingElement != null) {
+            dragHudElement(event.x(), event.y());
             return true;
         }
 
-        return super.mouseDragged(click, dx, dy);
+        boolean handled = false;
+        for (FeatureCategory category : categoryPanels.keySet()) {
+            Point pos = categoryPositions.get(category);
+            if (pos == null) continue;
+
+            CategoryPanel panel = categoryPanels.get(category);
+            panel.mouseDragged(scaledMouseX, scaledMouseY, event.button(), pos.x, pos.y);
+            handled = true;
+        }
+
+        return handled || super.mouseDragged(event, dx, dy);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        draggingCategory = false;
+        draggedCategory = null;
+
+        if (event.button() == 0) {
+            draggingElement = null;
+        }
+
+        int scaledMouseX = (int) (event.x() / scale);
+        int scaledMouseY = (int) (event.y() / scale);
+        for (FeatureCategory category : categoryPanels.keySet()) {
+            Point pos = categoryPositions.get(category);
+            if (pos == null) continue;
+
+            CategoryPanel panel = categoryPanels.get(category);
+            panel.mouseReleased(scaledMouseX, scaledMouseY, event.button(), pos.x, pos.y);
+        }
+
+        return super.mouseReleased(event);
     }
 
     private void dragHudElement(double mouseX, double mouseY) {
@@ -255,18 +287,6 @@ public class HudEditorScreen extends NamiScreen {
 
         draggingElement.x.set(newRenderX / (double) screenWidth);
         draggingElement.y.set(newRenderY / (double) screenHeight);
-    }
-
-    @Override
-    public boolean mouseReleased(MouseButtonEvent click) {
-        draggingCategory = false;
-        draggedCategory = null;
-
-        if (click.button() == 0) {
-            draggingElement = null;
-        }
-
-        return super.mouseReleased(click);
     }
 
     @Override

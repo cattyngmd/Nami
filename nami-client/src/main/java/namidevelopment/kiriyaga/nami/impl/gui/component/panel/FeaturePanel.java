@@ -2,9 +2,13 @@ package namidevelopment.kiriyaga.nami.impl.gui.component.panel;
 
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
+import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.model.setting.Setting;
 import namidevelopment.kiriyaga.nami.impl.gui.base.BasePanel;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings.BoolSettingPanel;
+import namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings.DoubleSettingPanel;
+import namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings.IntSettingPanel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +67,12 @@ public class FeaturePanel extends BasePanel {
             if (setting == null) continue;
             if (!setting.isShow()) continue;
 
-            if (setting instanceof BoolSetting boolSetting) {
+            if (setting instanceof BoolSetting boolSetting)
                 addSubPanel(new BoolSettingPanel(boolSetting));
-            }
+             else if (setting instanceof IntSetting intSetting)
+                addSubPanel(new IntSettingPanel(intSetting));
+            else if (setting instanceof DoubleSetting doubleSetting)
+                addSubPanel(new DoubleSettingPanel(doubleSetting));
         }
     }
 }

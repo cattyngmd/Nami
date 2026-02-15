@@ -126,6 +126,19 @@ public class CategoryPanel {
         return false;
     }
 
+    public void mouseDragged(int mouseX, int mouseY, int button, int x, int y) {
+        for (BasePanel panel : panels) {
+            panel.mouseDragged(mouseX, mouseY, button);
+        }
+    }
+
+    public boolean mouseReleased(int mouseX, int mouseY, int button, int x, int y) {
+        for (BasePanel panel : panels) {
+            if (panel.mouseReleased(mouseX, mouseY, button)) return true;
+        }
+        return false;
+    }
+
     public boolean isHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + currentHeight;
     }

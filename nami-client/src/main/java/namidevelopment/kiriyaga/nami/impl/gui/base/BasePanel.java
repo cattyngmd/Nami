@@ -163,4 +163,21 @@ public abstract class BasePanel {
         }
         return false;
     }
+
+    public boolean mouseReleased(int mouseX, int mouseY, int button) {
+        if (expanded) {
+            for (BasePanel sub : subPanels) {
+                if (sub.mouseReleased(mouseX, mouseY, button)) return true;
+            }
+        }
+        return false;
+    }
+
+    public void mouseDragged(int mouseX, int mouseY, int button) {
+        if (expanded) {
+            for (BasePanel sub : subPanels) {
+                sub.mouseDragged(mouseX, mouseY, button);
+            }
+        }
+    }
 }
