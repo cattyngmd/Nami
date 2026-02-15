@@ -18,7 +18,7 @@ public class ClickGuiFeature extends Feature {
     public final IntSetting guiAlpha = addSetting(new IntSetting("UIAlpha", 70, 0, 255));
     public final BoolSetting blur = addSetting(new BoolSetting("Blur", false));
     public final BoolSetting background = addSetting(new BoolSetting("Background", true));
-    public final BoolSetting gradientFill = addSetting(new BoolSetting("Gradient", false));
+    public final BoolSetting gradientFill = addSetting(new BoolSetting("Gradient", true));
     public final BoolSetting gear = addSetting(new BoolSetting("Gear", true));
 
     public ClickGuiFeature() {

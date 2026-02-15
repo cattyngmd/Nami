@@ -180,4 +180,12 @@ public abstract class BasePanel {
             }
         }
     }
+
+    public void keyPressed(int keyCode) {
+        if (expanded) {
+            for (BasePanel sub : subPanels) {
+                sub.keyPressed(keyCode);
+            }
+        }
+    }
 }

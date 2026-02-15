@@ -13,7 +13,7 @@ import static namidevelopment.kiriyaga.api.util.ColorUtils.toRGBA;
 
 public class IntSettingPanel extends BasePanel {
 
-    public static final int HEIGHT = 16;
+    public static final int HEIGHT = 14;
     private static final int PADDING = 3;
     private static final int SLIDER_HEIGHT = 1;
 
@@ -27,48 +27,33 @@ public class IntSettingPanel extends BasePanel {
 
     @Override
     public void render(GuiGraphics context, Font font, int mouseX, int mouseY) {
-
         boolean hovered = isHovered(mouseX, mouseY);
 
         int textY = y + 2;
         int textX = x + PADDING + (hovered ? 1 : 0);
-
-        FONT_SERVICE.drawText(context, setting.getName(),
-                textX, textY,
-                toRGBA(getTextColor()), true);
-
+        FONT_SERVICE.drawText(context, setting.getName(), textX, textY, toRGBA(getTextColor()), true);
         String val = String.valueOf(setting.get());
-        FONT_SERVICE.drawText(context, val,
-                x + width - PADDING - FONT_SERVICE.getWidth(val),
-                textY,
-                toRGBA(getTextColor()), true);
+        FONT_SERVICE.drawText(context, val, x + width - PADDING - FONT_SERVICE.getWidth(val), textY, toRGBA(getTextColor()), true);
 
         renderSlider(context);
     }
 
     private void renderSlider(GuiGraphics context) {
         ColorFeature colorFeature = getColorFeature();
-
         int sliderX = x + PADDING;
         int sliderY = y + height - SLIDER_HEIGHT - 2;
         int sliderWidth = width - PADDING * 2;
-
         int min = setting.getMin();
         int max = setting.getMax();
         int value = setting.get();
 
         double percent = (value - min) / (double)Math.max(1, max - min);
         percent = Math.max(0, Math.min(1, percent));
-
         int filled = (int)(sliderWidth * percent);
 
-        context.fill(sliderX, sliderY,
-                sliderX + sliderWidth, sliderY + SLIDER_HEIGHT,
-                toRGBA(new Color(60,60,60,150)));
+        context.fill(sliderX, sliderY, sliderX + sliderWidth, sliderY + SLIDER_HEIGHT, toRGBA(new Color(60,60,60,150)));
 
-        context.fill(sliderX, sliderY,
-                sliderX + filled, sliderY + SLIDER_HEIGHT,
-                toRGBA(colorFeature.getStyledGlobalColor()));
+        context.fill(sliderX, sliderY, sliderX + filled, sliderY + SLIDER_HEIGHT, toRGBA(colorFeature.getStyledGlobalColor()));
     }
 
     @Override

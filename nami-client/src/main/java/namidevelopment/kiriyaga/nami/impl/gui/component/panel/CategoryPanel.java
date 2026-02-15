@@ -3,6 +3,7 @@ package namidevelopment.kiriyaga.nami.impl.gui.component.panel;
 import namidevelopment.kiriyaga.nami.impl.gui.base.BasePanel;
 import namidevelopment.kiriyaga.nami.impl.gui.base.PanelRenderer;
 import namidevelopment.kiriyaga.api.util.render.ScissorUtil;
+import namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings.KeyBindSettingPanel;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -145,5 +146,11 @@ public class CategoryPanel {
 
     public boolean isHeaderHovered(double mouseX, double mouseY, int x, int y) {
         return mouseX >= x && mouseX <= x + WIDTH && mouseY >= y && mouseY <= y + HEADER_HEIGHT;
+    }
+
+    public void keyPressed(int keyCode) {
+        for (BasePanel panel : panels) {
+            panel.keyPressed(keyCode);
+        }
     }
 }

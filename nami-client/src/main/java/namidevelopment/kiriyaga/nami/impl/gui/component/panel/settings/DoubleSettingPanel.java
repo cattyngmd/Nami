@@ -13,7 +13,7 @@ import static namidevelopment.kiriyaga.api.util.ColorUtils.toRGBA;
 
 public class DoubleSettingPanel extends BasePanel {
 
-    public static final int HEIGHT = 16;
+    public static final int HEIGHT = 14;
     private static final int PADDING = 3;
     private static final int SLIDER_HEIGHT = 1;
 

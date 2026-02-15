@@ -3,14 +3,17 @@ package namidevelopment.kiriyaga.nami.impl.gui.screen;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
+import namidevelopment.kiriyaga.nami.impl.gui.base.BasePanel;
 import namidevelopment.kiriyaga.nami.impl.gui.base.NamiScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.CategoryPanel;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.FeaturePanel;
+import namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings.KeyBindSettingPanel;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -208,6 +211,14 @@ public class ClickGuiScreen extends NamiScreen {
         if (keyInput.input() == 256) {
             this.onClose();
             return true;
+        }
+        int keyCode = keyInput.input();
+
+        for (FeatureCategory category : categoryPanels.keySet()) {
+            CategoryPanel panel = categoryPanels.get(category);
+            if (panel != null) {
+                panel.keyPressed(keyCode);
+            }
         }
         return super.keyPressed(keyInput);
     }
