@@ -1,6 +1,8 @@
 package namidevelopment.kiriyaga.nami.impl.gui.component.panel;
 
 import namidevelopment.kiriyaga.api.model.feature.Feature;
+import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
+import namidevelopment.kiriyaga.api.model.setting.Setting;
 import namidevelopment.kiriyaga.nami.impl.gui.base.BasePanel;
 
 public class FeaturePanel extends BasePanel {
@@ -12,6 +14,15 @@ public class FeaturePanel extends BasePanel {
     public FeaturePanel(Feature feature) {
         this.feature = feature;
         this.height = HEIGHT;
+
+        for (Setting<?> setting : feature.getSettings()) {
+            if (setting == null) continue;
+            //if (!setting.isShow()) continue;
+
+            if (setting instanceof BoolSetting boolSetting) {
+                addSubPanel(new BoolSettingPanel(boolSetting));
+            }
+        }
     }
 
     @Override
@@ -36,6 +47,7 @@ public class FeaturePanel extends BasePanel {
 
     @Override
     public void onRightClick() {
+        expanded = !expanded;
     }
 
     public Feature getFeature() {

@@ -49,7 +49,7 @@ public class CategoryPanel {
             return height;
 
         for (BasePanel panel : panels)
-            height += panel.height + PANEL_SPACING;
+            height += panel.getFullHeight() + PANEL_SPACING;
 
         height += INNER_PADDING * 4;
 
@@ -83,7 +83,7 @@ public class CategoryPanel {
         for (BasePanel panel : panels) {
             panel.setBounds(contentX, currentY, contentW, panel.height);
             panel.render(context, font, mouseX, mouseY);
-            currentY += panel.height + PANEL_SPACING;
+            currentY += panel.getFullHeight() + PANEL_SPACING;
         }
 
         ScissorUtil.disable(context);
