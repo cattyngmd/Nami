@@ -4,6 +4,7 @@ import namidevelopment.kiriyaga.api.util.ColorUtils;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.CategoryPanel;
+import namidevelopment.kiriyaga.nami.impl.gui.component.panel.FeaturePanel;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -87,7 +88,7 @@ public abstract class BasePanel {
 
         FONT_SERVICE.drawText(context, getName(), textX, textY, toRGBA(getTextColor()), true);
 
-        if (!subPanels.isEmpty()) {
+        if (!subPanels.isEmpty() && getClickGuiFeature().gear.get()) {
             String gear = expanded ? "-" : "+";
             int gearWidth = FONT_SERVICE.getWidth(gear) + GEAR_PADDING;
 
@@ -95,6 +96,9 @@ public abstract class BasePanel {
         }
 
         if (expanded) {
+            if (this instanceof FeaturePanel fPanel)
+                fPanel.refreshSettings();
+
             int currentY = y + height;
 
             for (BasePanel panel : subPanels) {

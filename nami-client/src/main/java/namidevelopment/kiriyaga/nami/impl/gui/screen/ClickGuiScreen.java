@@ -34,17 +34,21 @@ public class ClickGuiScreen extends NamiScreen {
 
     public ClickGuiScreen() {
         super(Component.literal("NamiGuiScreen"));
-        initCategories();
+        refreshPanels();
     }
 
-    private void initCategories() {
+    public void refreshPanels() {
+        Map<FeatureCategory, Point> oldPositions = new HashMap<>(categoryPositions);
+        categoryPositions.clear();
+        categoryPanels.clear();
+
         int startX = 20;
         int startY = 20;
 
         for (FeatureCategory category : FeatureCategory.getAll()) {
             if ("hud".equalsIgnoreCase(category.getName())) continue;
-
-            categoryPositions.put(category, new Point(startX, startY));
+            Point pos = oldPositions.getOrDefault(category, new Point(startX, startY));
+            categoryPositions.put(category, pos);
 
             CategoryPanel panel = new CategoryPanel(category.getName());
 

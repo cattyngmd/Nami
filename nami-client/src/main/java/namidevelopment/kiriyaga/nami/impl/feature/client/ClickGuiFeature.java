@@ -35,6 +35,9 @@ public class ClickGuiFeature extends Feature {
         CLICK_GUI_SCREEN.scale = this.scale.get().floatValue(); // bad
         //CLICK_GUI_SCREEN.setPreviousScreen(MC.screen);
 
+        CLICK_GUI_SCREEN.refreshPanels();
+        HUD_EDITOR_SCREEN.refreshPanels();
+
         MC.setScreen(CLICK_GUI_SCREEN);
         this.toggle();
     }

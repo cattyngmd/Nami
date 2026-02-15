@@ -39,13 +39,13 @@ public class HudEditorScreen extends NamiScreen {
 
     public HudEditorScreen() {
         super(Component.literal("NamiHudEditorScreen"));
-        initHudCategory();
+        refreshPanels();
     }
 
-    private void initHudCategory() {
+    public void refreshPanels() {
         FeatureCategory hudCategory = FeatureCategory.of("HUD");
 
-        categoryPositions.put(hudCategory, new Point(20, 20));
+        categoryPositions.putIfAbsent(hudCategory, new Point(20, 20));
 
         CategoryPanel panel = new CategoryPanel(hudCategory.getName());
 
@@ -55,6 +55,7 @@ public class HudEditorScreen extends NamiScreen {
 
         categoryPanels.put(hudCategory, panel);
     }
+
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
