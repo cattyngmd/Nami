@@ -1,4 +1,4 @@
-package namidevelopment.kiriyaga.nami.impl.gui.component.panel;
+package namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings;
 
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;

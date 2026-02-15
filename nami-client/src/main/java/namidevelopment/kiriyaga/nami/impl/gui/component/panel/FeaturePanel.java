@@ -4,6 +4,7 @@ import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.Setting;
 import namidevelopment.kiriyaga.nami.impl.gui.base.BasePanel;
+import namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings.BoolSettingPanel;
 
 public class FeaturePanel extends BasePanel {
 
