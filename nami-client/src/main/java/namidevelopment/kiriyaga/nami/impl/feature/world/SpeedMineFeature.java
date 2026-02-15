@@ -50,7 +50,6 @@ import static namidevelopment.kiriyaga.api.util.PacketUtils.sendSequencedPacket;
 public class SpeedMineFeature extends Feature {
     public enum Rotate { NORMAL, HOLD, NONE}
     public enum Swap { NONE, NORMAL, SILENT121, SILENT}
-    public enum EchestPriority {FORTUNE, SILK}
 
     public final DoubleSetting range = addSetting(new DoubleSetting("Range", 4.5, 2.0, 7.0));
     public final DoubleSetting speed = addSetting(new DoubleSetting("Speed", 1.0, 0.7, 1.0));
@@ -62,8 +61,6 @@ public class SpeedMineFeature extends Feature {
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
     public final BoolSetting allowOffhand = addSetting(new BoolSetting("AllowOffhand", false));
-    public final EnumSetting<EchestPriority> echestPriority = addSetting(new EnumSetting<>("Echest", EchestPriority.SILK));
-    public final IntSetting damageThreshold = addSetting(new IntSetting("Durability", 3, 0, 15));
 
 
     public BlockBreakingTask currentTask;
@@ -74,8 +71,6 @@ public class SpeedMineFeature extends Feature {
     // Thats first packet mine i made like in my whole life, its bad, and there is issues, im gonna finish it, and maybe rewrite from scratch later
     public SpeedMineFeature() {
         super("SpeedMine", "Increases speed of mining.", FeatureCategory.of("World"));
-        echestPriority.setShowCondition(()-> swap.get() != Swap.NONE);
-        damageThreshold.setShowCondition(()-> swap.get() != Swap.NONE);
         allowOffhand.setShowCondition(()-> !multitask.get());
     }
 
@@ -390,24 +385,12 @@ public class SpeedMineFeature extends Feature {
     }
 
     private int getSlot(BlockState targetState) {
-        for (int slot = 0; slot < 9; slot++) {
-            ItemStack stack = MC.player.getInventory().getItem(slot);
-            if (stack.isEmpty() || isBroken(stack, damageThreshold.get()))continue;
-
-            boolean matchesPriority = switch (echestPriority.get()) {
-                case SILK -> EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) > 0;
-                case FORTUNE -> EnchantmentUtils.getEnchantmentLevel(stack, Enchantments.FORTUNE) > 0;
-            };
-
-            if (matchesPriority) return slot;
-        }
-
         int bestSlot = MC.player.getInventory().getSelectedSlot();
         float bestSpeed = 1.0f;
 
         for (int slot = 0; slot < 9; slot++) {
             ItemStack stack = MC.player.getInventory().getItem(slot);
-            if (stack.isEmpty() || isBroken(stack, damageThreshold.get())) continue;
+            if (stack.isEmpty()) continue;
 
             float speed = getToolSpeed(stack, targetState);
             if (speed > bestSpeed) {
