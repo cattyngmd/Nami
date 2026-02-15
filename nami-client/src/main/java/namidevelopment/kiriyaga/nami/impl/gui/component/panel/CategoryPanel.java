@@ -47,7 +47,7 @@ public class CategoryPanel {
         int height = HEADER_HEIGHT;
 
         if (!expanded)
-            return height;
+            return height + 3;
 
         for (BasePanel panel : panels)
             height += panel.getFullHeight() + PANEL_SPACING;
