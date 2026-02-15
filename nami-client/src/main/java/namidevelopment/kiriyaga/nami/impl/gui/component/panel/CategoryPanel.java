@@ -60,15 +60,32 @@ public class CategoryPanel {
     public void render(GuiGraphics context, Font font, int x, int y, int mouseX, int mouseY) {
         int contentHeight = getContentHeight(MC.getWindow().getGuiScaledHeight(), y);
         currentHeight += (contentHeight - currentHeight) * 10f * 1f / SERVER_SERVICE.getInstantFPS();
+        int realContentHeight = 0;
 
-        int visibleHeight = (int) (currentHeight - HEADER_HEIGHT - PANEL_SPACING);
-        int maxScroll = Math.max(0, contentHeight - visibleHeight);
+        if (expanded) {
+            for (BasePanel panel : panels)
+                realContentHeight += panel.getFullHeight() + PANEL_SPACING;
 
-        double targetScroll = velocity * 15 / SERVER_SERVICE.getInstantFPS();
-        double deltaScroll = targetScroll - scroll;
-        velocity *= Math.pow(0.85, 1f / SERVER_SERVICE.getInstantFPS());
-        scroll += deltaScroll * 0.1;
-        scroll = Math.max(0, Math.min(scroll, maxScroll));
+            realContentHeight += INNER_PADDING * 4;
+        }
+        int visibleHeight = (int) currentHeight - HEADER_HEIGHT - PANEL_SPACING - INNER_PADDING * 2;
+
+        int maxScroll = Math.max(0, realContentHeight - visibleHeight);
+
+
+        scroll += velocity;
+        velocity *= 0.85;
+
+        if (scroll < 0) {
+            scroll = 0;
+            velocity = 0;
+        }
+
+        if (scroll > maxScroll) {
+            scroll = maxScroll;
+            velocity = 0;
+        }
+
         renderer.renderPanel(context, x, y, WIDTH, (int) currentHeight, HEADER_HEIGHT);
         renderer.renderHeaderText(context, font, name, x, y, HEADER_HEIGHT, PADDING);
 
@@ -91,7 +108,8 @@ public class CategoryPanel {
 
     public boolean mouseScrolled(int mouseX, int mouseY, double amount, int x, int y) {
         if (!isHovered(mouseX, mouseY, x, y)) return false;
-        velocity += -amount * 0.2;
+
+        velocity += -amount * 5;
         return true;
     }
 
