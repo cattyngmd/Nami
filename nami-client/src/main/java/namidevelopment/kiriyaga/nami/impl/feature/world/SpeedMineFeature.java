@@ -19,6 +19,7 @@ import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
 import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.api.util.Timer;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
+import namidevelopment.kiriyaga.nami.impl.feature.combat.AutoTotemFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.SneakFeature;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -257,7 +258,11 @@ public class SpeedMineFeature extends Feature {
         float damageDelta = calculateBlockDamage(task.getBlockState(), MC.level, task.getBlockPos());
 
         if (task.incrementProgress(damageDelta) >= task.getTargetSpeed()) {
-            if (!multitask.get() && MC.player.isUsingItem())return;
+            if (!multitask.get() && MC.player.isUsingItem())
+                return;
+
+            if (FEATURE_SERVICE.getStorage().getByClass(AutoTotemFeature.class).isEnabled() && FEATURE_SERVICE.getStorage().getByClass(AutoTotemFeature.class).mainhandActive)
+                return;
 
             if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
                 int slot = getSlot(task.getStartState());
