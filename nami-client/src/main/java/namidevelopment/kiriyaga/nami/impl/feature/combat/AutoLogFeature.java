@@ -15,6 +15,7 @@ import namidevelopment.kiriyaga.nami.impl.feature.exploits.IllegalDisconnectFeat
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
@@ -57,8 +58,12 @@ public class AutoLogFeature extends Feature {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onUpdate(PreTickEvent event) {
-        if (MC.player == null || MC.level == null)
+        if (MC.player == null || MC.level == null || MC.gameMode == null)
             return;
+
+        if (MC.gameMode.isSpectator())
+            return;
+
         this.clearDisplayInfo();
 
         this.addDisplayInfo(health.get().toString());
@@ -104,7 +109,10 @@ public class AutoLogFeature extends Feature {
             return;
 
         MC.execute(() -> {
-            if (MC.player == null || MC.level == null)
+            if (MC.player == null || MC.level == null || MC.gameMode == null)
+                return;
+
+            if (MC.gameMode.isSpectator())
                 return;
 
             if (packet.getEntity(MC.level) == MC.player
