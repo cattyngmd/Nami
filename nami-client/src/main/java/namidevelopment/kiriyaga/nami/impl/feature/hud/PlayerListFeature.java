@@ -6,6 +6,7 @@ import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
+import namidevelopment.kiriyaga.api.util.ColorUtils;
 import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -15,7 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class PlayerListFeature extends HudElementFeature {
@@ -25,6 +25,7 @@ public class PlayerListFeature extends HudElementFeature {
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
     public final BoolSetting showDistance = addSetting(new BoolSetting("Distance", true));
     public final BoolSetting showHealth = addSetting(new BoolSetting("Health", true));
+    public final BoolSetting totemPops = addSetting(new BoolSetting("TotemPops", true));
     public final BoolSetting self = addSetting(new BoolSetting("Self", true));
 
     private final List<TextElement> elements = new ArrayList<>();
@@ -74,13 +75,7 @@ public class PlayerListFeature extends HudElementFeature {
 
         if (showHealth.get() && entity instanceof Player player) {
             double hp = player.getHealth() + player.getAbsorptionAmount();
-            double health = Math.round(hp * 2.0) / 2.0;
-            if (health >= 19) sb.append("{green}");
-            else if (health >= 13) sb.append("{yellow}");
-            else if (health >= 8) sb.append("{gold}");
-            else if (health >= 6) sb.append("{red}");
-            else sb.append("{dark_red}");
-
+            sb.append(ColorUtils.getHealthColor(player));
             sb.append(dec.format(hp)).append(" ");
         }
 
@@ -90,6 +85,7 @@ public class PlayerListFeature extends HudElementFeature {
 
         if (showDistance.get()) {
             double dist = Math.round(Math.sqrt(MC.player.distanceToSqr(entity)));
+
             if (dist <= 15) sb.append(" {dark_red}");
             else if (dist <= 25) sb.append(" {red}");
             else if (dist <= 40) sb.append(" {yellow}");
@@ -97,6 +93,17 @@ public class PlayerListFeature extends HudElementFeature {
             else sb.append(" {green}");
 
             sb.append(dec.format(dist));
+        }
+
+        if (totemPops.get() && entity instanceof Player player) {
+            int pops = TOTEMCOUNTER_SERVICE.getPoppedTotemCount(player.getId());
+            if (pops > 0) {
+                String popText = " -" + pops;
+                sb.append(popText);
+                String raw = sb.toString();
+                raw = raw.replace(popText, " " + ColorUtils.getTotemColor(pops) + "-" + pops);
+                return CAT_FORMAT.format(raw);
+            }
         }
         return CAT_FORMAT.format(sb.toString());
     }
