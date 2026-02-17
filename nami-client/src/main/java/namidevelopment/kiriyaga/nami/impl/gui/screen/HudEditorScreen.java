@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.nami.Nami.CLICK_GUI_SCREEN;
 import static namidevelopment.kiriyaga.nami.Nami.NAVIGATE_PANEL;
 
 public class HudEditorScreen extends NamiScreen {
@@ -38,7 +39,7 @@ public class HudEditorScreen extends NamiScreen {
     private HudElementFeature draggingElement = null;
     private int dragOffsetX, dragOffsetY;
 
-    public float scale = 1;
+    public float scale = CLICK_GUI_SCREEN.scale;
 
     public HudEditorScreen() {
         super(Component.literal("NamiHudEditorScreen"));
