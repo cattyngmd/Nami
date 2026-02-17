@@ -28,15 +28,15 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class AutoLogFeature extends Feature {
 
-    public final BoolSetting health = addSetting(new BoolSetting("OnPop", false));
+    public final BoolSetting health = addSetting(new BoolSetting("Health", false));
     public final IntSetting onHealth = addSetting(new IntSetting("OnHealth", 12, 0, 36));
-    public final BoolSetting totems = addSetting(new BoolSetting("OnPop", false));
+    public final BoolSetting totems = addSetting(new BoolSetting("Totems", false));
     public final IntSetting onTotems = addSetting(new IntSetting("OnTotems", 0, 0, 10));
+    public final BoolSetting level = addSetting(new BoolSetting("Level", false));
+    public final IntSetting onLevel = addSetting(new IntSetting("OnLevel", 0, 0, 15000));
     public final BoolSetting onRender = addSetting(new BoolSetting("OnRender", false));
     public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
     public final BoolSetting onPop = addSetting(new BoolSetting("OnPop", false));
-    public final BoolSetting level = addSetting(new BoolSetting("OnPop", false));
-    public final IntSetting onLevel = addSetting(new IntSetting("OnLevel", 0, 0, 15000));
 
     private boolean triggeredLevel = false;
     private boolean loggingOut = false;
@@ -45,8 +45,8 @@ public class AutoLogFeature extends Feature {
         super("AutoLog", "Automatically logs out in certain conditions.", FeatureCategory.of("Combat"), "autolog", "panic", "logout");
         packet.setShowCondition(() -> onRender.get());
         onHealth.setShowCondition(health::get);
-        totems.setShowCondition(health::get);
-        level.setShowCondition(health::get);
+        onTotems.setShowCondition(totems::get);
+        onLevel.setShowCondition(level::get);
     }
 
     @Override
