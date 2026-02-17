@@ -28,11 +28,14 @@ import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
 public class AutoLogFeature extends Feature {
 
-    public final IntSetting health = addSetting(new IntSetting("OnHealth", 12, 0, 36));
+    public final BoolSetting health = addSetting(new BoolSetting("OnPop", false));
+    public final IntSetting onHealth = addSetting(new IntSetting("OnHealth", 12, 0, 36));
+    public final BoolSetting totems = addSetting(new BoolSetting("OnPop", false));
     public final IntSetting onTotems = addSetting(new IntSetting("OnTotems", 0, 0, 10));
     public final BoolSetting onRender = addSetting(new BoolSetting("OnRender", false));
     public final BoolSetting packet = addSetting(new BoolSetting("Packet", false));
     public final BoolSetting onPop = addSetting(new BoolSetting("OnPop", false));
+    public final BoolSetting level = addSetting(new BoolSetting("OnPop", false));
     public final IntSetting onLevel = addSetting(new IntSetting("OnLevel", 0, 0, 15000));
 
     private boolean triggeredLevel = false;
@@ -41,6 +44,9 @@ public class AutoLogFeature extends Feature {
     public AutoLogFeature() {
         super("AutoLog", "Automatically logs out in certain conditions.", FeatureCategory.of("Combat"), "autolog", "panic", "logout");
         packet.setShowCondition(() -> onRender.get());
+        onHealth.setShowCondition(health::get);
+        totems.setShowCondition(health::get);
+        level.setShowCondition(health::get);
     }
 
     @Override
@@ -59,8 +65,7 @@ public class AutoLogFeature extends Feature {
 
         LocalPlayer player = MC.player;
 
-        if (onLevel.get() != 0) {
-
+        if (level.get()) {
             if (triggeredLevel && player.getBlockY() <= onLevel.get()) {
                 logOut("Too low level: {global}" + player.getBlockY() + "{white} Blocks");
                 triggeredLevel = false;
@@ -72,12 +77,12 @@ public class AutoLogFeature extends Feature {
             }
         }
 
-        if (player.getHealth() <= health.get() && health.get() != 0) {
+        if (health.get() && player.getHealth() <= onHealth.get()) {
             logOut("Low health: {global}" + player.getHealth() + "{white} HP");
             return;
         }
 
-        if (PlayerUtils.getTotemCount() <= onTotems.get()) {
+        if (totems.get() && PlayerUtils.getTotemCount() <= onTotems.get()) {
             logOut("Not enough totems: {global}" + PlayerUtils.getTotemCount() + "{white} Totems left");
             return;
         }
