@@ -38,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -476,14 +477,14 @@ public class AutoCrystalFeature extends Feature {
 
                     BlockPos pos = playerPos.offset(x, y, z);
                     BlockPos base = pos.below();
-
                     BlockState baseState = MC.level.getBlockState(base);
                     if (!baseState.is(Blocks.OBSIDIAN) && !baseState.is(Blocks.BEDROCK)) {
                         dbg.candidatesBadBase++;
                         continue;
                     }
 
-                    if (!MC.level.getBlockState(pos).isAir()) {
+                    BlockState state = MC.level.getBlockState(pos);
+                    if (!state.isAir() && !(state.getBlock().equals(Blocks.FIRE) && MC.level.dimension() == Level.END)) {
                         dbg.candidatesNotAir++;
                         continue;
                     }
