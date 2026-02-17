@@ -17,6 +17,7 @@ import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
 import namidevelopment.kiriyaga.api.util.InventoryUtils;
+import namidevelopment.kiriyaga.api.util.Timer;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.SneakFeature;
 import net.minecraft.core.BlockPos;
@@ -58,6 +59,7 @@ public class SpeedMineFeature extends Feature {
     public final BoolSetting grim = addSetting(new BoolSetting("Grim", false));
     public final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
     public final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
+    public final IntSetting instantDelay = addSetting(new IntSetting("InstantDelay", 0, 0, 1000));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
     public final BoolSetting allowOffhand = addSetting(new BoolSetting("AllowOffhand", false));
@@ -67,11 +69,13 @@ public class SpeedMineFeature extends Feature {
     public BlockBreakingTask doubleMineTask;
 
     private int shouldSwapBack = -1;
+    private final Timer instantRemineTimer = new Timer();
 
     // Thats first packet mine i made like in my whole life, its bad, and there is issues, im gonna finish it, and maybe rewrite from scratch later
     public SpeedMineFeature() {
         super("SpeedMine", "Increases speed of mining.", FeatureCategory.of("World"));
         allowOffhand.setShowCondition(()-> !multitask.get());
+        instantDelay.setShowCondition(instant::get);
     }
 
     @Override
@@ -128,6 +132,7 @@ public class SpeedMineFeature extends Feature {
         }
 
         currentTask = new BlockBreakingTask(event.blockPos, event.direction, speed.get().floatValue());
+        instantRemineTimer.reset();
         startMining(currentTask);
 
         float damageDelta = calculateBlockDamage(currentTask.getStartState(), MC.level, currentTask.getBlockPos());
@@ -307,6 +312,9 @@ public class SpeedMineFeature extends Feature {
             }
         }
 
+        if (task.isInstantRemine() && !instantRemineTimer.hasElapsed(instantDelay.get()))
+            return;
+
         Vec3 eyePos = MC.player.getEyePosition();
         AABB blockBox = new AABB(task.getBlockPos());
 
@@ -346,6 +354,9 @@ public class SpeedMineFeature extends Feature {
             InventoryUtils.attemptSwitch(prev);
 
         currentTask.markLastBroken();
+
+        if (task.isInstantRemine())
+            instantRemineTimer.reset();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
