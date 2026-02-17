@@ -7,6 +7,7 @@ import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.util.entity.EntityUtils;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -24,6 +25,7 @@ public class PlayerListFeature extends HudElementFeature {
     public final EnumSetting<SortMode> sortMode = addSetting(new EnumSetting<>("Sort", SortMode.DESCENDING));
     public final BoolSetting showDistance = addSetting(new BoolSetting("Distance", true));
     public final BoolSetting showHealth = addSetting(new BoolSetting("Health", true));
+    public final BoolSetting self = addSetting(new BoolSetting("Self", true));
 
     private final List<TextElement> elements = new ArrayList<>();
     private final DecimalFormat dec = new DecimalFormat("0.#");
@@ -43,6 +45,9 @@ public class PlayerListFeature extends HudElementFeature {
         int w = 0;
 
         for (Entity player : players) {
+            if (!self.get() && player instanceof LocalPlayer)
+                continue;
+
             Component t = text(player);
             int width = FONT_SERVICE.getWidth(t);
             elements.add(new TextElement(t, 0, offset));
