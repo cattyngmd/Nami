@@ -128,14 +128,14 @@ public class NametagsFeature extends Feature {
                 Vec3 camPos = MC.gameRenderer.getMainCamera().position();
                 Vec3 entPos = vec3d;
                 float dist = (float) camPos.distanceTo(entPos);
-                float start = 10.0f;
-                float end = 2.0f;
-                float maxScale = 3.0f;
+                float start = 10f;
+                float end = 0.5f;
+                float maxScale = 4f;
 
                 if (dist < start) {
                     float t = (start - dist) / (start - end);
                     t = Math.max(0.0f, Math.min(1.0f, t));
-                    t = (float) Math.pow(t, 2.5);
+                    t = (float) Math.pow(t, 4);
                     scale = 1.0f + t * (maxScale - 1.0f);
                 } else {
                     scale = 1.0f;
@@ -157,11 +157,10 @@ public class NametagsFeature extends Feature {
                 ctx.fill(x1, y1, x2, y2, 0x64000000);
                 int color = (140 << 24) | (19 << 16) | (19 << 8) | 19;
                 int thick = 1;
-                ctx.fill(x1 + thick, y1, x2 - thick, y1 + thick, color);
-                ctx.fill(x1 + thick, y2 - thick, x2 - thick, y2, color);
-                ctx.fill(x1, y1 + thick, x1 + thick, y2 - thick, color);
-                ctx.fill(x2 - thick, y1 + thick, x2, y2 - thick, color);
-
+                ctx.fill(x1 + 1, y1, x2 - 1, y1 + thick, color);
+                ctx.fill(x1 + 1, y2 - thick, x2 - 1, y2, color);
+                ctx.fill(x1, y1, x1 + thick, y2, color);
+                ctx.fill(x2 - thick, y1, x2, y2, color);
             }
 
             FONT_SERVICE.drawText(event.getDrawContext(), display, (int) (-FONT_SERVICE.getWidth(text) / 2.f), -FONT_SERVICE.getHeight(), true);
@@ -234,14 +233,14 @@ public class NametagsFeature extends Feature {
                         Vec3 camPos = MC.gameRenderer.getMainCamera().position();
                         Vec3 entPos = pos;
                         float dist = (float) camPos.distanceTo(entPos);
-                        float start = 10.0f;
-                        float end = 2.0f;
-                        float maxScale = 3.0f;
+                        float start = 10f;
+                        float end = 0.5f;
+                        float maxScale = 4f;
 
                         if (dist < start) {
                             float t = (start - dist) / (start - end);
                             t = Math.max(0.0f, Math.min(1.0f, t));
-                            t = (float) Math.pow(t, 2.5);
+                            t = (float) Math.pow(t, 4);
                             scale = 1.0f + t * (maxScale - 1.0f);
                         } else {
                             scale = 1.0f;
@@ -275,14 +274,14 @@ public class NametagsFeature extends Feature {
                             Vec3 camPos = MC.gameRenderer.getMainCamera().position();
                             Vec3 entPos = pos;
                             float dist = (float) camPos.distanceTo(entPos);
-                            float start = 10.0f;
-                            float end = 2.0f;
-                            float maxScale = 3.0f;
+                            float start = 10f;
+                            float end = 0.5f;
+                            float maxScale = 4f;
 
                             if (dist < start) {
                                 float t = (start - dist) / (start - end);
                                 t = Math.max(0.0f, Math.min(1.0f, t));
-                                t = (float) Math.pow(t, 2.5);
+                                t = (float) Math.pow(t, 4);
                                 scale = 1.0f + t * (maxScale - 1.0f);
                             } else {
                                 scale = 1.0f;
