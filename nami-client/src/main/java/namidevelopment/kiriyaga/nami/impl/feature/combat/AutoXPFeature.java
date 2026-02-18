@@ -12,7 +12,6 @@ import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
-import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.api.util.entity.TargetUtils;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -48,7 +47,7 @@ public class AutoXPFeature extends Feature {
         packetShift.setShowCondition(packet::get);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     private void onPreTickEvent(PreTickEvent ev) {
         if (!isEnabled() || MC.player == null || MC.level == null) return;
 
@@ -102,7 +101,7 @@ public class AutoXPFeature extends Feature {
 
         switch (swapMode.get()) {
             case NORMAL -> {
-                InventoryUtils.attemptSwitch(xpSlot);
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(xpSlot, false);
                 MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
 
                 if (packet.get()) {
@@ -113,7 +112,7 @@ public class AutoXPFeature extends Feature {
 
             }
             case SILENT -> {
-                InventoryUtils.attemptSwitch(xpSlot);
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(xpSlot, true);
                 MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
 
                 if (packet.get()) {
@@ -121,8 +120,6 @@ public class AutoXPFeature extends Feature {
                         sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch()));
                     }
                 }
-
-                InventoryUtils.attemptSwitch(prevSlot);
             }
         }
     }

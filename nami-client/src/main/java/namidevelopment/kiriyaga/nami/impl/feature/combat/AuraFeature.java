@@ -11,7 +11,6 @@ import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ColorFeature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
-import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.nami.impl.feature.combat.autocrystal.AutoCrystalFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.movement.SprintFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
@@ -226,13 +225,10 @@ public class AuraFeature extends Feature {
                 b = true;
             }
 
-        int prev = -1;
-
         if (swap.get() == Swap.NORMAL || swap.get() == Swap.SILENT) {
             int slot = getWeapon();
             if (slot != -1) {
-                prev = MC.player.getInventory().getSelectedSlot();
-                InventoryUtils.attemptSwitch(slot);
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, swap.get() == Swap.SILENT);
             }
         }
 
@@ -240,12 +236,6 @@ public class AuraFeature extends Feature {
 
         if (swing.get())
             MC.player.swing(InteractionHand.MAIN_HAND);
-
-        if (swap.get() == Swap.SILENT) {
-            if (prev != -1) {
-                InventoryUtils.attemptSwitch(prev);
-            }
-        }
 
         if (stopSprinting.get() == Sprint.PACKET)
             if (b)
@@ -274,7 +264,7 @@ public class AuraFeature extends Feature {
         });
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender3D(Render3DEvent event) {
         if (!render.get() || currentTarget == null || MC.player == null || MC.player.isDeadOrDying()) return;
 

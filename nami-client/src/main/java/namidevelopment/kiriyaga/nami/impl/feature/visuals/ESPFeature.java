@@ -64,7 +64,7 @@ public class ESPFeature extends Feature {
         showCrystals.setShowCondition(() -> renderMode.get() == RenderMode.GLOW);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender3D(Render3DEvent event) {
         if (MC == null || MC.level == null || MC.player == null) return;
         this.clearDisplayInfo();

@@ -11,7 +11,6 @@ import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
-import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.api.util.entity.PlayerUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -57,7 +56,7 @@ public class AutoTotemFeature extends Feature {
         swordGap.setShowCondition(offhandOverride::get);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreTick(PreTickEvent event) {
         if (MC.level == null || MC.player == null) return;
         this.clearDisplayInfo();
@@ -125,12 +124,12 @@ public class AutoTotemFeature extends Feature {
                 if (gappleSlot == -1) gappleSlot = findInventorySlot(new ItemStack(Items.GOLDEN_APPLE), -1);
 
                 if (gappleSlot != -1 && gappleSlot < 9) {
-                    InventoryUtils.attemptSwitch(gappleSlot);
+                    INVENTORY_SERVICE.getSwapHandler().attemptSwitch(gappleSlot, false);
                 } else {
-                    InventoryUtils.attemptSwitch(mainhandSlot.get());
+                    INVENTORY_SERVICE.getSwapHandler().attemptSwitch(mainhandSlot.get(), false);
                 }
             } else {
-                InventoryUtils.attemptSwitch(mainhandSlot.get());
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(mainhandSlot.get(), false);
             }
         }
 

@@ -37,13 +37,13 @@ public class PatchFeature extends Feature {
             this.toggle();
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onSprintResetEvent(SprintResetEvent event) {
         if (grimAttackVelocity.get() && !event.isCancelled())
                 event.cancel();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPacketReceiveEvent(PacketReceiveEvent event) {
         Packet<?> p = event.getPacket();
 

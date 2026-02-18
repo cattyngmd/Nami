@@ -48,7 +48,7 @@ public class RandomFeature extends Feature {
         this.sendFile = new File(logDir, "send.jsonl");
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPacketReceive(PacketReceiveEvent event) {
         if (!logReceive.get()) return;
 
@@ -56,7 +56,7 @@ public class RandomFeature extends Feature {
         logPacket(packet, "RECEIVE", receiveFile);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPacketSend(PacketSendEvent event) {
         if (!logSend.get()) return;
 

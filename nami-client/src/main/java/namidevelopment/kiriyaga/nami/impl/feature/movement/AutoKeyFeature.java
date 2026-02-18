@@ -61,7 +61,7 @@ public class AutoKeyFeature extends Feature {
         savedKeyStates.clear();
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdateEvent(PreTickEvent event) {
         if (trackedKeys == null) return;
         for (KeyMapping key : trackedKeys) {

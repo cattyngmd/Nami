@@ -9,7 +9,6 @@ import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
-import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -44,7 +43,7 @@ public class AutoFireworkFeature extends Feature {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     private void onTick(PreTickEvent ev) {
         if (MC.level == null || MC.player == null) return;
 
@@ -77,10 +76,8 @@ public class AutoFireworkFeature extends Feature {
         int hotbarSlot = getSlotInHotbar(item);
 
         if (hotbarSlot != -1) {
-            int prevSlot = MC.player.getInventory().getSelectedSlot();
-            InventoryUtils.attemptSwitch(hotbarSlot);
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(hotbarSlot, true);
             MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
-            InventoryUtils.attemptSwitch(prevSlot);
             return true;
         }
 

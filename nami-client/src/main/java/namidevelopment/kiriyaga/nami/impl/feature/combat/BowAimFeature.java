@@ -70,7 +70,7 @@ public class BowAimFeature extends Feature {
         ));
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender3D(Render3DEvent event) {
         if (!render.get() || currentTarget == null) return;
 

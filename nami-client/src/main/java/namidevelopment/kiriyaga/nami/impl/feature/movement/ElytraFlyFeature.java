@@ -9,7 +9,6 @@ import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.annotation.RegisterFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.RotationsFeature;
-import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.nami.mixin.DuckKeyMapping;
 import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
@@ -107,7 +106,7 @@ public class ElytraFlyFeature extends Feature {
         baseY = 0;
     }
 
-/*    @SubscribeEvent(priority = EventPriority.HIGHEST)
+/*    @SubscribeEvent(priority = EventPriority.HIGH)
     private void onMove(MoveEvent event) {
         if (MC.player == null || mode.get() != FlyMode.BOUNCE) return;
 
@@ -302,7 +301,7 @@ public class ElytraFlyFeature extends Feature {
         return Mth.clamp(pitchDeg, -89f, 89f);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     private void onPreTick2(PreTickEvent event) {
         if (MC.player == null) return;
 
@@ -378,10 +377,8 @@ public class ElytraFlyFeature extends Feature {
         int hotbarSlot = getSlotInHotbar(item);
 
         if (hotbarSlot != -1) {
-            int prevSlot = MC.player.getInventory().getSelectedSlot();
-            InventoryUtils.attemptSwitch(hotbarSlot);
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(hotbarSlot, true);
             MC.gameMode.useItem(MC.player, InteractionHand.MAIN_HAND);
-            InventoryUtils.attemptSwitch(prevSlot);
             return true;
         }
 

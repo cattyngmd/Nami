@@ -12,7 +12,6 @@ import namidevelopment.kiriyaga.api.model.setting.BoolSetting;
 import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
-import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -125,14 +124,11 @@ public class LiquidFillFeature extends Feature {
 
                 int currentSlot = MC.player.getInventory().getSelectedSlot();
                 if (currentSlot != blockSlot)
-                    InventoryUtils.attemptSwitch(blockSlot);
+                    INVENTORY_SERVICE.getSwapHandler().attemptSwitch(blockSlot, true);
 
                 BlockHitResult hit = new BlockHitResult(Vec3.atLowerCornerOf(pos).add(0.5,0.5,0.5), Direction.UP, pos, false);
 
                 airPlace(hit, grim.get(), swing.get());
-
-                if (currentSlot != MC.player.getInventory().getSelectedSlot())
-                    InventoryUtils.attemptSwitch(currentSlot);
 
                 cooldown = delay.get();
                 placed = true;

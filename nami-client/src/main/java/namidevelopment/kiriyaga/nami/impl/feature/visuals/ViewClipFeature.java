@@ -24,7 +24,7 @@ public class ViewClipFeature extends Feature {
         super("ViewClip", "Disables block clipping and extends camera distance.", FeatureCategory.of("Render"), "viewclip");
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender(Render2DEvent ev) {
         CameraType perspective = MC.options.getCameraType();
 

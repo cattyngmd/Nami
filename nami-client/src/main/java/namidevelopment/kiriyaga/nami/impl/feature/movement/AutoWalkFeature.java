@@ -31,7 +31,7 @@ public class AutoWalkFeature extends Feature {
         setWalkHeld(false);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null)
             return;

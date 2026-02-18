@@ -34,7 +34,7 @@ public class PhaseESPFeature extends Feature {
     safeOnly.setShowCondition(()-> bedrock.get() || obsidian.get());
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onRender3D(Render3DEvent event) {
         if (MC == null || MC.level == null || MC.player == null) return;
         this.clearDisplayInfo();

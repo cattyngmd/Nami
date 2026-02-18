@@ -250,7 +250,7 @@ public class AutoCrystalFeature extends Feature {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     private void onAddEntityEvent(AddEntityEvent event) {
         if (breakSequential.get() != Sequential.FULL) return;
 

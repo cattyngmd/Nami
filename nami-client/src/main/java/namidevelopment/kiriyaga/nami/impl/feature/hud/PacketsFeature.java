@@ -33,7 +33,7 @@ public class PacketsFeature extends HudElementFeature {
         super("Packets", "Displays sended packets.", 0, 0, 100, 30);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPacketSend(PacketSendEvent event) {
         Packet<?> packet = event.getPacket();
         if (packet == null) return;

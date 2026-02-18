@@ -24,7 +24,7 @@ public class AutoJumpFeature extends Feature {
         setJumpHeld(false);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdateEvent(PreTickEvent event) {
         setJumpHeld(true);
     }

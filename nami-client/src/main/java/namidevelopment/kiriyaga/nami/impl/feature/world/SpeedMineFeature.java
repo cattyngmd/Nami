@@ -16,7 +16,6 @@ import namidevelopment.kiriyaga.api.model.setting.DoubleSetting;
 import namidevelopment.kiriyaga.api.model.setting.EnumSetting;
 import namidevelopment.kiriyaga.api.model.setting.IntSetting;
 import namidevelopment.kiriyaga.api.util.EnchantmentUtils;
-import namidevelopment.kiriyaga.api.util.InventoryUtils;
 import namidevelopment.kiriyaga.api.util.Timer;
 import namidevelopment.kiriyaga.api.util.render.RenderUtil;
 import namidevelopment.kiriyaga.nami.impl.feature.combat.AutoTotemFeature;
@@ -95,7 +94,7 @@ public class SpeedMineFeature extends Feature {
             return;
 
         if (shouldSwapBack != -1)
-            InventoryUtils.attemptSwitch(shouldSwapBack);
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(shouldSwapBack, false);
 
         shouldSwapBack = -1;
 
@@ -106,7 +105,7 @@ public class SpeedMineFeature extends Feature {
             handleDoubleMine(doubleMineTask);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onBlockStartBreak(StartBreakingBlockEvent event) {
         BlockState state = MC.level.getBlockState(event.blockPos);
 
@@ -271,12 +270,12 @@ public class SpeedMineFeature extends Feature {
                     return;
 
                 shouldSwapBack = MC.player.getInventory().getSelectedSlot();
-                InventoryUtils.attemptSwitch(slot);
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, false);
             }
         }
 
 //        if (swap.get() == Swap.SILENT) {
-//            InventoryUtils.attemptSwitch(prev);
+//            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(prev);
 //            shouldSwapBack = -1;
 //        }
     }
@@ -285,7 +284,7 @@ public class SpeedMineFeature extends Feature {
         if (task.getBlockState().isAir()) return;
 
         if (swap.get() == Swap.NORMAL)
-            InventoryUtils.attemptSwitch(getSlot(task.getStartState()));
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(getSlot(task.getStartState()), false);
 
         if (grim.get())
             sendDestroyPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, task);
@@ -329,7 +328,6 @@ public class SpeedMineFeature extends Feature {
         if (rotate.get() == Rotate.NORMAL && !ROTATION_SERVICE.getRequestHandler().isCompleted(this.name))
             return;
 
-        int prev = MC.player.getInventory().getSelectedSlot();
         if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
             int slot = getSlot(task.getStartState());
             if (slot != MC.player.getInventory().getSelectedSlot()) {
@@ -337,7 +335,7 @@ public class SpeedMineFeature extends Feature {
                     if (swap.get() != Swap.SILENT)
                         shouldSwapBack = MC.player.getInventory().getSelectedSlot();
 
-                InventoryUtils.attemptSwitch(slot);
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) || (swap.get() == Swap.SILENT && shouldSwapBack == -1));
             }
         }
 
@@ -349,14 +347,6 @@ public class SpeedMineFeature extends Feature {
 
         sendDestroyPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, task);
         //MC.level.destroyBlock(task.blockPos, false, MC.player, 512);
-
-        if (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) {
-            InventoryUtils.attemptSwitch(prev);
-
-        }
-
-        if (swap.get() == Swap.SILENT && shouldSwapBack == -1)
-            InventoryUtils.attemptSwitch(prev);
 
         currentTask.markLastBroken();
 

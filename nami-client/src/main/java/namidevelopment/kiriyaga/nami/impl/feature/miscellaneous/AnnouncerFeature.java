@@ -78,7 +78,7 @@ public class AnnouncerFeature extends Feature {
         return othersPop.get();
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPacketReceive(PacketReceiveEvent event) {
         if (!joinAnnounce.get()) return;
 
@@ -116,7 +116,7 @@ public class AnnouncerFeature extends Feature {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onEntitySpawn(AddEntityEvent event) {
         if (MC.player == null || MC.level == null || !visualRange.get()) return;
 
@@ -139,7 +139,7 @@ public class AnnouncerFeature extends Feature {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onTotemPop(TotemPopEvent event) {
         if (!totemPopCounter.get()) return;
         if (MC.player == null || MC.level == null) return;

@@ -20,7 +20,7 @@ public class YawFeature extends Feature {
         super("Yaw", "Snap player yaw to nearest fixed angle.", FeatureCategory.of("Movement"));
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreTick(PreTickEvent event) {
         if (MC.player == null || MC.level == null) return;
 

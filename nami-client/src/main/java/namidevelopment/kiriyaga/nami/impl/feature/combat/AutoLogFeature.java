@@ -56,7 +56,7 @@ public class AutoLogFeature extends Feature {
         triggeredLevel = false;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onUpdate(PreTickEvent event) {
         if (MC.player == null || MC.level == null || MC.gameMode == null)
             return;
@@ -124,7 +124,7 @@ public class AutoLogFeature extends Feature {
         });
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onEntitySpawn(AddEntityEvent event) {
         if (MC.player == null || MC.level == null || !packet.get() || !onRender.get()) return;
 

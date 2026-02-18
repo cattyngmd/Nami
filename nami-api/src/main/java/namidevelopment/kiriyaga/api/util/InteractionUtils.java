@@ -42,7 +42,7 @@ public class InteractionUtils {
         if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
-        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
+        int slot = INVENTORY_SERVICE.getSwapHandler().findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
         
@@ -74,17 +74,13 @@ public class InteractionUtils {
 
 
         if (!isOffhand) {
-            int prev = MC.player.getInventory().getSelectedSlot();
-            InventoryUtils.attemptSwitch(slot);
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, swapBack);
 
             MC.gameMode.interactAt(MC.player, entity, hitResult, MAIN_HAND);
             MC.gameMode.interact(MC.player, entity, MAIN_HAND);
 
             if (swing)
                 MC.player.swing(MAIN_HAND);
-
-            if (swapBack)
-                InventoryUtils.attemptSwitch(prev);
         }
         else {
             MC.gameMode.interactAt(MC.player, entity, hitResult, OFF_HAND);
@@ -129,7 +125,7 @@ public class InteractionUtils {
         if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
-        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
+        int slot = INVENTORY_SERVICE.getSwapHandler().findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
 
@@ -229,8 +225,7 @@ public class InteractionUtils {
         if (canPlace) {
 
             if (!isOffhand) {
-                int prev = MC.player.getInventory().getSelectedSlot();
-                InventoryUtils.attemptSwitch(slot);
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, swapBack);
 
                 if (simulate)
                     MC.gameMode.useItemOn(MC.player, MAIN_HAND, hitResult);
@@ -241,9 +236,6 @@ public class InteractionUtils {
                     MC.player.swing(MAIN_HAND);
 
                 result = true;
-
-                if (swapBack)
-                    InventoryUtils.attemptSwitch(prev);
             }
             else {
                 if (simulate)
@@ -278,7 +270,7 @@ public class InteractionUtils {
         if (MC.player.getOffhandItem().is(item))
             isOffhand = true;
 
-        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
+        int slot = INVENTORY_SERVICE.getSwapHandler().findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
 
@@ -367,8 +359,7 @@ public class InteractionUtils {
         }
 
         if (!isOffhand) {
-            int prev = MC.player.getInventory().getSelectedSlot();
-            InventoryUtils.attemptSwitch(slot);
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, swapBack);
 
             if (simulate)
                 MC.gameMode.useItemOn(MC.player, MAIN_HAND, hit);
@@ -377,8 +368,6 @@ public class InteractionUtils {
 
             if (swing)
                 MC.player.swing(MAIN_HAND);
-            if (swapBack)
-                InventoryUtils.attemptSwitch(prev);
         } else {
             if (simulate)
                 MC.gameMode.useItemOn(MC.player, OFF_HAND, hit);
@@ -465,7 +454,7 @@ public class InteractionUtils {
         if (grim)
             isOffhand = false;
 
-        int slot = InventoryUtils.findHotbarItem(stack -> stack.is(item));
+        int slot = INVENTORY_SERVICE.getSwapHandler().findHotbarItem(stack -> stack.is(item));
         if (slot == -1 && !isOffhand)
             return false;
 
@@ -496,8 +485,7 @@ public class InteractionUtils {
 
         if (canPlace) {
             if (!isOffhand) {
-                int prev = MC.player.getInventory().getSelectedSlot();
-                InventoryUtils.attemptSwitch(slot);
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, swapBack);
 
                 if (grim) {
                     MC.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
@@ -526,10 +514,6 @@ public class InteractionUtils {
 
                     result = true;
                 }
-
-                if (swapBack)
-                    InventoryUtils.attemptSwitch(prev);
-
             } else {
                     if (simulate)
                         MC.gameMode.useItemOn(MC.player, InteractionHand.OFF_HAND, hitResult);
