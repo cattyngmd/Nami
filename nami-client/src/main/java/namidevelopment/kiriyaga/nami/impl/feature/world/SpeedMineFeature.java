@@ -68,7 +68,6 @@ public class SpeedMineFeature extends Feature {
     public BlockBreakingTask currentTask;
     public BlockBreakingTask doubleMineTask;
 
-    private int shouldSwapBack = -1;
     private final Timer instantRemineTimer = new Timer();
 
     // Thats first packet mine i made like in my whole life, its bad, and there is issues, im gonna finish it, and maybe rewrite from scratch later
@@ -85,18 +84,12 @@ public class SpeedMineFeature extends Feature {
         }
         currentTask = null;
         doubleMineTask = null;
-        shouldSwapBack = -1;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onTick(PreTickEvent event) {
         if (MC.level == null || MC.player == null)
             return;
-
-        if (shouldSwapBack != -1)
-            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(shouldSwapBack, false);
-
-        shouldSwapBack = -1;
 
         if (currentTask != null)
             handleMiningTick(currentTask);
@@ -263,21 +256,13 @@ public class SpeedMineFeature extends Feature {
             if (FEATURE_SERVICE.getStorage().getByClass(AutoTotemFeature.class).isEnabled() && FEATURE_SERVICE.getStorage().getByClass(AutoTotemFeature.class).mainhandActive)
                 return;
 
-            if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
-                int slot = getSlot(task.getStartState());
-                task.setDoublemineHoldTicks(task.doublemineHoldTicks+1);
-                if (slot == MC.player.getInventory().getSelectedSlot())
-                    return;
+            int slot = getSlot(task.getStartState());
+            task.setDoublemineHoldTicks(task.doublemineHoldTicks+1);
+            if (slot == MC.player.getInventory().getSelectedSlot())
+                return;
 
-                shouldSwapBack = MC.player.getInventory().getSelectedSlot();
-                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, false);
-            }
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT);
         }
-
-//        if (swap.get() == Swap.SILENT) {
-//            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(prev);
-//            shouldSwapBack = -1;
-//        }
     }
 
     private void startMining(BlockBreakingTask task) {
@@ -331,11 +316,7 @@ public class SpeedMineFeature extends Feature {
         if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
             int slot = getSlot(task.getStartState());
             if (slot != MC.player.getInventory().getSelectedSlot()) {
-                if (currentTask.brokenCount < 2 || !currentTask.isInstantRemine())
-                    if (swap.get() != Swap.SILENT)
-                        shouldSwapBack = MC.player.getInventory().getSelectedSlot();
-
-                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) || (swap.get() == Swap.SILENT && shouldSwapBack == -1));
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) || (swap.get() == Swap.SILENT));
             }
         }
 
