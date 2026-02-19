@@ -13,8 +13,7 @@ import static namidevelopment.kiriyaga.api.NamiApi.MC;
 
 public class InventorySwapHandler {
 
-    boolean swapBack = false;
-    int lastSlot = -1;
+    public int lastSlot = -1;
 
     public void init() {
         EVENT_SERVICE.register(this);
@@ -33,28 +32,24 @@ public class InventorySwapHandler {
         if (MC.player == null || MC.level == null || MC.gameMode == null || MC.player.getInventory() == null)
             return;
 
-        if (swapBack && lastSlot != -1) {
-            attemptSwitch(lastSlot);
-            swapBack = false;
-            lastSlot = -1;
-        }
+        attemptSwitch(lastSlot);
+        lastSlot = -1;
     }
 
-    public void attemptSwitch(int targetSlot, boolean swapBack) {
+    public void attemptSwitch(int targetSlot, boolean silent) {
         if (MC.player == null || MC.level == null || MC.gameMode == null || targetSlot < 0 || targetSlot > 8)
             return;
 
-        if (!swapBack)
+        if (!silent) {
             lastSlot = targetSlot;
-
-        this.swapBack = swapBack;
+        }
 
         MC.player.getInventory().setSelectedSlot(targetSlot);
         syncSelectedSlot();
     }
 
     private void attemptSwitch(int targetSlot) {
-        if (MC.player == null || MC.level == null || MC.gameMode == null || targetSlot < 0 || targetSlot > 8)
+        if (MC.player == null || MC.level == null || MC.gameMode == null || targetSlot < 0 || targetSlot > 8 || MC.player.getInventory().getSelectedSlot() == targetSlot)
             return;
 
         MC.player.getInventory().setSelectedSlot(targetSlot);

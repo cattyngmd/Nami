@@ -70,6 +70,8 @@ public class SpeedMineFeature extends Feature {
 
     private final Timer instantRemineTimer = new Timer();
 
+    private int i = -1;
+
     // Thats first packet mine i made like in my whole life, its bad, and there is issues, im gonna finish it, and maybe rewrite from scratch later
     public SpeedMineFeature() {
         super("SpeedMine", "Increases speed of mining.", FeatureCategory.of("World"));
@@ -190,13 +192,9 @@ public class SpeedMineFeature extends Feature {
     private void handleMiningTick(BlockBreakingTask task) {
         Vec3 eyePos = MC.player.getEyePosition();
         AABB blockBox = new AABB(task.getBlockPos());
-        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3 reachEnd = eyePos.add(lookDir.scale(range.get()));
-        boolean insideBox = blockBox.contains(eyePos);
 
-        if (!insideBox && blockBox.clip(eyePos, reachEnd).isEmpty()) {
-            abortMining(task);
-            currentTask = null;
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > range.get()) {
+            doubleMineTask = null;
             return;
         }
 
@@ -226,18 +224,17 @@ public class SpeedMineFeature extends Feature {
         if (!doubleMine.get())
             return;
 
-        if (task.getDoublemineHoldTicks() > 2) {
+        if (task.getDoublemineHoldTicks() >= 3) {
             doubleMineTask = null;
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(i, false);
+            i = -1;
             return;
         }
 
         Vec3 eyePos = MC.player.getEyePosition();
         AABB blockBox = new AABB(task.getBlockPos());
-        Vec3 lookDir = getClosestPointToEye(eyePos, blockBox).subtract(eyePos).normalize();
-        Vec3 reachEnd = eyePos.add(lookDir.scale(range.get()));
-        boolean insideBox = blockBox.contains(eyePos);
 
-        if (!insideBox && blockBox.clip(eyePos, reachEnd).isEmpty()) {
+        if (eyePos.distanceTo(getClampClosestPoint(eyePos, blockBox)) > range.get()) {
             doubleMineTask = null;
             return;
         }
@@ -256,12 +253,12 @@ public class SpeedMineFeature extends Feature {
             if (FEATURE_SERVICE.getStorage().getByClass(AutoTotemFeature.class).isEnabled() && FEATURE_SERVICE.getStorage().getByClass(AutoTotemFeature.class).mainhandActive)
                 return;
 
-            int slot = getSlot(task.getStartState());
-            task.setDoublemineHoldTicks(task.doublemineHoldTicks+1);
-            if (slot == MC.player.getInventory().getSelectedSlot())
-                return;
+            if (i == -1)
+                i = INVENTORY_SERVICE.getSwapHandler().lastSlot;
 
-            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT);
+            INVENTORY_SERVICE.getSwapHandler().attemptSwitch(getSlot(task.getStartState()), false);
+
+            task.setDoublemineHoldTicks(task.getDoublemineHoldTicks() + 1);
         }
     }
 
@@ -316,7 +313,7 @@ public class SpeedMineFeature extends Feature {
         if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
             int slot = getSlot(task.getStartState());
             if (slot != MC.player.getInventory().getSelectedSlot()) {
-                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 2) || (swap.get() == Swap.SILENT));
+                INVENTORY_SERVICE.getSwapHandler().attemptSwitch(slot, (swap.get() == Swap.SILENT121 && currentTask.isInstantRemine() && currentTask.brokenCount >= 3) || (swap.get() == Swap.SILENT));
             }
         }
 
@@ -366,7 +363,7 @@ public class SpeedMineFeature extends Feature {
             if (swap.get() == Swap.SILENT121 || swap.get() == Swap.SILENT) {
                 held = MC.player.getInventory().getItem(getSlot(state));
             }
-                return held.isCorrectToolForDrops(state);
+            return held.isCorrectToolForDrops(state);
         }
         return true;
     }
