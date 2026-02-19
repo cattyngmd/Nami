@@ -60,6 +60,7 @@ public class SpeedMineFeature extends Feature {
     public final BoolSetting doubleMine = addSetting(new BoolSetting("DoubleMine", false));
     public final BoolSetting instant = addSetting(new BoolSetting("Instant", true));
     public final IntSetting instantDelay = addSetting(new IntSetting("InstantDelay", 0, 0, 1000));
+    public final BoolSetting simulate = addSetting(new BoolSetting("Simulate", true));
     public final BoolSetting swing = addSetting(new BoolSetting("Swing", true));
     public final BoolSetting multitask = addSetting(new BoolSetting("Multitask", false));
     public final BoolSetting allowOffhand = addSetting(new BoolSetting("AllowOffhand", false));
@@ -130,9 +131,9 @@ public class SpeedMineFeature extends Feature {
         instantRemineTimer.reset();
         startMining(currentTask);
 
-        float damageDelta = calculateBlockDamage(currentTask.getStartState(), MC.level, currentTask.getBlockPos());
+/*        float damageDelta = calculateBlockDamage(currentTask.getStartState(), MC.level, currentTask.getBlockPos());
         if (damageDelta >= 0.100f)
-            finishMining(currentTask);
+            finishMining(currentTask);*/
     }
 
     @SubscribeEvent
@@ -324,7 +325,9 @@ public class SpeedMineFeature extends Feature {
             MC.player.swing(InteractionHand.MAIN_HAND);
 
         sendDestroyPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, task);
-        //MC.level.destroyBlock(task.blockPos, false, MC.player, 512);
+
+        if (simulate.get())
+            MC.level.destroyBlock(task.blockPos, false, MC.player, 512);
 
         currentTask.markLastBroken();
 
