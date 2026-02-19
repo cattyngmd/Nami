@@ -101,10 +101,6 @@ public class PacketsFeature extends HudElementFeature {
             text += "{global}Packets ";
         }
 
-        if (displayLabel.get()) {
-            text += "{global}Packets ";
-        }
-
         text += "{secondary}({white}M:" + move +
                 "{secondary}, {white}C:" + click +
                 "{secondary}, {white}S:" + swaps +

@@ -578,6 +578,6 @@ public class BlockUtils {
         if (MC.level == null) return false;
         int minY = MC.level.getMinY();
         int maxY = MC.level.getMaxY();
-        return pos.getY() >= minY && pos.getY() < maxY;
+        return pos.getY() >= minY && pos.getY() <= maxY;
     }
 }
