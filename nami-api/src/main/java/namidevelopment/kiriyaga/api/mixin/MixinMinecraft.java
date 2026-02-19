@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -90,8 +89,8 @@ public abstract class MixinMinecraft {
         if (!ROTATION_SERVICE.getStateHandler().isRotating() || !config.isFutureRotations()) {
             return;
         }
-        float yaw = ROTATION_SERVICE.getStateHandler().getRotationYaw();
-        float pitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
+        float yaw = ROTATION_SERVICE.getStateHandler().getRotationYRot();
+        float pitch = ROTATION_SERVICE.getStateHandler().getRotationXRot();
         targetRotation.set(new Vec2(yaw, pitch));
         var request = ROTATION_SERVICE.getRequestHandler().getActiveRequest();
         if (request == null) {
@@ -121,7 +120,7 @@ public abstract class MixinMinecraft {
             return;
         }
 
-        ROTATION_SERVICE.getStateHandler().setServerYaw(rot.x);
-        ROTATION_SERVICE.getStateHandler().setServerPitch(rot.y);
+        ROTATION_SERVICE.getStateHandler().setServerYRot(rot.x);
+        ROTATION_SERVICE.getStateHandler().setServerXRot(rot.y);
     }
 }

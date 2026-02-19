@@ -287,8 +287,8 @@ public class AutoCrystalFeature extends Feature {
         if (breakRotate.get()) {
             Vec3 hit = getClosestPointToEye(MC.player.getEyePosition(), crystal.getBoundingBox());
 
-            float yaw = (float) getYawToVec(MC.player, hit);
-            float pitch = (float) getPitchToVec(MC.player, hit);
+            float yaw = (float) getYRotToVec(MC.player, hit);
+            float pitch = (float) getXRotToVec(MC.player, hit);
 
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 9, yaw, pitch));
         }
@@ -314,8 +314,8 @@ public class AutoCrystalFeature extends Feature {
 
         if (breakRotate.get()) {
             Vec3 pos = getClosestPointToEye(MC.player.getEyePosition(), target.crystal.getBoundingBox());
-            float yaw = (float) getYawToVec(MC.player, pos);
-            float pitch = (float) getPitchToVec(MC.player, pos);
+            float yaw = (float) getYRotToVec(MC.player, pos);
+            float pitch = (float) getXRotToVec(MC.player, pos);
 
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 9, yaw, pitch));
         }
@@ -354,8 +354,8 @@ public class AutoCrystalFeature extends Feature {
             //   if (MC.player.distanceToSqr(crystal) > 10 * 10) continue;
 
             Vec3 pos = getClosestPointToEye(MC.player.getEyePosition(), crystal.getBoundingBox());
-            float yaw = (float) getYawToVec(MC.player, pos);
-            float pitch = (float) getPitchToVec(MC.player, pos);
+            float yaw = (float) getYRotToVec(MC.player, pos);
+            float pitch = (float) getXRotToVec(MC.player, pos);
             EntityHitResult perfect = raycastTarget(MC.player, crystal, breakRange.get(), yaw, pitch);
             boolean insideBox = crystal.getBoundingBox().contains(MC.player.getEyePosition());
 
@@ -381,7 +381,7 @@ public class AutoCrystalFeature extends Feature {
 
       //  ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(AutoCrystalFeature.class.getName(), 5, idealYaw, idealPitch));
         boolean insideBox = crystal.getBoundingBox().contains(MC.player.getEyePosition(1.0f));
-        EntityHitResult serverCheck = raycastTarget(MC.player, crystal, breakRange.get(), ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+        EntityHitResult serverCheck = raycastTarget(MC.player, crystal, breakRange.get(), ROTATION_SERVICE.getStateHandler().getServerYRot(), ROTATION_SERVICE.getStateHandler().getServerXRot());
         return serverCheck != null || insideBox;
     }
 

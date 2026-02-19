@@ -76,8 +76,8 @@ public class NoSlowFeature extends Feature {
         if (mode.get() == Mode.GRIM && MC.player.isUsingItem() && !MC.player.isShiftKeyDown() && items.get()) {
 
             if (isFood(MC.player.getActiveItem())) {
-                float yaw = ROTATION_SERVICE.getStateHandler().getServerYaw();
-                float pitch = ROTATION_SERVICE.getStateHandler().getServerPitch();
+                float yaw = ROTATION_SERVICE.getStateHandler().getServerYRot();
+                float pitch = ROTATION_SERVICE.getStateHandler().getServerXRot();
 
                 if (MC.player.getUsedItemHand() == InteractionHand.MAIN_HAND)
                     sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.OFF_HAND, id, yaw, pitch));

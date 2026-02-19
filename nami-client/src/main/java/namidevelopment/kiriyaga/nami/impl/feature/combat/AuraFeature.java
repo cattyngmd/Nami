@@ -166,8 +166,8 @@ public class AuraFeature extends Feature {
         if ((skipCooldown || attackCooldownTicks <= preRotate * tps)) {
             Vec3 eyePos = MC.player.getEyePosition(1.0f);
             Vec3 closestPoint = getClosestPointToEye(eyePos, target.getBoundingBox());
-            float idealYaw = (float) getYawToVec(MC.player, closestPoint);
-            float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
+            float idealYaw = (float) getYRotToVec(MC.player, closestPoint);
+            float idealPitch = (float) getXRotToVec(MC.player, closestPoint);
             boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePosition());
 
             if (eyePos.distanceTo(getClampClosestPoint(eyePos, target.getBoundingBox())) > attackRange.get()) {
@@ -189,8 +189,8 @@ public class AuraFeature extends Feature {
                         MC.player,
                         target,
                         attackRange.get(),
-                        ROTATION_SERVICE.getStateHandler().getServerYaw(),
-                        ROTATION_SERVICE.getStateHandler().getServerPitch()
+                        ROTATION_SERVICE.getStateHandler().getServerYRot(),
+                        ROTATION_SERVICE.getStateHandler().getServerXRot()
                 );
 
                 canAttack = serverCheck != null;

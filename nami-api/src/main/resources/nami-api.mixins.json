@@ -7,10 +7,10 @@
     "DuckClientLevel",
     "DuckFont",
     "DuckMultiPlayerGameMode",
+    "MixinClientPacketListener",
     "MixinCommandSuggestions",
     "MixinLocalPlayer",
     "MixinMinecraft",
-    "MixinClientPacketListener",
     "MixinMultiPlayerGameMode"
   ],
   "injectors": {

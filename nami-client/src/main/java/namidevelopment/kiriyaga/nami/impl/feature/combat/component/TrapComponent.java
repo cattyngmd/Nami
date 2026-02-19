@@ -278,8 +278,8 @@ public class TrapComponent {
 
         if (attackRotate.get()) {
             Vec3 pos = getClosestPointToEye(MC.player.getEyePosition(), target.getBoundingBox());
-            float yaw = (float) getYawToVec(MC.player, pos);
-            float pitch = (float) getPitchToVec(MC.player, pos);
+            float yaw = (float) getYRotToVec(MC.player, pos);
+            float pitch = (float) getXRotToVec(MC.player, pos);
 
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(owner.getName()+"_attack", 9, yaw, pitch));
 
@@ -288,7 +288,7 @@ public class TrapComponent {
 
         if (rotated) {
             boolean insideBox = target.getBoundingBox().contains(MC.player.getEyePosition(1.0f));
-            EntityHitResult serverCheck = raycastTarget(MC.player, target, attackRange.get(), ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+            EntityHitResult serverCheck = raycastTarget(MC.player, target, attackRange.get(), ROTATION_SERVICE.getStateHandler().getServerYRot(), ROTATION_SERVICE.getStateHandler().getServerXRot());
             if (serverCheck == null && !insideBox) return;
         }
 

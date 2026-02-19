@@ -220,7 +220,7 @@ public class SpeedMineFeature extends Feature {
             MC.player.swing(InteractionHand.MAIN_HAND);
 
         if (rotate.get() == Rotate.HOLD)
-            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 8, getYawToVec(MC.player, getClosestPointToEye(eyePos, blockBox)), getPitchToVec(MC.player, getClosestPointToEye(eyePos, blockBox))));
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 8, getYRotToVec(MC.player, getClosestPointToEye(eyePos, blockBox)), getXRotToVec(MC.player, getClosestPointToEye(eyePos, blockBox))));
 
 
         float damageDelta = calculateBlockDamage(task.getStartState(), MC.level, task.getBlockPos());
@@ -323,7 +323,7 @@ public class SpeedMineFeature extends Feature {
         AABB blockBox = new AABB(task.getBlockPos());
 
         if (rotate.get() == Rotate.NORMAL)
-            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 8, getYawToVec(MC.player, getClosestPointToEye(eyePos, blockBox)), getPitchToVec(MC.player, getClosestPointToEye(eyePos, blockBox))));
+            ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name, 8, getYRotToVec(MC.player, getClosestPointToEye(eyePos, blockBox)), getXRotToVec(MC.player, getClosestPointToEye(eyePos, blockBox))));
 
         if (rotate.get() == Rotate.NORMAL && !ROTATION_SERVICE.getRequestHandler().isCompleted(this.name))
             return;

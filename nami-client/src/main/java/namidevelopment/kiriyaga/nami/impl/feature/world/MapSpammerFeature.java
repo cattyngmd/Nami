@@ -178,8 +178,8 @@ public class MapSpammerFeature extends Feature {
         boolean rotated = false;
         if (attackRotate.get()) {
             Vec3 pos = getClosestPointToEye(MC.player.getEyePosition(), frame.getBoundingBox());
-            float yaw = (float) getYawToVec(MC.player, pos);
-            float pitch = (float) getPitchToVec(MC.player, pos);
+            float yaw = (float) getYRotToVec(MC.player, pos);
+            float pitch = (float) getXRotToVec(MC.player, pos);
 
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(this.name + "_attack", 9, yaw, pitch));
 
@@ -188,7 +188,7 @@ public class MapSpammerFeature extends Feature {
 
         if (rotated) {
             boolean insideBox = frame.getBoundingBox().contains(MC.player.getEyePosition(1.0f));
-            EntityHitResult serverCheck = raycastTarget(MC.player, frame, attackRange.get(), ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+            EntityHitResult serverCheck = raycastTarget(MC.player, frame, attackRange.get(), ROTATION_SERVICE.getStateHandler().getServerYRot(), ROTATION_SERVICE.getStateHandler().getServerXRot());
 
             if (serverCheck == null && !insideBox) return false;
         }

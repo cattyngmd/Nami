@@ -266,7 +266,7 @@ public class ElytraFlyFeature extends Feature {
                 targetPitch = cruisePitch();
             }
 
-            float currentPitch = ROTATION_SERVICE.getStateHandler().getRotationPitch();
+            float currentPitch = ROTATION_SERVICE.getStateHandler().getRotationXRot();
             float smoothPitch = approach(currentPitch, targetPitch, 10);
 
             //TODO yaw smooth n

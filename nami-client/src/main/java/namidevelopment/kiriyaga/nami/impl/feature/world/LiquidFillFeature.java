@@ -32,8 +32,8 @@ import java.util.List;
 
 import static namidevelopment.kiriyaga.api.util.InteractionUtils.airPlace;
 
-import static namidevelopment.kiriyaga.api.util.RotationUtils.getPitchToVec;
-import static namidevelopment.kiriyaga.api.util.RotationUtils.getYawToVec;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.getXRotToVec;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.getYRotToVec;
 import static namidevelopment.kiriyaga.nami.Nami.*;
 import static namidevelopment.kiriyaga.api.NamiApi.*;
 @RegisterFeature
@@ -115,8 +115,8 @@ public class LiquidFillFeature extends Feature {
                 ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(
                         LiquidFillFeature.class.getName(),
                         3,
-                        (float) getYawToVec(MC.player, Vec3.atLowerCornerOf(pos)),
-                        (float) getPitchToVec(MC.player, Vec3.atLowerCornerOf(pos))
+                        (float) getYRotToVec(MC.player, Vec3.atLowerCornerOf(pos)),
+                        (float) getXRotToVec(MC.player, Vec3.atLowerCornerOf(pos))
                 ));
             }
 

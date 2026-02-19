@@ -106,7 +106,7 @@ public class AutoXPFeature extends Feature {
 
                 if (packet.get()) {
                     for (int l = 0; l < packetShift.get(); l++) {
-                      sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch()));
+                      sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, ROTATION_SERVICE.getStateHandler().getServerYRot(), ROTATION_SERVICE.getStateHandler().getServerXRot()));
                         }
                 }
 
@@ -117,7 +117,7 @@ public class AutoXPFeature extends Feature {
 
                 if (packet.get()) {
                     for (int l = 0; l < packetShift.get(); l++) {
-                        sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch()));
+                        sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id, ROTATION_SERVICE.getStateHandler().getServerYRot(), ROTATION_SERVICE.getStateHandler().getServerXRot()));
                     }
                 }
             }

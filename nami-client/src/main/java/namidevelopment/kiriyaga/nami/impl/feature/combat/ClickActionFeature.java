@@ -21,7 +21,8 @@ import net.minecraft.world.phys.Vec3;
 import static namidevelopment.kiriyaga.api.NamiApi.INVENTORY_SERVICE;
 import static namidevelopment.kiriyaga.api.NamiApi.ROTATION_SERVICE;
 import static namidevelopment.kiriyaga.nami.Nami.*;
-import static namidevelopment.kiriyaga.api.NamiApi.*;import static namidevelopment.kiriyaga.api.util.RotationUtils.getLookVectorFromYawPitch;
+import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.RotationUtils.getLookVectorFromYRotXRot;
 
 @RegisterFeature
 public class ClickActionFeature extends Feature {
@@ -140,8 +141,8 @@ public class ClickActionFeature extends Feature {
             if (MC.player.distanceToSqr(entity) > 100) continue;
 
             EntityHitResult hitResult = raycastTarget(MC.player, entity, rayRange,
-                    ROTATION_SERVICE.getStateHandler().getServerYaw(),
-                    ROTATION_SERVICE.getStateHandler().getServerPitch());
+                    ROTATION_SERVICE.getStateHandler().getServerYRot(),
+                    ROTATION_SERVICE.getStateHandler().getServerXRot());
 
             if (hitResult != null)
                 return false;
@@ -171,7 +172,7 @@ public class ClickActionFeature extends Feature {
 
     private EntityHitResult raycastTarget(Entity player, Entity target, double reach, float yaw, float pitch) {
         Vec3 eyePos = player.getEyePosition(1.0f);
-        Vec3 look = getLookVectorFromYawPitch(yaw, pitch);
+        Vec3 look = getLookVectorFromYRotXRot(yaw, pitch);
         Vec3 reachEnd = eyePos.add(look.scale(reach));
 
         AABB targetBox = target.getBoundingBox();

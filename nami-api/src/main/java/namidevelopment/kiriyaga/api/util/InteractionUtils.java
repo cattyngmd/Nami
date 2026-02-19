@@ -1,7 +1,5 @@
 package namidevelopment.kiriyaga.api.util;
 
-import namidevelopment.kiriyaga.api.contract.FeatureContractService;
-import namidevelopment.kiriyaga.api.contract.feature.RotationsFeatureConfig;
 import namidevelopment.kiriyaga.api.core.rotation.model.RotationRequest;
 import namidevelopment.kiriyaga.api.mixin.DuckMultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
@@ -48,8 +46,8 @@ public class InteractionUtils {
         
         Vec3 eyePos = MC.player.getEyePosition(1.0f);
         Vec3 closestPoint = getClosestPointToEye(eyePos, entity.getBoundingBox());
-        float idealYaw = (float) getYawToVec(MC.player, closestPoint);
-        float idealPitch = (float) getPitchToVec(MC.player, closestPoint);
+        float idealYaw = (float) getYRotToVec(MC.player, closestPoint);
+        float idealPitch = (float) getXRotToVec(MC.player, closestPoint);
 
         if (eyePos.distanceTo(getClampClosestPoint(eyePos, entity.getBoundingBox())) > range)
             return false;
@@ -58,7 +56,7 @@ public class InteractionUtils {
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 4, idealYaw, idealPitch));
 
         boolean insideBox = entity.getBoundingBox().contains(MC.player.getEyePosition());
-        EntityHitResult hitResult = raycastTarget(MC.player, entity, range, ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+        EntityHitResult hitResult = raycastTarget(MC.player, entity, range, ROTATION_SERVICE.getStateHandler().getServerYRot(), ROTATION_SERVICE.getStateHandler().getServerXRot());
 
         boolean completed = !rotate || insideBox || hitResult != null;
 
@@ -195,8 +193,8 @@ public class InteractionUtils {
         boolean canPlace = true;
 
         if (rotate) {
-            float yaw = (float) getYawToVec(MC.player, neighbor.getCenter());
-            float pitch = (float) getPitchToVec(MC.player, neighbor.getCenter());
+            float yaw = (float) getYRotToVec(MC.player, neighbor.getCenter());
+            float pitch = (float) getXRotToVec(MC.player, neighbor.getCenter());
 
          //   if (getDefaultRotationMode() == RotationFeature.RotationMode.SILENT)
                 ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
@@ -213,8 +211,8 @@ public class InteractionUtils {
                     MC.player,
                     b,
                     range,
-                    ROTATION_SERVICE.getStateHandler().getServerYaw(),
-                    ROTATION_SERVICE.getStateHandler().getServerPitch()
+                    ROTATION_SERVICE.getStateHandler().getServerYRot(),
+                    ROTATION_SERVICE.getStateHandler().getServerXRot()
             );
 
 
@@ -328,8 +326,8 @@ public class InteractionUtils {
         boolean canInteract = true;
 
         if (rotate) {
-            float yaw = (float) getYawToVec(MC.player, pos.getCenter());
-            float pitch = (float) getPitchToVec(MC.player, pos.getCenter());
+            float yaw = (float) getYRotToVec(MC.player, pos.getCenter());
+            float pitch = (float) getXRotToVec(MC.player, pos.getCenter());
 
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
             // else
@@ -345,8 +343,8 @@ public class InteractionUtils {
                     MC.player,
                     b,
                     range,
-                    ROTATION_SERVICE.getStateHandler().getServerYaw(),
-                    ROTATION_SERVICE.getStateHandler().getServerPitch()
+                    ROTATION_SERVICE.getStateHandler().getServerYRot(),
+                    ROTATION_SERVICE.getStateHandler().getServerXRot()
             );
 
 
@@ -467,13 +465,13 @@ public class InteractionUtils {
 
         boolean canPlace = true;
         if (rotate) {
-            float yaw = (float) getYawToVec(MC.player, center);
-            float pitch = (float) getPitchToVec(MC.player, center);
+            float yaw = (float) getYRotToVec(MC.player, center);
+            float pitch = (float) getXRotToVec(MC.player, center);
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(rotationId, 8, yaw, pitch));
 
             boolean insideBox = blockBox.contains(MC.player.getEyePosition());
 
-            EntityHitResult serverCheck = raycastAABBFromPlayer(MC.player, blockBox, range, ROTATION_SERVICE.getStateHandler().getServerYaw(), ROTATION_SERVICE.getStateHandler().getServerPitch());
+            EntityHitResult serverCheck = raycastAABBFromPlayer(MC.player, blockBox, range, ROTATION_SERVICE.getStateHandler().getServerYRot(), ROTATION_SERVICE.getStateHandler().getServerXRot());
 
 
             canPlace = insideBox || serverCheck != null;
@@ -589,8 +587,8 @@ public class InteractionUtils {
             ROTATION_SERVICE.getRequestHandler().submit(new RotationRequest(
                     rotationId,
                     3,
-                    (float) getYawToVec(MC.player, center),
-                    (float) getPitchToVec(MC.player, center)
+                    (float) getYRotToVec(MC.player, center),
+                    (float) getXRotToVec(MC.player, center)
             ));
 
             if (!ROTATION_SERVICE.getRequestHandler().isCompleted(rotationId)) {
