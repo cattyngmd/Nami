@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static namidevelopment.kiriyaga.api.NamiApi.*;
+import static namidevelopment.kiriyaga.api.util.BlockUtils.withinLevelHeight;
 import static namidevelopment.kiriyaga.api.util.PacketUtils.sendSequencedPacket;
 import static namidevelopment.kiriyaga.api.util.RotationUtils.*;
 import static net.minecraft.world.InteractionHand.MAIN_HAND;
@@ -108,6 +109,9 @@ public class InteractionUtils {
     // TODO: figure out how to place on interactable blocks without manually sneaking
     public static boolean placeBlock(BlockPos pos, Item item, boolean swapBack, double range, boolean rotate, boolean strictDirection, boolean simulate, boolean swing, String rotationId, boolean multitask) {
         if (!MC.level.getBlockState(pos).canBeReplaced())
+            return false;
+
+        if (!withinLevelHeight(pos))
             return false;
 
         if (!multitask && MC.player.isUsingItem())
@@ -417,6 +421,7 @@ public class InteractionUtils {
         return dirs;
     }
 
+    @Deprecated
     public static void airPlace(BlockHitResult target, boolean grim, boolean swing) {
         if (grim) {
             MC.getConnection().send(new ServerboundPlayerActionPacket(
@@ -442,6 +447,9 @@ public class InteractionUtils {
 
         public static boolean airPlace(BlockPos pos, Direction direction, Item item, boolean swapBack, double range, boolean rotate, boolean grim, boolean simulate, boolean swing, String rotationId, boolean multitask) {
         if (!MC.level.getBlockState(pos).canBeReplaced())
+            return false;
+
+        if (!withinLevelHeight(pos))
             return false;
 
         if (!multitask && MC.player.isUsingItem())
