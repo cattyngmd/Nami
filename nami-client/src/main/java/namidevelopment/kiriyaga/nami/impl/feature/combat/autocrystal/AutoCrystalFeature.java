@@ -41,6 +41,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -63,7 +64,7 @@ import static namidevelopment.kiriyaga.api.util.entity.PlayerUtils.isBroken;
 @RegisterFeature
 public class AutoCrystalFeature extends Feature {
     public enum Sequential {NONE, FULL }
-    
+
     //place
     public final BoolSetting doPlace = addSetting(new BoolSetting("Place", true));
     public final DoubleSetting placeRange = addSetting(new DoubleSetting("PlaceRange","Range", 6.0, 1.0, 6.0));
@@ -117,6 +118,10 @@ public class AutoCrystalFeature extends Feature {
     private volatile Future<?> runningTask;
     private final AtomicReference<PlaceTarget> asyncBest = new AtomicReference<>();
     private volatile PlaceTarget bestPlace;
+
+    private int cachedChunkX = Integer.MIN_VALUE;
+    private int cachedChunkZ = Integer.MIN_VALUE;
+    private ChunkAccess cachedChunk;
 
     public AutoCrystalFeature() {
         super("AutoCrystal", "Automatically places and break crystals to kill people, if you are good enough!.", FeatureCategory.of("Combat"), "autocrystal", "ac", "crystalaura");
@@ -638,13 +643,15 @@ public class AutoCrystalFeature extends Feature {
         int hits = 0;
         int misses = 0;
 
+        DamageUtils.ExposureContext ctx = new DamageUtils.ExposureContext(Vec3.ZERO, Vec3.ZERO);
+
         for (double x = 0; x <= dx; x += dx / steps) {
             for (double y = 0; y <= dy; y += dy / steps) {
                 for (double z = 0; z <= dz; z += dz / steps) {
 
                     Vec3 pos = new Vec3(box.minX + x, box.minY + y, box.minZ + z);
-
-                    if (raycastForSnapshot(pos, source, snap) == null) {
+                    ctx.set(pos, source);
+                    if (raycastForSnapshot(ctx, snap) == null) {
                         misses++;
                     }
 
@@ -656,21 +663,19 @@ public class AutoCrystalFeature extends Feature {
         return hits == 0 ? 0f : (float) misses / hits;
     }
 
-    private BlockHitResult raycastForSnapshot(Vec3 start, Vec3 end, AutoCrystalSnapshot snap) {
+    private BlockHitResult raycastForSnapshot(DamageUtils.ExposureContext ctx, AutoCrystalSnapshot snap) {
         return BlockGetter.traverseBlocks(
-                start, end,
-                new DamageUtils.ExposureContext(start, end),
-                (ctx, pos) -> {
+                ctx.start(), ctx.end(),
+                ctx,
+                (context, pos) -> {
 
                     if (snap.ignoredBlocks() != null && snap.ignoredBlocks().contains(pos))
                         return null;
 
-                    BlockState state = snap.level().getBlockState(pos);
-
-                    return state.getCollisionShape(snap.level(), pos)
-                            .clip(ctx.start(), ctx.end(), pos);
+                    BlockState state = getBlockFast(snap.level(), pos);
+                    return state.getCollisionShape(snap.level(), pos).clip(context.start(), context.end(), pos);
                 },
-                ctx -> null
+                context -> null
         );
     }
 
@@ -810,6 +815,38 @@ public class AutoCrystalFeature extends Feature {
                 return true;
         }
         return false;
+    }
+
+    private BlockState getBlockFast(Level level, BlockPos pos) {
+
+        if (level.isOutsideBuildHeight(pos.getY())) {
+            return Blocks.VOID_AIR.defaultBlockState();
+        }
+
+        int chunkX = pos.getX() >> 4;
+        int chunkZ = pos.getZ() >> 4;
+
+        if (cachedChunkX != chunkX || cachedChunkZ != chunkZ) {
+            cachedChunk = level.getChunk(chunkX, chunkZ);
+            cachedChunkX = chunkX;
+            cachedChunkZ = chunkZ;
+        }
+
+        var chunk = cachedChunk;
+
+        if (chunk != null) {
+            var section = chunk.getSections()[level.getSectionIndex(pos.getY())];
+
+            if (section != null && !section.hasOnlyAir()) {
+                return section.getBlockState(
+                        pos.getX() & 15,
+                        pos.getY() & 15,
+                        pos.getZ() & 15
+                );
+            }
+        }
+
+        return Blocks.AIR.defaultBlockState();
     }
 
     private record PlaceTarget(BlockPos pos, float totalDamage) {}

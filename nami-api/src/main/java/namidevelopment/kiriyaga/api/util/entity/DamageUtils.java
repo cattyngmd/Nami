@@ -154,11 +154,19 @@ public class DamageUtils {
         int steps = 2;
         int hits = 0, misses = 0;
 
+        ExposureContext ctx = new ExposureContext(Vec3.ZERO, Vec3.ZERO);
+
         for (double x = 0; x <= dx; x += dx / steps) {
             for (double y = 0; y <= dy; y += dy / steps) {
                 for (double z = 0; z <= dz; z += dz / steps) {
+
                     Vec3 pos = new Vec3(box.minX + x, box.minY + y, box.minZ + z);
-                    if (raycast(new ExposureContext(pos, source), provider) == null) misses++;
+
+                    ctx.set(pos, source);
+
+                    if (raycast(ctx, provider) == null)
+                        misses++;
+
                     hits++;
                 }
             }
@@ -171,7 +179,28 @@ public class DamageUtils {
         return BlockGetter.traverseBlocks(context.start, context.end, context, provider, ctx -> null);
     }
 
-    public record ExposureContext(Vec3 start, Vec3 end) {}
+    public static final class ExposureContext {
+        private Vec3 start;
+        private Vec3 end;
+
+        public ExposureContext(Vec3 start, Vec3 end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public void set(Vec3 start, Vec3 end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public Vec3 start() {
+            return start;
+        }
+
+        public Vec3 end() {
+            return end;
+        }
+    }
 
     @FunctionalInterface
     public interface BlockRaycastProvider extends BiFunction<ExposureContext, net.minecraft.core.BlockPos, BlockHitResult> {}
