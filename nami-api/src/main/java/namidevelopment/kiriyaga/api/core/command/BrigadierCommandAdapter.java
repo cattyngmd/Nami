@@ -115,46 +115,6 @@ public class BrigadierCommandAdapter {
             return DoubleArgumentType.getDouble(ctx, name);
         }
 
-        if (arg instanceof CommandArgument.StringArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.ActionArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.FeatureArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.SettingArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.KeyBindArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.ConfigNameArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.IdentifierArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.OnlinePlayerArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.FriendArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
-        if (arg instanceof CommandArgument.FriendNameArg) {
-            return StringArgumentType.getString(ctx, name);
-        }
-
         return StringArgumentType.getString(ctx, name);
     }
 
