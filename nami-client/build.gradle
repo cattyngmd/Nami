@@ -54,7 +54,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    implementation project(path: ":nami-api", configuration: "namedElements")
+    include implementation(project(path: ":nami-api", configuration: "namedElements"))
 }
 
 java {
