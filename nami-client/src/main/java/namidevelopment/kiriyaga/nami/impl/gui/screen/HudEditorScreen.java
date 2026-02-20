@@ -4,18 +4,14 @@ import namidevelopment.kiriyaga.api.model.feature.Feature;
 import namidevelopment.kiriyaga.api.model.feature.FeatureCategory;
 import namidevelopment.kiriyaga.api.model.feature.HudElementFeature;
 import namidevelopment.kiriyaga.nami.impl.feature.client.ClickGuiFeature;
-import namidevelopment.kiriyaga.nami.impl.gui.base.BasePanel;
 import namidevelopment.kiriyaga.nami.impl.gui.base.NamiScreen;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.CategoryPanel;
 import namidevelopment.kiriyaga.nami.impl.gui.component.panel.FeaturePanel;
 import namidevelopment.kiriyaga.api.util.ChatAnimationHelper;
-import namidevelopment.kiriyaga.nami.impl.gui.component.panel.settings.KeyBindSettingPanel;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -279,18 +275,35 @@ public class HudEditorScreen extends NamiScreen {
 
     private void dragHudElement(double mouseX, double mouseY) {
         int chatAnimationOffset = (int) ChatAnimationHelper.getAnimationOffset();
-
-        int newRenderX = (int) mouseX - dragOffsetX;
-        int newRenderY = (int) (mouseY - dragOffsetY + chatAnimationOffset);
-
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
+        int absoluteX = (int) mouseX - dragOffsetX;
+        int absoluteY = (int) (mouseY - dragOffsetY + chatAnimationOffset);
 
-        newRenderY = Math.max(1, Math.min(newRenderY, screenHeight - draggingElement.height - 1));
-        newRenderX = Math.max(1, Math.min(newRenderX, screenWidth - draggingElement.width - 1));
+        absoluteY = Math.max(1, Math.min(absoluteY, screenHeight - draggingElement.height - 1));
+        absoluteX = Math.max(1, Math.min(absoluteX, screenWidth - draggingElement.width - 1));
+        Rectangle bounds = draggingElement.getBoundingBox();
 
-        draggingElement.x.set(newRenderX / (double) screenWidth);
-        draggingElement.y.set(newRenderY / (double) screenHeight);
+        int posX;
+
+        switch (draggingElement.alignment.get()) {
+            case LEFT -> posX = absoluteX;
+            case CENTER -> posX = absoluteX + bounds.width / 2 + bounds.x;
+            case RIGHT -> posX = absoluteX + bounds.width + bounds.x;
+            default -> posX = absoluteX;
+        }
+
+
+        Rectangle newBounds = new Rectangle(absoluteX, absoluteY, draggingElement.width, draggingElement.height);
+        if (overlap(draggingElement, newBounds)) {
+            return;
+        }
+
+        double relativeX = posX / (double) screenWidth;
+        double relativeY = absoluteY / (double) screenHeight;
+
+        draggingElement.x.set(relativeX);
+        draggingElement.y.set(relativeY);
     }
 
     @Override
@@ -311,6 +324,21 @@ public class HudEditorScreen extends NamiScreen {
 
     @Override
     public boolean isPauseScreen() {
+        return false;
+    }
+
+    private boolean overlap(HudElementFeature current, Rectangle newBounds) {
+        for (Feature feature : FEATURE_SERVICE.getStorage().getByCategory(FeatureCategory.of("HUD"))) {
+            if (!(feature instanceof HudElementFeature other)) continue;
+            if (!other.isEnabled()) continue;
+            if (other == current) continue;
+
+            Rectangle otherBounds = new Rectangle(other.getRenderX(), other.getRenderY(), other.width, other.height);
+
+            if (newBounds.intersects(otherBounds)) {
+                return true;
+            }
+        }
         return false;
     }
 }
