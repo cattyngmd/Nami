@@ -94,7 +94,7 @@ The default command prefix is `-`.
     ```
 
 The compiled JAR will be located at:  
-`build/libs/nami-<version>.jar`
+`./<project>/build/libs/nami-<version>.jar`
 
 nami-client is packaged with nami-api inside of it.
 
