@@ -168,46 +168,6 @@ public class BrigadierCommandAdapter {
             return DoubleArgumentType.doubleArg();
         }
 
-        if (arg instanceof CommandArgument.StringArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.ActionArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.FeatureArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.SettingArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.KeyBindArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.ConfigNameArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.IdentifierArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.OnlinePlayerArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.FriendArg) {
-            return last ? greedyString() : word();
-        }
-
-        if (arg instanceof CommandArgument.FriendNameArg) {
-            return last ? greedyString() : word();
-        }
-
         return last ? greedyString() : word();
     }
 
